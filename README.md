@@ -1,4 +1,4 @@
-# hasanabi.neocities.org
+# HasanAbi Chat Thing
 
 A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/hasanabi),
 hosted on Neocities. Live at <https://hasanabi.neocities.org/>.

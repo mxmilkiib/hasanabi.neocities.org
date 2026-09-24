@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23e8a33d" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>'>
-<title>HasanAbi chat</title>
+<title>HasanAbi Chat Thing</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible&family=Fira+Code:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=Inter&family=JetBrains+Mono:wght@400;600&family=Lexend:wght@400;600&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3&family=VT323&display=swap">
 <style>
@@ -1172,12 +1172,12 @@
         setDot(chatState);
         dotEl.title = `stream status unavailable · ${chatTxt}`;
         infoEl.textContent = chatState === 'connected' ? '' : chatTxt;
-        document.title = 'HasanAbi chat';
+        document.title = 'HasanAbi Chat Thing';
       } else {
         setDot('connecting');
         dotEl.title = `checking stream status · ${chatTxt}`;
         infoEl.textContent = '';
-        document.title = 'HasanAbi chat';
+        document.title = 'HasanAbi Chat Thing';
       }
       return;
     }
@@ -1213,7 +1213,7 @@
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
       infoEl.innerHTML = `offline${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
-      document.title = 'HasanAbi chat';
+      document.title = 'HasanAbi Chat Thing';
       return;
     }
     const mins = stream.startedAt ? Math.round((Date.now() - stream.startedAt) / 60000) : null;
@@ -1225,7 +1225,7 @@
     infoEl.textContent = (since ? `live since ${since} · up ${up}` : 'live') + viewers + chatSuffix;
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
-    document.title = 'HasanAbi chat';
+    document.title = 'HasanAbi Chat Thing';
   }
 
   function setStatus(state) {
