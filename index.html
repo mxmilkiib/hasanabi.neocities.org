@@ -592,6 +592,7 @@
   // <img> tags - fixes rows drawn before the emote map arrived and rows
   // restored from localStorage.
   function retokenizeRows() {
+    histDirty = true;
     const walker = document.createTreeWalker(mainEl, NodeFilter.SHOW_TEXT);
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
@@ -815,7 +816,7 @@
       if (kind === 'CLEARMSG') {
         // single-message deletion: mark the referenced row like chatterino
         const row = rowById.get(tags['target-msg-id']);
-        if (row) row.classList.add('deleted');
+        if (row) { row.classList.add('deleted'); histDirty = true; }
         continue;
       }
       const name = tags['display-name'] || '(unknown)';
@@ -901,6 +902,7 @@
               `${msgHtml}${SUB_MODES[subMode] === 'left' ? '' : auxHtml}</div>`;
     }
     queue = [];
+    histDirty = true;
     activeEl.insertAdjacentHTML('beforeend', html);
     const kids = activeEl.children;
     for (let i = kids.length - 1; i >= 0 && kids[i].dataset.mid && !rowById.has(kids[i].dataset.mid); i--)
@@ -927,6 +929,7 @@
   const rateSamples = [];
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
+  let sparkCols = null; // theme colours, resolved once instead of per draw
 
   function sparkSize() {
     const n = SPARK_WINDOWS[sparkWinIdx];
@@ -943,11 +946,18 @@
     const SPARK_N = SPARK_WINDOWS[sparkWinIdx];
     const SPARK_W = SPARK_N;
     sparkCtx.clearRect(0, 0, SPARK_W, SPARK_H);
-    const styles = getComputedStyle(document.documentElement);
+    if (!sparkCols) {
+      const styles = getComputedStyle(document.documentElement);
+      sparkCols = {
+        line: styles.getPropertyValue('--line') || '#262a35',
+        accent: styles.getPropertyValue('--accent') || '#e8a33d',
+        danger: styles.getPropertyValue('--danger') || '#e85d5d',
+      };
+    }
     const step = SPARK_W / (SPARK_N - 1); // ~1px per sample
     // faint vertical tick every 10s counting back from the newest; each
     // minute mark draws a touch thicker
-    sparkCtx.strokeStyle = styles.getPropertyValue('--line') || '#262a35';
+    sparkCtx.strokeStyle = sparkCols.line;
     for (let k = 0; ; k++) {
       const x = Math.round((SPARK_N - 1 - k * 10) * step) + .5;
       if (x < 0) break;
@@ -961,7 +971,7 @@
     }
     const n = rateSamples.length;
     if (!n) return;
-    const accent = styles.getPropertyValue('--accent') || '#e8a33d';
+    const accent = sparkCols.accent;
     const max = Math.max(1, ...rateSamples);
     sparkCtx.beginPath();
     for (let i = 0; i < n; i++) {
@@ -980,7 +990,7 @@
     sparkCtx.fill();
     sparkCtx.globalAlpha = 1;
     // seconds with more than two glorp/F messages get a red segment
-    const danger = styles.getPropertyValue('--danger') || '#e85d5d';
+    const danger = sparkCols.danger;
     sparkCtx.strokeStyle = danger;
     sparkCtx.lineWidth = 2;
     for (let i = 0; i < n; i++) {
@@ -1229,6 +1239,7 @@
     themeBtn.textContent = THEME_ICONS[themeMode] || '◐';
     themeBtn.title = `Theme: ${themeMode} - click or scroll to cycle, right-click for system`;
     helpPanel.querySelectorAll('.helpTheme').forEach((a) => { a.classList.toggle('on', a.dataset.theme === themeMode); });
+    sparkCols = null; // re-resolve canvas colours against the new theme
   }
 
   function stepTheme(dir) {
@@ -1637,6 +1648,7 @@
 
   // ---- local history: keep recent rows across reloads ----
   const HISTORY_KEY = 'hasan-history';
+  let histDirty = false; // set when rows render or mutate
   function saveHistory() {
     try {
       const rows = [...logEl.children, ...sideEl.children].filter((r) => r.classList.contains('row'));
@@ -1659,7 +1671,9 @@
   restoreHistory();
   window.addEventListener('pagehide', saveHistory);
   window.addEventListener('beforeunload', saveHistory);
-  setInterval(saveHistory, 15000);
+  // the periodic save is skipped while nothing rendered, so an idle page
+  // isn't serializing 250 rows every 15s
+  setInterval(() => { if (histDirty) { histDirty = false; saveHistory(); } }, 15000);
 
   // ---- relay iframe: handles the Twitch socket and its own reconnects ----
   const relayFrame = document.createElement('iframe');
