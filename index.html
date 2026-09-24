@@ -330,6 +330,7 @@
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   select.hdr-btn { padding-right: 4px; }
   select.hdr-btn option { background: var(--panel); color: var(--text); }
+  .hdr-lbl { color: var(--text-dim); font-size: 11px; align-self: center; white-space: nowrap; }
   .subr { float: right; }
   #subBtn { width: 30px; padding: 0 6px; display: flex; align-items: center; }
   #helpPanel {
@@ -368,6 +369,7 @@
     <div><b>Ⓢ</b> sub badge — the [sub N] chip marks how many months that chatter has been subscribed; cycles hidden / left of name / right edge of the row</div>
     <div><b>▮▮</b> page-flip columns — one fills top-to-bottom, then flips to the other; scroll or click</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
+    <div><b>?</b> cycles off → this panel → labels before each header control</div>
     <div><b>graph</b> — messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
     <div><b>dot</b> — stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
     <div><b>amber rows</b> @hasanabi mentions · <b>red rows</b> GLORP / F · <b>red tint</b> channel-point highlights</div>
@@ -966,6 +968,7 @@
         sub: subMode,
         zebra: mainEl.classList.contains('zebra'),
         shadow: mainEl.classList.contains('shadowed'),
+        help: helpMode,
       }));
     } catch (e) {}
   }
@@ -987,6 +990,7 @@
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = o.sub; applySubMode(); }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
     if (typeof o.shadow === 'boolean') setShadow(o.shadow);
+    if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
   }
 
   // ---- header collapse: button shrinks it to a thin strip, clicking the
@@ -1069,12 +1073,37 @@
   }, { passive: false });
   setShadow(false);
 
-  // ---- help panel ----
-  helpBtn.addEventListener('click', () => {
-    const show = helpPanel.hidden;
-    helpPanel.hidden = !show;
-    helpBtn.classList.toggle('on', show);
-  });
+  // ---- help: cycle off → popup panel → inline labels before each control ----
+  const HELP_MODES = ['off', 'panel', 'labels'];
+  let helpMode = 0;
+  const HDR_LABELS = [
+    [themeBtn, 'theme'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
+    [fontSel, 'font'], [fontBtn, 'size'], [lhBtn, 'height'],
+    [linesBtn, 'lines'], [subBtn, 'sub'], [splitBtn, 'cols'], [sparkEl, 'rate'],
+  ];
+  for (const [el, txt] of HDR_LABELS) {
+    const s = document.createElement('span');
+    s.className = 'hdr-lbl';
+    s.textContent = txt;
+    s.hidden = true;
+    el.parentNode.insertBefore(s, el);
+  }
+
+  function applyHelp() {
+    helpPanel.hidden = helpMode !== 1;
+    document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode !== 2; });
+    helpBtn.classList.toggle('on', helpMode !== 0);
+    helpBtn.title = `Help: ${HELP_MODES[helpMode]} — click or scroll to cycle`;
+  }
+
+  function stepHelp(dir) {
+    helpMode = (helpMode + dir + HELP_MODES.length) % HELP_MODES.length;
+    applyHelp();
+    saveOpts();
+  }
+
+  helpBtn.addEventListener('click', () => stepHelp(1));
+  helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY < 0 ? 1 : -1); }, { passive: false });
 
   linesBtn.addEventListener('click', () => { setLines(mainEl.classList.contains('nolines')); saveOpts(); });
   linesBtn.addEventListener('wheel', (e) => {
