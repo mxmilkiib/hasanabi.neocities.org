@@ -266,6 +266,7 @@
   .role.bits { color: var(--accent); }
   .role.first { color: var(--text-dim); }
   .row.notice { color: var(--text-dim); font-style: italic; }
+  .row.htag { font-style: italic; }
   .row.points { background-color: rgba(232, 93, 93, .12); }
   main.zebra .row:nth-child(even) {
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07));
@@ -660,7 +661,8 @@
       const role = roleTag(tags);
       const profile = escapeHTML(encodeURIComponent(login || name.toLowerCase()));
       const fossa = (login || name).toLowerCase() === 'fossabot';
-      const shimmer = fossa || (login || name).toLowerCase() === 'blammobot';
+      const blammo = (login || name).toLowerCase() === 'blammobot';
+      const shimmer = fossa || blammo;
       const points = tags['msg-id'] === 'highlighted-message';
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim()) ||
                     (fossa && /trigger is pulled.*bullet fired/i.test(message));
@@ -681,13 +683,17 @@
         reply = `<span class="reply" data-pid="${escapeHTML(pid)}" title="${escapeHTML(pname + ': ' + pbody)}">` +
                 `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
       }
-      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}"` +
+      const htag = /#(?:trivia|scramble|roulette)\b/i.test(message);
+      let msgHtml = fossa && /[⠀-⣿]/.test(message)
+        ? message.split(' ').map(escapeHTML).join('<br>')
+        : renderMessageHTML(message, tags.emotes);
+      if (blammo) msgHtml = msgHtml.replace(/\[(Roulette|Scramble|Trivia)\]/g, '<b>[$1]</b>');
+      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' ? auxHtml : ''}${reply}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
-              `${fossa && /[⠀-⣿]/.test(message) ? message.split(' ').map(escapeHTML).join('<br>') : renderMessageHTML(message, tags.emotes)}` +
-              `${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
+              `${msgHtml}${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
     }
     queue = [];
     activeEl.insertAdjacentHTML('beforeend', html);
