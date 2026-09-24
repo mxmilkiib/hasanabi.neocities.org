@@ -16,6 +16,14 @@ so the official Twitch embed, jChat, and any direct socket are all impossible.
 `frame-src` is unrestricted though, so the page embeds a hidden iframe relay
 hosted on GitHub Pages (which sends no CSP) and talks to it with `postMessage`.
 
+The split is therefore by network privilege, not by concern: the frontend
+owns all presentation and state, while the relay owns every outbound
+connection. Because the relay learns its channel from the `join` message
+rather than anything hardcoded, it is channel-agnostic — any page on any
+CSP-locked host can embed the same iframe for any Twitch channel, one
+channel per iframe instance. The hasanabi specifics all live in this file;
+the relay could just as well serve a completely different channel page.
+
 ## Frontend — `index.html` (this repo, on Neocities)
 
 Everything runs client-side in one file:
@@ -46,7 +54,9 @@ Repo: <https://github.com/mxmilkiib/twitch-chat-relay> — also a single
 `index.html`, loaded as a hidden iframe from
 `https://mxmilkiib.github.io/twitch-chat-relay/`.
 
-It does the network work the CSP forbids on Neocities:
+Channel-agnostic by design: it takes the target channel from the embedder's
+`join` message and derives everything else from it. It does the network work
+the CSP forbids on Neocities:
 
 - Connects to Twitch IRC over WebSocket as an anonymous `justinfan`
   user, requests `tags` + `commands` capabilities, handles
