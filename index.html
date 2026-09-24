@@ -1028,18 +1028,17 @@
         endTs = lastVod.end; startTs = lastVod.start || startTs; approx = false;
       }
       if (!endTs && lbEnd) { endTs = lbEnd; approx = true; }
-      let endedTxt = '';
-      if (endTs) endedTxt = ` · <b>ended:</b> ${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
       let ranTxt = '';
       if (endTs) {
+        const ago = `${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
         ranTxt = startTs
-          ? ` · <b>finished:</b> ${fmtTime(endTs)} after ${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))} (started ${fmtTime(startTs)})`
-          : ` · <b>last ended at</b> ${fmtTime(endTs)}`;
+          ? ` · <b>started:</b> ${fmtTime(startTs)}, <b>finished</b> ${ago} at ${fmtTime(endTs)} after ${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}`
+          : ` · <b>finished</b> ${ago} at ${fmtTime(endTs)}`;
       } else if (startTs) {
         ranTxt = ` · <b>last went live at</b> ${fmtTime(startTs)}`;
       }
-      dotEl.title = `${CHANNEL} is offline${(endedTxt + ranTxt).replace(/<[^>]+>/g, '')} · ${chatTxt}`;
-      infoEl.innerHTML = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
+      dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
+      infoEl.innerHTML = `offline${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
       document.title = 'HasanAbi chat';
       return;
     }
