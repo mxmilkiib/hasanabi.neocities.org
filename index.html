@@ -1206,10 +1206,10 @@
       if (endTs) {
         const ago = `${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
         ranTxt = startTs
-          ? ` · <b>started:</b> ${fmtTime(startTs)}${dayTag(startTs)}, <b>finished</b> ${ago} at ${fmtTime(endTs)} after ${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}`
-          : ` · <b>finished</b> ${ago} at ${fmtTime(endTs)}`;
+          ? ` · started: <b>${fmtTime(startTs)}${dayTag(startTs)}</b>, finished <b>${ago} at ${fmtTime(endTs)}</b> after <b>${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}</b>`
+          : ` · finished <b>${ago} at ${fmtTime(endTs)}</b>`;
       } else if (startTs) {
-        ranTxt = ` · <b>last went live at</b> ${fmtTime(startTs)}${dayTag(startTs)}`;
+        ranTxt = ` · last went live at <b>${fmtTime(startTs)}${dayTag(startTs)}</b>`;
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
       infoEl.innerHTML = `offline${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
@@ -1222,7 +1222,8 @@
     const viewers = stream.viewers != null ? ` · ${stream.viewers.toLocaleString()} watching` : '';
     const chatSuffix = chatState === 'connected' ? '' : ` · ${chatTxt}`;
     setDot('connected');
-    infoEl.textContent = (since ? `live since ${since} · up ${up}` : 'live') + viewers + chatSuffix;
+    infoEl.innerHTML = (since ? `live since <b>${since}</b> · up <b>${up}</b>` : 'live') +
+      (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') + chatSuffix;
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
     document.title = 'HasanAbi Chat Thing';
@@ -1238,10 +1239,10 @@
   function onRoomState(tags) {
     const chips = [];
     const slow = parseInt(tags.slow || '0', 10);
-    if (slow > 0) chips.push(`<b>slow</b> ${slow}s`);
+    if (slow > 0) chips.push(`slow <b>${slow}s</b>`);
     const foll = parseInt(tags['followers-only'] || '-1', 10);
-    if (foll === 0) chips.push('<b>follow age restriction</b>');
-    else if (foll > 0) chips.push(`<b>follow age restriction:</b> ${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}`);
+    if (foll === 0) chips.push('follow age restriction');
+    else if (foll > 0) chips.push(`follow age restriction: <b>${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}</b>`);
     if (tags['emote-only'] === '1') chips.push('emote');
     if (tags['subs-only'] === '1') chips.push('subs');
     if (tags.r9k === '1') chips.push('r9k');
