@@ -574,6 +574,13 @@
         const src = escapeHTML(`https://media.giphy.com/media/${giphy[1]}/giphy.gif`);
         return `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`;
       }
+      // twitter/x links display as twitter.com but route through a nitter
+      // instance so they work without a login
+      const tw = tok.match(/^(?:https?:\/\/)?(?:www\.|mobile\.)?(?:x\.com|twitter\.com)(\/\S*)?$/i);
+      if (tw) {
+        const path = tw[1] || '';
+        return `<a href="${escapeHTML(`https://nitter.tiekoetter.com${path}`)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`;
+      }
       if (/^https?:\/\/\S+$/i.test(tok) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn)(?:[?\/#]\S*)?$/i.test(tok)) {
         const u = escapeHTML(/^https?:\/\//i.test(tok) ? tok : `https://${tok}`);
@@ -632,7 +639,6 @@
     const out = [];
     const badges = tags.badges || '';
     if (badges.includes('broadcaster/')) out.push('<span class="role host">[host]</span>');
-    else if (badges.includes('moderator/')) out.push('<span class="role mod">[-mod-]</span>');
     else if (badges.includes('vip/')) out.push('<span class="role vip">[vip]</span>');
     return out.join(' ');
   }
@@ -698,8 +704,9 @@
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim()) ||
                     (fossa && /trigger is pulled.*bullet fired/i.test(message));
       if (glorp) glorpTimestamps.push(Date.now());
-      // auxiliary chips: sub months (subject to Ⓢ mode), bits, first-message
+      // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
+      if ((tags.badges || '').includes('moderator/')) aux.push('<span class="role mod">[-mod-]</span>');
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       if (subM) aux.push(`<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>[sub ${subM[1].padStart(2, '0')}]</span>`);
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
