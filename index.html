@@ -365,6 +365,8 @@
   #spark { width: 120px; height: 18px; flex: none; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  /* keep the ? button clickable above the help panel when they overlap */
+  #helpBtn { position: relative; z-index: 11; }
   select.hdr-btn { padding-right: 4px; }
   select.hdr-btn option { background: var(--panel); color: var(--text); }
   .hdr-lbl { color: var(--text-dim); font-size: 13px; align-self: center; white-space: nowrap; }
@@ -410,7 +412,7 @@
     #fontSel { max-width: 92px; }
     #spark { max-width: 70px; }
     .rate { font-size: 13px; }
-    #helpPanel { left: 8px; right: 8px; top: 8px; max-width: none; max-height: 70vh; }
+    #helpPanel { left: 8px; right: 8px; max-width: none; max-height: 70vh; }
     .col { padding: 6px 10px 6px 8px; }
   }
 </style>
@@ -1595,6 +1597,8 @@
 
   function applyHelp() {
     helpPanel.hidden = helpMode !== 1;
+    // anchor below whatever height the header currently wraps to
+    if (helpMode === 1) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
     document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode !== 2; });
     helpBtn.classList.toggle('on', helpMode !== 0);
     helpBtn.title = `Help: ${HELP_MODES[helpMode]} - click toggles panel, scroll cycles to labels`;
@@ -1612,6 +1616,10 @@
     saveOpts();
   });
   helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  // header height changes with width when the controls wrap - re-anchor
+  window.addEventListener('resize', () => {
+    if (!helpPanel.hidden) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
+  });
   document.getElementById('resetOpts').addEventListener('click', () => {
     try {
       localStorage.removeItem(OPTS_KEY);
