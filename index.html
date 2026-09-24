@@ -193,6 +193,7 @@
   .dot.connecting { background: var(--accent); }
   .dot.connected { background: var(--good); }
   .dot.offline { background: var(--text-dim); }
+  .dot.idle { background: var(--accent); }
   .dot.reconnecting { background: var(--danger); }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
   @media (prefers-reduced-motion: reduce) {
@@ -959,7 +960,8 @@
       return;
     }
     if (!stream.live) {
-      dotEl.className = 'dot offline';
+      const idle = chatState === 'connected';
+      dotEl.className = 'dot ' + (idle ? 'idle' : 'offline');
       // end is exact when the live-off transition was seen, else the last
       // live poll timestamp approximates it - prefixed '~' in that case
       const endTs = lastRun && (lastRun.ended || lastRun.seen);
@@ -974,7 +976,7 @@
       }
       dotEl.title = `${CHANNEL} is offline${endedTxt}${ranTxt} · ${chatTxt}`;
       infoEl.innerHTML = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
-      document.title = '🔴 HasanAbi chat';
+      document.title = (idle ? '🟡 ' : '🔴 ') + 'HasanAbi chat';
       return;
     }
     const mins = stream.startedAt ? Math.round((Date.now() - stream.startedAt) / 60000) : null;
