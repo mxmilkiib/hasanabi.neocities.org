@@ -740,12 +740,18 @@
         : renderMessageHTML(message, tags.emotes);
       if (blammo) {
         // bracketed tags ([Roulette], [Scramble], ...) get a bold chip
-        // shaded by the tag text's hash, so matching games share a hue
+        // shaded by the tag text's hash, so matching games share a hue;
+        // Trivia and Roulette are pinned to each other's hash colours
+        const TAG_HUES = { trivia: 108, roulette: 323 };
         msgHtml = msgHtml
           .replace(/\[([A-Za-z][^\[\]&<>]{0,18})\]/g, (m, g) => {
-            let h = 0;
-            for (const c of g) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-            return `<b class="tag" style="background:hsl(${h % 360} 60% 45%/.3)">[${g}]</b>`;
+            let h = TAG_HUES[g.toLowerCase()];
+            if (h == null) {
+              h = 0;
+              for (const c of g) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+              h %= 360;
+            }
+            return `<b class="tag" style="background:hsl(${h} 60% 45%/.3)">[${g}]</b>`;
           })
           .replace(/(the (?:answer|word) was:?\s*)&quot;(.+?)&quot;\s*$/i, '$1&quot;<b>$2</b>&quot;')
           .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>')
