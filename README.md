@@ -62,27 +62,45 @@ Relay → parent:
 
 ## Frontend — `index.html` (this repo, on Neocities)
 
-Everything runs client-side in one file:
+Everything runs client-side in one file — no build step, no framework,
+no dependencies beyond CDN-hosted fonts:
 
 - **Chat rendering** — raw Twitch IRC lines parsed into rows: timestamps,
   linked names, badges/role chips ([ mod. ], [sub N], [bits], [first]),
-  reply chips with jump-to-original, emote retokenization.
-- **Emotes** — native Twitch `emotes` tags plus 7TV, BTTV and FFZ sets
-  (name → CDN URL map supplied by the relay).
-- **Header** — stream status dot (live / idle-gold / offline), uptime,
-  viewers, title on hover; offline shows last-run info; ROOMSTATE chat
-  modes (slow, follow age, emote-only, subs-only, r9k).
+  reply chips with jump-to-original, emote retokenization. `/me` actions,
+  `!command` and `#tag` lines render in italics (names, chips and
+  timestamps stay upright), and USERNOTICE subs/raids/gifts become dim
+  italic notice rows showing the system message.
+- **Name colors** — the chatter's own Twitch color when set, a
+  hash-derived palette colour otherwise; either way the luminance is
+  nudged so names stay legible on the active theme (the console theme
+  ignores chatter colors for its phosphor-green palette).
+- **Emotes** — native Twitch `emotes` tags rendered as animated v2
+  images (static fallback), plus 7TV, BTTV and FFZ sets (name → CDN URL
+  map supplied by the relay).
+- **Header** — stream status dot (live / idle-gold / offline); the SVG
+  favicon is rebuilt in the dot's computed color so the tab icon tracks
+  stream state per theme. Uptime, viewers, title on hover; offline shows
+  last-run info; ROOMSTATE chat modes (slow, follow age, emote-only,
+  subs-only, r9k).
 - **Graph** — messages-per-second sparkline with 10s/minute ticks and
   red glorp/F bursts; persisted across reloads.
 - **Controls** — themes, zebra striping, graduated text shadow, font
   picker (incl. dyslexia-friendly), font size, line height, row lines,
   sub-chip alignment, page-flip two-column mode, minimizable header,
-  help panel. All persisted in `localStorage`.
+  help panel. All persisted in `localStorage`; every option answers to
+  click, shift+click (reverse) and the scroll wheel.
+- **Scrolling** — the log follows new messages only while at the
+  bottom; scrolling up releases it and shows a jump-to-latest button
+  (one per column in split mode).
 - **Formatting** — mention highlighting, GLORP/F red rows, channel-point
   tints, fossabot/blammobot name shimmer and game-line styling, braille
-  art restacking, image/GIF embeds, Nitter link rewriting for Twitter/X.
+  art restacking, image/GIF/Giphy embeds, Nitter link rewriting for
+  Twitter/X.
 - **Persistence** — last 250 rows, stream run history and graph samples
   survive reloads via `localStorage`.
+- **Performance** — incoming lines queue and flush once per animation
+  frame; the log is capped at 250 rows.
 
 ## Deploy
 
