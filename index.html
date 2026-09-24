@@ -345,7 +345,7 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #helpPanel b { color: var(--accent); font-weight: 600; }
-  #helpPanel div { margin: 4px 0; }
+  #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 82px 1fr; gap: 0 8px; }
 </style>
 </head>
 <body>
@@ -360,15 +360,15 @@
     <div><b>font menu</b> — pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b> font size, <b>↕</b> line height — click or scroll to cycle, shift+click goes back</div>
     <div><b>≡</b> row separator lines — click or scroll</div>
-    <div><b>Ⓢ</b> sub badge — scroll or click cycles hidden / left of name / right edge of the row</div>
+    <div><b>Ⓢ</b> sub badge — the [sub N] chip marks how many months that chatter has been subscribed; cycles hidden / left of name / right edge of the row</div>
     <div><b>▮▮</b> page-flip columns — one fills top-to-bottom, then flips to the other; scroll or click</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b>graph</b> — messages per second; scroll resizes the window (30s–4m); thin ticks mark 10s, thicker ones each minute</div>
     <div><b>dot</b> — stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
     <div><b>amber rows</b> @hasanabi mentions · <b>red rows</b> GLORP / FLORP / F · <b>red tint</b> channel-point highlights</div>
     <div><b>↩ chip</b> — reply context; click to jump to the original message</div>
-    <div>names link to twitch profiles · fossabot's name shimmers · urls are clickable · images and gifs embed pinned right</div>
-    <div>options persist between visits in localStorage</div>
+    <div><b></b>names link to twitch profiles · fossabot's name shimmers · urls are clickable · images and gifs embed pinned right</div>
+    <div><b></b>options persist between visits in localStorage</div>
   </div>
   <div id="hint" hidden>tip: scroll the wheel over any option to change it — click to dismiss</div>
   <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button></main>
