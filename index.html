@@ -359,6 +359,9 @@
   #helpPanel b.mention { background-color: rgba(232, 163, 61, .13); box-shadow: inset 3px 0 0 var(--accent); }
   #helpPanel b.points { background-color: rgba(232, 93, 93, .12); }
   #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 110px 1fr; gap: 0 8px; }
+  #helpThemeRow a { color: var(--accent); cursor: pointer; text-decoration: none; margin-right: 10px; }
+  #helpThemeRow a:hover { text-decoration: underline; }
+  #helpThemeRow a.on { color: var(--text); text-decoration: underline; cursor: default; }
 </style>
 </head>
 <body>
@@ -384,6 +387,7 @@
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b></b>names link to twitch profiles · fossabot's name shimmers · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage</div>
+    <div><b>themes</b><span id="helpThemeRow"></span></div>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">reset all settings</button>
   </div>
   <div id="hint" hidden>tip: scroll the wheel over any option to change it - click to dismiss</div>
@@ -892,6 +896,7 @@
     namePalette = monoNames ? CONSOLE_COLORS : (lightMode ? LIGHT_COLORS : COLORS);
     themeBtn.textContent = THEME_ICONS[themeMode] || '◐';
     themeBtn.title = `Theme: ${themeMode} - click or scroll to cycle, right-click for system`;
+    helpPanel.querySelectorAll('.helpTheme').forEach((a) => { a.classList.toggle('on', a.dataset.theme === themeMode); });
   }
 
   function stepTheme(dir) {
@@ -905,6 +910,13 @@
   themeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTheme(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   themeBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); themeMode = 'auto'; applyTheme(); saveOpts(); });
   lightMQ.addEventListener('change', () => { if (themeMode === 'auto') applyTheme(); });
+  // theme quick-switch row inside the help panel
+  document.getElementById('helpThemeRow').innerHTML = ['auto', ...THEMES].map((t) =>
+    `<a href="#" class="helpTheme" data-theme="${t}">${t === 'auto' ? 'system' : t}</a>`).join(' ');
+  helpPanel.addEventListener('click', (e) => {
+    const a = e.target.closest('a.helpTheme');
+    if (a) { e.preventDefault(); themeMode = a.dataset.theme; applyTheme(); saveOpts(); }
+  });
   applyTheme();
 
   // ---- text controls: click or scroll to cycle, shift+click goes back ----
