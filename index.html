@@ -324,6 +324,7 @@
   select.hdr-btn { padding-right: 4px; }
   select.hdr-btn option { background: var(--panel); color: var(--text); }
   .subr { float: right; }
+  #subBtn { width: 30px; padding: 0 6px; display: flex; align-items: center; }
   #helpPanel {
     position: fixed;
     top: 34px;
@@ -987,16 +988,25 @@
   // strip restores it ----
   const headerEl = document.querySelector('header');
   const hdrMinBtn = document.getElementById('hdrMin');
-  hdrMinBtn.addEventListener('click', () => {
+  function minHeader() {
     document.body.classList.add('hdrmin');
     saveOpts();
-  });
-  headerEl.addEventListener('click', (e) => {
-    if (!document.body.classList.contains('hdrmin') || e.target === hdrMinBtn) return;
+  }
+  function unminHeader() {
     document.body.classList.remove('hdrmin');
     saveOpts();
     repin();
+  }
+  hdrMinBtn.addEventListener('click', minHeader);
+  hdrMinBtn.addEventListener('wheel', (e) => { e.preventDefault(); minHeader(); }, { passive: false });
+  headerEl.addEventListener('click', (e) => {
+    if (document.body.classList.contains('hdrmin') && e.target !== hdrMinBtn) unminHeader();
   });
+  headerEl.addEventListener('wheel', (e) => {
+    if (!document.body.classList.contains('hdrmin')) return;
+    e.preventDefault();
+    unminHeader();
+  }, { passive: false });
 
   function setLines(on) {
     mainEl.classList.toggle('nolines', !on);
@@ -1010,6 +1020,7 @@
 
   function applySubMode() {
     subBtn.classList.toggle('on', subMode !== 0);
+    subBtn.style.justifyContent = ['center', 'flex-start', 'flex-end'][subMode];
     subBtn.title = `Sub badge: ${SUB_MODES[subMode]} — click or scroll to cycle`;
   }
 
