@@ -738,7 +738,8 @@
           })
           .replace(/(the (?:answer|word) was:?\s*)&quot;(.+?)&quot;\s*$/i, '$1&quot;<b>$2</b>&quot;')
           .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>')
-          .replace(/\b(\d[\d,]* points?)\b/gi, '<b>$1</b>');
+          .replace(/\b(\d[\d,]* points?)\b/gi, '<b>$1</b>')
+          .replace(/\b(hint:\s*)(.+)$/i, '$1<i>$2</i>');
       }
       if (fossa) {
         msgHtml = msgHtml
