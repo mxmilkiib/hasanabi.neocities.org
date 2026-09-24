@@ -528,6 +528,32 @@
 
   const tok2 = (a, n) => a[n] || '';
 
+  // Swaps plain-text third-party emote tokens in already-rendered rows for
+  // <img> tags - fixes rows drawn before the emote map arrived and rows
+  // restored from localStorage.
+  function retokenizeRows() {
+    const walker = document.createTreeWalker(mainEl, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      if (node.parentElement.closest('.time,.reply,.aux,a')) continue;
+      const parts = node.nodeValue.split(/(\s+)/);
+      if (!parts.some((t) => thirdPartyEmotes[t])) continue;
+      const frag = document.createDocumentFragment();
+      for (const tok of parts) {
+        const url = thirdPartyEmotes[tok];
+        if (url) {
+          const img = document.createElement('img');
+          img.className = 'emote';
+          img.src = url;
+          img.alt = img.title = tok;
+          frag.appendChild(img);
+        } else frag.appendChild(document.createTextNode(tok));
+      }
+      node.parentNode.replaceChild(frag, node);
+    }
+  }
+
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
   // and bolding @username mentions like real chat.
   function renderTextHTML(text) {
@@ -580,7 +606,7 @@
         emotes.push({ id, start, end });
       }
     }
-    if (emotes.length === 0) return escapeHTML(message);
+    if (emotes.length === 0) return renderTextHTML(message);
     emotes.sort((a, b) => a.start - b.start);
     let html = '', cursor = 0;
     for (const e of emotes) {
@@ -684,7 +710,7 @@
         reply = `<span class="reply" data-pid="${escapeHTML(pid)}" title="${escapeHTML(pname + ': ' + pbody)}">` +
                 `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
       }
-      const htag = /#(?:trivia|scramble|roulette|top)\b|!(?:gizmo|gimmo)\b/i.test(message);
+      const htag = /#(?:trivia|scramble|roulette|top)\b|!(?:gizmo|gimmo|love)\b/i.test(message);
       let msgHtml = fossa && /[⠀-⣿]/.test(message)
         ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
         : renderMessageHTML(message, tags.emotes);
@@ -1354,6 +1380,7 @@
       onStream(d);
     } else if (d.type === 'emotes') {
       thirdPartyEmotes = d.emotes || {};
+      retokenizeRows();
     }
   });
 
