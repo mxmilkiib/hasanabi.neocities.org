@@ -649,10 +649,10 @@
       // auxiliary chips: sub months (subject to Ⓢ mode), bits, first-message
       const aux = [];
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
-      if (SUB_MODES[subMode] !== 'hidden' && subM) aux.push(`<span class="role sub">[sub ${subM[1].padStart(2, '0')}]</span>`);
+      if (subM) aux.push(`<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>[sub ${subM[1].padStart(2, '0')}]</span>`);
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
-      const auxHtml = aux.join(' ');
+      const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode] === 'right' ? ' auxr' : ''}">${aux.join(' ')}</span>` : '';
       const pid = tags['reply-parent-msg-id'];
       let reply = '';
       if (pid) {
@@ -667,7 +667,7 @@
               `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' && auxHtml ? auxHtml + ' ' : ''}${reply}` +
               `<a class="name${fossa ? ' shimmer' : ''}"${fossa ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
-              `${renderMessageHTML(message, tags.emotes)}${SUB_MODES[subMode] === 'right' && auxHtml ? `<span class="auxr">${auxHtml}</span>` : ''}</div>`;
+              `${renderMessageHTML(message, tags.emotes)}${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
     }
     queue = [];
     activeEl.insertAdjacentHTML('beforeend', html);
@@ -791,6 +791,12 @@
   let stream = null;       // { live, startedAt, viewers, title }
   let streamHeard = false; // a stream report arrived at least once
   let streamDead = false;  // no report within the watchdog window
+  // most recent stream run { started, ended|null }, persisted across reloads
+  let lastRun = null;
+  try { lastRun = JSON.parse(localStorage.getItem('hasan-last-run')) || null; } catch (e) {}
+  function saveLastRun() {
+    try { localStorage.setItem('hasan-last-run', JSON.stringify(lastRun)); } catch (e) {}
+  }
 
   function parseUptimeMinutes(text) {
     const mult = { day: 1440, hour: 60, minute: 1 };
@@ -814,6 +820,10 @@
   function onStream(d) {
     streamHeard = true;
     if (/offline|not streaming|not live|not online/i.test(d.uptime)) {
+      if (stream && stream.live) {
+        lastRun = { started: stream.startedAt || (lastRun && lastRun.started) || null, ended: Date.now() };
+        saveLastRun();
+      }
       stream = { live: false };
     } else {
       const mins = parseUptimeMinutes(d.uptime);
@@ -824,6 +834,10 @@
         viewers: Number.isFinite(viewers) ? viewers : null,
         title: d.title || '',
       };
+      if (stream.startedAt && (!lastRun || lastRun.ended || lastRun.started !== stream.startedAt)) {
+        lastRun = { started: stream.startedAt, ended: null };
+        saveLastRun();
+      }
     }
     updateHeader();
   }
@@ -850,8 +864,17 @@
     }
     if (!stream.live) {
       dotEl.className = 'dot offline';
-      dotEl.title = `${CHANNEL} is offline · ${chatTxt}`;
-      infoEl.textContent = 'offline' + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
+      let endedTxt = '';
+      if (lastRun && lastRun.ended) {
+        endedTxt = ` · ended ${fmtDur(Math.max(0, Math.round((Date.now() - lastRun.ended) / 60000)))} ago`;
+      }
+      let ranTxt = '';
+      if (lastRun && lastRun.started) {
+        ranTxt = ` · last ran ${fmtTime(lastRun.started)}`;
+        if (lastRun.ended) ranTxt += `-${fmtTime(lastRun.ended)} (${fmtDur(Math.max(1, Math.round((lastRun.ended - lastRun.started) / 60000)))})`;
+      }
+      dotEl.title = `${CHANNEL} is offline${endedTxt}${ranTxt} · ${chatTxt}`;
+      infoEl.textContent = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
       document.title = '🔴 HasanAbi chat';
       return;
     }
@@ -1060,9 +1083,18 @@
   let subMode = 0;
 
   function applySubMode() {
-    subBtn.classList.toggle('on', SUB_MODES[subMode] !== 'hidden');
-    subBtn.style.justifyContent = { right: 'flex-end', left: 'flex-start', hidden: 'center' }[SUB_MODES[subMode]];
-    subBtn.title = `Sub badge: ${SUB_MODES[subMode]} - click or scroll to cycle`;
+    const mode = SUB_MODES[subMode];
+    subBtn.classList.toggle('on', mode !== 'hidden');
+    subBtn.style.justifyContent = { right: 'flex-end', left: 'flex-start', hidden: 'center' }[mode];
+    subBtn.title = `Sub badge: ${mode} - click or scroll to cycle`;
+    // move existing rows' aux clusters to match the new mode
+    document.querySelectorAll('.row .aux').forEach((aux) => {
+      const row = aux.parentElement;
+      const sub = aux.querySelector('.sub');
+      if (sub) sub.hidden = mode === 'hidden';
+      if (mode === 'right') { aux.classList.add('auxr'); row.appendChild(aux); }
+      else { aux.classList.remove('auxr'); row.insertBefore(aux, row.querySelector('.reply') || row.querySelector('.name')); }
+    });
   }
 
   function stepSub(dir) {
