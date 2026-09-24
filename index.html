@@ -670,7 +670,8 @@
               `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' ? auxHtml : ''}${reply}` +
               `<a class="name${fossa ? ' shimmer' : ''}"${fossa ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
-              `${renderMessageHTML(message, tags.emotes)}${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
+              `${fossa && /[⠀-⣿]/.test(message) ? message.split(' ').map(escapeHTML).join('<br>') : renderMessageHTML(message, tags.emotes)}` +
+              `${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
     }
     queue = [];
     activeEl.insertAdjacentHTML('beforeend', html);
