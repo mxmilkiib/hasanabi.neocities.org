@@ -274,10 +274,7 @@
   main.zebra .row:nth-child(even) {
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07));
   }
-  main.shadowed .row {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
-    text-shadow: 0 1px 2px color-mix(in srgb, var(--text) 45%, transparent);
-  }
+  main.shadowed .row { text-shadow: var(--row-sh); }
   .row.glorp {
     background-color: rgba(232, 93, 93, .13);
     box-shadow: inset 3px 0 0 var(--danger);
@@ -322,7 +319,7 @@
   .reply b { font-weight: 600; }
   .row.jump { animation: jumpflash 1.4s ease-out; }
   @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
-  .hdr-side { display: flex; align-items: center; gap: 10px; flex: none; }
+  .hdr-side { display: flex; align-items: center; gap: 6px; flex: none; }
   .hdr-btn {
     background: none;
     border: 1px solid var(--line);
@@ -382,7 +379,7 @@
   <div id="helpPanel" hidden>
     <div><b>◐</b> theme light / sepia / paper / mid / dark / black / console; right-click resets to system<sup>†</sup></div>
     <div><b>▦</b> zebra striping on alternating rows<sup>†</sup></div>
-    <div><b>T</b> subtle text shadow under chat text<sup>†</sup></div>
+    <div><b>T</b> text shadow under chat text<sup>†</sup></div>
     <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b> font size, <b>↕</b> line height; shift+click goes back<sup>†</sup></div>
     <div><b>≡</b> row separator lines<sup>†</sup></div>
@@ -1137,7 +1134,7 @@
         hdrmin: document.body.classList.contains('hdrmin'),
         sub: subMode,
         zebra: mainEl.classList.contains('zebra'),
-        shadow: mainEl.classList.contains('shadowed'),
+        shadow: shadLevel,
         help: helpMode,
       }));
     } catch (e) {}
@@ -1159,7 +1156,8 @@
     if (o.hdrmin) document.body.classList.add('hdrmin');
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = [2, 1, 0][o.sub]; applySubMode(); }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
-    if (typeof o.shadow === 'boolean') setShadow(o.shadow);
+    if (Number.isInteger(o.shadow)) setShadow(o.shadow);
+    else if (o.shadow === true) setShadow(1);
     if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
   }
 
@@ -1254,20 +1252,35 @@
   }, { passive: false });
   setZebra(false);
 
-  // ---- subtle text shadow on chat rows ----
-  function setShadow(on) {
+  // ---- text shadow on chat rows: graduated off/subtle/medium/strong ----
+  const SHADOW_LVLS = [
+    'none',
+    '0 1px 2px color-mix(in srgb, var(--text) 35%, transparent)',
+    '0 1px 3px color-mix(in srgb, var(--text) 55%, transparent)',
+    '0 2px 5px color-mix(in srgb, var(--text) 75%, transparent)',
+  ];
+  const SHADOW_NAMES = ['off', 'subtle', 'medium', 'strong'];
+  let shadLevel = 0;
+  function setShadow(lv) {
+    shadLevel = Math.max(0, Math.min(SHADOW_LVLS.length - 1, lv));
+    const on = shadLevel > 0;
     mainEl.classList.toggle('shadowed', on);
+    mainEl.style.setProperty('--row-sh', SHADOW_LVLS[shadLevel]);
     shadowBtn.classList.toggle('on', on);
-    shadowBtn.title = `Text shadow: ${on ? 'on' : 'off'} - click or scroll to toggle`;
+    shadowBtn.style.textShadow = on ? SHADOW_LVLS[shadLevel] : '';
+    shadowBtn.title = `Text shadow: ${SHADOW_NAMES[shadLevel]} - click or scroll to change, shift+click to go back`;
   }
 
-  shadowBtn.addEventListener('click', () => { setShadow(!mainEl.classList.contains('shadowed')); saveOpts(); });
+  shadowBtn.addEventListener('click', (e) => {
+    setShadow((shadLevel + (e.shiftKey ? -1 : 1) + SHADOW_LVLS.length) % SHADOW_LVLS.length);
+    saveOpts();
+  });
   shadowBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setShadow(!mainEl.classList.contains('shadowed'));
+    setShadow((shadLevel + (e.deltaY < 0 ? 1 : -1) + SHADOW_LVLS.length) % SHADOW_LVLS.length);
     saveOpts();
   }, { passive: false });
-  setShadow(false);
+  setShadow(0);
 
   // ---- help: cycle off → popup panel → inline labels before each control ----
   const HELP_MODES = ['off', 'panel', 'labels'];
