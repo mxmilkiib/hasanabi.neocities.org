@@ -943,6 +943,16 @@
     updateHeader();
   }
 
+  // Favicon glyph recolored to match the status dot's computed color,
+  // so it follows the active theme.
+  const faviconEl = document.querySelector('link[rel="icon"]');
+  const FAVICON_PATH = 'M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z';
+  function setDot(cls) {
+    dotEl.className = 'dot ' + cls;
+    const c = getComputedStyle(dotEl).backgroundColor;
+    faviconEl.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="${encodeURIComponent(c)}" d="${FAVICON_PATH}"/></svg>`;
+  }
+
   function updateHeader() {
     const chatTxt = chatState === 'connected' ? 'chat connected'
                   : chatState === 'reconnecting' ? 'chat reconnecting'
@@ -951,21 +961,21 @@
       if (streamDead) {
         // Relay never reported stream status (stale cache or blocked API):
         // fall back to showing chat connection state on the dot.
-        dotEl.className = 'dot ' + chatState;
+        setDot(chatState);
         dotEl.title = `stream status unavailable · ${chatTxt}`;
         infoEl.textContent = chatState === 'connected' ? '' : chatTxt;
-        document.title = (chatState === 'connected' ? '🟢 ' : '🔴 ') + 'HasanAbi chat';
+        document.title = 'HasanAbi chat';
       } else {
-        dotEl.className = 'dot connecting';
+        setDot('connecting');
         dotEl.title = `checking stream status · ${chatTxt}`;
         infoEl.textContent = '';
-        document.title = '🟡 HasanAbi chat';
+        document.title = 'HasanAbi chat';
       }
       return;
     }
     if (!stream.live) {
       const idle = chatState === 'connected';
-      dotEl.className = 'dot ' + (idle ? 'idle' : 'offline');
+      setDot(idle ? 'idle' : 'offline');
       // best end: exact VOD end > observed live-off transition > last
       // live poll > lastBroadcast stamp (approx, '~'-prefixed)
       let startTs = lastRun && lastRun.started;
@@ -996,7 +1006,7 @@
       }
       dotEl.title = `${CHANNEL} is offline${endedTxt}${ranTxt} · ${chatTxt}`;
       infoEl.innerHTML = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
-      document.title = (idle ? '🟡 ' : '🔴 ') + 'HasanAbi chat';
+      document.title = 'HasanAbi chat';
       return;
     }
     const mins = stream.startedAt ? Math.round((Date.now() - stream.startedAt) / 60000) : null;
@@ -1004,11 +1014,11 @@
     const since = stream.startedAt ? fmtTime(stream.startedAt) : '';
     const viewers = stream.viewers != null ? ` · ${stream.viewers.toLocaleString()} watching` : '';
     const chatSuffix = chatState === 'connected' ? '' : ` · ${chatTxt}`;
-    dotEl.className = 'dot connected';
+    setDot('connected');
     infoEl.textContent = (since ? `live since ${since} · up ${up}` : 'live') + viewers + chatSuffix;
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
-    document.title = '🟢 HasanAbi chat';
+    document.title = 'HasanAbi chat';
   }
 
   function setStatus(state) {
