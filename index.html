@@ -706,7 +706,7 @@
       if (glorp) glorpTimestamps.push(Date.now());
       // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
-      if ((tags.badges || '').includes('moderator/')) aux.push('<span class="role mod">[-mod-]</span>');
+      if ((tags.badges || '').includes('moderator/')) aux.push('<span class="role mod">[ mod. ]</span>');
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       if (subM) aux.push(`<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>[sub ${subM[1].padStart(2, '0')}]</span>`);
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
