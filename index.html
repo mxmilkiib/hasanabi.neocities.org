@@ -539,6 +539,9 @@
   // Third-party emote map (7TV/BTTV/FFZ) sent by the relay - the page's CSP
   // blocks fetching the sets itself, but img-src * lets the CDN images render.
   let thirdPartyEmotes = {};
+  // Nitter host for twitter/x link rewriting; the relay picks a live one
+  // from status.d420.de, this is only the fallback until then.
+  let nitterHost = 'https://nitter.netbub.com';
 
   const tok2 = (a, n) => a[n] || '';
 
@@ -589,7 +592,7 @@
       const tw = tok.match(/^(?:https?:\/\/)?(?:www\.|mobile\.)?(?:x\.com|twitter\.com)(\/\S*)?$/i);
       if (tw) {
         const path = tw[1] || '';
-        return `<a href="${escapeHTML(`https://nitter.tiekoetter.com${path}`)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`;
+        return `<a href="${escapeHTML(`${nitterHost}${path}`)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`;
       }
       if (/^https?:\/\/\S+$/i.test(tok) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(tok)) {
@@ -1543,6 +1546,8 @@
         lastVod = { start: vs, end: ve }; changed = true;
       }
       if (changed) updateHeader();
+    } else if (d.type === 'nitter' && /^https:\/\//.test(d.host || '')) {
+      nitterHost = d.host;
     }
   });
 

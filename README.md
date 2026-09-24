@@ -59,6 +59,8 @@ Relay → parent:
 - `{type: 'stream', uptime, viewers, title}` — decapi poll result
 - `{type: 'emotes', emotes, lastBroadcast, lastVod}` — emote map +
   stream history, refetched every 10 minutes
+- `{type: 'nitter', host}` — fastest healthy nitter instance from
+  status.d420.de, rechecked every 15 minutes
 
 ## Frontend — `index.html` (this repo, on Neocities)
 
