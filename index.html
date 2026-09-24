@@ -415,7 +415,7 @@
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps">◷</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn on" id="pauseBtn" title="Pause on hover">‖</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows">☺</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps">◷</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows">☺</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
@@ -429,7 +429,6 @@
     <div><b>≡</b> <span>row separator lines<sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps<sup>†</sup></span></div>
     <div><b>Ⓢ</b> <span>sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
-    <div><b>‖</b> <span>pause on hover the chat stops auto-scrolling while the pointer is over it<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the other<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
@@ -479,7 +478,6 @@
   const fontSel = document.getElementById('fontSel');
   const linesBtn = document.getElementById('linesBtn');
   const subBtn = document.getElementById('subBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
   const timeBtn = document.getElementById('timeBtn');
   const emoteBtn = document.getElementById('emoteBtn');
   const zebraBtn = document.getElementById('zebraBtn');
@@ -767,7 +765,6 @@
   let scheduled = false;
   let recentTimestamps = [];
   let stickBottom = true; // live column follows new messages while near the bottom
-  let hoverPause = false; // hovering the log freezes auto-follow, like chatterino
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
 
@@ -789,19 +786,13 @@
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
   jdownSide.addEventListener('click', () => jumpDown(sideEl, jdownSide));
-  logEl.addEventListener('mouseenter', () => { if (pauseOn) hoverPause = true; });
-  logEl.addEventListener('mouseleave', () => {
-    hoverPause = false;
-    if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
-  });
   // an image finishing after its row rendered (gif embeds) grows the column's
   // scrollHeight without firing a scroll event; re-snap a pinned column so
   // the next scroll event doesn't measure the grown gap and drop follow
   function resnap(e) {
     if (!(e.target instanceof HTMLImageElement)) return;
     const col = e.currentTarget;
-    if ((col === logEl ? stickBottom : sideBottom) && !hoverPause)
-      col.scrollTop = col.scrollHeight;
+    if (col === logEl ? stickBottom : sideBottom) col.scrollTop = col.scrollHeight;
   }
   logEl.addEventListener('load', resnap, true);
   sideEl.addEventListener('load', resnap, true);
@@ -946,13 +937,9 @@
       if (pushOverflow(activeEl, inactiveEl())) activeEl = inactiveEl();
     } else {
       while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
-      if (nearBottom && !hoverPause) activeEl.scrollTop = activeEl.scrollHeight;
+      if (nearBottom) activeEl.scrollTop = activeEl.scrollHeight;
     }
     jdownLog.hidden = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
-    // while hover-pause is why the view isn't following, the arrow shows a
-    // pause glyph so it reads as a state rather than a lost scroll
-    jdownLog.textContent = hoverPause ? '‖' : '↓';
-    jdownLog.title = hoverPause ? 'Paused while the pointer is over the chat' : 'Scroll to live chat';
     jdownSide.hidden = sideEl.hidden ||
       sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
   }
@@ -1390,7 +1377,6 @@
         zebra: mainEl.classList.contains('zebra'),
         times: !mainEl.classList.contains('notime'),
         shadow: shadLevel,
-        pause: pauseOn,
         eonly: emoteMode,
         help: helpMode,
       }));
@@ -1416,7 +1402,6 @@
     if (typeof o.times === 'boolean') setTimes(o.times);
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
     else if (o.shadow === true) setShadow(1);
-    if (typeof o.pause === 'boolean') setPause(o.pause);
     if (Number.isInteger(o.eonly) && o.eonly >= 0 && o.eonly < EMOTE_MODES.length) { emoteMode = o.eonly; applyEmoteMode(); }
     if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
   }
@@ -1496,18 +1481,6 @@
   subBtn.addEventListener('click', () => stepSub(1));
   subBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepSub(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   applySubMode();
-
-  // ---- pause auto-follow while the pointer is over the chat ----
-  let pauseOn = true;
-  function setPause(on) {
-    pauseOn = on;
-    pauseBtn.classList.toggle('on', on);
-    pauseBtn.title = `Pause on hover: ${on ? 'on' : 'off'} - click or scroll to toggle`;
-  }
-
-  pauseBtn.addEventListener('click', () => { setPause(!pauseOn); saveOpts(); });
-  pauseBtn.addEventListener('wheel', (e) => { e.preventDefault(); setPause(!pauseOn); saveOpts(); }, { passive: false });
-  setPause(true);
 
   // ---- emote-only rows: enlarged inline / pinned right / normal ----
   const EMOTE_MODES = ['inline', 'right', 'off'];
