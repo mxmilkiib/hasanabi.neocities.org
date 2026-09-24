@@ -335,8 +335,8 @@
   select.hdr-btn { padding-right: 4px; }
   select.hdr-btn option { background: var(--panel); color: var(--text); }
   .hdr-lbl { color: var(--text-dim); font-size: 11px; align-self: center; white-space: nowrap; }
-  .subr { float: right; }
-  #subBtn { width: 30px; padding: 0 6px; display: flex; align-items: center; }
+  .auxr { float: right; }
+  #subBtn { width: 30px; padding: 0 1px; display: flex; align-items: center; }
   #helpPanel {
     position: fixed;
     top: 34px;
@@ -581,8 +581,6 @@
     if (badges.includes('broadcaster/')) out.push('<span class="role host">[host]</span>');
     else if (badges.includes('moderator/')) out.push('<span class="role mod">[-mod-]</span>');
     else if (badges.includes('vip/')) out.push('<span class="role vip">[vip]</span>');
-    if (tags.bits) out.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
-    if (tags['first-msg'] === '1') out.push('<span class="role first">[first]</span>');
     return out.join(' ');
   }
 
@@ -644,8 +642,13 @@
       const points = tags['msg-id'] === 'highlighted-message';
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim());
       if (glorp) glorpTimestamps.push(Date.now());
-      const subM = subMode && (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
-      const subChip = subM ? `[sub ${subM[1].padStart(2, '0')}]` : '';
+      // auxiliary chips: sub months (subject to Ⓢ mode), bits, first-message
+      const aux = [];
+      const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
+      if (subMode && subM) aux.push(`<span class="role sub">[sub ${subM[1].padStart(2, '0')}]</span>`);
+      if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
+      if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
+      const auxHtml = aux.join(' ');
       const pid = tags['reply-parent-msg-id'];
       let reply = '';
       if (pid) {
@@ -657,10 +660,10 @@
       }
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${subMode === 1 && subChip ? `<span class="role sub">${subChip}</span> ` : ''}${reply}` +
+              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${subMode !== 2 && auxHtml ? auxHtml + ' ' : ''}${reply}` +
               `<a class="name${fossa ? ' shimmer' : ''}"${fossa ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
-              `${renderMessageHTML(message, tags.emotes)}${subMode === 2 && subChip ? `<span class="role sub subr">${subChip}</span>` : ''}</div>`;
+              `${renderMessageHTML(message, tags.emotes)}${subMode === 2 && auxHtml ? `<span class="auxr">${auxHtml}</span>` : ''}</div>`;
     }
     queue = [];
     activeEl.insertAdjacentHTML('beforeend', html);
