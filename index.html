@@ -716,7 +716,12 @@
       let msgHtml = fossa && /[⠀-⣿]/.test(message)
         ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
         : renderMessageHTML(message, tags.emotes);
-      if (blammo) msgHtml = msgHtml.replace(/\[(Roulette|Scramble|Trivia)\]/g, '<b>[$1]</b>');
+      if (blammo) {
+        msgHtml = msgHtml
+          .replace(/\[(Roulette|Scramble|Trivia)\]/g, '<b>[$1]</b>')
+          .replace(/(the (?:answer|word) was:?\s*)&quot;(.+?)&quot;\s*$/i, '$1&quot;<b>$2</b>&quot;')
+          .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>');
+      }
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' ? auxHtml : ''}${reply}` +
