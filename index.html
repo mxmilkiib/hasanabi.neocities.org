@@ -335,7 +335,9 @@
   select.hdr-btn { padding-right: 4px; }
   select.hdr-btn option { background: var(--panel); color: var(--text); }
   .hdr-lbl { color: var(--text-dim); font-size: 11px; align-self: center; white-space: nowrap; }
-  .auxr { float: right; }
+  .aux { margin-right: 5px; }
+  .aux .role:last-child { margin-right: 0; }
+  .auxr { float: right; margin: 0 0 0 5px; }
   #subBtn { width: 30px; padding: 0 1px; display: flex; align-items: center; }
   #helpPanel {
     position: fixed;
@@ -665,7 +667,7 @@
       }
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' && auxHtml ? auxHtml + ' ' : ''}${reply}` +
+              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' ? auxHtml : ''}${reply}` +
               `<a class="name${fossa ? ' shimmer' : ''}"${fossa ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
               `${renderMessageHTML(message, tags.emotes)}${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
