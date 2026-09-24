@@ -198,6 +198,7 @@
   @media (prefers-reduced-motion: reduce) {
     .dot.connecting, .dot.reconnecting { animation: none; }
   }
+  .chat-modes { font-size: 12px; color: var(--text-dim); white-space: nowrap; margin-left: 8px; }
   .stream-info {
     font-size: 14px;
     font-weight: 400;
@@ -368,7 +369,7 @@
 </head>
 <body>
   <header>
-    <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span></div>
+    <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
     <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
   </header>
@@ -387,7 +388,7 @@
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
     <div><b class="rowstyle mention">amber rows</b> @hasanabi mentions <b class="rowstyle glorp">red rows</b> GLORP / F <b class="rowstyle points">red tint</b> channel-point highlights</div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
-    <div><b></b>names link to twitch profiles · fossabot's name shimmers · urls are clickable · images and gifs embed pinned right</div>
+    <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage</div>
     <div><b>themes</b><span id="helpThemeRow"></span></div>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">reset all settings</button>
@@ -503,7 +504,7 @@
       tags = parseTags(raw.slice(1, spaceIdx));
       rest = raw.slice(spaceIdx + 1);
     }
-    const cmd = rest.match(/ (PRIVMSG|USERNOTICE) /);
+    const cmd = rest.match(/ (PRIVMSG|USERNOTICE|ROOMSTATE) /);
     if (!cmd) return null;
     let login = null;
     if (rest.startsWith(':')) {
@@ -512,7 +513,10 @@
     }
     const afterCmd = rest.slice(cmd.index + cmd[1].length + 2);
     const msgIdx = afterCmd.indexOf(' :');
-    if (msgIdx === -1) return null;
+    if (msgIdx === -1) {
+      if (cmd[1] === 'ROOMSTATE') return { tags, login, channel: afterCmd, message: '', kind: 'ROOMSTATE' };
+      return null;
+    }
     return { tags, login, channel: afterCmd.slice(0, msgIdx), message: afterCmd.slice(msgIdx + 2), kind: cmd[1] };
   }
 
@@ -656,6 +660,7 @@
       const role = roleTag(tags);
       const profile = escapeHTML(encodeURIComponent(login || name.toLowerCase()));
       const fossa = (login || name).toLowerCase() === 'fossabot';
+      const shimmer = fossa || (login || name).toLowerCase() === 'blammobot';
       const points = tags['msg-id'] === 'highlighted-message';
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim()) ||
                     (fossa && /trigger is pulled.*bullet fired/i.test(message));
@@ -679,7 +684,7 @@
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' ? auxHtml : ''}${reply}` +
-              `<a class="name${fossa ? ' shimmer' : ''}"${fossa ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
+              `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
               `${fossa && /[⠀-⣿]/.test(message) ? message.split(' ').map(escapeHTML).join('<br>') : renderMessageHTML(message, tags.emotes)}` +
               `${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
@@ -910,10 +915,28 @@
     updateHeader();
   }
 
+  // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
+  const modesEl = document.getElementById('chatModes');
+  function onRoomState(tags) {
+    const chips = [];
+    const slow = parseInt(tags.slow || '0', 10);
+    if (slow > 0) chips.push(`slow ${slow}s`);
+    const foll = parseInt(tags['followers-only'] || '-1', 10);
+    if (foll === 0) chips.push('foll');
+    else if (foll > 0) chips.push(`foll ${foll}m`);
+    if (tags['emote-only'] === '1') chips.push('emote');
+    if (tags['subs-only'] === '1') chips.push('subs');
+    if (tags.r9k === '1') chips.push('r9k');
+    modesEl.textContent = chips.join(' ');
+    modesEl.title = chips.length ? `chat modes: ${chips.join(', ')}` : '';
+  }
+
   function handleLine(line) {
-    if (/ (PRIVMSG|USERNOTICE) /.test(line)) {
+    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE) /.test(line)) {
       const parsed = parseTwitchMessage(line);
-      if (parsed) queueMessage(parsed);
+      if (!parsed) return;
+      if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags); return; }
+      queueMessage(parsed);
     }
   }
 
