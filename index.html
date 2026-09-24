@@ -582,7 +582,7 @@
         return `<a href="${escapeHTML(`https://nitter.tiekoetter.com${path}`)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`;
       }
       if (/^https?:\/\/\S+$/i.test(tok) ||
-          /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn)(?:[?\/#]\S*)?$/i.test(tok)) {
+          /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(tok)) {
         const u = escapeHTML(/^https?:\/\//i.test(tok) ? tok : `https://${tok}`);
         if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(tok)) {
           const src = /\.gifv(?:\?\S*)?$/i.test(tok) ? u.replace(/\.gifv/i, '.gif') : u;
