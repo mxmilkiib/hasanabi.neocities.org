@@ -1019,10 +1019,14 @@
     saveOpts();
     repin();
   }
-  hdrMinBtn.addEventListener('click', minHeader);
-  hdrMinBtn.addEventListener('wheel', (e) => { e.preventDefault(); minHeader(); }, { passive: false });
-  headerEl.addEventListener('click', (e) => {
-    if (document.body.classList.contains('hdrmin') && e.target !== hdrMinBtn) unminHeader();
+  hdrMinBtn.addEventListener('click', (e) => { e.stopPropagation(); minHeader(); });
+  hdrMinBtn.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // don't let the header's own wheel-unminimise undo this
+    minHeader();
+  }, { passive: false });
+  headerEl.addEventListener('click', () => {
+    if (document.body.classList.contains('hdrmin')) unminHeader();
   });
   headerEl.addEventListener('wheel', (e) => {
     if (!document.body.classList.contains('hdrmin')) return;
