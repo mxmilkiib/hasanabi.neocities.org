@@ -419,7 +419,7 @@
   </header>
   <div id="helpPanel" hidden>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
-    <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · follow age Nm/Nh (follow age needed to chat) · emote · subs · r9k (unique messages)</div>
+    <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · follow age restriction Nm/Nh (follow age needed to chat) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b>◐</b><span>theme <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping on alternating rows<sup>†</sup></span></div>
@@ -1228,8 +1228,8 @@
     const slow = parseInt(tags.slow || '0', 10);
     if (slow > 0) chips.push(`<b>slow</b> ${slow}s`);
     const foll = parseInt(tags['followers-only'] || '-1', 10);
-    if (foll === 0) chips.push('<b>follow age</b>');
-    else if (foll > 0) chips.push(`<b>follow age:</b> ${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}`);
+    if (foll === 0) chips.push('<b>follow age restriction</b>');
+    else if (foll > 0) chips.push(`<b>follow age restriction:</b> ${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}`);
     if (tags['emote-only'] === '1') chips.push('emote');
     if (tags['subs-only'] === '1') chips.push('subs');
     if (tags.r9k === '1') chips.push('r9k');
