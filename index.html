@@ -644,7 +644,8 @@
       const profile = escapeHTML(encodeURIComponent(login || name.toLowerCase()));
       const fossa = (login || name).toLowerCase() === 'fossabot';
       const points = tags['msg-id'] === 'highlighted-message';
-      const glorp = GLORP_RE.test(message) || F_RE.test(message.trim());
+      const glorp = GLORP_RE.test(message) || F_RE.test(message.trim()) ||
+                    (fossa && /trigger is pulled.*bullet fired/i.test(message));
       if (glorp) glorpTimestamps.push(Date.now());
       // auxiliary chips: sub months (subject to Ⓢ mode), bits, first-message
       const aux = [];
@@ -1086,6 +1087,7 @@
     const mode = SUB_MODES[subMode];
     subBtn.classList.toggle('on', mode !== 'hidden');
     subBtn.style.justifyContent = { right: 'flex-end', left: 'flex-start', hidden: 'center' }[mode];
+    subBtn.style.padding = mode === 'left' ? '0 1px 0 2px' : mode === 'right' ? '0 2px 0 1px' : '0 1px';
     subBtn.title = `Sub badge: ${mode} - click or scroll to cycle`;
     // move existing rows' aux clusters to match the new mode
     document.querySelectorAll('.row .aux').forEach((aux) => {
