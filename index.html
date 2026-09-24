@@ -1181,6 +1181,7 @@
     try {
       localStorage.removeItem(OPTS_KEY);
       localStorage.removeItem('hasan-hint');
+      localStorage.removeItem('hasan-history');
     } catch (e) {}
     location.reload();
   });
@@ -1249,6 +1250,31 @@
 
   splitBtn.addEventListener('click', toggleSplit);
   splitBtn.addEventListener('wheel', (e) => { e.preventDefault(); toggleSplit(); }, { passive: false });
+
+  // ---- local history: keep recent rows across reloads ----
+  const HISTORY_KEY = 'hasan-history';
+  function saveHistory() {
+    try {
+      const rows = [...logEl.children, ...sideEl.children].filter((r) => r.classList.contains('row'));
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => r.outerHTML)));
+    } catch (e) {}
+  }
+  function restoreHistory() {
+    try {
+      const rows = JSON.parse(localStorage.getItem(HISTORY_KEY));
+      if (!Array.isArray(rows) || !rows.length) return;
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+      logEl.insertAdjacentHTML('beforeend', rows.join(''));
+      for (const el of logEl.children) if (el.dataset.mid) rowById.set(el.dataset.mid, el);
+      applySubMode();
+      logEl.scrollTop = logEl.scrollHeight;
+    } catch (e) {}
+  }
+  restoreHistory();
+  window.addEventListener('pagehide', saveHistory);
+  window.addEventListener('beforeunload', saveHistory);
+  setInterval(saveHistory, 15000);
 
   // ---- relay iframe: handles the Twitch socket and its own reconnects ----
   const relayFrame = document.createElement('iframe');
