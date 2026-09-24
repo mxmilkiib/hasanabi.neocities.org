@@ -444,7 +444,8 @@
     <div><b class="fn">†</b> click or scroll to change</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage</div>
-    <button id="resetOpts" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">reset all settings</button>
+    <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
+    <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
     <div><b>see also</b><span><a class="at" href="https://nitter.miningtcup.me/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">discord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a></span></div>
     <div><b>authors</b><span><a class="at" href="https://www.marxists.org/archive/marx/" target="_blank" rel="noopener">karl marx</a> · <a class="at" href="https://en.wikisource.org/wiki/Author:Friedrich_Engels" target="_blank" rel="noopener">friedrich engels</a> · <a class="at" href="https://www.marxists.org/archive/lenin/" target="_blank" rel="noopener">lenin</a> · <a class="at" href="https://www.marxists.org/archive/trotsky/" target="_blank" rel="noopener">trotsky</a> · <a class="at" href="https://www.marxists.org/archive/luxemburg/" target="_blank" rel="noopener">rosa luxemburg</a> · <a class="at" href="https://www.marxists.org/archive/gramsci/" target="_blank" rel="noopener">gramsci</a> · <a class="at" href="https://www.marxists.org/archive/parenti/" target="_blank" rel="noopener">michael parenti</a> · <a class="at" href="https://www.marxists.org/archive/zinn/" target="_blank" rel="noopener">howard zinn</a> · <a class="at" href="https://www.marxists.org/archive/debs/" target="_blank" rel="noopener">eugene debs</a> · <a class="at" href="https://theanarchistlibrary.org/category/author/murray-bookchin?sort=title_asc&rows=200" target="_blank" rel="noopener">murray bookchin</a> (social ecology) · <a class="at" href="https://theanarchistlibrary.org/category/author/petr-kropotkin" target="_blank" rel="noopener">kropotkin</a> · <a class="at" href="https://theanarchistlibrary.org/category/author/emma-goldman" target="_blank" rel="noopener">emma goldman</a> · <a class="at" href="https://theanarchistlibrary.org/category/author/mikhail-bakunin" target="_blank" rel="noopener">bakunin</a> · <a class="at" href="https://theanarchistlibrary.org/category/author/david-graeber" target="_blank" rel="noopener">david graeber</a> · <a class="at" href="https://theanarchistlibrary.org/category/author/rudolf-rocker" target="_blank" rel="noopener">rudolf rocker</a> · <a class="at" href="https://theanarchistlibrary.org/category/author/voltairine-de-cleyre" target="_blank" rel="noopener">voltairine de cleyre</a> · <a class="at" href="https://beautiful.software/" target="_blank" rel="noopener">christopher alexander</a> (architectural patterns)</span></div>
     <div><b>extra links</b><span><a class="at" href="https://www.seedsforchange.org.uk/" target="_blank" rel="noopener">seeds for change</a> (consensus/facilitation/etc) · <a class="at" href="https://www.radicalroutes.org.uk/" target="_blank" rel="noopener">radical routes</a> (working/housing co-ops) · <a class="at" href="https://nvc.neocities.org/nonviolent-communication-a-language-of-life-marshall-b-rosenberg.pdf" target="_blank" rel="noopener">nonviolent communication</a> (nvc pdf) · <a class="at" href="https://www.youtube.com/BuddhistSocietyWA" target="_blank" rel="noopener">buddhist society wa</a> (bswa yt) · <a class="at" href="https://suttacentral.net/" target="_blank" rel="noopener">sutta central</a> (ebt)</span></div>
@@ -1621,6 +1622,27 @@
   // header height changes with width when the controls wrap - re-anchor
   window.addEventListener('resize', () => {
     if (!helpPanel.hidden) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
+  });
+  // builds a ?param url from the current non-default options
+  document.getElementById('copyUrl').addEventListener('click', (e) => {
+    const b = e.currentTarget;
+    const q = new URLSearchParams();
+    if (themeMode !== 'auto') q.set('theme', themeMode);
+    if (fontSel.value !== 'mono') q.set('font', fontSel.value);
+    if (fontCtl.get() !== 1) q.set('size', FONT_SIZES[fontCtl.get()]);
+    if (lhCtl.get() !== 3) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
+    if (mainEl.classList.contains('zebra')) q.set('zebra', '1');
+    if (mainEl.classList.contains('nolines')) q.set('lines', '0');
+    if (mainEl.classList.contains('notime')) q.set('times', '0');
+    if (shadLevel) q.set('shadow', shadLevel);
+    if (SUB_MODES[subMode] !== 'right') q.set('sub', SUB_MODES[subMode]);
+    if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
+    if (document.body.classList.contains('hdrmin')) q.set('min', '1');
+    if (isSplit()) q.set('split', '1');
+    const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
+    navigator.clipboard.writeText(url)
+      .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
+      .catch(() => { b.textContent = url; });
   });
   document.getElementById('resetOpts').addEventListener('click', () => {
     try {
