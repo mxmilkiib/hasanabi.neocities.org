@@ -270,6 +270,7 @@
   .row.notice { color: var(--text-dim); font-style: italic; }
   .row.htag { font-style: italic; }
   .row.htag .name, .row.htag .aux { font-style: normal; }
+  .tag { padding: 0 3px; border-radius: 3px; }
   .row.points { background-color: rgba(232, 93, 93, .12); }
   main.zebra .row:nth-child(even) {
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07));
@@ -727,8 +728,14 @@
         ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
         : renderMessageHTML(message, tags.emotes);
       if (blammo) {
+        // bracketed tags ([Roulette], [Scramble], ...) get a bold chip
+        // shaded by the tag text's hash, so matching games share a hue
         msgHtml = msgHtml
-          .replace(/\[(Roulette|Scramble|Trivia)\]/g, '<b>[$1]</b>')
+          .replace(/\[([A-Za-z][^\[\]&<>]{0,18})\]/g, (m, g) => {
+            let h = 0;
+            for (const c of g) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+            return `<b class="tag" style="background:hsl(${h % 360} 60% 45%/.3)">[${g}]</b>`;
+          })
           .replace(/(the (?:answer|word) was:?\s*)&quot;(.+?)&quot;\s*$/i, '$1&quot;<b>$2</b>&quot;')
           .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>')
           .replace(/\b(\d[\d,]* points?)\b/gi, '<b>$1</b>');
