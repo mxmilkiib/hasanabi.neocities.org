@@ -734,7 +734,7 @@
         reply = `<span class="reply" data-pid="${escapeHTML(pid)}" title="${escapeHTML(pname + ': ' + pbody)}">` +
                 `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
       }
-      const htag = /#(?:trivia|scramble|roulette|top)\b|!\w+/i.test(message);
+      const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       let msgHtml = fossa && /[⠀-⣿]/.test(message)
         ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
         : renderMessageHTML(message, tags.emotes);
