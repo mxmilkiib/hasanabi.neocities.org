@@ -1206,7 +1206,7 @@
       if (endTs) {
         const ago = `${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
         ranTxt = startTs
-          ? ` · started: <b>${fmtTime(startTs)}${dayTag(startTs)}</b>, finished <b>${ago} at ${fmtTime(endTs)}</b> after <b>${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}</b>`
+          ? ` · last started <b>${fmtTime(startTs)}${dayTag(startTs)}</b>, finished <b>${ago} at ${fmtTime(endTs)}</b> after <b>${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}</b>`
           : ` · finished <b>${ago} at ${fmtTime(endTs)}</b>`;
       } else if (startTs) {
         ranTxt = ` · last went live at <b>${fmtTime(startTs)}${dayTag(startTs)}</b>`;
