@@ -98,14 +98,19 @@ no dependencies beyond CDN-hosted fonts:
   help panel. All persisted in `localStorage`; every option answers to
   click, shift+click (reverse) and the scroll wheel.
 - **Scrolling** — the log follows new messages only while at the
-  bottom; scrolling up or hovering pauses it and shows a jump-to-latest
-  button (one per column in split mode).
+  bottom; scrolling up releases it and shows a jump-to-latest button
+  (one per column in split mode).
 - **Formatting** — mention highlighting, GLORP/F red rows, channel-point
   tints, fossabot/blammobot name shimmer and game-line styling, braille
   art restacking, image/GIF/Giphy embeds, Nitter link rewriting for
   Twitter/X.
 - **Persistence** — last 250 rows, stream run history and graph samples
   survive reloads via `localStorage`.
+- **URL options** — query params apply a configuration on top of (and
+  into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
+  Keys: `split`, `min`, `theme`, `font`, `size`, `lh`, `zebra`, `lines`,
+  `times`, `shadow`, `sub` (right/left/hidden), `eonly` (inline/right/off),
+  `help` (off/panel/labels). Booleans take `=0` to force off.
 - **Performance** — incoming lines queue and flush once per animation
   frame; the log is capped at 250 rows.
 

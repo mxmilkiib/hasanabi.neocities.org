@@ -421,7 +421,7 @@
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps">◷</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows">☺</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps">◷</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows">☺</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
@@ -1313,6 +1313,8 @@
     mono: '"JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace',
     sans: 'ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif',
     inter: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    // twitch's own face; proprietary - only resolves if installed locally
+    roobert: 'Roobert, "Helvetica Neue", Inter, ui-sans-serif, system-ui, sans-serif',
     sourcesans: '"Source Sans 3", ui-sans-serif, system-ui, sans-serif',
     atkinson: '"Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif',
     lexend: 'Lexend, ui-sans-serif, system-ui, sans-serif',
@@ -1782,6 +1784,28 @@
   });
 
   loadOpts();
+
+  // ---- url params apply on top of saved options, e.g. ?split&theme=dark&size=18 ----
+  {
+    const q = new URLSearchParams(location.search);
+    const flag = (k) => q.has(k) && q.get(k) !== '0';
+    if (q.has('theme') && (q.get('theme') === 'auto' || THEMES.includes(q.get('theme')))) {
+      themeMode = q.get('theme'); applyTheme();
+    }
+    if (q.has('font') && FONT_STACKS[q.get('font')]) { fontSel.value = q.get('font'); applyFont(); }
+    if (q.has('size')) { const i = FONT_SIZES.indexOf(+q.get('size')); if (i >= 0) fontCtl.set(i); }
+    if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
+    if (q.has('zebra')) setZebra(flag('zebra'));
+    if (q.has('lines')) setLines(flag('lines'));
+    if (q.has('times')) setTimes(flag('times'));
+    if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
+    if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
+    if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
+    if (q.has('help')) { const i = HELP_MODES.indexOf(q.get('help')); if (i >= 0) { helpMode = i; applyHelp(); } }
+    if (flag('split') && !isSplit()) toggleSplit();
+    if (flag('min')) minHeader();
+    if ([...q.keys()].length) saveOpts(); // params act as the saved config
+  }
 })();
 </script>
 </body>
