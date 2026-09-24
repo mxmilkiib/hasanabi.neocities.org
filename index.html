@@ -722,7 +722,7 @@
         reply = `<span class="reply" data-pid="${escapeHTML(pid)}" title="${escapeHTML(pname + ': ' + pbody)}">` +
                 `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
       }
-      const htag = /#(?:trivia|scramble|roulette|top)\b|!(?:gizmo|gimmo|love)\b/i.test(message);
+      const htag = /#(?:trivia|scramble|roulette|top)\b|!(?:gizmo|gimmo|love|cock|ub)\b/i.test(message);
       let msgHtml = fossa && /[⠀-⣿]/.test(message)
         ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
         : renderMessageHTML(message, tags.emotes);
@@ -730,7 +730,8 @@
         msgHtml = msgHtml
           .replace(/\[(Roulette|Scramble|Trivia)\]/g, '<b>[$1]</b>')
           .replace(/(the (?:answer|word) was:?\s*)&quot;(.+?)&quot;\s*$/i, '$1&quot;<b>$2</b>&quot;')
-          .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>');
+          .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>')
+          .replace(/\b(\d[\d,]* points?)\b/gi, '<b>$1</b>');
       }
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
