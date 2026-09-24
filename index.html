@@ -261,9 +261,12 @@
   .role.bits { color: var(--accent); }
   .role.first { color: var(--text-dim); }
   .row.notice { color: var(--text-dim); font-style: italic; }
-  .row.points { background: rgba(232, 93, 93, .12); }
+  .row.points { background-color: rgba(232, 93, 93, .12); }
+  main.zebra .row:nth-child(even) {
+    background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07));
+  }
   .row.glorp {
-    background: rgba(232, 93, 93, .13);
+    background-color: rgba(232, 93, 93, .13);
     box-shadow: inset 3px 0 0 var(--danger);
     margin-left: -8px;
     padding-left: 12px;
@@ -288,7 +291,7 @@
      overflow lands on empty space rather than over message text. */
   .imglnk { float: right; margin-left: 6px; }
   .row.mention {
-    background: rgba(232, 163, 61, .13);
+    background-color: rgba(232, 163, 61, .13);
     box-shadow: inset 3px 0 0 var(--accent);
     margin-left: -8px;
     padding-left: 12px;
@@ -349,10 +352,11 @@
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span></div>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header — click the strip to bring it back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><select class="hdr-btn" id="fontSel" title="Chat font — click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size — click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height — click to cycle, shift+click to go back">↕</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes — ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help — click to toggle">?</button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font — click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size — click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height — click to cycle, shift+click to go back">↕</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes — ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help — click to toggle">?</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div><b>◐</b> theme — click or scroll cycles light / sepia / paper / mid / dark / black / console; right-click resets to system</div>
+    <div><b>▦</b> zebra striping on alternating rows — click or scroll</div>
     <div><b>font menu</b> — pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b> font size, <b>↕</b> line height — click or scroll to cycle, shift+click goes back</div>
     <div><b>≡</b> row separator lines — click or scroll</div>
@@ -400,6 +404,7 @@
   const fontSel = document.getElementById('fontSel');
   const linesBtn = document.getElementById('linesBtn');
   const subBtn = document.getElementById('subBtn');
+  const zebraBtn = document.getElementById('zebraBtn');
   const helpBtn = document.getElementById('helpBtn');
   const helpPanel = document.getElementById('helpPanel');
   const mainEl = document.querySelector('main');
@@ -557,7 +562,7 @@
     const out = [];
     const badges = tags.badges || '';
     if (badges.includes('broadcaster/')) out.push('<span class="role host">[host]</span>');
-    else if (badges.includes('moderator/')) out.push('<span class="role mod">[mod]</span>');
+    else if (badges.includes('moderator/')) out.push('<span class="role mod">[-mod-]</span>');
     else if (badges.includes('vip/')) out.push('<span class="role vip">[vip]</span>');
     if (tags.bits) out.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
     if (tags['first-msg'] === '1') out.push('<span class="role first">[first]</span>');
@@ -623,7 +628,7 @@
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim());
       if (glorp) glorpTimestamps.push(Date.now());
       const subM = subMode && (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
-      const subChip = subM ? `[sub ${subM[1]}]` : '';
+      const subChip = subM ? `[sub ${subM[1].padStart(2, '0')}]` : '';
       const pid = tags['reply-parent-msg-id'];
       let reply = '';
       if (pid) {
@@ -962,6 +967,7 @@
         hdrmin: document.body.classList.contains('hdrmin'),
         spark: sparkWinIdx,
         sub: subMode,
+        zebra: mainEl.classList.contains('zebra'),
       }));
     } catch (e) {}
   }
@@ -982,6 +988,7 @@
     if (o.hdrmin) document.body.classList.add('hdrmin');
     if (Number.isInteger(o.spark) && SPARK_WINDOWS[o.spark]) { sparkWinIdx = o.spark; sparkSize(); }
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = o.sub; applySubMode(); }
+    if (typeof o.zebra === 'boolean') setZebra(o.zebra);
   }
 
   // ---- header collapse: button shrinks it to a thin strip, clicking the
@@ -1033,6 +1040,21 @@
   subBtn.addEventListener('click', () => stepSub(1));
   subBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepSub(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   applySubMode();
+
+  // ---- zebra striping on alternating rows ----
+  function setZebra(on) {
+    mainEl.classList.toggle('zebra', on);
+    zebraBtn.classList.toggle('on', on);
+    zebraBtn.title = `Zebra rows: ${on ? 'on' : 'off'} — click or scroll to toggle`;
+  }
+
+  zebraBtn.addEventListener('click', () => { setZebra(!mainEl.classList.contains('zebra')); saveOpts(); });
+  zebraBtn.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    setZebra(!mainEl.classList.contains('zebra'));
+    saveOpts();
+  }, { passive: false });
+  setZebra(false);
 
   // ---- help panel ----
   helpBtn.addEventListener('click', () => {
