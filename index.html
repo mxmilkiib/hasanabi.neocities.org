@@ -377,7 +377,7 @@
     <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b> font size, <b>↕</b> line height click or scroll to cycle, shift+click goes back</div>
     <div><b>≡</b> row separator lines click or scroll</div>
-    <div><b>Ⓢ</b> sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles hidden / left of name / right edge of the row</div>
+    <div><b>Ⓢ</b> sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden</div>
     <div><b>▮▮</b> page-flip columns one fills top-to-bottom, then flips to the other; scroll or click</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b>?</b> click toggles this panel; scroll cycles to labels before each header control</div>
@@ -649,7 +649,7 @@
       // auxiliary chips: sub months (subject to Ⓢ mode), bits, first-message
       const aux = [];
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
-      if (subMode && subM) aux.push(`<span class="role sub">[sub ${subM[1].padStart(2, '0')}]</span>`);
+      if (SUB_MODES[subMode] !== 'hidden' && subM) aux.push(`<span class="role sub">[sub ${subM[1].padStart(2, '0')}]</span>`);
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       const auxHtml = aux.join(' ');
@@ -664,10 +664,10 @@
       }
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${subMode !== 2 && auxHtml ? auxHtml + ' ' : ''}${reply}` +
+              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' && auxHtml ? auxHtml + ' ' : ''}${reply}` +
               `<a class="name${fossa ? ' shimmer' : ''}"${fossa ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
-              `${renderMessageHTML(message, tags.emotes)}${subMode === 2 && auxHtml ? `<span class="auxr">${auxHtml}</span>` : ''}</div>`;
+              `${renderMessageHTML(message, tags.emotes)}${SUB_MODES[subMode] === 'right' && auxHtml ? `<span class="auxr">${auxHtml}</span>` : ''}</div>`;
     }
     queue = [];
     activeEl.insertAdjacentHTML('beforeend', html);
@@ -1015,7 +1015,7 @@
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (typeof o.lines === 'boolean') setLines(o.lines);
     if (o.hdrmin) document.body.classList.add('hdrmin');
-    if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = o.sub; applySubMode(); }
+    if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = [2, 1, 0][o.sub]; applySubMode(); }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
     if (typeof o.shadow === 'boolean') setShadow(o.shadow);
     if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
@@ -1056,12 +1056,12 @@
   }
 
   // ---- sub badge placement: hidden / left of name / right edge of row ----
-  const SUB_MODES = ['hidden', 'left', 'right'];
-  let subMode = 1;
+  const SUB_MODES = ['right', 'left', 'hidden'];
+  let subMode = 0;
 
   function applySubMode() {
-    subBtn.classList.toggle('on', subMode !== 0);
-    subBtn.style.justifyContent = ['center', 'flex-start', 'flex-end'][subMode];
+    subBtn.classList.toggle('on', SUB_MODES[subMode] !== 'hidden');
+    subBtn.style.justifyContent = { right: 'flex-end', left: 'flex-start', hidden: 'center' }[SUB_MODES[subMode]];
     subBtn.title = `Sub badge: ${SUB_MODES[subMode]} - click or scroll to cycle`;
   }
 
