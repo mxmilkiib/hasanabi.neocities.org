@@ -740,6 +740,10 @@
           .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>')
           .replace(/\b(\d[\d,]* points?)\b/gi, '<b>$1</b>');
       }
+      if (fossa) {
+        msgHtml = msgHtml
+          .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
+      }
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}` +
