@@ -686,7 +686,7 @@
       }
       const htag = /#(?:trivia|scramble|roulette|top)\b|!(?:gizmo|gimmo)\b/i.test(message);
       let msgHtml = fossa && /[⠀-⣿]/.test(message)
-        ? message.split(' ').map(escapeHTML).join('<br>')
+        ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
         : renderMessageHTML(message, tags.emotes);
       if (blammo) msgHtml = msgHtml.replace(/\[(Roulette|Scramble|Trivia)\]/g, '<b>[$1]</b>');
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}"` +
