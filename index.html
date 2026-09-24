@@ -376,6 +376,7 @@
     <div><b>↩ chip</b> — reply context; click to jump to the original message</div>
     <div><b></b>names link to twitch profiles · fossabot's name shimmers · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage</div>
+    <button id="resetOpts" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">reset all settings</button>
   </div>
   <div id="hint" hidden>tip: scroll the wheel over any option to change it — click to dismiss</div>
   <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button></main>
@@ -1104,6 +1105,13 @@
 
   helpBtn.addEventListener('click', () => stepHelp(1));
   helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  document.getElementById('resetOpts').addEventListener('click', () => {
+    try {
+      localStorage.removeItem(OPTS_KEY);
+      localStorage.removeItem('hasan-hint');
+    } catch (e) {}
+    location.reload();
+  });
 
   linesBtn.addEventListener('click', () => { setLines(mainEl.classList.contains('nolines')); saveOpts(); });
   linesBtn.addEventListener('wheel', (e) => {
