@@ -739,9 +739,14 @@
                 `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
-      let msgHtml = fossa && /[⠀-⣿]/.test(message)
-        ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
-        : renderMessageHTML(message, tags.emotes);
+      // native twitch gif posts carry only the giphy title in brackets -
+      // no id or url - so link the title to a giphy search for it
+      const gifm = message.match(/^\[([^\]]*\bGIF\b[^\]]*)\]$/i);
+      let msgHtml = gifm
+        ? `<a href="https://giphy.com/search/${encodeURIComponent(gifm[1].replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(message)}</a>`
+        : fossa && /[⠀-⣿]/.test(message)
+          ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
+          : renderMessageHTML(message, tags.emotes);
       if (blammo) {
         // bracketed tags ([Roulette], [Scramble], ...) get a bold chip
         // shaded by the tag text's hash, so matching games share a hue;
