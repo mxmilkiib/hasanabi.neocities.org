@@ -201,6 +201,10 @@
   .dot.offline { background: var(--text-dim); }
   .dot.idle { background: var(--accent); }
   .dot.reconnecting { background: var(--danger); }
+  /* console is all-green, so the non-live states step down in brightness
+     instead of sharing accent/dim greens that read as live */
+  [data-theme="console"] .dot.idle { background: var(--text-dim); }
+  [data-theme="console"] .dot.offline { background: #1a4a24; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
   @media (prefers-reduced-motion: reduce) {
     .dot.connecting, .dot.reconnecting { animation: none; }
