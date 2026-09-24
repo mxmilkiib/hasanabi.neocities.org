@@ -711,7 +711,7 @@
       if (subM) aux.push(`<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>[sub ${subM[1].padStart(2, '0')}]</span>`);
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
-      const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode] === 'right' ? ' auxr' : ''}">${aux.join(' ')}</span>` : '';
+      const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode] === 'left' ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
       const pid = tags['reply-parent-msg-id'];
       let reply = '';
       if (pid) {
@@ -733,10 +733,10 @@
       }
       html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] !== 'right' ? auxHtml : ''}${reply}` +
+              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
-              `${msgHtml}${SUB_MODES[subMode] === 'right' ? auxHtml : ''}</div>`;
+              `${msgHtml}${SUB_MODES[subMode] === 'left' ? '' : auxHtml}</div>`;
     }
     queue = [];
     activeEl.insertAdjacentHTML('beforeend', html);
@@ -1204,13 +1204,25 @@
     subBtn.style.justifyContent = { right: 'flex-end', left: 'flex-start', hidden: 'center' }[mode];
     subBtn.style.padding = mode === 'left' ? '0 1px 0 2px' : mode === 'right' ? '0 2px 0 1px' : '0 1px';
     subBtn.title = `Sub badge: ${mode} - click or scroll to cycle`;
+    // adopt stray .mod chips from rows rendered before the chip joined the
+    // aux cluster (e.g. restored history)
+    document.querySelectorAll('.row > .role.mod').forEach((mod) => {
+      const row = mod.parentElement;
+      let aux = row.querySelector('.aux');
+      if (!aux) {
+        aux = document.createElement('span');
+        aux.className = 'aux';
+        row.insertBefore(aux, row.querySelector('.reply') || row.querySelector('.name'));
+      }
+      aux.prepend(mod);
+    });
     // move existing rows' aux clusters to match the new mode
     document.querySelectorAll('.row .aux').forEach((aux) => {
       const row = aux.parentElement;
       const sub = aux.querySelector('.sub');
       if (sub) sub.hidden = mode === 'hidden';
-      if (mode === 'right') { aux.classList.add('auxr'); row.appendChild(aux); }
-      else { aux.classList.remove('auxr'); row.insertBefore(aux, row.querySelector('.reply') || row.querySelector('.name')); }
+      if (mode === 'left') { aux.classList.remove('auxr'); row.insertBefore(aux, row.querySelector('.reply') || row.querySelector('.name')); }
+      else { aux.classList.add('auxr'); row.appendChild(aux); }
     });
   }
 
