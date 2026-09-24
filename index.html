@@ -363,7 +363,7 @@
     <div><b>Ⓢ</b> sub badge — the [sub N] chip marks how many months that chatter has been subscribed; cycles hidden / left of name / right edge of the row</div>
     <div><b>▮▮</b> page-flip columns — one fills top-to-bottom, then flips to the other; scroll or click</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
-    <div><b>graph</b> — messages per second; scroll resizes the window (30s–4m); thin ticks mark 10s, thicker ones each minute</div>
+    <div><b>graph</b> — messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
     <div><b>dot</b> — stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
     <div><b>amber rows</b> @hasanabi mentions · <b>red rows</b> GLORP / FLORP / F · <b>red tint</b> channel-point highlights</div>
     <div><b>↩ chip</b> — reply context; click to jump to the original message</div>
@@ -662,12 +662,11 @@
       sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
   }
 
-  // ---- msgs/sec sparkline: one sample per second; wheel cycles the
-  // window length (~1px per second of history) ----
+  // ---- msgs/sec sparkline: one sample per second, 4-minute window ----
   const DPR = window.devicePixelRatio || 1;
   const SPARK_H = 18;
   const SPARK_WINDOWS = [30, 60, 120, 240];
-  let sparkWinIdx = 2;
+  const sparkWinIdx = SPARK_WINDOWS.length - 1;
   sparkEl.height = SPARK_H * DPR;
   const sparkCtx = sparkEl.getContext('2d');
   const rateSamples = [];
@@ -679,18 +678,11 @@
     sparkEl.width = n * DPR; // resets the canvas transform
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
     sparkEl.style.width = n + 'px';
-    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} — scroll to resize`;
+    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}`;
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
     drawSpark();
   }
-
-  sparkEl.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    sparkWinIdx = (sparkWinIdx + (e.deltaY < 0 ? 1 : -1) + SPARK_WINDOWS.length) % SPARK_WINDOWS.length;
-    sparkSize();
-    saveOpts();
-  }, { passive: false });
 
   function drawSpark() {
     const SPARK_N = SPARK_WINDOWS[sparkWinIdx];
@@ -965,7 +957,6 @@
         font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), theme: themeMode,
         lines: !mainEl.classList.contains('nolines'),
         hdrmin: document.body.classList.contains('hdrmin'),
-        spark: sparkWinIdx,
         sub: subMode,
         zebra: mainEl.classList.contains('zebra'),
       }));
@@ -986,7 +977,6 @@
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (typeof o.lines === 'boolean') setLines(o.lines);
     if (o.hdrmin) document.body.classList.add('hdrmin');
-    if (Number.isInteger(o.spark) && SPARK_WINDOWS[o.spark]) { sparkWinIdx = o.spark; sparkSize(); }
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = o.sub; applySubMode(); }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
   }
