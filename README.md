@@ -7,12 +7,12 @@ The project comes in two parts: the frontend
 ([hasanabi.neocities.org](https://github.com/mxmilkiib/hasanabi.neocities.org),
 this repo — a single `index.html`) and the backend chat relay
 ([twitch-chat-relay](https://github.com/mxmilkiib/twitch-chat-relay),
-also a single `index.html`, hosted on GitHub Pages). See
-[Why two parts](#why-two-parts) for the reason.
+also a single `index.html`, hosted on GitHub Pages).
 
 ## Why two parts
 
-Neocities serves pages with a strict Content Security Policy:
+Neocities serves pages with a strict
+[Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP):
 
     connect-src 'self' data: blob:
 
@@ -28,30 +28,6 @@ rather than anything hardcoded, it is channel-agnostic — any page on any
 CSP-locked host can embed the same iframe for any Twitch channel, one
 channel per iframe instance. The hasanabi specifics all live in this file;
 the relay could just as well serve a completely different channel page.
-
-## Frontend — `index.html` (this repo, on Neocities)
-
-Everything runs client-side in one file:
-
-- **Chat rendering** — raw Twitch IRC lines parsed into rows: timestamps,
-  linked names, badges/role chips ([ mod. ], [sub N], [bits], [first]),
-  reply chips with jump-to-original, emote retokenization.
-- **Emotes** — native Twitch `emotes` tags plus 7TV, BTTV and FFZ sets
-  (name → CDN URL map supplied by the relay).
-- **Header** — stream status dot (live / idle-gold / offline), uptime,
-  viewers, title on hover; offline shows last-run info; ROOMSTATE chat
-  modes (slow, follow age, emote-only, subs-only, r9k).
-- **Graph** — messages-per-second sparkline with 10s/minute ticks and
-  red glorp/F bursts; persisted across reloads.
-- **Controls** — themes, zebra striping, graduated text shadow, font
-  picker (incl. dyslexia-friendly), font size, line height, row lines,
-  sub-chip alignment, page-flip two-column mode, minimizable header,
-  help panel. All persisted in `localStorage`.
-- **Formatting** — mention highlighting, GLORP/F red rows, channel-point
-  tints, fossabot/blammobot name shimmer and game-line styling, braille
-  art restacking, image/GIF embeds, Nitter link rewriting for Twitter/X.
-- **Persistence** — last 250 rows, stream run history and graph samples
-  survive reloads via `localStorage`.
 
 ## Backend — `twitch-chat-relay` (GitHub Pages)
 
@@ -83,6 +59,30 @@ Relay → parent:
 - `{type: 'stream', uptime, viewers, title}` — decapi poll result
 - `{type: 'emotes', emotes, lastBroadcast, lastVod}` — emote map +
   stream history, refetched every 10 minutes
+
+## Frontend — `index.html` (this repo, on Neocities)
+
+Everything runs client-side in one file:
+
+- **Chat rendering** — raw Twitch IRC lines parsed into rows: timestamps,
+  linked names, badges/role chips ([ mod. ], [sub N], [bits], [first]),
+  reply chips with jump-to-original, emote retokenization.
+- **Emotes** — native Twitch `emotes` tags plus 7TV, BTTV and FFZ sets
+  (name → CDN URL map supplied by the relay).
+- **Header** — stream status dot (live / idle-gold / offline), uptime,
+  viewers, title on hover; offline shows last-run info; ROOMSTATE chat
+  modes (slow, follow age, emote-only, subs-only, r9k).
+- **Graph** — messages-per-second sparkline with 10s/minute ticks and
+  red glorp/F bursts; persisted across reloads.
+- **Controls** — themes, zebra striping, graduated text shadow, font
+  picker (incl. dyslexia-friendly), font size, line height, row lines,
+  sub-chip alignment, page-flip two-column mode, minimizable header,
+  help panel. All persisted in `localStorage`.
+- **Formatting** — mention highlighting, GLORP/F red rows, channel-point
+  tints, fossabot/blammobot name shimmer and game-line styling, braille
+  art restacking, image/GIF embeds, Nitter link rewriting for Twitter/X.
+- **Persistence** — last 250 rows, stream run history and graph samples
+  survive reloads via `localStorage`.
 
 ## Deploy
 
