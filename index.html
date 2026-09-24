@@ -146,6 +146,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 3px;
     gap: 12px;
     padding: 3px 18px;
     background: var(--panel);
@@ -209,7 +211,8 @@
     font-weight: 400;
     color: var(--text-dim);
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -340,7 +343,7 @@
   .reply b { font-weight: 600; }
   .row.jump { animation: jumpflash 1.4s ease-out; }
   @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
-  .hdr-side { display: flex; align-items: center; gap: 6px; flex: none; }
+  .hdr-side { display: flex; align-items: center; gap: 6px; flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; }
   .hdr-btn {
     background: none;
     border: 1px solid var(--line);
@@ -391,6 +394,20 @@
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh { color: var(--accent); cursor: pointer; text-decoration: none; }
   #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover { text-decoration: underline; }
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on { color: var(--text); text-decoration: underline; cursor: default; }
+  /* narrow screens: the header wraps onto a second row, controls get a
+     larger touch target, and the spark canvas clamps so it can't hog the row */
+  @media (max-width: 720px) {
+    header { padding: 3px 8px; column-gap: 8px; }
+    .channel { font-size: 15px; }
+    .hdr-side { gap: 4px; }
+    .hdr-btn { height: 26px; font-size: 13px; }
+    button.hdr-btn { width: 32px; }
+    #fontSel { max-width: 92px; }
+    #spark { max-width: 70px; }
+    .rate { font-size: 11px; }
+    #helpPanel { left: 8px; right: 8px; top: 8px; max-width: none; max-height: 70vh; }
+    .col { padding: 6px 10px 6px 8px; }
+  }
 </style>
 </head>
 <body>
