@@ -198,7 +198,7 @@
   @media (prefers-reduced-motion: reduce) {
     .dot.connecting, .dot.reconnecting { animation: none; }
   }
-  .chat-modes { font-size: 12px; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .chat-modes { font-size: 12px; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .stream-info {
     font-size: 12px;
     font-weight: 400;
@@ -970,7 +970,7 @@
       if (lastRun && lastRun.started) {
         ranTxt = endTs
           ? ` · <b>finished at</b> ${fmtTime(endTs)} after ${approx}${fmtDur(Math.max(1, Math.round((endTs - lastRun.started) / 60000)))} (started ${fmtTime(lastRun.started)})`
-          : ` · <b>last started at</b> ${fmtTime(lastRun.started)}`;
+          : ` · <b>last went live at</b> ${fmtTime(lastRun.started)}`;
       }
       dotEl.title = `${CHANNEL} is offline${endedTxt}${ranTxt} · ${chatTxt}`;
       infoEl.innerHTML = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
