@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23e8a33d" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>'>
+<title>HasanAbi chat</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible&family=Fira+Code:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=Inter&family=JetBrains+Mono:wght@400;600&family=Lexend:wght@400;600&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3&family=VT323&display=swap">
+<style>
+  @font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@20160623-Stable/woff/OpenDyslexic-Regular.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'OpenDyslexic Mono';
+    src: url('https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@20160623-Stable/otf/OpenDyslexicMono-Regular.otf') format('opentype');
+  }
+  @font-face {
+    font-family: 'Fixedsys';
+    src: url('https://cdn.jsdelivr.net/gh/javanile/fixedsys-css@0.0.6/fonts/fsex300-webfont.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Gohu';
+    src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@master/patched-fonts/Gohu/uni-11/GohuFontuni11NerdFont-Regular.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Hack';
+    src: url('https://cdn.jsdelivr.net/gh/source-foundry/Hack@master/build/ttf/Hack-Regular.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Hack';
+    font-weight: 700;
+    src: url('https://cdn.jsdelivr.net/gh/source-foundry/Hack@master/build/ttf/Hack-Bold.ttf') format('truetype');
+  }
+  :root {
+    color-scheme: light dark;
+    --bg: #f5f4f1;
+    --panel: #e8e6e1;
+    --line: #d8d4cc;
+    --text: #23252d;
+    --text-dim: #6b6f7a;
+    --accent: #a8750e;
+    --good: #1f9d55;
+    --danger: #c94a4a;
+    --vip: #c2255c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #14161c;
+      --panel: #1b1e27;
+      --line: #262a35;
+      --text: #e7e5e0;
+      --text-dim: #7d818e;
+      --accent: #e8a33d;
+      --good: #5fd98a;
+      --danger: #e85d5d;
+      --vip: #f783ac;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161c;
+    --panel: #1b1e27;
+    --line: #262a35;
+    --text: #e7e5e0;
+    --text-dim: #7d818e;
+    --accent: #e8a33d;
+    --good: #5fd98a;
+    --danger: #e85d5d;
+    --vip: #f783ac;
+  }
+  :root[data-theme="sepia"] {
+    --bg: #efe6d5;
+    --panel: #e5dac6;
+    --line: #cfc2a8;
+    --text: #3f3627;
+    --text-dim: #7a6c52;
+    --accent: #9a6b12;
+    --good: #2e7d46;
+    --danger: #b04040;
+    --vip: #a03060;
+  }
+  :root[data-theme="mid"] {
+    --bg: #62666f;
+    --panel: #545862;
+    --line: #494d57;
+    --text: #f0efe9;
+    --text-dim: #b9bdc6;
+    --accent: #f0b04a;
+    --good: #6fe08f;
+    --danger: #ff7d7d;
+    --vip: #ffa4c8;
+  }
+  :root[data-theme="black"] {
+    --bg: #000;
+    --panel: #0d0d0f;
+    --line: #1c1c20;
+    --text: #e7e5e0;
+    --text-dim: #7d818e;
+    --accent: #e8a33d;
+    --good: #5fd98a;
+    --danger: #e85d5d;
+    --vip: #f783ac;
+  }
+  :root[data-theme="paper"] {
+    --bg: #f2ede0;
+    --panel: #e8e1cf;
+    --line: #d3c9ae;
+    --text: #37322a;
+    --text-dim: #7c7360;
+    --accent: #96690f;
+    --good: #2e7d46;
+    --danger: #b04040;
+    --vip: #a03060;
+    /* fractal-noise grain tile, faint alpha — a subtle paper texture */
+    --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  :root[data-theme="console"] {
+    --bg: #000;
+    --panel: #061006;
+    --line: #0f2a0f;
+    --text: #33dd55;
+    --text-dim: #2a7a3a;
+    --accent: #5fff8a;
+    --good: #33ff66;
+    --danger: #cc4444;
+    --vip: #aaffcc;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    background-image: var(--texture, none);
+    color: var(--text);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  header {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 18px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .hdr-min { position: absolute; left: 50%; transform: translateX(-50%); }
+  body.hdrmin header { height: 9px; padding: 0; cursor: pointer; }
+  body.hdrmin header > * { display: none; }
+  #hint {
+    flex: none;
+    padding: 2px 18px;
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    text-align: center;
+  }
+  body.hdrmin #hint { display: none; }
+  body.hdrmin header::after {
+    content: '–';
+    display: block;
+    text-align: center;
+    font-size: 8px;
+    line-height: 9px;
+    color: var(--text-dim);
+  }
+  .channel {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 0;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex: none;
+  }
+  .dot.connecting, .dot.reconnecting { animation: pulse 1.2s ease-in-out infinite; }
+  .dot.connecting { background: var(--accent); }
+  .dot.connected { background: var(--good); }
+  .dot.offline { background: var(--text-dim); }
+  .dot.reconnecting { background: var(--danger); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) {
+    .dot.connecting, .dot.reconnecting { animation: none; }
+  }
+  .stream-info {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rate {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+  }
+  main { flex: 1; display: flex; min-height: 0; position: relative; }
+  .jdown {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 5;
+    opacity: .9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+  }
+  main.split .jdown { left: 25%; }
+  main.split .jdown.side { left: 75%; }
+  .col {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 8px 18px 8px 10px;
+  }
+  #side { border-left: 1px solid var(--line); }
+  main.nolines .row { border-bottom-color: transparent; }
+  .empty {
+    color: var(--text-dim);
+    padding: 24px 4px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .row {
+    font-family: var(--chat-ff, ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace);
+    font-size: var(--chat-font, 14px);
+    line-height: var(--chat-lh, 1.65);
+    padding: 3px 0;
+    border-bottom: 1px solid var(--line);
+    word-wrap: break-word;
+  }
+  .time { color: var(--text-dim); margin-right: 8px; }
+  .role { margin-right: 4px; color: var(--text-dim); }
+  .role.mod { color: var(--good); }
+  .role.vip { color: var(--vip); }
+  .role.host { color: var(--accent); }
+  .role.sub { color: #66d9e8; }
+  .role.bits { color: var(--accent); }
+  .role.first { color: var(--text-dim); }
+  .row.notice { color: var(--text-dim); font-style: italic; }
+  .row.points { background: rgba(232, 93, 93, .12); }
+  .row.glorp {
+    background: rgba(232, 93, 93, .13);
+    box-shadow: inset 3px 0 0 var(--danger);
+    margin-left: -8px;
+    padding-left: 12px;
+  }
+  .name { font-weight: 600; margin-right: 3px; text-decoration: none; }
+  .name:hover { text-decoration: underline; }
+  .name.shimmer {
+    color: transparent;
+    background-image: linear-gradient(100deg, var(--accent) 35%, #fff6d8 50%, var(--accent) 65%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 2.5s linear infinite;
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+  @media (prefers-reduced-motion: reduce) { .name.shimmer { animation: none; } }
+  /* Negative vertical margins keep the line box at the fixed line-height
+     while the image paints above and below the row. */
+  .emote { height: 1.5em; vertical-align: middle; margin: -.35em 1px; }
+  .chat-img { max-height: 6em; vertical-align: middle; margin: -2.7em 1px; }
+  /* Pasted image/gif links pin to the right edge so their vertical
+     overflow lands on empty space rather than over message text. */
+  .imglnk { float: right; margin-left: 6px; }
+  .row.mention {
+    background: rgba(232, 163, 61, .13);
+    box-shadow: inset 3px 0 0 var(--accent);
+    margin-left: -8px;
+    padding-left: 12px;
+  }
+  .at { color: var(--accent); }
+  .row a { color: var(--accent); }
+  .reply {
+    color: var(--text-dim);
+    font-size: .85em;
+    cursor: pointer;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .reply:hover { color: var(--accent); }
+  .reply b { font-weight: 600; }
+  .row.jump { animation: jumpflash 1.4s ease-out; }
+  @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
+  .hdr-side { display: flex; align-items: center; gap: 10px; flex: none; }
+  .hdr-btn {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text-dim);
+    padding: 0 8px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  #spark { width: 120px; height: 18px; flex: none; }
+  .hdr-btn:hover { color: var(--text); }
+  .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  select.hdr-btn { padding-right: 4px; }
+  select.hdr-btn option { background: var(--panel); color: var(--text); }
+  .subr { float: right; }
+  #helpPanel {
+    position: fixed;
+    top: 34px;
+    right: 12px;
+    max-width: 360px;
+    max-height: 75vh;
+    overflow-y: auto;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    z-index: 10;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+  }
+  #helpPanel b { color: var(--accent); font-weight: 600; }
+  #helpPanel div { margin: 4px 0; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span></div>
+    <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header — click the strip to bring it back">–</button>
+    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><select class="hdr-btn" id="fontSel" title="Chat font — click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size — click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height — click to cycle, shift+click to go back">↕</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes — ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help — click to toggle">?</button></div>
+  </header>
+  <div id="helpPanel" hidden>
+    <div><b>◐</b> theme — click or scroll cycles light / sepia / paper / mid / dark / black / console; right-click resets to system</div>
+    <div><b>font menu</b> — pick a chat font; scroll cycles without opening</div>
+    <div><b>Aa</b> font size, <b>↕</b> line height — click or scroll to cycle, shift+click goes back</div>
+    <div><b>≡</b> row separator lines — click or scroll</div>
+    <div><b>Ⓢ</b> sub badge — scroll or click cycles hidden / left of name / right edge of the row</div>
+    <div><b>▮▮</b> page-flip columns — one fills top-to-bottom, then flips to the other; scroll or click</div>
+    <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
+    <div><b>graph</b> — messages per second; scroll resizes the window (30s–4m); thin ticks mark 10s, thicker ones each minute</div>
+    <div><b>dot</b> — stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
+    <div><b>amber rows</b> @hasanabi mentions · <b>red rows</b> GLORP / FLORP / F · <b>red tint</b> channel-point highlights</div>
+    <div><b>↩ chip</b> — reply context; click to jump to the original message</div>
+    <div>names link to twitch profiles · fossabot's name shimmers · urls are clickable · images and gifs embed pinned right</div>
+    <div>options persist between visits in localStorage</div>
+  </div>
+  <div id="hint" hidden>tip: scroll the wheel over any option to change it — click to dismiss</div>
+  <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button></main>
+
+<script>
+(() => {
+  // ---- change this to point the page at a different channel ----
+  const CHANNEL = 'hasanabi';
+  const MAX_MESSAGES = 250;
+  const MENTION_RE = new RegExp('@' + CHANNEL + '\\b', 'i');
+  const GLORP_RE = /\b(?:glorp|florp)\b/i;
+  const F_RE = /^f$/i;
+
+  // Neocities' CSP is `connect-src 'self' data: blob:`, so a direct WebSocket
+  // to Twitch is blocked. frame-src is unrestricted, so a hidden iframe loads
+  // this relay page (GitHub Pages, no CSP) which opens the socket and
+  // postMessages raw IRC lines back here.
+  const RELAY_ORIGIN = 'https://mxmilkiib.github.io';
+  const RELAY_URL = RELAY_ORIGIN + '/twitch-chat-relay/?v=3';
+
+  const logEl = document.getElementById('log');
+  const dotEl = document.getElementById('dot');
+  const rateEl = document.getElementById('rate');
+  const infoEl = document.getElementById('streamInfo');
+  const sideEl = document.getElementById('side');
+  let activeEl = logEl; // column currently receiving new rows
+  const inactiveEl = () => (activeEl === logEl ? sideEl : logEl);
+  const isSplit = () => !sideEl.hidden;
+  const splitBtn = document.getElementById('splitBtn');
+  const fontBtn = document.getElementById('fontBtn');
+  const lhBtn = document.getElementById('lhBtn');
+  const themeBtn = document.getElementById('themeBtn');
+  const fontSel = document.getElementById('fontSel');
+  const linesBtn = document.getElementById('linesBtn');
+  const subBtn = document.getElementById('subBtn');
+  const helpBtn = document.getElementById('helpBtn');
+  const helpPanel = document.getElementById('helpPanel');
+  const mainEl = document.querySelector('main');
+  const sparkEl = document.getElementById('spark');
+  let emptyEl = document.getElementById('emptyState');
+  document.getElementById('channelName').textContent = 'HasanAbi';
+  const hintEl = document.getElementById('hint');
+  if (!localStorage.getItem('hasan-hint')) hintEl.hidden = false;
+  hintEl.addEventListener('click', () => {
+    hintEl.remove();
+    try { localStorage.setItem('hasan-hint', '1'); } catch (e) {}
+  });
+
+  // Colors picked for contrast against --bg, used when a chatter has no
+  // color set (or one too dark to read), hashed so each name is stable.
+  const COLORS = ['#FF6B6B','#4DABF7','#69DB7C','#FFD43B','#FF922B','#DA77F2',
+                  '#66D9E8','#F783AC','#94D82D','#FFA94D','#B197FC','#63E6BE'];
+  const LIGHT_COLORS = ['#c92a2a','#1971c2','#2f9e44','#b08800','#d9480f','#9c36b5',
+                        '#0c8599','#c2255c','#5c940d','#e8590c','#7048e8','#0ca678'];
+  // Shades of phosphor green for the console theme's name palette.
+  const CONSOLE_COLORS = ['#33dd55','#5fff8a','#22bb44','#88ffaa','#44ee77','#aaffcc',
+                          '#19a03f','#66dd88','#bbffdd','#2bcc5f','#77ff99','#4dcc77'];
+  let lightMode = false;
+  let monoNames = false;   // console theme: ignore chatter colors, stay green
+  let namePalette = COLORS;
+
+  function colorForName(name) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    return namePalette[hash % namePalette.length];
+  }
+
+  function ensureLegible(hex) {
+    if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return null;
+    const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    if (lightMode) {
+      if (luminance < 0.55) return hex;
+      const mix = (c) => Math.round(c * 0.45);
+      return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+    }
+    if (luminance > 0.35) return hex;
+    const mix = (c) => Math.round(c + (255 - c) * 0.5);
+    return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+  }
+
+  function escapeHTML(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function parseTags(tagStr) {
+    const tags = {};
+    for (const pair of tagStr.split(';')) {
+      const eq = pair.indexOf('=');
+      if (eq === -1) continue;
+      tags[pair.slice(0, eq)] = pair.slice(eq + 1);
+    }
+    return tags;
+  }
+
+  // Twitch escapes tag values: \s space, \: semicolon, \\ backslash, \r \n.
+  function unescapeTag(s) {
+    return s.replace(/\\(.)/g, (m, c) => ({ s: ' ', ':': ';', r: '', n: ' ', '\\': '\\' }[c] ?? c));
+  }
+
+  // Parses one Twitch IRC line into {tags, channel, message}.
+  function parseTwitchMessage(raw) {
+    let tags = {};
+    let rest = raw;
+    if (raw.startsWith('@')) {
+      const spaceIdx = raw.indexOf(' ');
+      tags = parseTags(raw.slice(1, spaceIdx));
+      rest = raw.slice(spaceIdx + 1);
+    }
+    const cmd = rest.match(/ (PRIVMSG|USERNOTICE) /);
+    if (!cmd) return null;
+    let login = null;
+    if (rest.startsWith(':')) {
+      const bang = rest.indexOf('!');
+      if (bang > 1) login = rest.slice(1, bang);
+    }
+    const afterCmd = rest.slice(cmd.index + cmd[1].length + 2);
+    const msgIdx = afterCmd.indexOf(' :');
+    if (msgIdx === -1) return null;
+    return { tags, login, channel: afterCmd.slice(0, msgIdx), message: afterCmd.slice(msgIdx + 2), kind: cmd[1] };
+  }
+
+  // Third-party emote map (7TV/BTTV/FFZ) sent by the relay — the page's CSP
+  // blocks fetching the sets itself, but img-src * lets the CDN images render.
+  let thirdPartyEmotes = {};
+
+  // Escapes text, swapping whole-word third-party emote tokens for <img> tags
+  // and bolding @username mentions like real chat.
+  function renderTextHTML(text) {
+    return text.split(/(\s+)/).map((tok) => {
+      const url = thirdPartyEmotes[tok];
+      if (url) {
+        const alt = escapeHTML(tok);
+        return `<img class="emote" src="${escapeHTML(url)}" alt="${alt}" title="${alt}">`;
+      }
+      const giphy = tok.match(/giphy\.com\/(?:gifs|embed)\/\S*?-([A-Za-z0-9]+)/i) ||
+                    tok.match(/giphy\.com\/media\/([A-Za-z0-9]+)/i);
+      if (giphy) {
+        const u = escapeHTML(tok);
+        const src = escapeHTML(`https://media.giphy.com/media/${giphy[1]}/giphy.gif`);
+        return `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`;
+      }
+      if (/^https?:\/\/\S+$/i.test(tok)) {
+        const u = escapeHTML(tok);
+        if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(tok)) {
+          const src = /\.gifv(?:\?\S*)?$/i.test(tok) ? u.replace(/\.gifv/i, '.gif') : u;
+          return `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>`;
+        }
+        return `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`;
+      }
+      const at = tok.match(/^(@\w+)(.*)$/s);
+      if (at) return `<b class="at">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]);
+      return escapeHTML(tok);
+    }).join('');
+  }
+
+  // Turns message text + the "emotes" tag into HTML, swapping emote spans for
+  // <img> tags and escaping everything else.
+  function renderMessageHTML(message, emotesTag) {
+    if (!emotesTag) return renderTextHTML(message);
+    const emotes = [];
+    for (const part of emotesTag.split('/')) {
+      const [id, ranges] = part.split(':');
+      if (!ranges) continue;
+      for (const range of ranges.split(',')) {
+        const [start, end] = range.split('-').map(Number);
+        emotes.push({ id, start, end });
+      }
+    }
+    if (emotes.length === 0) return escapeHTML(message);
+    emotes.sort((a, b) => a.start - b.start);
+    let html = '', cursor = 0;
+    for (const e of emotes) {
+      if (e.start < cursor) continue; // ignore malformed/overlapping ranges
+      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start));
+      const alt = escapeHTML(message.slice(e.start, e.end + 1));
+      const eid = escapeHTML(e.id);
+      const tone = lightMode ? 'light' : 'dark';
+      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/animated/${tone}/2.0"` +
+              ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${eid}/default/${tone}/2.0'"` +
+              ` alt="${alt}" title="${alt}">`;
+      cursor = e.end + 1;
+    }
+    if (cursor < message.length) html += renderTextHTML(message.slice(cursor));
+    return html;
+  }
+
+  function roleTag(tags) {
+    const out = [];
+    const badges = tags.badges || '';
+    if (badges.includes('broadcaster/')) out.push('<span class="role host">[host]</span>');
+    else if (badges.includes('moderator/')) out.push('<span class="role mod">[mod]</span>');
+    else if (badges.includes('vip/')) out.push('<span class="role vip">[vip]</span>');
+    if (tags.bits) out.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
+    if (tags['first-msg'] === '1') out.push('<span class="role first">[first]</span>');
+    return out.join(' ');
+  }
+
+  // ---- batched rendering: incoming lines only queue, a single
+  // requestAnimationFrame per batch does all the DOM work ----
+  let queue = [];
+  let scheduled = false;
+  let recentTimestamps = [];
+  let stickBottom = true; // live column follows new messages while near the bottom
+  // IRC "id" tag → row element, so reply chips can jump to their parent.
+  const rowById = new Map();
+
+  const jdownLog = document.getElementById('jdownLog');
+  const jdownSide = document.getElementById('jdownSide');
+
+  logEl.addEventListener('scroll', () => {
+    stickBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
+    jdownLog.hidden = stickBottom;
+  });
+  sideEl.addEventListener('scroll', () => {
+    jdownSide.hidden = sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
+  });
+  function jumpDown(col, btn) {
+    btn.hidden = true;
+    col.scrollTo({ top: col.scrollHeight, behavior: 'smooth' });
+  }
+  jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
+  jdownSide.addEventListener('click', () => jumpDown(sideEl, jdownSide));
+
+  function queueMessage(parsed) {
+    queue.push(parsed);
+    recentTimestamps.push(Date.now());
+    if (!scheduled) {
+      scheduled = true;
+      requestAnimationFrame(flush);
+    }
+  }
+
+  function flush() {
+    scheduled = false;
+    if (emptyEl) { emptyEl.remove(); emptyEl = null; }
+    const nearBottom = stickBottom;
+    let html = '';
+    for (const { tags, login, message, kind } of queue) {
+      const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
+      const timeStr = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      if (kind === 'USERNOTICE') {
+        const sys = unescapeTag(tags['system-msg'] || '');
+        const who = tags['display-name'] || login || '';
+        html += `<div class="row notice"><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
+                `${escapeHTML(sys)}${message ? ' — ' + renderMessageHTML(message, tags.emotes) : ''}</div>`;
+        continue;
+      }
+      const name = tags['display-name'] || '(unknown)';
+      const color = monoNames ? colorForName(name) : (ensureLegible(tags.color) || colorForName(name));
+      const role = roleTag(tags);
+      const profile = escapeHTML(encodeURIComponent(login || name.toLowerCase()));
+      const fossa = (login || name).toLowerCase() === 'fossabot';
+      const points = tags['msg-id'] === 'highlighted-message';
+      const glorp = GLORP_RE.test(message) || F_RE.test(message.trim());
+      if (glorp) glorpTimestamps.push(Date.now());
+      const subM = subMode && (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
+      const subChip = subM ? `[sub ${subM[1]}]` : '';
+      const pid = tags['reply-parent-msg-id'];
+      let reply = '';
+      if (pid) {
+        const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
+        const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
+        const excerpt = pbody.length > 48 ? pbody.slice(0, 48).trimEnd() + '…' : pbody;
+        reply = `<span class="reply" data-pid="${escapeHTML(pid)}" title="${escapeHTML(pname + ': ' + pbody)}">` +
+                `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
+      }
+      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}"` +
+              `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
+              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${subMode === 1 && subChip ? `<span class="role sub">${subChip}</span> ` : ''}${reply}` +
+              `<a class="name${fossa ? ' shimmer' : ''}"${fossa ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
+              ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
+              `${renderMessageHTML(message, tags.emotes)}${subMode === 2 && subChip ? `<span class="role sub subr">${subChip}</span>` : ''}</div>`;
+    }
+    queue = [];
+    activeEl.insertAdjacentHTML('beforeend', html);
+    const kids = activeEl.children;
+    for (let i = kids.length - 1; i >= 0 && kids[i].dataset.mid && !rowById.has(kids[i].dataset.mid); i--)
+      rowById.set(kids[i].dataset.mid, kids[i]);
+    if (rowById.size > 2000) rowById.clear();
+    if (isSplit()) {
+      if (pushOverflow(activeEl, inactiveEl())) activeEl = inactiveEl();
+    } else {
+      while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
+      if (nearBottom) activeEl.scrollTop = activeEl.scrollHeight;
+    }
+    jdownLog.hidden = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
+    jdownSide.hidden = sideEl.hidden ||
+      sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
+  }
+
+  // ---- msgs/sec sparkline: one sample per second; wheel cycles the
+  // window length (~1px per second of history) ----
+  const DPR = window.devicePixelRatio || 1;
+  const SPARK_H = 18;
+  const SPARK_WINDOWS = [30, 60, 120, 240];
+  let sparkWinIdx = 2;
+  sparkEl.height = SPARK_H * DPR;
+  const sparkCtx = sparkEl.getContext('2d');
+  const rateSamples = [];
+  const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
+  const glorpSamples = [];
+
+  function sparkSize() {
+    const n = SPARK_WINDOWS[sparkWinIdx];
+    sparkEl.width = n * DPR; // resets the canvas transform
+    sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    sparkEl.style.width = n + 'px';
+    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} — scroll to resize`;
+    if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
+    if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
+    drawSpark();
+  }
+
+  sparkEl.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    sparkWinIdx = (sparkWinIdx + (e.deltaY < 0 ? 1 : -1) + SPARK_WINDOWS.length) % SPARK_WINDOWS.length;
+    sparkSize();
+    saveOpts();
+  }, { passive: false });
+
+  function drawSpark() {
+    const SPARK_N = SPARK_WINDOWS[sparkWinIdx];
+    const SPARK_W = SPARK_N;
+    sparkCtx.clearRect(0, 0, SPARK_W, SPARK_H);
+    const styles = getComputedStyle(document.documentElement);
+    const step = SPARK_W / (SPARK_N - 1); // ~1px per sample
+    // faint vertical tick every 10s counting back from the newest; each
+    // minute mark draws a touch thicker
+    sparkCtx.strokeStyle = styles.getPropertyValue('--line') || '#262a35';
+    for (let k = 0; ; k++) {
+      const x = Math.round((SPARK_N - 1 - k * 10) * step) + .5;
+      if (x < 0) break;
+      sparkCtx.beginPath();
+      sparkCtx.lineWidth = k % 6 === 0 ? 1.5 : 1;
+      sparkCtx.globalAlpha = k % 6 === 0 ? .5 : .3;
+      sparkCtx.moveTo(x, 0);
+      sparkCtx.lineTo(x, SPARK_H);
+      sparkCtx.stroke();
+      sparkCtx.globalAlpha = 1;
+    }
+    const n = rateSamples.length;
+    if (!n) return;
+    const accent = styles.getPropertyValue('--accent') || '#e8a33d';
+    const max = Math.max(1, ...rateSamples);
+    sparkCtx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = (i + SPARK_N - n) * step;
+      const y = SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3);
+      i ? sparkCtx.lineTo(x, y) : sparkCtx.moveTo(x, y);
+    }
+    sparkCtx.strokeStyle = accent;
+    sparkCtx.lineWidth = 1;
+    sparkCtx.stroke();
+    sparkCtx.lineTo(SPARK_W, SPARK_H);
+    sparkCtx.lineTo((SPARK_N - n) * step, SPARK_H);
+    sparkCtx.closePath();
+    sparkCtx.globalAlpha = .25;
+    sparkCtx.fillStyle = accent;
+    sparkCtx.fill();
+    sparkCtx.globalAlpha = 1;
+    // seconds with more than two glorp/F messages get a red segment
+    const danger = styles.getPropertyValue('--danger') || '#e85d5d';
+    sparkCtx.strokeStyle = danger;
+    sparkCtx.lineWidth = 2;
+    for (let i = 0; i < n; i++) {
+      if ((glorpSamples[i] || 0) <= 2) continue;
+      const x = (i + SPARK_N - n) * step;
+      const y = SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3);
+      sparkCtx.beginPath();
+      if (i) {
+        sparkCtx.moveTo((i - 1 + SPARK_N - n) * step,
+          SPARK_H - 1 - (rateSamples[i - 1] / max) * (SPARK_H - 3));
+      } else sparkCtx.moveTo(x, y);
+      sparkCtx.lineTo(x, y);
+      sparkCtx.stroke();
+    }
+  }
+
+  sparkSize();
+
+  setInterval(() => {
+    const cutoff = Date.now() - 5000;
+    recentTimestamps = recentTimestamps.filter((t) => t > cutoff);
+    const rate = recentTimestamps.length / 5;
+    rateEl.textContent = rate ? rate.toFixed(1) + ' msgs/sec' : '';
+    rateSamples.push(rate);
+    if (rateSamples.length > SPARK_WINDOWS[sparkWinIdx]) rateSamples.shift();
+    const gcut = Date.now() - 1000;
+    while (glorpTimestamps.length && glorpTimestamps[0] < gcut) glorpTimestamps.shift();
+    glorpSamples.push(glorpTimestamps.length);
+    if (glorpSamples.length > SPARK_WINDOWS[sparkWinIdx]) glorpSamples.shift();
+    drawSpark();
+    updateHeader();
+  }, 1000);
+
+  // ---- stream status (polled by the relay via decapi) ----
+  // The dot shows stream state: green live, grey offline, pulsing amber while
+  // unknown. Chat connection state folds into the dot's tooltip and, when it
+  // is not healthy, into the info text.
+  let chatState = 'connecting';
+  let stream = null;       // { live, startedAt, viewers, title }
+  let streamHeard = false; // a stream report arrived at least once
+  let streamDead = false;  // no report within the watchdog window
+
+  function parseUptimeMinutes(text) {
+    const mult = { day: 1440, hour: 60, minute: 1 };
+    let total = 0, found = false;
+    for (const m of text.matchAll(/(\d+)\s*(day|hour|minute)s?/gi)) {
+      total += Number(m[1]) * mult[m[2].toLowerCase()];
+      found = true;
+    }
+    return found ? total : null;
+  }
+
+  function fmtTime(ts) {
+    return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function fmtDur(mins) {
+    const h = (mins / 60) | 0;
+    return h ? `${h}h ${mins % 60}m` : `${mins}m`;
+  }
+
+  function onStream(d) {
+    streamHeard = true;
+    if (/offline|not streaming|not live|not online/i.test(d.uptime)) {
+      stream = { live: false };
+    } else {
+      const mins = parseUptimeMinutes(d.uptime);
+      const viewers = parseInt((d.viewers || '').replace(/[^\d]/g, ''), 10);
+      stream = {
+        live: true,
+        startedAt: mins != null ? Date.now() - mins * 60000 : null,
+        viewers: Number.isFinite(viewers) ? viewers : null,
+        title: d.title || '',
+      };
+    }
+    updateHeader();
+  }
+
+  function updateHeader() {
+    const chatTxt = chatState === 'connected' ? 'chat connected'
+                  : chatState === 'reconnecting' ? 'chat reconnecting'
+                  : 'connecting to chat';
+    if (!stream) {
+      if (streamDead) {
+        // Relay never reported stream status (stale cache or blocked API):
+        // fall back to showing chat connection state on the dot.
+        dotEl.className = 'dot ' + chatState;
+        dotEl.title = `stream status unavailable · ${chatTxt}`;
+        infoEl.textContent = chatState === 'connected' ? '' : chatTxt;
+      } else {
+        dotEl.className = 'dot connecting';
+        dotEl.title = `checking stream status · ${chatTxt}`;
+        infoEl.textContent = '';
+      }
+      return;
+    }
+    if (!stream.live) {
+      dotEl.className = 'dot offline';
+      dotEl.title = `${CHANNEL} is offline · ${chatTxt}`;
+      infoEl.textContent = 'offline' + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
+      return;
+    }
+    const mins = stream.startedAt ? Math.round((Date.now() - stream.startedAt) / 60000) : null;
+    const up = mins != null ? fmtDur(mins) : '';
+    const since = stream.startedAt ? fmtTime(stream.startedAt) : '';
+    const viewers = stream.viewers != null ? ` · ${stream.viewers.toLocaleString()} watching` : '';
+    const chatSuffix = chatState === 'connected' ? '' : ` · ${chatTxt}`;
+    dotEl.className = 'dot connected';
+    infoEl.textContent = (since ? `live since ${since} · up ${up}` : 'live') + viewers + chatSuffix;
+    infoEl.title = stream.title || '';
+    dotEl.title = `${CHANNEL} is live${since ? ` — started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
+  }
+
+  function setStatus(state) {
+    chatState = state;
+    updateHeader();
+  }
+
+  function handleLine(line) {
+    if (/ (PRIVMSG|USERNOTICE) /.test(line)) {
+      const parsed = parseTwitchMessage(line);
+      if (parsed) queueMessage(parsed);
+    }
+  }
+
+  // ---- theme: starts on system (prefers-color-scheme); click/wheel cycles
+  // the explicit palettes, right-click resets to system ----
+  const THEMES = ['light', 'sepia', 'paper', 'mid', 'dark', 'black', 'console'];
+  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', mid: '◐', dark: '☾', black: '●', console: '▮' };
+  const LIGHT_THEMES = ['light', 'sepia', 'paper'];
+  let themeMode = 'auto';
+  const lightMQ = matchMedia('(prefers-color-scheme: light)');
+
+  function applyTheme() {
+    if (themeMode === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.dataset.theme = themeMode;
+    const resolved = themeMode === 'auto' ? (lightMQ.matches ? 'light' : 'dark') : themeMode;
+    lightMode = LIGHT_THEMES.includes(resolved);
+    monoNames = resolved === 'console';
+    namePalette = monoNames ? CONSOLE_COLORS : (lightMode ? LIGHT_COLORS : COLORS);
+    themeBtn.textContent = THEME_ICONS[themeMode] || '◐';
+    themeBtn.title = `Theme: ${themeMode} — click or scroll to cycle, right-click for system`;
+  }
+
+  function stepTheme(dir) {
+    const cur = themeMode === 'auto' ? (lightMQ.matches ? 'light' : 'dark') : themeMode;
+    themeMode = THEMES[(THEMES.indexOf(cur) + dir + THEMES.length) % THEMES.length];
+    applyTheme();
+    saveOpts();
+  }
+
+  themeBtn.addEventListener('click', () => stepTheme(1));
+  themeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTheme(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  themeBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); themeMode = 'auto'; applyTheme(); saveOpts(); });
+  lightMQ.addEventListener('change', () => { if (themeMode === 'auto') applyTheme(); });
+  applyTheme();
+
+  // ---- text controls: click or scroll to cycle, shift+click goes back ----
+  const FONT_SIZES = [12, 14, 16, 18, 21, 24, 28, 32];
+  const LINE_HEIGHTS = [1.1, 1.25, 1.4, 1.65, 1.9, 2.2];
+  const FONT_STACKS = {
+    mono: '"JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace',
+    sans: 'ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif',
+    inter: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    sourcesans: '"Source Sans 3", ui-sans-serif, system-ui, sans-serif',
+    atkinson: '"Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif',
+    lexend: 'Lexend, ui-sans-serif, system-ui, sans-serif',
+    dyslexic: 'OpenDyslexic, ui-sans-serif, system-ui, sans-serif',
+    dyslexicmono: '"OpenDyslexic Mono", ui-monospace, monospace',
+    hack: 'Hack, ui-monospace, monospace',
+    firacode: '"Fira Code", ui-monospace, monospace',
+    sourcecodepro: '"Source Code Pro", ui-monospace, monospace',
+    plexmono: '"IBM Plex Mono", ui-monospace, monospace',
+    vt323: 'VT323, ui-monospace, monospace',
+    fixedsys: 'Fixedsys, monospace',
+    gohu: 'Gohu, monospace',
+  };
+
+  // After a layout-affecting change: keep the live column pinned, or in
+  // split mode re-run the page overflow check.
+  function repin() {
+    if (isSplit()) { if (pushOverflow(activeEl, inactiveEl())) activeEl = inactiveEl(); }
+    else if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function cycle(btn, list, idx, prop, label, unit) {
+    const apply = () => {
+      document.documentElement.style.setProperty(prop, list[idx] + unit);
+      btn.title = `${label}: ${list[idx]}${unit} — click or scroll to cycle, shift+click to go back`;
+      repin();
+      saveOpts();
+    };
+    btn.addEventListener('click', (e) => { idx = (idx + (e.shiftKey ? -1 : 1) + list.length) % list.length; apply(); });
+    btn.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      idx = (idx + (e.deltaY < 0 ? 1 : -1) + list.length) % list.length;
+      apply();
+    }, { passive: false });
+    return { set: (i) => { idx = i; apply(); }, get: () => idx };
+  }
+
+  const fontCtl = cycle(fontBtn, FONT_SIZES, 1, '--chat-font', 'Font size', 'px');
+  const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 3, '--chat-lh', 'Line height', '');
+  fontCtl.set(fontCtl.get());
+  lhCtl.set(lhCtl.get());
+
+  function applyFont() {
+    document.documentElement.style.setProperty('--chat-ff',
+      FONT_STACKS[fontSel.value] || FONT_STACKS.mono);
+    fontSel.title = `Font: ${fontSel.options[fontSel.selectedIndex].text} — click or scroll to change`;
+    repin();
+  }
+
+  fontSel.addEventListener('change', () => { applyFont(); saveOpts(); });
+  fontSel.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const n = fontSel.options.length;
+    fontSel.selectedIndex = (fontSel.selectedIndex + (e.deltaY < 0 ? 1 : -1) + n) % n;
+    applyFont();
+    saveOpts();
+  }, { passive: false });
+
+  // ---- option persistence ----
+  const OPTS_KEY = 'hasan-opts';
+
+  function saveOpts() {
+    try {
+      localStorage.setItem(OPTS_KEY, JSON.stringify({
+        font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), theme: themeMode,
+        lines: !mainEl.classList.contains('nolines'),
+        hdrmin: document.body.classList.contains('hdrmin'),
+        spark: sparkWinIdx,
+        sub: subMode,
+      }));
+    } catch (e) {}
+  }
+
+  function loadOpts() {
+    let o;
+    try { o = JSON.parse(localStorage.getItem(OPTS_KEY)); } catch (e) {}
+    if (!o) return;
+    if (typeof o.theme === 'string' && (o.theme === 'auto' || THEMES.includes(o.theme))) {
+      themeMode = o.theme; applyTheme();
+    } else if (Number.isInteger(o.theme)) { // legacy int index: 0=auto 1=light 2=dark
+      themeMode = ['auto', 'light', 'dark'][o.theme] || 'auto'; applyTheme();
+    }
+    if (Number.isInteger(o.size)) fontCtl.set(o.size);
+    if (Number.isInteger(o.lh)) lhCtl.set(o.lh);
+    if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
+    if (typeof o.lines === 'boolean') setLines(o.lines);
+    if (o.hdrmin) document.body.classList.add('hdrmin');
+    if (Number.isInteger(o.spark) && SPARK_WINDOWS[o.spark]) { sparkWinIdx = o.spark; sparkSize(); }
+    if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = o.sub; applySubMode(); }
+  }
+
+  // ---- header collapse: button shrinks it to a thin strip, clicking the
+  // strip restores it ----
+  const headerEl = document.querySelector('header');
+  const hdrMinBtn = document.getElementById('hdrMin');
+  hdrMinBtn.addEventListener('click', () => {
+    document.body.classList.add('hdrmin');
+    saveOpts();
+  });
+  headerEl.addEventListener('click', (e) => {
+    if (!document.body.classList.contains('hdrmin') || e.target === hdrMinBtn) return;
+    document.body.classList.remove('hdrmin');
+    saveOpts();
+    repin();
+  });
+
+  function setLines(on) {
+    mainEl.classList.toggle('nolines', !on);
+    linesBtn.classList.toggle('on', on);
+    linesBtn.title = `Row separators: ${on ? 'on' : 'off'} — click or scroll to toggle`;
+  }
+
+  // ---- sub badge placement: hidden / left of name / right edge of row ----
+  const SUB_MODES = ['hidden', 'left', 'right'];
+  let subMode = 1;
+
+  function applySubMode() {
+    subBtn.classList.toggle('on', subMode !== 0);
+    subBtn.title = `Sub badge: ${SUB_MODES[subMode]} — click or scroll to cycle`;
+  }
+
+  function stepSub(dir) {
+    subMode = (subMode + dir + SUB_MODES.length) % SUB_MODES.length;
+    applySubMode();
+    saveOpts();
+  }
+
+  subBtn.addEventListener('click', () => stepSub(1));
+  subBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepSub(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  applySubMode();
+
+  // ---- help panel ----
+  helpBtn.addEventListener('click', () => {
+    const show = helpPanel.hidden;
+    helpPanel.hidden = !show;
+    helpBtn.classList.toggle('on', show);
+  });
+
+  linesBtn.addEventListener('click', () => { setLines(mainEl.classList.contains('nolines')); saveOpts(); });
+  linesBtn.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    setLines(mainEl.classList.contains('nolines'));
+    saveOpts();
+  }, { passive: false });
+  setLines(true);
+
+  // Clicking a reply chip scrolls to the parent row and flashes it, if the
+  // original is still in the buffer.
+  mainEl.addEventListener('click', (e) => {
+    const chip = e.target.closest('.reply');
+    if (!chip) return;
+    const target = rowById.get(chip.dataset.pid);
+    if (!target || !target.isConnected) { rowById.delete(chip.dataset.pid); return; }
+    target.scrollIntoView({ block: 'center' });
+    target.classList.remove('jump');
+    void target.offsetWidth;
+    target.classList.add('jump');
+  });
+
+  // ---- split view: page-flip columns. New rows fill the active column;
+  // once a row drops below the fold the other column is cleared and becomes
+  // the target, flipping back and forth. Inactive column scrolls freely. ----
+  // Moves rows below the fold of `from` to the top of `to` (cleared first).
+  function pushOverflow(from, to) {
+    let last, moved = false;
+    while ((last = from.lastElementChild) &&
+           last.offsetTop - from.offsetTop + last.offsetHeight > from.clientHeight) {
+      if (!moved) { to.textContent = ''; moved = true; }
+      to.prepend(last);
+    }
+    return moved;
+  }
+
+  function toggleSplit() {
+    const enable = sideEl.hidden;
+    splitBtn.classList.toggle('on', enable);
+    mainEl.classList.toggle('split', enable);
+    if (!enable) jdownSide.hidden = true;
+    splitBtn.title = enable ? 'Rejoin the columns' : 'Split into page-flip columns';
+    if (enable) {
+      sideEl.textContent = '';
+      sideEl.hidden = false;
+      sideEl.scrollTop = 0;
+      activeEl = sideEl;
+    } else {
+      // merge both pages back into the left column, oldest first
+      if (activeEl === sideEl) {
+        while (sideEl.firstElementChild) logEl.appendChild(sideEl.firstElementChild);
+      } else {
+        while (sideEl.lastElementChild) logEl.prepend(sideEl.lastElementChild);
+      }
+      sideEl.hidden = true;
+      activeEl = logEl;
+    }
+    // On rejoin the columns widen again — re-pin the live column if it was
+    // following. On split the left column keeps its scroll position untouched.
+    if (!enable)
+      requestAnimationFrame(() => { if (stickBottom) logEl.scrollTop = logEl.scrollHeight; });
+  }
+
+  splitBtn.addEventListener('click', toggleSplit);
+  splitBtn.addEventListener('wheel', (e) => { e.preventDefault(); toggleSplit(); }, { passive: false });
+
+  // ---- relay iframe: handles the Twitch socket and its own reconnects ----
+  const relayFrame = document.createElement('iframe');
+  relayFrame.style.display = 'none';
+  relayFrame.src = RELAY_URL;
+  document.body.appendChild(relayFrame);
+
+  let joined = false;
+
+  function join() {
+    if (relayFrame.contentWindow)
+      relayFrame.contentWindow.postMessage({ type: 'join', channel: CHANNEL }, RELAY_ORIGIN);
+  }
+
+  relayFrame.addEventListener('load', join);
+  // Resend join until the relay reports connected, in case the first message
+  // raced the iframe's script or the relay was mid-reconnect.
+  const joinTimer = setInterval(() => { if (!joined) join(); }, 3000);
+
+  // If the relay never reports stream status, give up waiting for it.
+  setTimeout(() => {
+    if (!streamHeard) { streamDead = true; updateHeader(); }
+  }, 10000);
+
+  window.addEventListener('message', (event) => {
+    if (event.origin !== RELAY_ORIGIN || event.source !== relayFrame.contentWindow) return;
+    const d = event.data;
+    if (!d) return;
+    if (d.type === 'status') {
+      setStatus(d.state);
+      joined = d.state === 'connected';
+      if (joined) clearInterval(joinTimer);
+    } else if (d.type === 'lines') {
+      for (const line of d.lines) handleLine(line);
+    } else if (d.type === 'stream') {
+      onStream(d);
+    } else if (d.type === 'emotes') {
+      thirdPartyEmotes = d.emotes || {};
+    }
+  });
+
+  loadOpts();
+})();
+</script>
+</body>
+</html>
