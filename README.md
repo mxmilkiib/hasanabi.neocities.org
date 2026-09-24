@@ -83,5 +83,6 @@ Relay → parent:
 
     neocities-deploy deploy -s hasanabi.neocities.org
 
-Using [neocities-deploy](https://github.com/kugland/neocities-deploy).
+Using [neocities-deploy](https://github.com/kugland/neocities-deploy)
+([AUR package](https://aur.archlinux.org/packages/neocities-deploy-bin)).
 The relay deploys automatically via GitHub Pages on push.
