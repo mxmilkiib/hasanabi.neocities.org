@@ -373,7 +373,7 @@
   #helpPanel b.points { background-color: rgba(232, 93, 93, .12); }
   #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 110px 1fr; gap: 0 8px; }
   #helpPanel sup { position: absolute; font-size: 10px; margin-left: 2px; transform: translateY(-3px); }
-  #helpThemeRow a { margin-right: 10px; }
+  #helpPanel b.fn { color: var(--text); }
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh { color: var(--accent); cursor: pointer; text-decoration: none; }
   #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover { text-decoration: underline; }
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on { color: var(--text); text-decoration: underline; cursor: default; }
@@ -403,8 +403,7 @@
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage</div>
-    <div><b>†</b> click or scroll to change</div>
-    <div><b>themes</b><span id="helpThemeRow"></span></div>
+    <div><b class="fn">†</b> click or scroll to change</div>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">reset all settings</button>
     <div><b>source</b><span><a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a></span></div>
   </div>
@@ -1112,9 +1111,7 @@
   themeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTheme(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   themeBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); themeMode = 'auto'; applyTheme(); saveOpts(); });
   lightMQ.addEventListener('change', () => { if (themeMode === 'auto') applyTheme(); });
-  // theme quick-switch row inside the help panel
-  document.getElementById('helpThemeRow').innerHTML = ['auto', ...THEMES].map((t) =>
-    `<a href="#" class="helpTheme" data-theme="${t}">${t === 'auto' ? 'system' : t}</a>`).join(' ');
+  // theme names in the help description are clickable quick-switches
   document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
     `<a href="#" class="helpTheme" data-theme="${t}">${t}</a>`).join(' / ');
   helpPanel.addEventListener('click', (e) => {
