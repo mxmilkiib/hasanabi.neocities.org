@@ -323,6 +323,7 @@
   .hdr-btn {
     background: none;
     border: 1px solid var(--line);
+    border-color: color-mix(in srgb, var(--text-dim) 55%, var(--line));
     border-radius: 4px;
     color: var(--text-dim);
     padding: 0 8px;
@@ -374,7 +375,7 @@
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
@@ -382,9 +383,9 @@
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b>◐</b><span>theme light / sepia / paper / mid / dark / black / console; right-click resets to system<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping on alternating rows<sup>†</sup></span></div>
-    <div><b>T</b> <span>text shadow under chat text<sup>†</sup></span></div>
     <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b> font size, <b>↕</b> <span>line height; shift+click goes back<sup>†</sup></span></div>
+    <div><b>T</b> <span>text shadow under chat text<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator lines<sup>†</sup></span></div>
     <div><b>Ⓢ</b> sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden</div>
     <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the other<sup>†</sup></span></div>
