@@ -149,7 +149,13 @@
     position: relative;
   }
   .hdr-min { position: absolute; left: 50%; transform: translateX(-50%); }
-  body.hdrmin header { height: 9px; padding: 0; cursor: pointer; }
+  body.hdrmin header {
+    height: 10px;
+    padding: 0;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+  }
   body.hdrmin header > * { display: none; }
   #hint {
     flex: none;
@@ -164,11 +170,9 @@
   body.hdrmin #hint { display: none; }
   body.hdrmin header::after {
     content: '–';
-    display: block;
-    text-align: center;
-    font-size: 8px;
-    line-height: 9px;
-    color: var(--text-dim);
+    font-size: 9px;
+    line-height: 1;
+    color: var(--accent);
   }
   .channel {
     display: flex;
