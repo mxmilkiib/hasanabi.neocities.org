@@ -828,10 +828,12 @@
         dotEl.className = 'dot ' + chatState;
         dotEl.title = `stream status unavailable · ${chatTxt}`;
         infoEl.textContent = chatState === 'connected' ? '' : chatTxt;
+        document.title = (chatState === 'connected' ? '🟢 ' : '🔴 ') + 'HasanAbi chat';
       } else {
         dotEl.className = 'dot connecting';
         dotEl.title = `checking stream status · ${chatTxt}`;
         infoEl.textContent = '';
+        document.title = '🟡 HasanAbi chat';
       }
       return;
     }
@@ -839,6 +841,7 @@
       dotEl.className = 'dot offline';
       dotEl.title = `${CHANNEL} is offline · ${chatTxt}`;
       infoEl.textContent = 'offline' + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
+      document.title = '🔴 HasanAbi chat';
       return;
     }
     const mins = stream.startedAt ? Math.round((Date.now() - stream.startedAt) / 60000) : null;
@@ -850,6 +853,7 @@
     infoEl.textContent = (since ? `live since ${since} · up ${up}` : 'live') + viewers + chatSuffix;
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
+    document.title = '🟢 HasanAbi chat';
   }
 
   function setStatus(state) {
