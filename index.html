@@ -885,6 +885,11 @@
   // most recent stream run { started, ended|null }, persisted across reloads
   let lastRun = null;
   try { lastRun = JSON.parse(localStorage.getItem('hasan-last-run')) || null; } catch (e) {}
+  // lastVod {start,end} from the latest VOD (exact); lbEnd from ivr's
+  // lastBroadcast.startedAt, which despite the name stamps the last
+  // run's END for an offline channel (matches the VOD end to seconds)
+  let lastVod = null;
+  let lbEnd = null;
   function saveLastRun() {
     try { localStorage.setItem('hasan-last-run', JSON.stringify(lastRun)); } catch (e) {}
   }
@@ -959,17 +964,33 @@
     if (!stream.live) {
       const idle = chatState === 'connected';
       dotEl.className = 'dot ' + (idle ? 'idle' : 'offline');
-      // end is exact when the live-off transition was seen, else the last
-      // live poll timestamp approximates it - prefixed '~' in that case
-      const endTs = lastRun && (lastRun.ended || lastRun.seen);
-      const approx = lastRun && !lastRun.ended ? '~' : '';
+      // best end: exact VOD end > observed live-off transition > last
+      // live poll > lastBroadcast stamp (approx, '~'-prefixed)
+      let startTs = lastRun && lastRun.started;
+      let endTs = lastRun && lastRun.ended;
+      let approx = false;
+      // a stored run with only .started came from lastBroadcast, which
+      // is an end stamp, not a start - treat it as such
+      if (endTs == null && startTs != null && !(lastRun && lastRun.seen)) {
+        endTs = startTs; startTs = null; approx = true;
+      }
+      if (!endTs && lastRun && lastRun.seen) { endTs = lastRun.seen; approx = true; }
+      // a VOD counts as the latest run when it isn't older than other
+      // end info, and ends near lbEnd (or lbEnd is unknown)
+      if (lastVod && (!endTs || lastVod.end > endTs - 15 * 60000)
+          && (!lbEnd || Math.abs(lastVod.end - lbEnd) < 20 * 60000)) {
+        endTs = lastVod.end; startTs = lastVod.start || startTs; approx = false;
+      }
+      if (!endTs && lbEnd) { endTs = lbEnd; approx = true; }
       let endedTxt = '';
-      if (endTs) endedTxt = ` · ended ${approx}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
+      if (endTs) endedTxt = ` · ended ${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
       let ranTxt = '';
-      if (lastRun && lastRun.started) {
-        ranTxt = endTs
-          ? ` · <b>finished at</b> ${fmtTime(endTs)} after ${approx}${fmtDur(Math.max(1, Math.round((endTs - lastRun.started) / 60000)))} (started ${fmtTime(lastRun.started)})`
-          : ` · <b>last went live at</b> ${fmtTime(lastRun.started)}`;
+      if (endTs) {
+        ranTxt = startTs
+          ? ` · <b>finished at</b> ${fmtTime(endTs)} after ${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))} (started ${fmtTime(startTs)})`
+          : ` · <b>last ended at</b> ${fmtTime(endTs)}`;
+      } else if (startTs) {
+        ranTxt = ` · <b>last went live at</b> ${fmtTime(startTs)}`;
       }
       dotEl.title = `${CHANNEL} is offline${endedTxt}${ranTxt} · ${chatTxt}`;
       infoEl.innerHTML = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
@@ -1456,13 +1477,17 @@
     } else if (d.type === 'emotes') {
       thirdPartyEmotes = d.emotes || {};
       retokenizeRows();
-      // ivr.fi's lastBroadcast fills in the last run when it was never seen live
+      // lastBroadcast.startedAt is actually the last run's END for an
+      // offline channel; the VOD carries the real start and end
       const lb = d.lastBroadcast && Date.parse(d.lastBroadcast.startedAt);
-      if (lb && !(stream && stream.live) && (!lastRun || lb > (lastRun.started || 0))) {
-        lastRun = { started: lb, ended: null, seen: null };
-        saveLastRun();
-        updateHeader();
+      const vs = d.lastVod && Date.parse(d.lastVod.start);
+      const ve = d.lastVod && Date.parse(d.lastVod.end);
+      let changed = false;
+      if (lb && lb !== lbEnd) { lbEnd = lb; changed = true; }
+      if (vs && ve > vs && (!lastVod || lastVod.end !== ve)) {
+        lastVod = { start: vs, end: ve }; changed = true;
       }
+      if (changed) updateHeader();
     }
   });
 
