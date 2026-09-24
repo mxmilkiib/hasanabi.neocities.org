@@ -198,12 +198,13 @@
   @media (prefers-reduced-motion: reduce) {
     .dot.connecting, .dot.reconnecting { animation: none; }
   }
-  .chat-modes { font-size: 12px; color: var(--text-dim); white-space: nowrap; margin-left: 8px; }
+  .chat-modes { font-size: 12px; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .stream-info {
     font-size: 14px;
     font-weight: 400;
     color: var(--text-dim);
     white-space: nowrap;
+    flex-shrink: 0;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -387,6 +388,7 @@
     <div><b>?</b> click toggles this panel; scroll cycles to labels before each header control</div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
+    <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · foll Nm (followers-only) · emote · subs · r9k (unique messages)</div>
     <div><b class="rowstyle mention">amber rows</b> @hasanabi mentions <b class="rowstyle glorp">red rows</b> GLORP / F <b class="rowstyle points">red tint</b> channel-point highlights</div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
@@ -888,7 +890,10 @@
         title: d.title || '',
       };
       if (stream.startedAt && (!lastRun || lastRun.ended || lastRun.started !== stream.startedAt)) {
-        lastRun = { started: stream.startedAt, ended: null };
+        lastRun = { started: stream.startedAt, ended: null, seen: Date.now() };
+        saveLastRun();
+      } else if (lastRun && !lastRun.ended) {
+        lastRun.seen = Date.now(); // last moment the stream was observed live
         saveLastRun();
       }
     }
@@ -917,14 +922,16 @@
     }
     if (!stream.live) {
       dotEl.className = 'dot offline';
+      // end is exact when the live-off transition was seen, else the last
+      // live poll timestamp approximates it - prefixed '~' in that case
+      const endTs = lastRun && (lastRun.ended || lastRun.seen);
+      const approx = lastRun && !lastRun.ended ? '~' : '';
       let endedTxt = '';
-      if (lastRun && lastRun.ended) {
-        endedTxt = ` · ended ${fmtDur(Math.max(0, Math.round((Date.now() - lastRun.ended) / 60000)))} ago`;
-      }
+      if (endTs) endedTxt = ` · ended ${approx}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
       let ranTxt = '';
       if (lastRun && lastRun.started) {
         ranTxt = ` · last ran ${fmtTime(lastRun.started)}`;
-        if (lastRun.ended) ranTxt += `-${fmtTime(lastRun.ended)} (${fmtDur(Math.max(1, Math.round((lastRun.ended - lastRun.started) / 60000)))})`;
+        if (endTs) ranTxt += `-${fmtTime(endTs)} (${approx}${fmtDur(Math.max(1, Math.round((endTs - lastRun.started) / 60000)))})`;
       }
       dotEl.title = `${CHANNEL} is offline${endedTxt}${ranTxt} · ${chatTxt}`;
       infoEl.textContent = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
@@ -1381,6 +1388,13 @@
     } else if (d.type === 'emotes') {
       thirdPartyEmotes = d.emotes || {};
       retokenizeRows();
+      // ivr.fi's lastBroadcast fills in the last run when it was never seen live
+      const lb = d.lastBroadcast && Date.parse(d.lastBroadcast.startedAt);
+      if (lb && !(stream && stream.live) && (!lastRun || lb > (lastRun.started || 0))) {
+        lastRun = { started: lb, ended: null, seen: null };
+        saveLastRun();
+        updateHeader();
+      }
     }
   });
 
