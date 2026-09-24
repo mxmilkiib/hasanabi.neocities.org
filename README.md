@@ -83,4 +83,5 @@ Relay → parent:
 
     neocities-deploy deploy -s hasanabi.neocities.org
 
+Using [neocities-deploy](https://github.com/kugland/neocities-deploy).
 The relay deploys automatically via GitHub Pages on push.
