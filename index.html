@@ -112,7 +112,7 @@
     --good: #2e7d46;
     --danger: #b04040;
     --vip: #a03060;
-    /* fractal-noise grain tile, faint alpha — a subtle paper texture */
+    /* fractal-noise grain tile, faint alpha - a subtle paper texture */
     --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   :root[data-theme="console"] {
@@ -350,35 +350,39 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #helpPanel b { color: var(--accent); font-weight: 600; }
+  #helpPanel b.rowstyle { padding: 0 4px; }
+  #helpPanel b.glorp { background-color: rgba(232, 93, 93, .13); box-shadow: inset 3px 0 0 var(--danger); }
+  #helpPanel b.mention { background-color: rgba(232, 163, 61, .13); box-shadow: inset 3px 0 0 var(--accent); }
+  #helpPanel b.points { background-color: rgba(232, 93, 93, .12); }
   #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 82px 1fr; gap: 0 8px; }
 </style>
 </head>
 <body>
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span></div>
-    <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header — click the strip to bring it back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><select class="hdr-btn" id="fontSel" title="Chat font — click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size — click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height — click to cycle, shift+click to go back">↕</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes — ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help — click to toggle">?</button></div>
+    <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
+    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn" id="shadowBtn" title="Text shadow">T</button><select class="hdr-btn" id="fontSel" title="Chat font - click or scroll to change"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click to cycle, shift+click to go back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click to cycle, shift+click to go back">↕</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines">≡</button><button class="hdr-btn" id="subBtn" title="Sub badge display">Ⓢ</button><button class="hdr-btn" id="splitBtn" title="Freeze a copy of the chat in a second column">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click to toggle">?</button></div>
   </header>
   <div id="helpPanel" hidden>
-    <div><b>◐</b> theme — click or scroll cycles light / sepia / paper / mid / dark / black / console; right-click resets to system</div>
-    <div><b>▦</b> zebra striping on alternating rows — click or scroll</div>
-    <div><b>T</b> subtle text shadow under chat text — click or scroll</div>
-    <div><b>font menu</b> — pick a chat font; scroll cycles without opening</div>
-    <div><b>Aa</b> font size, <b>↕</b> line height — click or scroll to cycle, shift+click goes back</div>
-    <div><b>≡</b> row separator lines — click or scroll</div>
-    <div><b>Ⓢ</b> sub badge — the [sub N] chip marks how many months that chatter has been subscribed; cycles hidden / left of name / right edge of the row</div>
-    <div><b>▮▮</b> page-flip columns — one fills top-to-bottom, then flips to the other; scroll or click</div>
+    <div><b>◐</b> theme click or scroll cycles light / sepia / paper / mid / dark / black / console; right-click resets to system</div>
+    <div><b>▦</b> zebra striping on alternating rows click or scroll</div>
+    <div><b>T</b> subtle text shadow under chat text click or scroll</div>
+    <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
+    <div><b>Aa</b> font size, <b>↕</b> line height click or scroll to cycle, shift+click goes back</div>
+    <div><b>≡</b> row separator lines click or scroll</div>
+    <div><b>Ⓢ</b> sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles hidden / left of name / right edge of the row</div>
+    <div><b>▮▮</b> page-flip columns one fills top-to-bottom, then flips to the other; scroll or click</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b>?</b> cycles off → this panel → labels before each header control</div>
-    <div><b>graph</b> — messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
-    <div><b>dot</b> — stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
-    <div><b>amber rows</b> @hasanabi mentions <b>red rows</b> GLORP / F <b>red tint</b> channel-point highlights</div>
-    <div><b>↩ chip</b> — reply context; click to jump to the original message</div>
+    <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
+    <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
+    <div><b class="rowstyle mention">amber rows</b> @hasanabi mentions <b class="rowstyle glorp">red rows</b> GLORP / F <b class="rowstyle points">red tint</b> channel-point highlights</div>
+    <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b></b>names link to twitch profiles · fossabot's name shimmers · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage</div>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">reset all settings</button>
   </div>
-  <div id="hint" hidden>tip: scroll the wheel over any option to change it — click to dismiss</div>
+  <div id="hint" hidden>tip: scroll the wheel over any option to change it - click to dismiss</div>
   <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button></main>
 
 <script>
@@ -502,7 +506,7 @@
     return { tags, login, channel: afterCmd.slice(0, msgIdx), message: afterCmd.slice(msgIdx + 2), kind: cmd[1] };
   }
 
-  // Third-party emote map (7TV/BTTV/FFZ) sent by the relay — the page's CSP
+  // Third-party emote map (7TV/BTTV/FFZ) sent by the relay - the page's CSP
   // blocks fetching the sets itself, but img-src * lets the CDN images render.
   let thirdPartyEmotes = {};
 
@@ -625,7 +629,7 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         html += `<div class="row notice"><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
-                `${escapeHTML(sys)}${message ? ' — ' + renderMessageHTML(message, tags.emotes) : ''}</div>`;
+                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes) : ''}</div>`;
         continue;
       }
       const name = tags['display-name'] || '(unknown)';
@@ -845,7 +849,7 @@
     dotEl.className = 'dot connected';
     infoEl.textContent = (since ? `live since ${since} · up ${up}` : 'live') + viewers + chatSuffix;
     infoEl.title = stream.title || '';
-    dotEl.title = `${CHANNEL} is live${since ? ` — started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
+    dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
   }
 
   function setStatus(state) {
@@ -876,7 +880,7 @@
     monoNames = resolved === 'console';
     namePalette = monoNames ? CONSOLE_COLORS : (lightMode ? LIGHT_COLORS : COLORS);
     themeBtn.textContent = THEME_ICONS[themeMode] || '◐';
-    themeBtn.title = `Theme: ${themeMode} — click or scroll to cycle, right-click for system`;
+    themeBtn.title = `Theme: ${themeMode} - click or scroll to cycle, right-click for system`;
   }
 
   function stepTheme(dir) {
@@ -923,7 +927,7 @@
   function cycle(btn, list, idx, prop, label, unit) {
     const apply = () => {
       document.documentElement.style.setProperty(prop, list[idx] + unit);
-      btn.title = `${label}: ${list[idx]}${unit} — click or scroll to cycle, shift+click to go back`;
+      btn.title = `${label}: ${list[idx]}${unit} - click or scroll to cycle, shift+click to go back`;
       repin();
       saveOpts();
     };
@@ -944,7 +948,7 @@
   function applyFont() {
     document.documentElement.style.setProperty('--chat-ff',
       FONT_STACKS[fontSel.value] || FONT_STACKS.mono);
-    fontSel.title = `Font: ${fontSel.options[fontSel.selectedIndex].text} — click or scroll to change`;
+    fontSel.title = `Font: ${fontSel.options[fontSel.selectedIndex].text} - click or scroll to change`;
     repin();
   }
 
@@ -1021,7 +1025,7 @@
   function setLines(on) {
     mainEl.classList.toggle('nolines', !on);
     linesBtn.classList.toggle('on', on);
-    linesBtn.title = `Row separators: ${on ? 'on' : 'off'} — click or scroll to toggle`;
+    linesBtn.title = `Row separators: ${on ? 'on' : 'off'} - click or scroll to toggle`;
   }
 
   // ---- sub badge placement: hidden / left of name / right edge of row ----
@@ -1031,7 +1035,7 @@
   function applySubMode() {
     subBtn.classList.toggle('on', subMode !== 0);
     subBtn.style.justifyContent = ['center', 'flex-start', 'flex-end'][subMode];
-    subBtn.title = `Sub badge: ${SUB_MODES[subMode]} — click or scroll to cycle`;
+    subBtn.title = `Sub badge: ${SUB_MODES[subMode]} - click or scroll to cycle`;
   }
 
   function stepSub(dir) {
@@ -1048,7 +1052,7 @@
   function setZebra(on) {
     mainEl.classList.toggle('zebra', on);
     zebraBtn.classList.toggle('on', on);
-    zebraBtn.title = `Zebra rows: ${on ? 'on' : 'off'} — click or scroll to toggle`;
+    zebraBtn.title = `Zebra rows: ${on ? 'on' : 'off'} - click or scroll to toggle`;
   }
 
   zebraBtn.addEventListener('click', () => { setZebra(!mainEl.classList.contains('zebra')); saveOpts(); });
@@ -1063,7 +1067,7 @@
   function setShadow(on) {
     mainEl.classList.toggle('shadowed', on);
     shadowBtn.classList.toggle('on', on);
-    shadowBtn.title = `Text shadow: ${on ? 'on' : 'off'} — click or scroll to toggle`;
+    shadowBtn.title = `Text shadow: ${on ? 'on' : 'off'} - click or scroll to toggle`;
   }
 
   shadowBtn.addEventListener('click', () => { setShadow(!mainEl.classList.contains('shadowed')); saveOpts(); });
@@ -1094,7 +1098,7 @@
     helpPanel.hidden = helpMode !== 1;
     document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode !== 2; });
     helpBtn.classList.toggle('on', helpMode !== 0);
-    helpBtn.title = `Help: ${HELP_MODES[helpMode]} — click or scroll to cycle`;
+    helpBtn.title = `Help: ${HELP_MODES[helpMode]} - click or scroll to cycle`;
   }
 
   function stepHelp(dir) {
@@ -1169,7 +1173,7 @@
       sideEl.hidden = true;
       activeEl = logEl;
     }
-    // On rejoin the columns widen again — re-pin the live column if it was
+    // On rejoin the columns widen again - re-pin the live column if it was
     // following. On split the left column keeps its scroll position untouched.
     if (!enable)
       requestAnimationFrame(() => { if (stickBottom) logEl.scrollTop = logEl.scrollHeight; });
