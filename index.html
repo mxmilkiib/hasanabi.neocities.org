@@ -1111,6 +1111,14 @@
     return h ? `${h}h ${mins % 60}m` : `${mins}m`;
   }
 
+  // calendar-day tag for bare times: ' yesterday', ' N days ago', or ''
+  function dayTag(ts) {
+    const a = new Date(ts), b = new Date();
+    a.setHours(0, 0, 0, 0); b.setHours(0, 0, 0, 0);
+    const d = Math.round((b - a) / 86400000);
+    return d === 1 ? ' yesterday' : d > 1 ? ` ${d} days ago` : '';
+  }
+
   function onStream(d) {
     streamHeard = true;
     if (/offline|not streaming|not live|not online/i.test(d.uptime)) {
@@ -1194,10 +1202,10 @@
       if (endTs) {
         const ago = `${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
         ranTxt = startTs
-          ? ` · <b>started:</b> ${fmtTime(startTs)}, <b>finished</b> ${ago} at ${fmtTime(endTs)} after ${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}`
+          ? ` · <b>started:</b> ${fmtTime(startTs)}${dayTag(startTs)}, <b>finished</b> ${ago} at ${fmtTime(endTs)} after ${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}`
           : ` · <b>finished</b> ${ago} at ${fmtTime(endTs)}`;
       } else if (startTs) {
-        ranTxt = ` · <b>last went live at</b> ${fmtTime(startTs)}`;
+        ranTxt = ` · <b>last went live at</b> ${fmtTime(startTs)}${dayTag(startTs)}`;
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
       infoEl.innerHTML = `offline${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
