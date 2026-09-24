@@ -3,7 +3,12 @@
 A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/hasanabi),
 hosted on Neocities. Live at <https://hasanabi.neocities.org/>.
 
-Single file: `index.html`.
+The project comes in two parts: the frontend
+([hasanabi.neocities.org](https://github.com/mxmilkiib/hasanabi.neocities.org),
+this repo — a single `index.html`) and the backend chat relay
+([twitch-chat-relay](https://github.com/mxmilkiib/twitch-chat-relay),
+also a single `index.html`, hosted on GitHub Pages). See
+[Why two parts](#why-two-parts) for the reason.
 
 ## Why two parts
 
