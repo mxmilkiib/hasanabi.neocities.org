@@ -775,8 +775,10 @@
     stickBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
     jdownLog.hidden = stickBottom;
   });
+  let sideBottom = true;
   sideEl.addEventListener('scroll', () => {
-    jdownSide.hidden = sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
+    sideBottom = sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
+    jdownSide.hidden = sideBottom;
   });
   function jumpDown(col, btn) {
     btn.hidden = true;
@@ -789,6 +791,17 @@
     hoverPause = false;
     if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
   });
+  // an image finishing after its row rendered (gif embeds) grows the column's
+  // scrollHeight without firing a scroll event; re-snap a pinned column so
+  // the next scroll event doesn't measure the grown gap and drop follow
+  function resnap(e) {
+    if (!(e.target instanceof HTMLImageElement)) return;
+    const col = e.currentTarget;
+    if ((col === logEl ? stickBottom : sideBottom) && !hoverPause)
+      col.scrollTop = col.scrollHeight;
+  }
+  logEl.addEventListener('load', resnap, true);
+  sideEl.addEventListener('load', resnap, true);
 
   function queueMessage(parsed) {
     queue.push(parsed);
@@ -933,6 +946,10 @@
       if (nearBottom && !hoverPause) activeEl.scrollTop = activeEl.scrollHeight;
     }
     jdownLog.hidden = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
+    // while hover-pause is why the view isn't following, the arrow shows a
+    // pause glyph so it reads as a state rather than a lost scroll
+    jdownLog.textContent = hoverPause ? '‖' : '↓';
+    jdownLog.title = hoverPause ? 'Paused while the pointer is over the chat' : 'Scroll to live chat';
     jdownSide.hidden = sideEl.hidden ||
       sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
   }
