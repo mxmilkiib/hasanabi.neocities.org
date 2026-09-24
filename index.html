@@ -1171,7 +1171,7 @@
         // fall back to showing chat connection state on the dot.
         setDot(chatState);
         dotEl.title = `stream status unavailable · ${chatTxt}`;
-        infoEl.textContent = chatState === 'connected' ? '' : chatTxt;
+        infoEl.innerHTML = chatState === 'connected' ? '' : `<b>${chatTxt}</b>`;
         document.title = 'HasanAbi Chat Thing';
       } else {
         setDot('connecting');
@@ -1212,7 +1212,7 @@
         ranTxt = ` · last went live at <b>${fmtTime(startTs)}${dayTag(startTs)}</b>`;
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
-      infoEl.innerHTML = `offline${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
+      infoEl.innerHTML = `<b>offline</b>${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
       document.title = 'HasanAbi Chat Thing';
       return;
     }
@@ -1222,7 +1222,7 @@
     const viewers = stream.viewers != null ? ` · ${stream.viewers.toLocaleString()} watching` : '';
     const chatSuffix = chatState === 'connected' ? '' : ` · ${chatTxt}`;
     setDot('connected');
-    infoEl.innerHTML = (since ? `live since <b>${since}</b> · up <b>${up}</b>` : 'live') +
+    infoEl.innerHTML = (since ? `<b>live</b> since <b>${since}</b> · up <b>${up}</b>` : '<b>live</b>') +
       (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') + chatSuffix;
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
