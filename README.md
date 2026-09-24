@@ -57,8 +57,9 @@ Relay → parent:
 - `{type: 'status', state}` — connecting / connected / reconnecting
 - `{type: 'lines', lines[]}` — raw IRC lines
 - `{type: 'stream', uptime, viewers, title}` — decapi poll result
-- `{type: 'emotes', emotes, lastBroadcast, lastVod}` — emote map +
-  stream history, refetched every 10 minutes
+- `{type: 'emotes', emotes, emoteSrc, zeroWidth, badges, lastBroadcast,
+  lastVod}` — emote map + sources + badge sets + stream history,
+  refetched every 10 minutes
 - `{type: 'nitter', host}` — fastest healthy nitter instance from
   status.d420.de, rechecked every 15 minutes
 
@@ -68,18 +69,22 @@ Everything runs client-side in one file — no build step, no framework,
 no dependencies beyond CDN-hosted fonts:
 
 - **Chat rendering** — raw Twitch IRC lines parsed into rows: timestamps,
-  linked names, badges/role chips ([ mod. ], [sub N], [bits], [first]),
-  reply chips with jump-to-original, emote retokenization. `/me` actions,
-  `!command` and `#tag` lines render in italics (names, chips and
-  timestamps stay upright), and USERNOTICE subs/raids/gifts become dim
-  italic notice rows showing the system message.
+  linked names, real badge icons (mod, VIP, sub flair, bits, founder…)
+  with text chips as fallback, [sub N]/[bits]/[first] chips, reply chips
+  with jump-to-original, emote retokenization. `/me` actions, `!command`
+  and `#tag` lines render in italics (names, chips and timestamps stay
+  upright), USERNOTICE subs/raids/gifts become dim italic notice rows,
+  and CLEARCHAT/NOTICE events show timeouts, bans and channel notices.
 - **Name colors** — the chatter's own Twitch color when set, a
   hash-derived palette colour otherwise; either way the luminance is
   nudged so names stay legible on the active theme (the console theme
   ignores chatter colors for its phosphor-green palette).
 - **Emotes** — native Twitch `emotes` tags rendered as animated v2
-  images (static fallback), plus 7TV, BTTV and FFZ sets (name → CDN URL
-  map supplied by the relay).
+  images (static fallback), cheermotes on bit messages, plus 7TV, BTTV
+  and FFZ sets including animated FFZ emotes (name → CDN URL map
+  supplied by the relay). Zero-width 7TV emotes stack onto the previous
+  one, tooltips name the source set, and emote-only messages render
+  large.
 - **Header** — stream status dot (live / idle-gold / offline); the SVG
   favicon is rebuilt in the dot's computed color so the tab icon tracks
   stream state per theme. Uptime, viewers, title on hover; offline shows
@@ -93,8 +98,8 @@ no dependencies beyond CDN-hosted fonts:
   help panel. All persisted in `localStorage`; every option answers to
   click, shift+click (reverse) and the scroll wheel.
 - **Scrolling** — the log follows new messages only while at the
-  bottom; scrolling up releases it and shows a jump-to-latest button
-  (one per column in split mode).
+  bottom; scrolling up or hovering pauses it and shows a jump-to-latest
+  button (one per column in split mode).
 - **Formatting** — mention highlighting, GLORP/F red rows, channel-point
   tints, fossabot/blammobot name shimmer and game-line styling, braille
   art restacking, image/GIF/Giphy embeds, Nitter link rewriting for

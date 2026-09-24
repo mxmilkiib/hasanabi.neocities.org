@@ -303,6 +303,17 @@
   /* Negative vertical margins keep the line box at the fixed line-height
      while the image paints above and below the row. */
   .emote { height: 1.5em; vertical-align: middle; margin: -.35em 1px; }
+  /* emote-only messages scale up like chatterino */
+  .row.eonly .emote { height: 2.6em; margin: -.6em 1px; }
+  /* zero-width overlay emotes stack on the previous emote's box */
+  .estk { position: relative; display: inline-block; }
+  .estk .emote { height: 1.5em; }
+  .row.eonly .estk .emote { height: 2.6em; }
+  .estk .zw { position: absolute; left: 0; top: 0; height: 100%; width: auto; margin: 0; }
+  /* real badge icons render left of the name, like twitch */
+  .badge { height: 1.15em; width: 1.15em; vertical-align: -.18em; margin-right: 3px; }
+  .row.deleted { opacity: .45; text-decoration: line-through; }
+  .row.notice.raid { background-color: color-mix(in srgb, var(--accent) 12%, transparent); }
   .chat-img { max-height: 6em; vertical-align: middle; margin: -2.7em 1px; }
   /* Pasted image/gif links pin to the right edge so their vertical
      overflow lands on empty space rather than over message text. */
@@ -520,7 +531,7 @@
       tags = parseTags(raw.slice(1, spaceIdx));
       rest = raw.slice(spaceIdx + 1);
     }
-    const cmd = rest.match(/ (PRIVMSG|USERNOTICE|ROOMSTATE) /);
+    const cmd = rest.match(/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG) /);
     if (!cmd) return null;
     let login = null;
     if (rest.startsWith(':')) {
@@ -531,6 +542,7 @@
     const msgIdx = afterCmd.indexOf(' :');
     if (msgIdx === -1) {
       if (cmd[1] === 'ROOMSTATE') return { tags, login, channel: afterCmd, message: '', kind: 'ROOMSTATE' };
+      if (cmd[1] === 'CLEARCHAT') return { tags, login, channel: afterCmd, message: '', kind: 'CLEARCHAT' };
       return null;
     }
     return { tags, login, channel: afterCmd.slice(0, msgIdx), message: afterCmd.slice(msgIdx + 2), kind: cmd[1] };
@@ -539,9 +551,33 @@
   // Third-party emote map (7TV/BTTV/FFZ) sent by the relay - the page's CSP
   // blocks fetching the sets itself, but img-src * lets the CDN images render.
   let thirdPartyEmotes = {};
+  let emoteSrc = {};           // name -> 'Twitch'/'7TV'/'BTTV'/'FFZ' for tooltips
+  let zeroWidth = new Set();   // 7TV overlay emotes that stack on the previous one
+  let badgeSets = {};          // 'set_id' -> { version: url }
   // Nitter host for twitter/x link rewriting; the relay picks a live one
   // from status.d420.de, this is only the fallback until then.
   let nitterHost = 'https://nitter.netbub.com';
+
+  // badge 'set/ver' -> image url; falls back to the highest version <= ver
+  // (e.g. subscriber/34 uses the 24-month flair when no 34 exists)
+  function badgeUrl(b) {
+    const i = b.indexOf('/');
+    const set = badgeSets[b.slice(0, i)];
+    if (!set) return null;
+    const ver = b.slice(i + 1);
+    if (set[ver]) return set[ver];
+    let best = null;
+    for (const v of Object.keys(set))
+      if (+v <= +ver && (best === null || +v > +best)) best = v;
+    return best === null ? null : set[best];
+  }
+
+  // bit cheermotes: prefix + amount -> tier, image from twitch's CDN
+  const CHEER_ACTIONS = new Set(['cheer', 'kappa', 'kreygasm', 'muxify', 'swiftloss',
+    'cheerwhal', 'corgo', 'scoody', 'uni', 'showlove', 'party', 'seemsgood', 'pride',
+    'punchbets', 'saltycorn', 'streamlabs', 'glitch', 'starcitizen', 'clap',
+    'anonsalute', 'tri', 'mrdestructoid']);
+  const CHEER_TIERS = [1, 100, 1000, 5000, 10000, 100000];
 
   const tok2 = (a, n) => a[n] || '';
 
@@ -563,7 +599,8 @@
           const img = document.createElement('img');
           img.className = 'emote';
           img.src = url;
-          img.alt = img.title = tok;
+          img.alt = tok;
+        img.title = tok + (emoteSrc[tok] ? ' - ' + emoteSrc[tok] : '');
           frag.appendChild(img);
         } else frag.appendChild(document.createTextNode(tok));
       }
@@ -572,55 +609,92 @@
   }
 
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
-  // and bolding @username mentions like real chat.
-  function renderTextHTML(text) {
-    return text.split(/(\s+)/).map((tok, i, arr) => {
+  // and bolding @username mentions like real chat. Zero-width emotes stack
+  // onto the previous emote; cheermotes resolve when the message has bits.
+  function renderTextHTML(text, hasBits) {
+    const out = [];
+    let lastEmote = -1; // index in out of the last emote img, for zw stacking
+    text.split(/(\s+)/).forEach((tok, i, arr) => {
       const url = thirdPartyEmotes[tok];
       if (url) {
         const alt = escapeHTML(tok);
-        return `<img class="emote" src="${escapeHTML(url)}" alt="${alt}" title="${alt}">`;
+        const img = `<img class="emote" src="${escapeHTML(url)}" alt="${alt}"` +
+                    ` title="${alt}${emoteSrc[tok] ? ' - ' + emoteSrc[tok] : ''}">`;
+        if (zeroWidth.has(tok) && lastEmote >= 0) {
+          if (out[lastEmote].endsWith('</span>'))
+            out[lastEmote] = out[lastEmote].slice(0, -7) + img + '</span>';
+          else out[lastEmote] = `<span class="estk">${out[lastEmote]}${img}</span>`;
+        } else {
+          out.push(img);
+          if (!zeroWidth.has(tok)) lastEmote = out.length - 1;
+        }
+        return;
+      }
+      if (hasBits) {
+        const cheer = tok.match(/^([A-Za-z]+)(\d+)$/);
+        if (cheer && CHEER_ACTIONS.has(cheer[1].toLowerCase())) {
+          const amt = +cheer[2];
+          let tier = CHEER_TIERS[0];
+          for (const t of CHEER_TIERS) if (amt >= t) tier = t;
+          const src = `https://d3aqoihi2n8ty8.cloudfront.net/actions/` +
+            `${cheer[1].toLowerCase()}/${lightMode ? 'light' : 'dark'}/animated/${tier}/2.gif`;
+          out.push(`<img class="emote" src="${src}" alt="${escapeHTML(tok)}"` +
+                   ` title="${escapeHTML(tok)} - cheermote">`);
+          lastEmote = out.length - 1;
+          return;
+        }
       }
       const giphy = tok.match(/giphy\.com\/(?:gifs|embed)\/\S*?-([A-Za-z0-9]+)/i) ||
                     tok.match(/giphy\.com\/media\/([A-Za-z0-9]+)/i);
       if (giphy) {
         const u = escapeHTML(tok);
         const src = escapeHTML(`https://media.giphy.com/media/${giphy[1]}/giphy.gif`);
-        return `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`;
-      }
+        out.push(`<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`);
+      } else {
       // twitter/x links display as twitter.com but route through a nitter
       // instance so they work without a login
       const tw = tok.match(/^(?:https?:\/\/)?(?:www\.|mobile\.)?(?:x\.com|twitter\.com)(\/\S*)?$/i);
       if (tw) {
         const path = tw[1] || '';
-        return `<a href="${escapeHTML(`${nitterHost}${path}`)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`;
+        out.push(`<a href="${escapeHTML(`${nitterHost}${path}`)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`);
       }
-      if (/^https?:\/\/\S+$/i.test(tok) ||
+      else if (/^https?:\/\/\S+$/i.test(tok) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(tok)) {
         const u = escapeHTML(/^https?:\/\//i.test(tok) ? tok : `https://${tok}`);
         if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(tok)) {
           const src = /\.gifv(?:\?\S*)?$/i.test(tok) ? u.replace(/\.gifv/i, '.gif') : u;
-          return `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>`;
+          out.push(`<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>`);
+        } else {
+          out.push(`<a href="${u}" target="_blank" rel="noopener noreferrer">${escapeHTML(tok)}</a>`);
         }
-        return `<a href="${u}" target="_blank" rel="noopener noreferrer">${escapeHTML(tok)}</a>`;
       }
+      else {
       const at = tok.match(/^(@\w+)(.*)$/s);
-      if (at) return `<b class="at">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]);
+      if (at) out.push(`<b class="at">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]));
       // Fear& / Fear& PODCAST shout-outs get bolded; the bold wraps the
       // PODCAST token too when it directly follows.
+      else {
       const fear = tok.match(/^Fear&([\s\S]*)$/i);
       if (fear) {
-        if (!fear[1] && /^podcast\b/i.test(tok2(arr, i + 2))) return '<b>Fear&amp;';
-        return `<b>Fear&amp;</b>${escapeHTML(fear[1])}`;
+        if (!fear[1] && /^podcast\b/i.test(tok2(arr, i + 2))) out.push('<b>Fear&amp;');
+        else out.push(`<b>Fear&amp;</b>${escapeHTML(fear[1])}`);
       }
-      if (/^podcast\b/i.test(tok) && /^Fear&$/i.test(tok2(arr, i - 2))) return `${escapeHTML(tok)}</b>`;
-      return escapeHTML(tok);
-    }).join('');
+      else if (/^podcast\b/i.test(tok) && /^Fear&$/i.test(tok2(arr, i - 2))) out.push(`${escapeHTML(tok)}</b>`);
+      else out.push(escapeHTML(tok));
+      }
+      }
+      }
+      if (!/^\s*$/.test(tok)) lastEmote = -1;
+    });
+    return out.join('');
   }
 
   // Turns message text + the "emotes" tag into HTML, swapping emote spans for
-  // <img> tags and escaping everything else.
-  function renderMessageHTML(message, emotesTag) {
-    if (!emotesTag) return renderTextHTML(message);
+  // <img> tags and escaping everything else. Also returns the native emote
+  // names so callers can tell emote-only messages apart.
+  function renderMessageHTML(message, emotesTag, hasBits) {
+    const names = new Set();
+    if (!emotesTag) return { html: renderTextHTML(message, hasBits), names };
     const emotes = [];
     for (const part of emotesTag.split('/')) {
       const [id, ranges] = part.split(':');
@@ -630,22 +704,24 @@
         emotes.push({ id, start, end });
       }
     }
-    if (emotes.length === 0) return renderTextHTML(message);
+    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits), names };
     emotes.sort((a, b) => a.start - b.start);
     let html = '', cursor = 0;
     for (const e of emotes) {
       if (e.start < cursor) continue; // ignore malformed/overlapping ranges
-      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start));
-      const alt = escapeHTML(message.slice(e.start, e.end + 1));
+      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits);
+      const name = message.slice(e.start, e.end + 1);
+      names.add(name);
+      const alt = escapeHTML(name);
       const eid = escapeHTML(e.id);
       const tone = lightMode ? 'light' : 'dark';
       html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/animated/${tone}/2.0"` +
               ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${eid}/default/${tone}/2.0'"` +
-              ` alt="${alt}" title="${alt}">`;
+              ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
     }
-    if (cursor < message.length) html += renderTextHTML(message.slice(cursor));
-    return html;
+    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits);
+    return { html, names };
   }
 
   function roleTag(tags) {
@@ -662,6 +738,7 @@
   let scheduled = false;
   let recentTimestamps = [];
   let stickBottom = true; // live column follows new messages while near the bottom
+  let hoverPause = false; // hovering the log freezes auto-follow, like chatterino
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
 
@@ -681,6 +758,11 @@
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
   jdownSide.addEventListener('click', () => jumpDown(sideEl, jdownSide));
+  logEl.addEventListener('mouseenter', () => { hoverPause = true; });
+  logEl.addEventListener('mouseleave', () => {
+    hoverPause = false;
+    if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
+  });
 
   function queueMessage(parsed) {
     queue.push(parsed);
@@ -706,13 +788,40 @@
       if (kind === 'USERNOTICE') {
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
-        html += `<div class="row notice"><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
-                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes) : ''}</div>`;
+        const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
+        html += `<div class="row notice${mid}"><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
+                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html : ''}</div>`;
+        continue;
+      }
+      if (kind === 'NOTICE') {
+        html += `<div class="row notice"><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
+        continue;
+      }
+      if (kind === 'CLEARCHAT') {
+        const target = rawMsg.trim();
+        const dur = +tags['ban-duration'] || 0;
+        html += `<div class="row notice"><span class="time">${timeStr}</span>` +
+          (target ? `${escapeHTML(target)} ${dur ? `was timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'was banned'}`
+                  : 'chat was cleared by a moderator') + '</div>';
+        continue;
+      }
+      if (kind === 'CLEARMSG') {
+        // single-message deletion: mark the referenced row like chatterino
+        const row = rowById.get(tags['target-msg-id']);
+        if (row) row.classList.add('deleted');
         continue;
       }
       const name = tags['display-name'] || '(unknown)';
       const color = monoNames ? colorForName(name) : (ensureLegible(tags.color) || colorForName(name));
-      const role = roleTag(tags);
+      // real badge icons left of the name; text chips only as fallback
+      const renderedSets = new Set();
+      const badgeImgs = (tags.badges || '').split(',').map((b) => {
+        const u = b && badgeUrl(b);
+        if (u) renderedSets.add(b.split('/')[0]);
+        return u ? `<img class="badge" src="${escapeHTML(u)}"` +
+                   ` title="${escapeHTML(b.split('/')[0].replace(/-/g, ' '))}" alt="">` : '';
+      }).filter(Boolean).join('');
+      const role = badgeImgs ? '' : roleTag(tags);
       const profile = escapeHTML(encodeURIComponent(login || name.toLowerCase()));
       const fossa = (login || name).toLowerCase() === 'fossabot';
       const blammo = (login || name).toLowerCase() === 'blammobot';
@@ -723,7 +832,8 @@
       if (glorp) glorpTimestamps.push(Date.now());
       // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
-      if ((tags.badges || '').includes('moderator/')) aux.push('<span class="role mod">[ mod. ]</span>');
+      if ((tags.badges || '').includes('moderator/') && !renderedSets.has('moderator'))
+        aux.push('<span class="role mod">[ mod. ]</span>');
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       if (subM) aux.push(`<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>[sub ${subM[1].padStart(2, '0')}]</span>`);
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
@@ -742,11 +852,16 @@
       // native twitch gif posts carry only the giphy title in brackets -
       // no id or url - so link the title to a giphy search for it
       const gifm = message.match(/^\[([^\]]*\bGIF\b[^\]]*)\]$/i);
-      let msgHtml = gifm
-        ? `<a href="https://giphy.com/search/${encodeURIComponent(gifm[1].replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(message)}</a>`
+      const rendered = gifm
+        ? { html: `<a href="https://giphy.com/search/${encodeURIComponent(gifm[1].replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(message)}</a>`, names: new Set() }
         : fossa && /[⠀-⣿]/.test(message)
-          ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
-          : renderMessageHTML(message, tags.emotes);
+          ? { html: '<br>' + message.split(' ').map(escapeHTML).join('<br>'), names: new Set() }
+          : renderMessageHTML(message, tags.emotes, !!tags.bits);
+      let msgHtml = rendered.html;
+      // chatterino-style: messages made of only emotes render them bigger
+      const mtoks = message.trim().split(/\s+/).filter(Boolean);
+      const eonly = mtoks.length > 0 &&
+        mtoks.every((t) => rendered.names.has(t) || thirdPartyEmotes[t] || zeroWidth.has(t));
       if (blammo) {
         // bracketed tags ([Roulette], [Scramble], ...) get a bold chip
         // shaded by the tag text's hash, so matching games share a hue;
@@ -771,9 +886,9 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
-      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}"` +
+      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
+              `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : ': '}` +
               `${msgHtml}${SUB_MODES[subMode] === 'left' ? '' : auxHtml}</div>`;
@@ -788,7 +903,7 @@
       if (pushOverflow(activeEl, inactiveEl())) activeEl = inactiveEl();
     } else {
       while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
-      if (nearBottom) activeEl.scrollTop = activeEl.scrollHeight;
+      if (nearBottom && !hoverPause) activeEl.scrollTop = activeEl.scrollHeight;
     }
     jdownLog.hidden = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
     jdownSide.hidden = sideEl.hidden ||
@@ -1081,7 +1196,7 @@
   }
 
   function handleLine(line) {
-    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE) /.test(line)) {
+    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG) /.test(line)) {
       const parsed = parseTwitchMessage(line);
       if (!parsed) return;
       if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags); return; }
@@ -1538,6 +1653,9 @@
       onStream(d);
     } else if (d.type === 'emotes') {
       thirdPartyEmotes = d.emotes || {};
+      emoteSrc = d.emoteSrc || {};
+      zeroWidth = new Set(d.zeroWidth || []);
+      badgeSets = d.badges || {};
       retokenizeRows();
       // lastBroadcast.startedAt is actually the last run's END for an
       // offline channel; the VOD carries the real start and end
