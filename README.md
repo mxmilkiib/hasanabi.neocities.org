@@ -91,3 +91,7 @@ Relay → parent:
 Using [neocities-deploy](https://github.com/kugland/neocities-deploy)
 ([AUR package](https://aur.archlinux.org/packages/neocities-deploy-bin)).
 The relay deploys automatically via GitHub Pages on push.
+
+## License
+
+AGPL-3.0 — see [LICENSE](LICENSE).
