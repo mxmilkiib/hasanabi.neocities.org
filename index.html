@@ -270,6 +270,8 @@
   .row.notice { color: var(--text-dim); font-style: italic; }
   .row.htag { font-style: italic; }
   .row.htag .name, .row.htag .aux { font-style: normal; }
+  .row.action { font-style: italic; }
+  .row.action .aux { font-style: normal; }
   .tag { padding: 0 3px; border-radius: 3px; }
   .row.points { background-color: rgba(232, 93, 93, .12); }
   main.zebra .row:nth-child(even) {
@@ -685,9 +687,13 @@
     if (emptyEl) { emptyEl.remove(); emptyEl = null; }
     const nearBottom = stickBottom;
     let html = '';
-    for (const { tags, login, message, kind } of queue) {
+    for (const { tags, login, message: rawMsg, kind } of queue) {
       const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
       const timeStr = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      // \x01ACTION ...\x01 is an IRC /me action - strip the CTCP wrapper
+      const am = rawMsg.match(/^\x01ACTION ?(.*?)\x01?$/);
+      const action = !!am;
+      const message = am ? am[1] : rawMsg;
       if (kind === 'USERNOTICE') {
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
@@ -723,7 +729,7 @@
         reply = `<span class="reply" data-pid="${escapeHTML(pid)}" title="${escapeHTML(pname + ': ' + pbody)}">` +
                 `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
       }
-      const htag = /#(?:trivia|scramble|roulette|top)\b|!(?:gizmo|gimmo|love|cock|ub)\b/i.test(message);
+      const htag = /#(?:trivia|scramble|roulette|top)\b|!(?:gizmo|gimmo|love|cock|ub|fight)\b/i.test(message);
       let msgHtml = fossa && /[⠀-⣿]/.test(message)
         ? '<br>' + message.split(' ').map(escapeHTML).join('<br>')
         : renderMessageHTML(message, tags.emotes);
@@ -745,11 +751,11 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
-      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}"` +
+      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}` +
+              `<span class="time">${timeStr}</span>${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
-              ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>: ` +
+              ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : ': '}` +
               `${msgHtml}${SUB_MODES[subMode] === 'left' ? '' : auxHtml}</div>`;
     }
     queue = [];
