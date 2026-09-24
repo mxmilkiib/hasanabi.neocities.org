@@ -373,9 +373,10 @@
   #helpPanel b.points { background-color: rgba(232, 93, 93, .12); }
   #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 110px 1fr; gap: 0 8px; }
   #helpPanel sup { position: absolute; font-size: 10px; margin-left: 2px; transform: translateY(-3px); }
-  #helpThemeRow a { color: var(--accent); cursor: pointer; text-decoration: none; margin-right: 10px; }
-  #helpThemeRow a:hover { text-decoration: underline; }
-  #helpThemeRow a.on { color: var(--text); text-decoration: underline; cursor: default; }
+  #helpThemeRow a { margin-right: 10px; }
+  #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh { color: var(--accent); cursor: pointer; text-decoration: none; }
+  #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover { text-decoration: underline; }
+  #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on { color: var(--text); text-decoration: underline; cursor: default; }
 </style>
 </head>
 <body>
@@ -388,10 +389,10 @@
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
     <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · follow age Nm/Nh (follow age needed to chat) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
-    <div><b>◐</b><span>theme light / sepia / paper / mid / dark / black / console; right-click resets to system<sup>†</sup></span></div>
+    <div><b>◐</b><span>theme <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping on alternating rows<sup>†</sup></span></div>
     <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
-    <div><b>Aa</b> font size, <b>↕</b> <span>line height; shift+click goes back<sup>†</sup></span></div>
+    <div><b>Aa</b><span>font size <span id="helpFontList"></span></span><b>↕</b><span>line height <span id="helpLhList"></span>; shift+click goes back<sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow under chat text<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator lines<sup>†</sup></span></div>
     <div><b>Ⓢ</b> sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden</div>
@@ -1108,9 +1109,15 @@
   // theme quick-switch row inside the help panel
   document.getElementById('helpThemeRow').innerHTML = ['auto', ...THEMES].map((t) =>
     `<a href="#" class="helpTheme" data-theme="${t}">${t === 'auto' ? 'system' : t}</a>`).join(' ');
+  document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
+    `<a href="#" class="helpTheme" data-theme="${t}">${t}</a>`).join(' / ');
   helpPanel.addEventListener('click', (e) => {
-    const a = e.target.closest('a.helpTheme');
-    if (a) { e.preventDefault(); themeMode = a.dataset.theme; applyTheme(); saveOpts(); }
+    const a = e.target.closest('a.helpTheme, a.helpFont, a.helpLh');
+    if (!a) return;
+    e.preventDefault();
+    if (a.classList.contains('helpTheme')) { themeMode = a.dataset.theme; applyTheme(); saveOpts(); }
+    else if (a.classList.contains('helpFont')) fontCtl.set(+a.dataset.idx);
+    else lhCtl.set(+a.dataset.idx);
   });
   applyTheme();
 
@@ -1143,10 +1150,12 @@
     else if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
   }
 
-  function cycle(btn, list, idx, prop, label, unit) {
+  function cycle(btn, list, idx, prop, label, unit, helpCls) {
     const apply = () => {
       document.documentElement.style.setProperty(prop, list[idx] + unit);
       btn.title = `${label}: ${list[idx]}${unit} - click or scroll to cycle, shift+click to go back`;
+      if (helpCls) helpPanel.querySelectorAll('a.' + helpCls)
+        .forEach((a) => a.classList.toggle('on', +a.dataset.idx === idx));
       repin();
       saveOpts();
     };
@@ -1159,8 +1168,13 @@
     return { set: (i) => { idx = i; apply(); }, get: () => idx };
   }
 
-  const fontCtl = cycle(fontBtn, FONT_SIZES, 1, '--chat-font', 'Font size', 'px');
-  const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 3, '--chat-lh', 'Line height', '');
+  const fontCtl = cycle(fontBtn, FONT_SIZES, 1, '--chat-font', 'Font size', 'px', 'helpFont');
+  const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 3, '--chat-lh', 'Line height', '', 'helpLh');
+  // the help descriptions embed the same option lists as clickable links
+  document.getElementById('helpFontList').innerHTML = FONT_SIZES.map((px, i) =>
+    `<a href="#" class="helpFont" data-idx="${i}">${px}</a>`).join(' ');
+  document.getElementById('helpLhList').innerHTML = LINE_HEIGHTS.map((lh, i) =>
+    `<a href="#" class="helpLh" data-idx="${i}">${lh}</a>`).join(' ');
   fontCtl.set(fontCtl.get());
   lhCtl.set(lhCtl.get());
 
