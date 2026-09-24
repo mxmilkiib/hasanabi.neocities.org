@@ -826,13 +826,36 @@
     }
   }
 
+  // persisted so a reload keeps the recent rate history; the gap while the
+  // page was closed is padded with zeros so the timeline stays honest
+  const SPARK_KEY = 'hasan-spark';
+  function saveSpark() {
+    try {
+      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, glorp: glorpSamples }));
+    } catch (e) {}
+  }
+  function restoreSpark() {
+    try {
+      const d = JSON.parse(localStorage.getItem(SPARK_KEY));
+      if (!d || !Array.isArray(d.rate)) return;
+      const win = SPARK_WINDOWS[sparkWinIdx];
+      const gap = Math.min(win, Math.max(0, Math.round((Date.now() - d.t) / 1000)));
+      rateSamples.push(...d.rate.slice(-win), ...Array(gap).fill(0));
+      glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
+      if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
+      if (glorpSamples.length > win) glorpSamples.splice(0, glorpSamples.length - win);
+    } catch (e) {}
+  }
+
   sparkSize();
+  restoreSpark();
+  drawSpark();
 
   setInterval(() => {
     const cutoff = Date.now() - 5000;
     recentTimestamps = recentTimestamps.filter((t) => t > cutoff);
     const rate = recentTimestamps.length / 5;
-    rateEl.textContent = rate ? rate.toFixed(1) + ' msgs/sec' : '';
+    rateEl.textContent = (rate ? rate.toFixed(1) : '-.-') + ' msgs/sec';
     rateSamples.push(rate);
     if (rateSamples.length > SPARK_WINDOWS[sparkWinIdx]) rateSamples.shift();
     const gcut = Date.now() - 1000;
@@ -1261,6 +1284,7 @@
       localStorage.removeItem(OPTS_KEY);
       localStorage.removeItem('hasan-hint');
       localStorage.removeItem('hasan-history');
+      localStorage.removeItem('hasan-spark');
     } catch (e) {}
     location.reload();
   });
@@ -1337,6 +1361,7 @@
       const rows = [...logEl.children, ...sideEl.children].filter((r) => r.classList.contains('row'));
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => r.outerHTML)));
     } catch (e) {}
+    saveSpark();
   }
   function restoreHistory() {
     try {
