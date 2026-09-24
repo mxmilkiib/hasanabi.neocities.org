@@ -520,10 +520,12 @@
   // blocks fetching the sets itself, but img-src * lets the CDN images render.
   let thirdPartyEmotes = {};
 
+  const tok2 = (a, n) => a[n] || '';
+
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
   // and bolding @username mentions like real chat.
   function renderTextHTML(text) {
-    return text.split(/(\s+)/).map((tok) => {
+    return text.split(/(\s+)/).map((tok, i, arr) => {
       const url = thirdPartyEmotes[tok];
       if (url) {
         const alt = escapeHTML(tok);
@@ -536,16 +538,25 @@
         const src = escapeHTML(`https://media.giphy.com/media/${giphy[1]}/giphy.gif`);
         return `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`;
       }
-      if (/^https?:\/\/\S+$/i.test(tok)) {
-        const u = escapeHTML(tok);
+      if (/^https?:\/\/\S+$/i.test(tok) ||
+          /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn)(?:[?\/#]\S*)?$/i.test(tok)) {
+        const u = escapeHTML(/^https?:\/\//i.test(tok) ? tok : `https://${tok}`);
         if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(tok)) {
           const src = /\.gifv(?:\?\S*)?$/i.test(tok) ? u.replace(/\.gifv/i, '.gif') : u;
           return `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>`;
         }
-        return `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`;
+        return `<a href="${u}" target="_blank" rel="noopener noreferrer">${escapeHTML(tok)}</a>`;
       }
       const at = tok.match(/^(@\w+)(.*)$/s);
       if (at) return `<b class="at">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]);
+      // Fear& / Fear& PODCAST shout-outs get bolded; the bold wraps the
+      // PODCAST token too when it directly follows.
+      const fear = tok.match(/^Fear&([\s\S]*)$/i);
+      if (fear) {
+        if (!fear[1] && /^podcast\b/i.test(tok2(arr, i + 2))) return '<b>Fear&amp;';
+        return `<b>Fear&amp;</b>${escapeHTML(fear[1])}`;
+      }
+      if (/^podcast\b/i.test(tok) && /^Fear&$/i.test(tok2(arr, i - 2))) return `${escapeHTML(tok)}</b>`;
       return escapeHTML(tok);
     }).join('');
   }
