@@ -200,7 +200,7 @@
   }
   .chat-modes { font-size: 12px; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .stream-info {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 400;
     color: var(--text-dim);
     white-space: nowrap;
@@ -958,8 +958,9 @@
       if (endTs) endedTxt = ` · ended ${approx}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
       let ranTxt = '';
       if (lastRun && lastRun.started) {
-        ranTxt = ` · last ran ${fmtTime(lastRun.started)}`;
-        if (endTs) ranTxt += `-${fmtTime(endTs)} (${approx}${fmtDur(Math.max(1, Math.round((endTs - lastRun.started) / 60000)))})`;
+        ranTxt = endTs
+          ? ` · finished at ${fmtTime(endTs)} after ${approx}${fmtDur(Math.max(1, Math.round((endTs - lastRun.started) / 60000)))} (started ${fmtTime(lastRun.started)})`
+          : ` · last started at ${fmtTime(lastRun.started)}`;
       }
       dotEl.title = `${CHANNEL} is offline${endedTxt}${ranTxt} · ${chatTxt}`;
       infoEl.textContent = `offline${endedTxt}${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
