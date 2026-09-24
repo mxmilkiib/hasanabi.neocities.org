@@ -388,7 +388,7 @@
     <div><b>?</b> click toggles this panel; scroll cycles to labels before each header control</div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
-    <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · foll Nm (followers-only) · emote · subs · r9k (unique messages)</div>
+    <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · followers Nm/Nh (follow age needed to chat) · emote · subs · r9k (unique messages)</div>
     <div><b class="rowstyle mention">amber rows</b> @hasanabi mentions <b class="rowstyle glorp">red rows</b> GLORP / F <b class="rowstyle points">red tint</b> channel-point highlights</div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
@@ -990,8 +990,8 @@
     const slow = parseInt(tags.slow || '0', 10);
     if (slow > 0) chips.push(`slow ${slow}s`);
     const foll = parseInt(tags['followers-only'] || '-1', 10);
-    if (foll === 0) chips.push('foll');
-    else if (foll > 0) chips.push(`foll ${foll}m`);
+    if (foll === 0) chips.push('followers');
+    else if (foll > 0) chips.push(`followers ${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}`);
     if (tags['emote-only'] === '1') chips.push('emote');
     if (tags['subs-only'] === '1') chips.push('subs');
     if (tags.r9k === '1') chips.push('r9k');
