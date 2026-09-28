@@ -320,7 +320,8 @@
   .row {
     font-family: var(--chat-ff, ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace);
     font-size: var(--chat-font, 14px);
-    line-height: var(--chat-lh, 1.65);
+    line-height: max(var(--chat-lh, 1.65), 1.15);
+    margin-bottom: min(0px, (var(--chat-lh, 1.65) - 1.15) * 1em);
     padding: 3px 0;
     border-bottom: 1px solid var(--rowline, var(--line));
     word-wrap: break-word;
