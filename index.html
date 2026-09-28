@@ -1566,15 +1566,16 @@
     s.onload = () => {
       const emb = new Twitch.Embed('vidFrame', {
         channel: CHANNEL, width: '100%', height: '100%', layout: 'video',
-        parent: [location.hostname], muted: saved.m !== false, autoplay: true
+        parent: [location.hostname], muted: saved.m !== false, autoplay: saved.p !== false
       });
       emb.addEventListener(Twitch.Embed.VIDEO_READY, () => {
         vidPlayer = emb.getPlayer();
         if (saved.v != null) vidPlayer.setVolume(saved.v);
         if (saved.m != null) vidPlayer.setMuted(saved.m);
+        if (saved.p === false) vidPlayer.pause();
         let last = '';
         setInterval(() => {          // poll + persist; the API emits no volume event
-          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: vidPlayer.getMuted() });
+          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: vidPlayer.getMuted(), p: !vidPlayer.isPaused() });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch (e) {} }
         }, 2000);
       });
