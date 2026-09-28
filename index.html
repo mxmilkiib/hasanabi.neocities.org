@@ -453,7 +453,7 @@
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click or scroll to change</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
-    <div><b></b>options persist between visits in localStorage</div>
+    <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
     <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
     <div><b>see also</b><span><a class="at" href="https://nitter.miningtcup.me/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">discord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a></span></div>
@@ -1844,6 +1844,16 @@
   // optional installability: standalone PWA windows survive backgrounding
   // better than a backgrounded browser tab
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  // reflect the actual install state in the help note
+  const pwaStateEl = document.getElementById('pwaState');
+  const standaloneMQ = matchMedia('(display-mode: standalone)');
+  const pwaNote = () => {
+    pwaStateEl.textContent =
+      standaloneMQ.matches || navigator.standalone ? ' (currently running installed)'
+      : 'serviceWorker' in navigator ? '' : ' (unsupported in this browser)';
+  };
+  standaloneMQ.addEventListener('change', pwaNote);
+  pwaNote();
 
   window.addEventListener('message', (event) => {
     if (event.origin !== RELAY_ORIGIN || event.source !== relayFrame.contentWindow) return;
