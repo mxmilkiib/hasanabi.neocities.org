@@ -1,0 +1,5 @@
+// Service worker: exists to satisfy installability (PWA) requirements.
+// Pass-through fetch - no caching, so deploys are never served stale.
+self.addEventListener('install', (e) => self.skipWaiting());
+self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));

@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23e8a33d" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>'>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e0e13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hasan Chat">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>HasanAbi Chat Thing</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible&family=Fira+Code:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=Inter&family=JetBrains+Mono:wght@400;600&family=Lexend:wght@400;600&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3&family=VT323&display=swap">
@@ -774,6 +781,9 @@
   let stickBottom = true; // live column follows new messages while near the bottom
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
+  // every msg id already handled, so replayed backfill lines can't duplicate
+  // rows - bounded, since the backfill window is small anyway
+  const seenIds = new Set();
 
   const jdownLog = document.getElementById('jdownLog');
   const jdownSide = document.getElementById('jdownSide');
@@ -819,6 +829,12 @@
     const nearBottom = stickBottom;
     let html = '';
     for (const { tags, login, message: rawMsg, kind } of queue) {
+      // replayed backfill lines carry ids the page has already rendered
+      if (tags.id) {
+        if (seenIds.has(tags.id)) continue;
+        seenIds.add(tags.id);
+        if (seenIds.size > 20000) { seenIds.clear(); seenIds.add(tags.id); }
+      }
       const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
       const timeStr = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       // \x01ACTION ...\x01 is an IRC /me action - strip the CTCP wrapper
@@ -1736,7 +1752,8 @@
       const empty = document.getElementById('emptyState');
       if (empty) empty.remove();
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
-      for (const el of logEl.children) if (el.dataset.mid) rowById.set(el.dataset.mid, el);
+      for (const el of logEl.children)
+        if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
       applySubMode();
       logEl.scrollTop = logEl.scrollHeight;
     } catch (e) {}
@@ -1771,6 +1788,21 @@
     if (!streamHeard) { streamDead = true; updateHeader(); }
   }, 10000);
 
+  // A suspended page misses live lines, so on wake it asks the relay for the
+  // backlog (recent-messages.robotty.de); already-rendered ids are skipped
+  function backfill() {
+    if (joined && relayFrame.contentWindow)
+      relayFrame.contentWindow.postMessage({ type: 'backfill' }, RELAY_ORIGIN);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') backfill();
+  });
+  window.addEventListener('pageshow', backfill);
+
+  // optional installability: standalone PWA windows survive backgrounding
+  // better than a backgrounded browser tab
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
   window.addEventListener('message', (event) => {
     if (event.origin !== RELAY_ORIGIN || event.source !== relayFrame.contentWindow) return;
     const d = event.data;
@@ -1778,7 +1810,7 @@
     if (d.type === 'status') {
       setStatus(d.state);
       joined = d.state === 'connected';
-      if (joined) clearInterval(joinTimer);
+      if (joined) { clearInterval(joinTimer); backfill(); }
     } else if (d.type === 'lines') {
       for (const line of d.lines) handleLine(line);
     } else if (d.type === 'stream') {

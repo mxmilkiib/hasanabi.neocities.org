@@ -50,12 +50,15 @@ the CSP forbids on Neocities:
 
 ### Message protocol
 
-Parent → relay: `{type: 'join', channel}`
+Parent → relay: `{type: 'join', channel}`, `{type: 'backfill'}`
 
 Relay → parent:
 
 - `{type: 'status', state}` — connecting / connected / reconnecting
-- `{type: 'lines', lines[]}` — raw IRC lines
+- `{type: 'lines', lines[]}` — raw IRC lines, live or backfilled
+- `backfill` — on request, the relay fetches the backlog from
+  recent-messages.robotty.de (the same service Chatterino uses) and
+  forwards it as `lines`; the page skips already-rendered msg ids
 - `{type: 'stream', uptime, viewers, title}` — decapi poll result
 - `{type: 'emotes', emotes, emoteSrc, zeroWidth, badges, lastBroadcast,
   lastVod}` — emote map + sources + badge sets + stream history,
@@ -106,6 +109,11 @@ no dependencies beyond CDN-hosted fonts:
   Twitter/X.
 - **Persistence** — last 250 rows, stream run history and graph samples
   survive reloads via `localStorage`.
+- **PWA / resume** — installable (manifest + pass-through service
+  worker); an installed standalone window survives backgrounding better
+  than a tab. Regardless, on wake or reconnect the page asks the relay
+  for missed lines via recent-messages.robotty.de, so the log backfills
+  rather than staying truncated.
 - **URL options** — query params apply a configuration on top of (and
   into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
   Keys: `split`, `min`, `theme`, `font`, `size`, `lh`, `zebra`, `lines`,
