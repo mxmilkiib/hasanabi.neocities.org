@@ -819,12 +819,19 @@
   jdownSide2.addEventListener('click', () => jumpDown(side2El, jdownSide2));
   // an image finishing after its row rendered (gif embeds) grows the column's
   // scrollHeight without firing a scroll event; re-snap a pinned column so
-  // the next scroll event doesn't measure the grown gap and drop follow
+  // the next scroll event doesn't measure the grown gap and drop follow.
+  // coalesced into one rAF - a wave of late-loading images (e.g. after a
+  // backfill) would otherwise force a synchronous layout per image
+  let resnapQueued = false;
   function resnap(e) {
-    if (!(e.target instanceof HTMLImageElement)) return;
-    const col = e.currentTarget;
-    if (col === logEl ? stickBottom : col === sideEl ? sideBottom : side2Bottom)
-      col.scrollTop = col.scrollHeight;
+    if (!(e.target instanceof HTMLImageElement) || resnapQueued) return;
+    resnapQueued = true;
+    requestAnimationFrame(() => {
+      resnapQueued = false;
+      if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
+      if (sideBottom && !sideEl.hidden) sideEl.scrollTop = sideEl.scrollHeight;
+      if (side2Bottom && !side2El.hidden) side2El.scrollTop = side2El.scrollHeight;
+    });
   }
   logEl.addEventListener('load', resnap, true);
   sideEl.addEventListener('load', resnap, true);
@@ -832,6 +839,10 @@
 
   function queueMessage(parsed, replay) {
     queue.push(parsed);
+    // rAF doesn't fire in a backgrounded tab but relay messages keep
+    // arriving - cap the backlog so wake-up isn't a minutes-long flush;
+    // the robotty backfill refetches the gap on visibility return anyway
+    if (document.hidden && queue.length > MAX_MESSAGES) queue.shift();
     // replayed backfill lines are historical, not live traffic - counting
     // their arrival time would spike the msgs/sec rate falsely
     if (!replay) recentTimestamps.push(Date.now());
@@ -976,6 +987,12 @@
     if (rowById.size > 2000) rowById.clear();
     if (isSplit()) {
       if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
+      // page-flip never trims by itself - bound the total across columns;
+      // the column after the active one holds the oldest rows
+      const oldest = nextCol();
+      let total = 0;
+      for (const c of cols()) total += c.children.length;
+      while (total > MAX_MESSAGES) { oldest.removeChild(oldest.firstElementChild); total--; }
     } else {
       while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
       if (nearBottom) activeEl.scrollTop = activeEl.scrollHeight;
