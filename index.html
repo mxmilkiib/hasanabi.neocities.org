@@ -448,7 +448,7 @@
     <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
-    <div><b>?</b> click cycles this panel and inline labels on each header control<sup>†</sup></div>
+    <div><b>?</b> click cycles this panel, inline labels, and both together<sup>†</sup></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -1656,8 +1656,8 @@
   }, { passive: false });
   setShadow(0);
 
-  // ---- help: cycle off → popup panel → inline labels before each control ----
-  const HELP_MODES = ['off', 'panel', 'labels'];
+  // ---- help: cycle off → popup panel → inline labels → both together ----
+  const HELP_MODES = ['off', 'panel', 'labels', 'both'];
   let helpMode = 0;
   const HDR_LABELS = [
     [themeBtn, 'theme'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
@@ -1673,10 +1673,11 @@
   }
 
   function applyHelp() {
-    helpPanel.hidden = helpMode !== 1;
+    const showPanel = helpMode === 1 || helpMode === 3;
+    helpPanel.hidden = !showPanel;
     // anchor below whatever height the header currently wraps to
-    if (helpMode === 1) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
-    document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode !== 2; });
+    if (showPanel) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
+    document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode < 2; });
     helpBtn.classList.toggle('on', helpMode !== 0);
     helpBtn.title = `Help: ${HELP_MODES[helpMode]} - click/scroll · ⇧click back`;
   }
