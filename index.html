@@ -234,8 +234,8 @@
     flex: none;
   }
   main { flex: 1; display: flex; min-height: 0; position: relative; }
-  #vid { height: clamp(180px, 34vh, 460px); border-bottom: 1px solid var(--line); flex: none; }
-  #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
+  #vid { height: clamp(180px, 34vh, 460px); border-bottom: 1px solid var(--line); flex: none; display: flex; justify-content: center; }
+  #vid iframe { height: 100%; aspect-ratio: 16/9; border: 0; display: block; }
   .jdown {
     position: absolute;
     bottom: 10px;
