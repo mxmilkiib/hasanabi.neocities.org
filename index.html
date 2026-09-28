@@ -336,8 +336,8 @@
     font-family: var(--chat-ff, ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace);
     font-size: var(--chat-font, 14px);
     line-height: max(var(--chat-lh, 1.65), 1.15);
-    margin-top: min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em);
-    margin-bottom: min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em);
+    margin-top: max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em));
+    margin-bottom: max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em));
     padding: 4px 0 2px;
     border-bottom: 1px solid var(--rowline, var(--line));
     word-wrap: break-word;
