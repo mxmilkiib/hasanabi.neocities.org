@@ -453,9 +453,9 @@
   #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 110px 1fr; gap: 0 8px; }
   #helpPanel sup { position: absolute; font-size: 10px; margin-left: 2px; transform: translateY(-3px); }
   #helpPanel b.fn { color: var(--text); }
-  #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh { color: var(--accent); cursor: pointer; text-decoration: none; }
-  #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover { text-decoration: underline; }
-  #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on { color: var(--text); text-decoration: underline; cursor: default; }
+  #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLines { color: var(--accent); cursor: pointer; text-decoration: none; }
+  #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover, #helpPanel a.helpLines:hover { text-decoration: underline; }
+  #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLines.on { color: var(--text); text-decoration: underline; cursor: default; }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
@@ -487,7 +487,7 @@
     <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b><span>font size <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height <span id="helpLhList"></span><sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow under chat text<sup>†</sup></span></div>
-    <div><b>≡</b> <span>row separator shades - off / faint / medium / solid<sup>†</sup></span></div>
+    <div><b>≡</b> <span>row separator shades <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps<sup>†</sup></span></div>
     <div><b>Ⓢ</b> <span>sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
@@ -1424,12 +1424,13 @@
   document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
     `<a href="#" class="helpTheme" data-theme="${t}">${t}</a>`).join(' / ');
   helpPanel.addEventListener('click', (e) => {
-    const a = e.target.closest('a.helpTheme, a.helpFont, a.helpLh');
+    const a = e.target.closest('a.helpTheme, a.helpFont, a.helpLh, a.helpLines');
     if (!a) return;
     e.preventDefault();
     if (a.classList.contains('helpTheme')) { themeMode = a.dataset.theme; applyTheme(); saveOpts(); }
     else if (a.classList.contains('helpFont')) fontCtl.set(+a.dataset.idx);
-    else lhCtl.set(+a.dataset.idx);
+    else if (a.classList.contains('helpLh')) lhCtl.set(+a.dataset.idx);
+    else { setLines(+a.dataset.idx); saveOpts(); }
   });
   applyTheme();
 
@@ -1706,11 +1707,15 @@
     ['solid', 'var(--line)'],
   ];
   let lineLevel = 3;
+  document.getElementById('helpLinesList').innerHTML = LINE_SHADES.map((s, i) =>
+    `<a href="#" class="helpLines" data-idx="${i}">${s[0]}</a>`).join(' / ');
   function setLines(level) {
     lineLevel = ((level % LINE_SHADES.length) + LINE_SHADES.length) % LINE_SHADES.length;
     mainEl.style.setProperty('--rowline', LINE_SHADES[lineLevel][1]);
     linesBtn.classList.toggle('on', lineLevel > 0);
     linesBtn.title = `Row separators: ${LINE_SHADES[lineLevel][0]} - click/scroll · ⇧click back`;
+    helpPanel.querySelectorAll('a.helpLines')
+      .forEach((a) => a.classList.toggle('on', +a.dataset.idx === lineLevel));
   }
 
   // ---- sub badge placement: hidden / left of name / right edge of row ----
