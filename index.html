@@ -499,7 +499,7 @@
     <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Theme">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll">◷</button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll">▶</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button></div>
   </header>
   <div id="helpPanel" hidden>
-    <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
+    <div><b>dot</b> stream status; hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · follow age restriction Nm/Nh (must have followed that long to chat; 0m shows as 'followers only' - following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b id="helpThemeIcon">◐</b><span>theme <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
@@ -1241,6 +1241,9 @@
   // run's END for an offline channel (matches the VOD end to seconds)
   let lastVod = null;
   let lbEnd = null;
+  // status info verbosity: 0 full, 1 compact, 2 minimal; wheel on the
+  // dot or info text cycles it
+  let statusView = 0;
   function saveLastRun() {
     try { localStorage.setItem('hasan-last-run', JSON.stringify(lastRun)); } catch (e) {}
   }
@@ -1351,9 +1354,9 @@
         endTs = lastVod.end; startTs = lastVod.start || startTs; approx = false;
       }
       if (!endTs && lbEnd) { endTs = lbEnd; approx = true; }
-      let ranTxt = '';
+      let ranTxt = '', ago = '';
       if (endTs) {
-        const ago = `${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
+        ago = `${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
         ranTxt = startTs
           ? ` · last started <b>${fmtTime(startTs)}${dayTag(startTs)}</b>, finished <b>${ago}</b> at <b>${fmtTime(endTs)}</b> after <b>${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}</b>`
           : ` · finished <b>${ago}</b> at <b>${fmtTime(endTs)}</b>`;
@@ -1361,7 +1364,10 @@
         ranTxt = ` · last went live at <b>${fmtTime(startTs)}${dayTag(startTs)}</b>`;
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
-      infoEl.innerHTML = `<b>offline</b>${ranTxt}` + (chatState === 'connected' ? '' : ` · ${chatTxt}`);
+      infoEl.innerHTML = '<b>offline</b>' +
+        (statusView === 0 ? ranTxt + (chatState === 'connected' ? '' : ` · ${chatTxt}`)
+         : statusView === 1 && ago ? ` · finished <b>${ago}</b>`
+         : statusView === 1 && startTs ? ` · live <b>${fmtTime(startTs)}${dayTag(startTs)}</b>` : '');
       document.title = 'HasanAbi Chat Thing';
       return;
     }
@@ -1371,8 +1377,11 @@
     const viewers = stream.viewers != null ? ` · ${stream.viewers.toLocaleString()} watching` : '';
     const chatSuffix = chatState === 'connected' ? '' : ` · ${chatTxt}`;
     setDot('connected');
-    infoEl.innerHTML = (since ? `<b>live</b> since <b>${since}</b> · up <b>${up}</b>` : '<b>live</b>') +
-      (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') + chatSuffix;
+    infoEl.innerHTML = statusView === 2 ? '<b>live</b>'
+      : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
+        (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
+      : (since ? `<b>live</b> since <b>${since}</b> · up <b>${up}</b>` : '<b>live</b>') +
+        (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') + chatSuffix;
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
     document.title = 'HasanAbi Chat Thing';
@@ -1382,6 +1391,14 @@
     chatState = state;
     updateHeader();
   }
+
+  // scroll on the status dot or text cycles the stream info verbosity
+  for (const el of [dotEl, infoEl])
+    el.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      statusView = (statusView + (e.deltaY < 0 ? 1 : -1) + 3) % 3;
+      updateHeader();
+    }, { passive: false });
 
   // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
   const modesEl = document.getElementById('chatModes');
@@ -1886,7 +1903,7 @@
   const HDR_LABELS = [
     [themeBtn, 'theme'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
     [fontSel, 'font'], [fontBtn, 'size'], [lhBtn, 'height'],
-    [linesBtn, 'lines'], [subBtn, 'sub'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'rate'],
+    [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'rate'],
   ];
   for (const [el, txt] of HDR_LABELS) {
     const s = document.createElement('span');
