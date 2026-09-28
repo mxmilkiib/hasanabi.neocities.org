@@ -504,7 +504,7 @@
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b id="helpThemeIcon">◐</b><span>theme <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
-    <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
+    <div><b>font menu</b> <span>chat font <span id="helpFontFamList"></span>; scroll cycles without opening<sup>†</sup></span></div>
     <div><b>Aa</b><span>font size <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height <span id="helpLhList"></span><sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades <span id="helpLinesList"></span><sup>†</sup></span></div>
@@ -1459,6 +1459,7 @@
     else if (a.classList.contains('helpEonly')) { emoteMode = +a.dataset.idx; applyEmoteMode(); saveOpts(); }
     else if (a.classList.contains('helpSplit')) { setSplit(+a.dataset.idx + 1); saveOpts(); }
     else if (a.classList.contains('helpVideo')) { setVideo(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpFontFam')) { fontSel.selectedIndex = +a.dataset.idx; applyFont(); saveOpts(); }
     else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
   });
   applyTheme();
@@ -1526,6 +1527,7 @@
     document.documentElement.style.setProperty('--chat-ff',
       FONT_STACKS[fontSel.value] || FONT_STACKS.mono);
     fontSel.title = `Font: ${fontSel.options[fontSel.selectedIndex].text} - click/scroll`;
+    markHelp('helpFontFam', fontSel.selectedIndex);
     repin();
   }
 
@@ -2193,6 +2195,19 @@
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
       `<a href="#" class="helpOpt ${cls}" data-idx="${i}">${n}</a>`).join(' / ');
+  // each font name renders in its own face
+  document.getElementById('helpFontFamList').innerHTML = [...fontSel.options].map((o, i) =>
+    `<a href="#" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value]}">${o.text}</a>`).join(' · ');
+  // the setters ran during init before the lists existed - mark now
+  markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
+  markHelp('helpTimes', mainEl.classList.contains('notime') ? 0 : 1);
+  markHelp('helpShadow', shadLevel);
+  markHelp('helpSub', subMode);
+  markHelp('helpEonly', emoteMode);
+  markHelp('helpSplit', !sideEl.hidden + !side2El.hidden);
+  markHelp('helpVideo', vidBox.hidden ? 0 : 1);
+  markHelp('helpHelp', helpMode);
+  markHelp('helpFontFam', fontSel.selectedIndex);
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
   // when the attribute changes, so hover parks the title in data-tt and a
