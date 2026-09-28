@@ -255,13 +255,16 @@
   }
   main.split .jdown { left: 25%; }
   main.split .jdown.side { left: 75%; }
+  main.split3 .jdown { left: 16.666%; }
+  main.split3 .jdown.side { left: 50%; }
+  main.split3 .jdown.side2 { left: 83.333%; }
   .col {
     flex: 1;
     min-width: 0;
     overflow-y: auto;
     padding: 8px 18px 8px 10px;
   }
-  #side { border-left: 1px solid var(--line); }
+  #side, #side2 { border-left: 1px solid var(--line); }
   main.nolines .row { border-bottom-color: transparent; }
   .empty {
     color: var(--text-dim);
@@ -443,7 +446,7 @@
     <div><b>◷</b> <span>message timestamps<sup>†</sup></span></div>
     <div><b>Ⓢ</b> <span>sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
-    <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the other<sup>†</sup></span></div>
+    <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
     <div><b>?</b> click toggles this panel; scroll cycles to labels before each header control</div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span></div>
@@ -459,7 +462,7 @@
     <div><b>source</b><span><a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a></span></div>
   </div>
   <div id="hint" hidden>tip: scroll the wheel over any option to change it - click to dismiss</div>
-  <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button></main>
+  <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
 
 <script>
 (() => {
@@ -482,8 +485,12 @@
   const rateEl = document.getElementById('rate');
   const infoEl = document.getElementById('streamInfo');
   const sideEl = document.getElementById('side');
+  const side2El = document.getElementById('side2');
   let activeEl = logEl; // column currently receiving new rows
-  const inactiveEl = () => (activeEl === logEl ? sideEl : logEl);
+  // the visible columns in page-flip order; a row page-flips to the column
+  // after the active one, so the column after it holds the oldest rows
+  const cols = () => [logEl, sideEl, side2El].slice(0, 1 + !sideEl.hidden + !side2El.hidden);
+  const nextCol = () => { const c = cols(); return c[(c.indexOf(activeEl) + 1) % c.length]; };
   const isSplit = () => !sideEl.hidden;
   const splitBtn = document.getElementById('splitBtn');
   const fontBtn = document.getElementById('fontBtn');
@@ -792,10 +799,16 @@
     stickBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
     jdownLog.hidden = stickBottom;
   });
+  const jdownSide2 = document.getElementById('jdownSide2');
   let sideBottom = true;
+  let side2Bottom = true;
   sideEl.addEventListener('scroll', () => {
     sideBottom = sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
     jdownSide.hidden = sideBottom;
+  });
+  side2El.addEventListener('scroll', () => {
+    side2Bottom = side2El.scrollHeight - side2El.scrollTop - side2El.clientHeight < 60;
+    jdownSide2.hidden = side2Bottom;
   });
   function jumpDown(col, btn) {
     btn.hidden = true;
@@ -803,16 +816,19 @@
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
   jdownSide.addEventListener('click', () => jumpDown(sideEl, jdownSide));
+  jdownSide2.addEventListener('click', () => jumpDown(side2El, jdownSide2));
   // an image finishing after its row rendered (gif embeds) grows the column's
   // scrollHeight without firing a scroll event; re-snap a pinned column so
   // the next scroll event doesn't measure the grown gap and drop follow
   function resnap(e) {
     if (!(e.target instanceof HTMLImageElement)) return;
     const col = e.currentTarget;
-    if (col === logEl ? stickBottom : sideBottom) col.scrollTop = col.scrollHeight;
+    if (col === logEl ? stickBottom : col === sideEl ? sideBottom : side2Bottom)
+      col.scrollTop = col.scrollHeight;
   }
   logEl.addEventListener('load', resnap, true);
   sideEl.addEventListener('load', resnap, true);
+  side2El.addEventListener('load', resnap, true);
 
   function queueMessage(parsed) {
     queue.push(parsed);
@@ -957,7 +973,7 @@
       rowById.set(kids[i].dataset.mid, kids[i]);
     if (rowById.size > 2000) rowById.clear();
     if (isSplit()) {
-      if (pushOverflow(activeEl, inactiveEl())) activeEl = inactiveEl();
+      if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
     } else {
       while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
       if (nearBottom) activeEl.scrollTop = activeEl.scrollHeight;
@@ -965,6 +981,8 @@
     jdownLog.hidden = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
     jdownSide.hidden = sideEl.hidden ||
       sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
+    jdownSide2.hidden = side2El.hidden ||
+      side2El.scrollHeight - side2El.scrollTop - side2El.clientHeight < 60;
   }
 
   // ---- msgs/sec sparkline: one sample per second, 4-minute window ----
@@ -1350,7 +1368,7 @@
   // After a layout-affecting change: keep the live column pinned, or in
   // split mode re-run the page overflow check.
   function repin() {
-    if (isSplit()) { if (pushOverflow(activeEl, inactiveEl())) activeEl = inactiveEl(); }
+    if (isSplit()) { if (pushOverflow(activeEl, nextCol())) activeEl = nextCol(); }
     else if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
   }
 
@@ -1638,6 +1656,8 @@
   // header height changes with width when the controls wrap - re-anchor
   window.addEventListener('resize', () => {
     if (!helpPanel.hidden) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
+    // the third pane only exists in landscape; dropping to portrait folds it
+    if (!side2El.hidden && window.innerWidth <= window.innerHeight) setSplit(2);
   });
   // builds a ?param url from the current non-default options
   document.getElementById('copyUrl').addEventListener('click', (e) => {
@@ -1654,7 +1674,7 @@
     if (SUB_MODES[subMode] !== 'right') q.set('sub', SUB_MODES[subMode]);
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
     if (document.body.classList.contains('hdrmin')) q.set('min', '1');
-    if (isSplit()) q.set('split', '1');
+    if (isSplit()) q.set('split', String(cols().length));
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
       .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
@@ -1705,42 +1725,64 @@
     return moved;
   }
 
-  function toggleSplit() {
-    const enable = sideEl.hidden;
-    splitBtn.classList.toggle('on', enable);
-    mainEl.classList.toggle('split', enable);
-    if (!enable) jdownSide.hidden = true;
-    splitBtn.title = enable ? 'Rejoin the columns' : 'Split into page-flip columns';
-    if (enable) {
-      sideEl.textContent = '';
-      sideEl.hidden = false;
-      sideEl.scrollTop = 0;
-      activeEl = sideEl;
-    } else {
-      // merge both pages back into the left column, oldest first
-      if (activeEl === sideEl) {
-        while (sideEl.firstElementChild) logEl.appendChild(sideEl.firstElementChild);
-      } else {
-        while (sideEl.lastElementChild) logEl.prepend(sideEl.lastElementChild);
-      }
-      sideEl.hidden = true;
+  // Sets the pane count (1..3); a third column only exists in landscape,
+  // where it's actually wider than it is tall enough to be readable.
+  function setSplit(level) {
+    if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
+    level = Math.max(1, Math.min(3, level));
+    const cur = 1 + !sideEl.hidden + !side2El.hidden;
+    if (level === cur) return;
+    // merge every column back into logEl chronologically - the column after
+    // the active one in flip order holds the oldest page - then re-deal
+    const c = cols();
+    const i = c.indexOf(activeEl);
+    for (const col of [...c.slice(i + 1), ...c.slice(0, i + 1)])
+      for (const r of [...col.children]) logEl.appendChild(r);
+    sideEl.hidden = level < 2;
+    side2El.hidden = level < 3;
+    mainEl.classList.toggle('split', level >= 2);
+    mainEl.classList.toggle('split3', level === 3);
+    jdownSide.hidden = jdownSide2.hidden = true;
+    splitBtn.classList.toggle('on', level > 1);
+    splitBtn.textContent = level === 3 ? '▮▮▮' : '▮▮';
+    splitBtn.title = level > 1 ? 'Rejoin the columns' : 'Split into page-flip columns';
+    if (level === 1) {
       activeEl = logEl;
-    }
-    // On rejoin the columns widen again - re-pin the live column if it was
-    // following. On split the left column keeps its scroll position untouched.
-    if (!enable)
+      // columns widen on rejoin - re-pin the live column if it was following
       requestAnimationFrame(() => { if (stickBottom) logEl.scrollTop = logEl.scrollHeight; });
+    } else if (level === 2) {
+      if (cur === 3) { // three -> two: move logEl's below-fold page to #side
+        activeEl = logEl;
+        if (pushOverflow(logEl, sideEl)) activeEl = sideEl;
+      } else { sideEl.scrollTop = 0; activeEl = sideEl; }
+    } else { // level 3: #side2 is the fresh page; re-deal #side if needed
+      if (cur === 2) pushOverflow(logEl, sideEl);
+      side2El.scrollTop = 0;
+      activeEl = side2El;
+    }
   }
 
-  splitBtn.addEventListener('click', toggleSplit);
-  splitBtn.addEventListener('wheel', (e) => { e.preventDefault(); toggleSplit(); }, { passive: false });
+  function cycleSplit(dir) {
+    const max = window.innerWidth > window.innerHeight ? 3 : 2;
+    const n = cols().length + dir;
+    setSplit(((n - 1) % max + max) % max + 1);
+  }
+
+  splitBtn.addEventListener('click', (e) => cycleSplit(e.shiftKey ? -1 : 1));
+  splitBtn.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    cycleSplit(e.deltaY < 0 ? 1 : -1);
+  }, { passive: false });
 
   // ---- local history: keep recent rows across reloads ----
   const HISTORY_KEY = 'hasan-history';
   let histDirty = false; // set when rows render or mutate
   function saveHistory() {
     try {
-      const rows = [...logEl.children, ...sideEl.children].filter((r) => r.classList.contains('row'));
+      const c = cols();
+      const i = c.indexOf(activeEl);
+      const rows = [...c.slice(i + 1), ...c.slice(0, i + 1)]
+        .flatMap((col) => [...col.children]).filter((r) => r.classList.contains('row'));
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => r.outerHTML)));
     } catch (e) {}
     saveSpark();
@@ -1856,7 +1898,10 @@
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
     if (q.has('help')) { const i = HELP_MODES.indexOf(q.get('help')); if (i >= 0) { helpMode = i; applyHelp(); } }
-    if (flag('split') && !isSplit()) toggleSplit();
+    if (q.has('split')) {
+      const n = q.get('split');
+      if (n !== '0') setSplit(n === '3' ? 3 : 2);
+    }
     if (flag('min')) minHeader();
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }

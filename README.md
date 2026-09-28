@@ -97,7 +97,8 @@ no dependencies beyond CDN-hosted fonts:
   red glorp/F bursts; persisted across reloads.
 - **Controls** — themes, zebra striping, graduated text shadow, font
   picker (incl. dyslexia-friendly), font size, line height, row lines,
-  sub-chip alignment, page-flip two-column mode, minimizable header,
+  sub-chip alignment, page-flip columns (two, or three in landscape),
+  minimizable header,
   help panel. All persisted in `localStorage`; every option answers to
   click, shift+click (reverse) and the scroll wheel.
 - **Scrolling** — the log follows new messages only while at the
@@ -116,7 +117,8 @@ no dependencies beyond CDN-hosted fonts:
   rather than staying truncated.
 - **URL options** — query params apply a configuration on top of (and
   into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
-  Keys: `split`, `min`, `theme`, `font`, `size`, `lh`, `zebra`, `lines`,
+  Keys: `split` (2 panes, or `split=3` on landscape screens), `min`,
+  `theme`, `font`, `size`, `lh`, `zebra`, `lines`,
   `times`, `shadow`, `sub` (right/left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels). Booleans take `=0` to force off.
 - **Performance** — incoming lines queue and flush once per animation
