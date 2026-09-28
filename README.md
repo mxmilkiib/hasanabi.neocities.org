@@ -95,7 +95,7 @@ no dependencies beyond CDN-hosted fonts:
   subs-only, r9k).
 - **Graph** — messages-per-second sparkline with 10s/minute ticks and
   red glorp/F bursts; persisted across reloads.
-- **Controls** — themes, zebra striping, graduated text shadow, font
+- **Controls** — colour styles, zebra striping, graduated text shadow, font
   picker (incl. dyslexia-friendly), font size, line height, row lines,
   sub-chip alignment, page-flip columns (two, or three in landscape),
   minimizable header,
@@ -118,9 +118,12 @@ no dependencies beyond CDN-hosted fonts:
 - **URL options** — query params apply a configuration on top of (and
   into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
   Keys: `split` (2 panes, or `split=3` on landscape screens), `min`,
-  `theme`, `font`, `size`, `lh`, `zebra`, `lines` (0-3 separator shades),
+  `style`, `font`, `size`, `lh`, `zebra`, `lines` (0-3 separator shades),
   `times`, `shadow`, `video`, `sub` (right/left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
+  `theme` names a preset bundle of all display options (`default`,
+  `compact`, `reader`, `terminal`, `cozy`, `cinema`); a style name like
+  `theme=dark` still selects just the palette for old links.
 - **Performance** — incoming lines queue and flush once per animation
   frame; the log is capped at 250 rows.
 
