@@ -482,7 +482,7 @@
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state. The text beside it shows stream info, title on hover</div>
     <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · follow age restriction Nm/Nh (follow age needed to chat) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
-    <div><b>◐</b><span>theme <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
+    <div><b id="helpThemeIcon">◐</b><span>theme <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping on alternating rows<sup>†</sup></span></div>
     <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b><span>font size <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height <span id="helpLhList"></span><sup>†</sup></span></div>
@@ -491,7 +491,7 @@
     <div><b>◷</b> <span>message timestamps<sup>†</sup></span></div>
     <div><b>Ⓢ</b> <span>sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
-    <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>draggable stream video overlay (loads only when enabled)<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> click cycles this panel, inline labels, and both together<sup>†</sup></div>
@@ -1404,6 +1404,7 @@
     monoNames = resolved === 'console';
     namePalette = monoNames ? CONSOLE_COLORS : (lightMode ? LIGHT_COLORS : COLORS);
     themeBtn.textContent = THEME_ICONS[themeMode] || '◐';
+    document.getElementById('helpThemeIcon').textContent = themeBtn.textContent;
     themeBtn.title = `Theme: ${themeMode} - click/scroll · ⇧click back · right-click: system`;
     helpPanel.querySelectorAll('.helpTheme').forEach((a) => { a.classList.toggle('on', a.dataset.theme === themeMode); });
     sparkCols = null; // re-resolve canvas colours against the new theme
@@ -1969,6 +1970,7 @@
     jdownSide.hidden = jdownSide2.hidden = true;
     splitBtn.classList.toggle('on', level > 1);
     splitBtn.textContent = level === 3 ? '▮▮▮' : '▮▮';
+    document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
     splitBtn.title = (level > 1 ? 'Rejoin the columns' : 'Split into page-flip columns') + ' - click/scroll · ⇧click back';
     if (level === 1) {
       activeEl = logEl;
