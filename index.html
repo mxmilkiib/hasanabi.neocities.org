@@ -473,6 +473,9 @@
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLines { color: var(--accent); cursor: pointer; text-decoration: none; }
   #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover, #helpPanel a.helpLines:hover { text-decoration: underline; }
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLines.on { color: var(--text); text-decoration: underline; cursor: default; }
+  #helpPanel a.helpOpt { color: var(--accent); cursor: pointer; text-decoration: none; }
+  #helpPanel a.helpOpt:hover { text-decoration: underline; }
+  #helpPanel a.helpOpt.on { color: var(--text); text-decoration: underline; cursor: default; }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
@@ -500,18 +503,18 @@
     <div><b>modes</b> active chat modes - slow Ns (seconds between messages) · follow age restriction Nm/Nh (must have followed that long to chat; 0m shows as 'followers only' - following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
     <div><b id="helpThemeIcon">◐</b><span>theme <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
-    <div><b>▦</b> <span>zebra striping on alternating rows<sup>†</sup></span></div>
+    <div><b>▦</b> <span>zebra striping <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
     <div><b>font menu</b> pick a chat font; scroll cycles without opening</div>
     <div><b>Aa</b><span>font size <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height <span id="helpLhList"></span><sup>†</sup></span></div>
-    <div><b>T</b> <span>text shadow under chat text<sup>†</sup></span></div>
+    <div><b>T</b> <span>text shadow <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades <span id="helpLinesList"></span><sup>†</sup></span></div>
-    <div><b>◷</b> <span>message timestamps<sup>†</sup></span></div>
-    <div><b>Ⓢ</b> <span>sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
-    <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
-    <div><b>▶</b> <span>draggable stream video overlay (loads only when enabled)<sup>†</sup></span></div>
+    <div><b>◷</b> <span>message timestamps <span id="helpTimesList"></span><sup>†</sup></span></div>
+    <div><b>Ⓢ</b> <span>sub badge <span id="helpSubList"></span> - the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
+    <div><b>☺</b> <span>emote-only rows <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
+    <div><b>▶</b> <span>stream video overlay <span id="helpVideoList"></span> - draggable, loads only when enabled (loads only when enabled)<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
-    <div><b>?</b> click cycles this panel, inline labels, and both together<sup>†</sup></div>
+    <div><b>?</b> <span>help mode <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -1442,13 +1445,21 @@
   document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
     `<a href="#" class="helpTheme" data-theme="${t}">${t}</a>`).join(' / ');
   helpPanel.addEventListener('click', (e) => {
-    const a = e.target.closest('a.helpTheme, a.helpFont, a.helpLh, a.helpLines');
+    const a = e.target.closest('a.helpTheme, a.helpFont, a.helpLh, a.helpLines, a.helpOpt');
     if (!a) return;
     e.preventDefault();
     if (a.classList.contains('helpTheme')) { themeMode = a.dataset.theme; applyTheme(); saveOpts(); }
     else if (a.classList.contains('helpFont')) fontCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLh')) lhCtl.set(+a.dataset.idx);
-    else { setLines(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
+    else if (a.classList.contains('helpEonly')) { emoteMode = +a.dataset.idx; applyEmoteMode(); saveOpts(); }
+    else if (a.classList.contains('helpSplit')) { setSplit(+a.dataset.idx + 1); saveOpts(); }
+    else if (a.classList.contains('helpVideo')) { setVideo(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
   });
   applyTheme();
 
@@ -1606,6 +1617,7 @@
     vidBox.hidden = !on;
     vidBtn.classList.toggle('on', on);
     vidBtn.title = `Stream video: ${on ? 'on' : 'off'} - click/scroll`;
+    markHelp('helpVideo', on ? 1 : 0);
     if (on) loadPlayer();
   }
   vidBtn.addEventListener('click', () => { setVideo(vidBox.hidden); saveOpts(); });
@@ -1747,6 +1759,7 @@
     subBtn.style.justifyContent = { right: 'flex-end', left: 'flex-start', hidden: 'center' }[mode];
     subBtn.style.padding = mode === 'left' ? '0 1px 0 2px' : mode === 'right' ? '0 2px 0 1px' : '0 1px';
     subBtn.title = `Sub badge: ${mode} - click/scroll · ⇧click back`;
+    markHelp('helpSub', subMode);
     // adopt stray .mod chips from rows rendered before the chip joined the
     // aux cluster (e.g. restored history)
     document.querySelectorAll('.row > .role.mod').forEach((mod) => {
@@ -1789,6 +1802,7 @@
     mainEl.classList.toggle('em-right', m === 'right');
     emoteBtn.classList.toggle('on', m !== 'off');
     emoteBtn.title = `Emote-only rows: ${m} - click/scroll · ⇧click back`;
+    markHelp('helpEonly', emoteMode);
   }
 
   function stepEmote(dir) {
@@ -1806,6 +1820,7 @@
     mainEl.classList.toggle('zebra', on);
     zebraBtn.classList.toggle('on', on);
     zebraBtn.title = `Zebra rows: ${on ? 'on' : 'off'} - click/scroll`;
+    markHelp('helpZebra', on ? 1 : 0);
   }
 
   zebraBtn.addEventListener('click', () => { setZebra(!mainEl.classList.contains('zebra')); saveOpts(); });
@@ -1821,6 +1836,7 @@
     mainEl.classList.toggle('notime', !on);
     timeBtn.classList.toggle('on', on);
     timeBtn.title = `Timestamps: ${on ? 'on' : 'off'} - click/scroll`;
+    markHelp('helpTimes', on ? 1 : 0);
   }
 
   timeBtn.addEventListener('click', () => { setTimes(mainEl.classList.contains('notime')); saveOpts(); });
@@ -1848,6 +1864,7 @@
     shadowBtn.classList.toggle('on', on);
     shadowBtn.style.textShadow = on ? SHADOW_LVLS[shadLevel] : '';
     shadowBtn.title = `Text shadow: ${SHADOW_NAMES[shadLevel]} - click/scroll · ⇧click back`;
+    markHelp('helpShadow', shadLevel);
   }
 
   shadowBtn.addEventListener('click', (e) => {
@@ -1885,6 +1902,7 @@
     document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode < 2; });
     helpBtn.classList.toggle('on', helpMode !== 0);
     helpBtn.title = `Help: ${HELP_MODES[helpMode]} - click/scroll · ⇧click back`;
+    markHelp('helpHelp', helpMode);
   }
 
   function stepHelp(dir) {
@@ -1973,6 +1991,7 @@
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
     level = Math.max(1, Math.min(3, level));
+    markHelp('helpSplit', level - 1);
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     if (level === cur) return;
     // merge every column back into logEl chronologically - the column after
@@ -2160,6 +2179,20 @@
     if (flag('video')) setVideo(true);
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
+
+  // clickable option lists in the help rows, matching the theme/size lists
+  function markHelp(cls, idx) {
+    helpPanel.querySelectorAll('a.' + cls)
+      .forEach((a) => a.classList.toggle('on', +a.dataset.idx === idx));
+  }
+  const HELP_LISTS = {
+    helpZebra: ['off', 'on'], helpTimes: ['off', 'on'], helpShadow: SHADOW_NAMES,
+    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
+  };
+  for (const [cls, names] of Object.entries(HELP_LISTS))
+    document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
+      `<a href="#" class="helpOpt ${cls}" data-idx="${i}">${n}</a>`).join(' / ');
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
   // when the attribute changes, so hover parks the title in data-tt and a
