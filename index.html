@@ -2020,8 +2020,9 @@
         activeEl = logEl;
         if (pushOverflow(logEl, sideEl)) activeEl = sideEl;
       } else { sideEl.scrollTop = 0; activeEl = sideEl; }
-    } else { // level 3: #side2 is the fresh page; re-deal #side if needed
-      if (cur === 2) pushOverflow(logEl, sideEl);
+    } else { // level 3: #side gets #log's overflow page, the rest lands in #side2
+      pushOverflow(logEl, sideEl);
+      pushOverflow(sideEl, side2El);
       side2El.scrollTop = 0;
       activeEl = side2El;
     }
