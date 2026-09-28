@@ -1324,7 +1324,7 @@
   applyTheme();
 
   // ---- text controls: click or scroll to cycle, shift+click goes back ----
-  const FONT_SIZES = [12, 14, 15, 16, 17, 18, 20, 21, 24, 28, 32];
+  const FONT_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 28, 32];
   const LINE_HEIGHTS = [1.1, 1.25, 1.4, 1.65, 1.9, 2.2];
   const FONT_STACKS = {
     mono: '"JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace',
@@ -1372,7 +1372,7 @@
     return { set: (i) => { idx = i; apply(); }, get: () => idx };
   }
 
-  const fontCtl = cycle(fontBtn, FONT_SIZES, 1, '--chat-font', 'Font size', 'px', 'helpFont');
+  const fontCtl = cycle(fontBtn, FONT_SIZES, 7, '--chat-font', 'Font size', 'px', 'helpFont');
   const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 3, '--chat-lh', 'Line height', '', 'helpLh');
   // the help descriptions embed the same option lists as clickable links
   document.getElementById('helpFontList').innerHTML = FONT_SIZES.map((px, i) =>
@@ -1645,7 +1645,7 @@
     const q = new URLSearchParams();
     if (themeMode !== 'auto') q.set('theme', themeMode);
     if (fontSel.value !== 'mono') q.set('font', fontSel.value);
-    if (fontCtl.get() !== 1) q.set('size', FONT_SIZES[fontCtl.get()]);
+    if (fontCtl.get() !== 7) q.set('size', FONT_SIZES[fontCtl.get()]);
     if (lhCtl.get() !== 3) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (mainEl.classList.contains('zebra')) q.set('zebra', '1');
     if (mainEl.classList.contains('nolines')) q.set('lines', '0');
