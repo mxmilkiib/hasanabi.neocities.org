@@ -447,7 +447,7 @@
     <div><b>Ⓢ</b> <span>sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
-    <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts</div>
+    <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> click cycles this panel and inline labels on each header control<sup>†</sup></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
@@ -830,9 +830,11 @@
   sideEl.addEventListener('load', resnap, true);
   side2El.addEventListener('load', resnap, true);
 
-  function queueMessage(parsed) {
+  function queueMessage(parsed, replay) {
     queue.push(parsed);
-    recentTimestamps.push(Date.now());
+    // replayed backfill lines are historical, not live traffic - counting
+    // their arrival time would spike the msgs/sec rate falsely
+    if (!replay) recentTimestamps.push(Date.now());
     if (!scheduled) {
       scheduled = true;
       requestAnimationFrame(flush);
@@ -1002,7 +1004,7 @@
     sparkEl.width = n * DPR; // resets the canvas transform
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
     sparkEl.style.width = n + 'px';
-    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}`;
+    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · dim bands mark time the page wasn't watching`;
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
     drawSpark();
@@ -1018,6 +1020,7 @@
         line: styles.getPropertyValue('--line') || '#262a35',
         accent: styles.getPropertyValue('--accent') || '#e8a33d',
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
+        gap: styles.getPropertyValue('--text-dim') || '#666',
       };
     }
     const step = SPARK_W / (SPARK_N - 1); // ~1px per sample
@@ -1038,12 +1041,23 @@
     const n = rateSamples.length;
     if (!n) return;
     const accent = sparkCols.accent;
-    const max = Math.max(1, ...rateSamples);
+    const max = Math.max(1, ...rateSamples.filter(Number.isFinite));
+    // NaN samples = seconds the page wasn't observing (backgrounded, closed,
+    // relay down); shade them so dead time doesn't read as a quiet chat
+    sparkCtx.fillStyle = sparkCols.gap;
+    sparkCtx.globalAlpha = .2;
+    for (let i = 0; i < n; i++)
+      if (!Number.isFinite(rateSamples[i]))
+        sparkCtx.fillRect((i + SPARK_N - n) * step, 0, Math.max(step, 1), SPARK_H);
+    sparkCtx.globalAlpha = 1;
     sparkCtx.beginPath();
+    let penDown = false;
     for (let i = 0; i < n; i++) {
+      if (!Number.isFinite(rateSamples[i])) { penDown = false; continue; }
       const x = (i + SPARK_N - n) * step;
       const y = SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3);
-      i ? sparkCtx.lineTo(x, y) : sparkCtx.moveTo(x, y);
+      penDown ? sparkCtx.lineTo(x, y) : sparkCtx.moveTo(x, y);
+      penDown = true;
     }
     sparkCtx.strokeStyle = accent;
     sparkCtx.lineWidth = 1;
@@ -1060,11 +1074,11 @@
     sparkCtx.strokeStyle = danger;
     sparkCtx.lineWidth = 2;
     for (let i = 0; i < n; i++) {
-      if ((glorpSamples[i] || 0) <= 2) continue;
+      if (!Number.isFinite(rateSamples[i]) || (glorpSamples[i] || 0) <= 2) continue;
       const x = (i + SPARK_N - n) * step;
       const y = SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3);
       sparkCtx.beginPath();
-      if (i) {
+      if (i && Number.isFinite(rateSamples[i - 1])) {
         sparkCtx.moveTo((i - 1 + SPARK_N - n) * step,
           SPARK_H - 1 - (rateSamples[i - 1] / max) * (SPARK_H - 3));
       } else sparkCtx.moveTo(x, y);
@@ -1074,7 +1088,8 @@
   }
 
   // persisted so a reload keeps the recent rate history; the gap while the
-  // page was closed is padded with zeros so the timeline stays honest
+  // page was closed is padded with NaN so it draws shaded, not flat
+  // (NaN serializes as null in JSON - mapped back on restore)
   const SPARK_KEY = 'hasan-spark';
   function saveSpark() {
     try {
@@ -1087,7 +1102,7 @@
       if (!d || !Array.isArray(d.rate)) return;
       const win = SPARK_WINDOWS[sparkWinIdx];
       const gap = Math.min(win, Math.max(0, Math.round((Date.now() - d.t) / 1000)));
-      rateSamples.push(...d.rate.slice(-win), ...Array(gap).fill(0));
+      rateSamples.push(...d.rate.slice(-win).map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN));
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
       if (glorpSamples.length > win) glorpSamples.splice(0, glorpSamples.length - win);
@@ -1098,8 +1113,16 @@
   restoreSpark();
   drawSpark();
 
+  let lastTick = Date.now();
   setInterval(() => {
-    const cutoff = Date.now() - 5000;
+    const now = Date.now();
+    // a suspended tab misses ticks; push one NaN per missed second so the
+    // graph shades the unobserved span instead of quietly compressing it
+    const missed = Math.min(SPARK_WINDOWS[sparkWinIdx],
+      Math.max(0, Math.round((now - lastTick) / 1000) - 1));
+    for (let i = 0; i < missed; i++) { rateSamples.push(NaN); glorpSamples.push(0); }
+    lastTick = now;
+    const cutoff = now - 5000;
     recentTimestamps = recentTimestamps.filter((t) => t > cutoff);
     const rate = recentTimestamps.length / 5;
     rateEl.textContent = (rate ? rate.toFixed(1) : '-.-') + ' msgs/sec';
@@ -1287,12 +1310,12 @@
     modesEl.title = chips.length ? `chat modes: ${chips.join(', ').replace(/<[^>]+>/g, '')}` : '';
   }
 
-  function handleLine(line) {
+  function handleLine(line, replay) {
     if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG) /.test(line)) {
       const parsed = parseTwitchMessage(line);
       if (!parsed) return;
       if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags); return; }
-      queueMessage(parsed);
+      queueMessage(parsed, replay);
     }
   }
 
@@ -1860,7 +1883,7 @@
       joined = d.state === 'connected';
       if (joined) { clearInterval(joinTimer); backfill(); }
     } else if (d.type === 'lines') {
-      for (const line of d.lines) handleLine(line);
+      for (const line of d.lines) handleLine(line, !!d.replay);
     } else if (d.type === 'stream') {
       onStream(d);
     } else if (d.type === 'emotes') {
