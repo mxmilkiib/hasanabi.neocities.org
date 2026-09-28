@@ -119,7 +119,7 @@ no dependencies beyond CDN-hosted fonts:
   into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
   Keys: `split` (2 panes, or `split=3` on landscape screens), `min`,
   `theme`, `font`, `size`, `lh`, `zebra`, `lines`,
-  `times`, `shadow`, `sub` (right/left/hidden), `eonly` (inline/right/off),
+  `times`, `shadow`, `video`, `sub` (right/left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
 - **Performance** — incoming lines queue and flush once per animation
   frame; the log is capped at 250 rows.
