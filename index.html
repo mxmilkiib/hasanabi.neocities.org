@@ -234,8 +234,33 @@
     flex: none;
   }
   main { flex: 1; display: flex; min-height: 0; position: relative; }
-  #vid { height: clamp(180px, 34vh, 460px); border-bottom: 1px solid var(--line); flex: none; display: flex; justify-content: center; }
-  #vid iframe { height: 100%; aspect-ratio: 16/9; border: 0; display: block; }
+  #vid {
+    position: fixed;
+    right: 12px; bottom: 12px;
+    width: min(460px, 92vw);
+    aspect-ratio: 16/9;
+    z-index: 8;
+    border: 1px solid var(--line);
+    background: #000;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .45);
+  }
+  #vid .vid-handle {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 16px;
+    cursor: grab;
+    z-index: 2;
+    background: linear-gradient(color-mix(in srgb, var(--panel) 85%, transparent), transparent);
+    color: var(--text-dim);
+    font-size: 11px;
+    line-height: 16px;
+    padding-left: 8px;
+    opacity: 0;
+    transition: opacity .15s;
+    touch-action: none;
+  }
+  #vid:hover .vid-handle, #vid.dragging .vid-handle { opacity: 1; }
+  #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   .jdown {
     position: absolute;
     bottom: 10px;
@@ -449,7 +474,7 @@
     <div><b>Ⓢ</b> <span>sub badge the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>▮▮</b> <span>page-flip columns one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
-    <div><b>▶</b> <span>stream video embed above the chat (loads only when enabled)<sup>†</sup></span></div>
+    <div><b>▶</b> <span>draggable stream video overlay (loads only when enabled)<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> click cycles this panel, inline labels, and both together<sup>†</sup></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span></div>
@@ -465,7 +490,7 @@
     <div><b>source</b><span><a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License" target="_blank" rel="noopener">agpl</a>)</span></div>
   </div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
-  <div id="vid" hidden><iframe id="vidFrame" allowfullscreen title="HasanAbi stream"></iframe></div>
+  <div id="vid" hidden><div class="vid-handle" title="drag to move">⠿</div><iframe id="vidFrame" allowfullscreen title="HasanAbi stream"></iframe></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
 
 <script>
@@ -1522,6 +1547,40 @@
     setVideo(e.deltaY < 0);
     saveOpts();
   }, { passive: false });
+
+  // dragging: pointer capture keeps move events flowing to the handle even
+  // when the pointer crosses over the iframe, which would eat them otherwise
+  const VIDPOS_KEY = 'hasan-vidpos';
+  const vidHandle = vidBox.querySelector('.vid-handle');
+  try {
+    const p = JSON.parse(localStorage.getItem(VIDPOS_KEY));
+    if (p && p.left != null) {
+      vidBox.style.left = p.left; vidBox.style.top = p.top;
+      vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
+    }
+  } catch (e) {}
+  vidHandle.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    vidHandle.setPointerCapture(e.pointerId);
+    vidBox.classList.add('dragging');
+    const r = vidBox.getBoundingClientRect();
+    const ox = e.clientX - r.left, oy = e.clientY - r.top;
+    const move = (ev) => {
+      vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
+      vidBox.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
+      vidBox.style.top = Math.max(0, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+    };
+    const drop = () => {
+      vidBox.classList.remove('dragging');
+      vidHandle.removeEventListener('pointermove', move);
+      vidHandle.removeEventListener('pointerup', drop);
+      vidHandle.removeEventListener('pointercancel', drop);
+      try { localStorage.setItem(VIDPOS_KEY, JSON.stringify({ left: vidBox.style.left, top: vidBox.style.top })); } catch (e2) {}
+    };
+    vidHandle.addEventListener('pointermove', move);
+    vidHandle.addEventListener('pointerup', drop);
+    vidHandle.addEventListener('pointercancel', drop);
+  });
 
   // ---- header collapse: button shrinks it to a thin strip, clicking the
   // strip restores it ----
