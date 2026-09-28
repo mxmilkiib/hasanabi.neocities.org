@@ -247,7 +247,7 @@
   #vid .vid-handle {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 16px;
+    height: 20px;
     cursor: grab;
     z-index: 2;
     background: linear-gradient(color-mix(in srgb, var(--panel) 85%, transparent), transparent);
@@ -262,19 +262,21 @@
   #vid:hover .vid-handle, #vid.dragging .vid-handle { opacity: 1; }
   #vid .vid-size {
     position: absolute;
-    right: 0; bottom: 0;
-    width: 22px; height: 22px;
-    cursor: nwse-resize;
-    z-index: 2;
+    width: 24px; height: 24px;
+    z-index: 3;
     color: var(--text-dim);
     font-size: 13px;
     line-height: 1;
-    text-align: right;
-    padding: 5px 4px 2px 5px;
+    display: grid;
+    place-items: center;
     opacity: 0;
     transition: opacity .15s;
     touch-action: none;
   }
+  #vid .vid-size.br { right: 0; bottom: 0; cursor: nwse-resize; }
+  #vid .vid-size.bl { left: 0; bottom: 0; cursor: nesw-resize; }
+  #vid .vid-size.tr { right: 0; top: 0; cursor: nesw-resize; }
+  #vid .vid-size.tl { left: 0; top: 0; cursor: nwse-resize; }
   #vid:hover .vid-size, #vid.dragging .vid-size { opacity: 1; }
   #vid #vidFrame { position: absolute; inset: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -508,7 +510,7 @@
     <div><b>source</b><span><a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License" target="_blank" rel="noopener">agpl</a>)</span></div>
   </div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
-  <div id="vid" hidden><div class="vid-handle" title="drag to move">⠿</div><div id="vidFrame"></div><div class="vid-size" title="drag to resize">◢</div></div>
+  <div id="vid" hidden><div class="vid-handle" title="drag to move">⠿</div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState">Waiting for chat…</div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
 
 <script>
@@ -1620,37 +1622,51 @@
       vidHandle.removeEventListener('pointermove', move);
       vidHandle.removeEventListener('pointerup', drop);
       vidHandle.removeEventListener('pointercancel', drop);
-      try { localStorage.setItem(VIDPOS_KEY, JSON.stringify({ left: vidBox.style.left, top: vidBox.style.top, w: vidBox.offsetWidth })); } catch (e2) {}
+      saveVidBox();
     };
     vidHandle.addEventListener('pointermove', move);
     vidHandle.addEventListener('pointerup', drop);
     vidHandle.addEventListener('pointercancel', drop);
   });
 
-  // resizing: corner grip drags the width, aspect-ratio keeps the 16:9 height
-  const vidSize = vidBox.querySelector('.vid-size');
-  vidSize.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    vidSize.setPointerCapture(e.pointerId);
-    vidBox.classList.add('dragging');
-    const startW = vidBox.offsetWidth, startX = e.clientX;
-    const maxW = () => {
+  // resizing: each corner grip drags the far width, the opposite corner stays
+  // anchored, and aspect-ratio keeps the 16:9 height
+  const saveVidBox = () => {
+    try {
+      const rr = vidBox.getBoundingClientRect();
+      localStorage.setItem(VIDPOS_KEY, JSON.stringify({ left: rr.left + 'px', top: rr.top + 'px', w: vidBox.offsetWidth }));
+    } catch (e2) {}
+  };
+  vidBox.querySelectorAll('.vid-size').forEach((grip) => {
+    grip.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      grip.setPointerCapture(e.pointerId);
+      vidBox.classList.add('dragging');
       const r = vidBox.getBoundingClientRect();
-      return Math.min(innerWidth - r.left - 4, (innerHeight - r.top - 4) * 16 / 9);
-    };
-    const move = (ev) => {
-      vidBox.style.width = Math.max(180, Math.min(maxW(), startW + ev.clientX - startX)) + 'px';
-    };
-    const drop = () => {
-      vidBox.classList.remove('dragging');
-      vidSize.removeEventListener('pointermove', move);
-      vidSize.removeEventListener('pointerup', drop);
-      vidSize.removeEventListener('pointercancel', drop);
-      try { localStorage.setItem(VIDPOS_KEY, JSON.stringify({ left: vidBox.style.left, top: vidBox.style.top, w: vidBox.offsetWidth })); } catch (e2) {}
-    };
-    vidSize.addEventListener('pointermove', move);
-    vidSize.addEventListener('pointerup', drop);
-    vidSize.addEventListener('pointercancel', drop);
+      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl');
+      const topEdge = grip.classList.contains('tl') || grip.classList.contains('tr');
+      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner
+      const ay = topEdge ? r.bottom : r.top;
+      const move = (ev) => {
+        const maxW = Math.min(leftEdge ? ax : innerWidth - ax,
+          (topEdge ? ay : innerHeight - ay) * 16 / 9) - 4;
+        const w = Math.max(180, Math.min(maxW, Math.abs(ev.clientX - ax)));
+        vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
+        vidBox.style.width = w + 'px';
+        vidBox.style.left = (leftEdge ? ax - w : ax) + 'px';
+        vidBox.style.top = (topEdge ? ay - w * 9 / 16 : ay) + 'px';
+      };
+      const drop = () => {
+        vidBox.classList.remove('dragging');
+        grip.removeEventListener('pointermove', move);
+        grip.removeEventListener('pointerup', drop);
+        grip.removeEventListener('pointercancel', drop);
+        saveVidBox();
+      };
+      grip.addEventListener('pointermove', move);
+      grip.addEventListener('pointerup', drop);
+      grip.addEventListener('pointercancel', drop);
+    });
   });
 
   // ---- header collapse: button shrinks it to a thin strip, clicking the
