@@ -1642,7 +1642,7 @@
   vidBtn.addEventListener('click', () => { setVideo(vidBox.hidden); saveOpts(); });
   vidBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setVideo(e.deltaY < 0);
+    setVideo(vidBox.hidden);
     saveOpts();
   }, { passive: false });
 
@@ -1845,7 +1845,7 @@
   zebraBtn.addEventListener('click', () => { setZebra(!mainEl.classList.contains('zebra')); saveOpts(); });
   zebraBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setZebra(e.deltaY < 0);
+    setZebra(!mainEl.classList.contains('zebra'));
     saveOpts();
   }, { passive: false });
   setZebra(false);
@@ -1861,7 +1861,7 @@
   timeBtn.addEventListener('click', () => { setTimes(mainEl.classList.contains('notime')); saveOpts(); });
   timeBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setTimes(e.deltaY < 0);
+    setTimes(mainEl.classList.contains('notime'));
     saveOpts();
   }, { passive: false });
   setTimes(true);
