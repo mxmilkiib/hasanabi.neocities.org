@@ -541,6 +541,8 @@
     cursor: pointer;
   }
   button.hdr-btn { width: 30px; padding: 0; text-align: center; }
+  /* ▮▮▮ overflows the fixed-width button at full size */
+  #splitBtn.tri { font-size: .72em; letter-spacing: -.5px; }
   /* flexes to fill the free header space; sparkSize() matches the buffer to
      the laid-out width whenever it changes so it never rasterises blurry */
   #spark { height: 18px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
@@ -2398,6 +2400,7 @@
     jdownSide.hidden = jdownSide2.hidden = true;
     splitBtn.classList.toggle('on', level > 1);
     splitBtn.textContent = level === 3 ? '▮▮▮' : '▮▮';
+    splitBtn.classList.toggle('tri', level === 3);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
     splitBtn.title = (level > 1 ? 'Rejoin the columns' : 'Split into page-flip columns') + ' - click/scroll · ⇧click back';
     if (level === 1) {
