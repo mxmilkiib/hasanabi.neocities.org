@@ -121,6 +121,8 @@ no dependencies beyond CDN-hosted fonts:
   `style`, `font`, `size`, `lh`, `zebra`, `lines` (0-3 separator shades),
   `times`, `shadow`, `video`, `sub` (right/left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
+  `kw` is a comma-separated keyword list; lines containing one get a
+  green edge (e.g. `?kw=malkiii,raid`).
   `theme` names a preset bundle of all display options (`default`,
   `compact`, `paper`, `cosy`, `console`, `cinema`, `phosphor`,
   `dyslexic`, `midnight`, `solar`, `minimal`); a style name like

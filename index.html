@@ -458,6 +458,12 @@
     margin-left: -8px;
     padding-left: 8px;
   }
+  .row.kw {
+    background-color: color-mix(in srgb, var(--good) 11%, transparent);
+    box-shadow: inset 3px 0 0 var(--good);
+    margin-left: -8px;
+    padding-left: 8px;
+  }
   .at { color: var(--accent); }
   .row a { color: var(--accent); }
   .reply {
@@ -572,6 +578,8 @@
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
+    <div style="margin-top: 8px"><span>highlight keywords - comma separated; a line containing one gets a green edge (own username, phrases…)</span></div>
+    <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: 13px; text-align: left">
     <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
     <div><b>see also</b><span><a class="at" href="https://nitter.xitter.cc/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">discord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a></span></div>
@@ -1099,7 +1107,7 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
-      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}"` +
+      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwRe && kwRe.test(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -1631,6 +1639,22 @@
   }, { passive: false });
   applyFont();
 
+  // ---- highlight keywords: a comma-separated list whose lines get a green
+  // edge bar. Existing rows are re-tagged live on each edit. ----
+  const kwInput = document.getElementById('kwInput');
+  let kwRe = null;
+  function setKeywords(str) {
+    const words = str.split(',').map((s) => s.trim()).filter(Boolean)
+      .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    kwRe = words.length ? new RegExp(`\\b(?:${words.join('|')})\\b`, 'i') : null;
+    document.querySelectorAll('.row').forEach((r) => {
+      const name = r.querySelector('.name');
+      const txt = name ? r.textContent.replace(name.textContent, '') : r.textContent;
+      r.classList.toggle('kw', !!(kwRe && kwRe.test(txt)));
+    });
+  }
+  kwInput.addEventListener('input', () => { setKeywords(kwInput.value); saveOpts(); });
+
   // ---- option persistence ----
   const OPTS_KEY = 'hasan-opts';
 
@@ -1647,6 +1671,7 @@
         eonly: emoteMode,
         help: helpMode,
         video: !vidBox.hidden,
+        kw: kwInput.value,
       }));
     } catch (e) {}
   }
@@ -1682,6 +1707,7 @@
     if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
     if (typeof o.video === 'boolean') setVideo(o.video);
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
+    if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
   }
 
   // ---- theme presets: a named combo of every display option. The active
@@ -2074,6 +2100,7 @@
     if (document.body.classList.contains('hdrmin')) q.set('min', '1');
     if (isSplit()) q.set('split', String(cols().length));
     if (!vidBox.hidden) q.set('video', '1');
+    if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
       .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
@@ -2320,6 +2347,7 @@
     }
     if (flag('min')) minHeader();
     if (flag('video')) setVideo(true);
+    if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
 
