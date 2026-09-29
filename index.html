@@ -387,7 +387,11 @@
      to the right edge like gif embeds so the row keeps its line height */
   main.em-inline .row.eonly .emote, main.em-right .row.eonly .emote { height: 2.2em; }
   main.em-inline .row.eonly .emote { margin: -.45em 1px; }
-  main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { float: right; margin: -1em 4px -1em 1px; }
+  /* right-pinned emote rows go flexbox so dom order holds at the right edge:
+     emotes first, then the trailing aux chip ([sub 12], [mod], bits) last */
+  main.em-right .row.eonly { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+  main.em-right .row.eonly > .name { margin-right: auto; }
+  main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { margin: -.45em 1px; }
   /* zero-width overlay emotes stack on the previous emote's box */
   .estk { position: relative; display: inline-block; }
   .estk .emote { height: 1.5em; }
