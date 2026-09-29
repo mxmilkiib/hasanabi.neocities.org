@@ -161,7 +161,9 @@
     border-bottom: 1px solid var(--line);
     position: relative;
   }
-  .hdr-min { margin: 0 auto; flex: none; }
+  /* centred on the header itself - margin:auto only centres inside the
+     flex gap, which skews left against the wider right-hand controls */
+  .hdr-min { position: absolute; left: 50%; transform: translateX(-50%); z-index: 2; }
   body.hdrmin header {
     height: 10px;
     padding: 0;
@@ -514,7 +516,7 @@
     <div><b>T</b> <span>text shadow <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps <span id="helpTimesList"></span><sup>†</sup></span></div>
-    <div><b>Ⓢ</b> <span>sub badge <span id="helpSubList"></span> - the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
+    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge <span id="helpSubList"></span> - the [sub N] chip marks how many months that chatter has been subscribed; cycles right edge of the row / left of name / hidden<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay <span id="helpVideoList"></span> - draggable, loads only when enabled (loads only when enabled)<sup>†</sup></span></div>
