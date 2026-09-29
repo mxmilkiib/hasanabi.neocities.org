@@ -1863,7 +1863,7 @@
         help: helpMode,
         video: !vidBox.hidden,
         kw: kwInput.value, self: selfHl ? 1 : 0,
-        hpw: helpWIdx, hfs: hdrFs,
+        hpw: helpWIdx, hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
         split: 1 + !sideEl.hidden + !side2El.hidden,
       }));
     } catch (e) {}
@@ -1908,7 +1908,16 @@
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (Number.isInteger(o.hpw) && o.hpw >= 0 && o.hpw < HELP_WIDTHS.length) { helpWIdx = o.hpw; applyHelpW(); }
-    if (Number.isInteger(o.hfs) && o.hfs >= -1 && o.hfs < HDR_SIZES.length) { hdrFs = o.hfs; applyHdrFs(); }
+    // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
+    // list, which maps +4 (7-10 were prepended)
+    if (Number.isInteger(o.hfspx)) {
+      const i = HDR_SIZES.indexOf(o.hfspx);
+      hdrFs = i >= 0 ? i : -1;
+      applyHdrFs();
+    } else if (Number.isInteger(o.hfs) && o.hfs >= -1 && o.hfs < 8) {
+      hdrFs = o.hfs < 0 ? -1 : o.hfs + 4;
+      applyHdrFs();
+    }
   }
 
   // ---- theme presets: a named combo of every display option. The active
@@ -2342,7 +2351,7 @@
   // ---- help popup width: five steps; narrow screens still get clamped by
   // the left/right insets regardless of the inline max-width ----
   const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280];
-  const HDR_SIZES = [11, 12, 13, 14, 15, 16, 18, 20];
+  const HDR_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20];
   let hdrFs = -1; // -1 = follow the chat font
   function applyHdrFs() {
     const s = document.documentElement.style;
