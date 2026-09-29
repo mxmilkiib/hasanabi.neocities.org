@@ -512,13 +512,9 @@
   .row.deleted { opacity: .45; text-decoration: line-through; }
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
-  .row.stale { opacity: .3; }
-  /* stale rows nearest the incoming fresh block fade hardest, ramping back
-     to the base ghost opacity over the next few rows */
-  .row:not(.stale) + .row.stale { opacity: .08; }
-  .row:not(.stale) + .row.stale + .row.stale { opacity: .14; }
-  .row:not(.stale) + .row.stale + .row.stale + .row.stale { opacity: .2; }
-  .row:not(.stale) + .row.stale + .row.stale + .row.stale + .row.stale { opacity: .25; }
+  .row.stale { opacity: .16; }
+  /* ghost rows near the fresh/ghost boundary fade hardest and ease off with
+     depth as a pixel-distance gradient - applied inline by ghostFade() */
   /* invisible spacer repaying ghost-height overage so the faded page keeps
      its layout while fresh rows overwrite it */
   .row.ghostgap { padding: 0; margin: 0; border-bottom: none; }
@@ -1289,6 +1285,7 @@
     if (rowById.size > 2000) rowById.clear();
     if (isSplit()) {
       if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
+      for (const c of cols()) ghostFade(c);
       // page-flip never trims by itself - bound the total across columns;
       // the column after the active one holds the oldest rows
       const oldest = nextCol();
@@ -2457,6 +2454,7 @@
       } else to.prepend(last);
       evictGhosts(to);
     }
+    ghostFade(to);
     return moved;
   }
 
@@ -2490,6 +2488,23 @@
     }
   }
 
+  // Ghost rows fade as a smooth gradient by pixel distance below the
+  // fresh/ghost boundary: the next row to be overwritten is faintest, and
+  // the dimming creeps well ahead of the incoming text rather than stepping.
+  const GHOST_LO = 0.03;  // boundary ghost, about to be overwritten
+  const GHOST_HI = 0.16;  // resting ghost opacity (matches .row.stale)
+  const GHOST_RAMP = 340; // px below the boundary the fade eases over
+  function ghostFade(col) {
+    const first = col.querySelector('.row.stale');
+    if (!first) return;
+    const top = first.offsetTop;
+    for (let r = first; r && r.classList.contains('stale'); r = r.nextElementSibling) {
+      const d = r.offsetTop - top;
+      r.style.opacity = d >= GHOST_RAMP ? '' :
+        (GHOST_LO + (d / GHOST_RAMP) * (GHOST_HI - GHOST_LO)).toFixed(3);
+    }
+  }
+
   // Sets the pane count (1..3); a third column only exists in landscape,
   // where it's actually wider than it is tall enough to be readable.
   function setSplit(level) {
@@ -2516,6 +2531,8 @@
     splitBtn.title = (level > 1 ? 'Rejoin the columns' : 'Split into page-flip columns') + ' - click/scroll · ⇧click back';
     if (level === 1) {
       activeEl = logEl;
+      // drop inline ghost-gradient values left over from column mode
+      for (const r of logEl.querySelectorAll('.row.stale')) r.style.opacity = '';
       // columns widen on rejoin - re-pin the live column if it was following
       requestAnimationFrame(() => { if (stickBottom) logEl.scrollTop = logEl.scrollHeight; });
     } else if (level === 2) {
