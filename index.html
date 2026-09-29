@@ -1121,16 +1121,16 @@
     histDirty = true;
     const firstGhost = activeEl.querySelector('.row.stale');
     if (firstGhost) {
-      // overwrite: the ghost page stays put; each fresh row consumes the
-      // ghost line at the fresh/ghost boundary so the new page overwrites
-      // the old one top-down instead of shoving it down
+      // overwrite: the ghost page stays put; consume ghost lines at the
+      // fresh/ghost boundary until it returns to its original offset, so a
+      // wrapped multi-line row eats as many ghosts as its height needs and
+      // the rows below never shift
       const tpl = document.createElement('template');
       tpl.innerHTML = html;
-      const frag = tpl.content;
-      let n = frag.childElementCount;
-      firstGhost.before(frag);
+      const boundary = firstGhost.offsetTop;
+      firstGhost.before(tpl.content);
       let g = firstGhost;
-      while (n-- > 0 && g?.classList.contains('stale')) {
+      while (g?.classList.contains('stale') && g.offsetTop > boundary) {
         const nx = g.nextElementSibling;
         g.remove();
         g = nx;
@@ -2175,20 +2175,23 @@
         for (const r of to.children) r.classList.add('stale');
         moved = true;
       }
-      to.prepend(last);
-      // consume a ghost line at the boundary per incoming row so the moved
-      // rows overwrite the old page in place rather than pushing it down
-      consumeGhost(to);
+      // consume ghost lines at the boundary until it returns to its
+      // original offset, so moved rows overwrite the old page in place
+      // rather than pushing it down
+      const firstGhost = to.querySelector('.row.stale');
+      if (firstGhost) {
+        const boundary = firstGhost.offsetTop;
+        to.prepend(last);
+        let g = firstGhost;
+        while (g?.classList.contains('stale') && g.offsetTop > boundary) {
+          const nx = g.nextElementSibling;
+          g.remove();
+          g = nx;
+        }
+      } else to.prepend(last);
       evictGhosts(to);
     }
     return moved;
-  }
-
-  // Removes the topmost ghost row in `col` (the one at the fresh/ghost
-  // boundary), so fresh content takes its place in situ.
-  function consumeGhost(col) {
-    const g = col.querySelector('.row.stale');
-    if (g) g.remove();
   }
 
   // Drops any ghost rows that have already fallen below `col`'s fold.
