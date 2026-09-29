@@ -262,10 +262,15 @@
     text-align: center;
   }
   body.hdrmin #hint { display: none; }
-  body.hdrmin header::after {
-    content: '–';
+  /* the strip keeps ? and – pinned at the right end instead of a dash */
+  body.hdrmin header { justify-content: flex-end; gap: 4px; padding: 0 4px; }
+  body.hdrmin #helpBtn, body.hdrmin #hdrMin {
+    display: inline-block;
+    width: auto; height: 10px;
+    padding: 0 4px;
+    border: none;
     font-size: 9px;
-    line-height: 1;
+    line-height: 10px;
     color: var(--accent);
   }
   .channel {
@@ -2140,6 +2145,7 @@
     saveOpts();
     repin();
     if (helpParked) { helpParked = false; applyHelp(); }
+    else if (!helpPanel.hidden) applyHelp(); // re-anchor if opened over the strip
   }
   // the – button cycles three modes: normal → graph-only → strip
   hdrMinBtn.addEventListener('click', (e) => {
@@ -2148,6 +2154,8 @@
     if (e.shiftKey) { // ⇧click retreats, matching the other controls
       if (b.contains('hdrmin')) { unminHeader(); b.add('hdrgraph'); saveOpts(); }
       else if (b.contains('hdrgraph')) { b.remove('hdrgraph'); saveOpts(); }
+    } else if (b.contains('hdrmin')) {
+      unminHeader(); // strip's own – steps back out to the normal header
     } else if (b.contains('hdrgraph')) {
       b.remove('hdrgraph');
       minHeader();
