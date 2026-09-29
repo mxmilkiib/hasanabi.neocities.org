@@ -572,7 +572,8 @@
     <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
     <div><b>font menu</b> <span>chat font: <span id="helpFontFamList"></span>; scroll cycles without opening<sup>†</sup></span></div>
-    <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span><b>hdr</b><span>header font size: <span id="helpHfsList"></span> - 'follow chat' tracks the chat size<sup>†</sup></span></div>
+    <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span></div>
+    <div><b>hdr</b><span>header font size: <span id="helpHfsList"></span> - 'follow chat' tracks the chat size<sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
@@ -2842,7 +2843,7 @@
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
-    helpHfs: ['follow chat'].concat(HDR_SIZES.map((s) => s + 'px')),
+    helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
