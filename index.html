@@ -181,6 +181,17 @@
     --danger: #b5455f;
     --vip: #b8457a;
   }
+  :root[data-theme="mirc"] {
+    --bg: #ffffff;
+    --panel: #ececec;
+    --line: #d4d4d4;
+    --text: #000000;
+    --text-dim: #6a6a6a;
+    --accent: #0000cc;
+    --good: #007a00;
+    --danger: #cc0000;
+    --vip: #a000a0;
+  }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
@@ -1560,10 +1571,11 @@
     midnight: { theme: 'nord',    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: true,  shadow: 1, subMode: 0, eonly: 0 },
     solar:    { theme: 'solarized',font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
     minimal:  { theme: 'light',   font: 'sans',       size: 7,  lh: 9,  lines: 0, zebra: false, times: false, shadow: 0, subMode: 2, eonly: 2 },
+    mirc:     { theme: 'mirc',    font: 'fixedsys',   size: 6,  lh: 4,  lines: 1, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
   };
-  const THEMES = ['light', 'sepia', 'paper', 'lavender', 'mid', 'solarized', 'nord', 'dark', 'black', 'amber', 'console'];
-  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', console: '▮' };
-  const LIGHT_THEMES = ['light', 'sepia', 'paper', 'lavender'];
+  const THEMES = ['light', 'sepia', 'paper', 'lavender', 'mid', 'solarized', 'nord', 'dark', 'black', 'amber', 'console', 'mirc'];
+  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', console: '▮', mirc: '⊞' };
+  const LIGHT_THEMES = ['light', 'sepia', 'paper', 'lavender', 'mirc'];
   let themeMode = 'auto';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
 
