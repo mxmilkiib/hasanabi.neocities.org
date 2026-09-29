@@ -104,9 +104,13 @@ no dependencies beyond CDN-hosted fonts:
   favicon is rebuilt in the dot's computed color so the tab icon tracks
   stream state per theme. Uptime, viewers, title on hover; offline shows
   last-run info; ROOMSTATE chat modes (slow, follow age, emote-only,
-  subs-only, r9k).
+  subs-only, r9k). The `–` button cycles three modes: normal →
+  graph-only (option buttons hide, `?` stays) → a 10px minimised strip
+  that restores on click.
 - **Graph** — messages-per-second sparkline with 10s/minute ticks and
-  red glorp/F bursts; persisted across reloads.
+  red glorp/F bursts; it flexes to fill whatever header space is free
+  (the whole bar in graph-only mode) and re-rasterises to match its box
+  so it stays sharp through resizes. Persisted across reloads.
 - **Controls** — colour styles, zebra striping, graduated text shadow, font
   picker (incl. dyslexia-friendly), font size, line height, row lines,
   sub-chip alignment, page-flip columns (two, or three in landscape),
@@ -135,9 +139,10 @@ no dependencies beyond CDN-hosted fonts:
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
   `kw` is a comma-separated keyword list; lines containing one get a
   green edge (e.g. `?kw=malkiii,raid`). `self=1` puts an accent edge on
-  one's own messages when logged in. `min=graph` collapses the header
-  to just the rate graph. `hpw` sets the help popup width
-  (`480`, `560`, `640`, `720`, `840`+).
+  one's own messages when logged in. `min=graph` hides the option
+  buttons and stretches the rate graph across the header; `min=1`
+  minimises to a strip. `hpw` sets the help popup width
+  (`480`–`1280`).
   `theme` names a preset bundle of all display options (`default`,
   `compact`, `paper`, `cosy`, `console`, `cinema`, `phosphor`,
   `dyslexic`, `midnight`, `solar`, `minimal`); a style name like
