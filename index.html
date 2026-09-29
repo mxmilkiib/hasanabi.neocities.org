@@ -1435,12 +1435,12 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'auto',    font: 'mono',       size: 7,  lh: 10, lines: 3, zebra: false, times: true,  shadow: 0, sub: 0, eonly: 0 },
-    compact:  { theme: 'dark',    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: false, shadow: 0, sub: 2, eonly: 1 },
-    reader:   { theme: 'paper',   font: 'atkinson',   size: 13, lh: 12, lines: 3, zebra: true,  times: true,  shadow: 0, sub: 0, eonly: 0 },
-    terminal: { theme: 'console', font: 'vt323',      size: 10, lh: 7,  lines: 0, zebra: false, times: true,  shadow: 0, sub: 2, eonly: 0 },
-    cozy:     { theme: 'sepia',   font: 'sourcesans', size: 9,  lh: 11, lines: 1, zebra: true,  times: true,  shadow: 1, sub: 0, eonly: 0 },
-    cinema:   { theme: 'black',   font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: false, shadow: 2, sub: 2, eonly: 1 },
+    default:  { theme: 'auto',    font: 'mono',       size: 7,  lh: 10, lines: 3, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
+    compact:  { theme: 'dark',    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: false, shadow: 0, subMode: 2, eonly: 1 },
+    reader:   { theme: 'paper',   font: 'atkinson',   size: 13, lh: 12, lines: 3, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0 },
+    terminal: { theme: 'console', font: 'vt323',      size: 10, lh: 7,  lines: 0, zebra: false, times: true,  shadow: 0, subMode: 2, eonly: 0 },
+    cozy:     { theme: 'sepia',   font: 'sourcesans', size: 9,  lh: 11, lines: 1, zebra: true,  times: true,  shadow: 1, subMode: 0, eonly: 0 },
+    cinema:   { theme: 'black',   font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: false, shadow: 2, subMode: 2, eonly: 1 },
   };
   const THEMES = ['light', 'sepia', 'paper', 'mid', 'dark', 'black', 'console'];
   const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', mid: '◐', dark: '☾', black: '●', console: '▮' };
@@ -1616,6 +1616,8 @@
     if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
     if (o.hdrmin) document.body.classList.add('hdrmin');
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = [2, 1, 0][o.sub]; applySubMode(); }
+    // presets use the direct index; saved 'sub' is the legacy reversed order
+    if (Number.isInteger(o.subMode) && o.subMode >= 0 && o.subMode < SUB_MODES.length) { subMode = o.subMode; applySubMode(); }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
     if (typeof o.times === 'boolean') setTimes(o.times);
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
@@ -1633,7 +1635,7 @@
       p.size === fontCtl.get() && p.lh === lhCtl.get() &&
       p.lines === lineLevel && p.zebra === mainEl.classList.contains('zebra') &&
       p.times === !mainEl.classList.contains('notime') &&
-      p.shadow === shadLevel && p.sub === subMode && p.eonly === emoteMode;
+      p.shadow === shadLevel && p.subMode === subMode && p.eonly === emoteMode;
   }
   function markPresets() {
     try { // called during init before some options exist - retry later
