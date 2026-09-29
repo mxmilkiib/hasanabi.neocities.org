@@ -1444,7 +1444,7 @@
   const THEME_PRESETS = {
     default:  { theme: 'auto',    font: 'mono',       size: 7,  lh: 10, lines: 3, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
     compact:  { theme: 'dark',    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: false, shadow: 0, subMode: 2, eonly: 1 },
-    reader:   { theme: 'paper',   font: 'atkinson',   size: 13, lh: 12, lines: 3, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0 },
+    paper:    { theme: 'light',   font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: true,  shadow: 0, subMode: 2, eonly: 1, split: 2, video: true },
     terminal: { theme: 'console', font: 'vt323',      size: 10, lh: 7,  lines: 0, zebra: false, times: true,  shadow: 0, subMode: 2, eonly: 0 },
     cozy:     { theme: 'sepia',   font: 'sourcesans', size: 9,  lh: 11, lines: 1, zebra: true,  times: true,  shadow: 1, subMode: 0, eonly: 0 },
     cinema:   { theme: 'black',   font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: false, shadow: 2, subMode: 2, eonly: 1 },
@@ -1632,6 +1632,7 @@
     if (Number.isInteger(o.eonly) && o.eonly >= 0 && o.eonly < EMOTE_MODES.length) { emoteMode = o.eonly; applyEmoteMode(); }
     if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
     if (typeof o.video === 'boolean') setVideo(o.video);
+    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
   }
 
   // ---- theme presets: a named combo of every display option. The active
