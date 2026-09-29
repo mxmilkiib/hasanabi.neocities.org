@@ -240,8 +240,8 @@
     align-items: center;
   }
   body.hdrmin header > * { display: none; }
-  /* graph mode: option buttons hide, the rate graph takes the width */
-  /* option buttons hide in graph mode, except ? so help stays reachable */
+  /* reduced mode: option buttons hide, the rate graph takes the width */
+  /* option buttons hide in reduced mode, except ? so help stays reachable */
   body.hdrgraph .hdr-side .hdr-btn:not(#helpBtn), body.hdrgraph .hdr-side select, body.hdrgraph .hdr-lbl { display: none; }
   body.hdrgraph .hdr-lbl { display: none; }
   /* #subBtn's own display:flex (id selector) outranks the rule above */
@@ -262,14 +262,14 @@
     text-align: center;
   }
   body.hdrmin #hint { display: none; }
-  /* the strip keeps ? and – pinned at the right end instead of a dash */
+  /* the minimised strip carries just the –, pinned at the right end */
   body.hdrmin header { justify-content: flex-end; gap: 4px; padding: 0 4px; }
-  body.hdrmin #helpBtn, body.hdrmin #hdrMin {
+  body.hdrmin #hdrMin {
     display: inline-block;
     width: auto; height: 10px;
-    padding: 0 4px;
+    padding: 0 8px;
     border: none;
-    font-size: 9px;
+    font-size: 12px;
     line-height: 10px;
     color: var(--accent);
   }
@@ -662,14 +662,14 @@
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" hidden></span></div>
     <canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
-    <button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header mode - click/scroll cycles normal → graph-only → minimised · ⇧click back">–</button>
+    <button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back">–</button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages">➤</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div class="wide"><b></b><span>help popup width: <span id="helpWList"></span></span></div>
     <div><b>dot</b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
-    <div><b>–</b> centre button cycles: normal → option buttons hidden with the rate graph filling the bar (? stays visible) → minimised strip; ⇧click or scroll back retreats; click the strip to restore</div>
+    <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
     <div><b>font menu</b> <span>chat font: <span id="helpFontFamList"></span>; scroll cycles without opening<sup>†</sup></span></div>
@@ -2155,7 +2155,7 @@
     if (helpParked) { helpParked = false; applyHelp(); }
     else if (!helpPanel.hidden) applyHelp(); // re-anchor if opened over the strip
   }
-  // the – button cycles three modes: normal → graph-only → strip
+  // the – button cycles three sizes: full → reduced → minimised strip
   hdrMinBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     const b = document.body.classList;
