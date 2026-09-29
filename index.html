@@ -1121,16 +1121,18 @@
     histDirty = true;
     const firstGhost = activeEl.querySelector('.row.stale');
     if (firstGhost) {
-      // overwrite: the ghost page stays put; consume ghost lines at the
-      // fresh/ghost boundary until it returns to its original offset, so a
-      // wrapped multi-line row eats as many ghosts as its height needs and
-      // the rows below never shift
+      // overwrite: the ghost page stays put; consume ghost height equal to
+      // the inserted height at the fresh/ghost boundary, so a wrapped
+      // multi-line row eats as many ghosts as it needs and the rows below
+      // never shift
       const tpl = document.createElement('template');
       tpl.innerHTML = html;
       const boundary = firstGhost.offsetTop;
       firstGhost.before(tpl.content);
+      let need = firstGhost.offsetTop - boundary;
       let g = firstGhost;
-      while (g?.classList.contains('stale') && g.offsetTop > boundary) {
+      while (need > 0 && g?.classList.contains('stale')) {
+        need -= g.offsetHeight;
         const nx = g.nextElementSibling;
         g.remove();
         g = nx;
@@ -2175,15 +2177,17 @@
         for (const r of to.children) r.classList.add('stale');
         moved = true;
       }
-      // consume ghost lines at the boundary until it returns to its
-      // original offset, so moved rows overwrite the old page in place
+      // consume ghost height equal to the moved row's height at the
+      // fresh/ghost boundary, so it overwrites the old page in place
       // rather than pushing it down
       const firstGhost = to.querySelector('.row.stale');
       if (firstGhost) {
         const boundary = firstGhost.offsetTop;
         to.prepend(last);
+        let need = firstGhost.offsetTop - boundary;
         let g = firstGhost;
-        while (g?.classList.contains('stale') && g.offsetTop > boundary) {
+        while (need > 0 && g?.classList.contains('stale')) {
+          need -= g.offsetHeight;
           const nx = g.nextElementSibling;
           g.remove();
           g = nx;
