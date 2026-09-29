@@ -50,7 +50,9 @@ the CSP forbids on Neocities:
 
 ### Message protocol
 
-Parent → relay: `{type: 'join', channel}`, `{type: 'backfill'}`
+Parent → relay: `{type: 'join', channel}`, `{type: 'backfill'}`,
+`{type: 'auth', token}` (or `token: null` to log out),
+`{type: 'send', text}` — posts a chat message once authenticated
 
 Relay → parent:
 
@@ -65,6 +67,16 @@ Relay → parent:
   refetched every 10 minutes
 - `{type: 'nitter', host}` — fastest healthy nitter instance from
   status.d420.de, rechecked every 15 minutes
+- `{type: 'auth', login}` (or `{type: 'auth', error}`) — after `auth`, the
+  relay validates the token at id.twitch.tv, reconnects the socket with
+  the user's credentials, and reports the resolved login
+
+Optional login uses Twitch's implicit OAuth grant (`➤` in the header) — a
+pure client-side flow, so no secret ships in the page. `TWITCH_CLIENT_ID`
+in `index.html` must be an app registered at dev.twitch.tv with this
+page's URL as its redirect URI. Chat-scoped tokens live in localStorage
+until logout; channel rules (slow mode etc.) apply to sent messages and
+rejections come back as ordinary `[notice]` rows.
 
 ## Frontend — `index.html` (this repo, on Neocities)
 
