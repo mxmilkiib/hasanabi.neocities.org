@@ -496,7 +496,7 @@
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
@@ -566,6 +566,7 @@
   const fontBtn = document.getElementById('fontBtn');
   const lhBtn = document.getElementById('lhBtn');
   const themeBtn = document.getElementById('themeBtn');
+  const presetBtn = document.getElementById('presetBtn');
   const fontSel = document.getElementById('fontSel');
   const linesBtn = document.getElementById('linesBtn');
   const subBtn = document.getElementById('subBtn');
@@ -1633,14 +1634,30 @@
   }
   function markPresets() {
     try { // called during init before some options exist - retry later
+      let cur = null;
       helpPanel.querySelectorAll('a.helpPreset')
-        .forEach((a) => a.classList.toggle('on', presetMatch(THEME_PRESETS[a.dataset.preset])));
+        .forEach((a) => {
+          const on = presetMatch(THEME_PRESETS[a.dataset.preset]);
+          a.classList.toggle('on', on);
+          if (on) cur = a.dataset.preset;
+        });
+      presetBtn.classList.toggle('on', !!cur);
+      presetBtn.title = `Theme preset: ${cur || 'custom'} - click/scroll · ⇧click back`;
     } catch (e) {}
   }
   function applyPreset(name) {
     applyOpts(THEME_PRESETS[name]);
     markPresets();
   }
+  // steps from whichever preset currently matches; a custom mix restarts at 0
+  function stepPreset(dir) {
+    const names = Object.keys(THEME_PRESETS);
+    const cur = names.findIndex((n) => presetMatch(THEME_PRESETS[n]));
+    applyPreset(names[(cur + dir + names.length) % names.length]);
+    saveOpts();
+  }
+  presetBtn.addEventListener('click', (e) => stepPreset(e.shiftKey ? -1 : 1));
+  presetBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepPreset(e.deltaY < 0 ? 1 : -1); }, { passive: false });
 
   // ---- stream video embed: the official JS embed API, lazily loaded so the
   // option carries no cost until enabled. The API (unlike a bare iframe) can
@@ -1941,7 +1958,7 @@
   const HELP_MODES = ['off', 'panel', 'labels', 'both'];
   let helpMode = 0;
   const HDR_LABELS = [
-    [themeBtn, 'style'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
+    [themeBtn, 'style'], [presetBtn, 'theme'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
     [fontSel, 'font'], [fontBtn, 'size'], [lhBtn, 'height'],
     [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [emoteBtn, 'emote'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'msg rate'],
   ];
