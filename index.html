@@ -2501,6 +2501,10 @@
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
     relayFrame.contentWindow.postMessage({ type: 'send', text }, RELAY_ORIGIN);
+    // twitch doesn't echo own messages back over IRC - render locally
+    queueMessage({ tags: { id: 'local-' + Date.now(), 'display-name': auth.login,
+      'tmi-sent-ts': String(Date.now()) }, login: auth.login,
+      kind: 'PRIVMSG', message: text }, false);
     chatInput.value = '';
   });
 
