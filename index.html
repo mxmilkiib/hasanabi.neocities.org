@@ -113,6 +113,7 @@
        state; padding-right keeps flowing content clear of them */
     padding-right: 84px;
     font-size: var(--hdr-fs, var(--chat-font, 15px));
+    font-family: var(--chat-ff, inherit);
     background: var(--panel);
     border-bottom: 1px solid var(--line);
     position: relative;
@@ -461,6 +462,7 @@
     color: var(--text-dim);
     padding: 0 8px;
     height: 26px;
+    font-family: inherit;
     font-size: 1.07em;
     line-height: 1;
     cursor: pointer;
@@ -528,7 +530,7 @@
   #chatbar[hidden] { display: none; }
   #chatbar input {
     flex: 1;
-    font-family: var(--chat-font-family, inherit);
+    font-family: var(--chat-ff, inherit);
     font-size: var(--chat-font, 15px);
     text-align: left;
     width: auto;
