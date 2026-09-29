@@ -1291,8 +1291,8 @@
       const x = Math.round((SPARK_N - 1 - k * 10) * step) + .5;
       if (x < 0) break;
       sparkCtx.beginPath();
-      sparkCtx.lineWidth = k % 6 === 0 ? 1.5 : 1;
-      sparkCtx.globalAlpha = k % 6 === 0 ? .5 : .3;
+      sparkCtx.lineWidth = k % 6 === 0 ? 2 : 1;
+      sparkCtx.globalAlpha = k % 6 === 0 ? .75 : .45;
       sparkCtx.moveTo(x, 0);
       sparkCtx.lineTo(x, SPARK_H);
       sparkCtx.stroke();
