@@ -161,9 +161,9 @@
     border-bottom: 1px solid var(--line);
     position: relative;
   }
-  /* centred on the header itself - margin:auto only centres inside the
-     flex gap, which skews left against the wider right-hand controls */
-  .hdr-min { position: absolute; left: 50%; transform: translateX(-50%); z-index: 2; }
+  /* centred in the free space between the channel block and the controls:
+     auto margins only split it evenly while hdr-side isn't flex-growing */
+  .hdr-min { margin: 0 auto; flex: none; }
   body.hdrmin header {
     height: 10px;
     padding: 0;
@@ -426,7 +426,7 @@
   .reply b { font-weight: 600; }
   .row.jump { animation: jumpflash 1.4s ease-out; }
   @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
-  .hdr-side { display: flex; align-items: center; gap: 6px; flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; }
+  .hdr-side { display: flex; align-items: center; gap: 6px; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; }
   .hdr-btn {
     background: none;
     border: 1px solid var(--line);
