@@ -782,7 +782,7 @@
   let badgeSets = {};          // 'set_id' -> { version: url }
   // Nitter host for twitter/x link rewriting; the relay picks a live one
   // from status.d420.de, this is only the fallback until then.
-  let nitterHost = 'https://nitter.netbub.com';
+  let nitterHost = null; // set once the relay confirms a live instance
 
   // badge 'set/ver' -> image url; falls back to the highest version <= ver
   // (e.g. subscriber/34 uses the 24-month flair when no 34 exists)
@@ -879,11 +879,15 @@
         out.push(`<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`);
       } else {
       // twitter/x links display as twitter.com but route through a nitter
-      // instance so they work without a login
+      // instance so they work without a login. nitter now only serves
+      // profile pages - status links stay on x.com, and without a confirmed
+      // live host nothing is rewritten
       const tw = tok.match(/^(?:https?:\/\/)?(?:www\.|mobile\.)?(?:x\.com|twitter\.com)(\/\S*)?$/i);
       if (tw) {
         const path = tw[1] || '';
-        out.push(`<a href="${escapeHTML(`${nitterHost}${path}`)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`);
+        const profile = /^\/[A-Za-z0-9_]{1,15}\/?$/.test(path);
+        const href = nitterHost && profile ? `${nitterHost}${path}` : `https://x.com${path}`;
+        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`);
       }
       else if (/^https?:\/\/\S+$/i.test(tok) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(tok)) {
@@ -2791,8 +2795,8 @@
         try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch (e) {}
       }
       updateSendUI();
-    } else if (d.type === 'nitter' && /^https:\/\//.test(d.host || '')) {
-      nitterHost = d.host;
+    } else if (d.type === 'nitter') {
+      nitterHost = /^https:\/\//.test(d.host || '') ? d.host : null;
     } else if (d.type === 'repo') {
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
       document.getElementById('repoStats').textContent =
