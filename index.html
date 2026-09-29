@@ -589,6 +589,7 @@
     <div style="margin-top: 8px"><b></b><span>highlight keywords - comma separated; a line containing one gets a green edge (own username, phrases…):</span></div>
     <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: 13px; text-align: left">
     <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
+    <div><b></b><span>popup width <span id="helpWList"></span></span></div>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
     <div><b>bots</b><span>blammobot games: !roulette gamble points on red/black · !trivia answer questions for points · !scramble unscramble the word · !points check balance · !top leaderboard · fossabot: mod/utility commands (!Goodnight and friends) · this page colours each game's [tag] chip and bolds answers, rolls and point counts</span></div>
     <div><b>see also</b><span><a class="at" href="https://nitter.xitter.cc/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">discord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a></span></div>
@@ -1586,6 +1587,7 @@
     else if (a.classList.contains('helpFontFam')) { fontSel.selectedIndex = +a.dataset.idx; applyFont(); saveOpts(); }
     else if (a.classList.contains('helpPreset')) { applyPreset(a.dataset.preset); saveOpts(); }
     else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
+    else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; applyHelpW(); saveOpts(); }
   });
   applyTheme();
 
@@ -1699,6 +1701,7 @@
         help: helpMode,
         video: !vidBox.hidden,
         kw: kwInput.value,
+        hpw: helpWIdx,
       }));
     } catch (e) {}
   }
@@ -1735,6 +1738,7 @@
     if (typeof o.video === 'boolean') setVideo(o.video);
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
+    if (Number.isInteger(o.hpw) && o.hpw >= 0 && o.hpw < HELP_WIDTHS.length) { helpWIdx = o.hpw; applyHelpW(); }
   }
 
   // ---- theme presets: a named combo of every display option. The active
@@ -2121,6 +2125,15 @@
 
   helpBtn.addEventListener('click', (e) => stepHelp(e.shiftKey ? -1 : 1));
   helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+
+  // ---- help popup width: five steps; narrow screens still get clamped by
+  // the left/right insets regardless of the inline max-width ----
+  const HELP_WIDTHS = [480, 560, 640, 720, 840];
+  let helpWIdx = 3;
+  function applyHelpW() {
+    helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
+    markHelp('helpW', helpWIdx);
+  }
   // header height changes with width when the controls wrap - re-anchor
   window.addEventListener('resize', () => {
     if (!helpPanel.hidden) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
@@ -2145,6 +2158,7 @@
     if (isSplit()) q.set('split', String(cols().length));
     if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
+    if (helpWIdx !== 3) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
       .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
@@ -2448,6 +2462,7 @@
     if (flag('min')) minHeader();
     if (flag('video')) setVideo(true);
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
+    if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
 
@@ -2461,6 +2476,7 @@
     helpZebra: ['off', 'on'], helpTimes: ['off', 'on'], helpShadow: SHADOW_NAMES,
     helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
+    helpW: HELP_WIDTHS.map((w) => w + 'px'),
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
@@ -2480,6 +2496,7 @@
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);
   markHelp('helpHelp', helpMode);
   markHelp('helpFontFam', fontSel.selectedIndex);
+  markHelp('helpW', helpWIdx);
   markPresets();
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
