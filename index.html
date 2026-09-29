@@ -661,7 +661,7 @@
   <div id="helpPanel" hidden>
     <div class="wide"><b></b><span>help popup width: <span id="helpWList"></span></span></div>
     <div><b>dot</b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
-    <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow age restriction Nm/Nh (must have followed that long to chat; 0m shows as 'followers only' - following is enough) · emote · subs · r9k (unique messages)</div>
+    <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> centre button cycles: normal → option buttons hidden with the rate graph filling the bar (? stays visible) → minimised strip; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
@@ -1631,7 +1631,8 @@
       : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
       : (since ? `<b>live</b> since <b>${since}</b> · up <b>${up}</b>` : '<b>live</b>') +
-        (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') + chatSuffix;
+        (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') +
+        (chatState === 'connected' ? ` · chat${chatModesTxt ? `: <b>${chatModesTxt}</b>` : ''}` : chatSuffix);
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
     document.title = 'HasanAbi Chat Thing';
@@ -1652,18 +1653,21 @@
 
   // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
   const modesEl = document.getElementById('chatModes');
+  let chatModesTxt = ''; // compact mode list folded into the live status line
   function onRoomState(tags) {
     const chips = [];
     const slow = parseInt(tags.slow || '0', 10);
     if (slow > 0) chips.push(`slow <b>${slow}s</b>`);
     const foll = parseInt(tags['followers-only'] || '-1', 10);
-    if (foll === 0) chips.push('followers only');
-    else if (foll > 0) chips.push(`follow age restriction: <b>${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}</b>`);
+    if (foll === 0) chips.push('follow req');
+    else if (foll > 0) chips.push(`follow req <b>${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}</b>`);
     if (tags['emote-only'] === '1') chips.push('emote');
     if (tags['subs-only'] === '1') chips.push('subs');
     if (tags.r9k === '1') chips.push('r9k');
     modesEl.innerHTML = chips.join(' ');
     modesEl.title = chips.length ? `chat modes: ${chips.join(', ').replace(/<[^>]+>/g, '')}` : '';
+    chatModesTxt = chips.join(', ').replace(/<[^>]+>/g, '');
+    updateHeader();
   }
 
   function handleLine(line, replay) {
