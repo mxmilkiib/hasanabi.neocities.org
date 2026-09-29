@@ -188,6 +188,7 @@
     background-image: var(--texture, none);
     color: var(--text);
     font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-weight: var(--chat-w, 400);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -561,7 +562,7 @@
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div><b>dot</b> stream status; hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
@@ -571,7 +572,7 @@
     <div><b id="helpThemeIcon">◐</b><span>style <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
     <div><b>font menu</b> <span>chat font <span id="helpFontFamList"></span>; scroll cycles without opening<sup>†</sup></span></div>
-    <div><b>Aa</b><span>font size <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height <span id="helpLhList"></span><sup>†</sup></span></div>
+    <div><b>Aa</b><span>font size <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps <span id="helpTimesList"></span><sup>†</sup></span></div>
@@ -633,6 +634,7 @@
   const isSplit = () => !sideEl.hidden;
   const splitBtn = document.getElementById('splitBtn');
   const fontBtn = document.getElementById('fontBtn');
+  const weightBtn = document.getElementById('weightBtn');
   const lhBtn = document.getElementById('lhBtn');
   const themeBtn = document.getElementById('themeBtn');
   const presetBtn = document.getElementById('presetBtn');
@@ -1576,6 +1578,7 @@
     if (a.classList.contains('helpTheme')) { themeMode = a.dataset.theme; applyTheme(); saveOpts(); }
     else if (a.classList.contains('helpFont')) fontCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLh')) lhCtl.set(+a.dataset.idx);
+    else if (a.classList.contains('helpWg')) weightCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx === 1); saveOpts(); }
@@ -1642,6 +1645,11 @@
 
   const fontCtl = cycle(fontBtn, FONT_SIZES, 7, '--chat-font', 'Font size', 'px', 'helpFont');
   const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 10, '--chat-lh', 'Line height', '', 'helpLh');
+  const WEIGHTS = [300, 400, 500, 600, 700];
+  const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
+  const weightCtl = cycle(weightBtn, WEIGHTS, 1, '--chat-w', 'Font weight', '', 'helpWg');
+  document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
+    `<a href="#" class="helpWg" data-idx="${i}">${n}</a>`).join(' ');
   // the help descriptions embed the same option lists as clickable links
   document.getElementById('helpFontList').innerHTML = FONT_SIZES.map((px, i) =>
     `<a href="#" class="helpFont" data-idx="${i}">${px}</a>`).join(' ');
@@ -1690,7 +1698,7 @@
   function saveOpts() {
     try {
       localStorage.setItem(OPTS_KEY, JSON.stringify({
-        font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), theme: themeMode,
+        font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode,
         lines: lineLevel,
         hdrmin: document.body.classList.contains('hdrmin'),
         sub: subMode,
@@ -1723,6 +1731,7 @@
     }
     if (Number.isInteger(o.size)) fontCtl.set(o.size);
     if (Number.isInteger(o.lh)) lhCtl.set(o.lh);
+    if (Number.isInteger(o.weight)) weightCtl.set(o.weight);
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
     if (o.hdrmin) document.body.classList.add('hdrmin');
@@ -2095,7 +2104,7 @@
   let helpMode = 0;
   const HDR_LABELS = [
     [presetBtn, 'theme'], [themeBtn, 'style'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
-    [fontSel, 'font'], [fontBtn, 'size'], [lhBtn, 'height'],
+    [fontSel, 'font'], [fontBtn, 'size'], [weightBtn, 'weight'], [lhBtn, 'height'],
     [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [emoteBtn, 'emote'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'msg rate'],
   ];
   for (const [el, txt] of HDR_LABELS) {
@@ -2148,6 +2157,7 @@
     if (fontSel.value !== 'mono') q.set('font', fontSel.value);
     if (fontCtl.get() !== 7) q.set('size', FONT_SIZES[fontCtl.get()]);
     if (lhCtl.get() !== 10) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
+    if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (mainEl.classList.contains('zebra')) q.set('zebra', '1');
     if (lineLevel !== 3) q.set('lines', String(lineLevel));
     if (mainEl.classList.contains('notime')) q.set('times', '0');
@@ -2448,6 +2458,7 @@
     if (q.has('font') && FONT_STACKS[q.get('font')]) { fontSel.value = q.get('font'); applyFont(); }
     if (q.has('size')) { const i = FONT_SIZES.indexOf(+q.get('size')); if (i >= 0) fontCtl.set(i); }
     if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
+  if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
     if (q.has('times')) setTimes(flag('times'));
