@@ -1170,7 +1170,9 @@
     if (!sparkCols) {
       const styles = getComputedStyle(document.documentElement);
       sparkCols = {
-        line: styles.getPropertyValue('--line') || '#262a35',
+        // ticks use text-dim rather than --line: sepia/paper lines wash out
+        // against the panel, while text-dim keeps contrast on every style
+        tick: styles.getPropertyValue('--text-dim') || '#666',
         accent: styles.getPropertyValue('--accent') || '#e8a33d',
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
         gap: styles.getPropertyValue('--text-dim') || '#666',
@@ -1179,7 +1181,7 @@
     const step = SPARK_W / (SPARK_N - 1); // ~1px per sample
     // faint vertical tick every 10s counting back from the newest; each
     // minute mark draws a touch thicker
-    sparkCtx.strokeStyle = sparkCols.line;
+    sparkCtx.strokeStyle = sparkCols.tick;
     for (let k = 0; ; k++) {
       const x = Math.round((SPARK_N - 1 - k * 10) * step) + .5;
       if (x < 0) break;
