@@ -111,7 +111,8 @@ no dependencies beyond CDN-hosted fonts:
   red glorp/F bursts; it flexes to fill whatever header space is free
   (the whole bar in reduced mode) and re-rasterises to match its box
   so it stays sharp through resizes. Persisted across reloads.
-- **Controls** — colour styles, zebra striping, graduated text shadow, font
+- **Controls** — colour style palettes plus a separate 7-stop shade
+  axis (lightest → darkest, or system-following auto), zebra striping, graduated text shadow, font
   picker (incl. dyslexia-friendly), font size, line height, row lines,
   sub-chip alignment, page-flip columns (two, or three in landscape),
   minimizable header,
@@ -137,7 +138,7 @@ no dependencies beyond CDN-hosted fonts:
 - **URL options** — query params apply a configuration on top of (and
   into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
   Keys: `split` (2 panes, or `split=3` on landscape screens), `min`,
-  `style`, `font`, `size`, `lh`, `wght` (300-700), `hfs` (header font px; unset = follow chat), `zebra`, `lines` (0-3 separator shades),
+  `style`, `shade` (0-6, `auto` follows the system), `font`, `size`, `lh`, `wght` (300-700), `hfs` (header font px; unset = follow chat), `zebra`, `lines` (0-3 separator shades),
   `times`, `shadow`, `video`, `sub` (right/left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
   `kw` is a comma-separated keyword list; lines containing one get a
