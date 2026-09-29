@@ -447,6 +447,9 @@
   /* real badge icons render left of the name, like twitch */
   .badge { height: 1.15em; width: 1.15em; vertical-align: -.18em; margin-right: 3px; }
   .row.deleted { opacity: .45; text-decoration: line-through; }
+  /* outgoing page-flip contents linger faded until pushed below the fold */
+  .row { transition: opacity .3s; }
+  .row.stale { opacity: .3; }
   .row.notice.raid { background-color: color-mix(in srgb, var(--accent) 12%, transparent); }
   .chat-img { max-height: 6em; vertical-align: middle; margin: -2.7em 1px; }
   /* Pasted image/gif links pin to the right edge so their vertical
@@ -2142,13 +2145,22 @@
   // ---- split view: page-flip columns. New rows fill the active column;
   // once a row drops below the fold the other column is cleared and becomes
   // the target, flipping back and forth. Inactive column scrolls freely. ----
-  // Moves rows below the fold of `from` to the top of `to` (cleared first).
+  // Moves rows below the fold of `from` to the top of `to`. The outgoing
+  // contents stay as faded ghosts and are evicted one by one as the new
+  // rows push them below the fold.
   function pushOverflow(from, to) {
     let last, moved = false;
     while ((last = from.lastElementChild) &&
            last.offsetTop - from.offsetTop + last.offsetHeight > from.clientHeight) {
-      if (!moved) { to.textContent = ''; moved = true; }
+      if (!moved) {
+        for (const r of to.children) r.classList.add('stale');
+        moved = true;
+      }
       to.prepend(last);
+      let s;
+      while ((s = to.lastElementChild) && s.classList.contains('stale') &&
+             s.offsetTop - to.offsetTop + s.offsetHeight > to.clientHeight)
+        s.remove();
     }
     return moved;
   }
@@ -2213,7 +2225,8 @@
       const c = cols();
       const i = c.indexOf(activeEl);
       const rows = [...c.slice(i + 1), ...c.slice(0, i + 1)]
-        .flatMap((col) => [...col.children]).filter((r) => r.classList.contains('row'));
+        .flatMap((col) => [...col.children])
+        .filter((r) => r.classList.contains('row') && !r.classList.contains('stale'));
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => r.outerHTML)));
     } catch (e) {}
     saveSpark();
