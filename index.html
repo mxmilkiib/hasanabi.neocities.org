@@ -514,7 +514,7 @@
   .row.deleted { opacity: .45; text-decoration: line-through; }
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
-  .row.stale { opacity: .16; }
+  .row.stale { opacity: .45; }
   /* ghost rows near the fresh/ghost boundary fade hardest and ease off with
      depth as a pixel-distance gradient - applied inline by ghostFade() */
   /* invisible spacer repaying ghost-height overage so the faded page keeps
@@ -2512,7 +2512,7 @@
   // fresh/ghost boundary: the next row to be overwritten is faintest, and
   // the dimming creeps well ahead of the incoming text rather than stepping.
   const GHOST_LO = 0.03;  // boundary ghost, about to be overwritten
-  const GHOST_HI = 0.16;  // resting ghost opacity (matches .row.stale)
+  const GHOST_HI = 0.45;  // resting ghost opacity (matches .row.stale)
   const GHOST_RAMP = 340; // px below the boundary the fade eases over
   function ghostFade(col) {
     const first = col.querySelector('.row.stale');
