@@ -1321,15 +1321,19 @@
       };
     }
     const step = SPARK_W / (SPARK_N - 1); // ~1px per sample
-    // faint vertical tick every 10s counting back from the newest; each
-    // minute mark draws a touch thicker
+    // ticks sit on wall-clock 10s boundaries, so they slide left with the
+    // trace instead of floating fixed over it; each minute mark draws a
+    // touch thicker
     sparkCtx.strokeStyle = sparkCols.tick;
-    for (let k = 0; ; k++) {
-      const x = Math.round((SPARK_N - 1 - k * 10) * step) + .5;
-      if (x < 0) break;
+    const newestSec = Math.floor(lastTick / 1000); // wall-second of the newest slot
+    for (let p = 0; p < SPARK_N; p++) {
+      const sec = newestSec - (SPARK_N - 1 - p);
+      if (sec % 10) continue;
+      const x = Math.round(p * step) + .5;
+      const minute = sec % 60 === 0;
       sparkCtx.beginPath();
-      sparkCtx.lineWidth = k % 6 === 0 ? 2 : 1;
-      sparkCtx.globalAlpha = k % 6 === 0 ? .75 : .45;
+      sparkCtx.lineWidth = minute ? 2 : 1;
+      sparkCtx.globalAlpha = minute ? .75 : .45;
       sparkCtx.moveTo(x, 0);
       sparkCtx.lineTo(x, SPARK_H);
       sparkCtx.stroke();
@@ -1406,11 +1410,10 @@
     } catch (e) {}
   }
 
+  let lastTick = Date.now();
   sparkSize();
   restoreSpark();
   drawSpark();
-
-  let lastTick = Date.now();
   setInterval(() => {
     const now = Date.now();
     // a suspended tab misses ticks; push one NaN per missed second so the
