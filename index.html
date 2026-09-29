@@ -241,7 +241,8 @@
   }
   body.hdrmin header > * { display: none; }
   /* graph mode: option buttons hide, the rate graph takes the width */
-  body.hdrgraph .hdr-side .hdr-btn, body.hdrgraph .hdr-side select, body.hdrgraph .hdr-lbl { display: none; }
+  /* option buttons hide in graph mode, except ? so help stays reachable */
+  body.hdrgraph .hdr-side .hdr-btn:not(#helpBtn), body.hdrgraph .hdr-side select, body.hdrgraph .hdr-lbl { display: none; }
   body.hdrgraph .hdr-lbl { display: none; }
   /* #subBtn's own display:flex (id selector) outranks the rule above */
   body.hdrgraph .hdr-side #subBtn { display: none; }
