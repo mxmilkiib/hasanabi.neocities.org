@@ -1000,11 +1000,15 @@
     const nearBottom = stickBottom;
     let html = '';
     for (const { tags, login, message: rawMsg, kind } of queue) {
-      // replayed backfill lines carry ids the page has already rendered
-      if (tags.id) {
-        if (seenIds.has(tags.id)) continue;
-        seenIds.add(tags.id);
-        if (seenIds.size > 20000) { seenIds.clear(); seenIds.add(tags.id); }
+      // replayed backfill lines carry ids the page has already rendered;
+      // notice-type events carry no id, so key them on kind+ts+sender+body
+      const dedupKey = tags.id ||
+        (kind !== 'PRIVMSG'
+          ? `${kind}:${tags['tmi-sent-ts'] || ''}:${login || ''}:${rawMsg}` : '');
+      if (dedupKey) {
+        if (seenIds.has(dedupKey)) continue;
+        seenIds.add(dedupKey);
+        if (seenIds.size > 20000) { seenIds.clear(); seenIds.add(dedupKey); }
       }
       const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
       const timeStr = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -1016,18 +1020,18 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div class="row notice${mid}"><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
+        html += `<div class="row notice${mid}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
                 `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
-        html += `<div class="row notice"><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
+        html += `<div class="row notice"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
         continue;
       }
       if (kind === 'CLEARCHAT') {
         const target = rawMsg.trim();
         const dur = +tags['ban-duration'] || 0;
-        html += `<div class="row notice"><span class="time">${timeStr}</span>` +
+        html += `<div class="row notice"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
           (target ? `${escapeHTML(target)} ${dur ? `was timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'was banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
