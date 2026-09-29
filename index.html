@@ -138,6 +138,9 @@
   /* hdr-side no longer grows - the spark takes all the free space itself */
   body.hdrgraph .hdr-side { flex: none; min-width: 0; }
   body.hdrgraph #spark { flex: 1; max-width: none; }
+  /* the corner buttons are 26px tall while the reduced bar is ~23px -
+     shrink them to fit rather than overlap the bottom edge */
+  body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { height: calc(100% - 6px); }
   /* when the header wraps, centre the icon strip on its own line */
   header.hdrwrap .hdr-side { margin-inline: auto; }
   #hint {
@@ -159,7 +162,8 @@
     width: auto; height: 10px;
     padding: 0 8px;
     border: none;
-    font-size: 12px;
+    /* oversized glyph deliberately overflows the 10px strip */
+    font-size: 18px;
     line-height: 10px;
     color: var(--accent);
   }
