@@ -1474,6 +1474,9 @@
     const chatTxt = chatState === 'connected' ? 'chat connected'
                   : chatState === 'reconnecting' ? 'chat reconnecting'
                   : 'connecting to chat';
+    // the full status line already carries the mode phrases; the chips span
+    // only earns its place in the two compact views
+    modesEl.hidden = statusView === 0;
     if (!stream) {
       if (streamDead) {
         // Relay never reported stream status (stale cache or blocked API):
