@@ -137,6 +137,50 @@
     --danger: #cc4444;
     --vip: #aaffcc;
   }
+  :root[data-theme="amber"] {
+    --bg: #0a0800;
+    --panel: #141008;
+    --line: #2a2008;
+    --text: #ffb000;
+    --text-dim: #8a6a1e;
+    --accent: #ffd040;
+    --good: #ffcc33;
+    --danger: #cc5533;
+    --vip: #ffcc88;
+  }
+  :root[data-theme="nord"] {
+    --bg: #2e3440;
+    --panel: #3b4252;
+    --line: #434c5e;
+    --text: #eceff4;
+    --text-dim: #8fa0bb;
+    --accent: #88c0d0;
+    --good: #a3be8c;
+    --danger: #bf616a;
+    --vip: #b48ead;
+  }
+  :root[data-theme="solarized"] {
+    --bg: #002b36;
+    --panel: #073642;
+    --line: #164450;
+    --text: #93a1a1;
+    --text-dim: #586e75;
+    --accent: #b58900;
+    --good: #859900;
+    --danger: #dc322f;
+    --vip: #d33682;
+  }
+  :root[data-theme="lavender"] {
+    --bg: #efecf8;
+    --panel: #e2ddf2;
+    --line: #cfc6e8;
+    --text: #3a3350;
+    --text-dim: #6f6790;
+    --accent: #7a5fb5;
+    --good: #4a8a5a;
+    --danger: #b5455f;
+    --vip: #b8457a;
+  }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
@@ -1448,14 +1492,15 @@
     console:  { theme: 'sepia',   font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
     cosy:     { theme: 'sepia',   font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
     cinema:   { theme: 'black',   font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: false, shadow: 2, subMode: 2, eonly: 1 },
-    phosphor: { theme: 'console', font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: true,  shadow: 0, subMode: 2, eonly: 0 },
-    dyslexic: { theme: 'light',   font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0 },
-    midnight: { theme: 'mid',     font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: true,  shadow: 1, subMode: 0, eonly: 0 },
+    phosphor: { theme: 'amber',   font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: true,  shadow: 0, subMode: 2, eonly: 0 },
+    dyslexic: { theme: 'lavender',font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0 },
+    midnight: { theme: 'nord',    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: true,  shadow: 1, subMode: 0, eonly: 0 },
+    solar:    { theme: 'solarized',font: 'sourcesans',size: 9,  lh: 10, lines: 2, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
     minimal:  { theme: 'light',   font: 'sans',       size: 7,  lh: 9,  lines: 0, zebra: false, times: false, shadow: 0, subMode: 2, eonly: 2 },
   };
-  const THEMES = ['light', 'sepia', 'paper', 'mid', 'dark', 'black', 'console'];
-  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', mid: '◐', dark: '☾', black: '●', console: '▮' };
-  const LIGHT_THEMES = ['light', 'sepia', 'paper'];
+  const THEMES = ['light', 'sepia', 'paper', 'lavender', 'mid', 'solarized', 'nord', 'dark', 'black', 'amber', 'console'];
+  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', console: '▮' };
+  const LIGHT_THEMES = ['light', 'sepia', 'paper', 'lavender'];
   let themeMode = 'auto';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
 
