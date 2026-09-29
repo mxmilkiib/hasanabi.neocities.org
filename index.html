@@ -118,7 +118,9 @@
     border-bottom: 1px solid var(--line);
     position: relative;
   }
-  #helpBtn, #hdrMin { position: absolute; top: 3px; }
+  /* centred by transform rather than a fixed top: the header's padding is
+     asymmetric and the reduced bar is thin, so a fixed offset sits off-level */
+  #helpBtn, #hdrMin { position: absolute; top: 50%; transform: translateY(-50%); }
   #helpBtn { right: 44px; }
   #hdrMin { right: 8px; }
   body.hdrmin header {
@@ -158,7 +160,7 @@
   body.hdrmin header { justify-content: flex-end; gap: 4px; padding: 0 4px; }
   body.hdrmin #hdrMin {
     display: inline-block;
-    top: 0; right: 2px;
+    right: 2px;
     width: auto; height: 10px;
     padding: 0 8px;
     border: none;
@@ -2119,6 +2121,15 @@
     }
     requestAnimationFrame(sparkSize);
   }, { passive: false });
+  // the – button's tooltip names the current mode; watching the body's class
+  // list catches every path that flips it (click, wheel, opts, url params)
+  const hdrModeTitle = () => {
+    const b = document.body.classList;
+    const mode = b.contains('hdrmin') ? 'minimised' : b.contains('hdrgraph') ? 'reduced' : 'full';
+    hdrMinBtn.title = `Header size: ${mode} - click/scroll cycles full → reduced → minimised · ⇧click back`;
+  };
+  new MutationObserver(hdrModeTitle).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  hdrModeTitle();
   headerEl.addEventListener('click', () => {
     if (document.body.classList.contains('hdrmin')) unminHeader();
   });
