@@ -1643,9 +1643,9 @@
     infoEl.innerHTML = statusView === 2 ? '<b>live</b>'
       : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
-      : (since ? `<b>live</b> since <b>${since}</b> · up <b>${up}</b>` : '<b>live</b>') +
+      : (since ? `<b>live</b>, since <b>${since}</b>, up <b>${up}</b>` : '<b>live</b>') +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') +
-        (chatState === 'connected' ? ` · chat${chatModesTxt ? `: <b>${chatModesTxt}</b>` : ''}` : chatSuffix);
+        (chatState === 'connected' ? ` · ${chatModesTxt || 'chat'}` : chatSuffix);
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
     document.title = 'HasanAbi Chat Thing';
@@ -1679,7 +1679,15 @@
     if (tags.r9k === '1') chips.push('r9k');
     modesEl.innerHTML = chips.join(' ');
     modesEl.title = chips.length ? `chat modes: ${chips.join(', ').replace(/<[^>]+>/g, '')}` : '';
-    chatModesTxt = chips.join(', ').replace(/<[^>]+>/g, '');
+    // status-line phrasing: 'follow req for chat: 24h' etc.
+    const phrases = [];
+    if (slow > 0) phrases.push(`slow mode for chat: ${slow}s`);
+    if (foll === 0) phrases.push('follow req for chat');
+    else if (foll > 0) phrases.push(`follow req for chat: ${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}`);
+    if (tags['emote-only'] === '1') phrases.push('emote-only chat');
+    if (tags['subs-only'] === '1') phrases.push('subs-only chat');
+    if (tags.r9k === '1') phrases.push('r9k chat');
+    chatModesTxt = phrases.join(', ');
     updateHeader();
   }
 
