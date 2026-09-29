@@ -2306,6 +2306,15 @@
       const empty = document.getElementById('emptyState');
       if (empty) empty.remove();
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
+      // notices saved before mid-dedup have no id and were duplicated by
+      // each replay - collapse identical no-id rows on restore
+      const seenRows = new Set();
+      for (const el of [...logEl.children]) {
+        if (!el.classList.contains('row') || el.dataset.mid) continue;
+        const k = el.className + '|' + el.textContent;
+        if (seenRows.has(k)) el.remove();
+        else seenRows.add(k);
+      }
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
       // continue the stripe alternation from the restored tail
