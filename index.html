@@ -1119,7 +1119,19 @@
     }
     queue = [];
     histDirty = true;
-    activeEl.insertAdjacentHTML('beforeend', html);
+    const firstGhost = activeEl.querySelector('.row.stale');
+    if (firstGhost) {
+      // the column still holds a faded outgoing page: fresh rows insert above
+      // the ghost block and grow downward, pushing ghosts below the fold
+      firstGhost.insertAdjacentHTML('beforebegin', html);
+      let g = activeEl.lastElementChild;
+      while (g?.classList.contains('stale') &&
+             g.offsetTop - activeEl.offsetTop + g.offsetHeight > activeEl.clientHeight) {
+        const prev = g.previousElementSibling;
+        g.remove();
+        g = prev;
+      }
+    } else activeEl.insertAdjacentHTML('beforeend', html);
     const kids = activeEl.children;
     for (let i = kids.length - 1; i >= 0 && kids[i].dataset.mid && !rowById.has(kids[i].dataset.mid); i--)
       rowById.set(kids[i].dataset.mid, kids[i]);
@@ -2152,6 +2164,8 @@
     let last, moved = false;
     while ((last = from.lastElementChild) &&
            last.offsetTop - from.offsetTop + last.offsetHeight > from.clientHeight) {
+      // ghost tail already displaced below the fold: drop, don't carry over
+      if (last.classList.contains('stale')) { last.remove(); continue; }
       if (!moved) {
         for (const r of to.children) r.classList.add('stale');
         moved = true;
