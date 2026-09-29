@@ -1118,7 +1118,7 @@
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
-              `${msgHtml}${SUB_MODES[subMode] === 'left' ? '' : auxHtml}</div>`;
+              `${SUB_MODES[subMode] === 'left' ? '' : auxHtml}${msgHtml}</div>`;
     }
     queue = [];
     histDirty = true;
@@ -1986,7 +1986,7 @@
       const sub = aux.querySelector('.sub');
       if (sub) sub.hidden = mode === 'hidden';
       if (mode === 'left') { aux.classList.remove('auxr'); row.insertBefore(aux, row.querySelector('.reply') || row.querySelector('.name')); }
-      else { aux.classList.add('auxr'); row.appendChild(aux); }
+      else { aux.classList.add('auxr'); row.insertBefore(aux, row.querySelector('.imglnk')); }
     });
   }
 
