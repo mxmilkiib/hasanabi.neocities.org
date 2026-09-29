@@ -248,7 +248,12 @@
   body.hdrgraph .hdr-side #subBtn { display: none; }
   /* hdr-side no longer grows - the spark takes all the free space itself */
   body.hdrgraph .hdr-side { flex: none; min-width: 0; }
+  /* in graph mode the lone ? sits left of the – rather than after it */
+  body.hdrgraph .hdr-side { order: 1; }
+  body.hdrgraph .hdr-min { order: 2; }
   body.hdrgraph #spark { flex: 1; max-width: none; }
+  /* when the header wraps, centre the icon strip on its own line */
+  header.hdrwrap .hdr-side { margin-inline: auto; }
   #hint {
     flex: none;
     padding: 2px 18px;
@@ -1343,6 +1348,12 @@
   // flex sizing means the box changes on window resize, graph-mode toggles,
   // label mode, font changes - refit the buffer to whatever it lands on
   new ResizeObserver(() => sparkSize()).observe(sparkEl);
+  // flag when .hdr-side wraps onto a second header line so CSS can centre it
+  const hdrBarEl = document.querySelector('header');
+  const hdrSideEl = document.querySelector('.hdr-side');
+  new ResizeObserver(() => {
+    hdrBarEl.classList.toggle('hdrwrap', hdrSideEl.offsetTop > 10);
+  }).observe(hdrBarEl);
 
   function drawSpark() {
     const SPARK_N = sparkWin;
