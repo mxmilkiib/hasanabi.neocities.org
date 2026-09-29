@@ -529,7 +529,9 @@
     cursor: pointer;
   }
   button.hdr-btn { width: 30px; padding: 0; text-align: center; }
-  #spark { width: 120px; height: 18px; flex: none; vertical-align: middle; }
+  /* flexes to fill the free header space; sparkSize() matches the buffer to
+     the laid-out width whenever it changes so it never rasterises blurry */
+  #spark { height: 18px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   /* keep the ? button clickable above the help panel when they overlap */
@@ -1240,21 +1242,16 @@
 
   function sparkSize() {
     const n = SPARK_WINDOWS[sparkWinIdx];
-    if (document.body.classList.contains('hdrgraph')) {
-      // flex stretches the box in graph mode - the buffer must match its
-      // laid-out width or the line rasterises blurry
-      sparkEl.style.width = '';
-      sparkEl.width = Math.max(1, Math.round(sparkEl.clientWidth * DPR));
-    } else {
-      sparkEl.width = n * DPR; // resets the canvas transform
-      sparkEl.style.width = n + 'px';
-    }
+    sparkEl.width = Math.max(1, Math.round(sparkEl.clientWidth * DPR)); // resets the transform
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
     sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · dim bands mark time the page wasn't watching`;
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
     drawSpark();
   }
+  // flex sizing means the box changes on window resize, graph-mode toggles,
+  // label mode, font changes - refit the buffer to whatever it lands on
+  new ResizeObserver(() => sparkSize()).observe(sparkEl);
 
   function drawSpark() {
     const SPARK_N = SPARK_WINDOWS[sparkWinIdx];
