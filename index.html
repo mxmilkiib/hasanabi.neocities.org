@@ -678,7 +678,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div><b>➤</b> <span>log in with twitch to send messages from the input bar; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows</span></div>
-    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs ➤ login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name also highlight; ones arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
+    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs ➤ login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
@@ -1284,7 +1284,9 @@
     const unfocused = document.hidden || !document.hasFocus();
     for (const r of activeEl.querySelectorAll('.row[data-new]')) {
       r.removeAttribute('data-new');
-      if (unfocused && (r.classList.contains('mention') || r.classList.contains('kw')))
+      // kw rows = own login (when authed) plus chosen keywords; skip own
+      // messages and @hasanabi mentions, which aren't pings for the user
+      if (unfocused && r.classList.contains('kw') && !r.classList.contains('self'))
         missed.push(r);
     }
     if (missed.length > 50) missed.splice(0, missed.length - 50);
