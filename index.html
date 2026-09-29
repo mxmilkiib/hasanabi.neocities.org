@@ -1903,11 +1903,15 @@
   const vidHandle = vidBox.querySelector('.vid-handle');
   try {
     const p = JSON.parse(localStorage.getItem(VIDPOS_KEY));
+    if (p && p.w) vidBox.style.width = Math.min(p.w, innerWidth - 24) + 'px';
     if (p && p.left != null) {
-      vidBox.style.left = p.left; vidBox.style.top = p.top;
+      // clamp to the viewport: the box is hidden here so it can't be
+      // measured, and an off-screen saved position renders it invisible
+      const w = Math.min(p.w || 460, innerWidth - 24), h = w * 9 / 16;
+      vidBox.style.left = Math.max(0, Math.min(innerWidth - w, parseFloat(p.left) || 0)) + 'px';
+      vidBox.style.top = Math.max(0, Math.min(innerHeight - h, parseFloat(p.top) || 0)) + 'px';
       vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
     }
-    if (p && p.w) vidBox.style.width = Math.min(p.w, innerWidth - 24) + 'px';
   } catch (e) {}
   vidHandle.addEventListener('pointerdown', (e) => {
     e.preventDefault();
