@@ -233,6 +233,8 @@
   body.hdrmin header > * { display: none; }
   /* graph mode: option buttons hide, the rate graph takes the width */
   body.hdrgraph .hdr-side .hdr-btn, body.hdrgraph .hdr-side select, body.hdrgraph .hdr-lbl { display: none; }
+  /* #subBtn's own display:flex (id selector) outranks the rule above */
+  body.hdrgraph .hdr-side #subBtn { display: none; }
   body.hdrgraph .hdr-side { flex: 1; min-width: 0; }
   body.hdrgraph #spark { flex: 1; max-width: none; }
   #hint {
@@ -1238,9 +1240,16 @@
 
   function sparkSize() {
     const n = SPARK_WINDOWS[sparkWinIdx];
-    sparkEl.width = n * DPR; // resets the canvas transform
+    if (document.body.classList.contains('hdrgraph')) {
+      // flex stretches the box in graph mode - the buffer must match its
+      // laid-out width or the line rasterises blurry
+      sparkEl.style.width = '';
+      sparkEl.width = Math.max(1, Math.round(sparkEl.clientWidth * DPR));
+    } else {
+      sparkEl.width = n * DPR; // resets the canvas transform
+      sparkEl.style.width = n + 'px';
+    }
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    sparkEl.style.width = n + 'px';
     sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · dim bands mark time the page wasn't watching`;
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
@@ -1249,7 +1258,7 @@
 
   function drawSpark() {
     const SPARK_N = SPARK_WINDOWS[sparkWinIdx];
-    const SPARK_W = SPARK_N;
+    const SPARK_W = sparkEl.width / DPR; // stretched past SPARK_N in graph mode
     sparkCtx.clearRect(0, 0, SPARK_W, SPARK_H);
     if (!sparkCols) {
       const styles = getComputedStyle(document.documentElement);
@@ -1798,7 +1807,7 @@
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
     if (o.hdrmin) document.body.classList.add('hdrmin');
-    if (o.hdrgraph) document.body.classList.add('hdrgraph');
+    if (o.hdrgraph) { document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     if (Number.isInteger(o.self)) setSelfHl(o.self === 1);
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = [2, 1, 0][o.sub]; applySubMode(); }
     // presets use the direct index; saved 'sub' is the legacy reversed order
@@ -2016,6 +2025,7 @@
       document.body.classList.add('hdrgraph');
       saveOpts();
     }
+    requestAnimationFrame(sparkSize);
   });
   hdrMinBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
@@ -2028,6 +2038,7 @@
       if (b.contains('hdrmin')) { unminHeader(); b.add('hdrgraph'); saveOpts(); }
       else if (b.contains('hdrgraph')) { b.remove('hdrgraph'); saveOpts(); }
     }
+    requestAnimationFrame(sparkSize);
   }, { passive: false });
   headerEl.addEventListener('click', () => {
     if (document.body.classList.contains('hdrmin')) unminHeader();
@@ -2253,6 +2264,7 @@
     if (!helpPanel.hidden) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
     // the third pane only exists in landscape; dropping to portrait folds it
     if (!side2El.hidden && window.innerWidth <= window.innerHeight) setSplit(2);
+    if (document.body.classList.contains('hdrgraph')) sparkSize();
   });
   // builds a ?param url from the current non-default options
   document.getElementById('copyUrl').addEventListener('click', (e) => {
@@ -2660,7 +2672,7 @@
       const n = q.get('split');
       if (n !== '0') setSplit(n === '3' ? 3 : 2);
     }
-    if (q.get('min') === 'graph') document.body.classList.add('hdrgraph');
+    if (q.get('min') === 'graph') { document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
     if (flag('self')) setSelfHl(true);
     if (flag('video')) setVideo(true);
