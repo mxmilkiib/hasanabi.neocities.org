@@ -2394,6 +2394,11 @@
       side2El.scrollTop = 0;
       activeEl = side2El;
     }
+    // columns narrower than the merged one reflow taller, leaving saved
+    // scroll offsets mid-page - re-pin every non-active column at bottom
+    if (level >= 2) requestAnimationFrame(() => {
+      for (const col of cols()) if (col !== activeEl) col.scrollTop = col.scrollHeight;
+    });
   }
 
   function cycleSplit(dir) {
