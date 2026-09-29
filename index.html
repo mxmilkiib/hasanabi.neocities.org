@@ -224,14 +224,17 @@
     row-gap: 3px;
     gap: 12px;
     padding: 3px 18px 2px;
+    /* ? and – live at the absolute top-right corner whatever the wrap
+       state; padding-right keeps flowing content clear of them */
+    padding-right: 84px;
     font-size: var(--hdr-fs, var(--chat-font, 15px));
     background: var(--panel);
     border-bottom: 1px solid var(--line);
     position: relative;
   }
-  /* centred in the free space between the channel block and the controls:
-     auto margins only split it evenly while hdr-side isn't flex-growing */
-  .hdr-min { margin: 0 auto; flex: none; }
+  #helpBtn, #hdrMin { position: absolute; top: 3px; }
+  #helpBtn { right: 44px; }
+  #hdrMin { right: 8px; }
   body.hdrmin header {
     height: 10px;
     padding: 0;
@@ -266,6 +269,7 @@
   body.hdrmin header { justify-content: flex-end; gap: 4px; padding: 0 4px; }
   body.hdrmin #hdrMin {
     display: inline-block;
+    top: 0; right: 2px;
     width: auto; height: 10px;
     padding: 0 8px;
     border: none;
@@ -585,7 +589,7 @@
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   /* keep the ? button clickable above the help panel when they overlap */
-  #helpBtn { position: relative; z-index: 11; }
+  #helpBtn { position: absolute; z-index: 11; }
   select.hdr-btn { padding-right: 4px; }
   select.hdr-btn option { background: var(--panel); color: var(--text); }
   .hdr-lbl { color: var(--text-dim); font-size: 13px; align-self: center; white-space: nowrap; }
@@ -647,7 +651,9 @@
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
-    header { padding: 3px 8px 2px; column-gap: 8px; font-size: var(--hdr-fs, calc(var(--chat-font, 15px) * 0.87)); }
+    header { padding: 3px 8px 2px; padding-right: 92px; column-gap: 8px; font-size: var(--hdr-fs, calc(var(--chat-font, 15px) * 0.87)); }
+    #helpBtn { right: 48px; }
+    #hdrMin { right: 6px; }
     .hdr-side { gap: 4px; }
     .hdr-btn { height: 28px; }
     button.hdr-btn { width: 34px; }
