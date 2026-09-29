@@ -1649,7 +1649,7 @@
     infoEl.innerHTML = statusView === 2 ? '<b>live</b>'
       : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
-      : (since ? `<b>live</b>, since <b>${since}</b>, up <b>${up}</b>` : '<b>live</b>') +
+      : (since ? `<b>live</b> since <b>${since}</b>, up <b>${up}</b>` : '<b>live</b>') +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') +
         (chatState === 'connected' ? ` · ${chatModesTxt || 'chat'}` : chatSuffix);
     infoEl.title = stream.title || '';
