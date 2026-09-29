@@ -296,6 +296,21 @@
     .dot.connecting, .dot.reconnecting { animation: none; }
   }
   .chat-modes { font-size: .93em; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  /* @N chip: mentions that arrived while the page wasn't focused */
+  .missed {
+    font-size: .78em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 0 6px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  @keyframes missflash {
+    0%, 40% { background-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+    100% { background-color: transparent; }
+  }
+  .row.flash { animation: missflash 1.4s ease-out; }
   .stream-info {
     font-size: .93em;
     font-weight: 400;
@@ -595,6 +610,7 @@
   #helpPanel b.mention { background-color: rgba(232, 163, 61, .13); box-shadow: inset 3px 0 0 var(--accent); }
   #helpPanel b.points { background-color: rgba(232, 93, 93, .12); }
   #helpPanel b.selfchip { background-color: color-mix(in srgb, var(--accent) 13%, transparent); box-shadow: inset 3px 0 0 var(--accent); }
+  #helpPanel b.kw { background-color: color-mix(in srgb, var(--good) 13%, transparent); box-shadow: inset 3px 0 0 var(--good); }
   #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 110px 1fr; gap: 0 8px; }
   #helpPanel sup { position: absolute; font-size: .7em; margin-left: 2px; transform: translateY(-3px); }
   #helpPanel b.fn { color: var(--text); }
@@ -636,7 +652,7 @@
 </head>
 <body>
   <header>
-    <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
+    <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" hidden></span></div>
     <canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn hdr-min" id="hdrMin" title="Header mode - click/scroll cycles normal → graph-only → minimised · ⇧click back">–</button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages">➤</button><button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button></div>
@@ -661,7 +677,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div><b>➤</b> <span>log in with twitch to send messages from the input bar; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows</span></div>
-    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs ➤ login) <span id="helpSelfList"></span><sup>†</sup></span></div>
+    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs ➤ login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name also highlight; ones arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
@@ -1235,7 +1251,7 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
-      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwRe && kwRe.test(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
+      html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -1257,6 +1273,16 @@
       consumeGhosts(firstGhost, firstGhost.offsetTop - boundary);
       evictGhosts(activeEl);
     } else activeEl.insertAdjacentHTML('beforeend', html);
+    // mentions that land while the page isn't focused are queued on the
+    // @N chip so they can be walked back through later
+    const unfocused = document.hidden || !document.hasFocus();
+    for (const r of activeEl.querySelectorAll('.row[data-new]')) {
+      r.removeAttribute('data-new');
+      if (unfocused && (r.classList.contains('mention') || r.classList.contains('kw')))
+        missed.push(r);
+    }
+    if (missed.length > 50) missed.splice(0, missed.length - 50);
+    if (unfocused) updateMissedBadge();
     const kids = activeEl.children;
     for (let i = kids.length - 1; i >= 0 && kids[i].dataset.mid && !rowById.has(kids[i].dataset.mid); i--)
       rowById.set(kids[i].dataset.mid, kids[i]);
@@ -1804,17 +1830,49 @@
   // edge bar. Existing rows are re-tagged live on each edit. ----
   const kwInput = document.getElementById('kwInput');
   let kwRe = null;
+  let selfMentionRe = null; // own login once authed - bare or @-prefixed alike
+  function kwMatch(txt) {
+    return !!((kwRe && kwRe.test(txt)) || (selfMentionRe && selfMentionRe.test(txt)));
+  }
+  function retagKw() {
+    document.querySelectorAll('.row').forEach((r) => {
+      const name = r.querySelector('.name');
+      const txt = name ? r.textContent.replace(name.textContent, '') : r.textContent;
+      r.classList.toggle('kw', kwMatch(txt));
+    });
+  }
   function setKeywords(str) {
     const words = str.split(',').map((s) => s.trim()).filter(Boolean)
       .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     kwRe = words.length ? new RegExp(`\\b(?:${words.join('|')})\\b`, 'i') : null;
-    document.querySelectorAll('.row').forEach((r) => {
-      const name = r.querySelector('.name');
-      const txt = name ? r.textContent.replace(name.textContent, '') : r.textContent;
-      r.classList.toggle('kw', !!(kwRe && kwRe.test(txt)));
-    });
+    retagKw();
   }
   kwInput.addEventListener('input', () => { setKeywords(kwInput.value); saveOpts(); });
+
+  // ---- missed mentions: rows flagged while the page lacks focus queue on
+  // the @N chip; each click scrolls to the next one and flashes it ----
+  const missed = [];
+  const missedEl = document.getElementById('missed');
+  function updateMissedBadge() {
+    missedEl.hidden = !missed.length;
+    missedEl.textContent = `@${missed.length}`;
+    missedEl.title = missed.length
+      ? `${missed.length} mention${missed.length === 1 ? '' : 's'} while away - click to jump to each · ⇧click clears`
+      : '';
+  }
+  missedEl.addEventListener('click', (e) => {
+    if (e.shiftKey) { missed.length = 0; updateMissedBadge(); return; }
+    while (missed.length) {
+      const r = missed.shift(); // rows can be evicted - skip the gone ones
+      if (!r.isConnected) continue;
+      r.scrollIntoView({ block: 'center' });
+      r.classList.remove('flash');
+      void r.offsetWidth; // restart the animation on repeat visits
+      r.classList.add('flash');
+      break;
+    }
+    updateMissedBadge();
+  });
 
   // ---- option persistence ----
   const OPTS_KEY = 'hasan-opts';
@@ -2610,6 +2668,8 @@
 
   function logout() {
     auth = null;
+    selfMentionRe = null;
+    retagKw();
     try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
     if (relayFrame.contentWindow)
       relayFrame.contentWindow.postMessage({ type: 'auth', token: null }, RELAY_ORIGIN);
@@ -2703,6 +2763,9 @@
           message: 'twitch login failed or expired - click ➤ to sign in again' }, false);
       } else if (typeof d.login === 'string' && auth) {
         auth.login = d.login;
+        // own-name mentions join the keyword highlight set
+        selfMentionRe = new RegExp('\\b' + auth.login.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+        retagKw();
         try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch (e) {}
       }
       updateSendUI();

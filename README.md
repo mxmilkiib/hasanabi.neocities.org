@@ -120,10 +120,13 @@ no dependencies beyond CDN-hosted fonts:
 - **Scrolling** — the log follows new messages only while at the
   bottom; scrolling up releases it and shows a jump-to-latest button
   (one per column in split mode).
-- **Formatting** — mention highlighting, GLORP/F red rows, channel-point
+- **Formatting** — mention highlighting (your own login joins the
+  keyword set when logged in), GLORP/F red rows, channel-point
   tints, fossabot/blammobot name shimmer and game-line styling, braille
   art restacking, image/GIF/Giphy embeds, Nitter link rewriting for
-  Twitter/X.
+  Twitter/X. Mentions landing while the page is unfocused queue on a
+  clickable `@N` chip in the header — click to jump to each, ⇧click
+  clears.
 - **Persistence** — last 250 rows, stream run history and graph samples
   survive reloads via `localStorage`.
 - **PWA / resume** — installable (manifest + pass-through service
