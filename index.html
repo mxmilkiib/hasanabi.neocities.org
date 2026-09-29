@@ -839,7 +839,7 @@
       tags = parseTags(raw.slice(1, spaceIdx));
       rest = raw.slice(spaceIdx + 1);
     }
-    const cmd = rest.match(/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG) /);
+    const cmd = rest.match(/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE)(?: |$)/);
     if (!cmd) return null;
     let login = null;
     if (rest.startsWith(':')) {
@@ -851,6 +851,9 @@
     if (msgIdx === -1) {
       if (cmd[1] === 'ROOMSTATE') return { tags, login, channel: afterCmd, message: '', kind: 'ROOMSTATE' };
       if (cmd[1] === 'CLEARCHAT') return { tags, login, channel: afterCmd, message: '', kind: 'CLEARCHAT' };
+      // USERSTATE carries a channel arg; GLOBALUSERSTATE ends the line
+      if (cmd[1] === 'USERSTATE' || cmd[1] === 'GLOBALUSERSTATE')
+        return { tags, login, channel: afterCmd, message: '', kind: cmd[1] };
       return null;
     }
     return { tags, login, channel: afterCmd.slice(0, msgIdx), message: afterCmd.slice(msgIdx + 2), kind: cmd[1] };
@@ -1655,7 +1658,7 @@
   }
 
   function handleLine(line, replay) {
-    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE) /.test(line)) {
+    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE)(?: |$)/.test(line)) {
       const parsed = parseTwitchMessage(line);
       if (!parsed) return;
       if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags); return; }
