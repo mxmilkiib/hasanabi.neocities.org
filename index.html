@@ -246,7 +246,8 @@
   body.hdrgraph .hdr-lbl { display: none; }
   /* #subBtn's own display:flex (id selector) outranks the rule above */
   body.hdrgraph .hdr-side #subBtn { display: none; }
-  body.hdrgraph .hdr-side { flex: 1; min-width: 0; }
+  /* hdr-side no longer grows - the spark takes all the free space itself */
+  body.hdrgraph .hdr-side { flex: none; min-width: 0; }
   body.hdrgraph #spark { flex: 1; max-width: none; }
   #hint {
     flex: none;
