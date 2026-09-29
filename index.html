@@ -469,6 +469,12 @@
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
   .row.stale { opacity: .3; }
+  /* stale rows nearest the incoming fresh block fade hardest, ramping back
+     to the base ghost opacity over the next few rows */
+  .row:not(.stale) + .row.stale { opacity: .08; }
+  .row:not(.stale) + .row.stale + .row.stale { opacity: .14; }
+  .row:not(.stale) + .row.stale + .row.stale + .row.stale { opacity: .2; }
+  .row:not(.stale) + .row.stale + .row.stale + .row.stale + .row.stale { opacity: .25; }
   /* invisible spacer repaying ghost-height overage so the faded page keeps
      its layout while fresh rows overwrite it */
   .row.ghostgap { padding: 0; margin: 0; border-bottom: none; }
