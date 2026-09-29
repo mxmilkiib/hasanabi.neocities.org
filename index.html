@@ -392,7 +392,8 @@
   /* right-pinned emote rows go flexbox so dom order holds at the right edge:
      emotes first, then the trailing aux chip ([sub 12], [mod], bits) last */
   main.em-right .row.eonly { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
-  main.em-right .row.eonly > .name { margin-right: auto; }
+  /* colon rides with the name; its auto margin is what pins the emotes right */
+  main.em-right .row.eonly > .colon { margin-right: auto; }
   main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { margin: -.45em 1px; }
   /* zero-width overlay emotes stack on the previous emote's box */
   .estk { position: relative; display: inline-block; }
@@ -1058,7 +1059,7 @@
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
-              ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : ': '}` +
+              ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${msgHtml}${SUB_MODES[subMode] === 'left' ? '' : auxHtml}</div>`;
     }
     queue = [];
