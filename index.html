@@ -208,6 +208,8 @@
   /* centred in the free space between the channel block and the controls:
      auto margins only split it evenly while hdr-side isn't flex-growing */
   .hdr-min { margin: 0 auto; flex: none; }
+  /* dead-centre on the header, applied only while the centre is clear */
+  .hdr-min.abs-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; }
   body.hdrmin header {
     height: 10px;
     padding: 0;
@@ -1894,6 +1896,23 @@
   // strip restores it ----
   const headerEl = document.querySelector('header');
   const hdrMinBtn = document.getElementById('hdrMin');
+  const channelEl = headerEl.querySelector('.channel');
+  const hdrSideEl = headerEl.querySelector('.hdr-side');
+  // Dead-centre the minimise button only while the header's true centre is
+  // clear of both flanking blocks; otherwise it falls back to margin:auto,
+  // which centres it in the free space between them.
+  function centerMinBtn() {
+    const hr = headerEl.getBoundingClientRect();
+    const cx = hr.left + hr.width / 2;
+    const half = hdrMinBtn.offsetWidth / 2;
+    hdrMinBtn.classList.toggle('abs-center',
+      cx - half > channelEl.getBoundingClientRect().right &&
+      cx + half < hdrSideEl.getBoundingClientRect().left);
+  }
+  new ResizeObserver(centerMinBtn).observe(headerEl);
+  new ResizeObserver(centerMinBtn).observe(channelEl);
+  new ResizeObserver(centerMinBtn).observe(hdrSideEl);
+  centerMinBtn();
   function minHeader() {
     document.body.classList.add('hdrmin');
     saveOpts();
