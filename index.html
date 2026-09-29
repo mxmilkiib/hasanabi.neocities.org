@@ -2040,7 +2040,12 @@
   // strip restores it ----
   const headerEl = document.querySelector('header');
   const hdrMinBtn = document.getElementById('hdrMin');
+  let helpParked = false; // help panel was open when the header minimised
   function minHeader() {
+    // an open help panel would float over the strip; park it and reopen
+    // when the header comes back
+    helpParked = !helpPanel.hidden;
+    if (helpParked) helpPanel.hidden = true;
     document.body.classList.add('hdrmin');
     saveOpts();
   }
@@ -2048,6 +2053,7 @@
     document.body.classList.remove('hdrmin');
     saveOpts();
     repin();
+    if (helpParked) { helpParked = false; applyHelp(); }
   }
   // the – button cycles three modes: normal → graph-only → strip
   hdrMinBtn.addEventListener('click', (e) => {
