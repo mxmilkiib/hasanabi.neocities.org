@@ -1307,7 +1307,10 @@
   const DPR = window.devicePixelRatio || 1;
   const SPARK_H = 18;
   const SPARK_WINDOWS = [30, 60, 120, 240];
-  const sparkWinIdx = SPARK_WINDOWS.length - 1;
+  // the window grows with the rendered width (~3px per second of history),
+  // so the stretched graph-mode bar shows longer history instead of a
+  // zoomed-in trace; capped at 30 min
+  let sparkWin = SPARK_WINDOWS[SPARK_WINDOWS.length - 1];
   sparkEl.height = SPARK_H * DPR;
   const sparkCtx = sparkEl.getContext('2d');
   const rateSamples = [];
@@ -1316,7 +1319,8 @@
   let sparkCols = null; // theme colours, resolved once instead of per draw
 
   function sparkSize() {
-    const n = SPARK_WINDOWS[sparkWinIdx];
+    const n = Math.max(240, Math.min(1800, Math.round(sparkEl.clientWidth / 3 / 30) * 30));
+    sparkWin = n;
     sparkEl.width = Math.max(1, Math.round(sparkEl.clientWidth * DPR)); // resets the transform
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
     sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · dim bands mark time the page wasn't watching`;
@@ -1329,7 +1333,7 @@
   new ResizeObserver(() => sparkSize()).observe(sparkEl);
 
   function drawSpark() {
-    const SPARK_N = SPARK_WINDOWS[sparkWinIdx];
+    const SPARK_N = sparkWin;
     const SPARK_W = sparkEl.width / DPR; // stretched past SPARK_N in graph mode
     sparkCtx.clearRect(0, 0, SPARK_W, SPARK_H);
     if (!sparkCols) {
@@ -1424,7 +1428,7 @@
     try {
       const d = JSON.parse(localStorage.getItem(SPARK_KEY));
       if (!d || !Array.isArray(d.rate)) return;
-      const win = SPARK_WINDOWS[sparkWinIdx];
+      const win = sparkWin;
       const gap = Math.min(win, Math.max(0, Math.round((Date.now() - d.t) / 1000)));
       rateSamples.push(...d.rate.slice(-win).map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN));
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
@@ -1441,7 +1445,7 @@
     const now = Date.now();
     // a suspended tab misses ticks; push one NaN per missed second so the
     // graph shades the unobserved span instead of quietly compressing it
-    const missed = Math.min(SPARK_WINDOWS[sparkWinIdx],
+    const missed = Math.min(sparkWin,
       Math.max(0, Math.round((now - lastTick) / 1000) - 1));
     for (let i = 0; i < missed; i++) { rateSamples.push(NaN); glorpSamples.push(0); }
     lastTick = now;
@@ -1450,11 +1454,11 @@
     const rate = recentTimestamps.length / 5;
     rateEl.textContent = (rate ? rate.toFixed(1) : '-.-') + ' msgs/sec';
     rateSamples.push(rate);
-    if (rateSamples.length > SPARK_WINDOWS[sparkWinIdx]) rateSamples.shift();
+    if (rateSamples.length > sparkWin) rateSamples.shift();
     const gcut = Date.now() - 1000;
     while (glorpTimestamps.length && glorpTimestamps[0] < gcut) glorpTimestamps.shift();
     glorpSamples.push(glorpTimestamps.length);
-    if (glorpSamples.length > SPARK_WINDOWS[sparkWinIdx]) glorpSamples.shift();
+    if (glorpSamples.length > sparkWin) glorpSamples.shift();
     drawSpark();
     updateHeader();
   }, 1000);
