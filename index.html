@@ -358,7 +358,7 @@
   .row.action .aux, .row.action .time { font-style: normal; }
   .tag { padding: 0 3px; border-radius: 3px; }
   .row.points { background-color: rgba(232, 93, 93, .12); }
-  main.zebra .row:nth-child(even) {
+  main.zebra .row.z {
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07));
   }
   main.shadowed .row { text-shadow: var(--row-sh); }
@@ -911,6 +911,9 @@
   sideEl.addEventListener('load', resnap, true);
   side2El.addEventListener('load', resnap, true);
 
+  // zebra parity is tagged per row (class 'z') so a message keeps its shade
+  // across trimming, deletions and page-flip column moves
+  let zFlip = false;
   function queueMessage(parsed, replay) {
     queue.push(parsed);
     // rAF doesn't fire in a backgrounded tab but relay messages keep
@@ -1045,7 +1048,7 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
-      html += `<div class="row${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}"` +
+      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -2136,6 +2139,8 @@
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
+      // continue the stripe alternation from the restored tail
+      zFlip = !!(logEl.lastElementChild && logEl.lastElementChild.classList.contains('z'));
       applySubMode();
       logEl.scrollTop = logEl.scrollHeight;
     } catch (e) {}
