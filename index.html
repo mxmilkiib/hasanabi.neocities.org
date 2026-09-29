@@ -231,6 +231,10 @@
     align-items: center;
   }
   body.hdrmin header > * { display: none; }
+  /* graph mode: option buttons hide, the rate graph takes the width */
+  body.hdrgraph .hdr-side .hdr-btn, body.hdrgraph .hdr-side select, body.hdrgraph .hdr-lbl { display: none; }
+  body.hdrgraph .hdr-side { flex: 1; min-width: 0; }
+  body.hdrgraph #spark { flex: 1; max-width: none; }
   #hint {
     flex: none;
     padding: 2px 18px;
@@ -485,6 +489,12 @@
     margin-left: -8px;
     padding-left: 8px;
   }
+  body.selfhl .row.self {
+    background-color: color-mix(in srgb, var(--accent) 11%, transparent);
+    box-shadow: inset 3px 0 0 var(--accent);
+    margin-left: -8px;
+    padding-left: 8px;
+  }
   .at { color: var(--accent); }
   .row a { color: var(--accent); }
   .reply {
@@ -545,6 +555,7 @@
   #helpPanel b.glorp { background-color: rgba(232, 93, 93, .13); box-shadow: inset 3px 0 0 var(--danger); }
   #helpPanel b.mention { background-color: rgba(232, 163, 61, .13); box-shadow: inset 3px 0 0 var(--accent); }
   #helpPanel b.points { background-color: rgba(232, 93, 93, .12); }
+  #helpPanel b.selfchip { background-color: color-mix(in srgb, var(--accent) 13%, transparent); box-shadow: inset 3px 0 0 var(--accent); }
   #helpPanel div { margin: 4px 0; display: grid; grid-template-columns: 110px 1fr; gap: 0 8px; }
   #helpPanel sup { position: absolute; font-size: .7em; margin-left: 2px; transform: translateY(-3px); }
   #helpPanel b.fn { color: var(--text); }
@@ -587,14 +598,14 @@
 <body>
   <header>
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><span id="channelName"></span><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span></div>
-    <button class="hdr-btn hdr-min" id="hdrMin" title="Minimize header - click the strip to bring it back">–</button>
+    <button class="hdr-btn hdr-min" id="hdrMin" title="Header mode: click for graph-only · again to minimise · scroll skips to the strip">–</button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages">➤</button><button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button></div>
   </header>
   <div id="helpPanel" hidden>
     <div><b></b><span>help popup width: <span id="helpWList"></span></span></div>
     <div><b>dot</b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow age restriction Nm/Nh (must have followed that long to chat; 0m shows as 'followers only' - following is enough) · emote · subs · r9k (unique messages)</div>
-    <div><b>–</b> centre button minimises the header to a thin strip; click the strip to restore</div>
+    <div><b>–</b> centre button cycles: first click hides the option buttons and stretches the rate graph, second click minimises to a strip; click the strip to restore</div>
     <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
@@ -610,7 +621,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div><b>➤</b> <span>log in with twitch to send messages from the input bar; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows</span></div>
-    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span></div>
+    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">@HasanAbi</a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs ➤ login) <span id="helpSelfList"></span><sup>†</sup></span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
@@ -1162,7 +1173,7 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
-      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwRe && kwRe.test(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}"` +
+      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwRe && kwRe.test(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -1634,6 +1645,7 @@
     else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
     else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; applyHelpW(); saveOpts(); }
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
+    else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
   });
   applyTheme();
 
@@ -1744,6 +1756,7 @@
         font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode,
         lines: lineLevel,
         hdrmin: document.body.classList.contains('hdrmin'),
+        hdrgraph: document.body.classList.contains('hdrgraph'),
         sub: subMode,
         zebra: mainEl.classList.contains('zebra'),
         times: !mainEl.classList.contains('notime'),
@@ -1751,7 +1764,7 @@
         eonly: emoteMode,
         help: helpMode,
         video: !vidBox.hidden,
-        kw: kwInput.value,
+        kw: kwInput.value, self: selfHl ? 1 : 0,
         hpw: helpWIdx, hfs: hdrFs,
       }));
     } catch (e) {}
@@ -1778,6 +1791,8 @@
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
     if (o.hdrmin) document.body.classList.add('hdrmin');
+    if (o.hdrgraph) document.body.classList.add('hdrgraph');
+    if (Number.isInteger(o.self)) setSelfHl(o.self === 1);
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < SUB_MODES.length) { subMode = [2, 1, 0][o.sub]; applySubMode(); }
     // presets use the direct index; saved 'sub' is the legacy reversed order
     if (Number.isInteger(o.subMode) && o.subMode >= 0 && o.subMode < SUB_MODES.length) { subMode = o.subMode; applySubMode(); }
@@ -1980,10 +1995,21 @@
     saveOpts();
     repin();
   }
-  hdrMinBtn.addEventListener('click', (e) => { e.stopPropagation(); minHeader(); });
+  // the – button cycles three modes: normal → graph-only → strip
+  hdrMinBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (document.body.classList.contains('hdrgraph')) {
+      document.body.classList.remove('hdrgraph');
+      minHeader();
+    } else {
+      document.body.classList.add('hdrgraph');
+      saveOpts();
+    }
+  });
   hdrMinBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
     e.stopPropagation(); // don't let the header's own wheel-unminimise undo this
+    document.body.classList.remove('hdrgraph');
     minHeader();
   }, { passive: false });
   headerEl.addEventListener('click', () => {
@@ -2112,6 +2138,15 @@
   }, { passive: false });
   setTimes(true);
 
+  // ---- accent edge on one's own messages (needs the ➤ login) ----
+  let selfHl = false;
+  function setSelfHl(on) {
+    selfHl = on;
+    document.body.classList.toggle('selfhl', on);
+    markHelp('helpSelf', on ? 1 : 0);
+  }
+  setSelfHl(false);
+
   // ---- text shadow on chat rows: graduated off/subtle/medium/strong ----
   const SHADOW_LVLS = [
     'none',
@@ -2217,7 +2252,9 @@
     if (shadLevel) q.set('shadow', shadLevel);
     if (SUB_MODES[subMode] !== 'right') q.set('sub', SUB_MODES[subMode]);
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
-    if (document.body.classList.contains('hdrmin')) q.set('min', '1');
+    if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
+    else if (document.body.classList.contains('hdrmin')) q.set('min', '1');
+    if (selfHl) q.set('self', '1');
     if (isSplit()) q.set('split', String(cols().length));
     if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
@@ -2601,7 +2638,9 @@
       const n = q.get('split');
       if (n !== '0') setSplit(n === '3' ? 3 : 2);
     }
-    if (flag('min')) minHeader();
+    if (q.get('min') === 'graph') document.body.classList.add('hdrgraph');
+    else if (flag('min')) minHeader();
+    if (flag('self')) setSelfHl(true);
     if (flag('video')) setVideo(true);
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
@@ -2621,6 +2660,7 @@
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES.map((s) => s + 'px')),
+    helpSelf: ['off', 'on'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
@@ -2642,6 +2682,7 @@
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
   markHelp('helpHfs', hdrFs + 1);
+  markHelp('helpSelf', selfHl ? 1 : 0);
   markPresets();
 
   // ---- live tooltips: a displayed native title tooltip does not refresh

@@ -134,8 +134,10 @@ no dependencies beyond CDN-hosted fonts:
   `times`, `shadow`, `video`, `sub` (right/left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
   `kw` is a comma-separated keyword list; lines containing one get a
-  green edge (e.g. `?kw=malkiii,raid`). `hpw` sets the help popup width
-  (`480`, `560`, `640`, `720`, `840`).
+  green edge (e.g. `?kw=malkiii,raid`). `self=1` puts an accent edge on
+  one's own messages when logged in. `min=graph` collapses the header
+  to just the rate graph. `hpw` sets the help popup width
+  (`480`, `560`, `640`, `720`, `840`+).
   `theme` names a preset bundle of all display options (`default`,
   `compact`, `paper`, `cosy`, `console`, `cinema`, `phosphor`,
   `dyslexic`, `midnight`, `solar`, `minimal`); a style name like
