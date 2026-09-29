@@ -122,7 +122,7 @@ no dependencies beyond CDN-hosted fonts:
   `times`, `shadow`, `video`, `sub` (right/left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
   `theme` names a preset bundle of all display options (`default`,
-  `compact`, `paper`, `terminal`, `cozy`, `cinema`); a style name like
+  `compact`, `paper`, `terminal`, `cosy`, `cinema`); a style name like
   `theme=dark` still selects just the palette for old links.
 - **Performance** — incoming lines queue and flush once per animation
   frame; the log is capped at 250 rows.
