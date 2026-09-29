@@ -1055,7 +1055,7 @@
     if (emptyEl) { emptyEl.remove(); emptyEl = null; }
     const nearBottom = stickBottom;
     let html = '';
-    for (const { tags, login, message: rawMsg, kind } of queue) {
+    for (const { tags, login, message: rawMsg, kind, local } of queue) {
       // replayed backfill lines carry ids the page has already rendered;
       // notice-type events carry no id, so key them on kind+ts+sender+body
       const dedupKey = tags.id ||
@@ -1173,7 +1173,7 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
-      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwRe && kwRe.test(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}"` +
+      html += `<div class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwRe && kwRe.test(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode] === 'left' ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -2417,7 +2417,7 @@
       const i = c.indexOf(activeEl);
       const rows = [...c.slice(i + 1), ...c.slice(0, i + 1)]
         .flatMap((col) => [...col.children])
-        .filter((r) => r.classList.contains('row') && !r.classList.contains('stale'));
+        .filter((r) => r.classList.contains('row') && !r.classList.contains('stale') && !r.classList.contains('local'));
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => r.outerHTML)));
     } catch (e) {}
     saveSpark();
@@ -2547,7 +2547,7 @@
     queueMessage({ tags: { ...me, id: 'local-' + Date.now(),
       'display-name': me['display-name'] || auth.login,
       'tmi-sent-ts': String(Date.now()) }, login: auth.login,
-      kind: 'PRIVMSG', message: text }, false);
+      kind: 'PRIVMSG', message: text, local: true }, false);
     chatInput.value = '';
   });
 
