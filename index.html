@@ -2602,7 +2602,7 @@
     `<a href="#" class="helpOpt helpPreset" data-preset="${n}">${n}</a>`).join(' / ');
   // each font name renders in its own face
   document.getElementById('helpFontFamList').innerHTML = [...fontSel.options].map((o, i) =>
-    `<a href="#" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value]}">${o.text} <span style="opacity:.55">aGg0O1l</span></a>`).join(' · ');
+    `<a href="#" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value]}">${o.text}</a>`).join(' · ');
   // the setters ran during init before the lists existed - mark now
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
   markHelp('helpTimes', mainEl.classList.contains('notime') ? 0 : 1);
