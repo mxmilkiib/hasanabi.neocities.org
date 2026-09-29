@@ -1550,10 +1550,12 @@
   }
 
   function handleLine(line, replay) {
-    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG) /.test(line)) {
+    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE) /.test(line)) {
       const parsed = parseTwitchMessage(line);
       if (!parsed) return;
       if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags); return; }
+      // own badges/colour/display-name for the local echo of sent messages
+      if (parsed.kind === 'USERSTATE' || parsed.kind === 'GLOBALUSERSTATE') { selfTags = { ...selfTags, ...parsed.tags }; return; }
       queueMessage(parsed, replay);
     }
   }
@@ -2457,6 +2459,7 @@
   // the echo arrives back as an ordinary chat line.
   const AUTH_KEY = 'hasanabi-auth';
   let auth = null; // { token, login }
+  let selfTags = null; // own badges/colour from USERSTATE/GLOBALUSERSTATE
   try { auth = JSON.parse(localStorage.getItem(AUTH_KEY)); } catch (e) {}
   const oauthFrag = new URLSearchParams(location.hash.slice(1));
   if (oauthFrag.get('access_token')) {
@@ -2501,8 +2504,11 @@
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
     relayFrame.contentWindow.postMessage({ type: 'send', text }, RELAY_ORIGIN);
-    // twitch doesn't echo own messages back over IRC - render locally
-    queueMessage({ tags: { id: 'local-' + Date.now(), 'display-name': auth.login,
+    // twitch doesn't echo own messages back over IRC - render locally,
+    // dressed with the badges/colour USERSTATE reported
+    const me = selfTags || {};
+    queueMessage({ tags: { ...me, id: 'local-' + Date.now(),
+      'display-name': me['display-name'] || auth.login,
       'tmi-sent-ts': String(Date.now()) }, login: auth.login,
       kind: 'PRIVMSG', message: text }, false);
     chatInput.value = '';
