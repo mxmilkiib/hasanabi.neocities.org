@@ -452,6 +452,9 @@
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
   .row.stale { opacity: .3; }
+  /* invisible spacer repaying ghost-height overage so the faded page keeps
+     its layout while fresh rows overwrite it */
+  .row.ghostgap { padding: 0; margin: 0; border-bottom: none; }
   .row.notice.raid { background-color: color-mix(in srgb, var(--accent) 12%, transparent); }
   .chat-img { max-height: 6em; vertical-align: middle; margin: -2.7em 1px; }
   /* Pasted image/gif links pin to the right edge so their vertical
@@ -1136,14 +1139,7 @@
       tpl.innerHTML = html;
       const boundary = firstGhost.offsetTop;
       firstGhost.before(tpl.content);
-      let need = firstGhost.offsetTop - boundary;
-      let g = firstGhost;
-      while (need > 0 && g?.classList.contains('stale')) {
-        need -= g.offsetHeight;
-        const nx = g.nextElementSibling;
-        g.remove();
-        g = nx;
-      }
+      consumeGhosts(firstGhost, firstGhost.offsetTop - boundary);
       evictGhosts(activeEl);
     } else activeEl.insertAdjacentHTML('beforeend', html);
     const kids = activeEl.children;
@@ -2208,18 +2204,30 @@
       if (firstGhost) {
         const boundary = firstGhost.offsetTop;
         to.prepend(last);
-        let need = firstGhost.offsetTop - boundary;
-        let g = firstGhost;
-        while (need > 0 && g?.classList.contains('stale')) {
-          need -= g.offsetHeight;
-          const nx = g.nextElementSibling;
-          g.remove();
-          g = nx;
-        }
+        consumeGhosts(firstGhost, firstGhost.offsetTop - boundary);
       } else to.prepend(last);
       evictGhosts(to);
     }
     return moved;
+  }
+
+  // Removes ghost rows starting at `firstGhost` until `need` px of height is
+  // covered. A ghost taller than the remainder repays the overage as a
+  // spacer, so the surviving ghost rows keep their original offsets.
+  function consumeGhosts(firstGhost, need) {
+    let g = firstGhost;
+    while (need > 0 && g?.classList.contains('stale')) {
+      need -= g.offsetHeight;
+      const nx = g.nextElementSibling;
+      g.remove();
+      g = nx;
+    }
+    if (need < 0 && g?.classList.contains('stale')) {
+      const sp = document.createElement('div');
+      sp.className = 'row stale ghostgap';
+      sp.style.height = `${-need}px`;
+      g.before(sp);
+    }
   }
 
   // Drops any ghost rows that have already fallen below `col`'s fold.
