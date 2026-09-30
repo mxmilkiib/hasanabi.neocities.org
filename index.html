@@ -355,7 +355,24 @@
     padding: 4px 0 2px;
     border-bottom: 1px solid var(--rowline, var(--line));
     word-wrap: break-word;
+    position: relative;
   }
+  /* hover reply affordance - hidden unless logged in (body.chaton) */
+  .rplybtn { position: absolute; top: 1px; right: 0; z-index: 1; padding: 0 5px;
+    border: 1px solid var(--line); border-radius: 3px; background: var(--panel);
+    color: var(--text-dim); font-size: .8em; line-height: 1.35; cursor: pointer;
+    opacity: 0; pointer-events: none; }
+  .row:hover .rplybtn { opacity: .95; pointer-events: auto; }
+  body:not(.chaton) .rplybtn { display: none; }
+  /* pending-reply indicator across the top of the input */
+  #chatbar { flex-wrap: wrap; }
+  #replyBar { flex: 1 0 100%; display: flex; align-items: baseline; gap: 5px;
+    font-size: .8em; color: var(--text-dim); white-space: nowrap; overflow: hidden; }
+  #replyBar[hidden] { display: none; }
+  #replyBar b { color: var(--accent); }
+  #replyBar button { border: 0; background: none; color: var(--text-dim);
+    font: inherit; cursor: pointer; padding: 0 2px; }
+  #replyBar button:hover { color: var(--text); }
   .time { color: var(--text-dim); margin-right: 8px; }
   main.notime .time { display: none; }
   main.nosec .time .sec { display: none; }
@@ -627,7 +644,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move">⠿</div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"></div>
 
 <script>
 (() => {
@@ -1262,7 +1279,7 @@
               `<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
-              `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}</div>`;
+              `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}<span class="rplybtn" title="reply to this message">↩</span></div>`;
     }
     queue = [];
     histDirty = true;
@@ -2552,8 +2569,11 @@
   setLines(lineLevel);
 
   // Clicking a reply chip scrolls to the parent row and flashes it, if the
-  // original is still in the buffer.
+  // original is still in the buffer. A row's hover ↩ sets it as the
+  // pending reply target for the next sent message.
   mainEl.addEventListener('click', (e) => {
+    const rb = e.target.closest('.rplybtn');
+    if (rb) { setReply(rb.closest('.row')); return; }
     const chip = e.target.closest('.reply');
     if (!chip) return;
     const target = rowById.get(chip.dataset.pid);
@@ -2828,7 +2848,40 @@
       : 'Log in with Twitch to send messages';
     chatbarEl.hidden = !on;
     chatInput.placeholder = on ? `chat as ${auth.login}` : 'log in to chat';
+    document.body.classList.toggle('chaton', on);
+    if (!on) clearReply();
   }
+
+  // ---- replies: pick a row with its hover ↩, then Enter sends it as a
+  // threaded reply. The outgoing body gets the @login prefix and the relay
+  // attaches the reply-parent-msg-id tag ----
+  let replyCtx = null;
+  const replyBar = document.getElementById('replyBar');
+  const replyWho = document.getElementById('replyWho');
+  const replyWhat = document.getElementById('replyWhat');
+  function setReply(row) {
+    if (!auth || !row || row.classList.contains('notice')) return;
+    const nameEl = row.querySelector('.name');
+    if (!row.dataset.mid || !nameEl) return;
+    let body = '';
+    for (let n = nameEl.nextSibling; n; n = n.nextSibling) {
+      if (n.nodeType === 1 && n.classList.contains('rplybtn')) break;
+      body += n.textContent;
+    }
+    replyCtx = {
+      id: row.dataset.mid,
+      name: nameEl.textContent,
+      login: decodeURIComponent(new URL(nameEl.href).pathname.slice(1)),
+      body: body.replace(/^:\s*/, '').trim().slice(0, 200),
+    };
+    replyWho.textContent = replyCtx.name;
+    replyWhat.textContent = replyCtx.body.length > 80 ? replyCtx.body.slice(0, 80) + '…' : replyCtx.body;
+    replyBar.hidden = false;
+    chatbarEl.hidden = false;
+    chatInput.focus();
+  }
+  function clearReply() { replyCtx = null; replyBar.hidden = true; }
+  document.getElementById('replyX').addEventListener('click', clearReply);
 
   function logout() {
     auth = null;
@@ -2854,19 +2907,27 @@
   });
 
   chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && replyCtx) { clearReply(); return; }
     if (e.key !== 'Enter' || e.isComposing) return;
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
-    relayFrame.contentWindow.postMessage({ type: 'send', text }, RELAY_ORIGIN);
+    const ctx = replyCtx;
+    const body = ctx ? `@${ctx.name} ${text}` : text;
+    relayFrame.contentWindow.postMessage({ type: 'send', text, replyTo: ctx }, RELAY_ORIGIN);
     // twitch doesn't echo own messages back over IRC - render locally,
     // dressed with the badges/colour USERSTATE reported
     const me = selfTags || {};
     queueMessage({ tags: { ...me, id: 'local-' + Date.now(),
       'display-name': me['display-name'] || auth.login,
-      'tmi-sent-ts': String(Date.now()) }, login: auth.login,
-      kind: 'PRIVMSG', message: text, local: true }, false);
-    pendingEcho.push(auth.login + '\x00' + text);
+      'tmi-sent-ts': String(Date.now()),
+      ...(ctx ? { 'reply-parent-msg-id': ctx.id,
+        'reply-parent-display-name': ctx.name,
+        'reply-parent-user-login': ctx.login,
+        'reply-parent-msg-body': ctx.body } : {}) }, login: auth.login,
+      kind: 'PRIVMSG', message: body, local: true }, false);
+    pendingEcho.push(auth.login + '\x00' + body);
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
+    clearReply();
     chatInput.value = '';
   });
 
