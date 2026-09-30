@@ -143,6 +143,10 @@
   /* the corner buttons are 26px tall while the reduced bar is ~23px -
      shrink them to fit rather than overlap the bottom edge */
   body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { height: calc(100% - 6px); }
+  /* the stream play button stays reachable too, pinned left of the ?;
+     the .hdr-side .hdr-btn chain matches the hide rule's specificity so
+     this later rule wins */
+  body.hdrgraph .hdr-side .hdr-btn#vidBtn { display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); right: 80px; height: calc(100% - 6px); }
   /* when the header wraps, centre the icon strip on its own line */
   header.hdrwrap .hdr-side { margin-inline: auto; }
   #hint {
