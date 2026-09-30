@@ -149,6 +149,8 @@
   /* the corner buttons are 26px tall while the reduced bar is ~23px -
      shrink them to fit rather than overlap the bottom edge */
   body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { height: calc(100% - 6px); }
+  /* the pinned ▶ sits at right:80 - outside the 84px reserve, so reserve more */
+  body.hdrgraph header { padding-right: 118px; }
   /* the stream play button stays reachable too, pinned left of the ?;
      the .hdr-side .hdr-btn chain matches the hide rule's specificity so
      this later rule wins */
@@ -650,6 +652,7 @@
     button.hdr-btn { width: 34px; }
     #fontSel { max-width: 92px; }
     #spark { max-width: 70px; }
+    body.hdrgraph header { padding-right: 130px; }
     #helpPanel { left: 8px; right: 8px; max-width: none; max-height: 70vh; }
     .col { padding: 6px 10px 6px 6px; }
   }
