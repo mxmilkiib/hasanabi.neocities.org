@@ -636,7 +636,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   #emoteGrid button:hover { background: var(--line); }
-  #emoteGrid button img { max-width: 34px; max-height: 34px; }
+  #emoteGrid button img { max-width: 34px; max-height: 34px; pointer-events: none; } /* else animation repaints kill the button's tooltip */
   #emoteGrid button.eji { font-size: 21px; }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   /* narrow screens: the header wraps onto a second row, controls get a
