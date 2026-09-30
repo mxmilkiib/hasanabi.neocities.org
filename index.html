@@ -556,6 +556,7 @@
   #helpPanel .linkcols > i { display: block; break-inside: avoid; }
   #helpPanel sup { position: absolute; font-size: .7em; margin-left: 2px; transform: translateY(-3px); }
   #helpPanel b.fn { color: var(--text); }
+  #helpPanel a.helpTheme, #helpPanel a.helpPreset { padding: 0 5px; border-radius: 3px; border: 1px solid var(--line); }
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLines { color: var(--accent); cursor: pointer; text-decoration: none; }
   #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover, #helpPanel a.helpLines:hover { text-decoration: underline; }
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLines.on { color: var(--text); text-decoration: underline; cursor: default; }
@@ -1815,6 +1816,7 @@
     document.getElementById('helpShadeIcon').textContent = shadeBtn.textContent;
     shadeBtn.title = `Shade: ${shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx]} - click/scroll · ⇧click back · right-click: system`;
     markHelp('helpShade', shadeIdx == null ? -1 : shadeIdx);
+    previewSwatches(); // style chips preview at the current shade stop
   }
   function stepShade(dir) {
     const cur = shadeIdx == null ? (lightMQ.matches ? 0 : 6) : shadeIdx;
@@ -1836,7 +1838,7 @@
   shadeBtn.addEventListener('click', (e) => stepShade(e.shiftKey ? -1 : 1));
   shadeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepShade(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   shadeBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); shadeIdx = null; applyShade(); saveOpts(); });
-  lightMQ.addEventListener('change', updateTone);
+  lightMQ.addEventListener('change', () => { updateTone(); previewSwatches(); });
   // theme names in the help description are clickable quick-switches
   document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
     `<a href="#" class="helpTheme" data-theme="${t}">${t}</a>`).join(' / ');
@@ -2142,6 +2144,40 @@
     applyOpts(THEME_PRESETS[name]);
     markPresets();
   }
+  // swatch previews: a style/preset chip wears its own palette (and the
+  // preset's font). The composed vars only live on :root, so each palette
+  // is read by flipping data-theme/-shade in one synchronous pass - no
+  // paint can interleave - then restored
+  function paletteOf(theme, shade) {
+    const root = document.documentElement;
+    const keepT = root.getAttribute('data-theme'), keepS = root.getAttribute('data-shade');
+    if (theme) root.setAttribute('data-theme', theme); else root.removeAttribute('data-theme');
+    if (shade == null) root.removeAttribute('data-shade'); else root.setAttribute('data-shade', shade);
+    const cs = getComputedStyle(root);
+    const out = { bg: cs.getPropertyValue('--bg').trim(), text: cs.getPropertyValue('--text').trim() };
+    if (keepT == null) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', keepT);
+    if (keepS == null) root.removeAttribute('data-shade'); else root.setAttribute('data-shade', keepS);
+    return out;
+  }
+  function previewSwatches() {
+    try { // lists may not be built yet during early init
+      helpPanel.querySelectorAll('a.helpTheme').forEach((a) => {
+        const { bg, text } = paletteOf(a.dataset.theme === 'auto' ? null : a.dataset.theme, shadeIdx);
+        a.style.background = bg;
+        a.style.color = text;
+      });
+      helpPanel.querySelectorAll('a.helpPreset').forEach((a) => {
+        const p = THEME_PRESETS[a.dataset.preset];
+        if (!p) return;
+        const { bg, text } = paletteOf(p.theme === 'auto' ? null : p.theme, p.shade);
+        a.style.background = bg;
+        a.style.color = text;
+        const ff = FONT_STACKS[p.font];
+        if (ff) a.style.fontFamily = ff;
+      });
+    } catch (e) {}
+  }
+
   // steps from whichever preset currently matches; a custom mix restarts at 0
   function stepPreset(dir) {
     const names = Object.keys(THEME_PRESETS);
@@ -3251,6 +3287,7 @@
   markHelp('helpFs', helpFs + 1);
   markHelp('helpSelf', selfHl ? 1 : 0);
   markPresets();
+  previewSwatches();
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
   // when the attribute changes, so hover parks the title in data-tt and a
