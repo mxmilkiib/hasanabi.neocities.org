@@ -121,7 +121,7 @@
   /* centred by transform rather than a fixed top: the header's padding is
      asymmetric and the reduced bar is thin, so a fixed offset sits off-level */
   #helpBtn, #hdrMin { position: absolute; top: 50%; transform: translateY(-50%); }
-  #helpBtn { right: 44px; }
+  #helpBtn { right: 44px; font-weight: 700; }
   #hdrMin { right: 8px; }
   body.hdrmin header {
     height: 10px;
@@ -1641,15 +1641,15 @@
       if (endTs) {
         ago = `${approx ? '~' : ''}${fmtDur(Math.max(0, Math.round((Date.now() - endTs) / 60000)))} ago`;
         ranTxt = startTs
-          ? ` · last started <b>${fmtTime(startTs)}${dayTag(startTs)}</b>, finished <b>${ago}</b> at <b>${fmtTime(endTs)}</b> after <b>${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}</b>`
-          : ` · finished <b>${ago}</b> at <b>${fmtTime(endTs)}</b>`;
+          ? ` · last start <b>${fmtTime(startTs)}${dayTag(startTs)}</b>, ended <b>${ago}</b>, at <b>${fmtTime(endTs)}</b> after <b>${approx ? '~' : ''}${fmtDur(Math.max(1, Math.round((endTs - startTs) / 60000)))}</b>`
+          : ` · ended <b>${ago}</b>, at <b>${fmtTime(endTs)}</b>`;
       } else if (startTs) {
         ranTxt = ` · last went live at <b>${fmtTime(startTs)}${dayTag(startTs)}</b>`;
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
       infoEl.innerHTML = '<b>offline</b>' +
         (statusView === 0 ? ranTxt + (chatState === 'connected' ? '' : ` · ${chatTxt}`)
-         : statusView === 1 && ago ? ` · finished <b>${ago}</b>`
+         : statusView === 1 && ago ? ` · ended <b>${ago}</b>`
          : statusView === 1 && startTs ? ` · live <b>${fmtTime(startTs)}${dayTag(startTs)}</b>` : '');
       document.title = 'HasanAbi Chat Thing';
       return;
