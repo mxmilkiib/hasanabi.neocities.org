@@ -1417,9 +1417,12 @@
     if (missed.length > 50) missed.splice(0, missed.length - 50);
     if (unfocused) updateMissedBadge();
     const kids = activeEl.children;
-    for (let i = kids.length - 1; i >= 0 && kids[i].dataset.mid && !rowById.has(kids[i].dataset.mid); i--)
-      rowById.set(kids[i].dataset.mid, kids[i]);
-    if (rowById.size > 2000) rowById.clear();
+    for (let i = kids.length - 1; i >= 0; i--) {
+      const mid = kids[i].dataset.mid;
+      if (mid) rowById.set(mid, kids[i]);
+    }
+    // evicted rows leave their ids behind - drop only the disconnected
+    for (const [mid, el] of rowById) if (!el.isConnected) rowById.delete(mid);
     if (isSplit()) {
       if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
       for (const c of cols()) ghostFade(c);
