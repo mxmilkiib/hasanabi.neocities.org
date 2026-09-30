@@ -73,7 +73,7 @@
     }
   }
   :root[data-theme="light"]     { --ph: 80;  --pc: .012; --ptc: .02;  --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; }
-  :root[data-theme="lavender"]  { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; }
+  :root[data-theme="lavender"]  { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; --spark: #d97706; }
   :root[data-theme="mirc"]      { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
   :root[data-theme="sepia"]     { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
   :root[data-theme="paper"]     { --ph: 80;  --pc: .045; --ptc: .045; --accent: #96690f; --good: #2e7d46; --danger: #b04040; --vip: #a03060;
@@ -1418,7 +1418,7 @@
         // ticks use text-dim rather than --line: sepia/paper lines wash out
         // against the panel, while text-dim keeps contrast on every style
         tick: styles.getPropertyValue('--text-dim') || '#666',
-        accent: styles.getPropertyValue('--accent') || '#e8a33d',
+        accent: styles.getPropertyValue('--spark').trim() || styles.getPropertyValue('--accent') || '#e8a33d',
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
         gap: styles.getPropertyValue('--text-dim') || '#666',
       };
