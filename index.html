@@ -302,11 +302,11 @@
     background: var(--panel);
     border: 1px solid var(--accent);
     color: var(--accent);
-    border-radius: 13px;
-    width: 78px;
-    height: 26px;
-    padding: 0;
-    font-size: 15px;
+    border-radius: 15px;
+    min-width: 92px;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
     z-index: 5;
@@ -664,7 +664,7 @@
 (() => {
   // ---- change this to point the page at a different channel ----
   const CHANNEL = 'hasanabi';
-  const MAX_MESSAGES = 250;
+  const MAX_MESSAGES = 1000;
   const MENTION_RE = new RegExp('@' + CHANNEL + '\\b', 'i');
   const GLORP_RE = /\b(?:glorp|florp)\b/i;
   const F_RE = /^f$/i;
@@ -1053,20 +1053,41 @@
   const jdownLog = document.getElementById('jdownLog');
   const jdownSide = document.getElementById('jdownSide');
 
+  // rows below a column's fold, counted back from the tail since they're
+  // chronological - the label on the ↓ button tells how far off live you are
+  function belowFold(col) {
+    const fold = col.scrollTop + col.clientHeight;
+    let n = 0;
+    for (let i = col.children.length - 1; i >= 0; i--) {
+      const r = col.children[i];
+      if (r.offsetTop - col.offsetTop < fold) break;
+      if (r.classList.contains('row') && !r.classList.contains('ghostgap')) n++;
+    }
+    return n;
+  }
+  function jdownSet(btn, col, forceHidden) {
+    const at = forceHidden || col.scrollHeight - col.scrollTop - col.clientHeight < 60;
+    btn.hidden = at;
+    if (!at) {
+      const n = belowFold(col);
+      btn.textContent = n ? `↓ ${n}` : '↓';
+    }
+  }
+
   logEl.addEventListener('scroll', () => {
     stickBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
-    jdownLog.hidden = stickBottom;
+    jdownSet(jdownLog, logEl, stickBottom);
   });
   const jdownSide2 = document.getElementById('jdownSide2');
   let sideBottom = true;
   let side2Bottom = true;
   sideEl.addEventListener('scroll', () => {
     sideBottom = sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
-    jdownSide.hidden = sideBottom;
+    jdownSet(jdownSide, sideEl, sideBottom);
   });
   side2El.addEventListener('scroll', () => {
     side2Bottom = side2El.scrollHeight - side2El.scrollTop - side2El.clientHeight < 60;
-    jdownSide2.hidden = side2Bottom;
+    jdownSet(jdownSide2, side2El, side2Bottom);
   });
   function jumpDown(col, btn) {
     btn.hidden = true;
@@ -1346,11 +1367,9 @@
       while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
       if (nearBottom) activeEl.scrollTop = activeEl.scrollHeight;
     }
-    jdownLog.hidden = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
-    jdownSide.hidden = sideEl.hidden ||
-      sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
-    jdownSide2.hidden = side2El.hidden ||
-      side2El.scrollHeight - side2El.scrollTop - side2El.clientHeight < 60;
+    jdownSet(jdownLog, logEl);
+    jdownSet(jdownSide, sideEl, sideEl.hidden);
+    jdownSet(jdownSide2, side2El, side2El.hidden);
   }
 
   // ---- msgs/sec sparkline: one sample per second, 4-minute window ----
