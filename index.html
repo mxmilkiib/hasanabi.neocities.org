@@ -529,7 +529,7 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     padding: 10px 14px;
-    font-size: var(--chat-font, 15px);
+    font-size: min(var(--chat-font, 15px), 18px); /* follow chat, capped */
     line-height: 1.5;
     z-index: 10;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
