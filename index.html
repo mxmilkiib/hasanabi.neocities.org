@@ -45,7 +45,7 @@
     src: url('https://cdn.jsdelivr.net/gh/source-foundry/Hack@master/build/ttf/Hack-Bold.ttf') format('truetype');
   }
   /* two axes: style = hue + chroma + accent set (data-theme), shade =
-     lightness stop 0..6 (data-shade, unset = follow system). --ptc tints
+     lightness stop 0..8 (data-shade, unset = follow system). --ptc tints
      text toward the surface hue; --text-c overrides it entirely for the
      phosphor styles whose text is the accent colour */
   :root {
@@ -59,13 +59,15 @@
     --line: color-mix(in oklch, var(--bg), var(--text) 24%);
     --text-dim: color-mix(in oklch, var(--bg), var(--text) 55%);
   }
-  :root[data-shade="0"] { --sh-bg: .97; --sh-tx: .14; }
-  :root[data-shade="1"] { --sh-bg: .88; --sh-tx: .20; }
-  :root[data-shade="2"] { --sh-bg: .75; --sh-tx: .27; }
-  :root[data-shade="3"] { --sh-bg: .58; --sh-tx: .90; }
-  :root[data-shade="4"] { --sh-bg: .40; --sh-tx: .92; }
-  :root[data-shade="5"] { --sh-bg: .22; --sh-tx: .94; }
-  :root[data-shade="6"] { --sh-bg: .05; --sh-tx: .96; }
+  :root[data-shade="0"] { --sh-bg: .99; --sh-tx: .10; }
+  :root[data-shade="1"] { --sh-bg: .95; --sh-tx: .15; }
+  :root[data-shade="2"] { --sh-bg: .88; --sh-tx: .20; }
+  :root[data-shade="3"] { --sh-bg: .75; --sh-tx: .26; }
+  :root[data-shade="4"] { --sh-bg: .58; --sh-tx: .92; }
+  :root[data-shade="5"] { --sh-bg: .40; --sh-tx: .94; }
+  :root[data-shade="6"] { --sh-bg: .25; --sh-tx: .95; }
+  :root[data-shade="7"] { --sh-bg: .12; --sh-tx: .97; }
+  :root[data-shade="8"] { --sh-bg: .02; --sh-tx: .98; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-shade]) { --sh-bg: .13; --sh-tx: .95; }
     :root:not([data-theme]) {
@@ -584,7 +586,7 @@
   #helpPanel .linkcols > i { display: block; break-inside: avoid; }
   #helpPanel sup { position: absolute; font-size: .7em; margin-left: 2px; transform: translateY(-3px); }
   #helpPanel b.fn { color: var(--text); }
-  #helpPanel a.helpTheme, #helpPanel a.helpPreset { padding: 0 5px; border-radius: 3px; border: 1px solid var(--line); }
+  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 0 5px; border-radius: 3px; border: 1px solid var(--line); }
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLines { color: var(--accent); cursor: pointer; text-decoration: none; }
   #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover, #helpPanel a.helpLines:hover { text-decoration: underline; }
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLines.on { color: var(--text); text-decoration: underline; cursor: default; }
@@ -1860,26 +1862,26 @@
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
     default:  { theme: 'auto',    shade: null, font: 'mono',       size: 11, lh: 10, lines: 3, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    compact:  { theme: 'dark',    shade: 5,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    paper:    { theme: 'light',   shade: 1,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
-    console:  { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    cosy:     { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    cinema:   { theme: 'black',   shade: 6,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
-    phosphor: { theme: 'amber',   shade: 6,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
-    dyslexic: { theme: 'lavender',shade: 1,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    midnight: { theme: 'nord',    shade: 4,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
-    solar:    { theme: 'solarized',shade: 5,   font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    paper:    { theme: 'light',   shade: 2,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
+    console:  { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    cinema:   { theme: 'black',   shade: 8,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
+    phosphor: { theme: 'amber',   shade: 8,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
+    dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    midnight: { theme: 'nord',    shade: 5,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
+    solar:    { theme: 'solarized',shade: 6,    font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
     minimal:  { theme: 'light',   shade: 0,    font: 'sans',       size: 7,  lh: 9,  lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2 },
     mirc:     { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 6,  lh: 4,  lines: 1, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
     irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 15, lh: 4,  weight: 0, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, video: false, hpw: 7, hfspx: 18 },
-    gohu:     { theme: 'lavender',shade: 5,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
-    heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', size: 8, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
+    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
+    heather:  { theme: 'lavender',shade: 6,    font: 'sourcecodepro', size: 8, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
   const THEMES = ['console', 'amber', 'black', 'ember', 'dark', 'solarized', 'nord', 'mid', 'lavender', 'sepia', 'paper', 'mirc', 'light'];
   // each style's designed shade: swatch previews and popup clicks use it,
   // while the ◐ cycle keeps whatever shade is currently active
-  const THEME_SHADE = { light: 0, mirc: 0, paper: 1, sepia: 1, lavender: 1, mid: 3, nord: 4, solarized: 5, dark: 5, ember: 5, black: 6, amber: 6, console: 6 };
+  const THEME_SHADE = { light: 1, mirc: 0, paper: 2, sepia: 2, lavender: 2, mid: 4, nord: 5, solarized: 6, dark: 6, ember: 6, black: 8, amber: 8, console: 8 };
   const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
   let themeMode = 'auto';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
@@ -1887,7 +1889,7 @@
   // tone = the derived light/dark split used for nick colours and emote
   // assets: light while the shade stop is 2 or brighter, else dark
   function updateTone() {
-    lightMode = shadeIdx == null ? lightMQ.matches : shadeIdx <= 2;
+    lightMode = shadeIdx == null ? lightMQ.matches : shadeIdx <= 3;
     monoNames = themeMode === 'console';
     namePalette = monoNames ? CONSOLE_COLORS : (lightMode ? LIGHT_COLORS : COLORS);
     sparkCols = null; // re-resolve canvas colours against the new scheme
@@ -1904,9 +1906,9 @@
     markPresets();
   }
 
-  // seven shade stops, lightest → darkest; null follows the system
-  const SHADE_NAMES = ['lightest', 'light', 'pale', 'mid', 'dusk', 'dark', 'black'];
-  const SHADE_ICONS = ['○', '◔', '◔', '◑', '◕', '◕', '●'];
+  // nine shade stops, lightest → darkest; null follows the system
+  const SHADE_NAMES = ['white', 'lightest', 'light', 'pale', 'mid', 'dusk', 'dark', 'deep', 'black'];
+  const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●'];
   let shadeIdx = null;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
@@ -1919,7 +1921,7 @@
     previewSwatches(); // style chips preview at their designed shade stop
   }
   function stepShade(dir) {
-    const cur = shadeIdx == null ? (lightMQ.matches ? 0 : 6) : shadeIdx;
+    const cur = shadeIdx == null ? (lightMQ.matches ? 0 : 7) : shadeIdx;
     shadeIdx = (cur + dir + SHADE_NAMES.length) % SHADE_NAMES.length;
     applyShade();
     saveOpts();
@@ -2284,6 +2286,14 @@
         a.style.color = text;
         const ff = FONT_STACKS[p.font];
         if (ff) a.style.fontFamily = ff;
+      });
+      // shade chips wear the current style at their own stop; 'system'
+      // previews whatever the media query resolves to
+      helpPanel.querySelectorAll('a.helpShade').forEach((a) => {
+        const idx = a.dataset.idx === 'auto' ? null : +a.dataset.idx;
+        const { bg, text } = paletteOf(themeMode === 'auto' ? null : themeMode, idx);
+        a.style.background = bg;
+        a.style.color = text;
       });
     } catch (e) {}
   }
