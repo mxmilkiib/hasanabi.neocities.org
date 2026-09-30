@@ -52,7 +52,9 @@ the CSP forbids on Neocities:
 
 Parent → relay: `{type: 'join', channel}`, `{type: 'backfill'}`,
 `{type: 'auth', token}` (or `token: null` to log out),
-`{type: 'send', text}` — posts a chat message once authenticated
+`{type: 'send', text, replyTo}` — posts a chat message once
+authenticated (`replyTo` attaches a `reply-parent-msg-id` tag),
+`{type: 'tweet', id}` — fetches an X/Twitter preview via api.fxtwitter.com
 
 Relay → parent:
 
@@ -70,6 +72,7 @@ Relay → parent:
 - `{type: 'auth', login}` (or `{type: 'auth', error}`) — after `auth`, the
   relay validates the token at id.twitch.tv, reconnects the socket with
   the user's credentials, and reports the resolved login
+- `{type: 'tweet', id, tweet}` — preview data for a tweet link
 
 Optional login uses Twitch's implicit OAuth grant (`➤` in the header) — a
 pure client-side flow, so no secret ships in the page. `TWITCH_CLIENT_ID`
@@ -89,7 +92,10 @@ no dependencies beyond CDN-hosted fonts:
   with jump-to-original, emote retokenization. `/me` actions, `!command`
   and `#tag` lines render in italics (names, chips and timestamps stay
   upright), USERNOTICE subs/raids/gifts become dim italic notice rows,
-  and CLEARCHAT/NOTICE events show timeouts, bans and channel notices.
+  and CLEARCHAT/NOTICE events show timeouts, bans and channel notices
+  (a room-wide `/clear` wipes rendered rows). Stretches the page wasn't
+  watching — hidden tab, suspended timers, page closed — get a `· Nm gap
+  · cause · start → end` notice so lost context is visible in the log.
 - **Name colors** — the chatter's own Twitch color when set, a
   hash-derived palette colour otherwise; either way the luminance is
   nudged so names stay legible on the active theme (the console theme
@@ -105,31 +111,53 @@ no dependencies beyond CDN-hosted fonts:
   stream state per theme. Uptime, viewers, title on hover; offline shows
   last-run info; ROOMSTATE chat modes (slow, follow age, emote-only,
   subs-only, r9k). The `–` button cycles three sizes: full →
-  reduced (option buttons hide, `?` stays) → minimised, a 10px strip
-  carrying just `–` that restores on click.
+  reduced (option buttons hide; `?`, `–` and the `▶` stream-play stay
+  pinned at the right edge) → minimised, a 10px strip carrying just `–`
+  that restores on click.
 - **Graph** — messages-per-second sparkline with 10s/minute ticks and
-  red glorp/F bursts; it flexes to fill whatever header space is free
-  (the whole bar in reduced mode) and re-rasterises to match its box
-  so it stays sharp through resizes. Persisted across reloads.
-- **Controls** — colour style palettes plus a separate 7-stop shade
-  axis (lightest → darkest, or system-following auto), zebra striping, graduated text shadow, font
-  picker (incl. dyslexia-friendly), font size, line height, row lines,
-  sub-chip alignment, page-flip columns (two, or three in landscape),
-  minimizable header,
-  help panel. All persisted in `localStorage`; every option answers to
-  click, shift+click (reverse) and the scroll wheel.
+  red glorp/F bursts; dim bands shade spans the page wasn't watching
+  (suspended timers, reloads) instead of drawing them flat. It flexes
+  to fill whatever header space is free (the whole bar in reduced mode)
+  and re-rasterises to match its box so it stays sharp through resizes.
+  Persisted across reloads.
+- **Controls** — colour style palettes (brightness-ordered, each with a
+  designed shade stop) plus a separate 7-stop shade axis
+  (lightest → darkest, or system-following auto); the `◐` cycle swaps
+  hue family alone while picking a chip also applies its shade, zebra
+  striping, graduated text shadow, font picker (incl. dyslexia-friendly),
+  font size, weight, line height, row separator shades, three-state
+  timestamps (off / no seconds / seconds), sub-chip modes (right /
+  compact `[NN]` / before badges / hidden), emote-only row modes,
+  page-flip columns (two, or three in landscape), draggable stream-video
+  overlay, minimizable header, tabbed help panel (resources · authors ·
+  configuration) with its own width and font-size controls. All
+  persisted in `localStorage`; every option answers to click,
+  shift+click (reverse) and the scroll wheel. In the popup the style and
+  preset links render as live swatches — background, text colour and,
+  for presets, the bundled font.
+- **Sending** — optional Twitch login (`➤`, implicit OAuth — no secret
+  ships in the page) enables a chat input bar. `/me` is wrapped as a
+  CTCP ACTION so it renders as a proper action line; hovering a row
+  shows `↩` to reply — the pending-reply bar shows the target and cancels
+  on `Esc`, and the send carries `reply-parent-msg-id` plus the `@login`
+  prefix like other clients. Local echoes render instantly and are
+  adopted in place when the real line replays.
 - **Scrolling** — the log follows new messages only while at the
   bottom; scrolling up releases it and shows a jump-to-latest button
-  (one per column in split mode).
+  with a count of rows below the fold (one per column in split mode).
 - **Formatting** — mention highlighting (your own login joins the
   keyword set when logged in), GLORP/F red rows, channel-point
   tints, fossabot/blammobot name shimmer and game-line styling, braille
-  art restacking, image/GIF/Giphy embeds, Nitter link rewriting for
-  Twitter/X. Mentions landing while the page is unfocused queue on a
+  art restacking, image/GIF/Giphy embeds, X/Twitter preview cards via
+  fxtwitter (profile links fall back to Bird.makeup when nitter is
+  down). Mentions landing while the page is unfocused queue on a
   clickable `@N` chip in the header — click to jump to each, ⇧click
   clears.
-- **Persistence** — last 250 rows, stream run history and graph samples
-  survive reloads via `localStorage`.
+- **Persistence** — last 1000 rows (including gap notices), stream run
+  history and graph samples survive reloads via `localStorage`.
+- **Multi-tab** — option changes and login/logout propagate to other
+  open copies through `storage` events; sent-message echoes broadcast
+  over a `BroadcastChannel` so every copy renders them at once.
 - **PWA / resume** — installable (manifest + pass-through service
   worker); an installed standalone window survives backgrounding better
   than a tab. Regardless, on wake or reconnect the page asks the relay
@@ -138,21 +166,26 @@ no dependencies beyond CDN-hosted fonts:
 - **URL options** — query params apply a configuration on top of (and
   into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
   Keys: `split` (2 panes, or `split=3` on landscape screens), `min`,
-  `style`, `shade` (0-6, `auto` follows the system), `font`, `size`, `lh`, `wght` (300-700), `hfs` (header font px; unset = follow chat), `zebra`, `lines` (0-3 separator shades),
-  `times`, `shadow`, `video`, `sub` (right/left/hidden), `eonly` (inline/right/off),
+  `style`, `shade` (0-6, `auto` follows the system; a bare `style` with
+  no `shade` lands on the style's designed stop), `font`, `size`, `lh`,
+  `wght` (300-700), `hfs` (header font px; unset = follow chat),
+  `hpfs` (help popup font px), `hpw` (help popup width, `480`–`1280`),
+  `zebra`, `lines` (0-3 separator shades),
+  `times` (on, `nosec`, or `=0` off), `shadow`, `video`,
+  `sub` (right/num-right/left/num-left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
   `kw` is a comma-separated keyword list; lines containing one get a
   green edge (e.g. `?kw=malkiii,raid`). `self=1` puts an accent edge on
   one's own messages when logged in. `min=graph` selects the reduced
   header (option buttons hidden, rate graph across the bar); `min=1`
-  minimises to a strip. `hpw` sets the help popup width
-  (`480`–`1280`).
+  minimises to a strip.
   `theme` names a preset bundle of all display options (`default`,
   `compact`, `paper`, `cosy`, `console`, `cinema`, `phosphor`,
-  `dyslexic`, `midnight`, `solar`, `minimal`); a style name like
-  `theme=dark` still selects just the palette for old links.
+  `dyslexic`, `midnight`, `solar`, `minimal`, `mirc`, `irc`, `gohu`); a
+  style name like `theme=dark` still selects just the palette for old
+  links.
 - **Performance** — incoming lines queue and flush once per animation
-  frame; the log is capped at 250 rows.
+  frame; the log is capped at 1000 rows.
 
 ## Deploy
 
