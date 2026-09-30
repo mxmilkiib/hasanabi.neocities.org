@@ -2993,6 +2993,28 @@
   // each font name renders in its own face
   document.getElementById('helpFontFamList').innerHTML = [...fontSel.options].map((o, i) =>
     `<a href="#" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value]}">${o.text}</a>`).join(' · ');
+  // bold each leading 'name:' in the description cells - whether it sits
+  // in a <span> or a bare text node beside the row's <b> label
+  helpPanel.querySelectorAll('div').forEach((d) => {
+    for (const n of d.childNodes) {
+      const t = n.nodeType === 3 ? n
+        : n.nodeType === 1 && n.tagName === 'SPAN' && n.firstChild?.nodeType === 3 ? n.firstChild
+        : null;
+      if (!t) continue;
+      const i = t.textContent.indexOf(':');
+      if (i < 1 || i > 30) continue;
+      const b = document.createElement('b');
+      b.textContent = t.textContent.slice(0, i + 1).trim();
+      t.textContent = t.textContent.slice(i + 1);
+      // a bare text node is itself a grid item - wrap it so the <b>
+      // lands inside the cell rather than becoming an item of its own
+      if (t.parentNode === d) {
+        const sp = document.createElement('span');
+        t.before(sp);
+        sp.append(b, t);
+      } else t.before(b);
+    }
+  });
   // the setters ran during init before the lists existed - mark now
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
   markHelp('helpTimes', timeIdx);
