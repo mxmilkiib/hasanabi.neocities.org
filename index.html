@@ -336,6 +336,8 @@
     opacity: .9;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
   }
+  .jdown .arr { font-size: 19px; vertical-align: -1px; }
+  .jdown .cnt { color: var(--text); font-weight: 600; margin-left: 4px; }
   main.split .jdown { left: 25%; }
   main.split .jdown.side { left: 75%; }
   main.split3 .jdown { left: 16.666%; }
@@ -1136,7 +1138,7 @@
     btn.hidden = at;
     if (!at) {
       const n = belowFold(col);
-      btn.textContent = n ? `↓ ${n}` : '↓';
+      btn.innerHTML = `<span class="arr">↓</span>${n ? `<span class="cnt">${n}</span>` : ''}`;
     }
   }
 
