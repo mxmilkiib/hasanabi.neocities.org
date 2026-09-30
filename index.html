@@ -562,14 +562,14 @@
   #helpPanel b.selfchip { background-color: color-mix(in srgb, var(--accent) 13%, transparent); box-shadow: inset 4px 0 0 var(--accent); }
   #helpPanel b.kw { background-color: color-mix(in srgb, var(--good) 13%, transparent); box-shadow: inset 4px 0 0 var(--good); }
   #helpPanel .htabs { display: flex; gap: 4px; margin: 0 0 10px; }
-  #helpPanel .htabs a { color: var(--accent); text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-radius: 4px; }
+  #helpPanel .htabs a { flex: 1; text-align: center; color: var(--accent); text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-radius: 4px; }
   #helpPanel .htabs a.on { color: var(--text); border-color: var(--accent); font-weight: 600; }
   /* 9em of popup font keeps the glyph column aligned at any popup font
      size while fitting the longest labels ("radicals & labour" etc) */
   #helpPanel .htabpage > div { margin: 4px 0; display: grid; grid-template-columns: 9em 1fr; gap: 0 8px; }
   #helpPanel div.sep { display: block; grid-column: 1 / -1; text-align: center; color: var(--text-dim); opacity: .55; margin: 11px 0 9px; }
   #helpPanel #htabRes div.sep { margin: 3px 0 1px; }
-  #helpPanel div.wide > span { grid-column: 1 / -1; }
+  #helpPanel div.wide > span { grid-column: 1 / -1; text-align: center; }
   #helpPanel i { font-style: normal; color: var(--text-dim); font-size: .85em; }
   /* link-column rows (news): one entry per line, flowing into as many
      ~12em columns as the popup width fits */
@@ -1837,8 +1837,8 @@
     gohu:     { theme: 'lavender',shade: 5,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
     heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', size: 8, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
   };
-  // ordered by each style's designed shade stop, lightest → darkest
-  const THEMES = ['light', 'mirc', 'paper', 'sepia', 'lavender', 'mid', 'nord', 'solarized', 'dark', 'ember', 'black', 'amber', 'console'];
+  // ordered by each style's designed shade stop, darkest → lightest
+  const THEMES = ['console', 'amber', 'black', 'ember', 'dark', 'solarized', 'nord', 'mid', 'lavender', 'sepia', 'paper', 'mirc', 'light'];
   // each style's designed shade: swatch previews and popup clicks use it,
   // while the ◐ cycle keeps whatever shade is currently active
   const THEME_SHADE = { light: 0, mirc: 0, paper: 1, sepia: 1, lavender: 1, mid: 3, nord: 4, solarized: 5, dark: 5, ember: 5, black: 6, amber: 6, console: 6 };
@@ -2679,7 +2679,7 @@
     markHelp('helpHfs', hdrFs + 1);
     saveOpts();
   }
-  let helpWIdx = 3;
+  let helpWIdx = 5;
   function applyHelpW() {
     helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
     markHelp('helpW', helpWIdx);
@@ -2723,7 +2723,7 @@
     if (isSplit()) q.set('split', String(cols().length));
     if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
-    if (helpWIdx !== 3) q.set('hpw', HELP_WIDTHS[helpWIdx]);
+    if (helpWIdx !== 5) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== -1) q.set('hfs', HDR_SIZES[hdrFs]);
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
