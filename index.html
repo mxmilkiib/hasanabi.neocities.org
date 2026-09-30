@@ -358,6 +358,7 @@
   }
   .time { color: var(--text-dim); margin-right: 8px; }
   main.notime .time { display: none; }
+  main.nosec .time .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
   .role.mod { color: var(--good); }
   .role.vip { color: var(--vip); }
@@ -1056,6 +1057,21 @@
   sideEl.addEventListener('load', resnap, true);
   side2El.addEventListener('load', resnap, true);
 
+  // formatToParts so the seconds fragment - and its separator - can be
+  // wrapped and hidden by the 'no seconds' mode regardless of locale
+  const TIME_FMT = new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  function fmtRowTime(when) {
+    const parts = TIME_FMT.formatToParts(when);
+    let s = '', open = false;
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i];
+      if (!open && (p.type === 'second' || parts[i + 1]?.type === 'second')) { s += '<span class="sec">'; open = true; }
+      s += p.value;
+      if (p.type === 'second' && open) { s += '</span>'; open = false; }
+    }
+    return s;
+  }
+
   // zebra parity is tagged per row (class 'z') so a message keeps its shade
   // across trimming, deletions and page-flip column moves
   let zFlip = false;
@@ -1099,7 +1115,7 @@
         if (seenIds.size > 20000) { seenIds.clear(); seenIds.add(dedupKey); }
       }
       const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
-      const timeStr = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const timeStr = fmtRowTime(when);
       // \x01ACTION ...\x01 is an IRC /me action - strip the CTCP wrapper
       const am = rawMsg.match(/^\x01ACTION ?(.*?)\x01?$/);
       const action = !!am;
@@ -1684,19 +1700,19 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'auto',    shade: null, font: 'mono',       size: 11, lh: 10, lines: 3, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
-    compact:  { theme: 'dark',    shade: 5,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: false, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    paper:    { theme: 'light',   shade: 1,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: true,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
-    console:  { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    cosy:     { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    cinema:   { theme: 'black',   shade: 6,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: false, shadow: 2, subMode: 2, eonly: 1 },
-    phosphor: { theme: 'amber',   shade: 6,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: true,  shadow: 0, subMode: 2, eonly: 0 },
-    dyslexic: { theme: 'lavender',shade: 1,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: true,  shadow: 0, subMode: 0, eonly: 0 },
-    midnight: { theme: 'nord',    shade: 4,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: true,  shadow: 1, subMode: 0, eonly: 0 },
-    solar:    { theme: 'solarized',shade: 5,   font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
-    minimal:  { theme: 'light',   shade: 0,    font: 'sans',       size: 7,  lh: 9,  lines: 0, zebra: false, times: false, shadow: 0, subMode: 4, eonly: 2 },
-    mirc:     { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 6,  lh: 4,  lines: 1, zebra: false, times: true,  shadow: 0, subMode: 0, eonly: 0 },
-    gohu:     { theme: 'lavender',shade: 5,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: true,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
+    default:  { theme: 'auto',    shade: null, font: 'mono',       size: 11, lh: 10, lines: 3, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    compact:  { theme: 'dark',    shade: 5,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    paper:    { theme: 'light',   shade: 1,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
+    console:  { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    cosy:     { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    cinema:   { theme: 'black',   shade: 6,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
+    phosphor: { theme: 'amber',   shade: 6,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
+    dyslexic: { theme: 'lavender',shade: 1,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    midnight: { theme: 'nord',    shade: 4,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
+    solar:    { theme: 'solarized',shade: 5,   font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    minimal:  { theme: 'light',   shade: 0,    font: 'sans',       size: 7,  lh: 9,  lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2 },
+    mirc:     { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 6,  lh: 4,  lines: 1, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    gohu:     { theme: 'lavender',shade: 5,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
   };
   // ordered roughly by visual similarity: light family → lavender → mid-grey
   // pivot → cool darks → neutral darks → warm darks → the green phosphor
@@ -1773,7 +1789,7 @@
     else if (a.classList.contains('helpWg')) weightCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
-    else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
     else if (a.classList.contains('helpEonly')) { emoteMode = +a.dataset.idx; applyEmoteMode(); saveOpts(); }
@@ -1930,7 +1946,7 @@
         hdrgraph: document.body.classList.contains('hdrgraph'),
         sub: subMode,
         zebra: mainEl.classList.contains('zebra'),
-        times: !mainEl.classList.contains('notime'),
+        times: timeIdx,
         shadow: shadLevel,
         eonly: emoteMode,
         help: helpMode,
@@ -1972,7 +1988,8 @@
     // presets use the direct index; saved 'sub' is the legacy reversed order
     if (Number.isInteger(o.subMode) && o.subMode >= 0 && o.subMode < SUB_MODES.length) { subMode = o.subMode; applySubMode(); }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
-    if (typeof o.times === 'boolean') setTimes(o.times);
+    if (typeof o.times === 'boolean') setTimes(o.times ? 2 : 0);
+    else if (Number.isInteger(o.times)) setTimes(o.times);
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
     else if (o.shadow === true) setShadow(1);
     if (Number.isInteger(o.eonly) && o.eonly >= 0 && o.eonly < EMOTE_MODES.length) { emoteMode = o.eonly; applyEmoteMode(); }
@@ -2000,7 +2017,7 @@
     return p && p.theme === themeMode && p.shade === shadeIdx && p.font === fontSel.value &&
       p.size === fontCtl.get() && p.lh === lhCtl.get() &&
       p.lines === lineLevel && p.zebra === mainEl.classList.contains('zebra') &&
-      p.times === !mainEl.classList.contains('notime') &&
+      p.times === timeIdx &&
       p.shadow === shadLevel && p.subMode === subMode && p.eonly === emoteMode;
   }
   function markPresets() {
@@ -2329,21 +2346,26 @@
   }, { passive: false });
   setZebra(false);
 
-  // ---- message timestamps ----
-  function setTimes(on) {
-    mainEl.classList.toggle('notime', !on);
-    timeBtn.classList.toggle('on', on);
-    timeBtn.title = `Timestamps: ${on ? 'on' : 'off'} - click/scroll`;
-    markHelp('helpTimes', on ? 1 : 0);
+  // ---- message timestamps: off / hh:mm / hh:mm:ss ----
+  const TIME_MODES = ['off', 'no seconds', 'seconds'];
+  let timeIdx = 2;
+  function setTimes(idx) {
+    timeIdx = Math.max(0, Math.min(TIME_MODES.length - 1, idx));
+    mainEl.classList.toggle('notime', timeIdx === 0);
+    mainEl.classList.toggle('nosec', timeIdx === 1);
+    timeBtn.classList.toggle('on', timeIdx > 0);
+    timeBtn.title = `Timestamps: ${TIME_MODES[timeIdx]} - click/scroll · ⇧click back`;
+    markHelp('helpTimes', timeIdx);
   }
 
-  timeBtn.addEventListener('click', () => { setTimes(mainEl.classList.contains('notime')); saveOpts(); });
-  timeBtn.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    setTimes(mainEl.classList.contains('notime'));
+  function stepTime(dir) {
+    setTimes((timeIdx + dir + TIME_MODES.length) % TIME_MODES.length);
     saveOpts();
-  }, { passive: false });
-  setTimes(true);
+  }
+
+  timeBtn.addEventListener('click', (e) => stepTime(e.shiftKey ? -1 : 1));
+  timeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTime(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  setTimes(2);
 
   // ---- accent edge on one's own messages (needs the ➤ login) ----
   let selfHl = false;
@@ -2457,7 +2479,8 @@
     if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (mainEl.classList.contains('zebra')) q.set('zebra', '1');
     if (lineLevel !== 3) q.set('lines', String(lineLevel));
-    if (mainEl.classList.contains('notime')) q.set('times', '0');
+    if (timeIdx === 0) q.set('times', '0');
+    else if (timeIdx === 1) q.set('times', 'nosec');
     if (shadLevel) q.set('shadow', shadLevel);
     if (SUB_MODES[subMode] !== 'right') q.set('sub', SUB_MODES[subMode]);
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
@@ -2927,7 +2950,7 @@
   if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
-    if (q.has('times')) setTimes(flag('times'));
+    if (q.has('times')) setTimes(q.get('times') === 'nosec' ? 1 : flag('times') ? 2 : 0);
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
@@ -2953,7 +2976,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpTimes: ['off', 'on'], helpShadow: SHADOW_NAMES,
+    helpZebra: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
@@ -2970,7 +2993,7 @@
     `<a href="#" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value]}">${o.text}</a>`).join(' · ');
   // the setters ran during init before the lists existed - mark now
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
-  markHelp('helpTimes', mainEl.classList.contains('notime') ? 0 : 1);
+  markHelp('helpTimes', timeIdx);
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
   markHelp('helpEonly', emoteMode);
