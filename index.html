@@ -3250,10 +3250,17 @@
       .filter((n) => !q || n.toLowerCase().includes(q));
     const tw = TW_GLOBALS.filter(([n]) => !q || n.toLowerCase().includes(q));
     const ej = q ? [] : EMOJIS; // no names to match against
+    // third-party emotes grouped by provider
+    const groups = {};
+    for (const n of names) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
     let h = '';
-    if (names.length) h += `<div class="ehead">emotes</div>` + names.map((n) =>
-      `<button type="button" data-ins="${escapeHTML(n)}" title="${escapeHTML(n)}${emoteSrc[n] ? ' - ' + escapeHTML(emoteSrc[n]) : ''}">` +
-      `<img src="${escapeHTML(thirdPartyEmotes[n])}" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
+    for (const src of ['7TV', 'BTTV', 'FFZ', 'other']) {
+      const g = groups[src];
+      if (!g || !g.length) continue;
+      h += `<div class="ehead">${src === 'other' ? 'emotes' : src.toLowerCase()}</div>` + g.map((n) =>
+        `<button type="button" data-ins="${escapeHTML(n)}" title="${escapeHTML(n)}${emoteSrc[n] ? ' - ' + escapeHTML(emoteSrc[n]) : ''}">` +
+        `<img src="${escapeHTML(thirdPartyEmotes[n])}" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
+    }
     if (tw.length) h += `<div class="ehead">twitch</div>` + tw.map(([n, id]) =>
       `<button type="button" data-ins="${escapeHTML(n)}" title="${escapeHTML(n)} - Twitch">` +
       `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/2.0" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
