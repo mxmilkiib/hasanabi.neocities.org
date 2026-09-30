@@ -118,9 +118,9 @@
     border-bottom: 1px solid var(--line);
     position: relative;
   }
-  /* centred by transform rather than a fixed top: the header's padding is
-     asymmetric and the reduced bar is thin, so a fixed offset sits off-level */
-  #helpBtn, #hdrMin { position: absolute; top: 50%; transform: translateY(-50%); }
+  /* pinned to the first header line, not the box centre - when labels make
+     .hdr-side wrap onto a second line the buttons stay put up top */
+  #helpBtn, #hdrMin { position: absolute; top: 3px; }
   #helpBtn { right: 44px; font-weight: 700; }
   #hdrMin { right: 8px; }
   body.hdrmin header {
@@ -164,6 +164,7 @@
   body.hdrmin header { justify-content: flex-end; gap: 4px; padding: 0 4px; }
   body.hdrmin #hdrMin {
     display: inline-block;
+    top: 50%; transform: translateY(-50%); /* centre on the 10px strip */
     right: 2px;
     width: auto; height: 10px;
     padding: 0 8px;
