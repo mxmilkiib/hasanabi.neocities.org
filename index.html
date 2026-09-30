@@ -173,6 +173,15 @@
     line-height: 10px;
     color: var(--accent);
   }
+  /* hovering the strip doubles the – and pads it out - the whole strip
+     clicks to restore, so the swell is just the affordance for it */
+  body.hdrmin header:hover #hdrMin {
+    font-size: 36px;
+    height: 16px;
+    line-height: 16px;
+    padding: 0 16px;
+    right: 6px;
+  }
   .channel {
     display: flex;
     align-items: center;
