@@ -781,7 +781,13 @@
     const msgIdx = afterCmd.indexOf(' :');
     if (msgIdx === -1) {
       if (cmd[1] === 'ROOMSTATE') return { tags, login, channel: afterCmd, message: '', kind: 'ROOMSTATE' };
-      if (cmd[1] === 'CLEARCHAT') return { tags, login, channel: afterCmd, message: '', kind: 'CLEARCHAT' };
+      if (cmd[1] === 'CLEARCHAT') {
+        // real Twitch lines carry the ban/timeout target bare after the
+        // channel (no ' :' prefix); absent target = a room-wide /clear
+        const sp = afterCmd.indexOf(' ');
+        return { tags, login, channel: sp < 0 ? afterCmd : afterCmd.slice(0, sp),
+                 message: sp < 0 ? '' : afterCmd.slice(sp + 1).trim(), kind: 'CLEARCHAT' };
+      }
       // USERSTATE carries a channel arg; GLOBALUSERSTATE ends the line
       if (cmd[1] === 'USERSTATE' || cmd[1] === 'GLOBALUSERSTATE')
         return { tags, login, channel: afterCmd, message: '', kind: cmd[1] };
@@ -1141,6 +1147,7 @@
           html = '';
           for (const c of cols()) c.textContent = '';
           rowById.clear();
+          histDirty = true;
         }
         const dur = +tags['ban-duration'] || 0;
         html += `<div class="row notice"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
