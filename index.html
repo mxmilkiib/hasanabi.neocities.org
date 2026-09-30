@@ -588,7 +588,7 @@
     flex: none;
     display: flex;
     gap: 6px;
-    padding: 3px 8px;
+    padding: 2px 8px;
     background: var(--panel);
     border-top: 1px solid var(--line);
   }
@@ -1835,6 +1835,7 @@
     mirc:     { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 6,  lh: 4,  lines: 1, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
     irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 15, lh: 4,  weight: 0, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, video: false, hpw: 7, hfspx: 18 },
     gohu:     { theme: 'lavender',shade: 5,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
+    heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', size: 8, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
   };
   // ordered by each style's designed shade stop, lightest → darkest
   const THEMES = ['light', 'mirc', 'paper', 'sepia', 'lavender', 'mid', 'nord', 'solarized', 'dark', 'ember', 'black', 'amber', 'console'];
@@ -2306,6 +2307,7 @@
   // dragging: pointer capture keeps move events flowing to the handle even
   // when the pointer crosses over the iframe, which would eat them otherwise
   const VIDPOS_KEY = 'hasan-vidpos';
+  const headerEl = document.querySelector('header');
   const vidHandle = vidBox.querySelector('.vid-handle');
   try {
     const p = JSON.parse(localStorage.getItem(VIDPOS_KEY));
@@ -2315,7 +2317,7 @@
       // measured, and an off-screen saved position renders it invisible
       const w = Math.min(p.w || 460, innerWidth - 24), h = w * 9 / 16;
       vidBox.style.left = Math.max(0, Math.min(innerWidth - w, parseFloat(p.left) || 0)) + 'px';
-      vidBox.style.top = Math.max(0, Math.min(innerHeight - h, parseFloat(p.top) || 0)) + 'px';
+      vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - h, parseFloat(p.top) || 0)) + 'px';
       vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
     }
   } catch (e) {}
@@ -2328,7 +2330,7 @@
     const move = (ev) => {
       vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
       vidBox.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
-      vidBox.style.top = Math.max(0, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+      vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
     };
     const drop = () => {
       vidBox.classList.remove('dragging');
@@ -2367,7 +2369,7 @@
         vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
         vidBox.style.width = w + 'px';
         vidBox.style.left = (leftEdge ? ax - w : ax) + 'px';
-        vidBox.style.top = (topEdge ? ay - w * 9 / 16 : ay) + 'px';
+        vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, topEdge ? ay - w * 9 / 16 : ay) + 'px';
       };
       const drop = () => {
         vidBox.classList.remove('dragging');
@@ -2384,7 +2386,6 @@
 
   // ---- header collapse: button shrinks it to a thin strip, clicking the
   // strip restores it ----
-  const headerEl = document.querySelector('header');
   const hdrMinBtn = document.getElementById('hdrMin');
   let helpParked = false; // help panel was open when the header minimised
   function minHeader() {

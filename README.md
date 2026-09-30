@@ -181,7 +181,8 @@ no dependencies beyond CDN-hosted fonts:
   minimises to a strip.
   `theme` names a preset bundle of all display options (`default`,
   `compact`, `paper`, `cosy`, `console`, `cinema`, `phosphor`,
-  `dyslexic`, `midnight`, `solar`, `minimal`, `mirc`, `irc`, `gohu`); a
+  `dyslexic`, `midnight`, `solar`, `minimal`, `mirc`, `irc`, `gohu`,
+  `heather`); a
   style name like `theme=dark` still selects just the palette for old
   links.
 - **Performance** — incoming lines queue and flush once per animation
