@@ -408,7 +408,14 @@
   .role.host { color: var(--accent); }
   .role.sub { color: #4fbecd; }
   .role.bits { color: var(--accent); }
-  .role.first { color: var(--text-dim); }
+  .role.first {
+    color: transparent;
+    background-image: linear-gradient(100deg, var(--accent) 35%, #fff6d8 50%, var(--accent) 65%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 2.5s linear infinite;
+  }
   .row.notice { color: var(--text-dim); font-style: italic; }
   .row.htag { font-style: italic; }
   .row.htag .name, .row.htag .aux, .row.htag .time { font-style: normal; }
@@ -437,7 +444,7 @@
     animation: shimmer 2.5s linear infinite;
   }
   @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-  @media (prefers-reduced-motion: reduce) { .name.shimmer { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .name.shimmer, .role.first { animation: none; } }
   /* Negative vertical margins keep the line box at the fixed line-height
      while the image paints above and below the row. */
   .emote { height: 1.5em; vertical-align: middle; margin: -.35em 1px; }
