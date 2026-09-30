@@ -82,11 +82,14 @@
     /* fractal-noise grain tile, faint alpha - a subtle paper texture */
     --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
+  :root[data-theme="ice"]       { --ph: 215; --pc: .02;  --ptc: .03;  --accent: #2a5fa8; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
   :root[data-theme="mid"]       { --ph: 255; --pc: .022; --ptc: .02;  --accent: #f0b04a; --good: #6fe08f; --danger: #ff7d7d; --vip: #ffa4c8; }
   :root[data-theme="solarized"] { --ph: 200; --pc: .038; --ptc: .03;  --accent: #b58900; --good: #859900; --danger: #dc322f; --vip: #d33682; }
   :root[data-theme="nord"]      { --ph: 245; --pc: .028; --ptc: .02;  --accent: #88c0d0; --good: #a3be8c; --danger: #bf616a; --vip: #b48ead; }
   :root[data-theme="dark"]      { --ph: 255; --pc: .016; --ptc: .015; --accent: #e8a33d; --good: #5fd98a; --danger: #e85d5d; --vip: #f783ac; }
   :root[data-theme="black"]     { --ph: 255; --pc: .006; --ptc: .008; --accent: #e8a33d; --good: #5fd98a; --danger: #e85d5d; --vip: #f783ac; }
+  :root[data-theme="forest"]    { --ph: 150; --pc: .025; --ptc: .02;  --accent: #e0b45a; --good: #7fd08a; --danger: #e87858; --vip: #f0a0b8; }
+  :root[data-theme="wine"]      { --ph: 335; --pc: .028; --ptc: .025; --accent: #f0a868; --good: #a0d080; --danger: #ff7d7d; --vip: #ff9dc8; }
   :root[data-theme="ember"]     { --ph: 65;  --pc: .032; --ptc: .045; --accent: #f0b04a; --good: #b8d88a; --danger: #e07850; --vip: #d8a0b8; }
   :root[data-theme="amber"]     { --ph: 70;  --pc: .02;  --ptc: .09;  --text-c: #ffb000; --accent: #ffd040; --good: #ffcc33; --danger: #cc5533; --vip: #ffcc88; }
   :root[data-theme="console"]   { --ph: 145; --pc: .006; --ptc: .10;  --text-c: #33dd55; --accent: #5fff8a; --good: #33ff66; --danger: #cc4444; --vip: #aaffcc; }
@@ -1878,10 +1881,10 @@
     heather:  { theme: 'lavender',shade: 6,    font: 'sourcecodepro', size: 11, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
-  const THEMES = ['console', 'amber', 'black', 'ember', 'dark', 'solarized', 'nord', 'mid', 'lavender', 'sepia', 'paper', 'mirc', 'light'];
+  const THEMES = ['console', 'amber', 'black', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
   // each style's designed shade: swatch previews and popup clicks use it,
   // while the ◐ cycle keeps whatever shade is currently active
-  const THEME_SHADE = { light: 1, mirc: 0, paper: 2, sepia: 2, lavender: 2, mid: 4, nord: 5, solarized: 6, dark: 6, ember: 6, black: 8, amber: 8, console: 8 };
+  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 2, sepia: 2, lavender: 2, mid: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, black: 8, amber: 8, console: 8 };
   const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
   let themeMode = 'auto';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
