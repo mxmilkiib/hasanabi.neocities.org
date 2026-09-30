@@ -1966,8 +1966,10 @@
 
   // ---- option persistence ----
   const OPTS_KEY = 'hasan-opts';
+  let applyingRemote = false; // mirrors another tab's bundle without re-saving it
 
   function saveOpts() {
+    if (applyingRemote) return;
     try {
       localStorage.setItem(OPTS_KEY, JSON.stringify({
         font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode, shade: shadeIdx,
@@ -2922,14 +2924,16 @@
     // twitch doesn't echo own messages back over IRC - render locally,
     // dressed with the badges/colour USERSTATE reported
     const me = selfTags || {};
-    queueMessage({ tags: { ...me, id: 'local-' + Date.now(),
+    const echoMsg = { tags: { ...me, id: 'local-' + Date.now(),
       'display-name': me['display-name'] || auth.login,
       'tmi-sent-ts': String(Date.now()),
       ...(ctx ? { 'reply-parent-msg-id': ctx.id,
         'reply-parent-display-name': ctx.name,
         'reply-parent-user-login': ctx.login,
         'reply-parent-msg-body': ctx.body } : {}) }, login: auth.login,
-      kind: 'PRIVMSG', message: body, local: true }, false);
+      kind: 'PRIVMSG', message: body, local: true };
+    queueMessage(echoMsg, false);
+    if (chan) chan.postMessage({ type: 'echo', msg: echoMsg });
     pendingEcho.push(auth.login + '\x00' + body);
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     clearReply();
@@ -2937,6 +2941,45 @@
   });
 
   updateSendUI();
+
+  // ---- cross-tab sync: a storage event fires only in OTHER tabs, so
+  // applying the written bundle mirrors option and login changes live.
+  // Sent messages ride a BroadcastChannel so they echo in every open
+  // copy instead of waiting for a backfill to replay them ----
+  window.addEventListener('storage', (e) => {
+    if (e.key === OPTS_KEY && e.newValue) {
+      try { applyingRemote = true; applyOpts(JSON.parse(e.newValue)); markPresets(); }
+      catch (err) {}
+      finally { applyingRemote = false; }
+    } else if (e.key === AUTH_KEY) {
+      if (e.newValue) {
+        let a = null;
+        try { a = JSON.parse(e.newValue); } catch (err) {}
+        if (a && a.token) {
+          if (a.token !== (auth && auth.token) && relayFrame.contentWindow)
+            relayFrame.contentWindow.postMessage({ type: 'auth', token: a.token }, RELAY_ORIGIN);
+          auth = a;
+        }
+      } else if (auth) {
+        // logged out elsewhere - mirror the logout without re-writing storage
+        auth = null;
+        selfMentionRe = null;
+        retagKw();
+        if (relayFrame.contentWindow)
+          relayFrame.contentWindow.postMessage({ type: 'auth', token: null }, RELAY_ORIGIN);
+      }
+      updateSendUI();
+    }
+  });
+
+  const chan = 'BroadcastChannel' in window ? new BroadcastChannel('hasanabi') : null;
+  if (chan) chan.addEventListener('message', (e) => {
+    const m = e.data;
+    if (!m || m.type !== 'echo' || !m.msg || m.msg.kind !== 'PRIVMSG') return;
+    queueMessage(m.msg, false);
+    pendingEcho.push(m.msg.login + '\x00' + m.msg.message);
+    if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
+  });
 
   // optional installability: standalone PWA windows survive backgrounding
   // better than a backgrounded browser tab
