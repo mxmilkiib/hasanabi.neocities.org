@@ -681,6 +681,7 @@
     <div><b>help</b><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
+    <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip marks how many months that chatter has been subscribed; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
@@ -1159,6 +1160,22 @@
     col.scrollTo({ top: col.scrollHeight, behavior: 'smooth' });
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
+  // scroll pause: hovering an actual message row holds that column; empty
+  // column space doesn't count. Leaving the row re-pins if it was following
+  let pauseOnText = false;
+  const pausedCols = new Set();
+  function repinCol(col) {
+    const at = col === logEl ? stickBottom : col === sideEl ? sideBottom : side2Bottom;
+    if (at) col.scrollTop = col.scrollHeight;
+  }
+  for (const col of [logEl, sideEl, side2El]) {
+    col.addEventListener('mouseover', (e) => {
+      const on = pauseOnText && !!e.target.closest('.row');
+      if (on === pausedCols.has(col)) return;
+      if (on) pausedCols.add(col); else { pausedCols.delete(col); repinCol(col); }
+    });
+    col.addEventListener('mouseleave', () => pausedCols.delete(col));
+  }
   jdownSide.addEventListener('click', () => jumpDown(sideEl, jdownSide));
   jdownSide2.addEventListener('click', () => jumpDown(side2El, jdownSide2));
   // an image finishing after its row rendered (gif embeds) grows the column's
@@ -1172,9 +1189,9 @@
     resnapQueued = true;
     requestAnimationFrame(() => {
       resnapQueued = false;
-      if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
-      if (sideBottom && !sideEl.hidden) sideEl.scrollTop = sideEl.scrollHeight;
-      if (side2Bottom && !side2El.hidden) side2El.scrollTop = side2El.scrollHeight;
+      if (stickBottom && !pausedCols.has(logEl)) logEl.scrollTop = logEl.scrollHeight;
+      if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) sideEl.scrollTop = sideEl.scrollHeight;
+      if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) side2El.scrollTop = side2El.scrollHeight;
     });
   }
   logEl.addEventListener('load', resnap, true);
@@ -1468,7 +1485,7 @@
       while (total > MAX_MESSAGES) { oldest.removeChild(oldest.firstElementChild); total--; }
     } else {
       while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
-      if (nearBottom) activeEl.scrollTop = activeEl.scrollHeight;
+      if (nearBottom && !pausedCols.has(activeEl)) activeEl.scrollTop = activeEl.scrollHeight;
     }
     jdownSet(jdownLog, logEl);
     jdownSet(jdownSide, sideEl, sideEl.hidden);
@@ -1968,6 +1985,7 @@
     else if (a.classList.contains('helpWg')) weightCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
@@ -2031,7 +2049,7 @@
   // split mode re-run the page overflow check.
   function repin() {
     if (isSplit()) { if (pushOverflow(activeEl, nextCol())) activeEl = nextCol(); }
-    else if (stickBottom) logEl.scrollTop = logEl.scrollHeight;
+    else if (stickBottom && !pausedCols.has(logEl)) logEl.scrollTop = logEl.scrollHeight;
   }
 
   function cycle(btn, list, idx, prop, label, unit, helpCls) {
@@ -2151,6 +2169,7 @@
         hdrgraph: document.body.classList.contains('hdrgraph'),
         sub: subMode,
         zebra: mainEl.classList.contains('zebra'),
+        pause: pauseOnText,
         times: timeIdx,
         shadow: shadLevel,
         eonly: emoteMode,
@@ -2202,6 +2221,7 @@
     // presets use the direct index; saved 'sub' is the legacy reversed order
     if (Number.isInteger(o.subMode) && o.subMode >= 0 && o.subMode < SUB_MODES.length) { subMode = o.subMode; applySubMode(); }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
+    if (typeof o.pause === 'boolean') setPause(o.pause);
     if (typeof o.times === 'boolean') setTimes(o.times ? 2 : 0);
     else if (Number.isInteger(o.times)) setTimes(o.times);
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
@@ -2609,6 +2629,13 @@
   emoteBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepEmote(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   applyEmoteMode();
 
+  // ---- scroll pause while hovering a message row ----
+  function setPause(on) {
+    pauseOnText = on;
+    markHelp('helpPause', on ? 1 : 0);
+    if (!on) { for (const col of [...pausedCols]) { pausedCols.delete(col); repinCol(col); } }
+  }
+
   // ---- zebra striping on alternating rows ----
   function setZebra(on) {
     mainEl.classList.toggle('zebra', on);
@@ -2767,6 +2794,7 @@
     if (lhCtl.get() !== 10) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (mainEl.classList.contains('zebra')) q.set('zebra', '1');
+    if (pauseOnText) q.set('pause', '1');
     if (lineLevel !== 3) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
@@ -2928,7 +2956,7 @@
       // drop inline ghost-gradient values left over from column mode
       for (const r of logEl.querySelectorAll('.row.stale')) r.style.opacity = '';
       // columns widen on rejoin - re-pin the live column if it was following
-      requestAnimationFrame(() => { if (stickBottom) logEl.scrollTop = logEl.scrollHeight; });
+      requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) logEl.scrollTop = logEl.scrollHeight; });
     } else if (level === 2) {
       if (cur === 3) { // three -> two: move logEl's below-fold page to #side
         activeEl = logEl;
@@ -3415,6 +3443,7 @@
     if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
   if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
+    if (q.has('pause')) setPause(flag('pause'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
     if (q.has('times')) setTimes(q.get('times') === 'nosec' ? 1 : flag('times') ? 2 : 0);
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
@@ -3443,7 +3472,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
@@ -3485,6 +3514,7 @@
   });
   // the setters ran during init before the lists existed - mark now
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
+  markHelp('helpPause', pauseOnText ? 1 : 0);
   markHelp('helpTimes', timeIdx);
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
