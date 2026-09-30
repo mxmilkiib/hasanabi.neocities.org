@@ -1428,7 +1428,7 @@
       }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
+              `<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? auxHtml + subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}<span class="rplybtn" title="reply to this message">↩</span></div>`;
