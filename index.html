@@ -609,6 +609,31 @@
     width: auto;
   }
   #chatbar input::placeholder { color: var(--text-dim); }
+  /* emote picker popup over the chatbar - chatterino-style scrollable grid */
+  #emojiBtn { flex: none; }
+  #emotePick {
+    position: fixed; right: 10px; bottom: 44px; z-index: 11;
+    width: 340px; max-width: 94vw; height: 280px;
+    display: flex; flex-direction: column; gap: 6px; padding: 8px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+  }
+  #emotePick[hidden] { display: none; }
+  #emoteQ { flex: none; width: 100%; box-sizing: border-box; font-family: var(--chat-ff, inherit); }
+  #emoteGrid {
+    flex: 1; overflow-y: auto;
+    display: grid; grid-template-columns: repeat(auto-fill, 36px);
+    grid-auto-rows: 36px; gap: 2px; align-content: start;
+  }
+  #emoteGrid button {
+    background: none; border: 0; border-radius: 4px; padding: 0;
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #emoteGrid button:hover { background: var(--line); }
+  #emoteGrid button img { max-width: 32px; max-height: 32px; }
+  #emoteGrid button.eji { font-size: 19px; }
+  #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
@@ -689,7 +714,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move">⠿</div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button" title="emote picker">☻</button><div id="emotePick" hidden><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><div id="emoteGrid"></div></div></div>
 
 <script>
 (() => {
@@ -3053,7 +3078,7 @@
     chatbarEl.hidden = !on;
     chatInput.placeholder = on ? `chat as ${auth.login}` : 'log in to chat';
     document.body.classList.toggle('chaton', on);
-    if (!on) clearReply();
+    if (!on) { clearReply(); emotePick.hidden = true; }
   }
 
   // ---- replies: pick a row with its hover ↩, then Enter sends it as a
@@ -3101,7 +3126,8 @@
     if (auth && auth.token) {
       if (e.shiftKey) { logout(); return; }
       chatbarEl.hidden = !chatbarEl.hidden;
-      if (!chatbarEl.hidden) chatInput.focus();
+      if (chatbarEl.hidden) emotePick.hidden = true;
+      else chatInput.focus();
     } else {
       location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
         '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
@@ -3111,6 +3137,7 @@
   });
 
   chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !emotePick.hidden) { emotePick.hidden = true; return; }
     if (e.key === 'Escape' && replyCtx) { clearReply(); return; }
     if (e.key !== 'Enter' || e.isComposing) return;
     const text = chatInput.value.trim();
@@ -3140,6 +3167,68 @@
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     clearReply();
     chatInput.value = '';
+  });
+
+  // ---- emote picker: a chatterino-style grid above the chat box.
+  // Third-party emotes the relay reported, twitch's global set (names go
+  // out and twitch renders them), then a row of unicode emoji ----
+  const emojiBtn = document.getElementById('emojiBtn');
+  const emotePick = document.getElementById('emotePick');
+  const emoteQ = document.getElementById('emoteQ');
+  const emoteGrid = document.getElementById('emoteGrid');
+  const TW_GLOBALS = [ // name -> twitch emote id
+    [':)', 1], [':(', 2], [':D', 3], [':o', 8], ['<3', 9], [';)', 11], [':p', 13],
+    ['Kappa', 25], ['MrDestructoid', 28], ['DansGame', 33], ['SwiftRage', 34],
+    ['PJSalt', 36], ['Kreygasm', 41], ['BibleThump', 86], ['ResidentSleeper', 245],
+    ['4Head', 354], ['FailFish', 360], ['Keepo', 1902], ['BabyRage', 22639],
+    ['WutFace', 28087], ['PogChamp', 30588], ['NotLikeThis', 58765],
+    ['riPepperonis', 62833], ['duDudu', 62834], ['bleedPurple', 62835],
+    ['CoolCat', 58127], ['SeemsGood', 64138], ['VoHiYo', 81274],
+    ['VoteYea', 106293], ['VoteNay', 106294], ['PrimeMe', 115075],
+    ['TriHard', 120232], ['LUL', 425618],
+  ];
+  const EMOJIS = ['😀', '😂', '🤣', '😅', '😊', '😍', '🥰', '😘', '😜', '🤪',
+    '😎', '🤔', '🙄', '😴', '😳', '🥺', '😭', '😤', '🥹', '🫡', '🙏', '👍',
+    '👎', '👏', '🤝', '💪', '👀', '💀', '🔥', '✨', '🎉', '💯', '❤️', '💜', '🌈'];
+  function buildPicker() {
+    const q = emoteQ.value.trim().toLowerCase();
+    const names = Object.keys(thirdPartyEmotes).sort()
+      .filter((n) => !q || n.toLowerCase().includes(q));
+    const tw = TW_GLOBALS.filter(([n]) => !q || n.toLowerCase().includes(q));
+    const ej = q ? [] : EMOJIS; // no names to match against
+    let h = '';
+    if (names.length) h += `<div class="ehead">emotes</div>` + names.map((n) =>
+      `<button type="button" data-ins="${escapeHTML(n)}" title="${escapeHTML(n)}${emoteSrc[n] ? ' - ' + escapeHTML(emoteSrc[n]) : ''}">` +
+      `<img src="${escapeHTML(thirdPartyEmotes[n])}" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
+    if (tw.length) h += `<div class="ehead">twitch</div>` + tw.map(([n, id]) =>
+      `<button type="button" data-ins="${escapeHTML(n)}" title="${escapeHTML(n)} - Twitch">` +
+      `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/2.0" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
+    if (ej.length) h += `<div class="ehead">emoji</div>` + ej.map((c) =>
+      `<button type="button" class="eji" data-ins="${c}">${c}</button>`).join('');
+    emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
+  }
+  emojiBtn.addEventListener('click', () => {
+    emotePick.hidden = !emotePick.hidden;
+    if (!emotePick.hidden) { emoteQ.value = ''; buildPicker(); emoteQ.focus(); }
+  });
+  emoteQ.addEventListener('input', buildPicker);
+  emoteQ.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { emotePick.hidden = true; chatInput.focus(); }
+    else if (e.key === 'Enter') emoteGrid.querySelector('button[data-ins]')?.click();
+  });
+  // inserts at the caret, spaced from neighbours; the panel stays open so
+  // several emotes can stack, like chatterino's picker
+  emoteGrid.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-ins]');
+    if (!b) return;
+    const s = chatInput.selectionStart ?? chatInput.value.length;
+    const pad = s > 0 && !/\s/.test(chatInput.value[s - 1]) ? ' ' : '';
+    chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
+    chatInput.focus();
+  });
+  document.addEventListener('click', (e) => {
+    if (!emotePick.hidden && e.target !== emojiBtn && !emotePick.contains(e.target))
+      emotePick.hidden = true;
   });
 
   updateSendUI();
