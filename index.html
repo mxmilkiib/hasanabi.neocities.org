@@ -615,17 +615,17 @@
   #emojiBtn { flex: none; }
   #emotePick {
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
-    width: 340px; max-width: 94vw; height: 280px;
+    width: 480px; max-width: 94vw; height: 420px;
     display: flex; flex-direction: column; gap: 6px; padding: 8px;
     background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #emotePick[hidden] { display: none; }
-  #emoteQ { flex: none; width: 100%; box-sizing: border-box; font-family: var(--chat-ff, inherit); }
+  #emotePick #emoteQ { flex: none; width: 100%; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 8px; }
   #emoteGrid {
     flex: 1; overflow-y: auto;
-    display: grid; grid-template-columns: repeat(auto-fill, 36px);
-    grid-auto-rows: 36px; gap: 2px; align-content: start;
+    display: grid; grid-template-columns: repeat(auto-fill, 40px);
+    grid-auto-rows: 40px; gap: 2px; align-content: start;
   }
   #emoteGrid button {
     background: none; border: 0; border-radius: 4px; padding: 0;
@@ -633,8 +633,8 @@
     display: flex; align-items: center; justify-content: center;
   }
   #emoteGrid button:hover { background: var(--line); }
-  #emoteGrid button img { max-width: 32px; max-height: 32px; }
-  #emoteGrid button.eji { font-size: 19px; }
+  #emoteGrid button img { max-width: 34px; max-height: 34px; }
+  #emoteGrid button.eji { font-size: 21px; }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
@@ -1862,20 +1862,20 @@
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
     default:  { theme: 'auto',    shade: null, font: 'mono',       size: 11, lh: 10, lines: 3, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    paper:    { theme: 'light',   shade: 2,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
-    console:  { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    cinema:   { theme: 'black',   shade: 8,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
-    phosphor: { theme: 'amber',   shade: 8,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
-    dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    midnight: { theme: 'nord',    shade: 5,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
-    solar:    { theme: 'solarized',shade: 6,    font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    compact:  { theme: 'dark',    shade: 5,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    paper:    { theme: 'light',   shade: 1,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
+    console:  { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    cosy:     { theme: 'sepia',   shade: 1,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    cinema:   { theme: 'black',   shade: 6,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
+    phosphor: { theme: 'amber',   shade: 6,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
+    dyslexic: { theme: 'lavender',shade: 1,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    midnight: { theme: 'nord',    shade: 4,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
+    solar:    { theme: 'solarized',shade: 5,   font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
     minimal:  { theme: 'light',   shade: 0,    font: 'sans',       size: 7,  lh: 9,  lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2 },
     mirc:     { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 6,  lh: 4,  lines: 1, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
     irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 15, lh: 4,  weight: 0, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, video: false, hpw: 7, hfspx: 18 },
-    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
-    heather:  { theme: 'lavender',shade: 6,    font: 'sourcecodepro', size: 11, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
+    gohu:     { theme: 'lavender',shade: 5,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
+    heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', size: 8, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
   const THEMES = ['console', 'amber', 'black', 'ember', 'dark', 'solarized', 'nord', 'mid', 'lavender', 'sepia', 'paper', 'mirc', 'light'];
