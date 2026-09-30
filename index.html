@@ -1135,6 +1135,31 @@
   // zebra parity is tagged per row (class 'z') so a message keeps its shade
   // across trimming, deletions and page-flip column moves
   let zFlip = false;
+
+  // windows where the page wasn't watching chat: [start, end, cause] - fed
+  // by visibilitychange, missed spark ticks (suspended timers), and the
+  // spark save's last-write time (closed/reloaded). flush() drops a gap
+  // notice when consecutive rows span a stretch over GAP_MS
+  const GAP_MS = 90000;
+  const away = [];
+  let hiddenAt = 0;
+  let lastRowTs = 0; // wall-clock ms of the newest rendered row
+  function gapCause(a, b) {
+    for (const [s, e, why] of away) if (s < b && e > a) return why;
+    return '';
+  }
+  // '19:27[:43] PM' back to wall-clock ms for restored rows saved before
+  // data-ts existed; assumes today, stepping back a day if it lands ahead
+  function parseRowTimeText(t) {
+    const m = /(\d{1,2}):(\d{2})(?::(\d{2}))?(\s*([ap])m)?/i.exec(t || '');
+    if (!m) return 0;
+    const h = m[5] ? (+m[1] % 12) + (m[5].toLowerCase() === 'p' ? 12 : 0) : +m[1];
+    const d = new Date();
+    d.setHours(h, +m[2], +(m[3] || 0), 0);
+    if (d.getTime() > Date.now()) d.setDate(d.getDate() - 1);
+    return d.getTime();
+  }
+
   function queueMessage(parsed, replay) {
     queue.push(parsed);
     // rAF doesn't fire in a backgrounded tab but relay messages keep
@@ -1176,6 +1201,16 @@
       }
       const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
       const timeStr = fmtRowTime(when);
+      // a long silence means the page missed a stretch - mark the gap with
+      // its span and, when an away window overlaps, the cause
+      const ts = when.getTime();
+      if (lastRowTs && ts - lastRowTs > GAP_MS) {
+        const why = gapCause(lastRowTs, ts);
+        html += `<div class="row notice" data-ts="${ts}"><span class="time">${timeStr}</span>` +
+                `· ${fmtDur(Math.max(1, Math.round((ts - lastRowTs) / 60000)))} gap${why ? ` · ${why}` : ''} · ` +
+                `${fmtRowTime(new Date(lastRowTs))} → ${timeStr}</div>`;
+      }
+      if (ts > lastRowTs) lastRowTs = ts;
       // \x01ACTION ...\x01 is an IRC /me action - strip the CTCP wrapper
       const am = rawMsg.match(/^\x01ACTION ?(.*?)\x01?$/);
       const action = !!am;
@@ -1184,12 +1219,12 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div class="row notice${mid}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
+        html += `<div class="row notice${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
                 `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
-        html += `<div class="row notice"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
+        html += `<div class="row notice" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
         continue;
       }
       if (kind === 'CLEARCHAT') {
@@ -1203,7 +1238,7 @@
           histDirty = true;
         }
         const dur = +tags['ban-duration'] || 0;
-        html += `<div class="row notice"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
+        html += `<div class="row notice" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
           (target ? `${escapeHTML(target)} ${dur ? `was timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'was banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
@@ -1311,7 +1346,7 @@
         }
       }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
-              `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
+              ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
@@ -1506,6 +1541,7 @@
       if (!d || !Array.isArray(d.rate)) return;
       const win = sparkWin;
       const gap = Math.min(win, Math.max(0, Math.round((Date.now() - d.t) / 1000)));
+      if (d.t) away.push([d.t, Date.now(), 'page closed']);
       rateSamples.push(...d.rate.slice(-win).map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN));
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
@@ -1524,6 +1560,8 @@
     const missed = Math.min(sparkWin,
       Math.max(0, Math.round((now - lastTick) / 1000) - 1));
     for (let i = 0; i < missed; i++) { rateSamples.push(NaN); glorpSamples.push(0); }
+    // hidden spans are recorded by visibilitychange instead; don't double-tag
+    if (missed && !hiddenAt) { away.push([lastTick, now, 'timers suspended']); if (away.length > 50) away.shift(); }
     lastTick = now;
     const cutoff = now - 5000;
     recentTimestamps = recentTimestamps.filter((t) => t > cutoff);
@@ -2871,6 +2909,11 @@
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
       // continue the stripe alternation from the restored tail
       zFlip = !!(logEl.lastElementChild && logEl.lastElementChild.classList.contains('z'));
+      // seed the gap clock so a reload marks the span the page was closed
+      const tail = logEl.lastElementChild;
+      const tEl = tail && tail.querySelector('.time');
+      lastRowTs = tail && tail.dataset.ts ? +tail.dataset.ts
+        : (tEl ? parseRowTimeText(tEl.textContent) : 0);
       applySubMode();
       logEl.scrollTop = logEl.scrollHeight;
     } catch (e) {}
@@ -2926,7 +2969,11 @@
       relayFrame.contentWindow.postMessage({ type: 'backfill' }, RELAY_ORIGIN);
   }
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') backfill();
+    if (document.visibilityState === 'hidden') hiddenAt = Date.now();
+    else {
+      if (hiddenAt) { away.push([hiddenAt, Date.now(), 'tab hidden']); hiddenAt = 0; }
+      backfill();
+    }
   });
   window.addEventListener('pageshow', backfill);
 
