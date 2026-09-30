@@ -1001,6 +1001,11 @@
   // every msg id already handled, so replayed backfill lines can't duplicate
   // rows - bounded, since the backfill window is small anyway
   const seenIds = new Set();
+  // sent messages echo locally (twitch doesn't return own PRIVMSGs), but
+  // the real copy arrives via backfill replay - tracked so it can adopt
+  // the echo row rather than render a duplicate
+  const echoRows = new Map(); // 'login\x00text' -> echo row element
+  const pendingEcho = [];     // keys, bound to rows in render order
 
   const jdownLog = document.getElementById('jdownLog');
   const jdownSide = document.getElementById('jdownSide');
@@ -1109,6 +1114,13 @@
       }
       if (kind === 'CLEARCHAT') {
         const target = rawMsg.trim();
+        // a room-wide /clear wipes everything before it - rendered rows in
+        // every column and whatever this batch already queued
+        if (!target) {
+          html = '';
+          for (const c of cols()) c.textContent = '';
+          rowById.clear();
+        }
         const dur = +tags['ban-duration'] || 0;
         html += `<div class="row notice"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
           (target ? `${escapeHTML(target)} ${dur ? `was timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'was banned'}`
@@ -1196,6 +1208,24 @@
         msgHtml = msgHtml
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
+      // a real copy of a locally-echoed message adopts the echo row:
+      // it drops .local (so it persists in history) and takes the real id
+      if (kind === 'PRIVMSG' && !local && auth && login === auth.login) {
+        const ek = login + '\x00' + rawMsg;
+        const el = echoRows.get(ek);
+        if (el) {
+          echoRows.delete(ek);
+          if (el.isConnected) {
+            el.classList.remove('local');
+            if (tags.id) {
+              el.dataset.mid = tags.id;
+              rowById.set(tags.id, el);
+              seenIds.add(tags.id);
+            }
+            continue;
+          }
+        }
+      }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               `${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
               `<span class="time">${timeStr}</span>${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${reply}${action ? '* ' : ''}` +
@@ -1227,6 +1257,13 @@
       // messages and @hasanabi mentions, which aren't pings for the user
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self'))
         missed.push(r);
+      if (r.classList.contains('local')) {
+        const k = pendingEcho.shift();
+        if (k) {
+          echoRows.set(k, r);
+          if (echoRows.size > 50) echoRows.delete(echoRows.keys().next().value);
+        }
+      }
     }
     if (missed.length > 50) missed.splice(0, missed.length - 50);
     if (unfocused) updateMissedBadge();
@@ -2754,6 +2791,8 @@
       'display-name': me['display-name'] || auth.login,
       'tmi-sent-ts': String(Date.now()) }, login: auth.login,
       kind: 'PRIVMSG', message: text, local: true }, false);
+    pendingEcho.push(auth.login + '\x00' + text);
+    if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     chatInput.value = '';
   });
 
