@@ -1236,7 +1236,7 @@
       const ts = when.getTime();
       if (lastRowTs && ts - lastRowTs > GAP_MS) {
         const why = gapCause(lastRowTs, ts);
-        html += `<div class="row notice" data-ts="${ts}"><span class="time">${timeStr}</span>` +
+        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"><span class="time">${timeStr}</span>` +
                 `· ${fmtDur(Math.max(1, Math.round((ts - lastRowTs) / 60000)))} gap${why ? ` · ${why}` : ''} · ` +
                 `${fmtRowTime(new Date(lastRowTs))} → ${timeStr}</div>`;
       }
@@ -1249,12 +1249,12 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div class="row notice${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
+        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
                 `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
-        html += `<div class="row notice" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
+        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
         continue;
       }
       if (kind === 'CLEARCHAT') {
@@ -1268,7 +1268,7 @@
           histDirty = true;
         }
         const dur = +tags['ban-duration'] || 0;
-        html += `<div class="row notice" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
+        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
           (target ? `${escapeHTML(target)} ${dur ? `was timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'was banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
@@ -1300,7 +1300,7 @@
       if (glorp) glorpTimestamps.push(Date.now());
       // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
-      if ((tags.badges || '').includes('moderator/') && !renderedSets.has('moderator'))
+      if ((tags.badges || '').includes('moderator/'))
         aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? '[md]' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       const subHtml = subM ? `<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${SUB_MODES[subMode].startsWith('num') ? `[${(+subM[1]).toString().padStart(2, '0')}]` : `[sub ${subM[1].padStart(2, '0')}]`}</span>` : '';
