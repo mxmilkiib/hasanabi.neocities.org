@@ -1966,13 +1966,15 @@
 
   // ---- option persistence ----
   const OPTS_KEY = 'hasan-opts';
-  let applyingRemote = false; // mirrors another tab's bundle without re-saving it
+  // set while applying a saved or another tab's bundle: mid-apply setters
+  // otherwise write partially-applied state back over the source bundle
+  let suppressSave = false;
 
   function saveOpts() {
     try {
       // init calls saveOpts before this declaration line; the try swallows
       // the TDZ throw the same way it already did for OPTS_KEY
-      if (applyingRemote) return;
+      if (suppressSave) return;
       localStorage.setItem(OPTS_KEY, JSON.stringify({
         font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode, shade: shadeIdx,
         lines: lineLevel,
@@ -1996,7 +1998,8 @@
   function loadOpts() {
     let o;
     try { o = JSON.parse(localStorage.getItem(OPTS_KEY)); } catch (e) {}
-    applyOpts(o);
+    try { suppressSave = true; applyOpts(o); }
+    finally { suppressSave = false; }
   }
 
   // applies a (possibly partial) option bundle; used by saved options,
@@ -2016,8 +2019,11 @@
     if (Number.isInteger(o.weight)) weightCtl.set(o.weight);
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
-    if (o.hdrmin) document.body.classList.add('hdrmin');
+    // a saved bundle always carries both booleans, so an explicit false
+    // restores the full header; presets leave the keys out and don't touch it
     if (o.hdrgraph) { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
+    else if (o.hdrmin) { document.body.classList.remove('hdrgraph'); minHeader(); }
+    else if (o.hdrmin === false || o.hdrgraph === false) { document.body.classList.remove('hdrgraph'); unminHeader(); }
     if (Number.isInteger(o.self)) setSelfHl(o.self === 1);
     if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < 3) { subMode = [4, 2, 0][o.sub]; applySubMode(); }
     // presets use the direct index; saved 'sub' is the legacy reversed order
@@ -2054,11 +2060,18 @@
   // mark means the current options exactly match the preset, so it clears
   // itself the moment any covered option changes ----
   function presetMatch(p) {
-    return p && p.theme === themeMode && p.shade === shadeIdx && p.font === fontSel.value &&
-      p.size === fontCtl.get() && p.lh === lhCtl.get() &&
-      p.lines === lineLevel && p.zebra === mainEl.classList.contains('zebra') &&
-      p.times === timeIdx &&
-      p.shadow === shadLevel && p.subMode === subMode && p.eonly === emoteMode;
+    if (!p) return false;
+    // compare only the fields the preset specifies: ones it pins that aren't
+    // listed here (weight, video, hpw, hfspx…) still break the mark
+    const cmp = {
+      theme: themeMode, shade: shadeIdx, font: fontSel.value, size: fontCtl.get(),
+      lh: lhCtl.get(), weight: weightCtl.get(), lines: lineLevel,
+      zebra: mainEl.classList.contains('zebra'), times: timeIdx, shadow: shadLevel,
+      subMode, eonly: emoteMode, video: !vidBox.hidden,
+      split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx,
+      hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
+    };
+    return Object.keys(p).every((k) => !(k in cmp) || p[k] === cmp[k]);
   }
   function markPresets() {
     try { // called during init before some options exist - retry later
@@ -2220,6 +2233,7 @@
     // when the header comes back
     helpParked = !helpPanel.hidden;
     if (helpParked) helpPanel.hidden = true;
+    document.body.classList.remove('hdrgraph'); // the modes are exclusive
     document.body.classList.add('hdrmin');
     saveOpts();
   }
@@ -2950,9 +2964,9 @@
   // copy instead of waiting for a backfill to replay them ----
   window.addEventListener('storage', (e) => {
     if (e.key === OPTS_KEY && e.newValue) {
-      try { applyingRemote = true; applyOpts(JSON.parse(e.newValue)); markPresets(); }
+      try { suppressSave = true; applyOpts(JSON.parse(e.newValue)); markPresets(); }
       catch (err) {}
-      finally { applyingRemote = false; }
+      finally { suppressSave = false; }
     } else if (e.key === AUTH_KEY) {
       if (e.newValue) {
         let a = null;
@@ -2961,6 +2975,12 @@
           if (a.token !== (auth && auth.token) && relayFrame.contentWindow)
             relayFrame.contentWindow.postMessage({ type: 'auth', token: a.token }, RELAY_ORIGIN);
           auth = a;
+          // a login adopted from another tab may never see the relay's auth
+          // reply that normally builds the own-name mention regex
+          if (a.login && !selfMentionRe) {
+            selfMentionRe = new RegExp('\\b' + a.login.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+            retagKw();
+          }
         }
       } else if (auth) {
         // logged out elsewhere - mirror the logout without re-writing storage
