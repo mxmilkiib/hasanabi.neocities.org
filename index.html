@@ -2912,8 +2912,13 @@
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
     const ctx = replyCtx;
-    const body = ctx ? `@${ctx.name} ${text}` : text;
-    relayFrame.contentWindow.postMessage({ type: 'send', text, replyTo: ctx }, RELAY_ORIGIN);
+    // /me goes out as a CTCP ACTION like other clients send it; a reply's
+    // @login prefix rides inside the wrap so the line still reads as action
+    const act = text.match(/^\/me\s+(.+)$/is);
+    let inner = act ? act[1].trim() : text;
+    if (ctx) inner = `@${ctx.name} ${inner}`;
+    const body = act ? `\x01ACTION ${inner}\x01` : inner;
+    relayFrame.contentWindow.postMessage({ type: 'send', text: body, replyTo: ctx }, RELAY_ORIGIN);
     // twitch doesn't echo own messages back over IRC - render locally,
     // dressed with the badges/colour USERSTATE reported
     const me = selfTags || {};
