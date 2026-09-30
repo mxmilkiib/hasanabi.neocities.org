@@ -338,6 +338,7 @@
   }
   .jdown .arr { font-size: 19px; vertical-align: -1px; }
   .jdown .cnt { color: var(--text); font-weight: 600; margin-left: 4px; }
+  .jdown .secs { font-size: 12px; font-weight: 400; opacity: .8; }
   main.split .jdown { left: 25%; }
   main.split .jdown.side { left: 75%; }
   main.split3 .jdown { left: 16.666%; }
@@ -1125,20 +1126,26 @@
   // chronological - the label on the ↓ button tells how far off live you are
   function belowFold(col) {
     const fold = col.scrollTop + col.clientHeight;
-    let n = 0;
+    let n = 0, oldest = 0;
     for (let i = col.children.length - 1; i >= 0; i--) {
       const r = col.children[i];
       if (r.offsetTop - col.offsetTop < fold) break;
-      if (r.classList.contains('row') && !r.classList.contains('ghostgap')) n++;
+      if (r.classList.contains('row') && !r.classList.contains('ghostgap')) {
+        n++;
+        oldest = +r.dataset.ts || 0;
+      }
     }
-    return n;
+    return { n, sec: oldest && lastRowTs > oldest ? Math.round((lastRowTs - oldest) / 1000) : 0 };
   }
+  const fmtBack = (s) => s < 60 ? s + 's' : s < 3600
+    ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
+    : Math.floor(s / 3600) + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
   function jdownSet(btn, col, forceHidden) {
     const at = forceHidden || col.scrollHeight - col.scrollTop - col.clientHeight < 60;
     btn.hidden = at;
     if (!at) {
-      const n = belowFold(col);
-      btn.innerHTML = `<span class="arr">↓</span>${n ? `<span class="cnt">${n}</span>` : ''}`;
+      const { n, sec } = belowFold(col);
+      btn.innerHTML = `<span class="arr">↓</span>${n ? `<span class="cnt">${n}</span>` : ''}${sec ? `<span class="cnt secs">${fmtBack(sec)}</span>` : ''}`;
     }
   }
 
