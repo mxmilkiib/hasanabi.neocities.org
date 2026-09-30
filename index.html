@@ -1969,8 +1969,10 @@
   let applyingRemote = false; // mirrors another tab's bundle without re-saving it
 
   function saveOpts() {
-    if (applyingRemote) return;
     try {
+      // init calls saveOpts before this declaration line; the try swallows
+      // the TDZ throw the same way it already did for OPTS_KEY
+      if (applyingRemote) return;
       localStorage.setItem(OPTS_KEY, JSON.stringify({
         font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode, shade: shadeIdx,
         lines: lineLevel,
