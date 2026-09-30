@@ -2595,22 +2595,32 @@
     document.querySelectorAll('.row').forEach((row) => {
       const aux = row.querySelector('.aux');
       const sub = row.querySelector('.sub');
+      // the left-mode anchor: aux leads, then the sub chip, both ahead of
+      // the badge icons - matching the order new rows render with
+      const lead = row.querySelector('img.badge') || row.querySelector('.reply') ||
+                   row.querySelector('.name') || row.children[1];
       if (sub) {
         sub.hidden = mode === 'hidden';
         // restyle the chip text to match: [sub 12] vs compact [12]
         const months = sub.textContent.replace(/\D/g, '');
         if (months) sub.textContent = mode.startsWith('num') ? `[${months.padStart(2, '0')}]` : `[sub ${months.padStart(2, '0')}]`;
         sub.classList.toggle('auxr', !left && !aux);
-        if (left) row.querySelector('.time').after(sub); // leads the row, ahead of badges
-        else if (aux) { const mod = aux.querySelector('.mod'); if (mod) mod.after(sub); else aux.prepend(sub); }
-        else row.insertBefore(sub, row.querySelector('.imglnk'));
+        if (!left) {
+          if (aux) { const mod = aux.querySelector('.mod'); if (mod) mod.after(sub); else aux.prepend(sub); }
+          else row.insertBefore(sub, row.querySelector('.imglnk'));
+        }
       }
-      if (!aux) return;
-      // the compact sub modes shrink the mod chip to match: [ mod. ] → [md]
-      const modChip = aux.querySelector('.mod');
-      if (modChip) modChip.textContent = mode.startsWith('num') ? '[md]' : '[ mod. ]';
-      if (left) { aux.classList.remove('auxr'); row.insertBefore(aux, row.querySelector('.reply') || row.querySelector('.name')); }
-      else { aux.classList.add('auxr'); row.insertBefore(aux, row.querySelector('.imglnk')); }
+      if (aux) {
+        // the compact sub modes shrink the mod chip to match: [ mod. ] → [md]
+        const modChip = aux.querySelector('.mod');
+        if (modChip) modChip.textContent = mode.startsWith('num') ? '[md]' : '[ mod. ]';
+        aux.classList.toggle('auxr', !left);
+        if (!left) row.insertBefore(aux, row.querySelector('.imglnk'));
+      }
+      if (left) {
+        if (aux) row.insertBefore(aux, lead);
+        if (sub) row.insertBefore(sub, lead);
+      }
     });
   }
 
