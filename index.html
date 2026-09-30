@@ -76,7 +76,7 @@
   :root[data-theme="lavender"]  { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; --spark: #d97706; }
   :root[data-theme="mirc"]      { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
   :root[data-theme="sepia"]     { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
-  :root[data-theme="paper"]     { --ph: 80;  --pc: .045; --ptc: .045; --accent: #96690f; --good: #2e7d46; --danger: #b04040; --vip: #a03060;
+  :root[data-theme="paper"]     { --ph: 92;  --pc: .026; --ptc: .028; --accent: #96690f; --good: #2e7d46; --danger: #b04040; --vip: #a03060;
     /* fractal-noise grain tile, faint alpha - a subtle paper texture */
     --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
@@ -616,7 +616,7 @@
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
-    <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span>; right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
+    <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span> - chips preview and apply each style's designed shade (the ◐ cycle leaves shade alone); right-click resets to <a href="#" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
     <div><b>font menu</b> <span>chat font: <span id="helpFontFamList"></span><sup>†</sup></span></div>
     <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span></div>
     <div><b>hdr</b><span>header font size: <span id="helpHfsList"></span> - 'follow chat' tracks the chat size<sup>†</sup></span></div>
@@ -1821,9 +1821,11 @@
     irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 15, lh: 4,  weight: 0, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, video: false, hpw: 7, hfspx: 18 },
     gohu:     { theme: 'lavender',shade: 5,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
   };
-  // ordered roughly by visual similarity: light family → lavender → mid-grey
-  // pivot → cool darks → neutral darks → warm darks → the green phosphor
-  const THEMES = ['light', 'lavender', 'mirc', 'sepia', 'paper', 'mid', 'solarized', 'nord', 'dark', 'black', 'ember', 'amber', 'console'];
+  // ordered by each style's designed shade stop, lightest → darkest
+  const THEMES = ['light', 'mirc', 'paper', 'sepia', 'lavender', 'mid', 'nord', 'solarized', 'dark', 'ember', 'black', 'amber', 'console'];
+  // each style's designed shade: swatch previews and popup clicks use it,
+  // while the ◐ cycle keeps whatever shade is currently active
+  const THEME_SHADE = { light: 0, mirc: 0, paper: 1, sepia: 1, lavender: 1, mid: 3, nord: 4, solarized: 5, dark: 5, ember: 5, black: 6, amber: 6, console: 6 };
   const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
   let themeMode = 'auto';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
@@ -1860,7 +1862,7 @@
     document.getElementById('helpShadeIcon').textContent = shadeBtn.textContent;
     shadeBtn.title = `Shade: ${shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx]} - click/scroll · ⇧click back · right-click: system`;
     markHelp('helpShade', shadeIdx == null ? -1 : shadeIdx);
-    previewSwatches(); // style chips preview at the current shade stop
+    previewSwatches(); // style chips preview at their designed shade stop
   }
   function stepShade(dir) {
     const cur = shadeIdx == null ? (lightMQ.matches ? 0 : 6) : shadeIdx;
@@ -1890,7 +1892,13 @@
     const a = e.target.closest('a.helpTheme, a.helpShade, a.helpFont, a.helpLh, a.helpLines, a.helpOpt');
     if (!a) return;
     e.preventDefault();
-    if (a.classList.contains('helpTheme')) { themeMode = a.dataset.theme; applyTheme(); saveOpts(); }
+    if (a.classList.contains('helpTheme')) {
+      // a picked style lands on its designed shade; 'auto' leaves it be
+      themeMode = a.dataset.theme; applyTheme();
+      const ds = THEME_SHADE[themeMode];
+      if (ds != null) { shadeIdx = ds; applyShade(); markPresets(); }
+      saveOpts();
+    }
     else if (a.classList.contains('helpShade')) { shadeIdx = a.dataset.idx === 'auto' ? null : +a.dataset.idx; applyShade(); saveOpts(); }
     else if (a.classList.contains('helpFont')) fontCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLh')) lhCtl.set(+a.dataset.idx);
@@ -2109,6 +2117,10 @@
     } else if (Number.isInteger(o.theme)) { // legacy int index: 0=auto 1=light 2=dark
       themeMode = ['auto', 'light', 'dark'][o.theme] || 'auto'; applyTheme();
     }
+    // a bare ?style= with no shade lands on the style's designed stop
+    if (typeof o.theme === 'string' && o.shade === undefined && THEME_SHADE[o.theme] != null) {
+      shadeIdx = THEME_SHADE[o.theme]; applyShade();
+    }
     if (o.shade === null || (Number.isInteger(o.shade) && o.shade >= 0 && o.shade < SHADE_NAMES.length)) {
       shadeIdx = o.shade; applyShade();
     }
@@ -2206,7 +2218,7 @@
   function previewSwatches() {
     try { // lists may not be built yet during early init
       helpPanel.querySelectorAll('a.helpTheme').forEach((a) => {
-        const { bg, text } = paletteOf(a.dataset.theme === 'auto' ? null : a.dataset.theme, shadeIdx);
+        const { bg, text } = paletteOf(a.dataset.theme === 'auto' ? null : a.dataset.theme, THEME_SHADE[a.dataset.theme] ?? shadeIdx);
         a.style.background = bg;
         a.style.color = text;
       });
