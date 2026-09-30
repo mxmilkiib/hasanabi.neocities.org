@@ -570,7 +570,7 @@
   #helpPanel b.points { background-color: rgba(232, 93, 93, .12); }
   #helpPanel b.selfchip { background-color: color-mix(in srgb, var(--accent) 13%, transparent); box-shadow: inset 4px 0 0 var(--accent); }
   #helpPanel b.kw { background-color: color-mix(in srgb, var(--good) 13%, transparent); box-shadow: inset 4px 0 0 var(--good); }
-  #helpPanel .htabs { display: flex; gap: 4px; margin: 0 0 10px; }
+  #helpPanel .htabs { display: flex; gap: 4px; margin: -7px -11px 10px; }
   #helpPanel .htabs a { flex: 1; text-align: center; color: var(--accent); text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-radius: 4px; }
   #helpPanel .htabs a.on { color: var(--text); border-color: var(--accent); font-weight: 600; }
   /* 9em of popup font keeps the glyph column aligned at any popup font
@@ -2717,7 +2717,7 @@
 
   // ---- help popup width: five steps; narrow screens still get clamped by
   // the left/right insets regardless of the inline max-width ----
-  const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280];
+  const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280, 1440, 1600];
   const HDR_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20];
   let hdrFs = -1; // -1 = follow the chat font
   function applyHdrFs() {
