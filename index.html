@@ -2985,7 +2985,9 @@
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
-      `<a href="#" class="helpOpt ${cls}" data-idx="${i}">${n}</a>`).join(' / ');
+      `<a href="#" class="helpOpt ${cls}" data-idx="${i}">${n}</a>`)
+      // bare numbers space-join like the chat size row; wordy options keep ' / '
+      .join(cls === 'helpHfs' ? ' ' : ' / ');
   document.getElementById('helpPresetList').innerHTML = Object.keys(THEME_PRESETS).map((n) =>
     `<a href="#" class="helpOpt helpPreset" data-preset="${n}">${n}</a>`).join(' / ');
   // each font name renders in its own face
