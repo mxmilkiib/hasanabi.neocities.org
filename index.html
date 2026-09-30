@@ -2650,10 +2650,20 @@
     try {
       const c = cols();
       const i = c.indexOf(activeEl);
+      // ghost rows are still real messages - keep them, but strip the
+      // stale marker and fade so they restore as ordinary rows (kept
+      // markers would corrupt the next session's ghost bookkeeping).
+      // ghostgap spacers and local echoes stay excluded.
       const rows = [...c.slice(i + 1), ...c.slice(0, i + 1)]
         .flatMap((col) => [...col.children])
-        .filter((r) => r.classList.contains('row') && !r.classList.contains('stale') && !r.classList.contains('local'));
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => r.outerHTML)));
+        .filter((r) => r.classList.contains('row') && !r.classList.contains('ghostgap') && !r.classList.contains('local'));
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => {
+        if (!r.classList.contains('stale')) return r.outerHTML;
+        const cl = r.cloneNode(true);
+        cl.classList.remove('stale');
+        cl.style.opacity = '';
+        return cl.outerHTML;
+      })));
     } catch (e) {}
     saveSpark();
   }
