@@ -1574,7 +1574,8 @@
       if (!d || !Array.isArray(d.rate)) return;
       const win = sparkWin;
       const gap = Math.min(win, Math.max(0, Math.round((Date.now() - d.t) / 1000)));
-      if (d.t) away.push([d.t, Date.now(), 'page closed']);
+      if (d.t) away.push([d.t, Date.now(),
+        document.wasDiscarded ? 'tab discarded by browser' : 'page closed']);
       rateSamples.push(...d.rate.slice(-win).map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN));
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
