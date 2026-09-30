@@ -604,9 +604,11 @@
     flex: 1;
     font-family: var(--chat-ff, inherit);
     font-size: var(--chat-font, 15px);
+    color: var(--text);
     text-align: left;
     width: auto;
   }
+  #chatbar input::placeholder { color: var(--text-dim); }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
