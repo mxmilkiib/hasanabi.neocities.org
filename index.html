@@ -589,6 +589,7 @@
     <div><b>font menu</b> <span>chat font: <span id="helpFontFamList"></span><sup>†</sup></span></div>
     <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span></div>
     <div><b>hdr</b><span>header font size: <span id="helpHfsList"></span> - 'follow chat' tracks the chat size<sup>†</sup></span></div>
+    <div><b>help</b><span>popup font size: <span id="helpFsList"></span> - 'follow chat' tracks the chat size<sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
@@ -1801,6 +1802,7 @@
     else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
     else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; applyHelpW(); saveOpts(); }
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
+    else if (a.classList.contains('helpFs')) { helpFs = +a.dataset.idx - 1; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
   });
   applyTheme();
@@ -1954,6 +1956,7 @@
         video: !vidBox.hidden,
         kw: kwInput.value, self: selfHl ? 1 : 0,
         hpw: helpWIdx, hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
+        hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
         split: 1 + !sideEl.hidden + !side2El.hidden,
       }));
     } catch (e) {}
@@ -2008,6 +2011,11 @@
     } else if (Number.isInteger(o.hfs) && o.hfs >= -1 && o.hfs < 8) {
       hdrFs = o.hfs < 0 ? -1 : o.hfs + 4;
       applyHdrFs();
+    }
+    if (Number.isInteger(o.hpfs)) {
+      helpFs = o.hpfs < 0 ? -1 : HDR_SIZES.indexOf(o.hpfs);
+      if (helpFs < -1) helpFs = -1; // a px no longer offered falls back to follow
+      applyHelpFs();
     }
   }
 
@@ -2461,6 +2469,15 @@
     helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
     markHelp('helpW', helpWIdx);
   }
+  // popup font size: -1 follows the chat font, else a px pick from the
+  // same stops the header size uses
+  let helpFs = -1;
+  function applyHelpFs() {
+    if (helpFs < 0) helpPanel.style.fontSize = '';
+    else helpPanel.style.fontSize = HDR_SIZES[helpFs] + 'px';
+    markHelp('helpFs', helpFs + 1);
+    saveOpts();
+  }
   // header height changes with width when the controls wrap - re-anchor
   window.addEventListener('resize', () => {
     if (!helpPanel.hidden) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
@@ -2492,6 +2509,7 @@
     if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     if (helpWIdx !== 3) q.set('hpw', HELP_WIDTHS[helpWIdx]);
+    if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== -1) q.set('hfs', HDR_SIZES[hdrFs]);
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
@@ -2966,6 +2984,7 @@
     if (flag('video')) setVideo(true);
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
+    if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const i = HDR_SIZES.indexOf(+q.get('hfs')); if (i >= 0) { hdrFs = i; applyHdrFs(); } }
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
@@ -2982,13 +3001,14 @@
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
+    helpFs: ['follow chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
       `<a href="#" class="helpOpt ${cls}" data-idx="${i}">${n}</a>`)
       // bare numbers space-join like the chat size row; wordy options keep ' / '
-      .join(cls === 'helpHfs' ? ' ' : ' / ');
+      .join(cls === 'helpHfs' || cls === 'helpFs' ? ' ' : ' / ');
   document.getElementById('helpPresetList').innerHTML = Object.keys(THEME_PRESETS).map((n) =>
     `<a href="#" class="helpOpt helpPreset" data-preset="${n}">${n}</a>`).join(' / ');
   // each font name renders in its own face
@@ -3028,6 +3048,7 @@
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
   markHelp('helpHfs', hdrFs + 1);
+  markHelp('helpFs', helpFs + 1);
   markHelp('helpSelf', selfHl ? 1 : 0);
   markPresets();
 
