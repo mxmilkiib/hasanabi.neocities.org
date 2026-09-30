@@ -424,6 +424,16 @@
      its layout while fresh rows overwrite it */
   .row.ghostgap { padding: 0; margin: 0; border-bottom: none; }
   .row.notice.raid { background-color: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .twcard {
+    display: block;
+    margin: 2px 0;
+    padding: 2px 8px;
+    border-left: 2px solid var(--accent);
+    color: var(--text-dim);
+    font-size: .92em;
+    white-space: normal;
+  }
+  .twcard .twmedia img { max-height: 5em; max-width: 12em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
   .chat-img { max-height: 6em; vertical-align: middle; margin: -2.7em 1px; }
   /* Pasted image/gif links pin to the right edge so their vertical
      overflow lands on empty space rather than over message text. */
@@ -783,6 +793,16 @@
   // Nitter host for twitter/x link rewriting; the relay picks a live one
   // from status.d420.de, this is only the fallback until then.
   let nitterHost = null; // set once the relay confirms a live instance
+  // status links get an inline preview fetched via the relay (api.fxtwitter):
+  // tweetCache holds rendered card html, tweetWait dedupes in-flight asks
+  const tweetCache = new Map();
+  const tweetWait = new Set();
+  function reqTweet(id) {
+    if (tweetWait.has(id) || tweetCache.has(id)) return;
+    tweetWait.add(id);
+    if (joined && relayFrame.contentWindow)
+      relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN);
+  }
 
   // badge 'set/ver' -> image url; falls back to the highest version <= ver
   // (e.g. subscriber/34 uses the 24-month flair when no 34 exists)
@@ -878,16 +898,23 @@
         const src = escapeHTML(`https://media.giphy.com/media/${giphy[1]}/giphy.gif`);
         out.push(`<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`);
       } else {
-      // twitter/x links display as twitter.com but route through a nitter
-      // instance so they work without a login. nitter now only serves
-      // profile pages - status links stay on x.com, and without a confirmed
-      // live host nothing is rewritten
+      // twitter/x links display as twitter.com. profile pages route through
+      // nitter when the relay has a live instance, else bird.makeup (a
+      // fediverse mirror that still serves); status links stay on x.com and
+      // get an inline preview card fetched by the relay
       const tw = tok.match(/^(?:https?:\/\/)?(?:www\.|mobile\.)?(?:x\.com|twitter\.com)(\/\S*)?$/i);
       if (tw) {
         const path = tw[1] || '';
-        const profile = /^\/[A-Za-z0-9_]{1,15}\/?$/.test(path);
-        const href = nitterHost && profile ? `${nitterHost}${path}` : `https://x.com${path}`;
-        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`);
+        const prof = path.match(/^\/([A-Za-z0-9_]{1,15})\/?$/);
+        const st = path.match(/^\/[\w]+\/status\/(\d+)/);
+        const href = prof ? (nitterHost ? `${nitterHost}${path}` : `https://bird.makeup/users/${prof[1]}`)
+                          : `https://x.com${path}`;
+        let extra = '';
+        if (st) {
+          if (tweetCache.has(st[1])) extra = tweetCache.get(st[1]);
+          else { reqTweet(st[1]); extra = `<span class="twprev" data-twid="${st[1]}"></span>`; }
+        }
+        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>` + extra);
       }
       else if (/^https?:\/\/\S+$/i.test(tok) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(tok)) {
@@ -2753,7 +2780,12 @@
     if (d.type === 'status') {
       setStatus(d.state);
       joined = d.state === 'connected';
-      if (joined) { clearInterval(joinTimer); backfill(); }
+      if (joined) {
+        clearInterval(joinTimer); backfill();
+        // tweet previews requested before the socket was up wait for this
+        tweetWait.forEach((id) =>
+          relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN));
+      }
       if (emptyEl) {
         if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
         else if (d.state === 'reconnecting') emptyLabel.textContent = 'socket dropped - retrying…';
@@ -2797,6 +2829,21 @@
       updateSendUI();
     } else if (d.type === 'nitter') {
       nitterHost = /^https:\/\//.test(d.host || '') ? d.host : null;
+    } else if (d.type === 'tweet' && /^\d+$/.test(d.id || '')) {
+      tweetWait.delete(d.id);
+      const t = d.tweet;
+      // filled once per id; a null tweet leaves the bare link (cached as '')
+      let html = '';
+      if (t && t.text) {
+        const imgs = (t.media && t.media.photos ? t.media.photos.slice(0, 4) : [])
+          .map((p) => `<img src="${escapeHTML(p.url)}" alt="tweet image">`).join('');
+        html = `<span class="twcard"><b>@${escapeHTML(t.author && t.author.screen_name || '')}</b> ` +
+          `${escapeHTML(t.text.slice(0, 280))}${imgs ? `<span class="twmedia">${imgs}</span>` : ''}</span>`;
+      }
+      tweetCache.set(d.id, html);
+      document.querySelectorAll(`.twprev[data-twid="${d.id}"]`)
+        .forEach((el) => { el.outerHTML = html; });
+      repin();
     } else if (d.type === 'repo') {
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
       document.getElementById('repoStats').textContent =
