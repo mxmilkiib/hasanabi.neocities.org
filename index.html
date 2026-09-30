@@ -1930,7 +1930,7 @@
     else if (a.classList.contains('helpFontFam')) { fontSel.selectedIndex = +a.dataset.idx; applyFont(); saveOpts(); }
     else if (a.classList.contains('helpPreset')) { applyPreset(a.dataset.preset); saveOpts(); }
     else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
-    else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; applyHelpW(); saveOpts(); }
+    else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; applyHelpW(); const s = readHsize(); delete s.w; writeHsize(s); saveOpts(); }
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
     else if (a.classList.contains('helpFs')) { helpFs = +a.dataset.idx - 1; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
@@ -2681,6 +2681,7 @@
   }
   let helpWIdx = 5;
   function applyHelpW() {
+    helpPanel.style.width = '';
     helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
     markHelp('helpW', helpWIdx);
   }
@@ -3372,6 +3373,67 @@
   markHelp('helpSelf', selfHl ? 1 : 0);
   markPresets();
   previewSwatches();
+
+  // ---- edge resize: the last EDGE_PX of the left and bottom edges drag
+  // the panel wider/taller; the corner does both. The zones sit inside the
+  // panel's padding so links stay clickable. A dragged size persists and
+  // overrides the width presets until one is picked again ----
+  const HSIZE_KEY = 'hasan-hsize';
+  const EDGE_PX = 8;
+  const readHsize = () => { try { return JSON.parse(localStorage.getItem(HSIZE_KEY)) || {}; } catch (e) { return {}; } };
+  const writeHsize = (s) => { try { localStorage.setItem(HSIZE_KEY, JSON.stringify(s)); } catch (e) {} };
+  const HS_CURS = { l: 'ew-resize', b: 'ns-resize', bl: 'nesw-resize' };
+  const edgeAt = (e) => {
+    const r = helpPanel.getBoundingClientRect();
+    const l = e.clientX - r.left < EDGE_PX, b = r.bottom - e.clientY < EDGE_PX;
+    return l && b ? 'bl' : l ? 'l' : b ? 'b' : '';
+  };
+  helpPanel.addEventListener('pointermove', (e) => {
+    if (e.buttons) return;
+    helpPanel.style.cursor = HS_CURS[edgeAt(e)] || '';
+  });
+  helpPanel.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || helpPanel.hidden) return;
+    const edge = edgeAt(e);
+    if (!edge) return;
+    e.preventDefault();
+    helpPanel.setPointerCapture(e.pointerId);
+    const r = helpPanel.getBoundingClientRect();
+    helpPanel.style.cursor = HS_CURS[edge];
+    const move = (ev) => {
+      if (edge.includes('l')) {
+        const w = Math.round(Math.max(280, Math.min(innerWidth - 24, r.right - ev.clientX)));
+        helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
+      }
+      if (edge.includes('b')) {
+        const h = Math.round(Math.max(120, Math.min(innerHeight - r.top - 8, ev.clientY - r.top)));
+        helpPanel.style.height = h + 'px';
+        helpPanel.style.maxHeight = 'none';
+      }
+    };
+    const drop = () => {
+      helpPanel.removeEventListener('pointermove', move);
+      helpPanel.removeEventListener('pointerup', drop);
+      helpPanel.removeEventListener('pointercancel', drop);
+      helpPanel.style.cursor = '';
+      const rr = helpPanel.getBoundingClientRect();
+      const s = readHsize();
+      if (edge.includes('l')) { s.w = Math.round(rr.width); markHelp('helpW', -1); }
+      if (edge.includes('b')) s.h = Math.round(rr.height);
+      writeHsize(s);
+    };
+    helpPanel.addEventListener('pointermove', move);
+    helpPanel.addEventListener('pointerup', drop);
+    helpPanel.addEventListener('pointercancel', drop);
+  });
+  // restore a dragged size once saved options and url params have settled;
+  // an explicit ?hpw= beats a stored width
+  try {
+    const hs = readHsize();
+    const q2 = new URLSearchParams(location.search);
+    if (hs.w && !q2.has('hpw')) helpPanel.style.width = helpPanel.style.maxWidth = hs.w + 'px';
+    if (hs.h) { helpPanel.style.height = hs.h + 'px'; helpPanel.style.maxHeight = 'none'; }
+  } catch (e) {}
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
   // when the attribute changes, so hover parks the title in data-tt and a
