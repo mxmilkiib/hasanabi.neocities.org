@@ -8,11 +8,11 @@
 <path fill="#e8a33d" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
 </g>
 <text x="380" y="208" font-family="JetBrains Mono" font-weight="bold" font-size="62" fill="#e8e8ea">HasanAbi Chat Thing</text>
-<text x="380" y="278" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">a compact, customisable twitch chat client,</text>
+<text x="380" y="278" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">a compact, customisable Twitch chat client,</text>
 <text x="380" y="316" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">orientated around the Hasan Piker stream, aka</text>
-<text x="380" y="354" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">the Piker Broadcasting Service — an alt-UI,</text>
-<text x="380" y="392" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">second-screen/accessibility tool, organising,</text>
-<text x="380" y="430" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">media and other resources, and more</text>
+<text x="380" y="354" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">the Piker Broadcasting Service (PBS) —</text>
+<text x="380" y="392" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">an alt-UI, second-screen/accessibility tool,</text>
+<text x="380" y="430" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">organising, media and other resources, and more</text>
 <text x="380" y="486" font-family="JetBrains Mono" font-size="27" fill="#6a6a75">hasanabi.neocities.org</text>
 <rect x="380" y="520" width="620" height="4" fill="#e8a33d"/>
 </svg>
