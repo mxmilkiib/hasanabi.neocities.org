@@ -724,6 +724,9 @@
   #emotePick .etabs { flex: none; display: flex; flex-wrap: wrap; gap: 4px; }
   #emotePick .etabs button { font-size: 12px; padding: 2px 8px; opacity: .55; width: auto; }
   #emotePick .etabs button.on { opacity: 1; background: var(--line); }
+  /* a subtle accent wash when the emote was just used in chat */
+  #emoteGrid button.justused { animation: eflash 1.4s ease-out; }
+  @keyframes eflash { from { background: color-mix(in srgb, var(--accent) 45%, transparent); } }
   #emoteGrid {
     flex: 1; overflow-y: auto;
     display: grid; grid-template-columns: repeat(auto-fill, 40px);
@@ -1601,6 +1604,8 @@
       let msgHtml = rendered.html;
       // chatterino-style: messages made of only emotes render them bigger
       const mtoks = message.trim().split(/\s+/).filter(Boolean);
+      for (const t of mtoks)
+        if (rendered.names.has(t) || thirdPartyEmotes[t] || EMOJI_SET.has(t)) noteEmoteUse(t);
       const eonly = mtoks.length > 0 &&
         mtoks.every((t) => rendered.names.has(t) || thirdPartyEmotes[t] || zeroWidth.has(t));
       if (blammo) {
@@ -3769,8 +3774,38 @@
     const fa = famKey(a), fb = famKey(b);
     return fa === fb ? byName(a, b) : byName(fa, fb);
   };
+  const EMOJI_SET = new Set(EMOJIS);
+  // live usage: emotes seen in chat bump a session count folded into the
+  // use-sort, flash their picker button, and lazily resort the open grid
+  const liveUse = {};
+  const flashSet = new Set();
+  let resortTimer = 0;
+  function noteEmoteUse(n) {
+    liveUse[n] = (liveUse[n] || 0) + 1;
+    if (emotePick.hidden) return;
+    flashSet.add(n);
+    const poke = (name) => {
+      for (const b of emoteGrid.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`))
+        b.classList.add('justused');
+    };
+    poke(n);
+    setTimeout(() => {
+      flashSet.delete(n);
+      for (const b of emoteGrid.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
+        b.classList.remove('justused');
+    }, 1400);
+    if (epickSort === 'use' && !resortTimer)
+      resortTimer = setTimeout(() => {
+        resortTimer = 0;
+        const st = emoteGrid.scrollTop;
+        buildPicker();
+        emoteGrid.scrollTop = st;
+        for (const f of flashSet) poke(f);
+      }, 1500);
+  }
   // most-used first; uncharted emotes keep the family/name order
-  const byUse = (a, b) => (emoteUse[b] || 0) - (emoteUse[a] || 0) || byFam(a, b);
+  const useOf = (n) => (emoteUse[n] || 0) + (liveUse[n] || 0);
+  const byUse = (a, b) => useOf(b) - useOf(a) || byFam(a, b);
   const pickerSort = () => epickSort === 'az' ? byFam : byUse;
   function buildPicker() {
     const q = emoteQ.value.trim().toLowerCase();
@@ -3803,7 +3838,7 @@
       for (const s of sets) {
         const g = s.emoteList.filter((e) => hit(e.code))
           .sort(epickSort === 'az' ? (a, b) => byName(a.code, b.code)
-              : (a, b) => (emoteUse[b.code] || 0) - (emoteUse[a.code] || 0) || byName(a.code, b.code));
+              : (a, b) => useOf(b.code) - useOf(a.code) || byName(a.code, b.code));
         if (!g.length) continue;
         const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                     : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
