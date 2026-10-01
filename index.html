@@ -4211,11 +4211,11 @@
         // videos and gifs show their thumbnail with a badge; a click
         // swaps the thumb for an inline player, shift-click opens x.com
         const imgs = (m.photos || []).slice(0, 4)
-          .map((p) => `<img src="${escapeHTML(p.url)}" alt="${escapeHTML(p.alt || '[image]')}">`)
+          .map((p) => `<img src="${escapeHTML(p.url)}" alt="${escapeHTML(' ' + (p.alt || '[image]'))}">`)
           .concat((m.videos || []).slice(0, 4).filter((v) => v.thumb)
             .map((v) => {
               const play = /\.(?:mp4|webm|mov|m4v)(?:\?|$)/i.test(v.url || '') ? ` data-vsrc="${escapeHTML(v.url)}"` : '';
-              return `<a class="twvid" href="${escapeHTML(twurl)}"${play} target="_blank" rel="noopener noreferrer" title="play - ⇧click opens x.com"><img src="${escapeHTML(v.thumb)}" alt="[video]"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`;
+              return `<a class="twvid" href="${escapeHTML(twurl)}"${play} target="_blank" rel="noopener noreferrer" title="play - ⇧click opens x.com"><img src="${escapeHTML(v.thumb)}" alt=" [video]"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`;
             }))
           .join('');
         entry = { text: t.text, author: t.author && t.author.screen_name || '', imgs };
