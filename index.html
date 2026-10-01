@@ -1324,7 +1324,7 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>[notice] <b>${escapeHTML(who)}</b> ` +
+        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span><b>[notice]</b> <b>${escapeHTML(who)}</b> ` +
                 `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html : ''}</div>`;
         continue;
       }
