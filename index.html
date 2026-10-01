@@ -396,7 +396,9 @@
      scroll origin anchors to the bottom, so the live edge sits at
      scrollTop = clientHeight - scrollHeight (negative) and sparse
      columns pack against the bottom edge - the exact mirror of normal */
-  main.rev .col { display: flex; flex-direction: column-reverse; }
+  /* :not([hidden]) keeps the author-rule display from overriding the UA
+     hidden attribute on unused split columns */
+  main.rev .col:not([hidden]) { display: flex; flex-direction: column-reverse; }
   main.rev .col > * { flex-shrink: 0; }
   main.rev .jdown { top: 10px; bottom: auto; }
   .col {
