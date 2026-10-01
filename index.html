@@ -75,7 +75,7 @@
     }
   }
   :root[data-theme="light"]     { --ph: 80;  --pc: .012; --ptc: .02;  --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; }
-  :root[data-theme="lavender"]  { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; --spark: #d97706; }
+  :root[data-theme="lavender"]  { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; }
   :root[data-theme="mirc"]      { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
   :root[data-theme="sepia"]     { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
   :root[data-theme="paper"]     { --ph: 92;  --pc: .026; --ptc: .028; --accent: #96690f; --good: #2e7d46; --danger: #b04040; --vip: #a03060;
@@ -91,8 +91,8 @@
   :root[data-theme="forest"]    { --ph: 150; --pc: .025; --ptc: .02;  --accent: #e0b45a; --good: #7fd08a; --danger: #e87858; --vip: #f0a0b8; }
   :root[data-theme="wine"]      { --ph: 335; --pc: .028; --ptc: .025; --accent: #f0a868; --good: #a0d080; --danger: #ff7d7d; --vip: #ff9dc8; }
   :root[data-theme="ember"]     { --ph: 65;  --pc: .032; --ptc: .045; --accent: #f0b04a; --good: #b8d88a; --danger: #e07850; --vip: #d8a0b8; }
-  :root[data-theme="amber"]     { --ph: 70;  --pc: .02;  --ptc: .09;  --text-c: #ffb000; --accent: #ffd040; --good: #ffcc33; --danger: #cc5533; --vip: #ffcc88; }
-  :root[data-theme="console"]   { --ph: 145; --pc: .006; --ptc: .10;  --text-c: #33dd55; --accent: #5fff8a; --good: #33ff66; --danger: #cc4444; --vip: #aaffcc; }
+  :root[data-theme="amber"]     { --ph: 70;  --pc: .02;  --ptc: .09;  --text-c: #ffb000; --accent: #ffd040; --good: #ffcc33; --danger: #cc5533; --vip: #ffcc88; --spark: #ffd040; }
+  :root[data-theme="console"]   { --ph: 145; --pc: .006; --ptc: .10;  --text-c: #33dd55; --accent: #5fff8a; --good: #33ff66; --danger: #cc4444; --vip: #aaffcc; --spark: #5fff8a; }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
@@ -1563,6 +1563,21 @@
     hdrBarEl.classList.toggle('hdrwrap', hdrSideEl.offsetTop > 10);
   }).observe(hdrBarEl);
 
+  // the trace draws in the accent's complement so it reads as its own
+  // element against the header; the canvas resolves whatever colour
+  // notation the palette used, then the hue flips 180° keeping s/l
+  function complement(css) {
+    sparkCtx.fillStyle = '#000'; sparkCtx.fillStyle = css;
+    const m = /^#([0-9a-f]{6})$/i.exec(sparkCtx.fillStyle);
+    if (!m) return css;
+    const [r, g, b] = [0, 2, 4].map((o) => parseInt(m[1].slice(o, o + 2), 16) / 255);
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    if (!d) return css;
+    const s = d / (1 - Math.abs(2 * l - 1));
+    let h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h = ((h * 60) + 180) % 360;
+    return `hsl(${h.toFixed(0)} ${(s * 100).toFixed(0)}% ${(l * 100).toFixed(0)}%)`;
+  }
   function drawSpark() {
     const SPARK_N = sparkWin;
     const SPARK_W = sparkEl.width / DPR; // stretched past SPARK_N in graph mode
@@ -1573,7 +1588,7 @@
         // ticks use text-dim rather than --line: sepia/paper lines wash out
         // against the panel, while text-dim keeps contrast on every style
         tick: styles.getPropertyValue('--text-dim') || '#666',
-        accent: styles.getPropertyValue('--spark').trim() || styles.getPropertyValue('--accent') || '#e8a33d',
+        accent: styles.getPropertyValue('--spark').trim() || complement(styles.getPropertyValue('--accent').trim() || '#e8a33d'),
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
         gap: styles.getPropertyValue('--text-dim') || '#666',
       };
