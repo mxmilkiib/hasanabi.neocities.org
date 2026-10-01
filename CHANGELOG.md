@@ -195,6 +195,11 @@ not versions — the page ships continuously to Neocities.
   no longer strand mid-column or eat whole pages
 - Third column deals through the second on landscape screens; split
   count persists across reloads; non-active columns pin to the bottom
+- `?rev=1` reverses the chat flow: newest rows land at the top of each
+  column. Scroll-follow, the jump button (which flips to `↑` and counts
+  rows above the fold), page-flip columns and history all track the
+  live edge either way; in reversed splits the first column stays live
+  and each column's below-fold tail drains into the next
 
 ### Chat & auth
 - Twitch OAuth login and message sending through the relay; sent

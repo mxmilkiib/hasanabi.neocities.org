@@ -382,6 +382,13 @@
   main.split3 .jdown { left: 16.666%; }
   main.split3 .jdown.side { left: 50%; }
   main.split3 .jdown.side2 { left: 83.333%; }
+  /* rev flow: the column axis flips so newest rows land at the top. The
+     scroll origin anchors to the bottom, so the live edge sits at
+     scrollTop = clientHeight - scrollHeight (negative) and sparse
+     columns pack against the bottom edge - the exact mirror of normal */
+  main.rev .col { display: flex; flex-direction: column-reverse; }
+  main.rev .col > * { flex-shrink: 0; }
+  main.rev .jdown { top: 10px; bottom: auto; }
   .col {
     flex: 1;
     min-width: 0;
@@ -793,6 +800,7 @@
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
+    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip marks how many months that chatter has been subscribed; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
@@ -1267,6 +1275,15 @@
   let scheduled = false;
   let recentTimestamps = [];
   let stickBottom = true; // live column follows new messages while near the bottom
+  // rev flips the flow: newest rows land at the top. DOM order stays
+  // chronological either way, so bookkeeping (dedupe, history, id maps)
+  // is unchanged - only scroll geometry differs. The live edge reads as
+  // a negative scrollTop, so all follow math routes through these two
+  let revFlow = false;
+  const liveDist = (col) => revFlow
+    ? col.scrollTop + col.scrollHeight - col.clientHeight
+    : col.scrollHeight - col.scrollTop - col.clientHeight;
+  const snapLive = (col) => { col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : col.scrollHeight; };
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
   // every msg id already handled, so replayed backfill lines can't duplicate
@@ -1296,8 +1313,22 @@
   // rows below a column's fold, counted back from the tail since they're
   // chronological - the label on the ↓ button tells how far off live you are
   function belowFold(col) {
-    const fold = col.scrollTop + col.clientHeight;
     let n = 0, oldest = 0;
+    if (revFlow) {
+      // in the flipped axis the unseen rows sit above the viewport, and
+      // content coords run negative - rects sidestep that geometry
+      const top = col.getBoundingClientRect().top;
+      for (let i = col.children.length - 1; i >= 0; i--) {
+        const r = col.children[i];
+        if (r.getBoundingClientRect().bottom > top) break;
+        if (r.classList.contains('row') && !r.classList.contains('ghostgap')) {
+          n++;
+          oldest = +r.dataset.ts || 0;
+        }
+      }
+      return { n, sec: oldest && lastRowTs > oldest ? Math.round((lastRowTs - oldest) / 1000) : 0 };
+    }
+    const fold = col.scrollTop + col.clientHeight;
     for (let i = col.children.length - 1; i >= 0; i--) {
       const r = col.children[i];
       if (r.offsetTop - col.offsetTop < fold) break;
@@ -1312,32 +1343,32 @@
     ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
     : Math.floor(s / 3600) + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
   function jdownSet(btn, col, forceHidden) {
-    const at = forceHidden || col.scrollHeight - col.scrollTop - col.clientHeight < 60;
+    const at = forceHidden || liveDist(col) < 60;
     btn.hidden = at;
     if (!at) {
       const { n, sec } = belowFold(col);
-      btn.innerHTML = `<span class="arr">↓</span>${n ? `<span class="cnt">${n}</span>` : ''}${sec ? `<span class="cnt secs">${fmtBack(sec)}</span>` : ''}`;
+      btn.innerHTML = `<span class="arr">${revFlow ? '↑' : '↓'}</span>${n ? `<span class="cnt">${n}</span>` : ''}${sec ? `<span class="cnt secs">${fmtBack(sec)}</span>` : ''}`;
     }
   }
 
   logEl.addEventListener('scroll', () => {
-    stickBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 60;
+    stickBottom = liveDist(logEl) < 60;
     jdownSet(jdownLog, logEl, stickBottom);
   });
   const jdownSide2 = document.getElementById('jdownSide2');
   let sideBottom = true;
   let side2Bottom = true;
   sideEl.addEventListener('scroll', () => {
-    sideBottom = sideEl.scrollHeight - sideEl.scrollTop - sideEl.clientHeight < 60;
+    sideBottom = liveDist(sideEl) < 60;
     jdownSet(jdownSide, sideEl, sideBottom);
   });
   side2El.addEventListener('scroll', () => {
-    side2Bottom = side2El.scrollHeight - side2El.scrollTop - side2El.clientHeight < 60;
+    side2Bottom = liveDist(side2El) < 60;
     jdownSet(jdownSide2, side2El, side2Bottom);
   });
   function jumpDown(col, btn) {
     btn.hidden = true;
-    col.scrollTo({ top: col.scrollHeight, behavior: 'smooth' });
+    col.scrollTo({ top: revFlow ? -col.scrollHeight : col.scrollHeight, behavior: 'smooth' });
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
   // scroll pause: hovering an actual message row holds that column; empty
@@ -1346,7 +1377,7 @@
   const pausedCols = new Set();
   function repinCol(col) {
     const at = col === logEl ? stickBottom : col === sideEl ? sideBottom : side2Bottom;
-    if (at) col.scrollTop = col.scrollHeight;
+    if (at) snapLive(col);
   }
   for (const col of [logEl, sideEl, side2El]) {
     col.addEventListener('mouseover', (e) => {
@@ -1369,9 +1400,9 @@
     resnapQueued = true;
     requestAnimationFrame(() => {
       resnapQueued = false;
-      if (stickBottom && !pausedCols.has(logEl)) logEl.scrollTop = logEl.scrollHeight;
-      if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) sideEl.scrollTop = sideEl.scrollHeight;
-      if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) side2El.scrollTop = side2El.scrollHeight;
+      if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
+      if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
+      if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
     });
   }
   logEl.addEventListener('load', resnap, true);
@@ -1659,7 +1690,10 @@
     }
     queue = [];
     histDirty = true;
-    const firstGhost = activeEl.querySelector('.row.stale');
+    // rev never marks stales (its overflow cascades instead of flipping),
+    // and any stragglers sit at the bottom edge where a tail append still
+    // lands correctly - so the seam path is normal-mode only
+    const firstGhost = revFlow ? null : activeEl.querySelector('.row.stale');
     if (firstGhost) {
       // overwrite: the ghost page stays put; consume ghost height equal to
       // the inserted height at the fresh/ghost boundary, so a wrapped
@@ -1700,17 +1734,18 @@
     // evicted rows leave their ids behind - drop only the disconnected
     for (const [mid, el] of rowById) if (!el.isConnected) rowById.delete(mid);
     if (isSplit()) {
-      if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
+      flipCols();
       for (const c of cols()) ghostFade(c);
       // page-flip never trims by itself - bound the total across columns;
-      // the column after the active one holds the oldest rows
-      const oldest = nextCol();
+      // the column after the active one holds the oldest rows (the last
+      // one in rev, where the cascade drains oldest-first)
+      const oldest = revFlow ? cols()[cols().length - 1] : nextCol();
       let total = 0;
       for (const c of cols()) total += c.children.length;
       while (total > MAX_MESSAGES) { oldest.removeChild(oldest.firstElementChild); total--; }
     } else {
       while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
-      if (nearBottom && !pausedCols.has(activeEl)) activeEl.scrollTop = activeEl.scrollHeight;
+      if (nearBottom && !pausedCols.has(activeEl)) snapLive(activeEl);
     }
     jdownSet(jdownLog, logEl);
     jdownSet(jdownSide, sideEl, sideEl.hidden);
@@ -2242,6 +2277,7 @@
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
@@ -2305,8 +2341,8 @@
   // After a layout-affecting change: keep the live column pinned, or in
   // split mode re-run the page overflow check.
   function repin() {
-    if (isSplit()) { if (pushOverflow(activeEl, nextCol())) activeEl = nextCol(); }
-    else if (stickBottom && !pausedCols.has(logEl)) logEl.scrollTop = logEl.scrollHeight;
+    if (isSplit()) flipCols();
+    else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
   }
 
   function cycle(btn, list, idx, prop, label, unit, helpCls) {
@@ -2429,6 +2465,7 @@
         subMode,
         zebra: mainEl.classList.contains('zebra'),
         pause: pauseOnText,
+        rev: revFlow,
         times: timeIdx,
         shadow: shadLevel,
         eonly: emoteMode,
@@ -2486,6 +2523,7 @@
     }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
     if (typeof o.pause === 'boolean') setPause(o.pause);
+    if (typeof o.rev === 'boolean') setRev(o.rev);
     if (typeof o.times === 'boolean') setTimes(o.times ? 2 : 0);
     else if (Number.isInteger(o.times)) setTimes(o.times);
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
@@ -2963,6 +3001,19 @@
   }, { passive: false });
   setZebra(false);
 
+  // ---- reversed flow: newest rows at the top of each column ----
+  function setRev(on) {
+    revFlow = on;
+    mainEl.classList.toggle('rev', on);
+    // ghost markers straddling the flip would sit mid-column - drop the
+    // marker and let the rows stand as ordinary content
+    for (const col of [logEl, sideEl, side2El])
+      for (const r of col.querySelectorAll('.row.stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
+    if (isSplit()) { activeEl = logEl; flipCols(); }
+    for (const col of [logEl, sideEl, side2El]) if (!col.hidden) snapLive(col);
+    markHelp('helpFlow', on ? 1 : 0);
+  }
+
   // ---- links view: only rows carrying a url, first post of each link ----
   function setLinkview(on) {
     if (on) dedupeLinks();
@@ -3127,6 +3178,7 @@
     if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
     if (pauseOnText) q.set('pause', '1');
+    if (revFlow) q.set('rev', '1');
     if (lineLevel !== 1) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
@@ -3207,10 +3259,40 @@
   // ---- split view: page-flip columns. New rows fill the active column;
   // once a row drops below the fold the other column is cleared and becomes
   // the target, flipping back and forth. Inactive column scrolls freely. ----
+  // Runs the flip for the whole column set. Normal mode rotates the live
+  // column to whichever page just received the spill; rev keeps the first
+  // column live and drains each column's below-fold tail into the next,
+  // the last one shedding rows off the end of history
+  function flipCols() {
+    if (revFlow) {
+      const cs = cols();
+      for (let i = 0; i < cs.length; i++) pushOverflow(cs[i], cs[i + 1] || null);
+      // appends land at a column's top edge, which moves the live edge the
+      // same way a growing bottom did not - re-pin every following column
+      for (const c of cs) if (!pausedCols.has(c)) repinCol(c);
+      return;
+    }
+    if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
+  }
   // Moves rows below the fold of `from` to the top of `to`. The outgoing
   // contents stay as faded ghosts and are evicted one by one as the new
   // rows push them below the fold.
   function pushOverflow(from, to) {
+    if (revFlow) {
+      // the flipped column keeps its newest page at the top; rows past
+      // the page's bottom fold are its oldest, dom-first, and head onward.
+      // A column's stale stragglers and the last column's spill just drop.
+      // rects because the flipped axis gives rows negative offsetTops, and
+      // the fold is measured from the content's top edge, not the viewport
+      let r, moved = false;
+      while ((r = from.firstElementChild)) {
+        const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
+        if (r.getBoundingClientRect().top < fold) break;
+        if (to && !r.classList.contains('stale')) { to.appendChild(r); moved = true; }
+        else r.remove();
+      }
+      return moved;
+    }
     let last, moved = false;
     while ((last = from.lastElementChild) &&
            last.offsetTop - from.offsetTop + last.offsetHeight > from.clientHeight) {
@@ -3291,10 +3373,11 @@
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     if (level === cur) return;
     // merge every column back into logEl chronologically - the column after
-    // the active one in flip order holds the oldest page - then re-deal
+    // the active one in flip order holds the oldest page (the last column
+    // in rev's drain order) - then re-deal
     const c = cols();
     const i = c.indexOf(activeEl);
-    for (const col of [...c.slice(i + 1), ...c.slice(0, i + 1)])
+    for (const col of (revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)]))
       for (const r of [...col.children]) logEl.appendChild(r);
     sideEl.hidden = level < 2;
     side2El.hidden = level < 3;
@@ -3311,7 +3394,12 @@
       // drop inline ghost-gradient values left over from column mode
       for (const r of logEl.querySelectorAll('.row.stale')) r.style.opacity = '';
       // columns widen on rejoin - re-pin the live column if it was following
-      requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) logEl.scrollTop = logEl.scrollHeight; });
+      requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); });
+    } else if (revFlow) {
+      // rev never rotates: the first column stays live, its spill page
+      // lands in the next
+      activeEl = logEl;
+      flipCols();
     } else if (level === 2) {
       if (cur === 3) { // three -> two: move logEl's below-fold page to #side
         activeEl = logEl;
@@ -3324,9 +3412,10 @@
       activeEl = side2El;
     }
     // columns narrower than the merged one reflow taller, leaving saved
-    // scroll offsets mid-page - re-pin every non-active column at bottom
+    // scroll offsets mid-page - re-pin every non-active column at the edge
+    // opposite its page flow
     if (level >= 2) requestAnimationFrame(() => {
-      for (const col of cols()) if (col !== activeEl) col.scrollTop = col.scrollHeight;
+      for (const col of cols()) if (col !== activeEl) snapLive(col);
     });
   }
 
@@ -3353,7 +3442,7 @@
       // stale marker and fade so they restore as ordinary rows (kept
       // markers would corrupt the next session's ghost bookkeeping).
       // ghostgap spacers and local echoes stay excluded.
-      const rows = [...c.slice(i + 1), ...c.slice(0, i + 1)]
+      const rows = (revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)])
         .flatMap((col) => [...col.children])
         .filter((r) => r.classList.contains('row') && !r.classList.contains('ghostgap') && !r.classList.contains('local'));
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => {
@@ -3391,7 +3480,7 @@
       lastRowTs = tail && tail.dataset.ts ? +tail.dataset.ts
         : (tEl ? parseRowTimeText(tEl.textContent) : 0);
       applySubMode();
-      logEl.scrollTop = logEl.scrollHeight;
+      snapLive(logEl);
     } catch (e) {}
   }
   restoreHistory();
@@ -4107,6 +4196,7 @@
   if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
     if (q.has('pause')) setPause(flag('pause'));
+    if (q.has('rev')) setRev(flag('rev'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
     if (q.has('times')) setTimes(q.get('times') === 'nosec' ? 1 : flag('times') ? 2 : 0);
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
@@ -4135,7 +4225,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
@@ -4178,6 +4268,7 @@
   // the setters ran during init before the lists existed - mark now
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
   markHelp('helpPause', pauseOnText ? 1 : 0);
+  markHelp('helpFlow', revFlow ? 1 : 0);
   markHelp('helpTimes', timeIdx);
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
