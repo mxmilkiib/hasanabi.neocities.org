@@ -718,6 +718,9 @@
   #emotePick #emoteQ { flex: 1; min-width: 0; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 8px; }
   #emotePick #emoteNames { flex: none; font-size: 13px; padding: 4px 8px; }
   #emotePick.names #emoteNames { background: var(--line); }
+  /* sort chips hug their labels like the section tabs do */
+  #emotePick .esort { flex: none; width: auto; font-size: 12px; padding: 0 8px; opacity: .55; }
+  #emotePick .esort.on { opacity: 1; background: var(--line); }
   #emotePick .etabs { flex: none; display: flex; flex-wrap: wrap; gap: 4px; }
   #emotePick .etabs button { font-size: 12px; padding: 2px 8px; opacity: .55; width: auto; }
   #emotePick .etabs button.on { opacity: 1; background: var(--line); }
@@ -846,7 +849,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
 
 <script>
 (() => {
@@ -3699,6 +3702,23 @@
     try { localStorage.setItem(EPICK_NAMES_KEY, on ? '1' : '0'); } catch (e) {}
     emoteQ.focus();
   });
+  // grid ordering: channel usage counts or the alphabetical family sort
+  const EPICK_SORT_KEY = 'hasan-epicksort';
+  let epickSort = 'use';
+  try { epickSort = localStorage.getItem(EPICK_SORT_KEY) === 'az' ? 'az' : 'use'; } catch (e) {}
+  const sortBtns = { az: document.getElementById('emoteSortAz'), use: document.getElementById('emoteSortUse') };
+  function paintSort() {
+    sortBtns.az.classList.toggle('on', epickSort === 'az');
+    sortBtns.use.classList.toggle('on', epickSort === 'use');
+  }
+  paintSort();
+  for (const [m, b] of Object.entries(sortBtns)) b.addEventListener('click', () => {
+    epickSort = m;
+    try { localStorage.setItem(EPICK_SORT_KEY, m); } catch (e) {}
+    paintSort();
+    buildPicker();
+    emoteQ.focus();
+  });
   // source tabs: any mix of groups may be lit; none lit means everything
   const EPICK_TABS_KEY = 'hasan-epicktabs';
   const EPICK_GROUPS = ['7tv', 'bttv', 'ffz', 'twitch', 'emoji'];
@@ -3751,6 +3771,7 @@
   };
   // most-used first; uncharted emotes keep the family/name order
   const byUse = (a, b) => (emoteUse[b] || 0) - (emoteUse[a] || 0) || byFam(a, b);
+  const pickerSort = () => epickSort === 'az' ? byFam : byUse;
   function buildPicker() {
     const q = emoteQ.value.trim().toLowerCase();
     const hit = (n) => !q || n.toLowerCase().includes(q);
@@ -3762,7 +3783,7 @@
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // third-party emotes grouped by provider
     const groups = {};
-    for (const n of Object.keys(thirdPartyEmotes).sort(byUse)) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
+    for (const n of Object.keys(thirdPartyEmotes).sort(pickerSort())) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
     let h = '';
     // recents lead when not searching - a search already surfaces them
     if (!q && epickRecent.length) h += head('recent') + epickRecent.map((r) =>
@@ -3781,7 +3802,8 @@
       const sets = [...twSets].sort((a, b) => rank(a) - rank(b) || byName(a.channelLogin || '', b.channelLogin || '') || (+a.tier || 0) - (+b.tier || 0));
       for (const s of sets) {
         const g = s.emoteList.filter((e) => hit(e.code))
-          .sort((a, b) => (emoteUse[b.code] || 0) - (emoteUse[a.code] || 0) || byName(a.code, b.code));
+          .sort(epickSort === 'az' ? (a, b) => byName(a.code, b.code)
+              : (a, b) => (emoteUse[b.code] || 0) - (emoteUse[a.code] || 0) || byName(a.code, b.code));
         if (!g.length) continue;
         const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                     : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
