@@ -34,9 +34,27 @@ not versions — the page ships continuously to Neocities.
   stashed on the first `↑` and restored by `↓`
 - Emote picker: sections per provider (7TV / BTTV / FFZ / Twitch /
   emoji), resizable from its left and top edges, rows sized so section
-  titles hug their emotes, no per-cell tooltips, closes on `☻` or `Esc`
-  from anywhere
-- Chip order: left sub modes lead with `[md] [12]` ahead of the badges,
+  titles hug their emotes, closes on `☻` or `Esc` from anywhere
+- Emote picker, later the same day: every Twitch set the login can send
+  (`USERSTATE` emote-sets resolved through ivr.fi; the full global set
+  when logged out, replacing a hardcoded 34), this channel's sets first;
+  a `recent` row of the last 24 used; source tabs (`7tv bttv ffz twitch
+  emoji`, any mix, shift-click isolates); an `Aa` toggle for a names
+  list view; `name - source` tooltips; case-insensitive sort; animated
+  FFZ in its own section
+- Links: bare domains wrapped in brackets or trailing punctuation still
+  linkify (`(example.com),`); `hasanabi.neocities.org` shimmers like the
+  bot names
+- Graph: the trace's complement colour now respects the shade - held
+  dark on light stops (mirc's yellow was vanishing), lifted on dark ones
+- Styles: `paper` is a warmer cream (shade 1) with stronger two-layer
+  grain that now also covers the header
+- Presets drop the stream embed - one toggles video by hand and presets
+  leave it alone; `minimal` is now mirc/lexend 16px with the graph
+  header, `retro` is console/terminus 28px with shadow
+- Header: the pinned `?` and `–` sit on the padding edge like the rest of
+  the row (were 1px low)
+- Chip order: left sub modes lead with `[12] [md]` ahead of the badges,
   right modes end `[md] [bits] [first] [sub]`; the restyle pass anchors
   right-edge chips after the colon so they stay on the first line of a
   long message. `[first]` is hot pink and bold, `[notice]` bold, sub
@@ -56,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   row and locks the input with a live countdown
 - Video: box follows the stream's real aspect ratio with no letterbox
   gap, and the `▶` button is green while playing, red when stopped
+- `🔗` links view filters the log to messages carrying a URL, showing
+  only the first post of each link
 - Twitch login button wears a monochrome glitch logo
 
 ### Header & graph

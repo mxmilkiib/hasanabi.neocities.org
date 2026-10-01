@@ -432,6 +432,8 @@
   .role.bits { color: var(--accent); }
   .role.first { color: #ff69b4; font-weight: 700; }
   .row.notice { color: var(--text-dim); font-style: italic; }
+  /* links view: rows without a url, and repeat posts of a url, hide */
+  body.linkview .row:not([data-lk]), body.linkview .row.linkdup { display: none; }
   .row.notice.selfmod { color: var(--danger); font-style: normal; font-weight: 600; }
   .row.htag { font-style: italic; }
   .row.htag .name, .row.htag .aux, .row.htag .sub, .row.htag .time { font-style: normal; }
@@ -738,7 +740,7 @@
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" hidden></span></div>
     <canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.35)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.35)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles">&#x1F517;&#xFE0E;</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
   </header>
   <div id="helpPanel" hidden>
     <nav class="htabs"><a href="#" class="htab" data-htab="htabRes">resources</a><a href="#" class="htab" data-htab="htabAuth">authors</a><a href="#" class="htab on" data-htab="htabCfg">config/help</a></nav>
@@ -760,6 +762,7 @@
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip marks how many months that chatter has been subscribed; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
+    <div><b>🔗</b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
@@ -868,6 +871,7 @@
   const subBtn = document.getElementById('subBtn');
   const timeBtn = document.getElementById('timeBtn');
   const emoteBtn = document.getElementById('emoteBtn');
+  const linkBtn = document.getElementById('linkBtn');
   const zebraBtn = document.getElementById('zebraBtn');
   const shadowBtn = document.getElementById('shadowBtn');
   const helpBtn = document.getElementById('helpBtn');
@@ -1394,6 +1398,41 @@
     }
   }
 
+  // links view: a row qualifies when its text carries a url; the key is the
+  // sorted set of normalised urls so a reposted link counts as a dupe
+  const LINK_TLD_RE = /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i;
+  const normUrl = (u) => u.toLowerCase().replace(/^https?:\/\//, '').replace(/^(?:www|mobile)\./, '').replace(/[/?#]+$/, '');
+  function linkKeyOf(msg) {
+    const ks = [];
+    for (const t of msg.split(/\s+/)) {
+      const u = (t.match(/^([(\["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s) || [])[2] || t;
+      if (/^https?:\/\/\S+$/i.test(u) || LINK_TLD_RE.test(u)) ks.push(normUrl(u));
+    }
+    return ks.sort().join(' ');
+  }
+  const seenLinks = new Set();
+  function dedupeLinks() {
+    for (const col of [logEl, sideEl, side2El]) {
+      for (const r of col.querySelectorAll('.row:not([data-lks])')) {
+        r.dataset.lks = '1';
+        let k = r.dataset.lk;
+        if (k == null) {
+          // rows restored from old history lack data-lk - key on their hrefs
+          const ks = [...r.querySelectorAll('a[href]')].filter((a) => !a.classList.contains('name'))
+            .map((a) => normUrl(a.getAttribute('href') || '')).filter(Boolean);
+          if (!ks.length) continue;
+          k = ks.sort().join(' ');
+          r.dataset.lk = k;
+        }
+        if (seenLinks.has(k)) r.classList.add('linkdup');
+        else {
+          seenLinks.add(k);
+          if (seenLinks.size > 20000) { seenLinks.clear(); seenLinks.add(k); }
+        }
+      }
+    }
+  }
+
   function flush() {
     scheduled = false;
     if (emptyEl) {
@@ -1515,6 +1554,7 @@
                 `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(pbody)}</span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
+      const lkey = linkKeyOf(message);
       // native twitch gif posts carry only the giphy title in brackets -
       // no id or url - so link the title to a giphy search for it
       const gifm = message.match(/^\[([^\]]*\bGIF\b[^\]]*)\]$/i);
@@ -1571,7 +1611,7 @@
         }
       }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
-              ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
+              ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
@@ -1592,6 +1632,7 @@
       consumeGhosts(firstGhost, firstGhost.offsetTop - boundary);
       evictGhosts(activeEl);
     } else activeEl.insertAdjacentHTML('beforeend', html);
+    dedupeLinks();
     // mentions that land while the page isn't focused are queued on the
     // @N chip so they can be walked back through later
     const unfocused = document.hidden || !document.hasFocus();
@@ -2159,6 +2200,7 @@
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
@@ -2878,6 +2920,21 @@
   }, { passive: false });
   setZebra(false);
 
+  // ---- links view: only rows carrying a url, first post of each link ----
+  function setLinkview(on) {
+    if (on) dedupeLinks();
+    document.body.classList.toggle('linkview', on);
+    linkBtn.classList.toggle('on', on);
+    linkBtn.title = `Links view: ${on ? 'on' : 'off'} - click toggles`;
+    markHelp('helpLinks', on ? 1 : 0);
+  }
+
+  linkBtn.addEventListener('click', () => setLinkview(!document.body.classList.contains('linkview')));
+  linkBtn.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    setLinkview(!document.body.classList.contains('linkview'));
+  }, { passive: false });
+
   // ---- message timestamps: off / hh:mm / hh:mm:ss ----
   const TIME_MODES = ['off', 'no seconds', 'seconds'];
   let timeIdx = 2;
@@ -2945,7 +3002,7 @@
   const HDR_LABELS = [
     [presetBtn, 'theme'], [themeBtn, 'style'], [shadeBtn, 'shade'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
     [fontSel, 'font'], [fontBtn, 'size'], [weightBtn, 'weight'], [lhBtn, 'height'],
-    [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [emoteBtn, 'emote'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'msg rate'], [sendBtn, 'chat'],
+    [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [emoteBtn, 'emote'], [linkBtn, 'links'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'msg rate'], [sendBtn, 'chat'],
     [helpBtn, 'help'], [hdrMinBtn, 'header'], // corner buttons are absolute - the labels land in flow beside the side cluster
   ];
   for (const [el, txt] of HDR_LABELS) {
@@ -3902,7 +3959,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),

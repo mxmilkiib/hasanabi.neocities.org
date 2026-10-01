@@ -165,6 +165,9 @@ no dependencies beyond CDN-hosted fonts:
   the OAuth round-trip carries the channel in `state`. The resources
   tab's twitch streams row links each streamer with a `*` that switches
   to them.
+- **Links view** — `🔗` filters the log to rows carrying a URL and
+  shows each link only once (a reposted URL hides as a duplicate);
+  click again to restore. Session-only, not saved
 - **Scrolling** — the log follows new messages only while at the
   bottom; scrolling up releases it and shows a jump-to-latest button
   with a count of rows below the fold (one per column in split mode).
