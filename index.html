@@ -2688,6 +2688,11 @@
       // the badge icons - matching the order new rows render with
       const lead = row.querySelector('img.badge') || row.querySelector('.reply') ||
                    row.querySelector('.name') || row.children[1];
+      // the right-mode anchor: straight after the colon, where fresh rows
+      // put the float - appended after the body text it would sink to the
+      // last line of a long message instead of the first
+      const after = row.querySelector('.colon') || row.querySelector('.name');
+      const rightAt = after ? after.nextSibling : row.querySelector('.imglnk');
       if (sub) {
         sub.hidden = mode === 'hidden';
         // restyle the chip text to match: [sub 12] vs compact [12]
@@ -2696,7 +2701,7 @@
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
           if (aux) aux.append(sub); // outermost in the right cluster
-          else row.insertBefore(sub, row.querySelector('.imglnk'));
+          else row.insertBefore(sub, rightAt);
         }
       }
       if (aux) {
@@ -2704,7 +2709,7 @@
         const modChip = aux.querySelector('.mod');
         if (modChip) modChip.textContent = mode.startsWith('num') ? '[md]' : '[ mod. ]';
         aux.classList.toggle('auxr', !left);
-        if (!left) row.insertBefore(aux, row.querySelector('.imglnk'));
+        if (!left) row.insertBefore(aux, rightAt);
       }
       if (left) {
         if (aux) row.insertBefore(aux, lead);
