@@ -73,7 +73,13 @@ not versions — the page ships continuously to Neocities.
   leave it alone; `minimal` is now mirc/lexend 16px with the graph
   header, `retro` is console/terminus 28px with shadow
 - Header: the pinned `?` and `–` sit on the padding edge like the rest of
-  the row (were 1px low)
+  the row (were 1px low); the bottom padding drops to 0 so the buttons
+  sit on the border, and the channel block pins to the line top instead
+  of centring low against it
+- Header labels mode: `help` and `header` labels now anchor directly left
+  of their corner buttons (`–` slides left to make room) instead of
+  floating mid-header in flow order, aligned to the same 26px band as
+  the button glyphs
 - Chip order: left sub modes lead with `[12] [md]` ahead of the badges,
   right modes end `[md] [bits] [first] [sub]`; the restyle pass anchors
   right-edge chips after the colon so they stay on the first line of a

@@ -141,7 +141,7 @@
     /* a bare gap: shorthand would also widen the row gap; keep them apart */
     column-gap: 12px;
     row-gap: 1px;
-    padding: 2px 18px 1px;
+    padding: 2px 18px 0;
     /* ? and – live at the absolute top-right corner whatever the wrap
        state; padding-right keeps flowing content clear of them */
     padding-right: 84px;
@@ -152,6 +152,13 @@
     border-bottom: 1px solid var(--line);
     position: relative;
   }
+  /* the corner pair is out of flow, so in labels mode their labels anchor
+     beside them by hand; – slides left to make room for the help label */
+  .hdr-lbl.corner { position: absolute; top: 2px; line-height: 26px; }
+  .hdr-lbl.c-help { right: 40px; }
+  .hdr-lbl.c-hdr { right: 112px; }
+  body.hdrlbl:not(.hdrgraph):not(.hdrmin) #hdrMin { right: 80px; }
+  body.hdrlbl:not(.hdrgraph):not(.hdrmin) header { padding-right: 172px; }
   /* pinned to the first header line, not the box centre - when labels make
      .hdr-side wrap onto a second line the buttons stay put up top. top
      matches the header's padding so they line up with the flowing row */
@@ -228,6 +235,9 @@
     font-size: 1.27em;
     font-weight: 600;
     min-width: 0;
+    /* pin to the line top like the buttons - centring against the line
+       box left the channel block sitting visibly lower than them */
+    align-self: flex-start;
   }
   #channelName { color: inherit; text-decoration: none; }
   #channelName:hover { text-decoration: underline; }
@@ -726,8 +736,8 @@
   #emotePick #emoteNames { flex: none; font-size: 13px; padding: 4px 8px; }
   #emotePick.names #emoteNames { background: var(--line); }
   /* sort chips hug their labels like the section tabs do */
-  #emotePick .echip { flex: none; width: auto; font-size: 12px; padding: 0 8px; opacity: .55; }
-  #emotePick .echip.on { opacity: 1; background: var(--line); }
+  #emotePick .esort { flex: none; width: auto; font-size: 12px; padding: 0 8px; opacity: .55; }
+  #emotePick .esort.on { opacity: 1; background: var(--line); }
   #emotePick .etabs { flex: none; display: flex; flex-wrap: wrap; gap: 4px; }
   #emotePick .etabs button { font-size: 12px; padding: 2px 8px; opacity: .55; width: auto; }
   #emotePick .etabs button.on { opacity: 1; background: var(--line); }
@@ -860,7 +870,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn echip" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn echip on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button><button class="hdr-btn echip on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn echip on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
 
 <script>
 (() => {
@@ -3103,6 +3113,8 @@
   for (const [el, txt] of HDR_LABELS) {
     const s = document.createElement('span');
     s.className = 'hdr-lbl';
+    if (el === helpBtn || el === hdrMinBtn)
+      s.classList.add('corner', el === helpBtn ? 'c-help' : 'c-hdr');
     s.textContent = txt;
     s.hidden = true;
     el.parentNode.insertBefore(s, el);
@@ -3111,9 +3123,11 @@
   function applyHelp() {
     const showPanel = helpMode === 1 || helpMode === 3;
     helpPanel.hidden = !showPanel;
-    // anchor below whatever height the header currently wraps to
-    if (showPanel) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
     document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode < 2; });
+    // labels mode widens the corner reserve so the pinned labels clear content
+    document.body.classList.toggle('hdrlbl', helpMode >= 2);
+    // anchor below whatever height the header wraps to once labels are in
+    if (showPanel) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
     helpBtn.classList.toggle('on', helpMode !== 0);
     helpBtn.title = `Help: ${HELP_MODES[helpMode]} - click/scroll · ⇧click back`;
     markHelp('helpHelp', helpMode);
