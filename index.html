@@ -101,6 +101,16 @@
   }
   :root[data-theme="ice"]       { --ph: 215; --pc: .02;  --ptc: .03;  --accent: #2a5fa8; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
   :root[data-theme="mid"]       { --ph: 255; --pc: .022; --ptc: .02;  --accent: #f0b04a; --good: #6fe08f; --danger: #ff7d7d; --vip: #ffa4c8; }
+  /* mid's weakness is contrast - steel scales the shade's text lightness
+     away from the .5 midpoint (a bigger bg/text gap at every stop, light
+     or dark) and mixes line/dim harder toward text so borders and glyphs
+     read stronger */
+  :root[data-theme="steel"]     { --ph: 250; --pc: .028; --ptc: .014; --accent: #8ab8f5; --good: #6fe08f; --danger: #ff8585; --vip: #f0a4c8;
+    --text: oklch(clamp(.03, calc(.5 + (var(--sh-tx) - .5) * 1.2), .99) var(--ptc) var(--ph));
+    --text-dim: color-mix(in oklch, var(--bg), var(--text) 68%);
+    --line: color-mix(in oklch, var(--bg), var(--text) 40%);
+    --panel: color-mix(in oklch, var(--bg), var(--text) 12%);
+  }
   :root[data-theme="solarized"] { --ph: 200; --pc: .038; --ptc: .03;  --accent: #b58900; --good: #859900; --danger: #dc322f; --vip: #d33682; }
   :root[data-theme="nord"]      { --ph: 245; --pc: .028; --ptc: .02;  --accent: #88c0d0; --good: #a3be8c; --danger: #bf616a; --vip: #b48ead; }
   :root[data-theme="dark"]      { --ph: 255; --pc: .016; --ptc: .015; --accent: #e8a33d; --good: #5fd98a; --danger: #e85d5d; --vip: #f783ac; }
@@ -2130,11 +2140,11 @@
     heather:  { theme: 'lavender',shade: 6,    font: 'sourcecodepro', size: 11, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 4, hfspx: 15 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
-  const THEMES = ['console', 'amber', 'black', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
+  const THEMES = ['console', 'amber', 'black', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'steel', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
   // each style's designed shade: swatch previews and popup clicks use it,
   // while the ◐ cycle keeps whatever shade is currently active
-  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, black: 8, amber: 8, console: 8 };
-  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
+  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, steel: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, black: 8, amber: 8, console: 8 };
+  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', steel: '▣', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
   let themeMode = 'dark';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
 

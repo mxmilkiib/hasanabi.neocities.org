@@ -19,6 +19,10 @@ not versions — the page ships continuously to Neocities.
   `cosy`, is gone. `compact` runs at 15px
 - Nine shade stops with previews drawn in the real palettes; new `ice`,
   `forest` and `wine` styles fill the hue gaps
+- New `steel` style: a mid-shade slate that scales text lightness away
+  from the .5 midpoint and mixes line/dim harder toward text - ~22%
+  more text contrast than `mid` at shade 4 (4.14:1 vs 3.39:1) with
+  crisper button borders at every stop
 
 ### Channels
 - `?channel=login` retargets chat, the video embed and stream status;
