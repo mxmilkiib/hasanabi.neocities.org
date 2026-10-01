@@ -259,6 +259,9 @@
   #vid {
     position: fixed;
     right: 12px; bottom: 12px;
+    /* content-box: aspect-ratio then covers exactly the iframe area, the
+       border frames it instead of shaving ~2px off the video box */
+    box-sizing: content-box;
     width: min(460px, 92vw);
     aspect-ratio: 16/9;
     z-index: 8;
@@ -2372,6 +2375,7 @@
   // read back mute/volume so the last setting survives a reload. ----
   const VOL_KEY = 'hasan-vidvol';
   let vidPlayer = null;
+  let vidRatio = 16 / 9; // replaces the css default once stats report the real resolution
   function loadPlayer() {
     if (loadPlayer.done) return;
     loadPlayer.done = true;
@@ -2392,6 +2396,20 @@
         setInterval(() => {          // poll + persist; the API emits no volume event
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: vidPlayer.getMuted(), p: !vidPlayer.isPaused() });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch (e) {} }
+          // match the box to the actual stream resolution so the embed
+          // letterboxes nothing - videoResolution is "WxH" or {width,height}
+          // depending on embed version
+          const vr = vidPlayer.getPlaybackStats && vidPlayer.getPlaybackStats().videoResolution;
+          const vw = typeof vr === 'string' ? +vr.split('x')[0] : vr && vr.width;
+          const vh = typeof vr === 'string' ? +vr.split('x')[1] : vr && vr.height;
+          if (vw > 0 && vh > 0 && Math.abs(vw / vh - vidRatio) > .001) {
+            vidRatio = vw / vh;
+            vidBox.style.aspectRatio = vw + ' / ' + vh;
+            const r = vidBox.getBoundingClientRect();
+            if (r.bottom > innerHeight) // a top-anchored box grew past the fold
+              vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, innerHeight - r.height) + 'px';
+            saveVidBox();
+          }
         }, 2000);
       });
     };
@@ -2422,7 +2440,7 @@
     if (p && p.left != null) {
       // clamp to the viewport: the box is hidden here so it can't be
       // measured, and an off-screen saved position renders it invisible
-      const w = Math.min(p.w || 460, innerWidth - 24), h = w * 9 / 16;
+      const w = Math.min(p.w || 460, innerWidth - 24), h = w / vidRatio;
       vidBox.style.left = Math.max(0, Math.min(innerWidth - w, parseFloat(p.left) || 0)) + 'px';
       vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - h, parseFloat(p.top) || 0)) + 'px';
       vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
@@ -2452,11 +2470,11 @@
   });
 
   // resizing: each corner grip drags the far width, the opposite corner stays
-  // anchored, and aspect-ratio keeps the 16:9 height
+  // anchored, and aspect-ratio keeps the height at the stream's real ratio
   const saveVidBox = () => {
     try {
       const rr = vidBox.getBoundingClientRect();
-      localStorage.setItem(VIDPOS_KEY, JSON.stringify({ left: rr.left + 'px', top: rr.top + 'px', w: vidBox.offsetWidth }));
+      localStorage.setItem(VIDPOS_KEY, JSON.stringify({ left: rr.left + 'px', top: rr.top + 'px', w: vidBox.clientWidth }));
     } catch (e2) {}
   };
   vidBox.querySelectorAll('.vid-size').forEach((grip) => {
@@ -2471,12 +2489,12 @@
       const ay = topEdge ? r.bottom : r.top;
       const move = (ev) => {
         const maxW = Math.min(leftEdge ? ax : innerWidth - ax,
-          (topEdge ? ay : innerHeight - ay) * 16 / 9) - 4;
+          (topEdge ? ay : innerHeight - ay) * vidRatio) - 4;
         const w = Math.max(180, Math.min(maxW, Math.abs(ev.clientX - ax)));
         vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
         vidBox.style.width = w + 'px';
         vidBox.style.left = (leftEdge ? ax - w : ax) + 'px';
-        vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, topEdge ? ay - w * 9 / 16 : ay) + 'px';
+        vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, topEdge ? ay - w / vidRatio : ay) + 'px';
       };
       const drop = () => {
         vidBox.classList.remove('dragging');
