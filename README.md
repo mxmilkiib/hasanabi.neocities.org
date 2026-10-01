@@ -156,9 +156,10 @@ no dependencies beyond CDN-hosted fonts:
   sent messages like an IRC client, stashing the draft on the first `↑`
   and restoring it once `↓` walks back past the newest entry.
 - **Emote picker** — `☻` opens a Chatterino-style grid above the chat
-  box: 7TV / BTTV / FFZ / Twitch / emoji sections with search, resizable
-  from its left and top edges (size persists). Clicking inserts at the
-  caret and the panel stays open until `☻` or `Esc`.
+  box: 7TV / BTTV / FFZ / Twitch / emoji sections with search, a
+  `recent` row of the last 24 used, resizable from its left and top
+  edges (size persists). Clicking inserts at the caret and the panel
+  stays open until `☻` or `Esc`.
 - **Channels** — `?channel=login` points chat, stream embed and status
   at another streamer for the visit; history, graph and tab-sync keys
   get a per-channel suffix so streams don't bleed into each other, and
