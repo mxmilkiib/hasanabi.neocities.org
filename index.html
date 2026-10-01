@@ -447,20 +447,20 @@
   /* emote-only messages scale up like chatterino, either inline or pinned
      to the right edge like gif embeds so the row keeps its line height */
   main.em-inline .row.eonly .emote, main.em-right .row.eonly .emote { height: 2.2em; }
-  main.em-inline .row.eonly .emote { margin: -.45em 1px; }
+  main.em-inline .row.eonly .emote { margin: -.7em 1px; }
   /* right-pinned emote rows go flexbox so dom order holds at the right edge:
      emotes first, then the trailing aux chip ([sub 12], [mod], bits) last */
   main.em-right .row.eonly { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
   /* colon rides with the name; its auto margin is what pins the emotes right */
   main.em-right .row.eonly > .colon { margin-right: auto; }
-  main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { margin: -.45em 1px; }
+  main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { margin: -.7em 1px; }
   /* floats are dead weight inside the flex row, so the aux chips ride
      flex order instead: emotes first, then [mod]/[sub]/bits at the tip */
   main.em-right .row.eonly > .aux, main.em-right .row.eonly > .sub { order: 1; float: none; margin-left: 5px; }
   /* zero-width overlay emotes stack on the previous emote's box */
   .estk { position: relative; display: inline-block; }
   .estk .emote { height: 1.5em; }
-  main.em-inline .row.eonly .estk .emote, main.em-right .row.eonly .estk .emote { height: 2.2em; }
+  main.em-inline .row.eonly .estk .emote, main.em-right .row.eonly .estk .emote { height: 2.2em; margin-top: -.7em; margin-bottom: -.7em; }
   .estk .zw { position: absolute; left: 0; top: 0; height: 100%; width: auto; margin: 0; }
   /* real badge icons render left of the name, like twitch */
   .badge { height: 1.15em; width: 1.15em; vertical-align: -.18em; margin-right: 3px; }
