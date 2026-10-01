@@ -166,7 +166,7 @@ no dependencies beyond CDN-hosted fonts:
   keyword set when logged in), GLORP/F red rows, channel-point
   tints, fossabot/blammobot name shimmer and game-line styling, braille
   art restacking, image/GIF/Giphy embeds, X/Twitter preview cards via
-  fxtwitter (profile links fall back to Bird.makeup when nitter is
+  fxtwitter (text skipped when a bot like fossabot already pasted it) (profile links fall back to Bird.makeup when nitter is
   down). Mentions landing while the page is unfocused queue on a
   clickable `@N` chip in the header — click to jump to each, ⇧click
   clears.

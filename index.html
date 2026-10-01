@@ -956,8 +956,19 @@
   // from status.d420.de, this is only the fallback until then.
   let nitterHost = null; // set once the relay confirms a live instance
   // status links get an inline preview fetched via the relay (api.fxtwitter):
-  // tweetCache holds rendered card html, tweetWait dedupes in-flight asks
+  // tweetCache holds the fetched tweet (text, author, media html), tweetWait
+  // dedupes in-flight asks
   const tweetCache = new Map();
+  const twNorm = (s) => s.toLowerCase().replace(/https?:\/\/\S+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  // the card is built per row: a bot that already pasted the tweet's text
+  // (fossabot) makes the text redundant, so only the media is kept
+  function twCard(c, rowText) {
+    if (!c) return '';
+    const head = twNorm(c.text).slice(0, 40);
+    const media = c.imgs ? `<span class="twmedia">${c.imgs}</span>` : '';
+    if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${media}</span>` : '';
+    return `<span class="twcard"><b>@${escapeHTML(c.author)}</b> ${escapeHTML(c.text.slice(0, 280))}${media}</span>`;
+  }
   const tweetWait = new Set();
   function reqTweet(id) {
     if (tweetWait.has(id) || tweetCache.has(id)) return;
@@ -1073,7 +1084,7 @@
                           : `https://x.com${path}`;
         let extra = '';
         if (st) {
-          if (tweetCache.has(st[1])) extra = tweetCache.get(st[1]);
+          if (tweetCache.has(st[1])) extra = twCard(tweetCache.get(st[1]), text);
           else { reqTweet(st[1]); extra = `<span class="twprev" data-twid="${st[1]}"></span>`; }
         }
         out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>` + extra);
@@ -3672,8 +3683,8 @@
     } else if (d.type === 'tweet' && /^\d+$/.test(d.id || '')) {
       tweetWait.delete(d.id);
       const t = d.tweet;
-      // filled once per id; a null tweet leaves the bare link (cached as '')
-      let html = '';
+      // filled once per id; a null tweet leaves the bare link (cached as null)
+      let entry = null;
       if (t && t.text) {
         const m = t.media || {};
         const twurl = `https://x.com/i/status/${d.id}`;
@@ -3684,12 +3695,11 @@
           .concat((m.videos || []).slice(0, 4).filter((v) => v.thumb)
             .map((v) => `<a class="twvid" href="${escapeHTML(twurl)}" target="_blank" rel="noopener noreferrer" title="play on x.com"><img src="${escapeHTML(v.thumb)}" alt="video thumbnail"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`))
           .join('');
-        html = `<span class="twcard"><b>@${escapeHTML(t.author && t.author.screen_name || '')}</b> ` +
-          `${escapeHTML(t.text.slice(0, 280))}${imgs ? `<span class="twmedia">${imgs}</span>` : ''}</span>`;
+        entry = { text: t.text, author: t.author && t.author.screen_name || '', imgs };
       }
-      tweetCache.set(d.id, html);
+      tweetCache.set(d.id, entry);
       document.querySelectorAll(`.twprev[data-twid="${d.id}"]`)
-        .forEach((el) => { el.outerHTML = html; });
+        .forEach((el) => { const row = el.closest('.row'); el.outerHTML = twCard(entry, row ? row.textContent : ''); });
       repin();
     } else if (d.type === 'repo') {
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
