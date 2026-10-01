@@ -3,7 +3,7 @@
 A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/hasanabi),
 hosted on Neocities — orientated around the Hasan Piker stream, aka the
 Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool,
-organising, media and other resources, and more. Live at
+organising, media and other resources, & more! Live at
 <https://hasanabi.neocities.org/>.
 
 The project comes in two parts: the frontend
