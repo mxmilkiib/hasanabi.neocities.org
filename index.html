@@ -3253,7 +3253,26 @@
     }
   });
 
+  // input history: ↑/↓ walks sent messages like an irc client; the
+  // in-progress draft is stashed on the first ↑ and restored once ↓
+  // walks back past the newest entry
+  const hist = [];
+  let histIdx = null, histDraft = '';
+  const histGo = (dir) => {
+    if (histIdx === null) {
+      if (dir > 0 || !hist.length) return;
+      histDraft = chatInput.value;
+      histIdx = hist.length;
+    }
+    const n = histIdx + dir;
+    if (n >= hist.length) { histIdx = null; chatInput.value = histDraft; }
+    else { histIdx = Math.max(0, n); chatInput.value = hist[histIdx]; }
+    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+  };
+
   chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp' && (histIdx !== null || hist.length)) { e.preventDefault(); histGo(-1); return; }
+    if (e.key === 'ArrowDown' && histIdx !== null) { e.preventDefault(); histGo(1); return; }
     if (e.key === 'Escape' && replyCtx) { clearReply(); return; }
     if (e.key !== 'Enter' || e.isComposing) return;
     const text = chatInput.value.trim();
@@ -3281,6 +3300,8 @@
     if (chan) chan.postMessage({ type: 'echo', msg: echoMsg });
     pendingEcho.push(auth.login + '\x00' + body);
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
+    if (hist[hist.length - 1] !== text) { hist.push(text); if (hist.length > 100) hist.shift(); }
+    histIdx = null; histDraft = '';
     clearReply();
     chatInput.value = '';
   });
