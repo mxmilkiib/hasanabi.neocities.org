@@ -69,12 +69,16 @@ Relay → parent:
   refetched every 10 minutes
 - `{type: 'nitter', host}` — fastest healthy nitter instance from
   status.d420.de, rechecked every 15 minutes
+- `{type: 'wscause', code, reason}` — why the Twitch socket last closed,
+  sent with each `reconnecting` status; the page shows it in the header
+- `{type: 'repo', stars, created, pushed}` — GitHub metadata for the
+  source row of the help popup
 - `{type: 'auth', login}` (or `{type: 'auth', error}`) — after `auth`, the
   relay validates the token at id.twitch.tv, reconnects the socket with
   the user's credentials, and reports the resolved login
 - `{type: 'tweet', id, tweet}` — preview data for a tweet link
 
-Optional login uses Twitch's implicit OAuth grant (`➤` in the header) — a
+Optional login uses Twitch's implicit OAuth grant (the Twitch button in the header) — a
 pure client-side flow, so no secret ships in the page. `TWITCH_CLIENT_ID`
 in `index.html` must be an app registered at dev.twitch.tv with this
 page's URL as its redirect URI. Chat-scoped tokens live in localStorage
@@ -121,27 +125,40 @@ no dependencies beyond CDN-hosted fonts:
   and re-rasterises to match its box so it stays sharp through resizes.
   Persisted across reloads.
 - **Controls** — colour style palettes (brightness-ordered, each with a
-  designed shade stop) plus a separate 7-stop shade axis
-  (lightest → darkest, or system-following auto); the `◐` cycle swaps
+  designed shade stop) plus a separate 9-stop shade axis
+  (white → black, or system-following auto); the `◐` cycle swaps
   hue family alone while picking a chip also applies its shade, zebra
   striping, graduated text shadow, font picker (incl. dyslexia-friendly),
   font size, weight, line height, row separator shades, three-state
   timestamps (off / no seconds / seconds), sub-chip modes (right /
   compact `[NN]` / before badges / hidden), emote-only row modes,
   page-flip columns (two, or three in landscape), draggable stream-video
-  overlay, minimizable header, tabbed help panel (resources · authors ·
-  configuration) with its own width and font-size controls. All
+  overlay (its button turns green while playing, red when stopped),
+  minimizable header, tabbed help panel (resources · authors ·
+  config/help) with its own width and font-size controls. All
   persisted in `localStorage`; every option answers to click,
   shift+click (reverse) and the scroll wheel. In the popup the style and
   preset links render as live swatches — background, text colour and,
   for presets, the bundled font.
-- **Sending** — optional Twitch login (`➤`, implicit OAuth — no secret
-  ships in the page) enables a chat input bar. `/me` is wrapped as a
+- **Sending** — optional Twitch login (the Twitch button, implicit OAuth — no
+  secret ships in the page) enables a chat input bar. `/me` is wrapped as a
   CTCP ACTION so it renders as a proper action line; hovering a row
   shows `↩` to reply — the pending-reply bar shows the target and cancels
   on `Esc`, and the send carries `reply-parent-msg-id` plus the `@login`
   prefix like other clients. Local echoes render instantly and are
-  adopted in place when the real line replays.
+  adopted in place when the real line replays. `↑`/`↓` in the input walk
+  sent messages like an IRC client, stashing the draft on the first `↑`
+  and restoring it once `↓` walks back past the newest entry.
+- **Emote picker** — `☻` opens a Chatterino-style grid above the chat
+  box: 7TV / BTTV / FFZ / Twitch / emoji sections with search, resizable
+  from its left and top edges (size persists). Clicking inserts at the
+  caret and the panel stays open until `☻` or `Esc`.
+- **Channels** — `?channel=login` points chat, stream embed and status
+  at another streamer for the visit; history, graph and tab-sync keys
+  get a per-channel suffix so streams don't bleed into each other, and
+  the OAuth round-trip carries the channel in `state`. The resources
+  tab's twitch streams row links each streamer with a `*` that switches
+  to them.
 - **Scrolling** — the log follows new messages only while at the
   bottom; scrolling up releases it and shows a jump-to-latest button
   with a count of rows below the fold (one per column in split mode).
@@ -166,10 +183,11 @@ no dependencies beyond CDN-hosted fonts:
 - **URL options** — query params apply a configuration on top of (and
   into) the saved one, e.g. `?split&theme=dark&size=18&font=inter`.
   Keys: `split` (2 panes, or `split=3` on landscape screens), `min`,
-  `style`, `shade` (0-6, `auto` follows the system; a bare `style` with
+  `style`, `shade` (0-8, `auto` follows the system; a bare `style` with
   no `shade` lands on the style's designed stop), `font`, `size`, `lh`,
   `wght` (300-700), `hfs` (header font px; unset = follow chat),
-  `hpfs` (help popup font px), `hpw` (help popup width, `480`–`1280`),
+  `hpfs` (help popup font px), `hpw` (help popup width, `480`–`1600`), `pause` (hold the scroll while
+  hovering a row), `channel` (any twitch login),
   `zebra`, `lines` (0-3 separator shades),
   `times` (on, `nosec`, or `=0` off), `shadow`, `video`,
   `sub` (right/num-right/left/num-left/hidden), `eonly` (inline/right/off),
@@ -180,11 +198,17 @@ no dependencies beyond CDN-hosted fonts:
   header (option buttons hidden, rate graph across the bar); `min=1`
   minimises to a strip.
   `theme` names a preset bundle of all display options (`default`,
-  `compact`, `paper`, `cosy`, `console`, `cinema`, `phosphor`,
-  `dyslexic`, `midnight`, `solar`, `minimal`, `mirc`, `irc`, `gohu`,
-  `heather`); a
-  style name like `theme=dark` still selects just the palette for old
-  links.
+  `compact`, `print`, `cosy`, `cinema`, `phosphor`, `dyslexic`,
+  `midnight`, `solar`, `minimal`, `retro`, `irc`, `gohu`, `heather`); a
+  style name like `theme=dark` still selects just the palette, which
+  is also what the retired preset names `paper`, `mirc` and `console`
+  now resolve to. Presets never share a name with a style.
+- **Help popup** — resources (re Hasan, news, yt channels, twitch
+  streams, usa pol, the largest DSA chapter per state, left parties,
+  extra links), authors (era-grouped reading lists) and config/help,
+  laid out in link columns whose count is capped by the popup's own
+  width via container queries. The popup resizes from its edges and
+  offers widths from 480 to 1600px.
 - **Performance** — incoming lines queue and flush once per animation
   frame; the log is capped at 1000 rows.
 

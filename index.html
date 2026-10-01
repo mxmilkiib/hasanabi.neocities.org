@@ -772,7 +772,8 @@
   // ?channel=login retargets chat, video embed and stream status for the
   // visit; history/rate/tab-sync keys get a suffix so streams don't bleed
   const DEFAULT_CHANNEL = 'hasanabi';
-  const CHANNEL = (new URLSearchParams(location.search).get('channel') || '')
+  const CHANNEL = (new URLSearchParams(location.search).get('channel') ||
+    new URLSearchParams(location.hash.slice(1)).get('state') || '')
     .toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 25) || DEFAULT_CHANNEL;
   const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? 'HasanAbi' : CHANNEL;
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
@@ -844,7 +845,10 @@
     if (fill) fill.style.width = (n / LOAD_STEPS * 100) + '%';
     if (txt != null) emptyLabel.textContent = txt;
   }
-  document.getElementById('channelName').textContent = CHAN_LABEL;
+  const chanLink = document.getElementById('channelName');
+  chanLink.textContent = CHAN_LABEL;
+  chanLink.href = 'https://www.twitch.tv/' + CHANNEL;
+  chanLink.title = CHANNEL + ' on twitch';
   document.title = CHAN_TITLE;
   const hintEl = document.getElementById('hint');
   if (!localStorage.getItem('hasan-hint')) hintEl.hidden = false;
@@ -2074,7 +2078,7 @@
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
   });
 
-  // tabs split the panel into configuration / resources / authors pages
+  // tabs split the panel into config/help / resources / authors pages
   function switchTab(id) {
     helpPanel.querySelectorAll('.htabs a').forEach((a) => a.classList.toggle('on', a.dataset.htab === id));
     helpPanel.querySelectorAll('.htabpage').forEach((p) => p.hidden = p.id !== id);
@@ -3250,7 +3254,10 @@
   if (oauthFrag.get('access_token')) {
     auth = { token: oauthFrag.get('access_token'), login: null };
     try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch (e) {}
-    history.replaceState(null, '', location.pathname + location.search);
+    // keep a non-default channel in the url after the token comes back
+    const back = new URLSearchParams(location.search);
+    if (CHANNEL !== DEFAULT_CHANNEL) back.set('channel', CHANNEL);
+    history.replaceState(null, '', location.pathname + (back.size ? '?' + back : ''));
   }
 
   function updateSendUI() {
@@ -3315,6 +3322,7 @@
     } else {
       location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
         '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
+        (CHANNEL !== DEFAULT_CHANNEL ? '&state=' + encodeURIComponent(CHANNEL) : '') +
         '&response_type=token&scope=' +
         encodeURIComponent('chat:read chat:edit user:read:chat user:write:chat');
     }

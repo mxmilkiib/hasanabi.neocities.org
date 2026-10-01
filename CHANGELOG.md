@@ -3,6 +3,95 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-01
+
+### Defaults & presets
+- New out-of-the-box set: dark style, shade 6, Source Code Pro 17px,
+  line height 1.3, weight 400, zebra, one separator shade, compact
+  `[NN]` sub chips ahead of the badges, video off, 1280px help popup,
+  14px header font, own-message accent edge on. A fresh page copies a
+  bare URL; precedence is defaults < saved options < URL params
+- Saved `sub` modes now round-trip: bundles decode by era instead of
+  always running through the oldest remap, and boot-time setters no
+  longer overwrite the saved bundle before it loads
+- Presets no longer share names with styles: `paper` → `print` (now at
+  the white shade), `mirc` → `retro`; the `console` preset, a copy of
+  `cosy`, is gone. `compact` runs at 15px
+- Nine shade stops with previews drawn in the real palettes; new `ice`,
+  `forest` and `wine` styles fill the hue gaps
+
+### Channels
+- `?channel=login` retargets chat, the video embed and stream status;
+  history, graph and tab-sync keys are per-channel, the header link and
+  title follow, and the OAuth round-trip returns to the same channel
+  through `state`
+- Resources tab: `channels` split into **yt channels** and **twitch
+  streams**, each streamer carrying a `*` that switches the page to
+  them; both rows grouped by kind, streamers ordered by followers
+
+### Chat & rendering
+- IRC-style input history: `↑`/`↓` walk sent messages, the draft is
+  stashed on the first `↑` and restored by `↓`
+- Emote picker: sections per provider (7TV / BTTV / FFZ / Twitch /
+  emoji), resizable from its left and top edges, rows sized so section
+  titles hug their emotes, closes on `☻` or `Esc` from anywhere
+- Chip order: left sub modes lead with `[md] [12]` ahead of the badges,
+  right modes end `[md] [bits] [first] [sub]`; the restyle pass anchors
+  right-edge chips after the colon so they stay on the first line of a
+  long message. `[first]` is hot pink and bold, `[notice]` bold, sub
+  chips stay upright on italic rows
+- Emote-only and stacked emotes can no longer lift the line box at
+  tight line heights
+- Video: box follows the stream's real aspect ratio with no letterbox
+  gap, and the `▶` button is green while playing, red when stopped
+- Twitch login button wears a monochrome glitch logo
+
+### Header & graph
+- Corner order is `–` then `?` rightmost, the minimised `–` keeping its
+  place; the `–` wheel wraps full ⇄ reduced ⇄ minimised both ways
+- Labels mode also names the shade, help and header buttons
+- Rate graph traces in the accent's complementary hue (`amber` and
+  `console` stay monochrome); 30s ticks get a mid-weight stroke
+- While chat is reconnecting the header names the socket's close code
+- Chat bar loses its top rule, gets a darker field and a 1px focus ring;
+  scrollback age shows on the jump-down chip, backlog count brighter
+
+### Help popup
+- Tab renamed **config/help**; the stream-status row carries a live
+  copy of the status dot
+- Widths run to 1600px; link-column counts are capped by the popup's
+  own width (container queries), columns are wider (20em, authors
+  26em, extra links 24em), and the authors tab is columnised with
+  era headings on their own line
+- New rows: **usa pol** (DSA national, commissions, ydsa, ActBlue),
+  **dsa chapters** (largest chapter in every state), **left parties**
+  (UK greens and Your Party plus the main European left parties and the
+  EP group); blammobot and fossabot get separate bot rows with the
+  longer fossabot command list
+- Tenant-union directories, Sociocracy for All, dual power, Lindsay
+  Ellis, Kat Blaque and more streamers added; turbulence points at the
+  UK journal; the twitter link goes direct to x.com now that every
+  nitter mirror is down or blocked
+
+## 2026-09-30
+
+### Help popup
+- Split into resources · authors · config tabs, edge-draggable and
+  resizable, default 960px, with its own font-size option; style and
+  preset links render as live palette swatches; styles ordered by
+  brightness, each with a designed shade stop; queer authors row added
+
+### Chat
+- Inline replies (`↩` on hover, reply bar, `reply-parent-msg-id`),
+  `/me` sent as a CTCP ACTION, options/auth/echoes synced across open
+  tabs, bare CLEARCHAT targets parsed
+- Gap markers where the page wasn't watching, including discarded-tab
+  reloads; tweet previews render video thumbnails
+- Chatterino-style emote picker; notices count in zebra parity and the
+  mod chip always shows
+- Jump-to-bottom button with a backlog count, four times the scrollback
+- `irc` and `heather` presets; video overlay clamps below the header
+
 ## 2026-09-29
 
 ### Style & appearance
