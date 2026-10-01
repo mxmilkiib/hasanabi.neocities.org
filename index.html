@@ -550,6 +550,8 @@
   #spark { height: 18px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  #vidBtn.playing { color: #3fbf3f; border-color: #3fbf3f; }
+  #vidBtn.stopped { color: #e04040; border-color: #e04040; }
   /* keep the ? button clickable above the help panel when they overlap */
   #helpBtn { position: absolute; z-index: 11; }
   select.hdr-btn { padding-right: 4px; }
@@ -2392,8 +2394,13 @@
         if (saved.v != null) vidPlayer.setVolume(saved.v);
         if (saved.m != null) vidPlayer.setMuted(saved.m);
         if (saved.p === false) vidPlayer.pause();
+        vidState();
+        vidPlayer.addEventListener(Twitch.Player.PLAYING, vidState);
+        vidPlayer.addEventListener(Twitch.Player.PAUSE, vidState);
+        vidPlayer.addEventListener(Twitch.Player.ENDED, vidState);
         let last = '';
         setInterval(() => {          // poll + persist; the API emits no volume event
+          vidState();
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: vidPlayer.getMuted(), p: !vidPlayer.isPaused() });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch (e) {} }
           // match the box to the actual stream resolution so the embed
@@ -2415,12 +2422,20 @@
     };
     document.head.appendChild(s);
   }
+  // paint the button from playback: green while playing, red once the
+  // player exists but sits paused/ended
+  function vidState() {
+    const playing = vidPlayer && !vidPlayer.isPaused();
+    vidBtn.classList.toggle('playing', !vidBox.hidden && !!playing);
+    vidBtn.classList.toggle('stopped', !vidBox.hidden && !!vidPlayer && !playing);
+  }
   function setVideo(on) {
     vidBox.hidden = !on;
     vidBtn.classList.toggle('on', on);
     vidBtn.title = `Stream video: ${on ? 'on' : 'off'} - click/scroll`;
     markHelp('helpVideo', on ? 1 : 0);
     if (on) loadPlayer();
+    else vidState();
   }
   vidBtn.addEventListener('click', () => { setVideo(vidBox.hidden); saveOpts(); });
   vidBtn.addEventListener('wheel', (e) => {
