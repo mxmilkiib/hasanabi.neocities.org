@@ -78,9 +78,9 @@ Relay → parent:
   forwards it as `lines`; the page skips already-rendered msg ids
 - `{type: 'stream', uptime, viewers, title}` — decapi poll result
 - `{type: 'emotes', emotes, emoteSrc, zeroWidth, badges, lastBroadcast,
-  lastVod, emoteUse}` — emote map + sources + badge sets + stream history
-  + per-emote channel usage counts (StreamElements chatstats), refetched
-  every 10 minutes
+  lastVod, emoteUse, emoteAnim}` — emote map + sources + badge sets +
+  stream history + per-emote channel usage counts (StreamElements
+  chatstats) + animated-emote names, refetched every 10 minutes
 - `{type: 'nitter', host}` — fastest healthy nitter instance from
   status.d420.de, rechecked every 15 minutes
 - `{type: 'wscause', code, reason}` — why the Twitch socket last closed,
