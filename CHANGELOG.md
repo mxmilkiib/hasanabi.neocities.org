@@ -34,6 +34,10 @@ not versions — the page ships continuously to Neocities.
   them; both rows grouped by kind, streamers ordered by followers
 
 ### Chat & rendering
+- Row metrics resolve to whole pixels: the em-based line-height and
+  overlap margin are rounded in `syncLh()`, so every row boundary lands
+  on a device pixel and paused columns no longer wiggle fractionally on
+  each trim/append
 - IRC-style input history: `↑`/`↓` walk sent messages, the draft is
   stashed on the first `↑` and restored by `↓`
 - Emote picker: sections per provider (7TV / BTTV / FFZ / Twitch /

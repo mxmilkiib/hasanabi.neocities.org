@@ -430,9 +430,12 @@
   .row {
     font-family: var(--chat-ff, ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace);
     font-size: var(--chat-font, 14px);
-    line-height: max(var(--chat-lh, 1.65), 1.15);
-    margin-top: max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em));
-    margin-bottom: max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em));
+    /* --chat-lhpx/--chat-lhm are the same metrics rounded to whole px by
+       syncLh() - integer row heights keep every boundary on a device
+       pixel, so paused columns don't drift fractionally on each trim */
+    line-height: var(--chat-lhpx, max(var(--chat-lh, 1.65), 1.15));
+    margin-top: var(--chat-lhm, max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em)));
+    margin-bottom: var(--chat-lhm, max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em)));
     padding: 4px 0 2px;
     border-bottom: 1px solid var(--rowline, var(--line));
     word-wrap: break-word;
@@ -2360,9 +2363,22 @@
     else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
   }
 
+  // the row's line box and negative margin, resolved to whole pixels:
+  // a fractional line-height (e.g. 1.65 * 14px = 23.1px) puts every row
+  // boundary on a different sub-pixel, which reads as a tiny wiggle each
+  // time a trim or append shifts the column under a paused scroll
+  function syncLh() {
+    const cs = getComputedStyle(document.documentElement);
+    const fs = parseFloat(cs.getPropertyValue('--chat-font')) || 14;
+    const lh = parseFloat(cs.getPropertyValue('--chat-lh')) || 1.65;
+    const de = document.documentElement.style;
+    de.setProperty('--chat-lhpx', Math.round(fs * Math.max(lh, 1.15)) + 'px');
+    de.setProperty('--chat-lhm', Math.round(Math.max(-3, Math.min(0, (lh - 1.15) * 0.5 * fs))) + 'px');
+  }
   function cycle(btn, list, idx, prop, label, unit, helpCls) {
     const apply = () => {
       document.documentElement.style.setProperty(prop, list[idx] + unit);
+      syncLh();
       btn.title = `${label}: ${list[idx]}${unit} - click/scroll · ⇧click back`;
       if (helpCls) helpPanel.querySelectorAll('a.' + helpCls)
         .forEach((a) => a.classList.toggle('on', +a.dataset.idx === idx));
