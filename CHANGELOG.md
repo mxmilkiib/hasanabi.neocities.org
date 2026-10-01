@@ -52,6 +52,13 @@ not versions — the page ships continuously to Neocities.
 - Emote picker orders each section by channel usage: the relay folds
   StreamElements' per-emote chatstats into `emoteUse` and most-used
   emotes lead, uncharted ones keeping the name-stem sort
+- Emote picker gets an `anim`/`still` filter pair in the toolbar: the
+  relay now flags each third-party emote's animation state from 7TV,
+  BTTV and FFZ provider metadata (`emoteAnim`), Twitch sets use their
+  `assetType`, emoji count as still; the chips toggle like the source
+  tabs (shift-click isolates), persist, and filter the `recent` row.
+  Animated Twitch emotes get their `/animated/` CDN variant so they
+  actually move in the grid
 - Tweet video thumbs play inline: a click swaps the thumbnail for a
   muted-loop GIF or a controls+autoplay player (the direct mp4 URL was
   already in the relay payload); shift-click still opens x.com

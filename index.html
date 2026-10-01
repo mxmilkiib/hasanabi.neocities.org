@@ -860,7 +860,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
 
 <script>
 (() => {
@@ -1047,6 +1047,7 @@
   let thirdPartyEmotes = {};
   let emoteSrc = {};           // name -> 'Twitch'/'7TV'/'BTTV'/'FFZ' for tooltips
   let emoteUse = {};           // name -> channel usage count (streamelements stats)
+  let emoteAnim = new Set();   // names flagged animated by their provider
   let zeroWidth = new Set();   // 7TV overlay emotes that stack on the previous one
   let badgeSets = {};          // 'set_id' -> { version: url }
   // Nitter host for twitter/x link rewriting; the relay picks a live one
@@ -3769,7 +3770,7 @@
     '⏺️', '⏩', '⏪', '🔀', '🔁', '🔂', '🔄', '🎵', '🎶', '➕', '➖', '✖️',
     '♾️', '💲', '🔔', '🔕', '📣', '📢', '💬', '💭', '🗯️', '♠️', '♣️', '♥️',
     '♦️', '🃏'];
-  const twEmoteUrl = (id) => `https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/${lightMode ? 'light' : 'dark'}/2.0`;
+  const twEmoteUrl = (id, anim) => `https://static-cdn.jtvnw.net/emoticons/v2/${id}/${anim ? 'animated' : 'default'}/${lightMode ? 'light' : 'dark'}/2.0`;
   // twitch sets: [{ setID, channelLogin, tier, emoteList: [{ code, id, type }] }]
   let twSets = [];
   let twSetsKey = '';
@@ -3813,6 +3814,29 @@
     buildPicker();
     emoteQ.focus();
   });
+  // animation filter: anim/still chips work like the source tabs -
+  // none lit means both, so a solo chip can't be turned into nothing
+  const EPICK_ANIM_KEY = 'hasan-epickanim';
+  let epickAnimOn = new Set();
+  try { epickAnimOn = new Set(JSON.parse(localStorage.getItem(EPICK_ANIM_KEY)) || []); } catch (e) {}
+  const animOk = (a) => !epickAnimOn.size || epickAnimOn.has(a ? 'anim' : 'still');
+  const animBtns = { anim: document.getElementById('emoteAnim'), still: document.getElementById('emoteStill') };
+  function paintAnim() {
+    animBtns.anim.classList.toggle('on', animOk(true));
+    animBtns.still.classList.toggle('on', animOk(false));
+  }
+  paintAnim();
+  for (const [k, b] of Object.entries(animBtns)) b.addEventListener('click', (e) => {
+    if (e.shiftKey) epickAnimOn = new Set([k]);
+    else if (!epickAnimOn.size) epickAnimOn = new Set(k === 'anim' ? ['still'] : ['anim']);
+    else if (epickAnimOn.has(k)) epickAnimOn.delete(k);
+    else epickAnimOn.add(k);
+    if (epickAnimOn.size === 2) epickAnimOn.clear();
+    try { localStorage.setItem(EPICK_ANIM_KEY, JSON.stringify([...epickAnimOn])); } catch (e2) {}
+    paintAnim();
+    buildPicker();
+    emoteQ.focus();
+  });
   // source tabs: any mix of groups may be lit; none lit means everything
   const EPICK_TABS_KEY = 'hasan-epicktabs';
   const EPICK_GROUPS = ['7tv', 'bttv', 'ffz', 'twitch', 'emoji'];
@@ -3846,7 +3870,7 @@
   try { epickRecent = JSON.parse(localStorage.getItem(EPICK_RECENT_KEY)) || []; } catch (e) {}
   function noteRecent(b) {
     const img = b.querySelector('img');
-    const r = { n: b.dataset.ins };
+    const r = { n: b.dataset.ins, a: b.dataset.a === '1' };
     if (img) { r.src = (b.title.split(' - ')[1] || ''); r.img = img.getAttribute('src'); }
     epickRecent = [r, ...epickRecent.filter((x) => x.n !== r.n)].slice(0, EPICK_RECENT_MAX);
     try { localStorage.setItem(EPICK_RECENT_KEY, JSON.stringify(epickRecent)); } catch (e) {}
@@ -3899,43 +3923,46 @@
   function buildPicker() {
     const q = emoteQ.value.trim().toLowerCase();
     const hit = (n) => !q || n.toLowerCase().includes(q);
-    const btn = (n, src, img) => {
+    const btn = (n, src, img, a) => {
       const e = escapeHTML(n);
-      return `<button type="button" data-ins="${e}" title="${e} - ${escapeHTML(src)}">` +
+      return `<button type="button" data-ins="${e}"${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}">` +
         `<img src="${escapeHTML(img)}" alt="${e}" loading="lazy"><span class="ename">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // third-party emotes grouped by provider
     const groups = {};
-    for (const n of Object.keys(thirdPartyEmotes).sort(pickerSort())) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
+    for (const n of Object.keys(thirdPartyEmotes).sort(pickerSort())) if (hit(n) && animOk(emoteAnim.has(n))) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
     let h = '';
     // recents lead when not searching - a search already surfaces them
-    if (!q && epickRecent.length) h += head('recent') + epickRecent.map((r) =>
-      r.img ? btn(r.n, r.src, r.img) : `<button type="button" class="eji" data-ins="${r.n}">${r.n}</button>`).join('');
+    if (!q && epickRecent.length) {
+      const recs = epickRecent.filter((r) => animOk(r.a !== undefined ? r.a : r.img ? emoteAnim.has(r.n) : false));
+      if (recs.length) h += head('recent') + recs.map((r) =>
+        r.img ? btn(r.n, r.src, r.img, r.a) : `<button type="button" class="eji" data-ins="${r.n}">${r.n}</button>`).join('');
+    }
     const srcTab = { '7TV': '7tv', 'BTTV': 'bttv', 'FFZ': 'ffz', 'FFZ animated': 'ffz' };
     for (const src of ['7TV', 'BTTV', 'FFZ', 'FFZ animated', 'other']) {
       const g = groups[src];
       // unlabelled extras ride along with whichever third-party tab is lit
       const on = src === 'other' ? ['7tv', 'bttv', 'ffz'].some(groupOn) : groupOn(srcTab[src]);
       if (!g || !g.length || !on) continue;
-      h += head(src === 'other' ? 'emotes' : src.toLowerCase()) + g.map((n) => btn(n, src, thirdPartyEmotes[n])).join('');
+      h += head(src === 'other' ? 'emotes' : src.toLowerCase()) + g.map((n) => btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n))).join('');
     }
     if (groupOn('twitch')) {
       // this channel's sets first, then other channels by name, globals last
       const rank = (s) => s.channelLogin === CHANNEL ? 0 : s.channelLogin ? 1 : 2;
       const sets = [...twSets].sort((a, b) => rank(a) - rank(b) || byName(a.channelLogin || '', b.channelLogin || '') || (+a.tier || 0) - (+b.tier || 0));
       for (const s of sets) {
-        const g = s.emoteList.filter((e) => hit(e.code))
+        const g = s.emoteList.filter((e) => hit(e.code) && animOk(e.assetType === 'ANIMATED'))
           .sort(epickSort === 'az' ? (a, b) => byName(a.code, b.code)
               : (a, b) => useOf(b.code) - useOf(a.code) || byName(a.code, b.code));
         if (!g.length) continue;
         const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                     : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
-        h += head(label) + g.map((e) => btn(e.code, label.slice(9), twEmoteUrl(e.id))).join('');
+        h += head(label) + g.map((e) => btn(e.code, label.slice(9), twEmoteUrl(e.id, e.assetType === 'ANIMATED'), e.assetType === 'ANIMATED')).join('');
       }
       if (!twSets.length && !q) h += head('twitch - loading…');
     }
-    if (groupOn('emoji') && !q) h += head('emoji') + EMOJIS.map((c) => // no names to match against
+    if (groupOn('emoji') && !q && animOk(false)) h += head('emoji') + EMOJIS.map((c) => // no names to match against
       `<button type="button" class="eji" data-ins="${c}">${c}</button>`).join('');
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
   }
@@ -4113,9 +4140,11 @@
       thirdPartyEmotes = d.emotes || {};
       emoteSrc = d.emoteSrc || {};
       emoteUse = d.emoteUse || {};
+      emoteAnim = new Set(d.emoteAnim || []);
       zeroWidth = new Set(d.zeroWidth || []);
       badgeSets = d.badges || {};
       retokenizeRows();
+      if (!emotePick.hidden) buildPicker();
       // lastBroadcast.startedAt is actually the last run's END for an
       // offline channel; the VOD carries the real start and end
       const lb = d.lastBroadcast && Date.parse(d.lastBroadcast.startedAt);
