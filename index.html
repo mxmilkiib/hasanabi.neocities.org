@@ -402,7 +402,7 @@
   #replyBar button { border: 0; background: none; color: var(--text-dim);
     font: inherit; cursor: pointer; padding: 0 2px; }
   #replyBar button:hover { color: var(--text); }
-  .time { color: var(--text-dim); margin-right: 8px; margin-left: 3px; }
+  .time { color: var(--text-dim); margin-right: 5px; margin-left: 3px; }
   main.notime .time { display: none; }
   main.nosec .time .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
@@ -1956,7 +1956,7 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 10, lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: false, hpw: 7, hfspx: 14, self: 1 },
+    default:  { theme: 'dark',    shade: 6,    font: 'sourcecodepro', size: 10, lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: false, hpw: 7, hfspx: 14, self: 1 },
     compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 8,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
     print:    { theme: 'light',   shade: 0,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
     cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
@@ -2172,6 +2172,7 @@
     applyFont();
     saveOpts();
   }, { passive: false });
+  fontSel.value = 'sourcecodepro'; // boot default; saved opts / url override below
   applyFont();
 
   // ---- highlight keywords: a comma-separated list whose lines get a green
@@ -2907,7 +2908,7 @@
     if (CHANNEL !== DEFAULT_CHANNEL) q.set('channel', CHANNEL);
     if (themeMode !== 'dark') q.set('style', themeMode);
     if (shadeIdx !== 6) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
-    if (fontSel.value !== 'mono') q.set('font', fontSel.value);
+    if (fontSel.value !== 'sourcecodepro') q.set('font', fontSel.value);
     if (fontCtl.get() !== 10) q.set('size', FONT_SIZES[fontCtl.get()]);
     if (lhCtl.get() !== 7) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
