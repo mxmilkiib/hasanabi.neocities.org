@@ -578,6 +578,9 @@
      the fixed-width button at full size */
   #splitBtn { font-size: .78em; }
   #splitBtn.tri { font-size: .66em; letter-spacing: -.5px; }
+  /* ◍ renders tall in the symbol fallback font and spills over the
+     button's top edge - shrinking it a touch keeps it inside */
+  #themeBtn.tall { font-size: .88em; }
   /* flexes to fill the free header space; sparkSize() matches the buffer to
      the laid-out width whenever it changes so it never rasterises blurry */
   #spark { height: 22px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
@@ -2146,6 +2149,7 @@
     else document.documentElement.dataset.theme = themeMode;
     updateTone();
     themeBtn.textContent = THEME_ICONS[themeMode] || '◐';
+    themeBtn.classList.toggle('tall', themeMode === 'solarized');
     document.getElementById('helpThemeIcon').textContent = themeBtn.textContent;
     themeBtn.title = `Style: ${themeMode} - click/scroll · ⇧click back · right-click: system`;
     helpPanel.querySelectorAll('.helpTheme').forEach((a) => { a.classList.toggle('on', a.dataset.theme === themeMode); });
