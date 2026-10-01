@@ -34,6 +34,30 @@ not versions — the page ships continuously to Neocities.
   them; both rows grouped by kind, streamers ordered by followers
 
 ### Chat & rendering
+- Page-flip ghost rows rest lighter (45% -> 62% opacity) while the fade
+  hugs the wave front harder - a curved ramp keeps ghosts near-invisible
+  deeper into the boundary before easing up
+- Reduced header keeps ?, - and stream-play buttons at their full-mode
+  size; the bar grows a few px to fit them instead of shrinking them
+- Emote-picker button glyph is larger, painted at 1.5x without changing
+  the button box
+- Links-view button uses a smaller monochrome chain glyph instead of
+  the platform-coloured emoji
+- Zebra striping no longer changes the shade of highlighted chat rows;
+  ordinary rows keep their alternating stripe
+- Tweet previews keep a space before `[video]` in both tweet text and
+  video thumbnail fallback labels
+- When subscriber months are not reported, chat rows show a dim [--]
+  (or [sub --]) placeholder instead of no chip; existing rows update when
+  cycling modes, and the tooltip distinguishes missing data from a real [00]
+- Scrollback row cap can be set from 250 to 100,000 in config/help,
+  saved locally or shared with `?scrollback=`; the background queue and
+  reload cache remain limited to 1,000 rows
+- Tweet preview text uses the full theme text colour for better contrast
+- Emote picker emoji sheet adds more faces and hand gestures, including
+  expressive, puzzled and sick faces plus directional and open hands
+- `[notice]` prefixes cycle through rainbow colours without changing the
+  rest of the row; reduced-motion settings keep a static rainbow
 - Row metrics resolve to whole pixels: the em-based line-height and
   overlap margin are rounded in `syncLh()`, so every row boundary lands
   on a device pixel and paused columns no longer wiggle fractionally on
@@ -48,7 +72,7 @@ not versions — the page ships continuously to Neocities.
   when logged out, replacing a hardcoded 34), this channel's sets first;
   a `recent` row of the last 24 used; source tabs (`7tv bttv ffz twitch
   emoji`, any mix, shift-click isolates, sized to fit their labels);
-  a ~550-character emoji sheet; emotes grouped by name-stem (peepo*,
+  a ~610-emoji sheet; emotes grouped by name-stem (peepo*,
   Feels*, monka* cluster instead of scattering alphabetically); an `Aa`
   toggle for a names
   list view; `name - source` tooltips; case-insensitive sort; animated

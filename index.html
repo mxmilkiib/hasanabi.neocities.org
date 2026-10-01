@@ -182,15 +182,15 @@
   /* hdr-side no longer grows - the spark takes all the free space itself */
   body.hdrgraph .hdr-side { flex: none; min-width: 0; }
   body.hdrgraph #spark { flex: 1; max-width: none; }
-  /* the corner buttons are 26px tall while the reduced bar is ~23px -
-     shrink them to fit rather than overlap the bottom edge */
-  body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { top: 3px; height: calc(100% - 6px); }
+  /* the bar grows to 30px so the pinned 26px corner buttons keep their
+     full-mode size instead of shrinking or overlapping the bottom edge */
+  body.hdrgraph header { min-height: 30px; }
   /* the pinned ▶ sits at right:80 - outside the 84px reserve, so reserve more */
   body.hdrgraph header { padding-right: 118px; }
   /* the stream play button stays reachable too, pinned left of the -;
      the .hdr-side .hdr-btn chain matches the hide rule's specificity so
      this later rule wins */
-  body.hdrgraph .hdr-side .hdr-btn#vidBtn { display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); right: 80px; height: calc(100% - 6px); }
+  body.hdrgraph .hdr-side .hdr-btn#vidBtn { display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); right: 80px; }
   /* when the header wraps, centre the icon strip on its own line */
   header.hdrwrap .hdr-side { margin-inline: auto; }
   #hint {
@@ -467,9 +467,21 @@
   .role.vip { color: var(--vip); }
   .role.host { color: var(--accent); }
   .role.sub { color: #4fbecd; }
+  .role.sub[title] { color: var(--text-dim); }
   .role.bits { color: var(--accent); }
   .role.first { color: #ff69b4; font-weight: 700; }
   .row.notice { color: var(--text-dim); font-style: italic; }
+  .row.notice .notice-label {
+    color: transparent;
+    background: linear-gradient(90deg, #ff6868, #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868,
+      #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: notice-rainbow 4s linear infinite;
+  }
+  @keyframes notice-rainbow { to { background-position: 100% 0; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label { animation: none; } }
   /* links view: rows without a url, and repeat posts of a url, hide */
   body.linkview .row:not([data-lk]), body.linkview .row.linkdup { display: none; }
   .row.notice.selfmod { color: var(--danger); font-style: normal; font-weight: 600; }
@@ -482,6 +494,8 @@
   main.zebra .row.z {
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07));
   }
+  main.zebra .row.z:is(.points, .glorp, .mention, .kw, .raid),
+  body.selfhl main.zebra .row.z.self { background-image: none; }
   main.shadowed .row { text-shadow: var(--row-sh); }
   .row.glorp {
     background-color: rgba(232, 93, 93, .13);
@@ -527,7 +541,7 @@
   .row.deleted { opacity: .45; text-decoration: line-through; }
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
-  .row.stale { opacity: .45; }
+  .row.stale { opacity: .62; }
   /* ghost rows near the fresh/ghost boundary fade hardest and ease off with
      depth as a pixel-distance gradient - applied inline by ghostFade() */
   /* invisible spacer repaying ghost-height overage so the faded page keeps
@@ -539,7 +553,7 @@
     margin: 2px 0;
     padding: 2px 8px;
     border-left: 2px solid var(--accent);
-    color: var(--text-dim);
+    color: var(--text);
     font-size: .92em;
     font-style: italic;
     white-space: normal;
@@ -798,7 +812,7 @@
     button.hdr-btn { width: 34px; }
     #fontSel { max-width: 92px; }
     #spark { max-width: 70px; }
-    body.hdrgraph header { padding-right: 130px; }
+    body.hdrgraph header { padding-right: 130px; min-height: 32px; } /* fits the 28px buttons */
     #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; }
     .col { padding: 6px 10px 6px 6px; }
   }
@@ -809,7 +823,7 @@
     <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" hidden></span></div>
     <canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back">–</button>
-    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.35)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles">&#x1F517;&#xFE0E;</button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,0)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.35)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,0)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
   </header>
   <div id="helpPanel" hidden>
     <nav class="htabs"><a href="#" class="htab" data-htab="htabRes">resources</a><a href="#" class="htab" data-htab="htabAuth">authors</a><a href="#" class="htab on" data-htab="htabCfg">config/help</a></nav>
@@ -827,10 +841,11 @@
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
+    <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads. Large values use more memory<sup>†</sup></span></div>
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
-    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip marks how many months that chatter has been subscribed; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
+    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim [--] / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>🔗</b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
@@ -887,7 +902,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
 
 <script>
 (() => {
@@ -901,7 +916,10 @@
   const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? 'HasanAbi' : CHANNEL;
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
-  const MAX_MESSAGES = 1000;
+  const SCROLLBACK_SIZES = [250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
+  let MAX_MESSAGES = 1000;
+  const BACKLOG_MAX = 1000;
+  const HISTORY_SAVE_MAX = 1000;
   const MENTION_RE = new RegExp('@' + CHANNEL + '\\b', 'i');
   const GLORP_RE = /\b(?:glorp|florp)\b/i;
   const F_RE = /^f$/i;
@@ -1084,6 +1102,8 @@
   // tweetCache holds the fetched tweet (text, author, media html), tweetWait
   // dedupes in-flight asks
   const tweetCache = new Map();
+  // cards collect while a row's tokens render, then land under the message
+  const pendingTw = [];
   const twNorm = (s) => s.toLowerCase().replace(/https?:\/\/\S+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
   // the card is built per row: a bot that already pasted the tweet's text
   // (fossabot) makes the text redundant, so only the media is kept
@@ -1093,7 +1113,8 @@
     const media = c.imgs ? `<span class="twmedia">${c.imgs}</span>` : '';
     if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${media}</span>` : '';
     // unicode runs stay upright: italic faces lack their glyph coverage
-    const text = escapeHTML(c.text.slice(0, 280)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>');
+    const text = escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& '))
+      .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>');
     return `<span class="twcard"><b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
   }
   const tweetWait = new Set();
@@ -1209,12 +1230,11 @@
         const st = path.match(/^\/[\w]+\/status\/(\d+)/);
         const href = prof ? (nitterHost ? `${nitterHost}${path}` : `https://bird.makeup/users/${prof[1]}`)
                           : `https://x.com${path}`;
-        let extra = '';
         if (st) {
-          if (tweetCache.has(st[1])) extra = twCard(tweetCache.get(st[1]), text);
-          else { reqTweet(st[1]); extra = `<span class="twprev" data-twid="${st[1]}"></span>`; }
+          if (tweetCache.has(st[1])) pendingTw.push(twCard(tweetCache.get(st[1]), text));
+          else { reqTweet(st[1]); pendingTw.push(`<span class="twprev" data-twid="${st[1]}"></span>`); }
         }
-        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>` + extra);
+        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`);
       }
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
@@ -1485,7 +1505,7 @@
     // rAF doesn't fire in a backgrounded tab but relay messages keep
     // arriving - cap the backlog so wake-up isn't a minutes-long flush;
     // the robotty backfill refetches the gap on visibility return anyway
-    if (document.hidden && queue.length > MAX_MESSAGES) queue.shift();
+    if (document.hidden && queue.length > BACKLOG_MAX) queue.shift();
     // replayed backfill lines are historical, not live traffic - counting
     // their arrival time would spike the msgs/sec rate falsely
     if (!replay) recentTimestamps.push(Date.now());
@@ -1508,26 +1528,49 @@
     return ks.sort().join(' ');
   }
   const seenLinks = new Set();
-  function dedupeLinks() {
-    for (const col of [logEl, sideEl, side2El]) {
-      for (const r of col.querySelectorAll('.row:not([data-lks])')) {
-        r.dataset.lks = '1';
-        let k = r.dataset.lk;
-        if (k == null) {
-          // rows restored from old history lack data-lk - key on their hrefs
-          const ks = [...r.querySelectorAll('a[href]')].filter((a) => !a.classList.contains('name'))
-            .map((a) => normUrl(a.getAttribute('href') || '')).filter(Boolean);
-          if (!ks.length) continue;
-          k = ks.sort().join(' ');
-          r.dataset.lk = k;
-        }
-        if (seenLinks.has(k)) r.classList.add('linkdup');
-        else {
-          seenLinks.add(k);
-          if (seenLinks.size > 20000) { seenLinks.clear(); seenLinks.add(k); }
-        }
+  function dedupeLinks(rows) {
+    for (const r of rows || [logEl, sideEl, side2El].flatMap((col) => [...col.querySelectorAll('.row:not([data-lks])')])) {
+      r.dataset.lks = '1';
+      let k = r.dataset.lk;
+      if (k == null) {
+        // rows restored from old history lack data-lk - key on their hrefs
+        const ks = [...r.querySelectorAll('a[href]')].filter((a) => !a.classList.contains('name'))
+          .map((a) => normUrl(a.getAttribute('href') || '')).filter(Boolean);
+        if (!ks.length) continue;
+        k = ks.sort().join(' ');
+        r.dataset.lk = k;
+      }
+      if (seenLinks.has(k)) r.classList.add('linkdup');
+      else {
+        seenLinks.add(k);
+        if (seenLinks.size > 20000) { seenLinks.clear(); seenLinks.add(k); }
       }
     }
+  }
+
+  // page-flip never trims by itself - bound the total across columns;
+  // the column after the active one holds the oldest rows (the last
+  // one in rev, where the cascade drains oldest-first)
+  function trimScrollback() {
+    const c = cols();
+    const i = c.indexOf(activeEl);
+    const pages = revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)];
+    let total = c.reduce((n, col) => n + col.children.length, 0);
+    while (total > MAX_MESSAGES) {
+      const oldest = pages.find((col) => col.firstElementChild);
+      if (!oldest) break;
+      const row = oldest.firstElementChild;
+      if (row.dataset.mid && rowById.get(row.dataset.mid) === row) rowById.delete(row.dataset.mid);
+      row.remove();
+      total--;
+    }
+  }
+  function setScrollback(n) {
+    if (!SCROLLBACK_SIZES.includes(n)) return;
+    MAX_MESSAGES = n;
+    trimScrollback();
+    histDirty = true;
+    markHelp('helpScrollback', SCROLLBACK_SIZES.indexOf(n));
   }
 
   function flush() {
@@ -1574,12 +1617,13 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span><b>[notice]</b> <b>${escapeHTML(who)}</b> ` +
-                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html : ''}</div>`;
+        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span><b class="notice-label">[notice]</b> <b>${escapeHTML(who)}</b> ` +
+                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
-        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${escapeHTML(rawMsg)}</div>`;
+        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
+                `${rawMsg.startsWith('[notice]') ? '<b class="notice-label">[notice]</b>' + escapeHTML(rawMsg.slice(8)) : escapeHTML(rawMsg)}</div>`;
         continue;
       }
       if (kind === 'CLEARCHAT') {
@@ -1633,14 +1677,15 @@
       if ((tags.badges || '').includes('moderator/'))
         aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? '[md]' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
-      const subHtml = subM ? `<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${SUB_MODES[subMode].startsWith('num') ? `[${(+subM[1]).toString().padStart(2, '0')}]` : `[sub ${subM[1].padStart(2, '0')}]`}</span>` : '';
+      const months = subM ? (+subM[1]).toString().padStart(2, '0') : '--';
+      const subHtml = `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the
       // badge icons - [03] [md]; right modes keep it inside the aux
       // cluster at the row's right edge, outermost - [first]/[bits] sit to
       // its left
-      if (subM && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
+      if (SUB_MODES[subMode] !== 'hidden' && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
       const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode].endsWith('left') ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
       const pid = tags['reply-parent-msg-id'];
       let reply = '';
@@ -1661,6 +1706,7 @@
           ? { html: '<br>' + message.split(' ').map(escapeHTML).join('<br>'), names: new Set() }
           : renderMessageHTML(message, tags.emotes, !!tags.bits);
       let msgHtml = rendered.html;
+      const twTail = pendingTw.splice(0).join('');
       // chatterino-style: messages made of only emotes render them bigger
       const mtoks = message.trim().split(/\s+/).filter(Boolean);
       for (const t of mtoks)
@@ -1711,10 +1757,10 @@
       }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
-              `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
+              `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
-              `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}<span class="rplybtn" title="reply to this message">↩</span></div>`;
+              `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}${twTail}<span class="rplybtn" title="reply to this message">↩</span></div>`;
     }
     queue = [];
     histDirty = true;
@@ -1722,24 +1768,26 @@
     // and any stragglers sit at the bottom edge where a tail append still
     // lands correctly - so the seam path is normal-mode only
     const firstGhost = revFlow ? null : activeEl.querySelector('.row.stale');
+    const tpl = document.createElement('template');
+    tpl.innerHTML = html;
+    const newRows = tpl.content.querySelectorAll('.row[data-new]');
     if (firstGhost) {
       // overwrite: the ghost page stays put; consume ghost height equal to
       // the inserted height at the fresh/ghost boundary, so a wrapped
       // multi-line row eats as many ghosts as it needs and the rows below
       // never shift
-      const tpl = document.createElement('template');
-      tpl.innerHTML = html;
       const boundary = firstGhost.offsetTop;
       firstGhost.before(tpl.content);
       consumeGhosts(firstGhost, firstGhost.offsetTop - boundary);
       evictGhosts(activeEl);
-    } else activeEl.insertAdjacentHTML('beforeend', html);
-    dedupeLinks();
+    } else activeEl.append(tpl.content);
+    dedupeLinks(newRows);
     // mentions that land while the page isn't focused are queued on the
     // @N chip so they can be walked back through later
     const unfocused = document.hidden || !document.hasFocus();
-    for (const r of activeEl.querySelectorAll('.row[data-new]')) {
+    for (const r of newRows) {
       r.removeAttribute('data-new');
+      if (r.dataset.mid) rowById.set(r.dataset.mid, r);
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self'))
@@ -1754,27 +1802,15 @@
     }
     if (missed.length > 50) missed.splice(0, missed.length - 50);
     if (unfocused) updateMissedBadge();
-    const kids = activeEl.children;
-    for (let i = kids.length - 1; i >= 0; i--) {
-      const mid = kids[i].dataset.mid;
-      if (mid) rowById.set(mid, kids[i]);
-    }
-    // evicted rows leave their ids behind - drop only the disconnected
-    for (const [mid, el] of rowById) if (!el.isConnected) rowById.delete(mid);
     if (isSplit()) {
       flipCols();
       for (const c of cols()) ghostFade(c);
-      // page-flip never trims by itself - bound the total across columns;
-      // the column after the active one holds the oldest rows (the last
-      // one in rev, where the cascade drains oldest-first)
-      const oldest = revFlow ? cols()[cols().length - 1] : nextCol();
-      let total = 0;
-      for (const c of cols()) total += c.children.length;
-      while (total > MAX_MESSAGES) { oldest.removeChild(oldest.firstElementChild); total--; }
-    } else {
-      while (activeEl.children.length > MAX_MESSAGES) activeEl.removeChild(activeEl.firstElementChild);
-      if (nearBottom && !pausedCols.has(activeEl)) snapLive(activeEl);
     }
+    trimScrollback();
+    // evicted rows leave their ids behind - drop only the disconnected
+    if (rowById.size > MAX_MESSAGES + 1000)
+      for (const [mid, el] of rowById) if (!el.isConnected) rowById.delete(mid);
+    if (!isSplit() && nearBottom && !pausedCols.has(activeEl)) snapLive(activeEl);
     jdownSet(jdownLog, logEl);
     jdownSet(jdownSide, sideEl, sideEl.hidden);
     jdownSet(jdownSide2, side2El, side2El.hidden);
@@ -2305,6 +2341,7 @@
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
@@ -2506,6 +2543,7 @@
         subMode,
         zebra: mainEl.classList.contains('zebra'),
         pause: pauseOnText,
+        scrollback: MAX_MESSAGES,
         rev: revFlow,
         times: timeIdx,
         shadow: shadLevel,
@@ -2564,6 +2602,7 @@
     }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
     if (typeof o.pause === 'boolean') setPause(o.pause);
+    if (SCROLLBACK_SIZES.includes(o.scrollback)) setScrollback(o.scrollback);
     if (typeof o.rev === 'boolean') setRev(o.rev);
     if (typeof o.times === 'boolean') setTimes(o.times ? 2 : 0);
     else if (Number.isInteger(o.times)) setTimes(o.times);
@@ -2953,7 +2992,13 @@
     // badge icons, right modes tuck it back inside the cluster
     document.querySelectorAll('.row').forEach((row) => {
       const aux = row.querySelector('.aux');
-      const sub = row.querySelector('.sub');
+      let sub = row.querySelector('.sub');
+      if (!sub && row.querySelector('.name')) {
+        sub = document.createElement('span');
+        sub.className = 'role sub';
+        sub.title = 'No subscriber months reported';
+        sub.textContent = '[--]';
+      }
       // the left-mode anchor: the sub chip leads, then aux, both ahead of
       // the badge icons - matching the order new rows render with
       const lead = row.querySelector('img.badge') || row.querySelector('.reply:not(.rq)') ||
@@ -2966,7 +3011,8 @@
       if (sub) {
         sub.hidden = mode === 'hidden';
         // restyle the chip text to match: [sub 12] vs compact [12]
-        const months = sub.textContent.replace(/\D/g, '');
+        const months = (sub.title || sub.dataset.tt) === 'No subscriber months reported'
+          ? '--' : sub.textContent.replace(/\D/g, '');
         if (months) sub.textContent = mode.startsWith('num') ? `[${months.padStart(2, '0')}]` : `[sub ${months.padStart(2, '0')}]`;
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
@@ -2979,11 +3025,13 @@
         const modChip = aux.querySelector('.mod');
         if (modChip) modChip.textContent = mode.startsWith('num') ? '[md]' : '[ mod. ]';
         aux.classList.toggle('auxr', !left);
+        aux.hidden = mode === 'hidden' && aux.children.length === 1 && aux.firstElementChild === sub;
         if (!left) row.insertBefore(aux, rightAt);
       }
       if (left) {
         if (sub) row.insertBefore(sub, lead);
-        if (aux) row.insertBefore(aux, lead);
+        if (aux?.children.length) row.insertBefore(aux, lead);
+        else aux?.remove();
       }
     });
   }
@@ -3225,6 +3273,7 @@
     if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
     if (pauseOnText) q.set('pause', '1');
+    if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
     if (lineLevel !== 1) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
@@ -3398,8 +3447,11 @@
   // fresh/ghost boundary: the next row to be overwritten is faintest, and
   // the dimming creeps well ahead of the incoming text rather than stepping.
   const GHOST_LO = 0.03;  // boundary ghost, about to be overwritten
-  const GHOST_HI = 0.45;  // resting ghost opacity (matches .row.stale)
+  const GHOST_HI = 0.62;  // resting ghost opacity (matches .row.stale)
   const GHOST_RAMP = 340; // px below the boundary the fade eases over
+  // >1: the fade hugs the wave front - ghosts stay near-invisible well past
+  // the boundary, then rise quickly to the resting shade
+  const GHOST_CURVE = 1.7;
   function ghostFade(col) {
     const first = col.querySelector('.row.stale');
     if (!first) return;
@@ -3407,7 +3459,7 @@
     for (let r = first; r && r.classList.contains('stale'); r = r.nextElementSibling) {
       const d = r.offsetTop - top;
       r.style.opacity = d >= GHOST_RAMP ? '' :
-        (GHOST_LO + (d / GHOST_RAMP) * (GHOST_HI - GHOST_LO)).toFixed(3);
+        (GHOST_LO + Math.pow(d / GHOST_RAMP, GHOST_CURVE) * (GHOST_HI - GHOST_LO)).toFixed(3);
     }
   }
 
@@ -3489,10 +3541,14 @@
       // stale marker and fade so they restore as ordinary rows (kept
       // markers would corrupt the next session's ghost bookkeeping).
       // ghostgap spacers and local echoes stay excluded.
-      const rows = (revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)])
-        .flatMap((col) => [...col.children])
-        .filter((r) => r.classList.contains('row') && !r.classList.contains('ghostgap') && !r.classList.contains('local'));
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_MESSAGES).map((r) => {
+      const rows = [];
+      const limit = Math.min(HISTORY_SAVE_MAX, MAX_MESSAGES);
+      for (const col of (revFlow ? c : [...c.slice(i + 1), ...c.slice(0, i + 1)].reverse())) {
+        for (let r = col.lastElementChild; r && rows.length < limit; r = r.previousElementSibling)
+          if (r.classList.contains('row') && !r.classList.contains('ghostgap') && !r.classList.contains('local')) rows.push(r);
+        if (rows.length >= limit) break;
+      }
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.reverse().map((r) => {
         if (!r.classList.contains('stale')) return r.outerHTML;
         const cl = r.cloneNode(true);
         cl.classList.remove('stale');
@@ -3519,6 +3575,7 @@
       }
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
+      dedupeLinks();
       // continue the stripe alternation from the restored tail
       zFlip = !!(logEl.lastElementChild && logEl.lastElementChild.classList.contains('z'));
       // seed the gap clock so a reload marks the span the page was closed
@@ -3770,9 +3827,15 @@
     '😁', '😆', '🙂', '😉', '😋', '😛', '🤤', '😏', '😌', '😇', '🤗', '🤭',
     '🤫', '🫣', '😐', '😑', '😬', '🥱', '😷', '🤢', '🥵', '🤯', '😱', '😨',
     '😢', '😥', '😞', '😖', '😣', '😫', '🫠', '😈', '👿', '🤡', '💩', '👻',
-    '☠️', '👽', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '🙀',
+    '😃', '😄', '😝', '😚', '😙', '😗', '😶', '😶‍🌫️', '🫥', '🥲', '🫢', '🫤',
+    '🫨', '🧐', '🤨', '😟', '😦', '😧', '😮', '😯', '😲', '😵', '😵‍💫', '🤕',
+    '🤒', '🤧', '🥴', '🤮', '🤠', '🤑', '🤓', '🤩', '🥳', '🤬', '😡', '😠',
+    '😕', '😔', '☹️', '🙁', '😒', '😪',
+    '☠️', '👽', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '😾', '😿', '🙀',
     '🤌', '🤞', '✌️', '🫰', '🤟', '🤘', '🫶', '👌', '🖐️', '✋', '🫵', '👆',
     '👇', '👈', '👉', '✊', '👊', '🤛', '🤜', '👐', '🙌', '👋', '✍️',
+    '🤏', '🫳', '🫴', '🫸', '🫷', '🫱', '🫲', '🤲', '☝️', '🤙', '🤚', '🖖',
+    '🖕', '🤳',
     '🧡', '💛', '💚', '💙', '🩷', '🤍', '🖤', '💔', '❤️‍🔥', '💕', '💗', '💖',
     '💘', '💝',
     '⭐', '🌟', '💫', '⚡', '🌙', '☀️', '❄️', '☁️', '🌧️', '🌊',
@@ -4278,12 +4341,14 @@
           .concat((m.videos || []).slice(0, 4).filter((v) => v.thumb)
             .map((v) => {
               const play = /\.(?:mp4|webm|mov|m4v)(?:\?|$)/i.test(v.url || '') ? ` data-vsrc="${escapeHTML(v.url)}"` : '';
-              return `<a class="twvid" href="${escapeHTML(twurl)}"${play} target="_blank" rel="noopener noreferrer" title="play - ⇧click opens x.com"><img src="${escapeHTML(v.thumb)}" alt=" [video]"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`;
+              return ` <a class="twvid" href="${escapeHTML(twurl)}"${play} target="_blank" rel="noopener noreferrer" title="play - ⇧click opens x.com"><img src="${escapeHTML(v.thumb)}" alt="[video]"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`;
             }))
           .join('');
         entry = { text: t.text, author: t.author && t.author.screen_name || '', imgs };
       }
       tweetCache.set(d.id, entry);
+      // bound the cache - a long session can link thousands of unique tweets
+      if (tweetCache.size > 2000) tweetCache.delete(tweetCache.keys().next().value);
       document.querySelectorAll(`.twprev[data-twid="${d.id}"]`)
         .forEach((el) => { const row = el.closest('.row'); el.outerHTML = twCard(entry, row ? row.textContent : ''); });
       repin();
@@ -4316,6 +4381,7 @@
   if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
     if (q.has('pause')) setPause(flag('pause'));
+    if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
     if (q.has('times')) setTimes(q.get('times') === 'nosec' ? 1 : flag('times') ? 2 : 0);
@@ -4345,7 +4411,8 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
+    helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
@@ -4388,6 +4455,7 @@
   // the setters ran during init before the lists existed - mark now
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
   markHelp('helpPause', pauseOnText ? 1 : 0);
+  markHelp('helpScrollback', SCROLLBACK_SIZES.indexOf(MAX_MESSAGES));
   markHelp('helpFlow', revFlow ? 1 : 0);
   markHelp('helpTimes', timeIdx);
   markHelp('helpShadow', shadLevel);

@@ -133,8 +133,8 @@ no dependencies beyond CDN-hosted fonts:
   last-run info; ROOMSTATE chat modes (slow, follow age, emote-only,
   subs-only, r9k). The `–` button cycles three sizes: full →
   reduced (option buttons hide; `?`, `–` and the `▶` stream-play stay
-  pinned at the right edge) → minimised, a 10px strip carrying just `–`
-  that restores on click.
+  pinned at the right edge at their full size) → minimised, a 10px
+  strip carrying just `–` that restores on click.
 - **Graph** — messages-per-second sparkline with 10s/minute ticks and
   red glorp/F bursts; dim bands shade spans the page wasn't watching
   (suspended timers, reloads) instead of drawing them flat. It flexes
@@ -145,12 +145,18 @@ no dependencies beyond CDN-hosted fonts:
   designed shade stop) plus a separate 9-stop shade axis
   (white → black, or system-following auto); the `◐` cycle swaps
   hue family alone while picking a chip also applies its shade, zebra
-  striping, graduated text shadow, font picker (incl. dyslexia-friendly),
+  striping (highlighted rows keep their own colour), graduated text shadow, font picker (incl. dyslexia-friendly),
   font size, weight, line height, row separator shades, three-state
-  timestamps (off / no seconds / seconds), sub-chip modes (right /
-  compact `[NN]` / before badges / hidden), emote-only row modes,
-  page-flip columns (two, or three in landscape), draggable stream-video
-  overlay (its button turns green while playing, red when stopped),
+  timestamps (off / no seconds / seconds), five sub-chip modes (right /
+  compact `[NN]` / before badges / compact-left / hidden; a dim `[--]`
+  or `[sub --]` marks chatters Twitch reported no month count for),
+  emote-only row modes,
+  page-flip columns (two, or three in landscape) — a full column hands
+  its overflow to the next, whose old page lingers as faded ghost rows
+  that the incoming messages overwrite in a dimming wave from the fold,
+  draggable stream-video
+  overlay (its glyph goes green while the stream is live, red when a
+  stopped player exists and the stream is not),
   minimizable header, tabbed help panel (resources · authors ·
   config/help) with its own width and font-size controls. All
   persisted in `localStorage`; every option answers to click,
@@ -167,11 +173,15 @@ no dependencies beyond CDN-hosted fonts:
   sent messages like an IRC client, stashing the draft on the first `↑`
   and restoring it once `↓` walks back past the newest entry.
 - **Emote picker** — `☻` opens a Chatterino-style grid above the chat
-  box: 7TV / BTTV / FFZ / Twitch / emoji sections with search, a
-  `recent` row of the last 24 used, resizable from its left and top
-  edges (size persists). Sections order their emotes by channel usage
-  (StreamElements chatstats, via the relay). Clicking inserts at the
-  caret and the panel stays open until `☻` or `Esc`.
+  box: 7TV / BTTV / FFZ / Twitch / emoji (a ~600-glyph sheet) sections
+  with search, a
+  `recent` row of the last 24 used, still/animated filters, and
+  resizable from its left and top edges (size persists). Ordering can be
+  alphabetical or by channel usage (StreamElements chatstats via the
+  relay, plus live session counts); in usage mode the sections sort
+  busiest-first and reshuffles animate emotes sliding to their new
+  spots, while a just-used emote flashes behind its cell. Clicking
+  inserts at the caret and the panel stays open until `☻` or `Esc`.
 - **Channels** — `?channel=login` points chat, stream embed and status
   at another streamer for the visit; history, graph and tab-sync keys
   get a per-channel suffix so streams don't bleed into each other, and
@@ -188,12 +198,17 @@ no dependencies beyond CDN-hosted fonts:
   keyword set when logged in), GLORP/F red rows, channel-point
   tints, fossabot/blammobot name shimmer and game-line styling, braille
   art restacking, image/GIF/Giphy embeds, X/Twitter preview cards via
-  fxtwitter (text skipped when a bot like fossabot already pasted it) (profile links fall back to Bird.makeup when nitter is
-  down). Mentions landing while the page is unfocused queue on a
+  fxtwitter rendered below the whole message (text skipped when a bot
+  like fossabot already pasted it, video thumbs playable inline)
+  (profile links fall back to Bird.makeup when nitter is
+  down). `[notice]` labels on event rows get a cycling rainbow wash. Mentions landing while the page is unfocused queue on a
   clickable `@N` chip in the header — click to jump to each, ⇧click
   clears.
-- **Persistence** — last 1000 rows (including gap notices), stream run
-  history and graph samples survive reloads via `localStorage`.
+- **Scrollback** — the config/help panel offers limits from 250 to 100,000
+  rows (1,000 by default). Larger limits use more browser memory and may
+  slow long-running tabs. At most the newest 1,000 rows (including gap
+  notices) survive reloads via `localStorage`; stream run history and
+  graph samples persist too.
 - **Multi-tab** — option changes and login/logout propagate to other
   open copies through `storage` events; sent-message echoes broadcast
   over a `BroadcastChannel` so every copy renders them at once.
@@ -209,7 +224,9 @@ no dependencies beyond CDN-hosted fonts:
   no `shade` lands on the style's designed stop), `font`, `size`, `lh`,
   `wght` (300-700), `hfs` (header font px; unset = follow chat),
   `hpfs` (help popup font px), `hpw` (help popup width, `480`–`1600`), `pause` (hold the scroll while
-  hovering a row), `channel` (any twitch login),
+  hovering a row), `scrollback` (250/500/1000/2000/5000/10000/25000/50000/100000),
+  `rev` (reverse flow - new messages cascade down from the top),
+  `channel` (any twitch login),
   `zebra`, `lines` (0-3 separator shades),
   `times` (on, `nosec`, or `=0` off), `shadow`, `video`,
   `sub` (right/num-right/left/num-left/hidden), `eonly` (inline/right/off),
@@ -233,7 +250,9 @@ no dependencies beyond CDN-hosted fonts:
   width via container queries. The popup resizes from its edges and
   offers widths from 480 to 1600px.
 - **Performance** — incoming lines queue and flush once per animation
-  frame; the log is capped at 1000 rows.
+  frame; the log defaults to 1,000 rows, with higher optional caps up to
+  100,000. Background message queues and saved reload history stay bounded
+  at 1,000 rows.
 
 ## vs. other Twitch chat clients
 
