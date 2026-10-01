@@ -1916,7 +1916,7 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 9,  lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: false, hpw: 7, hfspx: 14, self: 1 },
+    default:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 10, lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: false, hpw: 7, hfspx: 14, self: 1 },
     compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
     paper:    { theme: 'light',   shade: 2,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
     console:  { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
@@ -2101,7 +2101,7 @@
     return { set: (i) => { idx = i; apply(); }, get: () => idx };
   }
 
-  const fontCtl = cycle(fontBtn, FONT_SIZES, 9, '--chat-font', 'Font size', 'px', 'helpFont');
+  const fontCtl = cycle(fontBtn, FONT_SIZES, 10, '--chat-font', 'Font size', 'px', 'helpFont');
   const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 7, '--chat-lh', 'Line height', '', 'helpLh');
   const WEIGHTS = [300, 400, 500, 600, 700];
   const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
@@ -2868,7 +2868,7 @@
     if (themeMode !== 'dark') q.set('style', themeMode);
     if (shadeIdx !== 6) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
     if (fontSel.value !== 'mono') q.set('font', fontSel.value);
-    if (fontCtl.get() !== 9) q.set('size', FONT_SIZES[fontCtl.get()]);
+    if (fontCtl.get() !== 10) q.set('size', FONT_SIZES[fontCtl.get()]);
     if (lhCtl.get() !== 7) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
