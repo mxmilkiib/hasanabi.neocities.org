@@ -630,9 +630,11 @@
   #spark { height: 22px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
-  #vidBtn.live { color: var(--good); border-color: var(--good); }
-  #vidBtn.playing { color: #3fbf3f; border-color: #3fbf3f; }
-  #vidBtn.stopped { color: #e04040; border-color: #e04040; }
+  /* the states paint only the glyph - the border stays standard (or
+     accent while the embed is toggled on, like every other .on) */
+  #vidBtn.live { color: var(--good); }
+  #vidBtn.playing { color: #3fbf3f; }
+  #vidBtn.stopped { color: #e04040; }
   /* keep the ? button clickable above the help panel when they overlap */
   #helpBtn { position: absolute; z-index: 11; }
   select.hdr-btn { padding-right: 4px; }
@@ -2719,13 +2721,15 @@
     };
     document.head.appendChild(s);
   }
-  // paint the button from playback: green while playing, red once the
-  // player exists but sits paused/ended
+  // paint the button from playback: green while playing or while the
+  // stream is live, red once the player exists but sits paused/ended on
+  // an offline stream
   function vidState() {
+    const live = !!(stream && stream.live);
     const playing = vidPlayer && !vidPlayer.isPaused();
     vidBtn.classList.toggle('playing', !vidBox.hidden && !!playing);
-    vidBtn.classList.toggle('stopped', !vidBox.hidden && !!vidPlayer && !playing);
-    vidBtn.classList.toggle('live', !!(stream && stream.live));
+    vidBtn.classList.toggle('stopped', !vidBox.hidden && !!vidPlayer && !playing && !live);
+    vidBtn.classList.toggle('live', live);
   }
   function setVideo(on) {
     vidBox.hidden = !on;
