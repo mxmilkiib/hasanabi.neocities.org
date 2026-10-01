@@ -91,9 +91,13 @@
   :root[data-theme="lavender"]  { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; }
   :root[data-theme="mirc"]      { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
   :root[data-theme="sepia"]     { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
-  :root[data-theme="paper"]     { --ph: 92;  --pc: .026; --ptc: .028; --accent: #96690f; --good: #2e7d46; --danger: #b04040; --vip: #a03060;
-    /* fractal-noise grain tile, faint alpha - a subtle paper texture */
-    --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* warm cream stock: hue toward yellow-orange with more chroma than the
+     other light styles, text tinted the same way so it reads as ink */
+  :root[data-theme="paper"]     { --ph: 85;  --pc: .045; --ptc: .04;  --accent: #8a5a12; --good: #2e7d46; --danger: #a84040; --vip: #a03060;
+    /* fractal-noise grain tile, faint alpha - a subtle paper texture. two
+       layers: fine grain plus a softer, larger fibre mottle */
+    --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.09'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+               url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.07'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
   }
   :root[data-theme="ice"]       { --ph: 215; --pc: .02;  --ptc: .03;  --accent: #2a5fa8; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
   :root[data-theme="mid"]       { --ph: 255; --pc: .022; --ptc: .02;  --accent: #f0b04a; --good: #6fe08f; --danger: #ff7d7d; --vip: #ffa4c8; }
@@ -134,12 +138,14 @@
     font-size: var(--hdr-fs, var(--chat-font, 15px));
     font-family: var(--chat-ff, inherit);
     background: var(--panel);
+    background-image: var(--texture, none);
     border-bottom: 1px solid var(--line);
     position: relative;
   }
   /* pinned to the first header line, not the box centre - when labels make
-     .hdr-side wrap onto a second line the buttons stay put up top */
-  #helpBtn, #hdrMin { position: absolute; top: 3px; }
+     .hdr-side wrap onto a second line the buttons stay put up top. top
+     matches the header's padding so they line up with the flowing row */
+  #helpBtn, #hdrMin { position: absolute; top: 2px; }
   #helpBtn { right: 8px; font-weight: 700; }
   #hdrMin { right: 44px; }
   body.hdrmin header {
@@ -161,7 +167,7 @@
   body.hdrgraph #spark { flex: 1; max-width: none; }
   /* the corner buttons are 26px tall while the reduced bar is ~23px -
      shrink them to fit rather than overlap the bottom edge */
-  body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { height: calc(100% - 6px); }
+  body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { top: 3px; height: calc(100% - 6px); }
   /* the pinned ▶ sits at right:80 - outside the 84px reserve, so reserve more */
   body.hdrgraph header { padding-right: 118px; }
   /* the stream play button stays reachable too, pinned left of the -;
@@ -445,7 +451,7 @@
   }
   .name { font-weight: 600; margin-right: 3px; text-decoration: none; }
   .name:hover { text-decoration: underline; }
-  .name.shimmer {
+  .name.shimmer, .row a.shimmer {
     color: transparent;
     background-image: linear-gradient(100deg, var(--accent) 35%, #fff6d8 50%, var(--accent) 65%);
     background-size: 200% 100%;
@@ -454,7 +460,7 @@
     animation: shimmer 2.5s linear infinite;
   }
   @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-  @media (prefers-reduced-motion: reduce) { .name.shimmer { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .name.shimmer, .row a.shimmer { animation: none; } }
   /* Negative vertical margins keep the line box at the fixed line-height
      while the image paints above and below the row. */
   .emote { height: 1.5em; vertical-align: middle; margin: -.35em 1px; }
@@ -668,7 +674,7 @@
   #chatbar input::placeholder { color: var(--text-dim); }
   #chatbar input:focus { outline: 1px solid var(--accent); outline-offset: 0; }
   /* emote picker popup over the chatbar - chatterino-style scrollable grid */
-  #emojiBtn { flex: none; }
+  #emojiBtn { flex: none; font-size: 1.5em; }
   #emotePick {
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
     width: 480px; max-width: 94vw; height: 420px;
@@ -677,7 +683,13 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #emotePick[hidden] { display: none; }
-  #emotePick #emoteQ { flex: none; width: 100%; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 8px; }
+  #emotePick .erow { flex: none; display: flex; gap: 6px; }
+  #emotePick #emoteQ { flex: 1; min-width: 0; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 8px; }
+  #emotePick #emoteNames { flex: none; font-size: 13px; padding: 4px 8px; }
+  #emotePick.names #emoteNames { background: var(--line); }
+  #emotePick .etabs { flex: none; display: flex; flex-wrap: wrap; gap: 4px; }
+  #emotePick .etabs button { font-size: 12px; padding: 2px 8px; opacity: .55; }
+  #emotePick .etabs button.on { opacity: 1; background: var(--line); }
   #emoteGrid {
     flex: 1; overflow-y: auto;
     display: grid; grid-template-columns: repeat(auto-fill, 40px);
@@ -693,6 +705,15 @@
   #emoteGrid button:hover { background: var(--line); }
   #emoteGrid button img { max-width: 34px; max-height: 34px; pointer-events: none; } /* else animation repaints kill the button's tooltip */
   #emoteGrid button.eji { font-size: 21px; }
+  #emoteGrid .ename { display: none; }
+  /* names view: wider cells, image left, name ellipsised right */
+  #emotePick.names #emoteGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  #emotePick.names #emoteGrid button { justify-content: flex-start; gap: 6px; padding: 0 4px; }
+  #emotePick.names #emoteGrid button img { flex: none; }
+  #emotePick.names #emoteGrid .ename {
+    display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: var(--chat-ff, inherit); font-size: 12px; text-align: left;
+  }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
@@ -793,7 +814,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move">⠿</div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button" title="emote picker">☻</button><div id="emotePick" hidden><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><div id="emoteGrid"></div></div></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button" title="emote picker">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
 
 <script>
 (() => {
@@ -1117,14 +1138,20 @@
         }
         out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>` + extra);
       }
-      else if (/^https?:\/\/\S+$/i.test(tok) ||
-          /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(tok)) {
-        const u = escapeHTML(/^https?:\/\//i.test(tok) ? tok : `https://${tok}`);
-        if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(tok)) {
-          const src = /\.gifv(?:\?\S*)?$/i.test(tok) ? u.replace(/\.gifv/i, '.gif') : u;
-          out.push(`<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>`);
+      else {
+      // urls may be wrapped in brackets/quotes or trail sentence punctuation;
+      // peel those off so `(example.com),` still links the bare domain
+      const [, pre, url, post] = tok.match(/^([(\["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s);
+      if (/^https?:\/\/\S+$/i.test(url) ||
+          /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(url)) {
+        const u = escapeHTML(/^https?:\/\//i.test(url) ? url : `https://${url}`);
+        if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(url)) {
+          const src = /\.gifv(?:\?\S*)?$/i.test(url) ? u.replace(/\.gifv/i, '.gif') : u;
+          out.push(escapeHTML(pre) + `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>` + escapeHTML(post));
         } else {
-          out.push(`<a href="${u}" target="_blank" rel="noopener noreferrer">${escapeHTML(tok)}</a>`);
+          // this site's own domain gets the fossabot shimmer
+          const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?\/#]|$)/i.test(url);
+          out.push(escapeHTML(pre) + `<a${home ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer">${escapeHTML(url)}</a>` + escapeHTML(post));
         }
       }
       else {
@@ -1140,6 +1167,7 @@
       }
       else if (/^podcast\b/i.test(tok) && /^Fear&$/i.test(tok2(arr, i - 2))) out.push(`${escapeHTML(tok)}</b>`);
       else out.push(escapeHTML(tok));
+      }
       }
       }
       }
@@ -1472,9 +1500,10 @@
       const subHtml = subM ? `<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${SUB_MODES[subMode].startsWith('num') ? `[${(+subM[1]).toString().padStart(2, '0')}]` : `[sub ${subM[1].padStart(2, '0')}]`}</span>` : '';
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
-      // left modes lead with the chip ahead of the badge icons; right
-      // modes keep it inside the aux cluster at the row's right edge,
-      // outermost - [first]/[bits] sit to its left
+      // left modes lead with the chip ahead of the aux cluster and the
+      // badge icons - [03] [md]; right modes keep it inside the aux
+      // cluster at the row's right edge, outermost - [first]/[bits] sit to
+      // its left
       if (subM && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
       const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode].endsWith('left') ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
       const pid = tags['reply-parent-msg-id'];
@@ -1543,7 +1572,7 @@
       }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? auxHtml + subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
+              `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}<span class="rplybtn" title="reply to this message">↩</span></div>`;
@@ -1644,17 +1673,23 @@
 
   // the trace draws in the accent's complement so it reads as its own
   // element against the header; the canvas resolves whatever colour
-  // notation the palette used, then the hue flips 180° keeping s/l
-  function complement(css) {
+  // notation the palette used, then the hue flips 180° keeping s. The
+  // lightness is then held clear of the shade's background - mirc's blue
+  // flips to a yellow that vanishes on the light stops otherwise
+  function complement(css, bgL) {
     sparkCtx.fillStyle = '#000'; sparkCtx.fillStyle = css;
     const m = /^#([0-9a-f]{6})$/i.exec(sparkCtx.fillStyle);
     if (!m) return css;
     const [r, g, b] = [0, 2, 4].map((o) => parseInt(m[1].slice(o, o + 2), 16) / 255);
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    let l = (mx + mn) / 2;
     if (!d) return css;
     const s = d / (1 - Math.abs(2 * l - 1));
     let h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
     h = ((h * 60) + 180) % 360;
+    // yellows/cyans carry little luminance contrast, so light stops pull
+    // the trace well down (darker the paler the page) and dark stops lift it
+    if (bgL > .5) l = Math.min(l, .55 - bgL * .3); else if (bgL >= 0) l = Math.max(l, .6);
     return `hsl(${h.toFixed(0)} ${(s * 100).toFixed(0)}% ${(l * 100).toFixed(0)}%)`;
   }
   function drawSpark() {
@@ -1667,7 +1702,8 @@
         // ticks use text-dim rather than --line: sepia/paper lines wash out
         // against the panel, while text-dim keeps contrast on every style
         tick: styles.getPropertyValue('--text-dim') || '#666',
-        accent: styles.getPropertyValue('--spark').trim() || complement(styles.getPropertyValue('--accent').trim() || '#e8a33d'),
+        accent: styles.getPropertyValue('--spark').trim() ||
+          complement(styles.getPropertyValue('--accent').trim() || '#e8a33d', parseFloat(styles.getPropertyValue('--sh-bg')) || -1),
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
         gap: styles.getPropertyValue('--text-dim') || '#666',
       };
@@ -2008,7 +2044,11 @@
       if (!parsed) return;
       if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags); return; }
       // own badges/colour/display-name for the local echo of sent messages
-      if (parsed.kind === 'USERSTATE' || parsed.kind === 'GLOBALUSERSTATE') { selfTags = { ...selfTags, ...parsed.tags }; return; }
+      if (parsed.kind === 'USERSTATE' || parsed.kind === 'GLOBALUSERSTATE') {
+        selfTags = { ...selfTags, ...parsed.tags };
+        if (parsed.tags['emote-sets']) loadTwitchSets(parsed.tags['emote-sets']);
+        return;
+      }
       queueMessage(parsed, replay);
     }
   }
@@ -2019,26 +2059,26 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 6,    font: 'sourcecodepro', size: 10, lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: false, hpw: 7, hfspx: 14, self: 1 },
-    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 8,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
-    print:    { theme: 'light',   shade: 0,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
-    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
+    default:  { theme: 'dark',    shade: 6,    font: 'sourcecodepro', size: 10, lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1 },
+    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 8,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3 },
+    print:    { theme: 'light',   shade: 0,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2 },
+    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3 },
     cinema:   { theme: 'black',   shade: 8,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
     phosphor: { theme: 'amber',   shade: 8,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
     dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
     midnight: { theme: 'nord',    shade: 5,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
     solar:    { theme: 'solarized',shade: 6,    font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    minimal:  { theme: 'light',   shade: 0,    font: 'sans',       size: 7,  lh: 9,  lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2 },
-    retro:    { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 6,  lh: 4,  lines: 1, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 15, lh: 4,  weight: 0, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, video: false, hpw: 7, hfspx: 18 },
-    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, video: true, hpw: 4, hfspx: 15 },
-    heather:  { theme: 'lavender',shade: 6,    font: 'sourcecodepro', size: 11, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 15 },
+    minimal:  { theme: 'mirc',    shade: 2,    font: 'lexend',     size: 9,  lh: 4,  weight: 0, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: true, hfspx: -1 },
+    retro:    { theme: 'console', shade: 7,    font: 'terminus',   size: 16, lh: 4,  lines: 1, zebra: false, times: 1,  shadow: 2, subMode: 0, eonly: 0, hfspx: 18 },
+    irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 15, lh: 4,  weight: 0, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18 },
+    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15 },
+    heather:  { theme: 'lavender',shade: 6,    font: 'sourcecodepro', size: 11, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 4, hfspx: 15 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
   const THEMES = ['console', 'amber', 'black', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
   // each style's designed shade: swatch previews and popup clicks use it,
   // while the ◐ cycle keeps whatever shade is currently active
-  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 2, sepia: 2, lavender: 2, mid: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, black: 8, amber: 8, console: 8 };
+  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, black: 8, amber: 8, console: 8 };
   const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
   let themeMode = 'dark';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
@@ -2395,12 +2435,13 @@
   function presetMatch(p) {
     if (!p) return false;
     // compare only the fields the preset specifies: ones it pins that aren't
-    // listed here (weight, video, hpw, hfspx…) still break the mark
+    // listed here (weight, hpw, hfspx…) still break the mark. the stream
+    // embed is deliberately outside presets - one toggles it by hand
     const cmp = {
       theme: themeMode, shade: shadeIdx, font: fontSel.value, size: fontCtl.get(),
       lh: lhCtl.get(), weight: weightCtl.get(), lines: lineLevel,
       zebra: mainEl.classList.contains('zebra'), times: timeIdx, shadow: shadLevel,
-      subMode, eonly: emoteMode, video: !vidBox.hidden,
+      subMode, eonly: emoteMode,
       split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
     };
@@ -2747,7 +2788,7 @@
     document.querySelectorAll('.row').forEach((row) => {
       const aux = row.querySelector('.aux');
       const sub = row.querySelector('.sub');
-      // the left-mode anchor: aux leads, then the sub chip, both ahead of
+      // the left-mode anchor: the sub chip leads, then aux, both ahead of
       // the badge icons - matching the order new rows render with
       const lead = row.querySelector('img.badge') || row.querySelector('.reply:not(.rq)') ||
                    row.querySelector('.name') || row.children[1];
@@ -2775,8 +2816,8 @@
         if (!left) row.insertBefore(aux, rightAt);
       }
       if (left) {
-        if (aux) row.insertBefore(aux, lead);
         if (sub) row.insertBefore(sub, lead);
+        if (aux) row.insertBefore(aux, lead);
       }
     });
   }
@@ -3463,53 +3504,128 @@
   });
 
   // ---- emote picker: a chatterino-style grid above the chat box.
-  // Third-party emotes the relay reported, twitch's global set (names go
-  // out and twitch renders them), then a row of unicode emoji ----
+  // Third-party emotes the relay reported, every twitch set the login can
+  // actually send (USERSTATE's emote-sets resolved through ivr.fi; just the
+  // globals when logged out), then a row of unicode emoji. Source tabs
+  // toggle which groups show ----
   const emojiBtn = document.getElementById('emojiBtn');
   const emotePick = document.getElementById('emotePick');
   const emoteQ = document.getElementById('emoteQ');
   const emoteGrid = document.getElementById('emoteGrid');
-  const TW_GLOBALS = [ // name -> twitch emote id
-    [':)', 1], [':(', 2], [':D', 3], [':o', 8], ['<3', 9], [';)', 11], [':p', 13],
-    ['Kappa', 25], ['MrDestructoid', 28], ['DansGame', 33], ['SwiftRage', 34],
-    ['PJSalt', 36], ['Kreygasm', 41], ['BibleThump', 86], ['ResidentSleeper', 245],
-    ['4Head', 354], ['FailFish', 360], ['Keepo', 1902], ['BabyRage', 22639],
-    ['WutFace', 28087], ['PogChamp', 30588], ['NotLikeThis', 58765],
-    ['riPepperonis', 62833], ['duDudu', 62834], ['bleedPurple', 62835],
-    ['CoolCat', 58127], ['SeemsGood', 64138], ['VoHiYo', 81274],
-    ['VoteYea', 106293], ['VoteNay', 106294], ['PrimeMe', 115075],
-    ['TriHard', 120232], ['LUL', 425618],
-  ];
+  const emoteTabs = document.getElementById('emoteTabs');
   const EMOJIS = ['😀', '😂', '🤣', '😅', '😊', '😍', '🥰', '😘', '😜', '🤪',
     '😎', '🤔', '🙄', '😴', '😳', '🥺', '😭', '😤', '🥹', '🫡', '🙏', '👍',
     '👎', '👏', '🤝', '💪', '👀', '💀', '🔥', '✨', '🎉', '💯', '❤️', '💜', '🌈'];
+  const twEmoteUrl = (id) => `https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/${lightMode ? 'light' : 'dark'}/2.0`;
+  // twitch sets: [{ setID, channelLogin, tier, emoteList: [{ code, id, type }] }]
+  let twSets = [];
+  let twSetsKey = '';
+  async function loadTwitchSets(ids) {
+    const list = [...new Set(['0', ...ids.split(',')])].filter(Boolean);
+    const key = list.join(',');
+    if (key === twSetsKey) return;
+    twSetsKey = key;
+    const chunks = [];
+    for (let i = 0; i < list.length; i += 100) chunks.push(list.slice(i, i + 100)); // ivr caps at 100 ids per call
+    try {
+      const res = await Promise.all(chunks.map((c) =>
+        fetch(`https://api.ivr.fi/v2/twitch/emotes/sets?set_id=${c.join(',')}`).then((r) => (r.ok ? r.json() : []))));
+      twSets = res.flat().filter((s) => s && s.emoteList?.length);
+      if (!emotePick.hidden) buildPicker();
+    } catch (e) { twSetsKey = ''; }
+  }
+  // names view: each emote gets its name alongside, in a wider list grid
+  const EPICK_NAMES_KEY = 'hasan-epicknames';
+  const emoteNamesBtn = document.getElementById('emoteNames');
+  emotePick.classList.toggle('names', localStorage.getItem(EPICK_NAMES_KEY) === '1');
+  emoteNamesBtn.addEventListener('click', () => {
+    const on = emotePick.classList.toggle('names');
+    try { localStorage.setItem(EPICK_NAMES_KEY, on ? '1' : '0'); } catch (e) {}
+    emoteQ.focus();
+  });
+  // source tabs: any mix of groups may be lit; none lit means everything
+  const EPICK_TABS_KEY = 'hasan-epicktabs';
+  const EPICK_GROUPS = ['7tv', 'bttv', 'ffz', 'twitch', 'emoji'];
+  let epickOn = new Set();
+  try { epickOn = new Set(JSON.parse(localStorage.getItem(EPICK_TABS_KEY)) || []); } catch (e) {}
+  const groupOn = (g) => !epickOn.size || epickOn.has(g);
+  emoteTabs.innerHTML = EPICK_GROUPS.map((g) =>
+    `<button type="button" class="hdr-btn" data-g="${g}" title="toggle ${g} emotes (shift-click for only ${g})">${g}</button>`).join('');
+  function paintTabs() {
+    for (const b of emoteTabs.children) b.classList.toggle('on', groupOn(b.dataset.g));
+  }
+  paintTabs();
+  emoteTabs.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-g]');
+    if (!b) return;
+    const g = b.dataset.g;
+    if (e.shiftKey) epickOn = new Set([g]);
+    else if (!epickOn.size) epickOn = new Set(EPICK_GROUPS.filter((x) => x !== g));
+    else if (epickOn.has(g)) epickOn.delete(g);
+    else epickOn.add(g);
+    if (epickOn.size === EPICK_GROUPS.length) epickOn.clear();
+    try { localStorage.setItem(EPICK_TABS_KEY, JSON.stringify([...epickOn])); } catch (e2) {}
+    paintTabs();
+    buildPicker();
+    emoteQ.focus();
+  });
+  // last-used row: [{ n, src, img }] newest first, emoji carry just n
+  const EPICK_RECENT_KEY = 'hasan-epickrecent';
+  const EPICK_RECENT_MAX = 24;
+  let epickRecent = [];
+  try { epickRecent = JSON.parse(localStorage.getItem(EPICK_RECENT_KEY)) || []; } catch (e) {}
+  function noteRecent(b) {
+    const img = b.querySelector('img');
+    const r = { n: b.dataset.ins };
+    if (img) { r.src = (b.title.split(' - ')[1] || ''); r.img = img.getAttribute('src'); }
+    epickRecent = [r, ...epickRecent.filter((x) => x.n !== r.n)].slice(0, EPICK_RECENT_MAX);
+    try { localStorage.setItem(EPICK_RECENT_KEY, JSON.stringify(epickRecent)); } catch (e) {}
+  }
+  const byName = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' });
   function buildPicker() {
     const q = emoteQ.value.trim().toLowerCase();
-    const names = Object.keys(thirdPartyEmotes).sort()
-      .filter((n) => !q || n.toLowerCase().includes(q));
-    const tw = TW_GLOBALS.filter(([n]) => !q || n.toLowerCase().includes(q));
-    const ej = q ? [] : EMOJIS; // no names to match against
+    const hit = (n) => !q || n.toLowerCase().includes(q);
+    const btn = (n, src, img) => {
+      const e = escapeHTML(n);
+      return `<button type="button" data-ins="${e}" title="${e} - ${escapeHTML(src)}">` +
+        `<img src="${escapeHTML(img)}" alt="${e}" loading="lazy"><span class="ename">${e}</span></button>`;
+    };
+    const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // third-party emotes grouped by provider
     const groups = {};
-    for (const n of names) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
+    for (const n of Object.keys(thirdPartyEmotes).sort(byName)) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
     let h = '';
-    for (const src of ['7TV', 'BTTV', 'FFZ', 'other']) {
+    // recents lead when not searching - a search already surfaces them
+    if (!q && epickRecent.length) h += head('recent') + epickRecent.map((r) =>
+      r.img ? btn(r.n, r.src, r.img) : `<button type="button" class="eji" data-ins="${r.n}">${r.n}</button>`).join('');
+    const srcTab = { '7TV': '7tv', 'BTTV': 'bttv', 'FFZ': 'ffz', 'FFZ animated': 'ffz' };
+    for (const src of ['7TV', 'BTTV', 'FFZ', 'FFZ animated', 'other']) {
       const g = groups[src];
-      if (!g || !g.length) continue;
-      h += `<div class="ehead">${src === 'other' ? 'emotes' : src.toLowerCase()}</div>` + g.map((n) =>
-        `<button type="button" data-ins="${escapeHTML(n)}">` +
-        `<img src="${escapeHTML(thirdPartyEmotes[n])}" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
+      // unlabelled extras ride along with whichever third-party tab is lit
+      const on = src === 'other' ? ['7tv', 'bttv', 'ffz'].some(groupOn) : groupOn(srcTab[src]);
+      if (!g || !g.length || !on) continue;
+      h += head(src === 'other' ? 'emotes' : src.toLowerCase()) + g.map((n) => btn(n, src, thirdPartyEmotes[n])).join('');
     }
-    if (tw.length) h += `<div class="ehead">twitch</div>` + tw.map(([n, id]) =>
-      `<button type="button" data-ins="${escapeHTML(n)}">` +
-      `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/2.0" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
-    if (ej.length) h += `<div class="ehead">emoji</div>` + ej.map((c) =>
+    if (groupOn('twitch')) {
+      // this channel's sets first, then other channels by name, globals last
+      const rank = (s) => s.channelLogin === CHANNEL ? 0 : s.channelLogin ? 1 : 2;
+      const sets = [...twSets].sort((a, b) => rank(a) - rank(b) || byName(a.channelLogin || '', b.channelLogin || '') || (+a.tier || 0) - (+b.tier || 0));
+      for (const s of sets) {
+        const g = s.emoteList.filter((e) => hit(e.code));
+        if (!g.length) continue;
+        const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
+                    : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
+        h += head(label) + g.map((e) => btn(e.code, label.slice(9), twEmoteUrl(e.id))).join('');
+      }
+      if (!twSets.length && !q) h += head('twitch - loading…');
+    }
+    if (groupOn('emoji') && !q) h += head('emoji') + EMOJIS.map((c) => // no names to match against
       `<button type="button" class="eji" data-ins="${c}">${c}</button>`).join('');
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
   }
   emojiBtn.addEventListener('click', () => {
     emotePick.hidden = !emotePick.hidden;
-    if (!emotePick.hidden) { emoteQ.value = ''; buildPicker(); emoteQ.focus(); }
+    if (!emotePick.hidden) { emoteQ.value = ''; if (!twSetsKey) loadTwitchSets(''); buildPicker(); emoteQ.focus(); }
   });
   emoteQ.addEventListener('input', buildPicker);
   emoteQ.addEventListener('keydown', (e) => {
@@ -3526,6 +3642,7 @@
   emoteGrid.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-ins]');
     if (!b) return;
+    noteRecent(b); // the row itself redraws on the next open, so the grid doesn't shift mid-click
     const s = chatInput.selectionStart ?? chatInput.value.length;
     const pad = s > 0 && !/\s/.test(chatInput.value[s - 1]) ? ' ' : '';
     chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
