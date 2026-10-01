@@ -3294,7 +3294,7 @@
     if (e.key === 'ArrowUp' && (histIdx !== null || hist.length)) { e.preventDefault(); histGo(-1); return; }
     if (e.key === 'ArrowDown' && histIdx !== null) { e.preventDefault(); histGo(1); return; }
     if (e.key === 'Escape') {
-      if (!emotePick.hidden) { emotePick.hidden = true; return; }
+      if (!emotePick.hidden) return; // the document handler closes the picker
       if (replyCtx) { clearReply(); return; }
     }
     if (e.key !== 'Enter' || e.isComposing) return;
@@ -3381,7 +3381,12 @@
   emoteQ.addEventListener('input', buildPicker);
   emoteQ.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') emoteGrid.querySelector('button[data-ins]')?.click();
-    if (e.key === 'Escape') { emotePick.hidden = true; chatInput.focus(); }
+  });
+  // esc closes the picker wherever focus sits - grid button, page, anywhere
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || emotePick.hidden) return;
+    emotePick.hidden = true;
+    chatInput.focus();
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
   // several emotes can stack, like chatterino's picker
