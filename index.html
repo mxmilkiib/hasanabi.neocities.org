@@ -643,9 +643,11 @@
   #emoteGrid {
     flex: 1; overflow-y: auto;
     display: grid; grid-template-columns: repeat(auto-fill, 40px);
-    grid-auto-rows: 40px; gap: 2px; align-content: start;
+    /* rows size to content so section heads don't sit in a 40px track */
+    gap: 2px; align-content: start;
   }
   #emoteGrid button {
+    height: 40px;
     background: none; border: 0; border-radius: 4px; padding: 0;
     color: var(--text); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
