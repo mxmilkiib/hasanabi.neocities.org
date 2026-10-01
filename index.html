@@ -752,9 +752,15 @@
   #emotePick .etabs { flex: none; display: flex; flex-wrap: wrap; gap: 4px; }
   #emotePick .etabs button { font-size: 12px; padding: 2px 8px; opacity: .55; width: auto; }
   #emotePick .etabs button.on { opacity: 1; background: var(--line); }
-  /* a subtle accent wash when the emote was just used in chat */
-  #emoteGrid button.justused { animation: eflash 1.4s ease-out; }
-  @keyframes eflash { from { background: color-mix(in srgb, var(--accent) 45%, transparent); } }
+  /* an accent wash when the emote was just used in chat - bright pop,
+     slow tail so it stays readable while the grid resorts */
+  #emoteGrid button.justused { animation: eflash 2.8s ease-out; }
+  @keyframes eflash {
+    from { background: color-mix(in srgb, var(--accent) 78%, transparent); }
+    40% { background: color-mix(in srgb, var(--accent) 38%, transparent); }
+  }
+  /* resort moves animate; set inline by the FLIP step in rebuildPicker */
+  #emoteGrid button.emove { transition: transform .35s ease; }
   #emoteGrid {
     flex: 1; overflow-y: auto;
     display: grid; grid-template-columns: repeat(auto-fill, 40px);
@@ -3943,11 +3949,37 @@
       b.classList.add('justused');
     }
   };
-  // rebuild keeping the scroll spot and any flashes still fading
+  // rebuild keeping the scroll spot and any flashes still fading; rows
+  // that moved in the resort get a brief FLIP slide so the change reads
+  // as a swap rather than a redraw
   const rebuildPicker = () => {
     const st = emoteGrid.scrollTop;
+    // a name shows twice when it's both recent and in its home section -
+    // queue rects per name so each button animates from its own spot
+    const before = new Map();
+    for (const b of emoteGrid.querySelectorAll('button[data-ins]'))
+      (before.get(b.dataset.ins) || before.set(b.dataset.ins, []).get(b.dataset.ins))
+        .push(b.getBoundingClientRect());
     buildPicker();
     emoteGrid.scrollTop = st;
+    // write all offsets first, reflow once, then release to 0 together -
+    // a reflow per button would thrash layout on a full-grid resort
+    const movers = [];
+    for (const b of emoteGrid.querySelectorAll('button[data-ins]')) {
+      const r0 = before.get(b.dataset.ins)?.shift();
+      if (!r0) continue;
+      const r1 = b.getBoundingClientRect();
+      const dx = r0.left - r1.left, dy = r0.top - r1.top;
+      if (dx || dy) { b.style.transform = `translate(${dx}px,${dy}px)`; movers.push(b); }
+    }
+    if (movers.length) {
+      void emoteGrid.offsetWidth;
+      for (const b of movers) {
+        b.classList.add('emove');
+        b.style.transform = '';
+        b.addEventListener('transitionend', () => b.classList.remove('emove'), { once: true });
+      }
+    }
     for (const f of flashSet) poke(f);
   };
   function noteEmoteUse(n) {
@@ -3961,7 +3993,7 @@
       flashSet.delete(n);
       for (const b of emoteGrid.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
         b.classList.remove('justused');
-    }, 1400));
+    }, 2800));
     if (epickSort === 'use' && !resortTimer)
       resortTimer = setTimeout(() => { resortTimer = 0; rebuildPicker(); }, 1500);
   }
@@ -3990,12 +4022,17 @@
         r.img ? btn(r.n, r.src, r.img, r.a) : `<button type="button" class="eji" data-ins="${r.n}">${r.n}</button>`).join('');
     }
     const srcTab = { '7TV': '7tv', 'BTTV': 'bttv', 'FFZ': 'ffz', 'FFZ animated': 'ffz' };
+    // sections collect as (usage total, html) so the use sort can order
+    // the groups by what chat actually runs, not just their members
+    const secs = [];
+    const pushSec = (sum, label, body) => secs.push([sum, head(label) + body]);
     for (const src of ['7TV', 'BTTV', 'FFZ', 'FFZ animated', 'other']) {
       const g = groups[src];
       // unlabelled extras ride along with whichever third-party tab is lit
       const on = src === 'other' ? ['7tv', 'bttv', 'ffz'].some(groupOn) : groupOn(srcTab[src]);
       if (!g || !g.length || !on) continue;
-      h += head(src === 'other' ? 'emotes' : src.toLowerCase()) + g.map((n) => btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n))).join('');
+      pushSec(g.reduce((t, n) => t + useOf(n), 0), src === 'other' ? 'emotes' : src.toLowerCase(),
+        g.map((n) => btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n))).join(''));
     }
     if (groupOn('twitch')) {
       // this channel's sets first, then other channels by name, globals last
@@ -4008,12 +4045,16 @@
         if (!g.length) continue;
         const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                     : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
-        h += head(label) + g.map((e) => btn(e.code, label.slice(9), twEmoteUrl(e.id, e.assetType === 'ANIMATED'), e.assetType === 'ANIMATED')).join('');
+        pushSec(g.reduce((t, e) => t + useOf(e.code), 0), label,
+          g.map((e) => btn(e.code, label.slice(9), twEmoteUrl(e.id, e.assetType === 'ANIMATED'), e.assetType === 'ANIMATED')).join(''));
       }
       if (!twSets.length && !q) h += head('twitch - loading…');
     }
-    if (groupOn('emoji') && !q && animOk(false)) h += head('emoji') + EMOJIS.map((c) => // no names to match against
-      `<button type="button" class="eji" data-ins="${c}">${c}</button>`).join('');
+    if (groupOn('emoji') && !q && animOk(false)) pushSec(0, 'emoji', EMOJIS.map((c) => // no names to match against
+      `<button type="button" class="eji" data-ins="${c}">${c}</button>`).join(''));
+    // a-z keeps the fixed provider order; use sorts sections busiest-first
+    if (epickSort === 'use') secs.sort((a, b) => b[0] - a[0]);
+    for (const s of secs) h += s[1];
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
   }
   emojiBtn.addEventListener('click', () => {
