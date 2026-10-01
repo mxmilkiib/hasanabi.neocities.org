@@ -98,7 +98,9 @@ no dependencies beyond CDN-hosted fonts:
   and `#tag` lines render in italics (names, chips and timestamps stay
   upright), USERNOTICE subs/raids/gifts become dim italic notice rows,
   and CLEARCHAT/NOTICE events show timeouts, bans and channel notices
-  (a room-wide `/clear` wipes rendered rows). Stretches the page wasn't
+  (a room-wide `/clear` wipes rendered rows; a timeout or ban on the
+  logged-in user also locks the chat input with a live countdown until
+  it expires). Stretches the page wasn't
   watching — hidden tab, suspended timers, page closed — get a `· Nm gap
   · cause · start → end` notice so lost context is visible in the log.
 - **Name colors** — the chatter's own Twitch color when set, a
@@ -206,7 +208,8 @@ no dependencies beyond CDN-hosted fonts:
   now resolve to. Presets never share a name with a style.
 - **Help popup** — resources (re Hasan, news, yt channels, twitch
   streams, usa pol, the largest DSA chapter per state, left parties,
-  extra links), authors (era-grouped reading lists) and config/help,
+  organising, free software, open hardware, extra links), authors
+  (era-grouped reading lists) and config/help,
   laid out in link columns whose count is capped by the popup's own
   width via container queries. The popup resizes from its edges and
   offers widths from 480 to 1600px.
