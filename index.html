@@ -3445,7 +3445,7 @@
     chatInput.placeholder = on ? `chat as ${auth.login}` : 'log in to chat';
     if (toUntil) paintTimeout();
     document.body.classList.toggle('chaton', on);
-    if (!on) { clearReply(); emotePick.hidden = true; }
+    if (!on) { clearReply(); emotePick.hidden = true; emojiBtn.classList.remove('on'); }
   }
 
   // ---- replies: pick a row with its hover ↩, then Enter sends it as a
@@ -3493,7 +3493,7 @@
     if (auth && auth.token) {
       if (e.shiftKey) { logout(); return; }
       chatbarEl.hidden = !chatbarEl.hidden;
-      if (chatbarEl.hidden) emotePick.hidden = true;
+      if (chatbarEl.hidden) { emotePick.hidden = true; emojiBtn.classList.remove('on'); }
       else chatInput.focus();
     } else {
       location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
@@ -3742,6 +3742,7 @@
   }
   emojiBtn.addEventListener('click', () => {
     emotePick.hidden = !emotePick.hidden;
+    emojiBtn.classList.toggle('on', !emotePick.hidden);
     if (!emotePick.hidden) { emoteQ.value = ''; if (!twSetsKey) loadTwitchSets(''); buildPicker(); emoteQ.focus(); }
   });
   emoteQ.addEventListener('input', buildPicker);
@@ -3752,6 +3753,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape' || emotePick.hidden) return;
     emotePick.hidden = true;
+    emojiBtn.classList.remove('on');
     chatInput.focus();
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
