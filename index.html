@@ -3254,7 +3254,6 @@
   });
 
   chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !emotePick.hidden) { emotePick.hidden = true; return; }
     if (e.key === 'Escape' && replyCtx) { clearReply(); return; }
     if (e.key !== 'Enter' || e.isComposing) return;
     const text = chatInput.value.trim();
@@ -3337,8 +3336,7 @@
   });
   emoteQ.addEventListener('input', buildPicker);
   emoteQ.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { emotePick.hidden = true; chatInput.focus(); }
-    else if (e.key === 'Enter') emoteGrid.querySelector('button[data-ins]')?.click();
+    if (e.key === 'Enter') emoteGrid.querySelector('button[data-ins]')?.click();
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
   // several emotes can stack, like chatterino's picker
@@ -3350,10 +3348,7 @@
     chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
     chatInput.focus();
   });
-  document.addEventListener('click', (e) => {
-    if (!emotePick.hidden && e.target !== emojiBtn && !emotePick.contains(e.target))
-      emotePick.hidden = true;
-  });
+  // the picker only closes via ☻ - outside clicks and esc leave it alone
 
   // edge resize: the picker anchors bottom-right, so the live edges are
   // left (width) and top (height); the corner does both. A dragged size
