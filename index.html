@@ -559,7 +559,10 @@
   }
   .row.jump { animation: jumpflash 1.4s ease-out; }
   @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
-  .hdr-side { display: flex; align-items: center; gap: 6px; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; }
+  /* align-self flex-start pins the cluster to the line's top so the
+     buttons level with the absolute ?/- pair instead of centring
+     against a taller line (big header font, wrapped labels) */
+  .hdr-side { display: flex; align-items: center; gap: 6px; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; align-self: flex-start; }
   .hdr-btn {
     background: none;
     border: 1px solid var(--line);
