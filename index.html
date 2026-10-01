@@ -1905,7 +1905,7 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'auto',    shade: null, font: 'mono',       size: 11, lh: 10, lines: 3, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    default:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 9,  lh: 7,  weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 14 },
     compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
     paper:    { theme: 'light',   shade: 2,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
     console:  { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
@@ -1927,7 +1927,7 @@
   // while the ◐ cycle keeps whatever shade is currently active
   const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 2, sepia: 2, lavender: 2, mid: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, black: 8, amber: 8, console: 8 };
   const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
-  let themeMode = 'auto';
+  let themeMode = 'dark';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
 
   // tone = the derived light/dark split used for nick colours and emote
@@ -1953,7 +1953,7 @@
   // nine shade stops, lightest → darkest; null follows the system
   const SHADE_NAMES = ['white', 'lightest', 'light', 'pale', 'mid', 'dusk', 'dark', 'deep', 'black'];
   const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●'];
-  let shadeIdx = null;
+  let shadeIdx = 6;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
     else document.documentElement.dataset.shade = shadeIdx;
@@ -2090,11 +2090,11 @@
     return { set: (i) => { idx = i; apply(); }, get: () => idx };
   }
 
-  const fontCtl = cycle(fontBtn, FONT_SIZES, 11, '--chat-font', 'Font size', 'px', 'helpFont');
-  const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 10, '--chat-lh', 'Line height', '', 'helpLh');
+  const fontCtl = cycle(fontBtn, FONT_SIZES, 9, '--chat-font', 'Font size', 'px', 'helpFont');
+  const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 7, '--chat-lh', 'Line height', '', 'helpLh');
   const WEIGHTS = [300, 400, 500, 600, 700];
   const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
-  const weightCtl = cycle(weightBtn, WEIGHTS, 1, '--chat-w', 'Font weight', '', 'helpWg');
+  const weightCtl = cycle(weightBtn, WEIGHTS, 0, '--chat-w', 'Font weight', '', 'helpWg');
   document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
     `<a href="#" class="helpOpt helpWg" data-idx="${i}">${n}</a>`).join(' ');
   // the help descriptions embed the same option lists as clickable links
@@ -2104,6 +2104,7 @@
     `<a href="#" class="helpLh" data-idx="${i}">${lh}</a>`).join(' ');
   fontCtl.set(fontCtl.get());
   lhCtl.set(lhCtl.get());
+  weightCtl.set(weightCtl.get());
 
   function applyFont() {
     document.documentElement.style.setProperty('--chat-ff',
@@ -2176,6 +2177,9 @@
   // set while applying a saved or another tab's bundle: mid-apply setters
   // otherwise write partially-applied state back over the source bundle
   let suppressSave = false;
+  // read before init setters run - their saveOpts calls would otherwise
+  // stamp boot defaults into a "saved" bundle and look like a user decision
+  const savedOpts = (() => { try { return JSON.parse(localStorage.getItem(OPTS_KEY)); } catch (e) { return null; } })();
 
   function saveOpts() {
     try {
@@ -2187,7 +2191,7 @@
         lines: lineLevel,
         hdrmin: document.body.classList.contains('hdrmin'),
         hdrgraph: document.body.classList.contains('hdrgraph'),
-        sub: subMode,
+        subMode,
         zebra: mainEl.classList.contains('zebra'),
         pause: pauseOnText,
         times: timeIdx,
@@ -2237,9 +2241,14 @@
     else if (o.hdrmin) { document.body.classList.remove('hdrgraph'); minHeader(); }
     else if (o.hdrmin === false || o.hdrgraph === false) { document.body.classList.remove('hdrgraph'); unminHeader(); }
     if (Number.isInteger(o.self)) setSelfHl(o.self === 1);
-    if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < 3) { subMode = [4, 2, 0][o.sub]; applySubMode(); }
-    // presets use the direct index; saved 'sub' is the legacy reversed order
+    // presets and new bundles carry the direct 'subMode' index; a bare
+    // 'sub' was saved as an index into the mode order of its era -
+    // spark-era bundles stored [hidden,left,right], mid-era [right,left,hidden]
     if (Number.isInteger(o.subMode) && o.subMode >= 0 && o.subMode < SUB_MODES.length) { subMode = o.subMode; applySubMode(); }
+    else if (Number.isInteger(o.sub) && o.sub >= 0 && o.sub < 3) {
+      subMode = 'spark' in o ? [4, 2, 0][o.sub] : ('hfspx' in o || 'hpfs' in o) ? o.sub : [0, 2, 4][o.sub];
+      applySubMode();
+    }
     if (typeof o.zebra === 'boolean') setZebra(o.zebra);
     if (typeof o.pause === 'boolean') setPause(o.pause);
     if (typeof o.times === 'boolean') setTimes(o.times ? 2 : 0);
@@ -2555,7 +2564,7 @@
     ['medium', 'color-mix(in srgb, var(--line) 65%, transparent)'],
     ['solid', 'var(--line)'],
   ];
-  let lineLevel = 3;
+  let lineLevel = 1;
   document.getElementById('helpLinesList').innerHTML = LINE_SHADES.map((s, i) =>
     `<a href="#" class="helpLines" data-idx="${i}">${s[0]}</a>`).join(' / ');
   function setLines(level) {
@@ -2569,7 +2578,7 @@
 
   // ---- sub badge placement: hidden / left of name / right edge of row ----
   const SUB_MODES = ['right', 'num-right', 'left', 'num-left', 'hidden'];
-  let subMode = 0;
+  let subMode = 3;
 
   function applySubMode() {
     const mode = SUB_MODES[subMode];
@@ -2783,7 +2792,7 @@
   // the left/right insets regardless of the inline max-width ----
   const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280, 1440, 1600];
   const HDR_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20];
-  let hdrFs = -1; // -1 = follow the chat font
+  let hdrFs = 7; // -1 = follow the chat font
   function applyHdrFs() {
     const s = document.documentElement.style;
     if (hdrFs < 0) s.removeProperty('--hdr-fs');
@@ -2791,7 +2800,7 @@
     markHelp('helpHfs', hdrFs + 1);
     saveOpts();
   }
-  let helpWIdx = 5;
+  let helpWIdx = 4;
   function applyHelpW() {
     helpPanel.style.width = '';
     helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
@@ -2817,29 +2826,29 @@
   document.getElementById('copyUrl').addEventListener('click', (e) => {
     const b = e.currentTarget;
     const q = new URLSearchParams();
-    if (themeMode !== 'auto') q.set('style', themeMode);
-    if (shadeIdx != null) q.set('shade', shadeIdx);
+    if (themeMode !== 'dark') q.set('style', themeMode);
+    if (shadeIdx !== 6) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
     if (fontSel.value !== 'mono') q.set('font', fontSel.value);
-    if (fontCtl.get() !== 11) q.set('size', FONT_SIZES[fontCtl.get()]);
-    if (lhCtl.get() !== 10) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
-    if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
-    if (mainEl.classList.contains('zebra')) q.set('zebra', '1');
+    if (fontCtl.get() !== 9) q.set('size', FONT_SIZES[fontCtl.get()]);
+    if (lhCtl.get() !== 7) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
+    if (weightCtl.get() !== 0) q.set('wght', WEIGHTS[weightCtl.get()]);
+    if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
     if (pauseOnText) q.set('pause', '1');
-    if (lineLevel !== 3) q.set('lines', String(lineLevel));
+    if (lineLevel !== 1) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
     if (shadLevel) q.set('shadow', shadLevel);
-    if (SUB_MODES[subMode] !== 'right') q.set('sub', SUB_MODES[subMode]);
+    if (SUB_MODES[subMode] !== 'num-left') q.set('sub', SUB_MODES[subMode]);
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
     else if (document.body.classList.contains('hdrmin')) q.set('min', '1');
     if (selfHl) q.set('self', '1');
     if (isSplit()) q.set('split', String(cols().length));
-    if (!vidBox.hidden) q.set('video', '1');
+    if (vidBox.hidden) q.set('video', '0');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
-    if (helpWIdx !== 5) q.set('hpw', HELP_WIDTHS[helpWIdx]);
+    if (helpWIdx !== 4) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
-    if (hdrFs !== -1) q.set('hfs', HDR_SIZES[hdrFs]);
+    if (hdrFs !== 7) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
       .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
@@ -2862,6 +2871,18 @@
     saveOpts();
   }, { passive: false });
   setLines(lineLevel);
+  // the rest of the non-dim defaults: zebra on, num-left sub chips,
+  // dark/6 palette, fixed header and popup sizes - saved opts and url
+  // params apply later and override these. Suppressed: the setters save,
+  // and a boot bundle would mask what loadOpts is about to read
+  try {
+    suppressSave = true;
+    setZebra(true);
+    applySubMode();
+    applyShade();
+    applyHdrFs();
+    applyHelpW();
+  } finally { suppressSave = false; }
 
   // Clicking a reply chip scrolls to the parent row and flashes it, if the
   // original is still in the buffer. A row's hover ↩ sets it as the
@@ -3546,11 +3567,13 @@
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
     if (flag('self')) setSelfHl(true);
-    if (flag('video')) setVideo(true);
+    if (q.has('video')) setVideo(flag('video'));
+    // video defaults on unless a saved bundle already decided
+    else if (!savedOpts || !('video' in savedOpts)) setVideo(true);
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
-    if (q.has('hfs')) { const i = HDR_SIZES.indexOf(+q.get('hfs')); if (i >= 0) { hdrFs = i; applyHdrFs(); } }
+    if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
 
