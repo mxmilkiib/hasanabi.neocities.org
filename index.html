@@ -3688,6 +3688,17 @@
     try { localStorage.setItem(EPICK_RECENT_KEY, JSON.stringify(epickRecent)); } catch (e) {}
   }
   const byName = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' });
+  // family stem: the first word of a camel/all-caps name, lowercased, so
+  // peepo*/Peepo* share 'peepo', FeelsBadMan shares 'feels' with
+  // FeelsGoodMan, KKona sorts by 'kk'. Sort key: family, then name
+  const famKey = (n) => {
+    const m = n.match(/^[a-z]+|^[A-Z](?![a-z])[A-Z]*|^[A-Z][a-z]+|^[0-9]+/);
+    return m ? m[0].toLowerCase() : n.toLowerCase();
+  };
+  const byFam = (a, b) => {
+    const fa = famKey(a), fb = famKey(b);
+    return fa === fb ? byName(a, b) : byName(fa, fb);
+  };
   function buildPicker() {
     const q = emoteQ.value.trim().toLowerCase();
     const hit = (n) => !q || n.toLowerCase().includes(q);
@@ -3699,7 +3710,7 @@
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // third-party emotes grouped by provider
     const groups = {};
-    for (const n of Object.keys(thirdPartyEmotes).sort(byName)) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
+    for (const n of Object.keys(thirdPartyEmotes).sort(byFam)) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
     let h = '';
     // recents lead when not searching - a search already surfaces them
     if (!q && epickRecent.length) h += head('recent') + epickRecent.map((r) =>

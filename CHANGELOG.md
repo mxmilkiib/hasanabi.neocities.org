@@ -40,7 +40,9 @@ not versions — the page ships continuously to Neocities.
   when logged out, replacing a hardcoded 34), this channel's sets first;
   a `recent` row of the last 24 used; source tabs (`7tv bttv ffz twitch
   emoji`, any mix, shift-click isolates, sized to fit their labels);
-  a ~550-character emoji sheet; an `Aa` toggle for a names
+  a ~550-character emoji sheet; emotes grouped by name-stem (peepo*,
+  Feels*, monka* cluster instead of scattering alphabetically); an `Aa`
+  toggle for a names
   list view; `name - source` tooltips; case-insensitive sort; animated
   FFZ in its own section
 - Links: bare domains wrapped in brackets or trailing punctuation still
