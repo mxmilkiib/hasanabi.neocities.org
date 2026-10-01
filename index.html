@@ -1914,7 +1914,7 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 9,  lh: 7,  weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: true, hpw: 4, hfspx: 14 },
+    default:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 9,  lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, video: false, hpw: 7, hfspx: 14, self: 1 },
     compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 4,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
     paper:    { theme: 'light',   shade: 2,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, video: true },
     console:  { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, video: true },
@@ -2103,7 +2103,7 @@
   const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 7, '--chat-lh', 'Line height', '', 'helpLh');
   const WEIGHTS = [300, 400, 500, 600, 700];
   const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
-  const weightCtl = cycle(weightBtn, WEIGHTS, 0, '--chat-w', 'Font weight', '', 'helpWg');
+  const weightCtl = cycle(weightBtn, WEIGHTS, 1, '--chat-w', 'Font weight', '', 'helpWg');
   document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
     `<a href="#" class="helpOpt helpWg" data-idx="${i}">${n}</a>`).join(' ');
   // the help descriptions embed the same option lists as clickable links
@@ -2186,9 +2186,6 @@
   // set while applying a saved or another tab's bundle: mid-apply setters
   // otherwise write partially-applied state back over the source bundle
   let suppressSave = false;
-  // read before init setters run - their saveOpts calls would otherwise
-  // stamp boot defaults into a "saved" bundle and look like a user decision
-  const savedOpts = (() => { try { return JSON.parse(localStorage.getItem(OPTS_KEY)); } catch (e) { return null; } })();
 
   function saveOpts() {
     try {
@@ -2299,7 +2296,7 @@
       lh: lhCtl.get(), weight: weightCtl.get(), lines: lineLevel,
       zebra: mainEl.classList.contains('zebra'), times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode, video: !vidBox.hidden,
-      split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx,
+      split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
     };
     return Object.keys(p).every((k) => !(k in cmp) || p[k] === cmp[k]);
@@ -2743,7 +2740,7 @@
     document.body.classList.toggle('selfhl', on);
     markHelp('helpSelf', on ? 1 : 0);
   }
-  setSelfHl(false);
+  setSelfHl(true);
 
   // ---- text shadow on chat rows: graduated off/subtle/medium/strong ----
   const SHADOW_LVLS = [
@@ -2825,7 +2822,7 @@
     markHelp('helpHfs', hdrFs + 1);
     saveOpts();
   }
-  let helpWIdx = 4;
+  let helpWIdx = 7;
   function applyHelpW() {
     helpPanel.style.width = '';
     helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
@@ -2856,7 +2853,7 @@
     if (fontSel.value !== 'mono') q.set('font', fontSel.value);
     if (fontCtl.get() !== 9) q.set('size', FONT_SIZES[fontCtl.get()]);
     if (lhCtl.get() !== 7) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
-    if (weightCtl.get() !== 0) q.set('wght', WEIGHTS[weightCtl.get()]);
+    if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
     if (pauseOnText) q.set('pause', '1');
     if (lineLevel !== 1) q.set('lines', String(lineLevel));
@@ -2867,11 +2864,11 @@
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
     else if (document.body.classList.contains('hdrmin')) q.set('min', '1');
-    if (selfHl) q.set('self', '1');
+    if (!selfHl) q.set('self', '0');
     if (isSplit()) q.set('split', String(cols().length));
-    if (vidBox.hidden) q.set('video', '0');
+    if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
-    if (helpWIdx !== 4) q.set('hpw', HELP_WIDTHS[helpWIdx]);
+    if (helpWIdx !== 7) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== 7) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
@@ -3607,10 +3604,8 @@
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
-    if (flag('self')) setSelfHl(true);
+    if (q.has('self')) setSelfHl(flag('self'));
     if (q.has('video')) setVideo(flag('video'));
-    // video defaults on unless a saved bundle already decided
-    else if (!savedOpts || !('video' in savedOpts)) setVideo(true);
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
