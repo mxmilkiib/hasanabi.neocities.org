@@ -45,6 +45,9 @@ not versions — the page ships continuously to Neocities.
   toggle for a names
   list view; `name - source` tooltips; case-insensitive sort; animated
   FFZ in its own section
+- Tweet video thumbs play inline: a click swaps the thumbnail for a
+  muted-loop GIF or a controls+autoplay player (the direct mp4 URL was
+  already in the relay payload); shift-click still opens x.com
 - Links: bare domains wrapped in brackets or trailing punctuation still
   linkify (`(example.com),`); `hasanabi.neocities.org` shimmers like the
   bot names

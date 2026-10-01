@@ -509,6 +509,7 @@
   .twcard .up { font-style: normal; }
   .twcard .twmedia img { max-height: 5em; max-width: 12em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
   .twcard .twmedia a.twvid { position: relative; display: inline-block; }
+  .twcard .twmedia video.twvid { max-height: 12em; max-width: 18em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
   .twcard .twmedia a.twvid i {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
@@ -3143,6 +3144,17 @@
   mainEl.addEventListener('click', (e) => {
     const rb = e.target.closest('.rplybtn');
     if (rb) { setReply(rb.closest('.row')); return; }
+    const tv = e.target.closest('a.twvid');
+    if (tv && tv.dataset.vsrc && !e.shiftKey) {
+      e.preventDefault();
+      const gif = tv.querySelector('i').textContent === 'GIF';
+      const v = document.createElement('video');
+      v.className = 'twvid'; v.src = tv.dataset.vsrc;
+      v.controls = true; v.autoplay = true; v.playsInline = true;
+      v.loop = gif; v.muted = gif;
+      tv.replaceWith(v);
+      return;
+    }
     const chip = e.target.closest('.reply');
     if (!chip) return;
     const target = rowById.get(chip.dataset.pid);
@@ -3958,12 +3970,15 @@
       if (t && t.text) {
         const m = t.media || {};
         const twurl = `https://x.com/i/status/${d.id}`;
-        // videos and gifs show their thumbnail with a badge; the image
-        // links back to the tweet since inline playback isn't wanted
+        // videos and gifs show their thumbnail with a badge; a click
+        // swaps the thumb for an inline player, shift-click opens x.com
         const imgs = (m.photos || []).slice(0, 4)
           .map((p) => `<img src="${escapeHTML(p.url)}" alt="${escapeHTML(p.alt || 'tweet image')}">`)
           .concat((m.videos || []).slice(0, 4).filter((v) => v.thumb)
-            .map((v) => `<a class="twvid" href="${escapeHTML(twurl)}" target="_blank" rel="noopener noreferrer" title="play on x.com"><img src="${escapeHTML(v.thumb)}" alt="video thumbnail"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`))
+            .map((v) => {
+              const play = /\.(?:mp4|webm|mov|m4v)(?:\?|$)/i.test(v.url || '') ? ` data-vsrc="${escapeHTML(v.url)}"` : '';
+              return `<a class="twvid" href="${escapeHTML(twurl)}"${play} target="_blank" rel="noopener noreferrer" title="play - ⇧click opens x.com"><img src="${escapeHTML(v.thumb)}" alt="video thumbnail"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`;
+            }))
           .join('');
         entry = { text: t.text, author: t.author && t.author.screen_name || '', imgs };
       }
