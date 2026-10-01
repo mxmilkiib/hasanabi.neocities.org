@@ -76,6 +76,10 @@ not versions — the page ships continuously to Neocities.
   (UK greens and Your Party plus the main European left parties and the
   EP group); blammobot and fossabot get separate bot rows with the
   longer fossabot command list
+- Extra links split into **organising**, **free software** and **open
+  hardware** rows (FSF/FSFE, Software Freedom Conservancy, F-Droid,
+  OSHWA, Open Source Ecology, right to repair and more), leaving a short
+  extra links row
 - Tenant-union directories, Sociocracy for All, dual power, Lindsay
   Ellis, Kat Blaque and more streamers added; turbulence points at the
   UK journal; the twitter link goes direct to x.com now that every
