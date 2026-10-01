@@ -312,6 +312,12 @@
     opacity: 0;
     transition: opacity .15s;
     touch-action: none;
+    /* the grip glyph tiles the whole edge so the strip reads as
+       draggable at any point, not just where the icon sits */
+    overflow: hidden; white-space: nowrap; letter-spacing: 7px;
+  }
+  #vid .vid-handle::after {
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #vid:hover .vid-handle, #vid.dragging .vid-handle { opacity: 1; }
   #vid .vid-size {
@@ -838,7 +844,7 @@
     </div>
   </div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
-  <div id="vid" hidden><div class="vid-handle" title="drag to move">⠿</div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
+  <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button">☻</button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
 
