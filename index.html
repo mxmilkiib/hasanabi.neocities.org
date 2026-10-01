@@ -1007,6 +1007,7 @@
   // blocks fetching the sets itself, but img-src * lets the CDN images render.
   let thirdPartyEmotes = {};
   let emoteSrc = {};           // name -> 'Twitch'/'7TV'/'BTTV'/'FFZ' for tooltips
+  let emoteUse = {};           // name -> channel usage count (streamelements stats)
   let zeroWidth = new Set();   // 7TV overlay emotes that stack on the previous one
   let badgeSets = {};          // 'set_id' -> { version: url }
   // Nitter host for twitter/x link rewriting; the relay picks a live one
@@ -3718,6 +3719,8 @@
     const fa = famKey(a), fb = famKey(b);
     return fa === fb ? byName(a, b) : byName(fa, fb);
   };
+  // most-used first; uncharted emotes keep the family/name order
+  const byUse = (a, b) => (emoteUse[b] || 0) - (emoteUse[a] || 0) || byFam(a, b);
   function buildPicker() {
     const q = emoteQ.value.trim().toLowerCase();
     const hit = (n) => !q || n.toLowerCase().includes(q);
@@ -3729,7 +3732,7 @@
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // third-party emotes grouped by provider
     const groups = {};
-    for (const n of Object.keys(thirdPartyEmotes).sort(byFam)) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
+    for (const n of Object.keys(thirdPartyEmotes).sort(byUse)) if (hit(n)) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
     let h = '';
     // recents lead when not searching - a search already surfaces them
     if (!q && epickRecent.length) h += head('recent') + epickRecent.map((r) =>
@@ -3747,7 +3750,8 @@
       const rank = (s) => s.channelLogin === CHANNEL ? 0 : s.channelLogin ? 1 : 2;
       const sets = [...twSets].sort((a, b) => rank(a) - rank(b) || byName(a.channelLogin || '', b.channelLogin || '') || (+a.tier || 0) - (+b.tier || 0));
       for (const s of sets) {
-        const g = s.emoteList.filter((e) => hit(e.code));
+        const g = s.emoteList.filter((e) => hit(e.code))
+          .sort((a, b) => (emoteUse[b.code] || 0) - (emoteUse[a.code] || 0) || byName(a.code, b.code));
         if (!g.length) continue;
         const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                     : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
@@ -3932,6 +3936,7 @@
       loadStep(3, 'emotes loaded - waiting for messages…');
       thirdPartyEmotes = d.emotes || {};
       emoteSrc = d.emoteSrc || {};
+      emoteUse = d.emoteUse || {};
       zeroWidth = new Set(d.zeroWidth || []);
       badgeSets = d.badges || {};
       retokenizeRows();

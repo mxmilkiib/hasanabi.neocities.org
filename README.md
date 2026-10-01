@@ -6,6 +6,16 @@ Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool,
 organising, media and other resources, & more! Live at
 <https://hasanabi.neocities.org/>.
 
+In plainer terms: it is the stream's chat, liberated from twitch.tv. The
+log renders in a single self-contained page that runs on a static host,
+follows one along through suspends and reloads (backfilling whatever was
+missed), draws a live messages-per-second graph, understands every major
+emote ecosystem, and — after an optional Twitch login — replies, `/me`s
+and chat history walkbacks work like a real IRC client. Beyond chat, the
+page doubles as a curated hub: the help popup carries resources, news,
+organising links and era-grouped author reading lists. Any other Twitch
+channel can be pointed at with `?channel=login`.
+
 The project comes in two parts: the frontend
 ([hasanabi.neocities.org](https://github.com/mxmilkiib/hasanabi.neocities.org),
 this repo — a single `index.html`) and the backend chat relay
@@ -68,8 +78,9 @@ Relay → parent:
   forwards it as `lines`; the page skips already-rendered msg ids
 - `{type: 'stream', uptime, viewers, title}` — decapi poll result
 - `{type: 'emotes', emotes, emoteSrc, zeroWidth, badges, lastBroadcast,
-  lastVod}` — emote map + sources + badge sets + stream history,
-  refetched every 10 minutes
+  lastVod, emoteUse}` — emote map + sources + badge sets + stream history
+  + per-emote channel usage counts (StreamElements chatstats), refetched
+  every 10 minutes
 - `{type: 'nitter', host}` — fastest healthy nitter instance from
   status.d420.de, rechecked every 15 minutes
 - `{type: 'wscause', code, reason}` — why the Twitch socket last closed,
@@ -158,8 +169,9 @@ no dependencies beyond CDN-hosted fonts:
 - **Emote picker** — `☻` opens a Chatterino-style grid above the chat
   box: 7TV / BTTV / FFZ / Twitch / emoji sections with search, a
   `recent` row of the last 24 used, resizable from its left and top
-  edges (size persists). Clicking inserts at the caret and the panel
-  stays open until `☻` or `Esc`.
+  edges (size persists). Sections order their emotes by channel usage
+  (StreamElements chatstats, via the relay). Clicking inserts at the
+  caret and the panel stays open until `☻` or `Esc`.
 - **Channels** — `?channel=login` points chat, stream embed and status
   at another streamer for the visit; history, graph and tab-sync keys
   get a per-channel suffix so streams don't bleed into each other, and
@@ -222,6 +234,29 @@ no dependencies beyond CDN-hosted fonts:
   offers widths from 480 to 1600px.
 - **Performance** — incoming lines queue and flush once per animation
   frame; the log is capped at 1000 rows.
+
+## vs. other Twitch chat clients
+
+Where this sits relative to the usual suspects:
+
+| | this page | Twitch embed | Chatterino | Chatty | jChat |
+|---|---|---|---|---|---|
+| form factor | one web page | Twitch iframe/popout | desktop app | desktop app (Java) | web overlay |
+| install / build | none, static file | none | app install | JRE | none |
+| runs on strict-CSP static hosts | ✓ (relay iframe) | embed-domain rules | n/a | n/a | partial |
+| send chat (login) | ✓ implicit OAuth | ✓ | ✓ | ✓ | — |
+| replies | quoted block, jump-back | collapsed thread | ✓ | ✓ | — |
+| 7TV / BTTV / FFZ | ✓ animated, zero-width stacks | native only | ✓ | ✓ | partial |
+| backfill after suspend/resume | ✓ (robotty) | — | ✓ | — | — |
+| msgs/sec graph, gap & burst marks | ✓ | — | — | — | — |
+| theming / accessibility fonts | palettes × 9-stop shade axis | light/dark | extensive | extensive | CSS params |
+| multi-channel | `?channel=` per tab | per embed | tabs/splits | tabs | URL param |
+| second-screen / PWA install | ✓ | — | — | — | — |
+
+Broad strokes only — feature sets drift; Chatterino in particular is the
+much deeper client if one lives at a desktop. The niche here is zero
+install, a host that forbids sockets outright, and a page that treats
+the stream's context (resources, history, rate graph) as part of chat.
 
 ## Deploy
 
