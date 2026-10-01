@@ -1168,6 +1168,18 @@
   // the echo row rather than render a duplicate
   const echoRows = new Map(); // 'login\x00text' -> echo row element
   const pendingEcho = [];     // keys, bound to rows in render order
+  // twitch prepends "@parent " to threaded replies for irc clients, so an
+  // echo and its real line differ by that mention - key both with it stripped
+  function echoKey(login, tags, text) {
+    const names = [tags['reply-parent-display-name'], tags['reply-parent-user-login']]
+      .filter(Boolean).map((s) => s.toLowerCase());
+    let t = text;
+    const act = t.startsWith('\x01ACTION ') ? '\x01ACTION ' : '';
+    t = t.slice(act.length);
+    for (let m; names.length && (m = t.match(/^@(\S+)\s+/)) && names.includes(m[1].toLowerCase());)
+      t = t.slice(m[0].length);
+    return login + '\x00' + act + t;
+  }
 
   const jdownLog = document.getElementById('jdownLog');
   const jdownSide = document.getElementById('jdownSide');
@@ -1476,7 +1488,7 @@
       // a real copy of a locally-echoed message adopts the echo row:
       // it drops .local (so it persists in history) and takes the real id
       if (kind === 'PRIVMSG' && !local && auth && login === auth.login) {
-        const ek = login + '\x00' + rawMsg;
+        const ek = echoKey(login, tags, rawMsg);
         const el = echoRows.get(ek);
         if (el) {
           echoRows.delete(ek);
@@ -3384,12 +3396,12 @@
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
     const ctx = replyCtx;
-    // /me goes out as a CTCP ACTION like other clients send it; a reply's
-    // @login prefix rides inside the wrap so the line still reads as action
+    // /me goes out as a CTCP ACTION like other clients send it. Twitch adds
+    // a reply's @mention itself, so only the local echo spells it out
     const act = text.match(/^\/me\s+(.+)$/is);
     let inner = act ? act[1].trim() : text;
-    if (ctx) inner = `@${ctx.name} ${inner}`;
     const body = act ? `\x01ACTION ${inner}\x01` : inner;
+    const shown = !ctx ? body : act ? `\x01ACTION @${ctx.name} ${inner}\x01` : `@${ctx.name} ${inner}`;
     relayFrame.contentWindow.postMessage({ type: 'send', text: body, replyTo: ctx }, RELAY_ORIGIN);
     // twitch doesn't echo own messages back over IRC - render locally,
     // dressed with the badges/colour USERSTATE reported
@@ -3401,10 +3413,10 @@
         'reply-parent-display-name': ctx.name,
         'reply-parent-user-login': ctx.login,
         'reply-parent-msg-body': ctx.body } : {}) }, login: auth.login,
-      kind: 'PRIVMSG', message: body, local: true };
+      kind: 'PRIVMSG', message: shown, local: true };
     queueMessage(echoMsg, false);
     if (chan) chan.postMessage({ type: 'echo', msg: echoMsg });
-    pendingEcho.push(auth.login + '\x00' + body);
+    pendingEcho.push(echoKey(auth.login, echoMsg.tags, shown));
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     if (hist[hist.length - 1] !== text) { hist.push(text); if (hist.length > 100) hist.shift(); }
     histIdx = null; histDraft = '';
@@ -3578,7 +3590,7 @@
     const m = e.data;
     if (!m || m.type !== 'echo' || !m.msg || m.msg.kind !== 'PRIVMSG') return;
     queueMessage(m.msg, false);
-    pendingEcho.push(m.msg.login + '\x00' + m.msg.message);
+    pendingEcho.push(echoKey(m.msg.login, m.msg.tags || {}, m.msg.message));
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
   });
 

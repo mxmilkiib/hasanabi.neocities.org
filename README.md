@@ -144,8 +144,8 @@ no dependencies beyond CDN-hosted fonts:
   secret ships in the page) enables a chat input bar. `/me` is wrapped as a
   CTCP ACTION so it renders as a proper action line; hovering a row
   shows `↩` to reply — the pending-reply bar shows the target and cancels
-  on `Esc`, and the send carries `reply-parent-msg-id` plus the `@login`
-  prefix like other clients. Local echoes render instantly and are
+  on `Esc`, and the send carries `reply-parent-msg-id`; Twitch prepends
+  the `@login` itself, so only the local echo spells it out. Local echoes render instantly and are
   adopted in place when the real line replays. `↑`/`↓` in the input walk
   sent messages like an IRC client, stashing the draft on the first `↑`
   and restoring it once `↓` walks back past the newest entry.

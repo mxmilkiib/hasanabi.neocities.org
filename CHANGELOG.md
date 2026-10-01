@@ -42,6 +42,12 @@ not versions — the page ships continuously to Neocities.
   chips stay upright on italic rows
 - Emote-only and stacked emotes can no longer lift the line box at
   tight line heights
+- Replies no longer echo twice: Twitch prepends the `@parent` mention to
+  threaded replies itself, so the page stops adding its own (which
+  doubled it) and matches echoes to their real lines with the mention
+  stripped
+- Being timed out as the logged-in user shows a `you were timed out`
+  row and locks the input with a live countdown
 - Video: box follows the stream's real aspect ratio with no letterbox
   gap, and the `▶` button is green while playing, red when stopped
 - Twitch login button wears a monochrome glitch logo
