@@ -606,6 +606,8 @@
   @container (min-width: 1250px) { #helpPanel .linkcols { column-count: 5; } }
   @container (min-width: 1500px) { #helpPanel .linkcols { column-count: auto; } }
   #helpPanel .linkcols > i { display: block; break-inside: avoid; font-size: 1em; }
+  /* author entries run long (name + work + dates), so wider columns there */
+  #htabAuth .linkcols { columns: 26em; }
   #helpPanel sup { position: absolute; font-size: .7em; margin-left: 2px; transform: translateY(-3px); }
   #helpPanel b.fn { color: var(--text); }
   #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 0 5px; border-radius: 3px; border: 1px solid var(--line); }
