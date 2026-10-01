@@ -3291,7 +3291,10 @@
   chatInput.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp' && (histIdx !== null || hist.length)) { e.preventDefault(); histGo(-1); return; }
     if (e.key === 'ArrowDown' && histIdx !== null) { e.preventDefault(); histGo(1); return; }
-    if (e.key === 'Escape' && replyCtx) { clearReply(); return; }
+    if (e.key === 'Escape') {
+      if (!emotePick.hidden) { emotePick.hidden = true; return; }
+      if (replyCtx) { clearReply(); return; }
+    }
     if (e.key !== 'Enter' || e.isComposing) return;
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
@@ -3376,6 +3379,7 @@
   emoteQ.addEventListener('input', buildPicker);
   emoteQ.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') emoteGrid.querySelector('button[data-ins]')?.click();
+    if (e.key === 'Escape') { emotePick.hidden = true; chatInput.focus(); }
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
   // several emotes can stack, like chatterino's picker
@@ -3387,7 +3391,7 @@
     chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
     chatInput.focus();
   });
-  // the picker only closes via ☻ - outside clicks and esc leave it alone
+  // the picker closes via ☻ or esc; outside clicks leave it alone
 
   // edge resize: the picker anchors bottom-right, so the live edges are
   // left (width) and top (height); the corner does both. A dragged size
