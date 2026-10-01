@@ -3523,6 +3523,8 @@
         if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
         else if (d.state === 'reconnecting') emptyLabel.textContent = 'socket dropped - retrying…';
       }
+    } else if (d.type === 'wscause' && emptyEl) {
+      emptyLabel.textContent = `socket closed (${d.code}${d.reason ? ' ' + d.reason : ''}) - retrying…`;
     } else if (d.type === 'lines') {
       for (const line of d.lines) handleLine(line, !!d.replay);
     } else if (d.type === 'stream') {
