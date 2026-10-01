@@ -413,6 +413,7 @@
   .role.bits { color: var(--accent); }
   .role.first { color: #ff69b4; font-weight: 700; }
   .row.notice { color: var(--text-dim); font-style: italic; }
+  .row.notice.selfmod { color: var(--danger); font-style: normal; font-weight: 600; }
   .row.htag { font-style: italic; }
   .row.htag .name, .row.htag .aux, .row.htag .sub, .row.htag .time { font-style: normal; }
   .row.action { font-style: italic; }
@@ -1377,8 +1378,13 @@
           histDirty = true;
         }
         const dur = +tags['ban-duration'] || 0;
-        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
-          (target ? `${escapeHTML(target)} ${dur ? `was timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'was banned'}`
+        // the logged-in user as the target: say so plainly and lock the input
+        // for the remaining time, like chatterino (replayed lines already past
+        // their expiry do nothing)
+        const me = !!(target && auth && auth.login && target.toLowerCase() === auth.login.toLowerCase());
+        if (me && dur) setTimedOut(ts + dur * 1000);
+        html += `<div class="row notice${me ? ' selfmod' : ''}${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
+          (target ? `${me ? 'you were' : escapeHTML(target) + ' was'} ${dur ? `timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
       }
@@ -3260,6 +3266,27 @@
     history.replaceState(null, '', location.pathname + (back.size ? '?' + back : ''));
   }
 
+  // timeout lock: the input is disabled with a countdown until it lapses
+  let toUntil = 0, toTimer = 0;
+  function paintTimeout() {
+    const left = Math.ceil((toUntil - Date.now()) / 1000);
+    if (left <= 0) {
+      toUntil = 0; clearInterval(toTimer); toTimer = 0;
+      chatInput.disabled = false;
+      updateSendUI();
+      return;
+    }
+    const h = (left / 3600) | 0, m = ((left % 3600) / 60) | 0, s = left % 60;
+    chatInput.disabled = true;
+    chatInput.placeholder = `timed out - ${h ? h + 'h ' : ''}${h || m ? m + 'm ' : ''}${s}s left`;
+  }
+  function setTimedOut(until) {
+    if (until <= Date.now()) return;
+    toUntil = Math.max(toUntil, until);
+    paintTimeout();
+    if (!toTimer) toTimer = setInterval(paintTimeout, 1000);
+  }
+
   function updateSendUI() {
     const on = !!(auth && auth.login);
     sendBtn.classList.toggle('on', on);
@@ -3268,6 +3295,7 @@
       : 'Log in with Twitch to send messages';
     chatbarEl.hidden = !on;
     chatInput.placeholder = on ? `chat as ${auth.login}` : 'log in to chat';
+    if (toUntil) paintTimeout();
     document.body.classList.toggle('chaton', on);
     if (!on) { clearReply(); emotePick.hidden = true; }
   }
