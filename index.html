@@ -127,8 +127,8 @@
   /* pinned to the first header line, not the box centre - when labels make
      .hdr-side wrap onto a second line the buttons stay put up top */
   #helpBtn, #hdrMin { position: absolute; top: 3px; }
-  #helpBtn { right: 44px; font-weight: 700; }
-  #hdrMin { right: 8px; }
+  #helpBtn { right: 8px; font-weight: 700; }
+  #hdrMin { right: 44px; }
   body.hdrmin header {
     height: 10px;
     padding: 0;
@@ -151,7 +151,7 @@
   body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { height: calc(100% - 6px); }
   /* the pinned ▶ sits at right:80 - outside the 84px reserve, so reserve more */
   body.hdrgraph header { padding-right: 118px; }
-  /* the stream play button stays reachable too, pinned left of the ?;
+  /* the stream play button stays reachable too, pinned left of the -;
      the .hdr-side .hdr-btn chain matches the hide rule's specificity so
      this later rule wins */
   body.hdrgraph .hdr-side .hdr-btn#vidBtn { display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); right: 80px; height: calc(100% - 6px); }
@@ -173,7 +173,7 @@
   body.hdrmin #hdrMin {
     display: inline-block;
     top: 50%; transform: translateY(-50%); /* centre on the 10px strip */
-    right: 2px;
+    right: 44px; /* keeps the - under its spot in the other header states */
     width: auto; height: 10px;
     padding: 0 8px;
     border: none;
@@ -190,7 +190,7 @@
     height: 16px;
     line-height: 16px;
     padding: 0 16px;
-    right: 6px;
+    right: 44px;
   }
   .channel {
     display: flex;
@@ -657,8 +657,9 @@
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
     header { padding: 3px 8px 2px; padding-right: 92px; column-gap: 8px; font-size: var(--hdr-fs, calc(var(--chat-font, 15px) * 0.87)); }
-    #helpBtn { right: 48px; }
-    #hdrMin { right: 6px; }
+    #helpBtn { right: 6px; }
+    #hdrMin { right: 48px; }
+    body.hdrmin #hdrMin { right: 48px; }
     .hdr-side { gap: 4px; }
     .hdr-btn { height: 28px; }
     button.hdr-btn { width: 34px; }
