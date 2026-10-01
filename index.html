@@ -2780,9 +2780,10 @@
   const HELP_MODES = ['off', 'panel', 'labels', 'both'];
   let helpMode = 0;
   const HDR_LABELS = [
-    [presetBtn, 'theme'], [themeBtn, 'style'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
+    [presetBtn, 'theme'], [themeBtn, 'style'], [shadeBtn, 'shade'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
     [fontSel, 'font'], [fontBtn, 'size'], [weightBtn, 'weight'], [lhBtn, 'height'],
     [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [emoteBtn, 'emote'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'msg rate'], [sendBtn, 'chat'],
+    [helpBtn, 'help'], [hdrMinBtn, 'header'], // corner buttons are absolute - the labels land in flow beside the side cluster
   ];
   for (const [el, txt] of HDR_LABELS) {
     const s = document.createElement('span');
