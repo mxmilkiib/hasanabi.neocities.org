@@ -3408,11 +3408,11 @@
       const g = groups[src];
       if (!g || !g.length) continue;
       h += `<div class="ehead">${src === 'other' ? 'emotes' : src.toLowerCase()}</div>` + g.map((n) =>
-        `<button type="button" data-ins="${escapeHTML(n)}" title="${escapeHTML(n)}${emoteSrc[n] ? ' - ' + escapeHTML(emoteSrc[n]) : ''}">` +
+        `<button type="button" data-ins="${escapeHTML(n)}">` +
         `<img src="${escapeHTML(thirdPartyEmotes[n])}" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
     }
     if (tw.length) h += `<div class="ehead">twitch</div>` + tw.map(([n, id]) =>
-      `<button type="button" data-ins="${escapeHTML(n)}" title="${escapeHTML(n)} - Twitch">` +
+      `<button type="button" data-ins="${escapeHTML(n)}">` +
       `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/2.0" alt="${escapeHTML(n)}" loading="lazy"></button>`).join('');
     if (ej.length) h += `<div class="ehead">emoji</div>` + ej.map((c) =>
       `<button type="button" class="eji" data-ins="${c}">${c}</button>`).join('');
