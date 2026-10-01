@@ -506,6 +506,7 @@
     font-style: italic;
     white-space: normal;
   }
+  .twcard .up { font-style: normal; }
   .twcard .twmedia img { max-height: 5em; max-width: 12em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
   .twcard .twmedia a.twvid { position: relative; display: inline-block; }
   .twcard .twmedia a.twvid i {
@@ -1022,7 +1023,9 @@
     const head = twNorm(c.text).slice(0, 40);
     const media = c.imgs ? `<span class="twmedia">${c.imgs}</span>` : '';
     if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${media}</span>` : '';
-    return `<span class="twcard"><b>@${escapeHTML(c.author)}</b> ${escapeHTML(c.text.slice(0, 280))}${media}</span>`;
+    // unicode runs stay upright: italic faces lack their glyph coverage
+    const text = escapeHTML(c.text.slice(0, 280)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>');
+    return `<span class="twcard"><b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
   }
   const tweetWait = new Set();
   function reqTweet(id) {
