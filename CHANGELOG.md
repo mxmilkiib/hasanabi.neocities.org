@@ -129,6 +129,9 @@ not versions — the page ships continuously to Neocities.
   (UK greens and Your Party plus the main European left parties and the
   EP group); blammobot and fossabot get separate bot rows with the
   longer fossabot command list
+- The bot rows reuse the resource-link column layout: each command
+  cluster sits in its own column block under a small bold heading
+  (games/points; mod-utility/links/toys/offline/more)
 - Extra links split into **organising**, **free software** and **open
   hardware** rows (FSF/FSFE, Software Freedom Conservancy, F-Droid,
   OSHWA, Open Source Ecology, right to repair and more), leaving a short
