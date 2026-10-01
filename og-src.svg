@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<rect width="1200" height="630" fill="#0e0e13"/>
+<path fill="#e8a33d" transform="translate(90 190) scale(10)" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+<text x="380" y="292" font-family="JetBrains Mono" font-weight="bold" font-size="62" fill="#e8e8ea">HasanAbi Chat Thing</text>
+<text x="380" y="366" font-family="JetBrains Mono" font-size="29" fill="#9a9aa5">a compact, customisable twitch chat client</text>
+<text x="380" y="422" font-family="JetBrains Mono" font-size="27" fill="#6a6a75">hasanabi.neocities.org</text>
+<rect x="380" y="468" width="620" height="4" fill="#e8a33d"/>
+</svg>
