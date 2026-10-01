@@ -1372,11 +1372,12 @@
         aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? '[md]' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       const subHtml = subM ? `<span class="role sub"${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${SUB_MODES[subMode].startsWith('num') ? `[${(+subM[1]).toString().padStart(2, '0')}]` : `[sub ${subM[1].padStart(2, '0')}]`}</span>` : '';
-      // left modes lead with the chip ahead of the badge icons; right
-      // modes keep it inside the aux cluster at the row's right edge
-      if (subM && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
+      // left modes lead with the chip ahead of the badge icons; right
+      // modes keep it inside the aux cluster at the row's right edge,
+      // outermost - [first]/[bits] sit to its left
+      if (subM && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
       const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode].endsWith('left') ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
       const pid = tags['reply-parent-msg-id'];
       let reply = '';
@@ -2606,7 +2607,7 @@
         if (months) sub.textContent = mode.startsWith('num') ? `[${months.padStart(2, '0')}]` : `[sub ${months.padStart(2, '0')}]`;
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
-          if (aux) { const mod = aux.querySelector('.mod'); if (mod) mod.after(sub); else aux.prepend(sub); }
+          if (aux) aux.append(sub); // outermost in the right cluster
           else row.insertBefore(sub, row.querySelector('.imglnk'));
         }
       }
