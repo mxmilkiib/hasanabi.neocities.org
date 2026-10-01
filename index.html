@@ -114,7 +114,7 @@
     /* a bare gap: shorthand would also widen the row gap; keep them apart */
     column-gap: 12px;
     row-gap: 1px;
-    padding: 3px 18px 2px;
+    padding: 2px 18px 1px;
     /* ? and – live at the absolute top-right corner whatever the wrap
        state; padding-right keeps flowing content clear of them */
     padding-right: 84px;
@@ -548,7 +548,7 @@
   #splitBtn.tri { font-size: .72em; letter-spacing: -.5px; }
   /* flexes to fill the free header space; sparkSize() matches the buffer to
      the laid-out width whenever it changes so it never rasterises blurry */
-  #spark { height: 18px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
+  #spark { height: 22px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   #vidBtn.playing { color: #3fbf3f; border-color: #3fbf3f; }
@@ -1588,7 +1588,7 @@
 
   // ---- msgs/sec sparkline: one sample per second, 4-minute window ----
   const DPR = window.devicePixelRatio || 1;
-  const SPARK_H = 18;
+  const SPARK_H = 22;
   const SPARK_WINDOWS = [30, 60, 120, 240];
   // the window grows with the rendered width (~3px per second of history),
   // so the stretched graph-mode bar shows longer history instead of a
