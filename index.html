@@ -525,6 +525,14 @@
   }
   .reply:hover { color: var(--accent); }
   .reply b { font-weight: 600; }
+  /* the replied-to message in full: a quote block on its own line above the
+     reply, ruled and dimmed so it reads as context, not as part of the reply.
+     (rows saved before this keep the old inline chip) */
+  .reply.rq {
+    display: block; flex: 0 0 100%; white-space: normal; overflow-wrap: anywhere;
+    margin: 0 0 1px 3px; padding-left: 8px; border-left: 2px solid var(--line);
+    font-style: normal; line-height: 1.3;
+  }
   .row.jump { animation: jumpflash 1.4s ease-out; }
   @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
   .hdr-side { display: flex; align-items: center; gap: 6px; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; }
@@ -1461,9 +1469,8 @@
       if (pid) {
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
-        const excerpt = pbody.length > 48 ? pbody.slice(0, 48).trimEnd() + '…' : pbody;
-        reply = `<span class="reply" data-pid="${escapeHTML(pid)}" title="${escapeHTML(pname + ': ' + pbody)}">` +
-                `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(excerpt)}</span>`;
+        reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
+                `↩ <b>${escapeHTML(pname)}</b>: ${escapeHTML(pbody)}</span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       // native twitch gif posts carry only the giphy title in brackets -
@@ -1523,7 +1530,7 @@
       }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}>` +
-              `<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? auxHtml + subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${reply}${action ? '* ' : ''}` +
+              `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? auxHtml + subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}<span class="rplybtn" title="reply to this message">↩</span></div>`;
@@ -2717,7 +2724,7 @@
       if (!aux) {
         aux = document.createElement('span');
         aux.className = 'aux';
-        row.insertBefore(aux, row.querySelector('.reply') || row.querySelector('.name'));
+        row.insertBefore(aux, row.querySelector('.reply:not(.rq)') || row.querySelector('.name'));
       }
       aux.prepend(mod);
     });
@@ -2729,7 +2736,7 @@
       const sub = row.querySelector('.sub');
       // the left-mode anchor: aux leads, then the sub chip, both ahead of
       // the badge icons - matching the order new rows render with
-      const lead = row.querySelector('img.badge') || row.querySelector('.reply') ||
+      const lead = row.querySelector('img.badge') || row.querySelector('.reply:not(.rq)') ||
                    row.querySelector('.name') || row.children[1];
       // the right-mode anchor: straight after the colon, where fresh rows
       // put the float - appended after the body text it would sink to the
@@ -3350,7 +3357,7 @@
       id: row.dataset.mid,
       name: nameEl.textContent,
       login: decodeURIComponent(new URL(nameEl.href).pathname.slice(1)),
-      body: body.replace(/^:\s*/, '').trim().slice(0, 200),
+      body: body.replace(/^:\s*/, '').trim().slice(0, 500),
     };
     replyWho.textContent = replyCtx.name;
     replyWhat.textContent = replyCtx.body.length > 80 ? replyCtx.body.slice(0, 80) + '…' : replyCtx.body;

@@ -46,6 +46,9 @@ not versions — the page ships continuously to Neocities.
   threaded replies itself, so the page stops adding its own (which
   doubled it) and matches echoes to their real lines with the mention
   stripped
+- Replies show the whole original message as a dim, ruled quote block
+  above the reply instead of a 48-character inline snippet; clicking it
+  still jumps to the original, and rows saved earlier keep the old chip
 - Tweet preview cards drop their text when the message already carries
   it (fossabot reposting a tweet), keeping only the media
 - Being timed out as the logged-in user shows a `you were timed out`

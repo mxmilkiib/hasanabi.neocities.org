@@ -92,8 +92,9 @@ no dependencies beyond CDN-hosted fonts:
 
 - **Chat rendering** — raw Twitch IRC lines parsed into rows: timestamps,
   linked names, real badge icons (mod, VIP, sub flair, bits, founder…)
-  with text chips as fallback, [sub N]/[bits]/[first] chips, reply chips
-  with jump-to-original, emote retokenization. `/me` actions, `!command`
+  with text chips as fallback, [sub N]/[bits]/[first] chips, replies
+  quote the full original in a ruled block above the line (click it to
+  jump to the original), emote retokenization. `/me` actions, `!command`
   and `#tag` lines render in italics (names, chips and timestamps stay
   upright), USERNOTICE subs/raids/gifts become dim italic notice rows,
   and CLEARCHAT/NOTICE events show timeouts, bans and channel notices
