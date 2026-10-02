@@ -1070,7 +1070,10 @@
       <button class="hdr-btn slot" data-i="1">➋</button>
       <button class="hdr-btn slot" data-i="2">➌</button>
     </div>
-    <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
+    <div style="margin-top: 6px; display: flex; gap: 6px">
+    <button id="resetOpts" class="hdr-btn" style="flex: 3; height: 26px">reset all settings</button>
+    <button id="cacheBust" class="hdr-btn" style="flex: 1; height: 26px" title="reload the page bypassing the cache - keeps this url's settings">↻ fresh</button>
+    </div>
     </div>
     <div class="htabpage" id="htabRes" hidden>
     <div><b>re Hasan</b><span><a class="at" href="https://www.youtube.com/@HasanAbi" target="_blank" rel="noopener">youtube</a> · <a class="at" href="https://x.com/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://www.tiktok.com/@hasandpiker" target="_blank" rel="noopener">tiktok</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">hascord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://hasanhub.com/" target="_blank" rel="noopener">hasanhub</a> (clips) · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a> (<a class="at" href="https://youtu.be/zoEWotQKiCo" target="_blank" rel="noopener">original</a>)</span></div>
@@ -3881,6 +3884,14 @@
       localStorage.removeItem('hasan-htab');
     } catch (e) {}
     location.reload();
+  });
+  // cache bust: a fresh ?_=ts query makes this a new request, so any
+  // stale copy gets bypassed; existing params (channel, state) survive
+  document.getElementById('cacheBust').addEventListener('click', () => {
+    try { if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k))); } catch (e) {}
+    const u = new URL(location.href);
+    u.searchParams.set('_', Date.now());
+    location.href = u.toString();
   });
 
   linesBtn.addEventListener('click', (e) => { setLines(lineLevel + (e.shiftKey ? -1 : 1)); saveOpts(); });
