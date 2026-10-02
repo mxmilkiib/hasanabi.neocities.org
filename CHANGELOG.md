@@ -36,6 +36,10 @@ not versions — the page ships continuously to Neocities.
   entries that stream get `tw`/`*` links, and twitch-stream entries
   that upload get `yt` links
 - Extra links gain droitalasante.be (Medics for the People)
+- New `restorative justice` row: transform harm, BATJC, Creative
+  Interventions, Interrupting Criminalization, generationFIVE, INCITE!,
+  The Revolution Starts at Home, Critical Resistance, Collective
+  Liberation, the RJ library and Mariame Kaba's Prison Culture
 
 ### Chat & rendering
 - Page-flip ghost rows rest lighter (45% -> 62% opacity) while the fade
