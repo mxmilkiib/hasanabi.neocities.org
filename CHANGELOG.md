@@ -19,6 +19,10 @@ not versions — the page ships continuously to Neocities.
   every entry carries data-b/data-d years, era labels now render as
   bold block heads like the bot lists, and the flat sort dedupes the
   mark fisher entry that sat in two sections
+- Authors tab gains an `info` cycle next to `sort`: `all` shows the
+  "(work · dates)" notes, `works` drops the dates, `names` drops the
+  whole note; the columns narrow (30em → 24em → 15em) as the text
+  shrinks
 - Help tab buttons got contrastier borders and a hover fill; the row
   sits tighter to the top edge with a little air beneath
 - The `restorative justice` resources block is now `justice` with
