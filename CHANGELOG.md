@@ -74,6 +74,7 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Popup ✕ buttons go bold, matching the tab links
 - Channel line nudges a pixel off the header top - a touch more air
   above the status text, a touch less below
 - `usa pol` splits in two - the dsa block keeps the labelled row,
