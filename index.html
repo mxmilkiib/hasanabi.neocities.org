@@ -4102,7 +4102,13 @@
       : n >= LONG_WARN ? `long messages (~${LONG_WARN}+ chars) can draw a fossabot warning`
       : '';
   };
-  chatInput.addEventListener('input', growInput);
+  chatInput.addEventListener('input', () => {
+    // typing while walking edits the shown history entry in place - a
+    // walk back out would otherwise revert to the stale stashed draft
+    // and silently discard the added text
+    if (histIdx !== null && histIdx < hist.length) hist[histIdx] = chatInput.value;
+    growInput();
+  });
   paintLen();
 
   chatInput.addEventListener('keydown', (e) => {
@@ -4173,9 +4179,12 @@
         for (const i of [...parked]) { parked.delete(i); if (i > 0) parked.add(i - 1); }
       }
     }
+    // a send from inside a walk hands the stashed draft back to the box -
+    // the entry was sent but the half-written text was never its own
+    const shelved = histIdx !== null && histDraft;
     histIdx = null; histDraft = '';
     if (ctx) clearReply();
-    chatInput.value = '';
+    chatInput.value = shelved || '';
     growInput();
     if (slowSecs > 0 && !selfExempt) {
       slowUntil = Date.now() + slowSecs * 1000;
