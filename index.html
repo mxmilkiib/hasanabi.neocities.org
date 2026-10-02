@@ -756,8 +756,13 @@
      margins and matching padding bleed the row's background over the
      panel padding so scrolling content doesn't peek through */
   #helpPanel .htabs { display: flex; gap: 4px; margin: -10px -14px 18px;
-    padding: 1px 6px 0; position: sticky; top: 0; z-index: 1;
+    padding: 0 6px; position: sticky; top: 0; z-index: 1;
     background: var(--panel); border-radius: 6px 6px 0 0; }
+  /* a panel-coloured tail under the sticky row so content scrolling
+     behind the tabs dissolves instead of cutting at a hard edge */
+  #helpPanel .htabs::after { content: ''; position: absolute; top: 100%;
+    left: 0; right: 0; height: 12px; pointer-events: none;
+    background: linear-gradient(var(--panel), transparent); }
   #helpPanel .htabs a { flex: 1; text-align: center; color: var(--accent); text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-color: color-mix(in srgb, var(--text-dim) 65%, var(--line)); border-radius: 4px; font-weight: 700; }
   #helpPanel .htabs a:hover { color: var(--text); background: var(--line); }
   #helpPanel .htabs a.on { color: var(--text); border-color: var(--accent); }
@@ -783,8 +788,9 @@
   /* author entries run long (name + work + dates), so wider columns there */
   #htabAuth .linkcols { columns: 30em; }
   /* the sortable region wraps the area sections without eating their
-     grid-item status in the tabpage grid */
-  #authSections { display: contents; }
+     grid-item status in the tabpage grid; scoped under #helpPanel so it
+     outranks the .htabpage > div grid rule and contents actually wins */
+  #helpPanel #authSections { display: contents; }
   /* the info cycle drops the " · dates" span, then the whole "(work)"
      note; columns narrow as less text needs room */
   #htabAuth.ainfo1 .linkcols { columns: 24em; }
