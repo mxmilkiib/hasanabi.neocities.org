@@ -838,9 +838,9 @@
   #htabAuth.ainfo1 .linkcols { columns: 28em; }
   #htabAuth.ainfo2 .linkcols { columns: 24em; }
   #htabAuth.ainfo3 .linkcols { columns: 15em; }
-  #htabAuth.ainfo1 .aw, #htabAuth.ainfo1 .ad, #htabAuth.ainfo1 .ac,
+  #htabAuth.ainfo1 .aw, #htabAuth.ainfo1 .ad,
   #htabAuth.ainfo2 .ad,
-  #htabAuth.ainfo3 .ad, #htabAuth.ainfo3 .aw, #htabAuth.ainfo3 .ac { display: none; }
+  #htabAuth.ainfo3 .ad, #htabAuth.ainfo3 .aw { display: none; }
   /* extra links carry long descriptors too */
   #helpPanel .linkcols.xtra { columns: 16em; }
   #helpPanel .linkcols.wider { columns: 30em; }
@@ -2809,11 +2809,13 @@
   const authTab = document.getElementById('htabAuth');
   const authSecs = document.getElementById('authSections');
   // split each entry's "(work · dates)" tail into hideable spans: aw
-  // carries "(work", ad the " · dates", ac the ")" - the info cycle
-  // drops dates or the whole note without leaving a stray paren
+  // carries "(work)", ad "(dates)" - the info cycle drops dates or the
+  // whole note; ad is moved after the tagline so dates read rightmost
   authSecs.querySelectorAll('.linkcols > i').forEach((el) => {
     el.innerHTML = el.innerHTML.replace(/ \(([^()]*?)(?: · ([^()]*))?\)/,
-      (m, w, d) => ` <span class="aw">(${w}</span>` + (d ? `<span class="ad"> · ${d}</span>` : '') + '<span class="ac">)</span>');
+      (m, w, d) => ` <span class="aw">(${w})</span>` + (d ? `<span class="ad"> (${d})</span>` : ''));
+    const ad = el.querySelector('.ad'), ag = el.querySelector('.ag');
+    if (ad && ag) ag.after(ad);
   });
   const authOrig = authSecs.innerHTML;
   helpPanel.addEventListener('click', (e) => {
