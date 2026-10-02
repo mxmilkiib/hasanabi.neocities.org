@@ -72,6 +72,8 @@ not versions — the page ships continuously to Neocities.
   as its own line above the message, so the row flips parity twice and
   the alternation stays in step per visual line
 - The header's msgs/sec and chatters values bold like the stream times
+- Floating surfaces (help panel, emote picker, stream overlay, hover
+  tooltip) tint their borders 40% toward the style's accent
 
 ## 2026-10-01
 
