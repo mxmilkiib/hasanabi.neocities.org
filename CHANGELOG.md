@@ -105,6 +105,8 @@ not versions — the page ships continuously to Neocities.
 - Reply-quote lines carry a violet tint + edge so the reprinted
   parent message reads as its own highlight, distinct from the
   red/amber/green/accent row colours
+- Authors-tab sort and info rows are single centred cells now,
+  matching the width row instead of the two-column label grid
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) use a hue-neutral --popline border: white on dark shades,
