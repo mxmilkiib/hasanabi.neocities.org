@@ -269,22 +269,25 @@ no dependencies beyond CDN-hosted fonts:
 
 Where this sits relative to the usual suspects:
 
-| | this page | Twitch embed | Chatterino | Chatty | jChat |
-|---|---|---|---|---|---|
-| form factor | one web page | Twitch iframe/popout | desktop app | desktop app (Java) | web overlay |
-| install / build | none, static file | none | app install | JRE | none |
-| runs on strict-CSP static hosts | ✓ (relay iframe) | embed-domain rules | n/a | n/a | partial |
-| send chat (login) | ✓ implicit OAuth | ✓ | ✓ | ✓ | — |
-| replies | quoted block, jump-back | collapsed thread | ✓ | ✓ | — |
-| 7TV / BTTV / FFZ | ✓ animated, zero-width stacks | native only | ✓ | ✓ | partial |
-| backfill after suspend/resume | ✓ (robotty) | — | ✓ | — | — |
-| msgs/sec graph, gap & burst marks | ✓ | — | — | — | — |
-| theming / accessibility fonts | palettes × 9-stop shade axis | light/dark | extensive | extensive | CSS params |
-| multi-channel | `?channel=` per tab | per embed | tabs/splits | tabs | URL param |
-| second-screen / PWA install | ✓ | — | — | — | — |
+| | this page | Twitch site | Twitch embed | Chatterino | Chatty | jChat | DankChat | Chatsen |
+|---|---|---|---|---|---|---|---|---|
+| form factor | one web page | web chat panel | iframe/popout | desktop app | desktop app (Java) | web overlay | Android app | iOS/Android app |
+| install / build | none, static file | none | none | app install | JRE | none | Play / F-Droid | app stores |
+| runs on strict-CSP static hosts | ✓ (relay iframe) | n/a | embed-domain rules | n/a | n/a | partial | n/a | n/a |
+| send chat (login) | ✓ implicit OAuth | ✓ | ✓ | ✓ | ✓ | — | ✓ (+whispers) | ✓ |
+| replies | quoted block, jump-back | ✓ threads | collapsed thread | ✓ | ✓ | — | ✓ | ✓ |
+| polls / predictions / points | — | ✓ | — | partial | — | — | ✓ | partial |
+| 7TV / BTTV / FFZ | ✓ animated, zero-width stacks | — (extensions) | native only | ✓ | ✓ | partial | ✓ | ✓ |
+| backfill after suspend/resume | ✓ (robotty) | recent only | — | ✓ | — | — | history search | — |
+| msgs/sec graph, gap & burst marks | ✓ | — | — | — | — | — | — | — |
+| theming / accessibility fonts | palettes × 9-stop shade axis | light/dark | light/dark | extensive | extensive | CSS params | accent palettes | ✓ |
+| multi-channel | `?channel=` per tab | per page | per embed | tabs/splits | tabs | URL param | tabs | ✓ |
+| second-screen / PWA install | ✓ | — | — | — | — | — | — | — |
 
 Broad strokes only — feature sets drift; Chatterino in particular is the
-much deeper client if one lives at a desktop. The niche here is zero
+much deeper client if one lives at a desktop, the Twitch site carries
+the platform-only surface (polls, predictions, channel points), and
+DankChat/Chatsen cover the phone. The niche here is zero
 install, a host that forbids sockets outright, and a page that treats
 the stream's context (resources, history, rate graph) as part of chat.
 
