@@ -50,6 +50,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Rate/chatters header text now matches the stream stats size (it was
+  computing against the header font, not .channel's 1.27em), and the
+  chatters tally moved left of the spark graph
 - Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,
   `--` and `md` instead of `[12]`, ` -- ` and `[md]`
 - `hasan-last-run` now carries the channel suffix like the history and
