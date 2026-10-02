@@ -1911,6 +1911,22 @@
     markHelp('helpScrollback', SCROLLBACK_SIZES.indexOf(n));
   }
 
+  // a reply's quote re-uses the row's own columns: its channel tag hangs
+  // in the tag column and the quoted text shifts right to sit above the
+  // responder's nick
+  function rqIndent(r) {
+    const rq = r.querySelector('.reply.rq'), nm = r.querySelector('.name');
+    if (!rq || !nm) return;
+    const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
+    if (qt && tg) {
+      // the quote's content box starts 13px in either padding scheme;
+      // the tag's right margin stretches so ' ↩ name:' lands at the nick
+      qt.style.marginLeft = (tg.offsetLeft - 13) + 'px';
+      qt.style.marginRight = Math.max(1, nm.offsetLeft - 16 - tg.offsetLeft - qt.offsetWidth) + 'px';
+    } else {
+      rq.style.paddingLeft = (nm.offsetLeft - 16 - rq.offsetLeft - 2) + 'px';
+    }
+  }
   function flush() {
     scheduled = false;
     if (emptyEl) {
@@ -2161,6 +2177,7 @@
     const unfocused = document.hidden || !document.hasFocus();
     for (const r of newRows) {
       r.removeAttribute('data-new');
+      rqIndent(r);
       if (r.dataset.mid) rowById.set(r.dataset.mid, r);
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
@@ -4212,6 +4229,7 @@
       }
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
+      for (const rq of logEl.querySelectorAll('.reply.rq')) rqIndent(rq.closest('.row'));
       // echoes kept their send-time key - re-register them so a real copy
       // arriving through backfill adopts the row instead of duplicating it
       for (const el of logEl.querySelectorAll('.row.local[data-ek]')) {
