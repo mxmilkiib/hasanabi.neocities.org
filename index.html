@@ -808,6 +808,7 @@
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
     color: var(--text-dim); font-size: .7em; border: 1px dashed var(--line); border-radius: 4px; opacity: .4; }
   #emoteGrid .eage.lit { opacity: 1; color: var(--text); border-color: var(--accent); font-weight: 700; }
+  #emoteGrid .eage.t0 { opacity: .9; color: var(--accent); border: 1px solid var(--accent); }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
@@ -4301,16 +4302,26 @@
     const aged = (items, codeOf, render) => {
       if (epickSort !== 'use') return items.map(render).join('');
       const now = Date.now();
+      const t0age = now - useT0;
+      const t0mins = Math.max(1, Math.round(t0age / 6e4));
+      // the era rungs plus a boundary square at recording start - no use
+      // can predate it, so everything below the square was never seen
+      const marks = AGES.map(([t, words]) => ({ t, words }));
+      marks.push({ t: t0age, t0: true });
+      marks.sort((a, b) => a.t - b.t);
       let next = 0; // thresholds fire once each, in order
       return items.map((x) => {
         const age = now - (useTs[codeOf(x)] || 0);
         let m = '';
-        while (next < AGES.length && age >= AGES[next][0]) {
-          const [t, words] = AGES[next++];
-          // a marker lights once recording has actually covered its era -
-          // earlier ones only mean 'not seen in the little time so far'
-          const lit = now - useT0 >= t;
-          m += `<div class="eage${lit ? ' lit' : ''}" title="${lit ? `emotes below were last used over ${words} ago` : `only ${Math.max(1, Math.round((now - useT0) / 6e4))}m recorded so far`}">${t / 6e4}m</div>`;
+        while (next < marks.length && age >= marks[next].t) {
+          const mk = marks[next++];
+          if (mk.t0) {
+            const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
+            m += `<div class="eage t0" title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${lbl}</div>`;
+          } else {
+            const lit = t0age >= mk.t;
+            m += `<div class="eage${lit ? ' lit' : ''}" title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}">${mk.t / 6e4}m</div>`;
+          }
         }
         return m + render(x);
       }).join('');

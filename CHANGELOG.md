@@ -95,7 +95,9 @@ not versions — the page ships continuously to Neocities.
   ones go bold with an accent border and full-contrast text
 - In use-sorted sections dashed `2m`/`5m`/`10m`/`20m`/`30m`/`40m`/`50m`/`60m` cells mark where
   last-seen chat use ages past each threshold; emotes never seen sit
-  below them all
+  below them all. A solid accent square marks where recording began
+  (its label counts up, e.g. `47m`, `3h`, `2d`) - nothing below it
+  was ever seen, since no recorded use can predate tracking
 - Bot rows no longer carry a ` -- ` sub placeholder - fossabot and
   blammobot never report a month count, so the chip doesn't render
 - The picker's Twitch emote sections actually load now: the ivr.fi ask

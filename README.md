@@ -191,7 +191,9 @@ no dependencies beyond CDN-hosted fonts:
   use updates both and persists across reloads); in usage mode the sections
   sort busiest-first, dashed `2m`/`5m`/`10m`/`20m`/`30m`/`40m`/`50m`/`60m` cells sit at the points where
   emotes were last used over that long ago (dim until recording has
-  actually covered that span, then bold and accent-bordered), and
+  actually covered that span, then bold and accent-bordered), plus a
+  solid accent square at the point recording began — everything below
+  it was never seen — and
   reshuffles animate emotes
   sliding to their new spots, while a just-used emote flashes behind its
   cell. Clicking
