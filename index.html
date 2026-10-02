@@ -1250,7 +1250,6 @@
   const chatInput = document.getElementById('chatInput');
   const vidBtn = document.getElementById('vidBtn');
   const vidBox = document.getElementById('vid');
-  const vidFrame = document.getElementById('vidFrame');
   const helpPanel = document.getElementById('helpPanel');
   const mainEl = document.querySelector('main');
   const sparkEl = document.getElementById('spark');
@@ -1404,8 +1403,6 @@
   let emoteSrc = {};           // name -> 'Twitch'/'7TV'/'BTTV'/'FFZ' for tooltips
   let emoteUse = {};           // name -> channel usage count (streamelements stats)
   let emoteAnim = new Set();   // names flagged animated by their provider
-  let zeroWidth = new Set();   // 7TV overlay emotes that stack on the previous one
-  let badgeSets = {};          // 'set_id' -> { version: url }
   // a row resolves against its own channel's sets, falling back to the
   // focused channel's (globals are identical either way)
   const setFor = (ch) => chanSets[ch] || chanSets[CHANNEL] || {};
@@ -5548,8 +5545,6 @@
         emoteSrc = chanSets[ech].emoteSrc;
         emoteUse = chanSets[ech].emoteUse;
         emoteAnim = chanSets[ech].emoteAnim;
-        zeroWidth = chanSets[ech].zeroWidth;
-        badgeSets = chanSets[ech].badges;
       }
       retokenizeRows();
       if (ech === CHANNEL && !emotePick.hidden) rebuildPicker();
