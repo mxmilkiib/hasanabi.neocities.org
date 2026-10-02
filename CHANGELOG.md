@@ -103,7 +103,8 @@ not versions — the page ships continuously to Neocities.
   per visual line (tinted rows keep their own colour on both lines)
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
-  tooltip) use muted grey borders mixed toward the text colour
+  tooltip) use a hue-neutral --popline border: white on dark shades,
+  dark on light - theme-relative mixes kept taking the text hue
 - The emote-picker button sits flush against the input's right edge and
   its ☻ glyph shrinks slightly so it no longer spills over the button's
   border when pressed
