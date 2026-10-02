@@ -818,6 +818,18 @@
   #helpPanel div.sep { display: block; grid-column: 1 / -1; text-align: center; color: var(--text-dim); opacity: .55; margin: 11px 0 9px; }
   #helpPanel #htabRes div.sep { margin: 1px 0 0; line-height: 1.1; }
   #helpPanel div.wide > span { grid-column: 1 / -1; text-align: center; }
+  /* a live riff on the classic 88x31 web button - github-dark tile, gold
+     star, and the repo's real stargazer count where the gif's text sat */
+  #helpPanel a.s88 { display: inline-flex; flex-direction: column; align-items: center;
+    justify-content: center; width: 88px; height: 31px; margin-left: 6px;
+    vertical-align: middle; overflow: hidden; text-decoration: none;
+    background: #161b22; border: 1px solid #444c56; border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 1px 2px rgba(0,0,0,.4); }
+  #helpPanel a.s88 .s88t { font-size: 8px; line-height: 1; letter-spacing: .08em;
+    text-transform: uppercase; color: #8b949e; }
+  #helpPanel a.s88 .s88t b { color: #e3b341; font-weight: 400; }
+  #helpPanel a.s88 .s88n { font-size: 13px; line-height: 1.1; font-weight: 700; color: #f0f6fc; }
+  #helpPanel a.s88:hover { border-color: #58a6ff; }
   #helpPanel i { font-style: normal; color: var(--text-dim); font-size: .85em; }
   /* link-column rows (news): one entry per line, flowing into as many
      ~20em columns as the popup width fits. Column counts are capped so
@@ -1126,7 +1138,7 @@
     <button id="cacheBust" class="hdr-btn" style="flex: 1; height: 26px" title="reload the page bypassing the cache - keeps this url's settings">↻ clear cache</button>
     </div>
     <div class="sep">—</div>
-    <div class="wide" style="margin-top: 8px"><span>source: <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/README.md" target="_blank" rel="noopener">README.md</a> · <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a> · <a class="at" href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License" target="_blank" rel="noopener">AGPL</a>)<span id="repoStats"></span></span></div>
+    <div class="wide" style="margin-top: 8px"><span>source: <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/README.md" target="_blank" rel="noopener">README.md</a> · <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a> · <a class="at" href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License" target="_blank" rel="noopener">AGPL</a>)<a class="s88" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener" title="star the repo on github"><span class="s88t"><b>★</b> star</span><span class="s88n" id="repoStars"></span></a><span id="repoStats"></span></span></div>
     </div>
     <div class="htabpage" id="htabRes" hidden>
     <div><b>re Hasan</b><span><a class="at" href="https://www.youtube.com/@HasanAbi" target="_blank" rel="noopener">youtube</a> · <a class="at" href="https://x.com/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://www.tiktok.com/@hasandpiker" target="_blank" rel="noopener">tiktok</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">hascord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://hasanhub.com/" target="_blank" rel="noopener">hasanhub</a> (clips) · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a> (<a class="at" href="https://youtu.be/zoEWotQKiCo" target="_blank" rel="noopener">original</a>) · <a class="at" href="https://www.youtube.com/@FearandPodcast" target="_blank" rel="noopener">fear&amp; pod</a> · <a class="at" href="https://en.wikipedia.org/wiki/Hasan_Piker" target="_blank" rel="noopener">wikipedia</a> · <a class="at" href="https://hasanabi.fandom.com/" target="_blank" rel="noopener">hasanabi wiki</a> · <a class="at" href="https://twitchtracker.com/hasanabi" target="_blank" rel="noopener">twitchtracker</a> · <a class="at" href="https://ideologie.shop/" target="_blank" rel="noopener">ideologie shop</a> · <a class="at" href="https://youtube.com/@ostonox" target="_blank" rel="noopener">ostonox</a></span></div>
@@ -5654,8 +5666,9 @@
       repin();
     } else if (d.type === 'repo') {
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
+      document.getElementById('repoStars').textContent = d.stars ?? '?';
       document.getElementById('repoStats').textContent =
-        ` · ★${d.stars ?? '?'} · from: ${ymd(d.created)}, updated: ${ymd(d.pushed)}`;
+        ` · started: ${ymd(d.created)}, updated: ${ymd(d.pushed)}`;
     }
   });
 

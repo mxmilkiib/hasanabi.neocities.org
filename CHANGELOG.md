@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- The source line's star count becomes a live 88x31 web-badge button -
+  a github-dark tile carrying the real stargazer count where the gif's
+  text sat; its repo date now reads `started:`
 - A `clippers` row joins the resources tab: the youtube clipplex
   (hasanabi productions, hasan reactions, daily dose, hasanabi clips),
   the tiktok fan accounts and the hastok hub index
