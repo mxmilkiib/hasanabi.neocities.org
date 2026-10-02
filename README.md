@@ -4,7 +4,8 @@ A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/ha
 hosted on Neocities — orientated around the Hasan Piker stream, aka the
 Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool,
 organising, media and other resources, & more! Live at
-<https://hasanabi.neocities.org/>.
+<https://hasanabi.neocities.org/>, mirrored on GitHub Pages at
+<https://mxmilkiib.github.io/hasanabi.neocities.org/>.
 
 In plainer terms: it is the stream's chat, liberated from twitch.tv. The
 log renders in a single self-contained page that runs on a static host,
