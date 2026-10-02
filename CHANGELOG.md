@@ -64,6 +64,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Help-popup tab row gets breathing room: the first tab and the ✕
+  no longer sit flush against the sticky bar's edges
 - The twitch-streams legend's * and + now render in the accent
   colour like the links they describe, each note on its own line
 - Stream overlay drags need the primary button - right-click on the
