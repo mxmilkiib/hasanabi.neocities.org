@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- urls inside notice/system-msg text, reply quotes and fossa columns now
+  linkify - they bypassed renderTextHTML so they rendered as raw text
 - Theme slots: three store/recall buttons under the copy-settings-URL
   button hold whole option bundles; click recalls (stores when empty),
   shift/right-click overwrites, and slots sync across open tabs

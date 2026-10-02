@@ -1207,6 +1207,22 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // linkifies url-looking tokens inside already-escaped text - system msgs,
+  // notice rows, reply quotes and fossa columns skip renderTextHTML so urls
+  // in them would render as raw text; honours the clean urls display option
+  function linkifyEsc(esc) {
+    return esc.replace(
+      /(?:https?:\/\/[^\s<]*|(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#][^\s<]*)?)/gi,
+      (raw) => {
+        // peel trailing punctuation/entities the same way the main linkifier does
+        const m = raw.match(/^(.*?)((?:[)\]”’.,!?;:]|&quot;|&#0?39;)*)$/s);
+        const url = m[1], post = m[2];
+        if (!url || url === '.') return raw;
+        const u = /^https?:/i.test(url) ? url : `https://${url}`;
+        return `<a href="${u}" target="_blank" rel="noopener noreferrer" data-u="${url}">${cleanUrls ? cleanUrlDisp(url) : url}</a>${post}`;
+      });
+  }
+
   function parseTags(tagStr) {
     const tags = {};
     for (const pair of tagStr.split(';')) {
@@ -1842,12 +1858,12 @@
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
         html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> <b>${escapeHTML(who)}</b> ` +
-                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
+                `${linkifyEsc(escapeHTML(sys))}${message ? ' - ' + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
         html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
-                `${rawMsg.startsWith('[notice]') ? '<b class="notice-label">[notice]</b>' + escapeHTML(rawMsg.slice(8)) : escapeHTML(rawMsg)}</div>`;
+                `${rawMsg.startsWith('[notice]') ? '<b class="notice-label">[notice]</b>' + linkifyEsc(escapeHTML(rawMsg.slice(8))) : linkifyEsc(escapeHTML(rawMsg))}</div>`;
         continue;
       }
       if (kind === 'CLEARCHAT') {
@@ -1930,7 +1946,7 @@
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
         reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
-                `↩ <b>${escapeHTML(pname)}</b>: <i>${escapeHTML(pbody).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span>`;
+                `↩ <b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       const lkey = linkKeyOf(message);
@@ -1940,7 +1956,7 @@
       const rendered = gifm
         ? { html: `<a href="https://giphy.com/search/${encodeURIComponent(gifm[1].replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(message)}</a>`, names: new Set() }
         : fossa && /[⠀-⣿]/.test(message)
-          ? { html: '<br>' + message.split(' ').map(escapeHTML).join('<br>'), names: new Set() }
+          ? { html: '<br>' + message.split(' ').map((w) => linkifyEsc(escapeHTML(w))).join('<br>'), names: new Set() }
           : renderMessageHTML(message, tags.emotes, !!tags.bits, ch);
       let msgHtml = rendered.html;
       const twTail = pendingTw.splice(0).join('');
