@@ -486,7 +486,9 @@
     white-space: nowrap;
     color: var(--chc, var(--text-dim)); text-decoration: none;
     font-size: .85em; opacity: .8; }
-  .chtag.live { color: var(--accent); opacity: 1; }
+  /* live keeps the channel hue - repainting to accent would paint every
+     live channel the same colour; full weight+opacity marks it instead */
+  .chtag.live { opacity: 1; font-weight: 700; }
   .chtag:hover { color: var(--text); text-decoration: underline; }
   .role.mod { color: var(--good); }
   .role.vip { color: var(--vip); }
