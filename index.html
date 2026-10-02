@@ -3159,7 +3159,9 @@
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
     else if (o.shadow === true) setShadow(1);
     if (Number.isInteger(o.eonly) && o.eonly >= 0 && o.eonly < EMOTE_MODES.length) { emoteMode = o.eonly; applyEmoteMode(); }
-    if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
+    // saved panel modes come back one notch lower so a reload never
+    // reopens the popup - labels-only state still survives
+    if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = (o.help === 1 || o.help === 3) ? o.help - 1 : o.help; applyHelp(); }
     if (typeof o.video === 'boolean') setVideo(o.video);
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
