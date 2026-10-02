@@ -97,7 +97,9 @@ not versions — the page ships continuously to Neocities.
   last-seen chat use ages past each threshold; emotes never seen sit
   below them all. A solid accent square marks where recording began
   (its label counts up, e.g. `47m`, `3h`, `2d`) - nothing below it
-  was ever seen, since no recorded use can predate tracking
+  was ever seen, since no recorded use can predate tracking. All the
+  squares' borders breathe on a slow pulse so they catch the eye
+  (off under prefers-reduced-motion)
 - Bot rows no longer carry a ` -- ` sub placeholder - fossabot and
   blammobot never report a month count, so the chip doesn't render
 - The picker's Twitch emote sections actually load now: the ivr.fi ask

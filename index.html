@@ -816,9 +816,17 @@
   }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
-    color: var(--text-dim); font-size: .7em; border: 1px dashed var(--line); border-radius: 4px; opacity: .4; }
-  #emoteGrid .eage.lit { opacity: 1; color: var(--text); border-color: var(--accent); font-weight: 700; }
-  #emoteGrid .eage.t0 { opacity: .9; color: var(--accent); border: 1px solid var(--accent); }
+    color: var(--text-dim); font-size: .7em; border: 1px dashed var(--line); border-radius: 4px; opacity: .4;
+    animation: eage-dim 2.4s ease-in-out infinite; }
+  #emoteGrid .eage.lit { opacity: 1; color: var(--text); border-color: var(--accent); font-weight: 700;
+    animation-name: eage-pulse; }
+  #emoteGrid .eage.t0 { opacity: .9; color: var(--accent); border: 1px solid var(--accent);
+    animation-name: eage-pulse; }
+  /* borders breathe slowly so the squares catch the eye - dim rungs drift
+     toward the text colour, lit ones toward a paler accent */
+  @keyframes eage-dim { 50% { border-color: color-mix(in srgb, var(--line) 45%, var(--text-dim)); } }
+  @keyframes eage-pulse { 50% { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); } }
+  @media (prefers-reduced-motion: reduce) { #emoteGrid .eage { animation: none; } }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
