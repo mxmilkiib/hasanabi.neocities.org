@@ -1680,14 +1680,16 @@
         aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? '[md]' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
-      const subHtml = `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? ' --&#160;' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
+      // bots never carry a sub count - skip the placeholder chip entirely
+      const subHtml = shimmer && !subM ? '' :
+        `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? ' --&#160;' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the
       // badge icons - [03] [md]; right modes keep it inside the aux
       // cluster at the row's right edge, outermost - [first]/[bits] sit to
       // its left
-      if (SUB_MODES[subMode] !== 'hidden' && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
+      if (subHtml && SUB_MODES[subMode] !== 'hidden' && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
       const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode].endsWith('left') ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
       const pid = tags['reply-parent-msg-id'];
       let reply = '';
@@ -2995,7 +2997,8 @@
     document.querySelectorAll('.row').forEach((row) => {
       const aux = row.querySelector('.aux');
       let sub = row.querySelector('.sub');
-      if (!sub && row.querySelector('.name')) {
+      // bot rows render no chip; don't conjure one on a mode switch
+      if (!sub && row.querySelector('.name') && !row.querySelector('.name.shimmer')) {
         sub = document.createElement('span');
         sub.className = 'role sub';
         sub.title = 'No subscriber months reported';

@@ -87,6 +87,8 @@ not versions — the page ships continuously to Neocities.
 - In use-sorted sections dashed `10m`/`20m`/`30m` cells mark where
   last-seen chat use ages past each threshold; emotes never seen sit
   below them all
+- Bot rows no longer carry a ` -- ` sub placeholder - fossabot and
+  blammobot never report a month count, so the chip doesn't render
 - The picker's Twitch emote sections actually load now: the ivr.fi ask
   re-posts until the relay answers (it could drop while the iframe was
   still loading), replies for superseded asks merge instead of being
