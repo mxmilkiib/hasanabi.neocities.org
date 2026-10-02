@@ -86,7 +86,8 @@ not versions — the page ships continuously to Neocities.
   count; live counts and last-use times persist across reloads
 - Age markers stay dim until recording has actually covered their
   era - a `10m` cell lit means ten minutes of watch time, not just
-  ten minutes of unknowns; unlit ones carry a coverage tooltip
+  ten minutes of unknowns; unlit ones carry a coverage tooltip; lit
+  ones go bold with an accent border and full-contrast text
 - In use-sorted sections dashed `2m`/`5m`/`10m`/`20m`/`30m`/`40m`/`50m`/`60m` cells mark where
   last-seen chat use ages past each threshold; emotes never seen sit
   below them all
@@ -155,6 +156,8 @@ not versions — the page ships continuously to Neocities.
 - Corner order is `–` then `?` rightmost, the minimised `–` keeping its
   place; the `–` wheel wraps full ⇄ reduced ⇄ minimised both ways
 - Labels mode also names the shade, help and header buttons
+- Status line rewords followers-only to `chat follow req: 24h` with the
+  duration bolded
 - Rate graph traces in the accent's complementary hue (`amber` and
   `console` stay monochrome); 30s ticks get a mid-weight stroke; the
   canvas fills its row so there's no dead space above or below the

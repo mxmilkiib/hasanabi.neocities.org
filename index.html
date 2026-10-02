@@ -2212,11 +2212,11 @@
     if (tags.r9k === '1') chips.push('r9k');
     modesEl.innerHTML = chips.join(' ');
     modesEl.title = chips.length ? `chat modes: ${chips.join(', ').replace(/<[^>]+>/g, '')}` : '';
-    // status-line phrasing: 'follow req for chat: 24h' etc.
+    // status-line phrasing: 'chat follow req: 24h' etc.
     const phrases = [];
     if (slow > 0) phrases.push(`slow mode for chat: ${slow}s`);
-    if (foll === 0) phrases.push('follow req for chat');
-    else if (foll > 0) phrases.push(`follow req for chat: ${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}`);
+    if (foll === 0) phrases.push('chat follow req');
+    else if (foll > 0) phrases.push(`chat follow req: <b>${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}</b>`);
     if (tags['emote-only'] === '1') phrases.push('emote-only chat');
     if (tags['subs-only'] === '1') phrases.push('subs-only chat');
     if (tags.r9k === '1') phrases.push('r9k chat');
