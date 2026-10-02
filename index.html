@@ -687,9 +687,9 @@
     cursor: pointer;
   }
   button.hdr-btn { width: 30px; padding: 0; text-align: center; }
-  /* theme slots stretch to share the row; a filled slot reads heavier */
-  #slotRow .slot { flex: 1; width: auto; opacity: .55; }
-  #slotRow .slot.full { opacity: 1; font-weight: 700; }
+  /* theme slots stretch to share the row; a filled slot reads as on */
+  #slotRow .slot { flex: 1; width: auto; }
+  #slotRow .slot.full { font-weight: 700; color: var(--accent); border-color: var(--accent); }
   /* the block glyphs sit heavier than their neighbours, and ▮▮▮ overflows
      the fixed-width button at full size */
   #splitBtn { font-size: .78em; }
@@ -702,6 +702,8 @@
   #spark { height: 22px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  /* destructive config buttons warn in the theme's danger hue */
+  #resetOpts:hover, #cacheBust:hover { color: var(--danger); }
   /* the states paint only the glyph - the border stays standard (or
      accent while the embed is toggled on, like every other .on) */
   #vidBtn.live { color: var(--good); }
@@ -1134,13 +1136,13 @@
     <div style="margin-top: 8px"><b>to block</b><span>comma separated; a chat line containing one is hidden:</span></div>
     <input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
     <div class="sep">—</div>
-    <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
-    <div id="slotRow" style="margin-top: 6px; display: flex; gap: 6px; align-items: center">
-      <span style="font-size: .85em; color: var(--text-dim)">theme slots</span>
+    <div id="slotRow" style="margin-top: 8px; display: flex; gap: 6px; align-items: center">
+      <b>theme slots</b>
       <button class="hdr-btn slot" data-i="0">➊</button>
       <button class="hdr-btn slot" data-i="1">➋</button>
       <button class="hdr-btn slot" data-i="2">➌</button>
     </div>
+    <button id="copyUrl" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">copy settings url</button>
     <div style="margin-top: 6px; display: flex; gap: 6px">
     <button id="resetOpts" class="hdr-btn" style="flex: 3; height: 26px">reset all settings</button>
     <button id="cacheBust" class="hdr-btn" style="flex: 1; height: 26px" title="reload the page bypassing the cache - keeps this url's settings">↻ clear cache</button>

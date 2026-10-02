@@ -74,6 +74,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Theme slots move above the copy-url button with a proper bold
+  label; empty slots lose the ghosting and filled ones read as on.
+  Reset and clear-cache warn in the theme's danger hue on hover
 - Star badge goes self-hosted: the ghbtns look rebuilt in css with
   the count filled from the relay - the iframe embed was blank for
   anyone on a social-widget blocklist
