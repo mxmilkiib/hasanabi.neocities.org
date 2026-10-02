@@ -59,6 +59,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- `heather` preset fields corrected to the url they were specced from:
+  emote-only rows at normal size, 1280px help width, 18px header font -
+  the three had kept the copied gohu row's values
 - @hasanabi and @ostonox get the bots' shimmer: their sender nicks shine
   when they speak, and @-mentions of them in message text sparkle too
 - Mid-edge resize arrows (◀ ▶ ▼) fade in on hover over the help, emote
