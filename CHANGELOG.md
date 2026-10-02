@@ -108,6 +108,20 @@ not versions — the page ships continuously to Neocities.
   tabs (shift-click isolates), persist, and filter the `recent` row.
   Animated Twitch emotes get their `/animated/` CDN variant so they
   actually move in the grid
+- Timestamps gain two 12-hour modes - the ◷ cycle now runs off /
+  hh:mm / hh:mm:ss / 12-hour / 12-hour with seconds, shareable as
+  `?times=12h`/`?times=12hsec`
+- A block-words field sits under the keyword field in config/help:
+  comma-separated, any chat line matching a word is hidden outright
+  (persists as `bw`, shareable as `?bw=`)
+- A `♪` mention ping toggles in config/help - a soft tone when a
+  keyword or @you line lands while the page isn't focused
+- Logged in, a plain click on a chatter's name types `@name ` at the
+  input caret instead of opening their profile; modifier-clicks still
+  open it
+- Slash commands pass through to Twitch as it reads them (/timeout,
+  /ban, /announce, /raid…); they drop a pending reply tag rather than
+  carrying it, and no longer clear an armed reply
 - Tweet video thumbs play inline: a click swaps the thumbnail for a
   muted-loop GIF or a controls+autoplay player (the direct mp4 URL was
   already in the relay payload); shift-click still opens x.com

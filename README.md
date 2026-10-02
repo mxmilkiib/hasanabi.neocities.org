@@ -152,7 +152,7 @@ no dependencies beyond CDN-hosted fonts:
   hue family alone while picking a chip also applies its shade, zebra
   striping (highlighted rows keep their own colour), graduated text shadow, font picker (incl. dyslexia-friendly),
   font size, weight, line height, row separator shades, three-state
-  timestamps (off / no seconds / seconds), five sub-chip modes (right /
+  timestamps (off / no seconds / seconds / 12-hour / 12-hour + seconds), five sub-chip modes (right /
   compact `[NN]` / before badges / compact-left / hidden; a dim " -- "
   or `[sub --]` marks chatters Twitch reported no month count for,
   skipped entirely on the bots),
@@ -177,7 +177,10 @@ no dependencies beyond CDN-hosted fonts:
   the `@login` itself, so only the local echo spells it out. Local echoes render instantly and are
   adopted in place when the real line replays. `↑`/`↓` in the input walk
   sent messages like an IRC client, stashing the draft on the first `↑`
-  and restoring it once `↓` walks back past the newest entry.
+  and restoring it once `↓` walks back past the newest entry. Slash
+  commands pass through as Twitch reads them (`/timeout`, `/ban`,
+  `/announce`, `/raid`…); a plain click on a chatter's name types
+  `@name ` at the input caret (modifier-clicks still open the profile).
 - **Emote picker** — `☻` opens a Chatterino-style grid above the chat
   box: 7TV / BTTV / FFZ / Twitch / emoji (a ~600-glyph sheet) sections
   with search, a
@@ -214,7 +217,9 @@ no dependencies beyond CDN-hosted fonts:
   (profile links fall back to Bird.makeup when nitter is
   down). `[notice]` labels on event rows get a cycling rainbow wash. Mentions landing while the page is unfocused queue on a
   clickable `@N` chip in the header — click to jump to each, ⇧click
-  clears.
+  clears; a `♪` toggle in config/help adds a soft ping for those lines.
+  A block-words field does the inverse of the keyword field — a
+  matching line is hidden outright.
 - **Scrollback** — the config/help panel offers limits from 250 to 100,000
   rows (1,000 by default). Larger limits use more browser memory and may
   slow long-running tabs. At most the newest 1,000 rows (including gap
@@ -243,7 +248,8 @@ no dependencies beyond CDN-hosted fonts:
   `sub` (right/num-right/left/num-left/hidden), `eonly` (inline/right/off),
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
   `kw` is a comma-separated keyword list; lines containing one get a
-  green edge (e.g. `?kw=malkiii,raid`). `self=1` puts an accent edge on
+  green edge (e.g. `?kw=malkiii,raid`). `bw` is the same list inverted:
+  matching lines are hidden. `ping` enables the mention ping. `self=1` puts an accent edge on
   one's own messages when logged in. `min=graph` selects the reduced
   header (option buttons hidden, rate graph across the bar); `min=1`
   minimises to a strip.

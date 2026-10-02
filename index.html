@@ -588,6 +588,7 @@
     margin-left: -8px;
     padding-left: 8px;
   }
+  .row.blk { display: none; }
   body.selfhl .row.self {
     background-color: color-mix(in srgb, var(--accent) 11%, transparent);
     box-shadow: inset 4px 0 0 var(--accent);
@@ -848,6 +849,7 @@
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> on alternating rows<sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
+    <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads. Large values use more memory<sup>†</sup></span></div>
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
@@ -859,14 +861,16 @@
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
-    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · typing a character jumps into the input, ↑/↓ select a row, r or enter replies to it, esc drops the pick</span></div>
+    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input, ↑/↓ select a row, r or enter replies to it, esc drops the pick</span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
-    <div><b></b>names link to twitch profiles · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
+    <div><b></b>names link to twitch profiles - logged in, a plain click types @name in the chat box (⌃/⌘-click still opens the profile) · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
     <div style="margin-top: 8px"><b></b><span>highlight keywords - comma separated; a line containing one gets a green edge (own username, phrases…):</span></div>
     <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
+    <div style="margin-top: 8px"><b></b><span>block words - comma separated; a chat line containing one is hidden:</span></div>
+    <input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
     <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
     <div><b>blammobot</b><span class="linkcols xtra wider"><i><b>games</b>!roulette [amount|all] (gamble points on red/black) · !trivia (answer questions for points) · !scramble (unscramble the word)</i><i><b>points</b>!points (check balance) · !top [count] (leaderboard)</i></span></div>
@@ -1471,8 +1475,11 @@
   // formatToParts so the seconds fragment - and its separator - can be
   // wrapped and hidden by the 'no seconds' mode regardless of locale
   const TIME_FMT = new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const TIME_FMT12 = new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+  const TIME_FMT12NS = new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit', hour12: true });
   function fmtRowTime(when) {
-    const parts = TIME_FMT.formatToParts(when);
+    const fmt = timeIdx >= 4 ? TIME_FMT12 : timeIdx === 3 ? TIME_FMT12NS : TIME_FMT;
+    const parts = fmt.formatToParts(when);
     let s = '', open = false;
     for (let i = 0; i < parts.length; i++) {
       const p = parts[i];
@@ -1776,7 +1783,7 @@
           }
         }
       }
-      html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
+      html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -1811,8 +1818,10 @@
       if (r.dataset.mid) rowById.set(r.dataset.mid, r);
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
-      if (unfocused && r.classList.contains('kw') && !r.classList.contains('self'))
+      if (unfocused && r.classList.contains('kw') && !r.classList.contains('self')) {
         missed.push(r);
+        pingSnd();
+      }
       if (r.classList.contains('local')) {
         const k = pendingEcho.shift();
         if (k) {
@@ -2364,6 +2373,7 @@
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpPing')) { setPing(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
@@ -2512,18 +2522,48 @@
       const name = r.querySelector('.name');
       const txt = name ? r.textContent.replace(name.textContent, '') : r.textContent;
       r.classList.toggle('kw', kwMatch(txt));
+      r.classList.toggle('blk', bwMatch(txt));
     });
   }
-  function setKeywords(str) {
+  function wordsRe(str) {
     const words = str.split(',').map((s) => s.trim()).filter(Boolean)
       .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    kwRe = words.length ? new RegExp(`\\b(?:${words.join('|')})\\b`, 'i') : null;
+    return words.length ? new RegExp(`\\b(?:${words.join('|')})\\b`, 'i') : null;
+  }
+  function setKeywords(str) {
+    kwRe = wordsRe(str);
     retagKw();
   }
   kwInput.addEventListener('input', () => { setKeywords(kwInput.value); saveOpts(); });
 
+  // block words mirror the keyword list - a matching chat line is hidden
+  // outright rather than highlighted
+  const bwInput = document.getElementById('bwInput');
+  let bwRe = null;
+  function bwMatch(txt) { return !!(bwRe && bwRe.test(txt)); }
+  function setBlocked(str) { bwRe = wordsRe(str); retagKw(); }
+  bwInput.addEventListener('input', () => { setBlocked(bwInput.value); saveOpts(); });
+
   // ---- missed mentions: rows flagged while the page lacks focus queue on
   // the @N chip; each click scrolls to the next one and flashes it ----
+  let pingOn = false;
+  let pingCtx = null;
+  function setPing(on) { pingOn = on; markHelp('helpPing', on ? 1 : 0); }
+  function pingSnd() {
+    if (!pingOn) return;
+    try {
+      pingCtx = pingCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (pingCtx.state === 'suspended') pingCtx.resume();
+      const t = pingCtx.currentTime;
+      const o = pingCtx.createOscillator(), g = pingCtx.createGain();
+      o.frequency.setValueAtTime(880, t);
+      o.frequency.exponentialRampToValueAtTime(660, t + .12);
+      g.gain.setValueAtTime(.07, t);
+      g.gain.exponentialRampToValueAtTime(.001, t + .3);
+      o.connect(g); g.connect(pingCtx.destination);
+      o.start(t); o.stop(t + .32);
+    } catch (e) {}
+  }
   const missed = [];
   const missedEl = document.getElementById('missed');
   function updateMissedBadge() {
@@ -2573,7 +2613,7 @@
         eonly: emoteMode,
         help: helpMode,
         video: !vidBox.hidden,
-        kw: kwInput.value, self: selfHl ? 1 : 0,
+        kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0,
         hpw: helpWIdx, hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
         hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
         split: 1 + !sideEl.hidden + !side2El.hidden,
@@ -2636,6 +2676,8 @@
     if (typeof o.video === 'boolean') setVideo(o.video);
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
+    if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
+    if (o.ping) setPing(true);
     if (Number.isInteger(o.hpw) && o.hpw >= 0 && o.hpw < HELP_WIDTHS.length) { helpWIdx = o.hpw; applyHelpW(); }
     // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
     // list, which maps +4 (7-10 were prepended)
@@ -3145,13 +3187,13 @@
     setLinkview(!document.body.classList.contains('linkview'));
   }, { passive: false });
 
-  // ---- message timestamps: off / hh:mm / hh:mm:ss ----
-  const TIME_MODES = ['off', 'no seconds', 'seconds'];
+  // ---- message timestamps: off / hh:mm / hh:mm:ss / 12-hour variants ----
+  const TIME_MODES = ['off', 'no seconds', 'seconds', '12-hour', '12-hour + seconds'];
   let timeIdx = 2;
   function setTimes(idx) {
     timeIdx = Math.max(0, Math.min(TIME_MODES.length - 1, idx));
     mainEl.classList.toggle('notime', timeIdx === 0);
-    mainEl.classList.toggle('nosec', timeIdx === 1);
+    mainEl.classList.toggle('nosec', timeIdx === 1 || timeIdx === 3);
     timeBtn.classList.toggle('on', timeIdx > 0);
     timeBtn.title = `Timestamps: ${TIME_MODES[timeIdx]} - click/scroll · ⇧click back`;
     markHelp('helpTimes', timeIdx);
@@ -3303,6 +3345,8 @@
     if (lineLevel !== 1) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
+    else if (timeIdx === 3) q.set('times', '12h');
+    else if (timeIdx === 4) q.set('times', '12hsec');
     if (shadLevel) q.set('shadow', shadLevel);
     if (SUB_MODES[subMode] !== 'num-left') q.set('sub', SUB_MODES[subMode]);
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
@@ -3312,6 +3356,8 @@
     if (isSplit()) q.set('split', String(cols().length));
     if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
+    if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
+    if (pingOn) q.set('ping', '1');
     if (helpWIdx !== 7) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== 7) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
@@ -3354,6 +3400,19 @@
   // original is still in the buffer. A row's hover ↩ sets it as the
   // pending reply target for the next sent message.
   mainEl.addEventListener('click', (e) => {
+    // logged in, a plain click on a chatter's name types @name at the input
+    // caret instead of opening the profile; modifier-clicks still open it
+    const nm = e.target.closest('a.name');
+    if (nm && auth && !(e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || e.button)) {
+      e.preventDefault();
+      const t = '@' + nm.textContent + ' ';
+      const at = chatInput.selectionStart ?? chatInput.value.length;
+      chatInput.value = chatInput.value.slice(0, at) + t + chatInput.value.slice(chatInput.selectionEnd ?? at);
+      chatbarEl.hidden = false;
+      chatInput.focus();
+      chatInput.setSelectionRange(at + t.length, at + t.length);
+      return;
+    }
     const rb = e.target.closest('.rplybtn');
     if (rb) { setReply(rb.closest('.row')); return; }
     const tv = e.target.closest('a.twvid');
@@ -3858,11 +3917,13 @@
     if (toUntil || slowUntil > Date.now()) return;
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
-    const ctx = replyCtx;
     // /me goes out as a CTCP ACTION like other clients send it. Twitch adds
     // a reply's @mention itself, so only the local echo spells it out
     const act = text.match(/^\/me\s+(.+)$/is);
     let inner = act ? act[1].trim() : text;
+    // twitch parses slash commands in message text; a reply tag would be
+    // meaningless on one, and the armed reply survives the command
+    const ctx = /^\/[a-z]/i.test(text) ? null : replyCtx;
     const body = act ? `\x01ACTION ${inner}\x01` : inner;
     const shown = !ctx ? body : act ? `\x01ACTION @${ctx.name} ${inner}\x01` : `@${ctx.name} ${inner}`;
     relayFrame.contentWindow.postMessage({ type: 'send', text: body, replyTo: ctx }, RELAY_ORIGIN);
@@ -3883,7 +3944,7 @@
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     if (hist[hist.length - 1] !== text) { hist.push(text); if (hist.length > 100) hist.shift(); }
     histIdx = null; histDraft = '';
-    clearReply();
+    if (ctx) clearReply();
     chatInput.value = '';
     if (slowSecs > 0 && !selfExempt) {
       slowUntil = Date.now() + slowSecs * 1000;
@@ -4569,7 +4630,7 @@
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
-    if (q.has('times')) setTimes(q.get('times') === 'nosec' ? 1 : flag('times') ? 2 : 0);
+    if (q.has('times')) setTimes({ nosec: 1, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
@@ -4583,6 +4644,8 @@
     if (q.has('self')) setSelfHl(flag('self'));
     if (q.has('video')) setVideo(flag('video'));
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
+    if (q.has('bw')) { bwInput.value = q.get('bw'); setBlocked(bwInput.value); }
+    if (q.has('ping')) setPing(flag('ping'));
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
@@ -4596,7 +4659,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
+    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
@@ -4640,6 +4703,7 @@
   // the setters ran during init before the lists existed - mark now
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
   markHelp('helpPause', pauseOnText ? 1 : 0);
+  markHelp('helpPing', pingOn ? 1 : 0);
   markHelp('helpScrollback', SCROLLBACK_SIZES.indexOf(MAX_MESSAGES));
   markHelp('helpFlow', revFlow ? 1 : 0);
   markHelp('helpTimes', timeIdx);
