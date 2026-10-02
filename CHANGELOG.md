@@ -84,6 +84,9 @@ not versions — the page ships continuously to Neocities.
   first, with the relay folding StreamElements' per-emote chatstats into
   `emoteUse` for tie-breaks and never-seen emotes ordered by lifetime
   count; live counts and last-use times persist across reloads
+- Age markers stay dim until recording has actually covered their
+  era - a `10m` cell lit means ten minutes of watch time, not just
+  ten minutes of unknowns; unlit ones carry a coverage tooltip
 - In use-sorted sections dashed `2m`/`5m`/`10m`/`20m`/`30m`/`40m`/`50m`/`60m` cells mark where
   last-seen chat use ages past each threshold; emotes never seen sit
   below them all

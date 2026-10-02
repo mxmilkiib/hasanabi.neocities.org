@@ -801,7 +801,8 @@
   }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
-    color: var(--text-dim); font-size: .7em; border: 1px dashed var(--line); border-radius: 4px; }
+    color: var(--text-dim); font-size: .7em; border: 1px dashed var(--line); border-radius: 4px; opacity: .4; }
+  #emoteGrid .eage.lit { opacity: 1; }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
@@ -4036,6 +4037,8 @@
   const savedUse = (() => { try { return JSON.parse(localStorage.getItem('hasan-emoteuse')) || {}; } catch (e) { return {}; } })();
   const liveUse = savedUse.n || {};
   const useTs = savedUse.t || {};
+  // when recording began: age markers stay dim until their era is covered
+  const useT0 = savedUse.s || Date.now();
   let useSaveTimer = 0;
   const saveUse = () => {
     if (useSaveTimer) return;
@@ -4047,10 +4050,10 @@
         ks.sort((a, b) => useTs[a] - useTs[b]);
         for (const k of ks.slice(0, ks.length - 6000)) { delete useTs[k]; delete liveUse[k]; }
       }
-      try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs })); } catch (e) {}
+      try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {}
     }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs })); } catch (e) {} });
+  addEventListener('pagehide', () => { try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   let resortTimer = 0;
@@ -4137,7 +4140,10 @@
         let m = '';
         while (next < AGES.length && age >= AGES[next][0]) {
           const [t, words] = AGES[next++];
-          m += `<div class="eage" title="emotes below were last used over ${words} ago">${t / 6e4}m</div>`;
+          // a marker lights once recording has actually covered its era -
+          // earlier ones only mean 'not seen in the little time so far'
+          const lit = now - useT0 >= t;
+          m += `<div class="eage${lit ? ' lit' : ''}" title="${lit ? `emotes below were last used over ${words} ago` : `only ${Math.max(1, Math.round((now - useT0) / 6e4))}m recorded so far`}">${t / 6e4}m</div>`;
         }
         return m + render(x);
       }).join('');
