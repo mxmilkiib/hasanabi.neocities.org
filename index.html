@@ -889,7 +889,10 @@
     line-height: 1.25; }
   #chatPick a { pointer-events: auto; color: var(--cc, var(--text-dim));
     text-decoration: none; }
-  #chatPick a.on { font-weight: 700; text-decoration: underline; }
+  /* the picked channel reads as a boxed chip in its own colour */
+  #chatPick a.on { color: var(--text); font-weight: 700; padding: 0 3px;
+    border-radius: 3px; background: color-mix(in srgb, var(--cc) 30%, transparent);
+    box-shadow: 0 0 0 1px var(--cc); }
   /* character count beside the box: amber past the long-message guess,
      red near twitch's 500 cap; the box border tints along with it */
   #chatLen { flex: none; align-self: flex-end; padding: 0 2px 6px; min-width: 2.5ch;
@@ -4319,24 +4322,37 @@
   const sendTarget = () => (replyCtx && replyCtx.ch) || pickChan || CHANNEL;
   const chatPick = document.getElementById('chatPick');
   function paintChatPick() {
-    const show = MULTI && auth && auth.login && !chatInput.value && !chatInput.disabled &&
-      !chatbarEl.hidden && !slowUntils[sendTarget()] && !toUntils[sendTarget()];
+    const typing = !!chatInput.value;
+    const show = MULTI && auth && auth.login && !chatInput.disabled &&
+      !chatbarEl.hidden && (typing || (!slowUntils[sendTarget()] && !toUntils[sendTarget()]));
     chatPick.hidden = !show;
+    chatInput.style.textIndent = '';
     if (!show) return;
     const tgt = sendTarget();
-    chatPick.innerHTML = `chat as @${escapeHTML(auth.login)} → ` +
-      CHANNELS.map((c) =>
-        `<a data-ch="${escapeHTML(c)}" href="#" class="${c === tgt ? 'on' : ''}" ` +
-        `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' · ');
+    // typing swaps the full 'chat as' list for just the target chip at the
+    // input's left edge; the textarea's first line indents past its width
+    if (typing) {
+      chatPick.innerHTML = `<a ${replyCtx ? '' : `data-ch="${escapeHTML(tgt)}" `}href="#" class="on" ` +
+        `style="--cc:${chColor(tgt)}" title="${replyCtx ? 'replying in' : 'sending to'} #${escapeHTML(tgt)}${replyCtx ? '' : ' - click for the next channel'}">#${escapeHTML(tgt)}</a>`;
+    } else {
+      chatPick.innerHTML = `chat as @${escapeHTML(auth.login)} → ` +
+        CHANNELS.map((c) =>
+          `<a data-ch="${escapeHTML(c)}" href="#" class="${c === tgt ? 'on' : ''}" ` +
+          `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' · ');
+      chatInput.placeholder = '';
+    }
     chatPick.style.left = (chatInput.offsetLeft + 8) + 'px';
     chatPick.style.top = (chatInput.offsetTop + 3) + 'px';
-    chatInput.placeholder = '';
+    if (typing) chatInput.style.textIndent = (chatPick.offsetWidth + 4) + 'px';
   }
   chatPick.addEventListener('click', (e) => {
     const a = e.target.closest('a[data-ch]');
     if (!a) return;
     e.preventDefault();
-    pickChan = a.dataset.ch;
+    // typing shows only the target chip: a click cycles the joined list
+    pickChan = chatInput.value
+      ? CHANNELS[(CHANNELS.indexOf(sendTarget()) + 1) % CHANNELS.length]
+      : a.dataset.ch;
     updateSendUI();
     chatInput.focus();
   });
