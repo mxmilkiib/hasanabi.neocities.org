@@ -74,6 +74,9 @@ not versions — the page ships continuously to Neocities.
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) tint their borders 40% toward the style's accent
+- Emote-picker era rungs whose window spans an unwatched stretch (tab
+  hidden, socket dropped, page closed) border purple instead of accent,
+  flagging that the usage count may be understated
 
 ## 2026-10-01
 
