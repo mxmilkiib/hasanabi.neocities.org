@@ -69,6 +69,7 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- A — separator also opens the bot-command block at blammobot
 - Config's keyword inputs retitle `to highlight`/`to block`, and —
   separators now break the tab into sections around the pair and
   above the source line
