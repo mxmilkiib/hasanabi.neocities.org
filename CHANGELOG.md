@@ -35,6 +35,7 @@ not versions — the page ships continuously to Neocities.
 - Creators present on both platforms are cross-linked - yt-channel
   entries that stream get `tw`/`*` links, and twitch-stream entries
   that upload get `yt` links
+- Extra links gain droitalasante.be (Medics for the People)
 
 ### Chat & rendering
 - Page-flip ghost rows rest lighter (45% -> 62% opacity) while the fade
