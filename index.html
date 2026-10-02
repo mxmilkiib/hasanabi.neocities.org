@@ -888,7 +888,7 @@
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
-    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim " -- " / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
+    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>🔗</b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
@@ -1394,7 +1394,7 @@
   // sent messages echo locally (twitch doesn't return own PRIVMSGs), but
   // the real copy arrives via backfill replay - tracked so it can adopt
   // the echo row rather than render a duplicate
-  const echoRows = new Map(); // 'login\x00text' -> echo row element
+  const echoRows = new Map(); // 'login\x00text' -> [echo rows] - identical sends share a key
   const pendingEcho = [];     // keys, bound to rows in render order
   // twitch prepends "@parent " to threaded replies for irc clients, so an
   // echo and its real line differ by that mention - key both with it stripped
@@ -1422,6 +1422,7 @@
       const top = col.getBoundingClientRect().top;
       for (let i = col.children.length - 1; i >= 0; i--) {
         const r = col.children[i];
+        if (r.classList.contains('blk')) continue; // display:none - no position
         if (r.getBoundingClientRect().bottom > top) break;
         if (r.classList.contains('row') && !r.classList.contains('ghostgap')) {
           n++;
@@ -1433,6 +1434,7 @@
     const fold = col.scrollTop + col.clientHeight;
     for (let i = col.children.length - 1; i >= 0; i--) {
       const r = col.children[i];
+      if (r.classList.contains('blk')) continue; // display:none - no position
       if (r.offsetTop - col.offsetTop < fold) break;
       if (r.classList.contains('row') && !r.classList.contains('ghostgap')) {
         n++;
@@ -1563,15 +1565,20 @@
     // arriving - cap the backlog so wake-up isn't a minutes-long flush;
     // the robotty backfill refetches the gap on visibility return anyway
     if (document.hidden && queue.length > BACKLOG_MAX) queue.shift();
-    // replayed backfill lines are historical, not live traffic - counting
-    // their arrival time would spike the msgs/sec rate falsely
-    if (!replay) recentTimestamps.push(Date.now());
+    // replayed backfill lines are historical, not live traffic - the rate
+    // counts live rows at flush time instead, after dedup drops repeats
+    if (!replay) parsed.live = true;
     // screen-reader live region: announce live lines only - replays would
     // flood it, and the local echo is already known to the typist
     if (!replay && !parsed.local) {
       const t = parsed.kind === 'USERNOTICE'
         ? `${unescapeTag(parsed.tags['system-msg'] || '')} ${parsed.message || ''}`.trim()
-        : parsed.message;
+        : parsed.kind === 'CLEARCHAT'
+          ? (parsed.message.trim()
+             ? `${parsed.message.trim()} was ${+parsed.tags['ban-duration'] ? 'timed out' : 'banned'}`
+             : 'chat was cleared by a moderator')
+          : parsed.kind === 'CLEARMSG' ? 'a message was deleted'
+          : parsed.message;
       if (t) srLiveEl.textContent = (parsed.login ? parsed.login + ': ' : '') + t;
     }
     if (!scheduled) {
@@ -1587,7 +1594,7 @@
   // display-only cleanup for the 'clean urls' option: drops the scheme, a
   // www. prefix, and a bare trailing / or /index.htm[l]
   const cleanUrlDisp = (u) => u.replace(/^https?:\/\//i, '').replace(/^www\./i, '')
-    .replace(/\/index\.html?(?:[?#]\S*)?$/i, '').replace(/\/$/, '');
+    .replace(/\/$/, '').replace(/\/index\.html?(?:[?#]\S*)?$/i, '').replace(/\/$/, '');
   function linkKeyOf(msg) {
     const ks = [];
     for (const t of msg.split(/\s+/)) {
@@ -1655,7 +1662,7 @@
     }
     const nearBottom = stickBottom;
     let html = '';
-    for (const { tags, login, message: rawMsg, kind, local } of queue) {
+    for (const { tags, login, message: rawMsg, kind, local, live } of queue) {
       // replayed backfill lines carry ids the page has already rendered;
       // notice-type events carry no id, so key them on kind+ts+sender+body
       const dedupKey = tags.id ||
@@ -1666,6 +1673,7 @@
         seenIds.add(dedupKey);
         if (seenIds.size > 20000) { seenIds.clear(); seenIds.add(dedupKey); }
       }
+      if (live) recentTimestamps.push(Date.now()); // counted once rendered, not at queue time
       const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
       const timeStr = fmtRowTime(when);
       // a long silence means the page missed a stretch - mark the gap with
@@ -1744,16 +1752,16 @@
       // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
       if ((tags.badges || '').includes('moderator/'))
-        aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? '[md]' : '[ mod. ]'}</span>`);
+        aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? 'md' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
       // bots never carry a sub count - skip the placeholder chip entirely
       const subHtml = shimmer && !subM ? '' :
-        `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? ' --&#160;' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
+        `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the
-      // badge icons - [03] [md]; right modes keep it inside the aux
+      // badge icons - 03 md; right modes keep it inside the aux
       // cluster at the row's right edge, outermost - [first]/[bits] sit to
       // its left
       if (subHtml && SUB_MODES[subMode] !== 'hidden' && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
@@ -1812,19 +1820,23 @@
       // it drops .local (so it persists in history) and takes the real id
       if (kind === 'PRIVMSG' && !local && auth && login === auth.login) {
         const ek = echoKey(login, tags, rawMsg);
-        const el = echoRows.get(ek);
+        const arr = echoRows.get(ek);
+        // evicted echoes go stale in the bucket - skip to a live row; the
+        // oldest matching echo adopts first when the key is shared
+        while (arr && arr.length && !arr[0].isConnected) arr.shift();
+        const el = arr && arr[0];
         if (el) {
-          echoRows.delete(ek);
-          if (el.isConnected) {
-            el.classList.remove('local');
-            if (tags.id) {
-              el.dataset.mid = tags.id;
-              rowById.set(tags.id, el);
-              seenIds.add(tags.id);
-            }
-            continue;
+          arr.shift();
+          if (!arr.length) echoRows.delete(ek);
+          el.classList.remove('local');
+          if (tags.id) {
+            el.dataset.mid = tags.id;
+            rowById.set(tags.id, el);
+            seenIds.add(tags.id);
           }
+          continue;
         }
+        if (arr && !arr.length) echoRows.delete(ek);
       }
       html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
@@ -1868,7 +1880,7 @@
       if (r.classList.contains('local')) {
         const k = pendingEcho.shift();
         if (k) {
-          echoRows.set(k, r);
+          (echoRows.get(k) || echoRows.set(k, []).get(k)).push(r);
           // persists so a restored echo can still be adopted; encoded since
           // the key holds a literal NUL that markup reparse would mangle
           r.dataset.ek = encodeURIComponent(k);
@@ -2095,8 +2107,9 @@
   let streamHeard = false; // a stream report arrived at least once
   let streamDead = false;  // no report within the watchdog window
   // most recent stream run { started, ended|null }, persisted across reloads
+  const LASTRUN_KEY = 'hasan-last-run' + CHAN_SFX;
   let lastRun = null;
-  try { lastRun = JSON.parse(localStorage.getItem('hasan-last-run')) || null; } catch (e) {}
+  try { lastRun = JSON.parse(localStorage.getItem(LASTRUN_KEY)) || null; } catch (e) {}
   // lastVod {start,end} from the latest VOD (exact); lbEnd from ivr's
   // lastBroadcast.startedAt, which despite the name stamps the last
   // run's END for an offline channel (matches the VOD end to seconds)
@@ -2106,7 +2119,7 @@
   // dot or info text cycles it
   let statusView = 0;
   function saveLastRun() {
-    try { localStorage.setItem('hasan-last-run', JSON.stringify(lastRun)); } catch (e) {}
+    try { localStorage.setItem(LASTRUN_KEY, JSON.stringify(lastRun)); } catch (e) {}
   }
 
   function parseUptimeMinutes(text) {
@@ -2138,14 +2151,15 @@
 
   function onStream(d) {
     streamHeard = true;
-    if (/offline|not streaming|not live|not online/i.test(d.uptime)) {
+    const uptime = typeof d.uptime === 'string' ? d.uptime : '';
+    if (/offline|not streaming|not live|not online/i.test(uptime)) {
       if (stream && stream.live) {
         lastRun = { started: stream.startedAt || (lastRun && lastRun.started) || null, ended: Date.now() };
         saveLastRun();
       }
       stream = { live: false };
     } else {
-      const mins = parseUptimeMinutes(d.uptime);
+      const mins = parseUptimeMinutes(uptime);
       const viewers = parseInt((d.viewers || '').replace(/[^\d]/g, ''), 10);
       stream = {
         live: true,
@@ -2564,13 +2578,18 @@
   function kwMatch(txt) {
     return !!((kwRe && kwRe.test(txt)) || (selfMentionRe && selfMentionRe.test(txt)));
   }
+  let retagT = 0;
   function retagKw() {
-    document.querySelectorAll('.row').forEach((r) => {
+    // the scan walks every chat row - debounce so keystrokes in the kw/bw
+    // inputs aren't a full-dom pass each; notices are never retagged, so
+    // a blocked word can't hide a timeout or clear message
+    clearTimeout(retagT);
+    retagT = setTimeout(() => document.querySelectorAll('.row:not(.notice)').forEach((r) => {
       const name = r.querySelector('.name');
       const txt = name ? r.textContent.replace(name.textContent, '') : r.textContent;
       r.classList.toggle('kw', kwMatch(txt));
       r.classList.toggle('blk', bwMatch(txt));
-    });
+    }), 150);
   }
   function wordsRe(str) {
     const words = str.split(',').map((s) => s.trim()).filter(Boolean)
@@ -2733,8 +2752,8 @@
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
-    if (o.ping) setPing(true);
-    if (o.clean) setCleanUrls(true);
+    if (o.ping !== undefined) setPing(!!o.ping);
+    if (o.clean !== undefined) setCleanUrls(!!o.clean);
     if (Number.isInteger(o.hpw) && o.hpw >= 0 && o.hpw < HELP_WIDTHS.length) { helpWIdx = o.hpw; applyHelpW(); }
     // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
     // list, which maps +4 (7-10 were prepended)
@@ -3120,7 +3139,7 @@
         sub = document.createElement('span');
         sub.className = 'role sub';
         sub.title = 'No subscriber months reported';
-        sub.textContent = ' --\u00a0';
+        sub.textContent = '--';
       }
       // the left-mode anchor: the sub chip leads, then aux, both ahead of
       // the badge icons - matching the order new rows render with
@@ -3133,11 +3152,11 @@
       const rightAt = after ? after.nextSibling : row.querySelector('.imglnk');
       if (sub) {
         sub.hidden = mode === 'hidden';
-        // restyle the chip text to match: [sub 12] vs compact [12]
+        // restyle the chip text to match: [sub 12] vs compact 12
         const months = (sub.title || sub.dataset.tt) === 'No subscriber months reported'
           ? ' -- ' : sub.textContent.replace(/\D/g, '');
-        if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? ' --\u00a0' : '[sub --]')
-          : mode.startsWith('num') ? `[${months.padStart(2, '0')}]` : `[sub ${months}]`;
+        if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? '--' : '[sub --]')
+          : mode.startsWith('num') ? months.padStart(2, '0') : `[sub ${months}]`;
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
           if (aux) aux.append(sub); // outermost in the right cluster
@@ -3145,9 +3164,9 @@
         }
       }
       if (aux) {
-        // the compact sub modes shrink the mod chip to match: [ mod. ] → [md]
+        // the compact sub modes shrink the mod chip to match: [ mod. ] → md
         const modChip = aux.querySelector('.mod');
-        if (modChip) modChip.textContent = mode.startsWith('num') ? '[md]' : '[ mod. ]';
+        if (modChip) modChip.textContent = mode.startsWith('num') ? 'md' : '[ mod. ]';
         aux.classList.toggle('auxr', !left);
         aux.hidden = mode === 'hidden' && aux.children.length === 1 && aux.firstElementChild === sub;
         if (!left) row.insertBefore(aux, rightAt);
@@ -3428,8 +3447,9 @@
     try {
       localStorage.removeItem(OPTS_KEY);
       localStorage.removeItem('hasan-hint');
-      localStorage.removeItem('hasan-history');
-      localStorage.removeItem('hasan-spark');
+      localStorage.removeItem(HISTORY_KEY);
+      localStorage.removeItem(SPARK_KEY);
+      localStorage.removeItem(LASTRUN_KEY);
     } catch (e) {}
     location.reload();
   });
@@ -3461,7 +3481,7 @@
     // logged in, a plain click on a chatter's name types @name at the input
     // caret instead of opening the profile; modifier-clicks still open it
     const nm = e.target.closest('a.name');
-    if (nm && auth && !(e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || e.button)) {
+    if (nm && auth && auth.login && !(e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || e.button)) {
       e.preventDefault();
       const t = '@' + nm.textContent + ' ';
       const at = chatInput.selectionStart ?? chatInput.value.length;
@@ -3533,10 +3553,20 @@
       return moved;
     }
     let last, moved = false;
-    while ((last = from.lastElementChild) &&
-           last.offsetTop - from.offsetTop + last.offsetHeight > from.clientHeight) {
+    while ((last = from.lastElementChild)) {
       // ghost tail already displaced below the fold: drop, don't carry over
       if (last.classList.contains('stale')) { last.remove(); continue; }
+      // a display:none (.blk) row reports offsetTop 0, which would read as
+      // inside the fold - hidden tail rows ride along only once a visible
+      // row has started moving
+      if (last.classList.contains('blk')) {
+        if (!moved) {
+          let p = last.previousElementSibling;
+          while (p && p.classList.contains('blk')) p = p.previousElementSibling;
+          if (!p || p.classList.contains('stale') ||
+              p.offsetTop - from.offsetTop + p.offsetHeight <= from.clientHeight) break;
+        }
+      } else if (last.offsetTop - from.offsetTop + last.offsetHeight <= from.clientHeight) break;
       if (!moved) {
         for (const r of to.children) r.classList.add('stale');
         moved = true;
@@ -3579,7 +3609,8 @@
   function evictGhosts(col) {
     let g = col.lastElementChild;
     while (g?.classList.contains('stale') &&
-           g.offsetTop - col.offsetTop + g.offsetHeight > col.clientHeight) {
+           (g.classList.contains('blk') || // no offsetTop while display:none
+            g.offsetTop - col.offsetTop + g.offsetHeight > col.clientHeight)) {
       const prev = g.previousElementSibling;
       g.remove();
       g = prev;
@@ -3721,8 +3752,10 @@
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
       // echoes kept their send-time key - re-register them so a real copy
       // arriving through backfill adopts the row instead of duplicating it
-      for (const el of logEl.querySelectorAll('.row.local[data-ek]'))
-        echoRows.set(decodeURIComponent(el.dataset.ek), el);
+      for (const el of logEl.querySelectorAll('.row.local[data-ek]')) {
+        const k = decodeURIComponent(el.dataset.ek);
+        (echoRows.get(k) || echoRows.set(k, []).get(k)).push(el);
+      }
       dedupeLinks();
       // continue the stripe alternation from the restored tail
       zFlip = !!(logEl.lastElementChild && logEl.lastElementChild.classList.contains('z'));
@@ -3929,6 +3962,8 @@
   function logout() {
     auth = null;
     selfMentionRe = null;
+    selfTags = null; // drop the old account's badges/colour and mod/vip
+    selfExempt = false; // exemption before the next login's USERSTATE lands
     retagKw();
     try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
     if (relayFrame.contentWindow)
@@ -4009,13 +4044,18 @@
   paintLen();
 
   chatInput.addEventListener('keydown', (e) => {
-    // history walk hijacks arrows only on a single-line draft - once the
-    // text wraps, arrows belong to the caret (walking resumes on the way out)
-    if (e.key === 'ArrowUp' && (histIdx !== null || (hist.length && !chatInput.value.includes('\n')))) {
-      e.preventDefault(); histGo(-1); return;
-    }
-    if (e.key === 'ArrowDown' && (histIdx !== null || (chatInput.value && !chatInput.value.includes('\n')))) {
-      e.preventDefault(); histGo(1); return;
+    // history walk hijacks arrows at the draft's outer lines - ↑ from the
+    // first line, ↓ from the last - so multi-line text keeps caret movement
+    // in between, and ⇧+arrow still extends the selection
+    if (!e.shiftKey) {
+      const firstLine = !chatInput.value.slice(0, chatInput.selectionStart).includes('\n');
+      const lastLine = !chatInput.value.slice(chatInput.selectionEnd).includes('\n');
+      if (e.key === 'ArrowUp' && firstLine && (histIdx !== null || hist.length)) {
+        e.preventDefault(); histGo(-1); return;
+      }
+      if (e.key === 'ArrowDown' && lastLine && (histIdx !== null || chatInput.value)) {
+        e.preventDefault(); histGo(1); return;
+      }
     }
     if (e.key === 'Escape') {
       if (!emotePick.hidden) return; // the document handler closes the picker
@@ -4546,6 +4586,9 @@
     const s = chatInput.selectionStart ?? chatInput.value.length;
     const pad = s > 0 && !/\s/.test(chatInput.value[s - 1]) ? ' ' : '';
     chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
+    // a pinned picker can outlive the chat bar - bring the bar back so the
+    // insert lands somewhere visible
+    chatbarEl.hidden = false;
     growInput();
     chatInput.focus();
   });
@@ -4868,7 +4911,8 @@
     if (q.has('help')) { const i = HELP_MODES.indexOf(q.get('help')); if (i >= 0) { helpMode = i; applyHelp(); } }
     if (q.has('split')) {
       const n = q.get('split');
-      if (n !== '0') setSplit(n === '3' ? 3 : 2);
+      const v = parseInt(n, 10);
+      if (n !== '0') setSplit(v >= 1 && v <= 3 ? v : 2);
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();

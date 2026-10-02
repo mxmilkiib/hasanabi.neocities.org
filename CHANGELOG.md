@@ -3,6 +3,30 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-02
+
+### Fixes & polish
+- Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,
+  `--` and `md` instead of `[12]`, ` -- ` and `[md]`
+- `hasan-last-run` now carries the channel suffix like the history and
+  spark keys, so `?channel=` pages no longer read the default channel's
+  run times; settings reset clears the suffixed keys
+- Keyword and block-word retags skip notice rows, so a blocked word can
+  no longer hide a timeout or `/clear` notice; the retag scan is
+  debounced instead of running a full-dom pass per keystroke
+- Blocked (`display:none`) rows no longer corrupt fold math in the
+  jump-to-live counter and page-flip overflow
+- `ping` and `clean` options apply in both directions through saved
+  bundles and cross-tab sync (previously they could only turn on)
+- Logout clears the old account's USERSTATE badges and mod/vip slow-mode
+  exemption; name-click `@name` insert waits for a validated login
+- Identical rapid sends each get their own echo row for adoption;
+  `?split=1` can force a single column; clean-url mode strips
+  `/index.htm` even with a trailing slash; the stream-status handler no
+  longer throws on a missing uptime field
+- Input history arrows now honour caret position in multi-line drafts:
+  ↑ walks from the first line, ↓ from the last, ⇧+arrow selects
+
 ## 2026-10-01
 
 ### Defaults & presets
