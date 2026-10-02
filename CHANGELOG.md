@@ -112,6 +112,7 @@ not versions — the page ships continuously to Neocities.
 - Authors info cycle gains a 'themes' rung between 'all' and 'works':
   each entry shows a short tagline (slogan or theme) in place of the
   work/dates note
+- Authors: 'critical & social theory' moved below 'queer'
 - Emote-picker era rungs whose window spans an unwatched stretch (tab
   hidden, socket dropped, page closed) get a dotted purple border instead
   of the standard accent dash, flagging that the usage count may be
