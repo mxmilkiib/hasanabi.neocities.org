@@ -74,6 +74,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Star badge swaps the hand-rolled tile for the real ghbtns.com
+  embed - their iframe serves the count, so the repoStars span and
+  its fill go with the old tile
 - Unpinning the emote picker snaps it back to the chat bar: the
   inline position clears and the stashed left/top drops from the
   saved box - the size survives on its own
