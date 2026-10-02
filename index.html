@@ -839,6 +839,9 @@
      outranks the .htabpage > div grid rule and contents actually wins */
   #helpPanel #authSections { display: contents; }
   #helpPanel #authSections > div { margin-top: 9px; }
+  /* config's top width row is a filter-style row like the authors' sort/info
+     pair - give the content below it the same air */
+  #helpPanel #htabCfg > div.wide + div { margin-top: 9px; }
   /* the info cycle: 0 all (work + dates + tagline), 1 themes (a tagline
      in place of the note), 2 works (no dates), 3 names only; columns
      narrow as less text needs room */
