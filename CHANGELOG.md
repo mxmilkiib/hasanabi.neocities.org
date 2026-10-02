@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Links-view row icon pins to text presentation (🔗︎) so it renders
+  monochrome like the rest of the list
 - Star badge swaps the hand-rolled tile for the real ghbtns.com
   embed - their iframe serves the count, so the repoStars span and
   its fill go with the old tile
