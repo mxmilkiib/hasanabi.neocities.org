@@ -6,6 +6,7 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- Emote picker gains an ✕ close button right of the pin
 - urls inside notice/system-msg text, reply quotes and fossa columns now
   linkify - they bypassed renderTextHTML so they rendered as raw text
 - Theme slots: three store/recall buttons under the copy-settings-URL
