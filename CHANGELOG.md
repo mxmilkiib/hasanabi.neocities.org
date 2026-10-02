@@ -107,6 +107,9 @@ not versions — the page ships continuously to Neocities.
   red/amber/green/accent row colours
 - Authors-tab sort and info rows are single centred cells now,
   matching the width row instead of the two-column label grid
+- Resources justice section gains an anarchist subgroup: an
+  anarchist faq 'what about crime?', ferrell's against the law,
+  and the 1976 instead of prisons handbook
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) use a hue-neutral --popline border: white on dark shades,
