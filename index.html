@@ -774,14 +774,17 @@
     padding: 0 6px; position: sticky; top: 0; z-index: 1;
     background: var(--panel); border-radius: 6px 6px 0 0; }
   /* a panel-coloured tail under the sticky row so content scrolling
-     behind the tabs dissolves instead of cutting at a hard edge */
+     behind the tabs dissolves instead of cutting at a hard edge; a
+     second mid-stop keeps it denser so the covered text greys out more */
   #helpPanel .htabs::after { content: ''; position: absolute; top: 100%;
-    left: 0; right: 0; height: 12px; pointer-events: none;
-    background: linear-gradient(var(--panel), transparent); }
+    left: 0; right: 0; height: 16px; pointer-events: none;
+    background: linear-gradient(var(--panel), color-mix(in srgb, var(--panel) 70%, transparent) 55%, transparent); }
   #helpPanel .htabs a { flex: 1; text-align: center; color: var(--accent); text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-color: color-mix(in srgb, var(--text-dim) 65%, var(--line)); border-radius: 4px; font-weight: 700; }
   #helpPanel .htabs a:hover { color: var(--text); background: var(--line); }
   #helpPanel .htabs a.on { color: var(--text); border-color: var(--accent); }
-  #helpPanel .htabs button { flex: none; padding: 0 8px; }
+  /* height: auto lets the ✕ stretch to the tab row's height instead of
+     using the taller hdr-btn height */
+  #helpPanel .htabs button { flex: none; padding: 0 8px; height: auto; }
   /* 9em of popup font keeps the glyph column aligned at any popup font
      size while fitting the longest labels ("radicals & labour" etc) */
   #helpPanel .htabpage > div, #helpPanel #authSections > div { margin: 4px 0; display: grid; grid-template-columns: 9em 1fr; gap: 0 8px; }

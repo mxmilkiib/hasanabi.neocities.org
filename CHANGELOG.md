@@ -114,6 +114,8 @@ not versions — the page ships continuously to Neocities.
   each entry shows a short tagline (slogan or theme) in place of the
   work/dates note
 - Authors: 'critical & social theory' moved below 'queer'
+- Help popup: the ✕ button now matches the tab height, and the scroll
+  fade under the tabs is denser so covered text greys out further
 - Emote-picker era rungs whose window spans an unwatched stretch (tab
   hidden, socket dropped, page closed) get a dotted purple border instead
   of the standard accent dash, flagging that the usage count may be
