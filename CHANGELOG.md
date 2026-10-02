@@ -59,6 +59,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Saved size, line-height and weight indices bounds-check like the
+  other indexed options - an out-of-range bundle wrote 'undefinedpx'
+  into the css var
 - Font size, line height and weight cycles now refresh the preset 'on'
   mark - cycle()'s own help-link marking skipped markPresets
 - `heather` preset fields corrected to the url they were specced from:

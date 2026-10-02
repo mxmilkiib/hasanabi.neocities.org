@@ -3187,9 +3187,9 @@
     if (o.shade === null || (Number.isInteger(o.shade) && o.shade >= 0 && o.shade < SHADE_NAMES.length)) {
       shadeIdx = o.shade; applyShade();
     }
-    if (Number.isInteger(o.size)) fontCtl.set(o.size);
-    if (Number.isInteger(o.lh)) lhCtl.set(o.lh);
-    if (Number.isInteger(o.weight)) weightCtl.set(o.weight);
+    if (Number.isInteger(o.size) && o.size >= 0 && o.size < FONT_SIZES.length) fontCtl.set(o.size);
+    if (Number.isInteger(o.lh) && o.lh >= 0 && o.lh < LINE_HEIGHTS.length) lhCtl.set(o.lh);
+    if (Number.isInteger(o.weight) && o.weight >= 0 && o.weight < WEIGHTS.length) weightCtl.set(o.weight);
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
     // a saved bundle always carries both booleans, so an explicit false
@@ -5666,7 +5666,7 @@
     if (q.has('font') && FONT_STACKS[q.get('font')]) { fontSel.value = q.get('font'); applyFont(); }
     if (q.has('size')) { const i = FONT_SIZES.indexOf(+q.get('size')); if (i >= 0) fontCtl.set(i); }
     if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
-  if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
+    if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
