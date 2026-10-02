@@ -480,7 +480,7 @@
   /* multi-channel mode: which room a row came from. Dim while that channel
      is offline, accent-tinted once its stream is live */
   .chtag { display: inline-block; min-width: var(--chw, auto); text-align: right;
-    margin-right: 2px; color: var(--text-dim); text-decoration: none;
+    margin-right: 2px; color: var(--chc, var(--text-dim)); text-decoration: none;
     font-size: .85em; opacity: .8; }
   .chtag.live { color: var(--accent); opacity: 1; }
   .chtag:hover { color: var(--text); text-decoration: underline; }
@@ -868,7 +868,16 @@
     resize: none; height: auto; min-height: 26px; max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 8px);
     overflow-y: hidden; line-height: 1.25; padding: 3px 8px; box-sizing: border-box;
   }
-  #chatbar { align-items: flex-end; }
+  #chatbar { align-items: flex-end; position: relative; }
+  /* multi-channel send picker: sits over the empty textarea like a
+     placeholder, each channel chip its own colour, click to pick */
+  #chatPick { position: absolute; z-index: 1; pointer-events: none;
+    color: var(--text-dim); white-space: nowrap;
+    font-family: var(--chat-ff, inherit); font-size: var(--chat-font, 15px);
+    line-height: 1.25; }
+  #chatPick a { pointer-events: auto; color: var(--cc, var(--text-dim));
+    text-decoration: none; }
+  #chatPick a.on { font-weight: 700; text-decoration: underline; }
   /* character count beside the box: amber past the long-message guess,
      red near twitch's 500 cap; the box border tints along with it */
   #chatLen { flex: none; align-self: flex-end; padding: 0 2px 6px; min-width: 2.5ch;
@@ -1107,7 +1116,7 @@
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button></div>
+  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button><button class="hdr-btn esort" id="emoteX" type="button" title="close the picker">✕</button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div></div>
 
 <script>
@@ -1127,6 +1136,10 @@
   const CHANNEL = CHANNELS[0] || DEFAULT_CHANNEL;
   if (!CHANNELS.length) CHANNELS.push(DEFAULT_CHANNEL);
   const MULTI = CHANNELS.length > 1;
+  // one hue per joined channel - index-ordered so tags and the send-target
+  // chips share a colour for a channel
+  const CH_COLORS = ['#6ea8ff', '#e08fd0', '#ff9a5e', '#ffd75f', '#5fd8b0', '#b48fff'];
+  const chColor = (ch) => CH_COLORS[Math.max(0, CHANNELS.indexOf(ch)) % CH_COLORS.length];
   // the widest channel name sizes the #tag column so every row's tag
   // right-aligns on the same edge
   if (MULTI) document.documentElement.style.setProperty('--chw',
@@ -1890,6 +1903,7 @@
       const ch = (channel || '').replace(/^#/, '').toLowerCase() || CHANNEL;
       const chTag = MULTI
         ? `<a class="chtag${streamStates[ch] && streamStates[ch].live ? ' live' : ''}" data-ch="${escapeHTML(ch)}" ` +
+          `style="--chc:${chColor(ch)}" ` +
           `href="?channel=${escapeHTML([ch, ...CHANNELS.filter((c) => c !== ch)].join(','))}" ` +
           `title="from #${escapeHTML(ch)} - click to focus that channel">#${escapeHTML(ch)}</a> `
         : '';
@@ -4274,8 +4288,34 @@
   const roomStates = {};   // channel -> { slow, ... } from ROOMSTATE
   const selfExempts = {};  // channel -> own mod/broadcaster/vip flag
   const selfTagsPer = {};  // channel -> own USERSTATE tags (echo dressing)
-  // where a send is headed: the reply's channel or the focused one
-  const sendTarget = () => (replyCtx && replyCtx.ch) || CHANNEL;
+  // where a send is headed: the reply's channel, then any chip pick in
+  // the input, then the focused channel
+  let pickChan = null;
+  const sendTarget = () => (replyCtx && replyCtx.ch) || pickChan || CHANNEL;
+  const chatPick = document.getElementById('chatPick');
+  function paintChatPick() {
+    const show = MULTI && auth && auth.login && !chatInput.value && !chatInput.disabled &&
+      !chatbarEl.hidden && !slowUntils[sendTarget()] && !toUntils[sendTarget()];
+    chatPick.hidden = !show;
+    if (!show) return;
+    const tgt = sendTarget();
+    chatPick.innerHTML = `chat as @${escapeHTML(auth.login)} → ` +
+      CHANNELS.map((c) =>
+        `<a data-ch="${escapeHTML(c)}" href="#" class="${c === tgt ? 'on' : ''}" ` +
+        `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' · ');
+    chatPick.style.left = (chatInput.offsetLeft + 8) + 'px';
+    chatPick.style.top = (chatInput.offsetTop + 3) + 'px';
+    chatInput.placeholder = '';
+  }
+  chatPick.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-ch]');
+    if (!a) return;
+    e.preventDefault();
+    pickChan = a.dataset.ch;
+    updateSendUI();
+    chatInput.focus();
+  });
+  chatInput.addEventListener('input', paintChatPick);
   function paintSlow() {
     const tch = sendTarget();
     const left = Math.ceil(((slowUntils[tch] || 0) - Date.now()) / 1000);
@@ -4319,6 +4359,7 @@
     chatInput.placeholder = on
       ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}` : 'log in to chat';
     if (toUntils[sendTarget()]) paintTimeout();
+    paintChatPick();
     document.body.classList.toggle('chaton', on);
     // inline rather than clearReply(): that path refreshes this same UI
     if (!on) { replyCtx = null; replyBar.hidden = true; if (!epickPinned) closePicker(); }

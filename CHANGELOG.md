@@ -116,6 +116,10 @@ not versions — the page ships continuously to Neocities.
   sized by the longest joined channel name
 - Joined streams stand out in the resources list: any entry whose
   * switch targets a joined channel goes azure, yt-section *s too
+- Joined channels get a colour each (azure/orchid/orange/yellow/
+  teal/violet rotation) on their row #tags, and the empty input
+  shows chat as @you -> #a #b #c with clickable channel chips that
+  pick where the next message goes
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) use a hue-neutral --popline border: white on dark shades,
