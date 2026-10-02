@@ -935,8 +935,11 @@
   #emoteGrid .eage.lit { opacity: 1; color: var(--text); font-weight: 700; }
   #emoteGrid .eage.lit .ants rect { stroke: var(--accent); }
   /* a lit era whose window spans a stretch the page wasn't watching -
-     the count could be understated, so the border turns purple */
-  #emoteGrid .eage.lit.missed .ants rect { stroke: #a06be0; }
+     the count could be understated, so the border turns purple and its
+     ants thin to dots, clearly broken against the standard rungs */
+  #emoteGrid .eage.lit.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
+    animation-name: eage-ants-missed; }
+  @keyframes eage-ants-missed { to { stroke-dashoffset: -5; } }
   #emoteGrid .eage.t0 { opacity: .9; color: var(--accent); }
   #emoteGrid .eage.t0 .ants rect { stroke: var(--accent); stroke-width: 1.4; }
   @keyframes eage-ants { to { stroke-dashoffset: -7; } }
