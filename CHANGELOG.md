@@ -69,6 +69,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Config's keyword inputs retitle `to highlight`/`to block`, and —
+  separators now break the tab into sections around the pair and
+  above the source line
 - Chatbar tightens: the empty char-count stops reserving 2.5ch
   between the box and the emote button, and the emote/send buttons
   now match the one-line textarea height so their tops sit flush
