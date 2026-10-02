@@ -4452,12 +4452,15 @@
         let m = '';
         while (next < marks.length && age >= marks[next].t) {
           const mk = marks[next++];
+          // a per-rung negative delay starts each square mid-cycle, so
+          // the pulses stagger instead of beating in lockstep
+          const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
           if (mk.t0) {
             const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
-            m += `<div class="eage t0" title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${lbl}</div>`;
+            m += `<div class="eage t0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${lbl}</div>`;
           } else {
             const lit = t0age >= mk.t;
-            m += `<div class="eage${lit ? ' lit' : ''}" title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}">${mk.t / 6e4}m</div>`;
+            m += `<div class="eage${lit ? ' lit' : ''}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}">${mk.t / 6e4}m</div>`;
           }
         }
         return m + render(x);
