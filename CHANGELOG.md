@@ -103,7 +103,10 @@ not versions — the page ships continuously to Neocities.
   per visual line (tinted rows keep their own colour on both lines)
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
-  tooltip) tint their borders 60% toward the style's accent
+  tooltip) use muted grey borders mixed toward the text colour
+- The emote-picker button sits flush against the input's right edge and
+  its ☻ glyph shrinks slightly so it no longer spills over the button's
+  border when pressed
 - Emote-picker era rungs whose window spans an unwatched stretch (tab
   hidden, socket dropped, page closed) get a dotted purple border instead
   of the standard accent dash, flagging that the usage count may be

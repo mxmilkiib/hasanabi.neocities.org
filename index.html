@@ -857,7 +857,9 @@
   #chatbar input:focus, #chatbar textarea:focus { outline: 1px solid var(--accent); outline-offset: 0; }
   /* emote picker popup over the chatbar - chatterino-style scrollable grid */
   /* pull it a touch toward the input/char-count, push the send button away */
-  #emojiBtn { flex: none; font-size: 1.5em; margin-left: -2px; margin-right: 4px; }
+  /* the glyph is scaled up in markup - a modest font-size + clipped box
+     keeps it inside the 30x26 button in every state */
+  #emojiBtn { flex: none; font-size: 1.3em; margin-left: -4px; margin-right: 4px; overflow: hidden; }
   #emotePick {
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
     width: 480px; max-width: 94vw; height: 420px;
