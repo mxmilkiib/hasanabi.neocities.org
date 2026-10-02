@@ -479,7 +479,9 @@
   .role { margin-right: 4px; color: var(--text-dim); }
   /* multi-channel mode: which room a row came from. Dim while that channel
      is offline, accent-tinted once its stream is live */
-  .chtag { display: inline-block; min-width: var(--chw, auto); text-align: right;
+  /* fixed width + right-align: a name longer than --chw overflows left
+     rather than pushing its right edge out */
+  .chtag { display: inline-block; width: var(--chw, auto); text-align: right;
     margin-right: 2px; color: var(--chc, var(--text-dim)); text-decoration: none;
     font-size: .85em; opacity: .8; }
   .chtag.live { color: var(--accent); opacity: 1; }
