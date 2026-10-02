@@ -973,7 +973,8 @@
 (() => {
   // ---- change this to point the page at a different channel ----
   // ?channel=login retargets chat, video embed and stream status for the
-  // visit; history/rate/tab-sync keys get a suffix so streams don't bleed
+  // visit; history/rate/last-run/emote-use/tab-sync keys get a suffix so
+  // streams don't bleed
   const DEFAULT_CHANNEL = 'hasanabi';
   const CHANNEL = (new URLSearchParams(location.search).get('channel') ||
     new URLSearchParams(location.hash.slice(1)).get('state') || '')
@@ -3517,6 +3518,7 @@
       localStorage.removeItem(SPARK_KEY);
       localStorage.removeItem(LASTRUN_KEY);
       localStorage.removeItem(SLOTS_KEY);
+      localStorage.removeItem(EMOTEUSE_KEY);
     } catch (e) {}
     location.reload();
   });
@@ -4414,8 +4416,10 @@
   // live usage: emotes seen in chat bump a session count folded into the
   // use-sort, flash their picker button, and lazily resort the open grid
   // session-use counts and last-seen times, persisted so the use sort and
-  // its age markers keep working across a reload instead of going cold
-  const savedUse = (() => { try { return JSON.parse(localStorage.getItem('hasan-emoteuse')) || {}; } catch (e) { return {}; } })();
+  // its age markers keep working across a reload instead of going cold -
+  // per-channel, since the emote sets being counted differ per stream
+  const EMOTEUSE_KEY = 'hasan-emoteuse' + CHAN_SFX;
+  const savedUse = (() => { try { return JSON.parse(localStorage.getItem(EMOTEUSE_KEY)) || {}; } catch (e) { return {}; } })();
   const liveUse = savedUse.n || {};
   const useTs = savedUse.t || {};
   // when recording began: age markers stay dim until their era is covered
@@ -4431,10 +4435,10 @@
         ks.sort((a, b) => useTs[a] - useTs[b]);
         for (const k of ks.slice(0, ks.length - 6000)) { delete useTs[k]; delete liveUse[k]; }
       }
-      try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {}
+      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {}
     }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {} });
+  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   let resortTimer = 0;
