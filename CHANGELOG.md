@@ -72,6 +72,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- `usa pol` splits in two - the dsa block keeps the labelled row,
+  act blue / votehub / vote-vote-vote drop to a line of their own
 - A — separator also opens the bot-command block at blammobot
 - Config's keyword inputs retitle `to highlight`/`to block`, and —
   separators now break the tab into sections around the pair and
