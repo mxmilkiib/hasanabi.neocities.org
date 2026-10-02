@@ -3422,6 +3422,7 @@
     }
   } catch {}
   vidHandle.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
     e.preventDefault();
     vidHandle.setPointerCapture(e.pointerId);
     vidBox.classList.add('dragging');
@@ -3454,6 +3455,7 @@
   };
   vidBox.querySelectorAll('.vid-size').forEach((grip) => {
     grip.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
       e.preventDefault();
       grip.setPointerCapture(e.pointerId);
       vidBox.classList.add('dragging');

@@ -59,6 +59,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Stream overlay drags need the primary button - right-click on the
+  handle or a resize grip was starting a drag and capturing the pointer
 - Saved size, line-height and weight indices bounds-check like the
   other indexed options - an out-of-range bundle wrote 'undefinedpx'
   into the css var
