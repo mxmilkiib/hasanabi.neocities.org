@@ -181,7 +181,7 @@ no dependencies beyond CDN-hosted fonts:
   alphabetical or by usage — most recently used in chat first (StreamElements
   chatstats via the relay seed lifetime counts for tie-breaks, live session
   use updates both and persists across reloads); in usage mode the sections
-  sort busiest-first, dashed `5m`/`10m`/`20m`/`30m` cells sit at the points where
+  sort busiest-first, dashed `2m`/`5m`/`10m`/`20m`/`30m` cells sit at the points where
   emotes were last used over that long ago, and reshuffles animate emotes
   sliding to their new spots, while a just-used emote flashes behind its
   cell. Clicking

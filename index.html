@@ -4112,9 +4112,9 @@
         `<img src="${escapeHTML(img)}" alt="${e}" loading="lazy"><span class="ename">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
-    // in use mode, 5m/10m/20m/30m cells mark where last-seen chat use ages
-    // past each threshold; emotes never seen this session count as stale
-    const AGES = [[3e5, '5 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, 'half an hour']];
+    // in use mode, 2m/5m/10m/20m/30m cells mark where last-seen chat use
+    // ages past each threshold; emotes never seen this session count as stale
+    const AGES = [[12e4, '2 minutes'], [3e5, '5 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, 'half an hour']];
     const aged = (items, codeOf, render) => {
       if (epickSort !== 'use') return items.map(render).join('');
       const now = Date.now();
