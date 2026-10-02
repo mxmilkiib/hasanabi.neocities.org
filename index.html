@@ -2316,7 +2316,7 @@
     }
     const nc = chatterSeen.size;
     chattersEl.hidden = !nc;
-    chattersEl.innerHTML = nc ? `· <b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
+    chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
     rateSamples.push(rate);
     if (rateSamples.length > sparkWin) rateSamples.shift();
     const gcut = Date.now() - 1000;
