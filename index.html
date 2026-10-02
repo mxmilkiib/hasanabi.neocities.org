@@ -820,8 +820,10 @@
   #helpPanel .linkcols > i { display: block; break-inside: avoid; font-size: 1em; }
   /* the * after a twitch stream retargets the whole page at that channel */
   #helpPanel a.chsw { margin-left: .5em; font-weight: 700; text-decoration: none; }
-  /* the merge + sits a space off the switch *, painted the accent gold */
-  #helpPanel a.chadd { margin-left: 5px; color: var(--accent); }
+  /* the merge + is a chsw clone - it inherits the .5em margin, which
+     doubles up with the literal space between the two; strip it so the
+     space alone separates * from + */
+  #helpPanel a.chadd { margin-left: 0; color: var(--accent); }
   /* a joined stream's entry reads in azure - a hue apart from the
      accent/red/green/amber/violet colours already in use */
   #helpPanel i.chon a.at { color: #5f9dff; }
@@ -837,6 +839,9 @@
      in place of the note), 2 works (no dates), 3 names only; columns
      narrow as less text needs room */
   #htabAuth.ainfo2 .ag, #htabAuth.ainfo3 .ag { display: none; }
+  /* the (work)/(tagline)/(dates) annotations match the resources tab's
+     nested-note size */
+  #htabAuth .aw, #htabAuth .ad, #htabAuth .ag { font-size: .85em; }
   #htabAuth.ainfo1 .linkcols { columns: 28em; }
   #htabAuth.ainfo2 .linkcols { columns: 24em; }
   #htabAuth.ainfo3 .linkcols { columns: 15em; }
@@ -5352,6 +5357,39 @@
   standaloneMQ.addEventListener('change', pwaNote);
   pwaNote();
 
+  // bracketed "(…)" descriptors beside links take the smaller note face the
+  // yt-channel entries already get from their nested <i> - a range wrap also
+  // covers parens holding their own links, since only elements can be whole
+  for (const el of helpPanel.querySelectorAll('#htabRes div, #htabAuth div')) {
+    for (let guard = 0; guard < 50; guard++) {
+      const texts = [];
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      let t;
+      while ((t = walk.nextNode())) {
+        const p = t.parentElement;
+        // link/label/sup text can't hold a descriptor; an i nested in an i
+        // or the authors' aw/ad/ag spans already carry the small note face
+        if (p.closest('a,b,sup,.aw,.ad,.ag')) continue;
+        if (p.tagName === 'I' && p.parentElement.closest('i')) continue;
+        texts.push(t);
+      }
+      let open = null, wrapped = false;
+      for (const n of texts) {
+        const from = open ? 0 : n.textContent.indexOf('(');
+        if (from < 0) continue;
+        if (!open) open = { n, off: from };
+        const to = n.textContent.indexOf(')', open.n === n ? open.off + 1 : 0);
+        if (to < 0) continue;
+        const r = document.createRange();
+        r.setStart(open.n, open.off);
+        r.setEnd(n, to + 1);
+        const inner = document.createElement('i');
+        try { r.surroundContents(inner); wrapped = true; } catch (e) {}
+        break;
+      }
+      if (!wrapped) break;
+    }
+  }
   // every '*' channel-switch link gets a '+' twin that appends the channel
   // to the current ?channel= list - a merged multi-room log
   for (const a of document.querySelectorAll('a.chsw[href^="?channel="]')) {
