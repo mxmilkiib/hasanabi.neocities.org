@@ -659,6 +659,20 @@
   #vidBtn.live { color: var(--good); }
   #vidBtn.playing { color: #3fbf3f; }
   #vidBtn.stopped { color: #e04040; }
+  /* first visit: the doorway controls sweep a sheen until each is
+     pressed once - the class only lands while hasan-hint is unset */
+  .hdr-btn.shiny { overflow: hidden; }
+  .hdr-btn.shiny:not(#helpBtn) { position: relative; } /* helpBtn keeps its absolute pin */
+  .hdr-btn.shiny::after {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
+    transform: translateX(-140%) skewX(-20deg); pointer-events: none;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--text) 45%, transparent), transparent);
+    animation: sheen-sweep 1.8s ease-in-out infinite;
+  }
+  /* most of the cycle holds the bar off-canvas so the sweep reads as an
+     occasional glint rather than a constant shimmer */
+  @keyframes sheen-sweep { 55%, 100% { transform: translateX(340%) skewX(-20deg); } }
+  @media (prefers-reduced-motion: reduce) { .hdr-btn.shiny::after { animation: none; transform: none; width: 100%; opacity: .12; } }
   /* keep the ? button clickable above the help panel when they overlap */
   #helpBtn { position: absolute; z-index: 11; }
   select.hdr-btn { padding-right: 4px; }
@@ -1074,7 +1088,16 @@
   chanLink.title = CHANNEL + ' on twitch';
   document.title = CHAN_TITLE;
   const hintEl = document.getElementById('hint');
-  if (!localStorage.getItem('hasan-hint')) hintEl.hidden = false;
+  if (!localStorage.getItem('hasan-hint')) {
+    hintEl.hidden = false;
+    /* first visit: sheen the doorway controls - video, login, help and
+       the emote picker - until each has been pressed once */
+    for (const id of ['vidBtn', 'sendBtn', 'helpBtn', 'emojiBtn']) {
+      const b = document.getElementById(id);
+      b.classList.add('shiny');
+      b.addEventListener('click', () => b.classList.remove('shiny'), { once: true });
+    }
+  }
   hintEl.addEventListener('click', () => {
     hintEl.remove();
     try { localStorage.setItem('hasan-hint', '1'); } catch (e) {}

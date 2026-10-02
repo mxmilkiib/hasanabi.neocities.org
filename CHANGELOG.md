@@ -13,6 +13,8 @@ not versions — the page ships continuously to Neocities.
 - Emote-picker era markers carry a marching-ants dashed border (an
   animated svg stroke-dashoffset), still staggered per rung; era rungs
   now extend from 1h through 12h with `Nh` labels
+- First-visit sheen: while the tip banner is up, the video, login, help
+  and emote-picker buttons sweep a periodic glint until each is pressed
 
 ### Fixes & polish
 - Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,
