@@ -15,7 +15,10 @@ emote ecosystem, and — after an optional Twitch login — replies, `/me`s
 and chat history walkbacks work like a real IRC client. Beyond chat, the
 page doubles as a curated hub: the help popup carries resources, news,
 organising links and era-grouped author reading lists. Any other Twitch
-channel can be pointed at with `?channel=login`.
+channel can be pointed at with `?channel=login`, and a comma list
+(`?channel=a,b,c`, up to 6) merges several rooms into one log — the first
+channel stays focused (title, stream status, video, chat target, storage)
+while each row carries a `#chan` chip that refocuses on click.
 
 The project comes in two parts: the frontend
 ([hasanabi.neocities.org](https://github.com/mxmilkiib/hasanabi.neocities.org),
@@ -37,11 +40,11 @@ hosted on GitHub Pages (which sends no CSP) and talks to it with `postMessage`.
 
 The split is therefore by network privilege, not by concern: the frontend
 owns all presentation and state, while the relay owns every outbound
-connection. Because the relay learns its channel from the `join` message
+connection. Because the relay learns its channels from the `join` message
 rather than anything hardcoded, it is channel-agnostic — any page on any
-CSP-locked host can embed the same iframe for any Twitch channel, one
-channel per iframe instance. The hasanabi specifics all live in this file;
-the relay could just as well serve a completely different channel page.
+CSP-locked host can embed the same iframe for any Twitch channel. The
+hasanabi specifics all live in this file; the relay could just as well
+serve a completely different channel page.
 
 ## Backend — `twitch-chat-relay` (GitHub Pages)
 
@@ -68,10 +71,10 @@ Parent → relay:
 
 | message | purpose |
 |---|---|
-| `{type: 'join', channel}` | set the channel to watch |
-| `{type: 'backfill'}` | ask for the recent-messages backlog |
+| `{type: 'join', channels[]}` | set the channels to watch (a bare `channel` string still works); repeats diff JOIN/PART |
+| `{type: 'backfill'}` | ask for the recent-messages backlog (every joined channel, merged by timestamp) |
 | `{type: 'auth', token}` | log in (or `token: null` to log out) |
-| `{type: 'send', text, replyTo}` | post a chat message once authenticated; `replyTo` attaches a `reply-parent-msg-id` tag |
+| `{type: 'send', channel, text, replyTo}` | post a chat message once authenticated; `replyTo` attaches a `reply-parent-msg-id` tag |
 | `{type: 'tweet', id}` | fetch an X/Twitter preview via api.fxtwitter.com |
 | `{type: 'twsets', ids}` | fetch Twitch emote-set metadata via ivr.fi |
 
@@ -82,11 +85,13 @@ Relay → parent:
 - `backfill` — on request, the relay fetches the backlog from
   recent-messages.robotty.de (the same service Chatterino uses) and
   forwards it as `lines`; the page skips already-rendered msg ids
-- `{type: 'stream', uptime, viewers, title}` — decapi poll result
-- `{type: 'emotes', emotes, emoteSrc, zeroWidth, badges, lastBroadcast,
-  lastVod, emoteUse, emoteAnim}` — emote map + sources + badge sets +
-  stream history + per-emote channel usage counts (StreamElements
-  chatstats) + animated-emote names, refetched every 10 minutes
+- `{type: 'stream', channel, uptime, viewers, title}` — decapi poll
+  result, per joined channel
+- `{type: 'emotes', channel, emotes, emoteSrc, zeroWidth, badges,
+  lastBroadcast, lastVod, emoteUse, emoteAnim}` — per-channel emote map +
+  sources + badge sets + stream history + per-emote channel usage counts
+  (StreamElements chatstats) + animated-emote names, refetched every
+  10 minutes (global sets are fetched once per cycle and merged in)
 - `{type: 'nitter', host}` — fastest healthy nitter instance from
   status.d420.de, rechecked every 15 minutes
 - `{type: 'wscause', code, reason}` — why the Twitch socket last closed,

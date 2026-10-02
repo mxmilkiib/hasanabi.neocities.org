@@ -463,6 +463,12 @@
   main.notime .time { display: none; }
   main.nosec .time .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
+  /* multi-channel mode: which room a row came from. Dim while that channel
+     is offline, accent-tinted once its stream is live */
+  .chtag { margin-right: 4px; color: var(--text-dim); text-decoration: none;
+    font-size: .85em; opacity: .8; }
+  .chtag.live { color: var(--accent); opacity: 1; }
+  .chtag:hover { color: var(--text); text-decoration: underline; }
   .role.mod { color: var(--good); }
   .role.vip { color: var(--vip); }
   .role.host { color: var(--accent); }
@@ -762,6 +768,7 @@
   #helpPanel .linkcols > i { display: block; break-inside: avoid; font-size: 1em; }
   /* the * after a twitch stream retargets the whole page at that channel */
   #helpPanel a.chsw { margin-left: .5em; font-weight: 700; text-decoration: none; }
+  #helpPanel a.chadd { margin-left: 2px; color: var(--text-dim); }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run long (name + work + dates), so wider columns there */
   #htabAuth .linkcols { columns: 30em; }
@@ -992,7 +999,7 @@
     <div><b id="helpnews">news</b><span class="linkcols"><i><a class="at" href="https://www.democracynow.org/" target="_blank" rel="noopener">democracy now</a> (daily news hour)</i><i><a class="at" href="https://theintercept.com/" target="_blank" rel="noopener">the intercept</a></i><i><a class="at" href="https://www.dropsitenews.com/" target="_blank" rel="noopener">drop site</a> (grim + scahill)</i><i><a class="at" href="https://thelevernews.com/" target="_blank" rel="noopener">the lever</a> (money in politics)</i><i><a class="at" href="https://jacobin.com/" target="_blank" rel="noopener">jacobin</a> (socialist magazine)</i><i><a class="at" href="https://monthlyreview.org/" target="_blank" rel="noopener">monthly review</a> (socialist journal)</i><i><a class="at" href="https://www.currentaffairs.org/" target="_blank" rel="noopener">current affairs</a> (magazine)</i><i><a class="at" href="https://zeteo.com/" target="_blank" rel="noopener">zeteo</a> (mehdi hasan)</i><i><a class="at" href="https://lpeproject.org/" target="_blank" rel="noopener">lpe project</a> (law & pol. economy)</i><i><a class="at" href="https://unicornriot.ninja/" target="_blank" rel="noopener">unicorn riot</a> (decentralized media)</i><i><a class="at" href="https://indymedia.org/" target="_blank" rel="noopener">indymedia</a> (open publishing imc · <a class="at" href="https://ucimc.org/" target="_blank" rel="noopener">ucimc</a> · <a class="at" href="https://www.indymedia.nl/" target="_blank" rel="noopener">nl</a>)</i><i><a class="at" href="https://itsgoingdown.org/" target="_blank" rel="noopener">it's going down</a> (anarchist news)</i><i><a class="at" href="https://novaramedia.com/" target="_blank" rel="noopener">novara</a> (uk)</i><i><a class="at" href="https://www.doubledown.news/" target="_blank" rel="noopener">double down news</a> (uk)</i><i><a class="at" href="https://mondoweiss.net/" target="_blank" rel="noopener">mondoweiss</a> (palestine)</i><i><a class="at" href="https://electronicintifada.net/" target="_blank" rel="noopener">electronic intifada</a> (palestine)</i><i><a class="at" href="https://jewishcurrents.org/" target="_blank" rel="noopener">jewish currents</a></i><i><a class="at" href="https://www.aljazeera.com/" target="_blank" rel="noopener">al jazeera</a></i><i><a class="at" href="https://www.middleeasteye.net/" target="_blank" rel="noopener">middle east eye</a></i><i><a class="at" href="https://www.972mag.com/" target="_blank" rel="noopener">+972</a> (israel-palestine)</i></span></div>
     <div class="sep">—</div>
     <div><b>yt channels</b><span class="linkcols"><i><a class="at" href="https://www.youtube.com/@MorePerfectUnion" target="_blank" rel="noopener">more perfect union</a> <i>(labour)</i></i><i><a class="at" href="https://www.youtube.com/@TheMajorityReport" target="_blank" rel="noopener">majority report</a> <i>(news · <a class="at" href="https://twitch.tv/themajorityreport" target="_blank" rel="noopener">tw</a><a class="at chsw" href="?channel=themajorityreport" title="switch this page to majority report's chat">*</a>)</i></i><i><a class="at" href="https://www.youtube.com/@BreakingPoints" target="_blank" rel="noopener">breaking points</a> <i>(news)</i></i><i><a class="at" href="https://www.youtube.com/@SecularTalk" target="_blank" rel="noopener">secular talk</a> <i>(news)</i></i><i><a class="at" href="https://www.youtube.com/@SMN" target="_blank" rel="noopener">some more news</a> <i>(news · <a class="at" href="https://twitch.tv/somemorenews" target="_blank" rel="noopener">tw</a><a class="at chsw" href="?channel=somemorenews" title="switch this page to some more news's chat">*</a>)</i></i><i><a class="at" href="https://www.youtube.com/@PodSaveAmerica" target="_blank" rel="noopener">pod save america</a> <i>(podcast)</i> (crooked media)</i><i><a class="at" href="https://soundcloud.com/chapo-trap-house" target="_blank" rel="noopener">chapo trap house</a> <i>(podcast)</i></i><i><a class="at" href="https://www.youtube.com/@coffeezilla" target="_blank" rel="noopener">coffeezilla</a> <i>(investigations)</i></i><i><a class="at" href="https://www.youtube.com/@hbomberguy" target="_blank" rel="noopener">hbomberguy</a> <i>(essays · <a class="at" href="https://twitch.tv/hbomberguy" target="_blank" rel="noopener">tw</a><a class="at chsw" href="?channel=hbomberguy" title="switch this page to hbomberguy's chat">*</a>)</i></i><i><a class="at" href="https://www.youtube.com/@shaun_vids" target="_blank" rel="noopener">shaun</a> <i>(essays · <a class="at" href="https://twitch.tv/shaun_vids" target="_blank" rel="noopener">tw</a><a class="at chsw" href="?channel=shaun_vids" title="switch this page to shaun's chat">*</a>)</i></i><i><a class="at" href="https://www.youtube.com/@PhilosophyTube" target="_blank" rel="noopener">philosophy tube</a> <i>(essays · <a class="at" href="https://twitch.tv/philosophytube" target="_blank" rel="noopener">tw</a><a class="at chsw" href="?channel=philosophytube" title="switch this page to philosophy tube's chat">*</a>)</i></i><i><a class="at" href="https://www.youtube.com/@ThoughtSlime" target="_blank" rel="noopener">thought slime</a> <i>(essays · <a class="at" href="https://twitch.tv/ThoughtSlime" target="_blank" rel="noopener">tw</a><a class="at chsw" href="?channel=ThoughtSlime" title="switch this page to thought slime's chat">*</a>)</i></i><i><a class="at" href="https://www.youtube.com/@LindsayEllisVids" target="_blank" rel="noopener">lindsay ellis</a> <i>(essays)</i></i><i><a class="at" href="https://www.youtube.com/@KatBlaque" target="_blank" rel="noopener">kat blaque</a> <i>(essays)</i></i><i><a class="at" href="https://www.youtube.com/@SecondThought" target="_blank" rel="noopener">second thought</a> <i>(essays)</i></i><i><a class="at" href="https://www.youtube.com/@Boy_Boy" target="_blank" rel="noopener">boy boy</a> <i>(essays · <a class="at" href="https://twitch.tv/boyboyofficial" target="_blank" rel="noopener">tw</a><a class="at chsw" href="?channel=boyboyofficial" title="switch this page to boy boy's chat">*</a>)</i></i><i><a class="at" href="https://www.youtube.com/@YaBoiHakim" target="_blank" rel="noopener">hakim</a> <i>(essays)</i></i><i><a class="at" href="https://www.youtube.com/@LunaOi" target="_blank" rel="noopener">luna oi</a> <i>(essays)</i></i><i><a class="at" href="https://www.youtube.com/@badempanada" target="_blank" rel="noopener">badempanada</a> <i>(commentary)</i></i></span></div>
-    <div><b>twitch streams</b><span class="linkcols"><i><a class="at" href="https://twitch.tv/hasanabi" target="_blank" rel="noopener">hasanabi</a><a class="at chsw" href="?channel=hasanabi" title="switch this page to hasanabi's chat">*</a> (home)</i><i><a class="at" href="https://twitch.tv/hasanabi_waiting_room_" target="_blank" rel="noopener">waiting room</a><a class="at chsw" href="?channel=hasanabi_waiting_room_" title="switch this page to waiting room's chat">*</a> (fan reruns while offline)</i><i><a class="at" href="https://twitch.tv/central_committee" target="_blank" rel="noopener">mikefrompa</a><a class="at chsw" href="?channel=central_committee" title="switch this page to mikefrompa's chat">*</a> (organiser · <a class="at" href="https://www.youtube.com/@mikefrompa" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/theserfstv" target="_blank" rel="noopener">the serfs</a><a class="at chsw" href="?channel=theserfstv" title="switch this page to the serfs's chat">*</a> (news · <a class="at" href="https://www.youtube.com/@theserfstv" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/novaramedia" target="_blank" rel="noopener">novara media</a><a class="at chsw" href="?channel=novaramedia" title="switch this page to novara media's chat">*</a> (news, uk · <a class="at" href="https://www.youtube.com/@novaramedia" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/mapletakes" target="_blank" rel="noopener">maple takes</a><a class="at chsw" href="?channel=mapletakes" title="switch this page to maple takes's chat">*</a> (news, canada)</i><i><a class="at" href="https://twitch.tv/kaceytron" target="_blank" rel="noopener">kaceytron</a><a class="at chsw" href="?channel=kaceytron" title="switch this page to kaceytron's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/@Kaceytron" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/kneecoleslaw" target="_blank" rel="noopener">kneecoleslaw</a><a class="at chsw" href="?channel=kneecoleslaw" title="switch this page to kneecoleslaw's chat">*</a> (commentary)</i><i><a class="at" href="https://twitch.tv/boyboyofficial" target="_blank" rel="noopener">boy boy</a><a class="at chsw" href="?channel=boyboyofficial" title="switch this page to boy boy's chat">*</a> (essays · <a class="at" href="https://www.youtube.com/@Boy_Boy" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/frogan" target="_blank" rel="noopener">frogan</a><a class="at chsw" href="?channel=frogan" title="switch this page to frogan's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/@frogan" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/yugopniktwitch" target="_blank" rel="noopener">yugopnik</a><a class="at chsw" href="?channel=yugopniktwitch" title="switch this page to yugopnik's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/@YUGOPNIK" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/madelinependleton" target="_blank" rel="noopener">madeline pendleton</a><a class="at chsw" href="?channel=madelinependleton" title="switch this page to madeline pendleton's chat">*</a> (tank tube · <a class="at" href="https://www.youtube.com/@madelinependleton" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/leftreckoning" target="_blank" rel="noopener">left reckoning</a><a class="at chsw" href="?channel=leftreckoning" title="switch this page to left reckoning's chat">*</a> (podcast · <a class="at" href="https://www.youtube.com/@LeftReckoning" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/leaping_larry" target="_blank" rel="noopener">leaping larry</a><a class="at chsw" href="?channel=leaping_larry" title="switch this page to leaping larry's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/c/shanelawrence86" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/comrade_virgo" target="_blank" rel="noopener">comrade virgo</a><a class="at chsw" href="?channel=comrade_virgo" title="switch this page to comrade virgo's chat">*</a> (community)</i><i class="note"><b>*</b> to point this page at that chat + stream instead (<a class="at" href="?">reset to hasan</a>)</i></span></div>
+    <div><b>twitch streams</b><span class="linkcols"><i><a class="at" href="https://twitch.tv/hasanabi" target="_blank" rel="noopener">hasanabi</a><a class="at chsw" href="?channel=hasanabi" title="switch this page to hasanabi's chat">*</a> (home)</i><i><a class="at" href="https://twitch.tv/hasanabi_waiting_room_" target="_blank" rel="noopener">waiting room</a><a class="at chsw" href="?channel=hasanabi_waiting_room_" title="switch this page to waiting room's chat">*</a> (fan reruns while offline)</i><i><a class="at" href="https://twitch.tv/central_committee" target="_blank" rel="noopener">mikefrompa</a><a class="at chsw" href="?channel=central_committee" title="switch this page to mikefrompa's chat">*</a> (organiser · <a class="at" href="https://www.youtube.com/@mikefrompa" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/theserfstv" target="_blank" rel="noopener">the serfs</a><a class="at chsw" href="?channel=theserfstv" title="switch this page to the serfs's chat">*</a> (news · <a class="at" href="https://www.youtube.com/@theserfstv" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/novaramedia" target="_blank" rel="noopener">novara media</a><a class="at chsw" href="?channel=novaramedia" title="switch this page to novara media's chat">*</a> (news, uk · <a class="at" href="https://www.youtube.com/@novaramedia" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/mapletakes" target="_blank" rel="noopener">maple takes</a><a class="at chsw" href="?channel=mapletakes" title="switch this page to maple takes's chat">*</a> (news, canada)</i><i><a class="at" href="https://twitch.tv/kaceytron" target="_blank" rel="noopener">kaceytron</a><a class="at chsw" href="?channel=kaceytron" title="switch this page to kaceytron's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/@Kaceytron" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/kneecoleslaw" target="_blank" rel="noopener">kneecoleslaw</a><a class="at chsw" href="?channel=kneecoleslaw" title="switch this page to kneecoleslaw's chat">*</a> (commentary)</i><i><a class="at" href="https://twitch.tv/boyboyofficial" target="_blank" rel="noopener">boy boy</a><a class="at chsw" href="?channel=boyboyofficial" title="switch this page to boy boy's chat">*</a> (essays · <a class="at" href="https://www.youtube.com/@Boy_Boy" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/frogan" target="_blank" rel="noopener">frogan</a><a class="at chsw" href="?channel=frogan" title="switch this page to frogan's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/@frogan" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/yugopniktwitch" target="_blank" rel="noopener">yugopnik</a><a class="at chsw" href="?channel=yugopniktwitch" title="switch this page to yugopnik's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/@YUGOPNIK" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/madelinependleton" target="_blank" rel="noopener">madeline pendleton</a><a class="at chsw" href="?channel=madelinependleton" title="switch this page to madeline pendleton's chat">*</a> (tank tube · <a class="at" href="https://www.youtube.com/@madelinependleton" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/leftreckoning" target="_blank" rel="noopener">left reckoning</a><a class="at chsw" href="?channel=leftreckoning" title="switch this page to left reckoning's chat">*</a> (podcast · <a class="at" href="https://www.youtube.com/@LeftReckoning" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/leaping_larry" target="_blank" rel="noopener">leaping larry</a><a class="at chsw" href="?channel=leaping_larry" title="switch this page to leaping larry's chat">*</a> (commentary · <a class="at" href="https://www.youtube.com/c/shanelawrence86" target="_blank" rel="noopener">yt</a>)</i><i><a class="at" href="https://twitch.tv/comrade_virgo" target="_blank" rel="noopener">comrade virgo</a><a class="at chsw" href="?channel=comrade_virgo" title="switch this page to comrade virgo's chat">*</a> (community)</i><i class="note"><b>*</b> switch this page to that chat · <b>+</b> merge it into the current channel list (<a class="at" href="?">reset to hasan</a>)</i></span></div>
     <div class="sep">—</div>
     <div><b>usa pol</b><span><a class="at" href="https://www.dsausa.org/" target="_blank" rel="noopener">dsa</a> (<a class="at" href="https://www.dsausa.org/join" target="_blank" rel="noopener">join</a> · <a class="at" href="https://www.dsausa.org/donate" target="_blank" rel="noopener">donate</a> · <a class="at" href="https://www.dsausa.org/chapters/" target="_blank" rel="noopener">chapters</a> · <a class="at" href="https://y.dsausa.org/" target="_blank" rel="noopener">ydsa</a> · <a class="at" href="https://democraticleft.dsausa.org/" target="_blank" rel="noopener">democratic left</a> · <a class="at" href="https://socialistforum.dsausa.org/" target="_blank" rel="noopener">socialist forum</a> · <a class="at" href="https://labor.dsausa.org/" target="_blank" rel="noopener">labor</a> · <a class="at" href="https://housing.dsausa.org/" target="_blank" rel="noopener">housing</a> · <a class="at" href="https://electoral.dsausa.org/" target="_blank" rel="noopener">electoral</a> · <a class="at" href="https://international.dsausa.org/" target="_blank" rel="noopener">international</a>) · <a class="at" href="https://www.actblue.com/" target="_blank" rel="noopener">act blue</a> (dem donations) · <a class="at" href="https://votehub.com/" target="_blank" rel="noopener">votehub</a> · <a class="at" href="https://www.youtube.com/shorts/ihZbYdYK6hs" target="_blank" rel="noopener">we're gonna vote vote vote</a></span></div>
     <div><b>dsa chapters</b><span class="linkcols"><i><a class="at" href="https://chapters.dsausa.org/" target="_blank" rel="noopener">chapter map</a> (zip lookup)</i><i><a class="at" href="https://bhamdsa.org" target="_blank" rel="noopener">birmingham</a> (al)</i><i><a class="at" href="https://linktr.ee/anchoragedsa" target="_blank" rel="noopener">anchorage</a> (ak)</i><i><a class="at" href="https://phxdsa.org" target="_blank" rel="noopener">phoenix metro</a> (az)</i><i><a class="at" href="https://www.centralarkansasdsa.org" target="_blank" rel="noopener">central arkansas</a> (ar)</i><i><a class="at" href="https://dsa-la.org" target="_blank" rel="noopener">dsa los angeles</a> (ca)</i><i><a class="at" href="https://www.denverdsa.org" target="_blank" rel="noopener">denver</a> (co)</i><i><a class="at" href="https://ctdsa.org" target="_blank" rel="noopener">connecticut</a> (ct)</i><i><a class="at" href="https://www.dedsa.org" target="_blank" rel="noopener">delaware</a> (de)</i><i><a class="at" href="https://mdcdsa.org" target="_blank" rel="noopener">metro dc</a> (dc)</i><i><a class="at" href="https://www.miamidsa.org" target="_blank" rel="noopener">miami</a> (fl)</i><i><a class="at" href="https://atldsa.org" target="_blank" rel="noopener">atlanta</a> (ga)</i><i><a class="at" href="https://www.dsoahu.org" target="_blank" rel="noopener">dem. socialists of o'ahu</a> (hi)</i><i><a class="at" href="https://www.boisedsa.org" target="_blank" rel="noopener">boise</a> (id)</i><i><a class="at" href="https://chicagodsa.org" target="_blank" rel="noopener">chicago</a> (il)</i><i><a class="at" href="https://www.centralindsa.org" target="_blank" rel="noopener">central indiana</a> (in)</i><i><a class="at" href="https://www.centraliowadsa.org" target="_blank" rel="noopener">central iowa</a> (ia)</i><i><a class="at" href="https://kcdsa.org" target="_blank" rel="noopener">kansas city</a> (ks)</i><i><a class="at" href="https://www.dsalouisville.org" target="_blank" rel="noopener">louisville</a> (ky)</i><i><a class="at" href="https://dsaneworleans.org" target="_blank" rel="noopener">new orleans</a> (la)</i><i><a class="at" href="https://www.mainedsa.org" target="_blank" rel="noopener">maine</a> (me)</i><i><a class="at" href="https://www.gbdsa.org" target="_blank" rel="noopener">greater baltimore</a> (md)</i><i><a class="at" href="https://bostondsa.org" target="_blank" rel="noopener">boston</a> (ma)</i><i><a class="at" href="https://metrodetroitdsa.org" target="_blank" rel="noopener">metro detroit</a> (mi)</i><i><a class="at" href="https://twincitiesdsa.org" target="_blank" rel="noopener">twin cities</a> (mn)</i><i><a class="at" href="https://linktr.ee/centralmsdsa" target="_blank" rel="noopener">central mississippi</a> (ms)</i><i><a class="at" href="https://www.stldsa.org" target="_blank" rel="noopener">st. louis</a> (mo)</i><i><a class="at" href="https://westernmtdsa.org" target="_blank" rel="noopener">western montana</a> (mt)</i><i><a class="at" href="https://omahadsa.org" target="_blank" rel="noopener">omaha</a> (ne)</i><i><a class="at" href="https://lvdsa.org" target="_blank" rel="noopener">las vegas</a> (nv)</i><i><a class="at" href="https://snh.dsachapters.org" target="_blank" rel="noopener">southern nh</a> (nh)</i><i><a class="at" href="https://north.dsanj.org" target="_blank" rel="noopener">north jersey</a> (nj)</i><i><a class="at" href="https://abqdsa.org" target="_blank" rel="noopener">albuquerque</a> (nm)</i><i><a class="at" href="https://socialists.nyc" target="_blank" rel="noopener">nyc</a> (ny)</i><i><a class="at" href="https://www.dsanc.org" target="_blank" rel="noopener">nc triangle</a> (nc)</i><i><a class="at" href="https://www.rrvdsa.org" target="_blank" rel="noopener">red river valley</a> (nd)</i><i><a class="at" href="https://www.dsacleveland.org" target="_blank" rel="noopener">cleveland</a> (oh)</i><i><a class="at" href="https://okcdsa.org" target="_blank" rel="noopener">oklahoma city</a> (ok)</i><i><a class="at" href="https://portlanddsa.org" target="_blank" rel="noopener">portland</a> (or)</i><i><a class="at" href="https://www.phillydsa.org" target="_blank" rel="noopener">philadelphia</a> (pa)</i><i><a class="at" href="https://ridsa.org" target="_blank" rel="noopener">rhode island</a> (ri)</i><i><a class="at" href="https://www.charlestondsa.org" target="_blank" rel="noopener">charleston</a> (sc)</i><i><a class="at" href="https://actionnetwork.org/groups/sioux-empire-dsa" target="_blank" rel="noopener">sioux empire</a> (sd)</i><i><a class="at" href="https://midtndsa.org" target="_blank" rel="noopener">middle tennessee</a> (tn)</i><i><a class="at" href="https://www.austindsa.org" target="_blank" rel="noopener">austin</a> (tx)</i><i><a class="at" href="https://saltlakedsa.org" target="_blank" rel="noopener">salt lake</a> (ut)</i><i><a class="at" href="https://greenmountaindsa.org" target="_blank" rel="noopener">green mountain</a> (vt)</i><i><a class="at" href="https://www.dsarichmond.org" target="_blank" rel="noopener">richmond</a> (va)</i><i><a class="at" href="https://seattledsa.org" target="_blank" rel="noopener">seattle</a> (wa)</i><i><a class="at" href="https://www.facebook.com/kanawhavalleydsa" target="_blank" rel="noopener">kanawha valley</a> (wv)</i><i><a class="at" href="https://dsamadison.org" target="_blank" rel="noopener">madison area</a> (wi)</i><i><a class="at" href="https://www.facebook.com/sewyomingdsa" target="_blank" rel="noopener">southeast wyoming</a> (wy)</i></span></div>
@@ -1041,9 +1048,16 @@
   // visit; history/rate/last-run/emote-use/tab-sync keys get a suffix so
   // streams don't bleed
   const DEFAULT_CHANNEL = 'hasanabi';
-  const CHANNEL = (new URLSearchParams(location.search).get('channel') ||
+  // ?channel=a,b,c watches several chats in one merged log; the first is
+  // focused (title, stream status, video, chat target, storage keys)
+  const CHANNELS = (new URLSearchParams(location.search).get('channel') ||
     new URLSearchParams(location.hash.slice(1)).get('state') || '')
-    .toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 25) || DEFAULT_CHANNEL;
+    .toLowerCase().split(',')
+    .map((c) => c.replace(/[^a-z0-9_]/g, '').slice(0, 25))
+    .filter(Boolean).slice(0, 6);
+  const CHANNEL = CHANNELS[0] || DEFAULT_CHANNEL;
+  if (!CHANNELS.length) CHANNELS.push(DEFAULT_CHANNEL);
+  const MULTI = CHANNELS.length > 1;
   const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? 'HasanAbi' : CHANNEL;
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
@@ -1051,7 +1065,10 @@
   let MAX_MESSAGES = 1000;
   const BACKLOG_MAX = 1000;
   const HISTORY_SAVE_MAX = 1000;
-  const MENTION_RE = new RegExp('@' + CHANNEL + '\\b', 'i');
+  // '@channel' pings highlight per the row's own channel - cached per name
+  const MENTION_RES = {};
+  const mentionRe = (ch) =>
+    MENTION_RES[ch] ||= new RegExp('@' + ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
   const GLORP_RE = /\b(?:glorp|florp)\b/i;
   const F_RE = /^f$/i;
 
@@ -1232,12 +1249,24 @@
 
   // Third-party emote map (7TV/BTTV/FFZ) sent by the relay - the page's CSP
   // blocks fetching the sets itself, but img-src * lets the CDN images render.
+  // chanSets holds each joined channel's own payload; the bare module vars
+  // alias the focused channel's set (the picker and most lookups only care
+  // about that one)
+  const chanSets = {};         // channel -> { emotes, emoteSrc, emoteUse, emoteAnim, zeroWidth, badges }
   let thirdPartyEmotes = {};
   let emoteSrc = {};           // name -> 'Twitch'/'7TV'/'BTTV'/'FFZ' for tooltips
   let emoteUse = {};           // name -> channel usage count (streamelements stats)
   let emoteAnim = new Set();   // names flagged animated by their provider
   let zeroWidth = new Set();   // 7TV overlay emotes that stack on the previous one
   let badgeSets = {};          // 'set_id' -> { version: url }
+  // a row resolves against its own channel's sets, falling back to the
+  // focused channel's (globals are identical either way)
+  const setFor = (ch) => chanSets[ch] || chanSets[CHANNEL] || {};
+  const emotesOf = (ch) => setFor(ch).emotes || {};
+  const emoteSrcOf = (ch) => setFor(ch).emoteSrc || {};
+  const zwOf = (ch) => setFor(ch).zeroWidth || ZERO;
+  const badgesOf = (ch) => setFor(ch).badges || {};
+  const ZERO = new Set();
   // Nitter host for twitter/x link rewriting; the relay picks a live one
   // from status.d420.de, this is only the fallback until then.
   let nitterHost = null; // set once the relay confirms a live instance
@@ -1270,9 +1299,9 @@
 
   // badge 'set/ver' -> image url; falls back to the highest version <= ver
   // (e.g. subscriber/34 uses the 24-month flair when no 34 exists)
-  function badgeUrl(b) {
+  function badgeUrl(b, ch) {
     const i = b.indexOf('/');
-    const set = badgeSets[b.slice(0, i)];
+    const set = (badgesOf(ch))[b.slice(0, i)];
     if (!set) return null;
     const ver = b.slice(i + 1);
     if (set[ver]) return set[ver];
@@ -1301,17 +1330,20 @@
     while (walker.nextNode()) nodes.push(walker.currentNode);
     for (const node of nodes) {
       if (node.parentElement.closest('.time,.reply,.aux,a')) continue;
+      const rowCh = (node.parentElement.closest('.row') || {}).dataset || {};
+      const em = emotesOf(rowCh.ch || CHANNEL);
       const parts = node.nodeValue.split(/(\s+)/);
-      if (!parts.some((t) => thirdPartyEmotes[t])) continue;
+      if (!parts.some((t) => em[t])) continue;
       const frag = document.createDocumentFragment();
+      const es = emoteSrcOf(rowCh.ch || CHANNEL);
       for (const tok of parts) {
-        const url = thirdPartyEmotes[tok];
+        const url = em[tok];
         if (url) {
           const img = document.createElement('img');
           img.className = 'emote';
           img.src = url;
           img.alt = tok;
-        img.title = tok + (emoteSrc[tok] ? ' - ' + emoteSrc[tok] : '');
+        img.title = tok + (es[tok] ? ' - ' + es[tok] : '');
           frag.appendChild(img);
         } else frag.appendChild(document.createTextNode(tok));
       }
@@ -1322,22 +1354,23 @@
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
   // and bolding @username mentions like real chat. Zero-width emotes stack
   // onto the previous emote; cheermotes resolve when the message has bits.
-  function renderTextHTML(text, hasBits) {
+  function renderTextHTML(text, hasBits, ch) {
+    const em = emotesOf(ch || CHANNEL), es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL);
     const out = [];
     let lastEmote = -1; // index in out of the last emote img, for zw stacking
     text.split(/(\s+)/).forEach((tok, i, arr) => {
-      const url = thirdPartyEmotes[tok];
+      const url = em[tok];
       if (url) {
         const alt = escapeHTML(tok);
         const img = `<img class="emote" src="${escapeHTML(url)}" alt="${alt}"` +
-                    ` title="${alt}${emoteSrc[tok] ? ' - ' + emoteSrc[tok] : ''}">`;
-        if (zeroWidth.has(tok) && lastEmote >= 0) {
+                    ` title="${alt}${es[tok] ? ' - ' + es[tok] : ''}">`;
+        if (zw.has(tok) && lastEmote >= 0) {
           if (out[lastEmote].endsWith('</span>'))
             out[lastEmote] = out[lastEmote].slice(0, -7) + img + '</span>';
           else out[lastEmote] = `<span class="estk">${out[lastEmote]}${img}</span>`;
         } else {
           out.push(img);
-          if (!zeroWidth.has(tok)) lastEmote = out.length - 1;
+          if (!zw.has(tok)) lastEmote = out.length - 1;
         }
         return;
       }
@@ -1421,9 +1454,9 @@
   // Turns message text + the "emotes" tag into HTML, swapping emote spans for
   // <img> tags and escaping everything else. Also returns the native emote
   // names so callers can tell emote-only messages apart.
-  function renderMessageHTML(message, emotesTag, hasBits) {
+  function renderMessageHTML(message, emotesTag, hasBits, ch) {
     const names = new Set();
-    if (!emotesTag) return { html: renderTextHTML(message, hasBits), names };
+    if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch), names };
     const emotes = [];
     for (const part of emotesTag.split('/')) {
       const [id, ranges] = part.split(':');
@@ -1433,12 +1466,12 @@
         emotes.push({ id, start, end });
       }
     }
-    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits), names };
+    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits, ch), names };
     emotes.sort((a, b) => a.start - b.start);
     let html = '', cursor = 0;
     for (const e of emotes) {
       if (e.start < cursor) continue; // ignore malformed/overlapping ranges
-      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits);
+      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch);
       const name = message.slice(e.start, e.end + 1);
       names.add(name);
       const alt = escapeHTML(name);
@@ -1449,7 +1482,7 @@
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
     }
-    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits);
+    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch);
     return { html, names };
   }
 
@@ -1672,7 +1705,8 @@
              : 'chat was cleared by a moderator')
           : parsed.kind === 'CLEARMSG' ? 'a message was deleted'
           : parsed.message;
-      if (t) srLiveEl.textContent = (parsed.login ? parsed.login + ': ' : '') + t;
+      if (t) srLiveEl.textContent = (MULTI ? (parsed.channel || '') + ' ' : '') +
+        (parsed.login ? parsed.login + ': ' : '') + t;
     }
     if (!scheduled) {
       scheduled = true;
@@ -1755,7 +1789,13 @@
     }
     const nearBottom = stickBottom;
     let html = '';
-    for (const { tags, login, message: rawMsg, kind, local, live } of queue) {
+    for (const { tags, login, message: rawMsg, kind, local, live, channel } of queue) {
+      const ch = (channel || '').replace(/^#/, '').toLowerCase() || CHANNEL;
+      const chTag = MULTI
+        ? `<a class="chtag${streamStates[ch] && streamStates[ch].live ? ' live' : ''}" data-ch="${escapeHTML(ch)}" ` +
+          `href="?channel=${escapeHTML([ch, ...CHANNELS.filter((c) => c !== ch)].join(','))}" ` +
+          `title="from #${escapeHTML(ch)} - click to focus that channel">#${escapeHTML(ch)}</a> `
+        : '';
       // replayed backfill lines carry ids the page has already rendered;
       // notice-type events carry no id, so key them on kind+ts+sender+body
       const dedupKey = tags.id ||
@@ -1791,12 +1831,12 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span><b class="notice-label">[notice]</b> <b>${escapeHTML(who)}</b> ` +
-                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes).html + pendingTw.splice(0).join('') : ''}</div>`;
+        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> <b>${escapeHTML(who)}</b> ` +
+                `${escapeHTML(sys)}${message ? ' - ' + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
-        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
+        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
                 `${rawMsg.startsWith('[notice]') ? '<b class="notice-label">[notice]</b>' + escapeHTML(rawMsg.slice(8)) : escapeHTML(rawMsg)}</div>`;
         continue;
       }
@@ -1805,18 +1845,29 @@
         // a room-wide /clear wipes everything before it - rendered rows in
         // every column and whatever this batch already queued
         if (!target) {
-          html = '';
-          for (const c of cols()) c.textContent = '';
-          rowById.clear();
-          histDirty = true;
+          if (MULTI) {
+            // /clear wipes one channel's room only - drop its rows and any
+            // same-channel rows still queued in this batch (rows never nest
+            // divs, so the non-greedy match ends at the row's own close)
+            for (const c of cols())
+              for (const r of c.querySelectorAll(`.row[data-ch="${ch}"]`)) r.remove();
+            for (const r of rowById) if ((r[1].dataset || {}).ch === ch) rowById.delete(r[0]);
+            html = html.replace(new RegExp(`<div [^>]*data-ch="${ch}"[^>]*>[^]*?</div>`, 'g'), '');
+            histDirty = true;
+          } else {
+            html = '';
+            for (const c of cols()) c.textContent = '';
+            rowById.clear();
+            histDirty = true;
+          }
         }
         const dur = +tags['ban-duration'] || 0;
         // the logged-in user as the target: say so plainly and lock the input
         // for the remaining time, like chatterino (replayed lines already past
-        // their expiry do nothing)
+        // their expiry do nothing). the lock is per-channel in multi mode
         const me = !!(target && auth && auth.login && target.toLowerCase() === auth.login.toLowerCase());
-        if (me && dur) setTimedOut(ts + dur * 1000);
-        html += `<div class="row notice${me ? ' selfmod' : ''}${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>` +
+        if (me && dur) setTimedOut(ts + dur * 1000, ch);
+        html += `<div class="row notice${me ? ' selfmod' : ''}${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
           (target ? `${me ? 'you were' : escapeHTML(target) + ' was'} ${dur ? `timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
@@ -1832,7 +1883,7 @@
       // real badge icons left of the name; text chips only as fallback
       const renderedSets = new Set();
       const badgeImgs = (tags.badges || '').split(',').map((b) => {
-        const u = b && badgeUrl(b);
+        const u = b && badgeUrl(b, ch);
         if (u) renderedSets.add(b.split('/')[0]);
         return u ? `<img class="badge" src="${escapeHTML(u)}"` +
                    ` title="${escapeHTML(b.split('/')[0].replace(/-/g, ' '))}" alt="">` : '';
@@ -1880,15 +1931,17 @@
         ? { html: `<a href="https://giphy.com/search/${encodeURIComponent(gifm[1].replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(message)}</a>`, names: new Set() }
         : fossa && /[⠀-⣿]/.test(message)
           ? { html: '<br>' + message.split(' ').map(escapeHTML).join('<br>'), names: new Set() }
-          : renderMessageHTML(message, tags.emotes, !!tags.bits);
+          : renderMessageHTML(message, tags.emotes, !!tags.bits, ch);
       let msgHtml = rendered.html;
       const twTail = pendingTw.splice(0).join('');
       // chatterino-style: messages made of only emotes render them bigger
       const mtoks = message.trim().split(/\s+/).filter(Boolean);
+      // usage-age stats belong to the focused channel's store; other rooms'
+      // rows would only pollute them
       for (const t of mtoks)
-        if (rendered.names.has(t) || thirdPartyEmotes[t] || EMOJI_SET.has(t)) noteEmoteUse(t);
+        if (ch === CHANNEL && (rendered.names.has(t) || emotesOf(ch)[t] || EMOJI_SET.has(t))) noteEmoteUse(t);
       const eonly = mtoks.length > 0 &&
-        mtoks.every((t) => rendered.names.has(t) || thirdPartyEmotes[t] || zeroWidth.has(t));
+        mtoks.every((t) => rendered.names.has(t) || emotesOf(ch)[t] || zwOf(ch).has(t));
       if (blammo) {
         // bracketed tags ([Roulette], [Scramble], ...) get a bold chip
         // shaded by the tag text's hash, so matching games share a hue;
@@ -1916,7 +1969,7 @@
       // a real copy of a locally-echoed message adopts the echo row:
       // it drops .local (so it persists in history) and takes the real id
       if (kind === 'PRIVMSG' && !local && auth && login === auth.login) {
-        const ek = echoKey(login, tags, rawMsg);
+        const ek = ch + '\x00' + echoKey(login, tags, rawMsg);
         const arr = echoRows.get(ek);
         // evicted echoes go stale in the bucket - skip to a live row; the
         // oldest matching echo adopts first when the key is shared
@@ -1935,9 +1988,9 @@
         }
         if (arr && !arr.length) echoRows.delete(ek);
       }
-      html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${MENTION_RE.test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
-              ` data-ts="${ts}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
-              `${reply}<span class="time">${timeStr}</span>${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
+      html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
+              ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
+              `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}${twTail}<span class="rplybtn" title="reply to this message">↩</span></div>`;
@@ -2253,24 +2306,37 @@
     return d === 1 ? ' yesterday' : d > 1 ? ` ${d} days ago` : '';
   }
 
+  // per-channel live state; the header narrates the focused one (stream),
+  // secondary channels' state only tints their row chips
+  const streamStates = {};
   function onStream(d) {
     streamHeard = true;
+    const sch = (d.channel || CHANNEL).toLowerCase();
     const uptime = typeof d.uptime === 'string' ? d.uptime : '';
+    let st;
     if (/offline|not streaming|not live|not online/i.test(uptime)) {
+      st = { live: false };
+    } else {
+      const mins = parseUptimeMinutes(uptime);
+      const viewers = parseInt((d.viewers || '').replace(/[^\d]/g, ''), 10);
+      st = {
+        live: true,
+        startedAt: mins != null ? Date.now() - mins * 60000 : null,
+        viewers: Number.isFinite(viewers) ? viewers : null,
+        title: d.title || '',
+      };
+    }
+    streamStates[sch] = st;
+    paintChTags(sch);
+    if (sch !== CHANNEL) return;
+    if (!st.live) {
       if (stream && stream.live) {
         lastRun = { started: stream.startedAt || (lastRun && lastRun.started) || null, ended: Date.now() };
         saveLastRun();
       }
       stream = { live: false };
     } else {
-      const mins = parseUptimeMinutes(uptime);
-      const viewers = parseInt((d.viewers || '').replace(/[^\d]/g, ''), 10);
-      stream = {
-        live: true,
-        startedAt: mins != null ? Date.now() - mins * 60000 : null,
-        viewers: Number.isFinite(viewers) ? viewers : null,
-        title: d.title || '',
-      };
+      stream = st;
       if (stream.startedAt && (!lastRun || lastRun.ended || lastRun.started !== stream.startedAt)) {
         lastRun = { started: stream.startedAt, ended: null, seen: Date.now() };
         saveLastRun();
@@ -2281,6 +2347,18 @@
     }
     updateHeader();
     vidState();
+  }
+
+  // channel chips tint accent while their room's stream is live
+  function paintChTags(ch) {
+    if (!MULTI) return;
+    const st = streamStates[ch];
+    for (const t of mainEl.querySelectorAll(`.chtag[data-ch="${ch}"]`)) {
+      t.classList.toggle('live', !!(st && st.live));
+      t.title = st && st.live
+        ? `#${ch} is live${st.viewers != null ? ` · ${st.viewers.toLocaleString()} viewers` : ''} - click to focus`
+        : `#${ch} - click to focus`;
+    }
   }
 
   // Favicon glyph recolored to match the status dot's computed color,
@@ -2389,10 +2467,12 @@
   // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
   const modesEl = document.getElementById('chatModes');
   let chatModesTxt = ''; // compact mode list folded into the live status line
-  function onRoomState(tags) {
+  function onRoomState(tags, ch) {
     const chips = [];
     const slow = parseInt(tags.slow || '0', 10);
-    slowSecs = slow;
+    (roomStates[ch] ||= {}).slow = slow;
+    // the header's mode chips only narrate the focused channel
+    if (ch !== CHANNEL) return;
     if (slow > 0) chips.push(`slow <b>${slow}s</b>`);
     const foll = parseInt(tags['followers-only'] || '-1', 10);
     if (foll === 0) chips.push('follow req');
@@ -2418,11 +2498,16 @@
     if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE)(?: |$)/.test(line)) {
       const parsed = parseTwitchMessage(line);
       if (!parsed) return;
-      if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags); return; }
-      // own badges/colour/display-name for the local echo of sent messages
+      if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags, (parsed.channel || '').replace(/^#/, '').toLowerCase() || CHANNEL); return; }
+      // own badges/colour/display-name for the local echo of sent messages -
+      // USERSTATE lands per channel; GLOBALUSERSTATE seeds all joined ones
       if (parsed.kind === 'USERSTATE' || parsed.kind === 'GLOBALUSERSTATE') {
-        selfTags = { ...selfTags, ...parsed.tags };
-        selfExempt = /(?:^|[,\s])(?:moderator|broadcaster|vip)\//.test(parsed.tags.badges || '');
+        const sch = (parsed.channel || '').replace(/^#/, '').toLowerCase() || CHANNEL;
+        const which = parsed.kind === 'GLOBALUSERSTATE' ? CHANNELS : [sch];
+        for (const c of which) {
+          selfTagsPer[c] = { ...selfTagsPer[c], ...parsed.tags };
+          selfExempts[c] = /(?:^|[,\s])(?:moderator|broadcaster|vip)\//.test(parsed.tags.badges || '');
+        }
         if (parsed.tags['emote-sets']) loadTwitchSets(parsed.tags['emote-sets']);
         return;
       }
@@ -3561,7 +3646,7 @@
   document.getElementById('copyUrl').addEventListener('click', (e) => {
     const b = e.currentTarget;
     const q = new URLSearchParams();
-    if (CHANNEL !== DEFAULT_CHANNEL) q.set('channel', CHANNEL);
+    if (CHANNEL !== DEFAULT_CHANNEL || MULTI) q.set('channel', CHANNELS.join(','));
     if (themeMode !== 'dark') q.set('style', themeMode);
     if (shadeIdx !== 6) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
     if (fontSel.value !== 'sourcecodepro') q.set('font', fontSel.value);
@@ -3992,7 +4077,7 @@
 
   function join() {
     if (!relayFrame.contentWindow) return;
-    relayFrame.contentWindow.postMessage({ type: 'join', channel: CHANNEL }, RELAY_ORIGIN);
+    relayFrame.contentWindow.postMessage({ type: 'join', channels: CHANNELS }, RELAY_ORIGIN);
     if (auth && auth.token)
       relayFrame.contentWindow.postMessage({ type: 'auth', token: auth.token }, RELAY_ORIGIN);
   }
@@ -4041,7 +4126,8 @@
   // the echo arrives back as an ordinary chat line.
   const AUTH_KEY = 'hasanabi-auth';
   let auth = null; // { token, login }
-  let selfTags = null; // own badges/colour from USERSTATE/GLOBALUSERSTATE
+  // own badges/colour from USERSTATE/GLOBALUSERSTATE live in selfTagsPer
+  // (keyed per channel, defined near the send UI)
   try { auth = JSON.parse(localStorage.getItem(AUTH_KEY)); } catch (e) {}
   const oauthFrag = new URLSearchParams(location.hash.slice(1));
   if (oauthFrag.get('access_token')) {
@@ -4049,39 +4135,52 @@
     try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch (e) {}
     // keep a non-default channel in the url after the token comes back
     const back = new URLSearchParams(location.search);
-    if (CHANNEL !== DEFAULT_CHANNEL) back.set('channel', CHANNEL);
+    if (CHANNEL !== DEFAULT_CHANNEL || MULTI) back.set('channel', CHANNELS.join(','));
     history.replaceState(null, '', location.pathname + (back.size ? '?' + back : ''));
   }
 
-  // timeout lock: the input is disabled with a countdown until it lapses
-  let toUntil = 0, toTimer = 0;
+  // timeout lock: the input is disabled with a countdown until it lapses.
+  // Keyed per channel - a timeout in one room leaves the others open
+  let toUntils = {}, toTimer = 0;
   // slow mode: ROOMSTATE's seconds between messages, counted down on the
-  // input after each send; mods/broadcasters/vips are exempt
-  let slowSecs = 0, slowUntil = 0, slowTimer = 0, selfExempt = false;
+  // input after each send; mods/broadcasters/vips are exempt. The countdown
+  // is per channel - sending in one room doesn't cool the others down
+  const slowUntils = {};
+  let slowTimer = 0;
+  const roomStates = {};   // channel -> { slow, ... } from ROOMSTATE
+  const selfExempts = {};  // channel -> own mod/broadcaster/vip flag
+  const selfTagsPer = {};  // channel -> own USERSTATE tags (echo dressing)
+  // where a send is headed: the reply's channel or the focused one
+  const sendTarget = () => (replyCtx && replyCtx.ch) || CHANNEL;
   function paintSlow() {
-    const left = Math.ceil((slowUntil - Date.now()) / 1000);
+    const tch = sendTarget();
+    const left = Math.ceil(((slowUntils[tch] || 0) - Date.now()) / 1000);
     if (left <= 0) {
-      slowUntil = 0; clearInterval(slowTimer); slowTimer = 0;
+      delete slowUntils[tch];
+      if (!Object.keys(slowUntils).length) { clearInterval(slowTimer); slowTimer = 0; }
       updateSendUI(); // restores the 'chat as …' placeholder
       return;
     }
-    if (!toUntil) chatInput.placeholder = `slow mode - ${left}s`;
+    if (!toUntils[tch]) chatInput.placeholder = `slow mode - ${left}s`;
   }
   function paintTimeout() {
-    const left = Math.ceil((toUntil - Date.now()) / 1000);
+    const tch = sendTarget();
+    const left = Math.ceil(((toUntils[tch] || 0) - Date.now()) / 1000);
     if (left <= 0) {
-      toUntil = 0; clearInterval(toTimer); toTimer = 0;
+      delete toUntils[tch];
+      if (!Object.keys(toUntils).length) { clearInterval(toTimer); toTimer = 0; }
       chatInput.disabled = false;
       updateSendUI();
       return;
     }
     const h = (left / 3600) | 0, m = ((left % 3600) / 60) | 0, s = left % 60;
     chatInput.disabled = true;
-    chatInput.placeholder = `timed out - ${h ? h + 'h ' : ''}${h || m ? m + 'm ' : ''}${s}s left`;
+    chatInput.placeholder = `timed out${MULTI ? ` in #${tch}` : ''} - ${h ? h + 'h ' : ''}${h || m ? m + 'm ' : ''}${s}s left`;
   }
-  function setTimedOut(until) {
+  function setTimedOut(until, ch) {
     if (until <= Date.now()) return;
-    toUntil = Math.max(toUntil, until);
+    ch = ch || CHANNEL;
+    toUntils[ch] = Math.max(toUntils[ch] || 0, until);
     paintTimeout();
     if (!toTimer) toTimer = setInterval(paintTimeout, 1000);
   }
@@ -4093,10 +4192,12 @@
       ? `Logged in as ${auth.login} - click for the chat box · ⇧click to log out`
       : 'Log in with Twitch to send messages';
     chatbarEl.hidden = !on;
-    chatInput.placeholder = on ? `chat as ${auth.login}` : 'log in to chat';
-    if (toUntil) paintTimeout();
+    chatInput.placeholder = on
+      ? `chat as ${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}` : 'log in to chat';
+    if (toUntils[sendTarget()]) paintTimeout();
     document.body.classList.toggle('chaton', on);
-    if (!on) { clearReply(); if (!epickPinned) closePicker(); }
+    // inline rather than clearReply(): that path refreshes this same UI
+    if (!on) { replyCtx = null; replyBar.hidden = true; if (!epickPinned) closePicker(); }
   }
 
   // ---- replies: pick a row with its hover ↩, then Enter sends it as a
@@ -4120,14 +4221,17 @@
       name: nameEl.textContent,
       login: decodeURIComponent(new URL(nameEl.href).pathname.slice(1)),
       body: body.replace(/^:\s*/, '').trim().slice(0, 500),
+      ch: row.dataset.ch || CHANNEL, // replies land in the row's own channel
     };
-    replyWho.textContent = replyCtx.name;
+    replyWho.textContent = replyCtx.name +
+      (MULTI && replyCtx.ch !== CHANNEL ? ` @#${replyCtx.ch}` : '');
     replyWhat.textContent = replyCtx.body.length > 80 ? replyCtx.body.slice(0, 80) + '…' : replyCtx.body;
     replyBar.hidden = false;
     chatbarEl.hidden = false;
+    updateSendUI(); // placeholder shows the reply's target channel
     chatInput.focus();
   }
-  function clearReply() { replyCtx = null; replyBar.hidden = true; }
+  function clearReply() { replyCtx = null; replyBar.hidden = true; updateSendUI(); }
   document.getElementById('replyX').addEventListener('click', clearReply);
 
   // keyboard ops with the chat bar up: ↑/↓ step a selection through rows
@@ -4166,8 +4270,8 @@
   function logout() {
     auth = null;
     selfMentionRe = null;
-    selfTags = null; // drop the old account's badges/colour and mod/vip
-    selfExempt = false; // exemption before the next login's USERSTATE lands
+    for (const c of CHANNELS) { delete selfTagsPer[c]; delete selfExempts[c]; }
+    // exemptions wait for the next login's USERSTATEs to land
     retagKw();
     try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
     if (relayFrame.contentWindow)
@@ -4184,7 +4288,7 @@
     } else {
       location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
         '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
-        (CHANNEL !== DEFAULT_CHANNEL ? '&state=' + encodeURIComponent(CHANNEL) : '') +
+        (CHANNEL !== DEFAULT_CHANNEL || MULTI ? '&state=' + encodeURIComponent(CHANNELS.join(',')) : '') +
         '&response_type=token&scope=' +
         encodeURIComponent('chat:read chat:edit user:read:chat user:write:chat');
     }
@@ -4280,7 +4384,8 @@
   function sendChat() {
     // timed-out blocks outright; a running slow-mode countdown holds sends
     // until its zero (the text stays put for a retry)
-    if (toUntil || slowUntil > Date.now()) return;
+    const target = sendTarget();
+    if (toUntils[target] || (slowUntils[target] || 0) > Date.now()) return;
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
     // /me goes out as a CTCP ACTION like other clients send it. Twitch adds
@@ -4292,10 +4397,10 @@
     const ctx = /^\/[a-z]/i.test(text) ? null : replyCtx;
     const body = act ? `\x01ACTION ${inner}\x01` : inner;
     const shown = !ctx ? body : act ? `\x01ACTION @${ctx.name} ${inner}\x01` : `@${ctx.name} ${inner}`;
-    relayFrame.contentWindow.postMessage({ type: 'send', text: body, replyTo: ctx }, RELAY_ORIGIN);
+    relayFrame.contentWindow.postMessage({ type: 'send', channel: target, text: body, replyTo: ctx }, RELAY_ORIGIN);
     // twitch doesn't echo own messages back over IRC - render locally,
-    // dressed with the badges/colour USERSTATE reported
-    const me = selfTags || {};
+    // dressed with the badges/colour the target channel's USERSTATE reported
+    const me = selfTagsPer[target] || {};
     const echoMsg = { tags: { ...me, id: 'local-' + Date.now(),
       'display-name': me['display-name'] || auth.login,
       'tmi-sent-ts': String(Date.now()),
@@ -4303,10 +4408,10 @@
         'reply-parent-display-name': ctx.name,
         'reply-parent-user-login': ctx.login,
         'reply-parent-msg-body': ctx.body } : {}) }, login: auth.login,
-      kind: 'PRIVMSG', message: shown, local: true };
+      kind: 'PRIVMSG', message: shown, channel: '#' + target, local: true };
     queueMessage(echoMsg, false);
     if (chan) chan.postMessage({ type: 'echo', msg: echoMsg });
-    pendingEcho.push(echoKey(auth.login, echoMsg.tags, shown));
+    pendingEcho.push(target + '\x00' + echoKey(auth.login, echoMsg.tags, shown));
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     // sending a parked draft closes its slot and lands it at the end
     // like any send; other slots' indexes shift down with the splice
@@ -4328,8 +4433,9 @@
     if (ctx) clearReply();
     chatInput.value = shelved || '';
     growInput();
-    if (slowSecs > 0 && !selfExempt) {
-      slowUntil = Date.now() + slowSecs * 1000;
+    const tSlow = (roomStates[target] || {}).slow || 0;
+    if (tSlow > 0 && !selfExempts[target]) {
+      slowUntils[target] = Date.now() + tSlow * 1000;
       paintSlow();
       if (!slowTimer) slowTimer = setInterval(paintSlow, 1000);
     }
@@ -5010,8 +5116,12 @@
   if (chan) chan.addEventListener('message', (e) => {
     const m = e.data;
     if (!m || m.type !== 'echo' || !m.msg || m.msg.kind !== 'PRIVMSG') return;
+    // a sibling tab may watch a different channel set - only echo rooms
+    // this page actually joined
+    const ech = (m.msg.channel || '').replace(/^#/, '') || CHANNEL;
+    if (!CHANNELS.includes(ech)) return;
     queueMessage(m.msg, false);
-    pendingEcho.push(echoKey(m.msg.login, m.msg.tags || {}, m.msg.message));
+    pendingEcho.push(ech + '\x00' + echoKey(m.msg.login, m.msg.tags || {}, m.msg.message));
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
   });
 
@@ -5028,6 +5138,19 @@
   };
   standaloneMQ.addEventListener('change', pwaNote);
   pwaNote();
+
+  // every '*' channel-switch link gets a '+' twin that appends the channel
+  // to the current ?channel= list - a merged multi-room log
+  for (const a of document.querySelectorAll('a.chsw[href^="?channel="]')) {
+    const target = (a.getAttribute('href').split('=')[1] || '').toLowerCase();
+    if (!target || CHANNELS.includes(target) || CHANNELS.length >= 6) continue;
+    const add = a.cloneNode(false);
+    add.textContent = '+';
+    add.classList.add('chadd');
+    add.href = `?channel=${[...CHANNELS, target].join(',')}`;
+    add.title = `merge #${target} into this page's chats`;
+    a.after(add);
+  }
 
   window.addEventListener('message', (event) => {
     if (event.origin !== RELAY_ORIGIN || event.source !== relayFrame.contentWindow) return;
@@ -5066,26 +5189,41 @@
       loadStep(3, 'metadata loaded - waiting for messages…');
       onStream(d);
     } else if (d.type === 'emotes') {
+      const ech = (d.channel || CHANNEL).toLowerCase();
+      chanSets[ech] = {
+        emotes: d.emotes || {},
+        emoteSrc: d.emoteSrc || {},
+        emoteUse: d.emoteUse || {},
+        emoteAnim: new Set(d.emoteAnim || []),
+        zeroWidth: new Set(d.zeroWidth || []),
+        badges: d.badges || {},
+      };
       loadStep(3, 'emotes loaded - waiting for messages…');
-      thirdPartyEmotes = d.emotes || {};
-      emoteSrc = d.emoteSrc || {};
-      emoteUse = d.emoteUse || {};
-      emoteAnim = new Set(d.emoteAnim || []);
-      zeroWidth = new Set(d.zeroWidth || []);
-      badgeSets = d.badges || {};
+      // rows from any channel retokenize; the picker's source maps and the
+      // broadcast/VOD bookkeeping only care about the focused channel
+      if (ech === CHANNEL) {
+        thirdPartyEmotes = chanSets[ech].emotes;
+        emoteSrc = chanSets[ech].emoteSrc;
+        emoteUse = chanSets[ech].emoteUse;
+        emoteAnim = chanSets[ech].emoteAnim;
+        zeroWidth = chanSets[ech].zeroWidth;
+        badgeSets = chanSets[ech].badges;
+      }
       retokenizeRows();
-      if (!emotePick.hidden) rebuildPicker();
+      if (ech === CHANNEL && !emotePick.hidden) rebuildPicker();
       // lastBroadcast.startedAt is actually the last run's END for an
       // offline channel; the VOD carries the real start and end
-      const lb = d.lastBroadcast && Date.parse(d.lastBroadcast.startedAt);
-      const vs = d.lastVod && Date.parse(d.lastVod.start);
-      const ve = d.lastVod && Date.parse(d.lastVod.end);
-      let changed = false;
-      if (lb && lb !== lbEnd) { lbEnd = lb; changed = true; }
-      if (vs && ve > vs && (!lastVod || lastVod.end !== ve)) {
-        lastVod = { start: vs, end: ve }; changed = true;
+      if (ech === CHANNEL) {
+        const lb = d.lastBroadcast && Date.parse(d.lastBroadcast.startedAt);
+        const vs = d.lastVod && Date.parse(d.lastVod.start);
+        const ve = d.lastVod && Date.parse(d.lastVod.end);
+        let changed = false;
+        if (lb && lb !== lbEnd) { lbEnd = lb; changed = true; }
+        if (vs && ve > vs && (!lastVod || lastVod.end !== ve)) {
+          lastVod = { start: vs, end: ve }; changed = true;
+        }
+        if (changed) updateHeader();
       }
-      if (changed) updateHeader();
     } else if (d.type === 'twsets') {
       // the relay answers with the key it was asked for. A reply for a
       // superseded ask still carries valid sets - merge it rather than

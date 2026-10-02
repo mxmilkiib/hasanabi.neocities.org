@@ -35,6 +35,17 @@ not versions — the page ships continuously to Neocities.
   restorative / transformative sub-groups, and a new `codes of conduct`
   section links confcoc, contributor covenant, geek feminism, citizen
   coc and safety first pdx
+- Multi-channel watching: `?channel=a,b,c` (up to 6) joins several rooms
+  into one merged log. The first channel stays focused (title, stream
+  status, video, chat target, storage keys); each row carries a `#chan`
+  chip that refocuses on click and tints accent while its room is live.
+  Emote/badge sets, USERSTATE/self badges, ROOMSTATE modes, timeouts and
+  slow-mode countdowns all key per channel; replies post to the row's
+  own room; room-wide `/clear` only wipes that channel's rows; the
+  channel-switch `*` links gain a `+` twin that merges a channel into the
+  current list. The relay JOINs each channel on one socket, polls decapi
+  and the emote providers per channel (global sets fetched once per
+  cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
 - Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,
