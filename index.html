@@ -2850,7 +2850,7 @@
     else if (a.classList.contains('helpFontFam')) { fontSel.selectedIndex = +a.dataset.idx; applyFont(); saveOpts(); }
     else if (a.classList.contains('helpPreset')) { applyPreset(a.dataset.preset); saveOpts(); }
     else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
-    else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; applyHelpW(); const s = readHsize(); delete s.w; writeHsize(s); saveOpts(); }
+    else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px'; applyHelpW(); const s = readHsize(); delete s.w; delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a width pick also docks the panel top-right
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
     else if (a.classList.contains('helpFs')) { helpFs = +a.dataset.idx - 1; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }

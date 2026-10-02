@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Picking a popup width also docks the panel top-right - the dragged
+  position clears and its saved x/y drops; a dragged height stays
 - Links-view row icon pins to text presentation (🔗︎) so it renders
   monochrome like the rest of the list
 - Star badge swaps the hand-rolled tile for the real ghbtns.com
