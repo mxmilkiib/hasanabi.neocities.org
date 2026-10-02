@@ -5,3 +5,4 @@ LICENSE
 README.md
 .nojekyll
 eslint.config.mjs
+page-scan.js
