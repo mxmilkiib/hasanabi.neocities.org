@@ -1680,7 +1680,7 @@
         aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? '[md]' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
-      const subHtml = `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? ' -- ' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
+      const subHtml = `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? ' --&#160;' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the
@@ -2999,7 +2999,7 @@
         sub = document.createElement('span');
         sub.className = 'role sub';
         sub.title = 'No subscriber months reported';
-        sub.textContent = ' -- ';
+        sub.textContent = ' --\u00a0';
       }
       // the left-mode anchor: the sub chip leads, then aux, both ahead of
       // the badge icons - matching the order new rows render with
@@ -3015,7 +3015,7 @@
         // restyle the chip text to match: [sub 12] vs compact [12]
         const months = (sub.title || sub.dataset.tt) === 'No subscriber months reported'
           ? ' -- ' : sub.textContent.replace(/\D/g, '');
-        if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? ' -- ' : '[sub --]')
+        if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? ' --\u00a0' : '[sub --]')
           : mode.startsWith('num') ? `[${months.padStart(2, '0')}]` : `[sub ${months}]`;
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
