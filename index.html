@@ -1926,12 +1926,12 @@
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
     if (qt && tg) {
       // the quote's content box starts 13px in either padding scheme;
-      // the tag's right margin stretches so ' ↩ name:' lands just past
-      // the responder's nick (-12 = 16px '↩ ' lead minus 4px overshoot)
+      // the tag's right margin stretches so ' ↩ name:' lands ~2-3 spaces
+      // past the responder's nick (16px '↩ ' lead minus 14px overshoot)
       qt.style.marginLeft = (tg.offsetLeft - 13) + 'px';
-      qt.style.marginRight = Math.max(1, nm.offsetLeft - 12 - tg.offsetLeft - qt.offsetWidth) + 'px';
+      qt.style.marginRight = Math.max(1, nm.offsetLeft - 2 - tg.offsetLeft - qt.offsetWidth) + 'px';
     } else {
-      rq.style.paddingLeft = (nm.offsetLeft - 12 - rq.offsetLeft - 2) + 'px';
+      rq.style.paddingLeft = (nm.offsetLeft - 2 - rq.offsetLeft - 2) + 'px';
     }
   }
   function flush() {
