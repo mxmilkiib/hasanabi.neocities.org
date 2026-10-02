@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- Resources gains a 'dual power' block under codes of conduct: the
+  dualpower.app dsa lsc strategy doc and medics for the people move in,
+  joined by the bsa dual power map, cooperation jackson, mutual aid
+  disaster relief, big door brigade, food not bombs, the us federation
+  of worker coops and ripess
+- Emote picker gains an ✕ close button right of the pin
 - urls inside notice/system-msg text, reply quotes and fossa columns now
   linkify - they bypassed renderTextHTML so they rendered as raw text
 - Theme slots: three store/recall buttons under the copy-settings-URL
@@ -50,6 +56,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Popup borders moved to a 60% accent mix so they read as accent-tinted
+  frames, distinct from the dim-mix button borders inside them
 - Help panel: content scrolling under the sticky tab row now fades out
   via a panel-coloured gradient tail, and the authors tab's sections
   stop interleaving - #authSections's display:contents was losing to the
@@ -86,10 +94,11 @@ not versions — the page ships continuously to Neocities.
   the alternation stays in step per visual line
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
-  tooltip) tint their borders 40% toward the style's accent
+  tooltip) tint their borders 60% toward the style's accent
 - Emote-picker era rungs whose window spans an unwatched stretch (tab
-  hidden, socket dropped, page closed) border purple instead of accent,
-  flagging that the usage count may be understated
+  hidden, socket dropped, page closed) get a dotted purple border instead
+  of the standard accent dash, flagging that the usage count may be
+  understated
 
 ## 2026-10-01
 
