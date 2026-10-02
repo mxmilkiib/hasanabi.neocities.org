@@ -51,8 +51,11 @@ not versions — the page ships continuously to Neocities.
 
 ### Fixes & polish
 - Rate/chatters header text now matches the stream stats size (it was
-  computing against the header font, not .channel's 1.27em), and the
-  chatters tally moved left of the spark graph
+  computing against the header font, not .channel's 1.27em); the chatters
+  tally moved inside the .channel block so it shares the stats' baseline,
+  persists across reloads via the spark save, and hides at zero
+- Chat mode chips no longer shrink - 'follow req' can't ellipsize off
+  its duration value; stream-info takes the truncation instead
 - Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,
   `--` and `md` instead of `[12]`, ` -- ` and `[md]`
 - `hasan-last-run` now carries the channel suffix like the history and

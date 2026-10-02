@@ -262,7 +262,9 @@
   @media (prefers-reduced-motion: reduce) {
     .dot.connecting, .dot.reconnecting { animation: none; }
   }
-  .chat-modes { font-size: .93em; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  /* flex-shrink 0: the mode chips are short status info - let stream-info
+     take all the truncation instead of clipping 'follow req' off its value */
+  .chat-modes { font-size: .93em; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
   /* @N chip: mentions that arrived while the page wasn't focused */
   .missed {
     font-size: .78em;
@@ -288,6 +290,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* the chatters tally sits inside .channel so it shares .stream-info's
+     baseline; the same .93em lands on the same effective size there */
+  .channel .rate { font-size: .93em; font-weight: 400; white-space: nowrap; }
   .rate {
     /* .stream-info sits inside .channel's 1.27em - this mirrors its
        effective size so the stats text and rate read identically */
@@ -949,8 +954,8 @@
 </head>
 <body>
   <header>
-    <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" hidden></span></div>
-    <span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register"></span> <canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
+    <div class="channel"><span class="dot connecting" id="dot" title="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
+    <canvas id="spark" title="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back">–</button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.35)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
   </header>
@@ -2234,7 +2239,7 @@
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
   function saveSpark() {
     try {
-      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, glorp: glorpSamples }));
+      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, glorp: glorpSamples, chat: [...chatterSeen] }));
     } catch (e) {}
   }
   function restoreSpark() {
@@ -2247,6 +2252,12 @@
         document.wasDiscarded ? 'tab discarded by browser' : 'page closed']);
       rateSamples.push(...d.rate.slice(-win).map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN));
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
+      // keep the rolling chatter tally going across a reload - entries
+      // already older than the hour window come back to expire at once
+      if (Array.isArray(d.chat)) {
+        const cut = Date.now() - 60 * 60e3;
+        for (const [who, t] of d.chat) if (t >= cut) chatterSeen.set(who, t);
+      }
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
       if (glorpSamples.length > win) glorpSamples.splice(0, glorpSamples.length - win);
     } catch (e) {}
@@ -2276,6 +2287,7 @@
       for (const [who, t] of chatterSeen) if (t < chatCut) chatterSeen.delete(who);
     }
     const nc = chatterSeen.size;
+    chattersEl.hidden = !nc;
     chattersEl.innerHTML = nc ? `<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
     rateSamples.push(rate);
     if (rateSamples.length > sparkWin) rateSamples.shift();
