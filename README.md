@@ -98,7 +98,9 @@ in `index.html` must be an app registered at dev.twitch.tv with this
 page's URL as its redirect URI. Chat-scoped tokens live in localStorage
 until logout; channel rules (slow mode etc.) apply to sent messages and
 rejections come back as ordinary `[notice]` rows. A `➤` button sends
-for pointer/voice-only users, slow mode counts down in the input, and
+for pointer/voice-only users, slow mode counts down in the input, the
+box grows a line at a time as a long draft wraps (⇧`enter` writes a
+newline, capped at five lines before scrolling), and
 typing a character anywhere jumps into the box — `↑`/`↓` select a row
 and `r`/`enter` replies to it. Accessibility: a hidden live region
 announces new lines to screen readers (history replays skipped), the

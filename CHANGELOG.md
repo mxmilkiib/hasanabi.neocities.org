@@ -70,6 +70,10 @@ not versions — the page ships continuously to Neocities.
   overlap margin are rounded in `syncLh()`, so every row boundary lands
   on a device pixel and paused columns no longer wiggle fractionally on
   each trim/append
+- The message input is a growing textarea: a wrapping draft gains a
+  line at a time up to five before scrolling, and ⇧enter writes a
+  newline (plain enter still sends). Arrow-key history only hijacks
+  `↑` on a single-line draft
 - IRC-style input history: `↑`/`↓` walk sent messages, the draft is
   stashed on the first `↑` and restored by `↓`
 - Emote picker: sections per provider (7TV / BTTV / FFZ / Twitch /

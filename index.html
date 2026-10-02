@@ -740,7 +740,7 @@
     background: var(--panel);
   }
   #chatbar[hidden] { display: none; }
-  #chatbar input {
+  #chatbar input, #chatbar textarea {
     flex: 1;
     background: var(--bg);
     font-family: var(--chat-ff, inherit);
@@ -749,8 +749,15 @@
     text-align: left;
     width: auto;
   }
-  #chatbar input::placeholder { color: var(--text-dim); }
-  #chatbar input:focus { outline: 1px solid var(--accent); outline-offset: 0; }
+  /* the message box is a one-row textarea that grows a line at a time as
+     the draft wraps, capping at five lines before scrolling */
+  #chatbar textarea {
+    resize: none; height: auto; min-height: 26px; max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 8px);
+    overflow-y: hidden; line-height: 1.25; padding: 3px 8px; box-sizing: border-box;
+  }
+  #chatbar { align-items: flex-end; }
+  #chatbar input::placeholder, #chatbar textarea::placeholder { color: var(--text-dim); }
+  #chatbar input:focus, #chatbar textarea:focus { outline: 1px solid var(--accent); outline-offset: 0; }
   /* emote picker popup over the chatbar - chatterino-style scrollable grid */
   #emojiBtn { flex: none; font-size: 1.5em; }
   #emotePick {
@@ -881,7 +888,7 @@
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
-    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input, ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups</span></div>
+    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups</span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -937,7 +944,7 @@
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message"><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button></div>
+  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div>
 
 <script>
@@ -3451,6 +3458,7 @@
       const t = '@' + nm.textContent + ' ';
       const at = chatInput.selectionStart ?? chatInput.value.length;
       chatInput.value = chatInput.value.slice(0, at) + t + chatInput.value.slice(chatInput.selectionEnd ?? at);
+      growInput();
       chatbarEl.hidden = false;
       chatInput.focus();
       chatInput.setSelectionRange(at + t.length, at + t.length);
@@ -3906,6 +3914,7 @@
       chatInput.focus();
       chatInput.value += e.key;
       chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+      growInput();
     }
   });
 
@@ -3949,16 +3958,33 @@
     if (n >= hist.length) { histIdx = null; chatInput.value = histDraft; }
     else { histIdx = Math.max(0, n); chatInput.value = hist[histIdx]; }
     chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+    growInput();
   };
 
+  // the box grows a line at a time as the draft wraps; the css max-height
+  // caps it and the scrollbar kicks in past that. Programmatic writes
+  // (send, history, inserts) call this after changing the value
+  const growInput = () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = chatInput.scrollHeight + 'px';
+    chatInput.style.overflowY = chatInput.scrollHeight > chatInput.clientHeight ? 'auto' : 'hidden';
+  };
+  chatInput.addEventListener('input', growInput);
+
   chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp' && (histIdx !== null || hist.length)) { e.preventDefault(); histGo(-1); return; }
+    // history walk hijacks arrows only on a single-line draft - once the
+    // text wraps, arrows belong to the caret (walking resumes on the way out)
+    if (e.key === 'ArrowUp' && (histIdx !== null || (hist.length && !chatInput.value.includes('\n')))) {
+      e.preventDefault(); histGo(-1); return;
+    }
     if (e.key === 'ArrowDown' && histIdx !== null) { e.preventDefault(); histGo(1); return; }
     if (e.key === 'Escape') {
       if (!emotePick.hidden) return; // the document handler closes the picker
       if (replyCtx) { clearReply(); return; }
     }
-    if (e.key !== 'Enter' || e.isComposing) return;
+    // ⇧enter writes a newline into the box; plain enter sends
+    if (e.key !== 'Enter' || e.isComposing || e.shiftKey) return;
+    e.preventDefault();
     sendChat();
   });
 
@@ -3997,6 +4023,7 @@
     histIdx = null; histDraft = '';
     if (ctx) clearReply();
     chatInput.value = '';
+    growInput();
     if (slowSecs > 0 && !selfExempt) {
       slowUntil = Date.now() + slowSecs * 1000;
       paintSlow();
@@ -4468,6 +4495,7 @@
     const s = chatInput.selectionStart ?? chatInput.value.length;
     const pad = s > 0 && !/\s/.test(chatInput.value[s - 1]) ? ' ' : '';
     chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
+    growInput();
     chatInput.focus();
   });
   // the picker closes via ☻ or esc (or stays up when 📌 pinned);
