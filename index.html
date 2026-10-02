@@ -845,7 +845,8 @@
   #chatbar input::placeholder, #chatbar textarea::placeholder { color: var(--text-dim); }
   #chatbar input:focus, #chatbar textarea:focus { outline: 1px solid var(--accent); outline-offset: 0; }
   /* emote picker popup over the chatbar - chatterino-style scrollable grid */
-  #emojiBtn { flex: none; font-size: 1.5em; }
+  /* pull it a touch toward the input/char-count, push the send button away */
+  #emojiBtn { flex: none; font-size: 1.5em; margin-left: -2px; margin-right: 4px; }
   #emotePick {
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
     width: 480px; max-width: 94vw; height: 420px;
