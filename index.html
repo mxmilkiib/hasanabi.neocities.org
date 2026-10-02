@@ -3721,6 +3721,16 @@
     helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
     markHelp('helpW', helpWIdx);
     helpWCur.textContent = '';
+    // a dragged panel is left-anchored, so growing the width would spill
+    // off the right edge - push it left; if the right edge was already at
+    // the viewport edge it stays pinned there
+    if (helpPanel.style.left && !helpPanel.hidden) {
+      const r = helpPanel.getBoundingClientRect();
+      if (r.right > innerWidth) {
+        helpPanel.style.left = Math.max(0, innerWidth - r.width) + 'px';
+        saveHsize(''); // '' skips w/h - position only
+      }
+    }
   }
   // a dragged width isn't one of the stops - note it in brackets
   const markHelpW = (w) => { helpWCur.textContent = w ? ` (${w}px)` : ''; };

@@ -110,6 +110,8 @@ not versions — the page ships continuously to Neocities.
 - Resources justice section gains an anarchist subgroup: an
   anarchist faq 'what about crime?', ferrell's against the law,
   and the 1976 instead of prisons handbook
+- Width picks on a drag-positioned help popup now push it left
+  so the right edge stays inside (or pinned to) the viewport edge
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) use a hue-neutral --popline border: white on dark shades,
