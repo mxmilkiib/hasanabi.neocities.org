@@ -4338,7 +4338,7 @@
       chatPick.innerHTML = `chat as @${escapeHTML(auth.login)} → ` +
         CHANNELS.map((c) =>
           `<a data-ch="${escapeHTML(c)}" href="#" class="${c === tgt ? 'on' : ''}" ` +
-          `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' · ');
+          `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' / ');
       chatInput.placeholder = '';
     }
     chatPick.style.left = (chatInput.offsetLeft + 8) + 'px';
