@@ -2994,7 +2994,7 @@
   function setPing(on) { pingOn = on; markHelp('helpPing', on ? 1 : 0); }
   // clean-url mode rewrites the visible text of every link anchor rendered
   // with data-u (the raw display text); the href is untouched either way
-  let cleanUrls = false;
+  let cleanUrls = true;
   function setCleanUrls(on) { cleanUrls = on; markHelp('helpClean', on ? 1 : 0); applyCleanUrls(); }
   function applyCleanUrls() {
     mainEl.querySelectorAll('a[data-u]').forEach((a) => {
