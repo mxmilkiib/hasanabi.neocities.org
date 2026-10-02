@@ -1988,7 +1988,12 @@
         }
         if (arr && !arr.length) echoRows.delete(ek);
       }
-      html += `<div data-new class="row${(zFlip = !zFlip) ? ' z' : ''}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
+      // a reply's quote block renders as its own line above the message, so
+      // it consumes a second stripe slot - the following row's parity then
+      // matches what strict per-line alternation would give
+      const zc = (zFlip = !zFlip) ? ' z' : '';
+      if (reply) zFlip = !zFlip;
+      html += `<div data-new class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
