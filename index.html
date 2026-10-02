@@ -272,8 +272,9 @@
   /* flex-shrink 0: the mode chips are short status info - let stream-info
      take all the truncation instead of clipping 'follow req' off its value */
   .chat-modes { font-size: .93em; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
-  /* @N chip: mentions that arrived while the page wasn't focused */
-  .missed {
+  /* @N chip: mentions that arrived while the page wasn't focused
+     (scoped to the header chip - .eage.missed rungs are unrelated) */
+  #missed.missed {
     font-size: .78em;
     color: var(--accent);
     border: 1px solid var(--accent);
@@ -1009,7 +1010,7 @@
   /* a lit era whose window spans a stretch the page wasn't watching -
      the count could be understated, so the border turns purple and its
      ants thin to dots, clearly broken against the standard rungs */
-  #emoteGrid .eage.lit.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
+  #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
   @keyframes eage-ants-missed { to { stroke-dashoffset: -5; } }
   #emoteGrid .eage.t0 { opacity: .9; color: var(--accent); }
@@ -5022,7 +5023,7 @@
           } else {
             const lit = t0age >= mk.t;
             const lbl = mk.t >= 36e5 ? `${mk.t / 36e5}h` : `${mk.t / 6e4}m`;
-            m += `<div class="eage${lit ? ' lit' : ''}${lit && mk.missed ? ' missed' : ''}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}` : `only ${t0mins}m recorded so far`}">${ANTS}${lbl}</div>`;
+            m += `<div class="eage${lit ? ' lit' : ''}${mk.missed ? ' missed' : ''}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lbl}</div>`;
           }
         }
         return m + render(x);
