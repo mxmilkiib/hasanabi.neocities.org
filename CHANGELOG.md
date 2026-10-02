@@ -59,6 +59,11 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- @hasanabi and @ostonox get the bots' shimmer: their sender nicks shine
+  when they speak, and @-mentions of them in message text sparkle too
+- Mid-edge resize arrows (◀ ▶ ▼) fade in on hover over the help, emote
+  and video popups alongside the corner glyphs, each dragging its own
+  edge with the opposite side anchored
 - Bot command reference moved above the copy-settings button in the
   help popup, the appendix daggers now use relative positioning so they
   stay with their text when the panel scrolls (absolute had anchored

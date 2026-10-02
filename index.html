@@ -536,7 +536,7 @@
   }
   .name { font-weight: 600; margin-right: 3px; text-decoration: none; }
   .name:hover { text-decoration: underline; }
-  .name.shimmer, .row a.shimmer {
+  .name.shimmer, .row a.shimmer, .row .at.shimmer {
     color: transparent;
     background-image: linear-gradient(100deg, var(--accent) 35%, #fff6d8 50%, var(--accent) 65%);
     background-size: 200% 100%;
@@ -545,7 +545,7 @@
     animation: shimmer 2.5s linear infinite;
   }
   @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-  @media (prefers-reduced-motion: reduce) { .name.shimmer, .row a.shimmer { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .name.shimmer, .row a.shimmer, .row .at.shimmer { animation: none; } }
   /* Negative vertical margins keep the line box at the fixed line-height
      while the image paints above and below the row. */
   .emote { height: 1.5em; vertical-align: middle; margin: -.35em 1px; }
@@ -1587,7 +1587,11 @@
       }
       else {
       const at = tok.match(/^(@\w+)(.*)$/s);
-      if (at) out.push(`<b class="at">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]));
+      // @hasanabi and @ostonox mentions get the bots' shimmer treatment
+      if (at) {
+        const shiny = /^(hasanabi|ostonox)$/i.test(at[1].slice(1));
+        out.push(`<b class="at${shiny ? ' shimmer' : ''}">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]));
+      }
       // Fear& / Fear& PODCAST shout-outs get bolded; the bold wraps the
       // PODCAST token too when it directly follows.
       else {
@@ -2073,6 +2077,8 @@
       const fossa = (login || name).toLowerCase() === 'fossabot';
       const blammo = (login || name).toLowerCase() === 'blammobot';
       const shimmer = fossa || blammo;
+      // nicks that shimmer like the bots when they speak or are @-ed
+      const shinyNick = shimmer || /^(hasanabi|ostonox)$/i.test(login || name);
       const points = tags['msg-id'] === 'highlighted-message';
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim()) ||
                     (fossa && /trigger is pulled.*bullet fired/i.test(message));
@@ -2176,7 +2182,7 @@
       html += `<div data-new class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
-              `<a class="name${shimmer ? ' shimmer' : ''}"${shimmer ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
+              `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}${twTail}<span class="rplybtn" title="reply to this message">↩</span></div>`;
     }
