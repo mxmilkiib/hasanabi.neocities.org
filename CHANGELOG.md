@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- README's client comparison table grows to 31 rows, swaps plain
+  ticks for ✅/❌ and names each floss client's licence
 - `yt channels` gains the young turks (`news · tw *`), between
   breaking points and secular talk
 - `re Hasan` gains `fear& pod`, `wikipedia`, `hasanabi wiki` and

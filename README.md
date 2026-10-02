@@ -376,16 +376,34 @@ Where this sits relative to the usual suspects:
 |---|---|---|---|---|---|---|---|---|
 | form factor | one web page | web chat panel | iframe/popout | desktop app | desktop app (Java) | web overlay | Android app | iOS/Android app |
 | install / build | none, static file | none | none | app install | JRE | none | Play / F-Droid | app stores |
-| runs on strict-CSP static hosts | ✓ (relay iframe) | n/a | embed-domain rules | n/a | n/a | partial | n/a | n/a |
-| send chat (login) | ✓ implicit OAuth | ✓ | ✓ | ✓ | ✓ | — | ✓ (+whispers) | ✓ |
-| replies | quoted block, jump-back | ✓ threads | collapsed thread | ✓ | ✓ | — | ✓ | ✓ |
-| polls / predictions / points | — | ✓ | — | partial | — | — | ✓ | partial |
-| 7TV / BTTV / FFZ | ✓ animated, zero-width stacks | — (extensions) | native only | ✓ | ✓ | partial | ✓ | ✓ |
-| backfill after suspend/resume | ✓ (robotty) | recent only | — | ✓ | — | — | history search | — |
-| msgs/sec graph, gap & burst marks | ✓ | — | — | — | — | — | — | — |
-| theming / accessibility fonts | palettes × 9-stop shade axis | light/dark | light/dark | extensive | extensive | CSS params | accent palettes | ✓ |
-| multi-channel | `?channel=` per tab | per page | per embed | tabs/splits | tabs | URL param | tabs | ✓ |
-| second-screen / PWA install | ✓ | — | — | — | — | — | — | — |
+| runs on strict-CSP static hosts | ✅ (relay iframe) | n/a | embed-domain rules | n/a | n/a | partial | n/a | n/a |
+| send chat (login) | ✅ implicit OAuth | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (+whispers) | ✅ |
+| replies | quoted block, jump-back | ✅ threads | collapsed thread | ✅ | ✅ | ❌ | ✅ | ✅ |
+| polls / predictions / points | ❌ | ✅ | ❌ | partial | ❌ | ❌ | ✅ | partial |
+| 7TV / BTTV / FFZ | ✅ animated, zero-width stacks | ❌ (extensions) | native only | ✅ | ✅ | partial | ✅ | ✅ |
+| backfill after suspend/resume | ✅ (robotty) | recent only | ❌ | ✅ | ❌ | ❌ | history search | ❌ |
+| msgs/sec graph, gap & burst marks | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| theming / accessibility fonts | palettes × 9-stop shade axis | light/dark | light/dark | extensive | extensive | CSS params | accent palettes | ✅ |
+| multi-channel | `?channel=` per tab | per page | per embed | tabs/splits | tabs | URL param | tabs | ✅ |
+| second-screen / PWA install | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| emote picker | ✅ usage stats + era marks | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| nick / emote completion | ❌ (names via click) | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| input draft history (↑/↓) | ✅ readline-style | ✅ | partial | ❌ | ❌ | n/a | ❌ | ❌ |
+| keyword / block-word filters | ✅ kw + bw | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| mention alerts | ✅ chip + opt. ping | partial | partial | ✅ sound/toast | ✅ | partial | ✅ | ✅ |
+| link / media cards | ✅ x-cards, gifs, imgs | partial | partial | ✅ hover previews | partial | ❌ | ❌ | ❌ |
+| emote-only enlargement | ✅ 3 modes | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| gap notices (missed spans) | ✅ timed + cause | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| scrollback limit | ✅ 250–100k | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| draft length warn | ✅ fossa + 500 cap | ❌ | ❌ | ❌ | ❌ | n/a | ❌ | ❌ |
+| usercard / mod UI | ❌ slash cmds pass through | ✅ | partial | ✅ | ✅ | ❌ | ✅ | partial |
+| whispers | ❌ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| stream stats line | ✅ uptime·viewers·chatters | viewers/uptime | ❌ | partial | ✅ | ❌ | partial | partial |
+| stream video alongside | ✅ drag/resize overlay | ✅ | ❌ | ❌ | partial ext. | ❌ | ❌ | ❌ |
+| multi-column log | ✅ 2-3 page-flip | ❌ | ❌ | ✅ splits | partial | ❌ | ❌ | ❌ |
+| screen-reader landmarks | ✅ live region + feeds | partial | partial | ❌ | ❌ | ❌ | partial | partial |
+| config as shareable url | ✅ settings-as-query | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| free/libre/open source | ✅ AGPL | ❌ | ❌ | ✅ MIT | ✅ GPLv3+ | ✅ GPLv3 | ✅ MIT | ✅ AGPLv3 |
 
 Broad strokes only — feature sets drift; Chatterino in particular is the
 much deeper client if one lives at a desktop, the Twitch site carries
