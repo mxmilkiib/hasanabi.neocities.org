@@ -1826,6 +1826,9 @@
         const k = pendingEcho.shift();
         if (k) {
           echoRows.set(k, r);
+          // persists so a restored echo can still be adopted; encoded since
+          // the key holds a literal NUL that markup reparse would mangle
+          r.dataset.ek = encodeURIComponent(k);
           if (echoRows.size > 50) echoRows.delete(echoRows.keys().next().value);
         }
       }
@@ -3624,12 +3627,13 @@
       // ghost rows are still real messages - keep them, but strip the
       // stale marker and fade so they restore as ordinary rows (kept
       // markers would corrupt the next session's ghost bookkeeping).
-      // ghostgap spacers and local echoes stay excluded.
+      // ghostgap spacers stay excluded; local echoes save with their
+      // data-ek key so a real copy arriving after restore adopts them.
       const rows = [];
       const limit = Math.min(HISTORY_SAVE_MAX, MAX_MESSAGES);
       for (const col of (revFlow ? c : [...c.slice(i + 1), ...c.slice(0, i + 1)].reverse())) {
         for (let r = col.lastElementChild; r && rows.length < limit; r = r.previousElementSibling)
-          if (r.classList.contains('row') && !r.classList.contains('ghostgap') && !r.classList.contains('local')) rows.push(r);
+          if (r.classList.contains('row') && !r.classList.contains('ghostgap')) rows.push(r);
         if (rows.length >= limit) break;
       }
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.reverse().map((r) => {
@@ -3659,6 +3663,10 @@
       }
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
+      // echoes kept their send-time key - re-register them so a real copy
+      // arriving through backfill adopts the row instead of duplicating it
+      for (const el of logEl.querySelectorAll('.row.local[data-ek]'))
+        echoRows.set(decodeURIComponent(el.dataset.ek), el);
       dedupeLinks();
       // continue the stripe alternation from the restored tail
       zFlip = !!(logEl.lastElementChild && logEl.lastElementChild.classList.contains('z'));
@@ -3685,6 +3693,9 @@
   document.body.appendChild(relayFrame);
 
   let joined = false;
+  // start of a socket outage, so the next gap notice can name its cause;
+  // 'down' here means the relay reported a non-connected state after a join
+  let downAt = 0;
 
   function join() {
     if (!relayFrame.contentWindow) return;
@@ -4504,15 +4515,24 @@
     const d = event.data;
     if (!d) return;
     if (d.type === 'status') {
+      const wasJoined = joined;
       setStatus(d.state);
       joined = d.state === 'connected';
       if (joined) wsCause = '';
       if (joined) {
+        if (downAt) {
+          away.push([downAt, Date.now(), 'socket dropped']);
+          if (away.length > 50) away.shift();
+          downAt = 0;
+        }
         clearInterval(joinTimer); backfill();
+        // robotty ingests on its own lag - a trailing pass catches lines
+        // (own sent messages) that missed the first snapshot
+        setTimeout(backfill, 45000);
         // tweet previews requested before the socket was up wait for this
         tweetWait.forEach((id) =>
           relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN));
-      }
+      } else if (wasJoined && !downAt) downAt = Date.now();
       if (emptyEl) {
         if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
         else if (d.state === 'reconnecting') emptyLabel.textContent = 'socket dropped - retrying…';

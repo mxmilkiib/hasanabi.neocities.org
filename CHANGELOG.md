@@ -122,6 +122,14 @@ not versions — the page ships continuously to Neocities.
 - Slash commands pass through to Twitch as it reads them (/timeout,
   /ban, /announce, /raid…); they drop a pending reply tag rather than
   carrying it, and no longer clear an armed reply
+- Sent-message echoes survive reloads - local echo rows persist with
+  their adoption key and re-register on restore, so a real copy arriving
+  late through backfill still adopts the row in place instead of the
+  message vanishing; a trailing backfill 45s after connect covers the
+  relay's ingest lag on just-sent lines
+- Socket outages join the away windows - a drop while the page stayed
+  open now tags the eventual gap notice 'socket dropped' instead of
+  leaving it unexplained
 - Tweet video thumbs play inline: a click swaps the thumbnail for a
   muted-loop GIF or a controls+autoplay player (the direct mp4 URL was
   already in the relay payload); shift-click still opens x.com
