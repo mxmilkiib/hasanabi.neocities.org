@@ -6,7 +6,6 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
-- Emote picker gains an ✕ close button right of the pin
 - urls inside notice/system-msg text, reply quotes and fossa columns now
   linkify - they bypassed renderTextHTML so they rendered as raw text
 - Theme slots: three store/recall buttons under the copy-settings-URL
@@ -51,6 +50,11 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Help panel: content scrolling under the sticky tab row now fades out
+  via a panel-coloured gradient tail, and the authors tab's sections
+  stop interleaving - #authSections's display:contents was losing to the
+  .htabpage grid rule on specificity so the section rows were being
+  dealt into the wrapper's own two columns
 - Rate/chatters header text now matches the stream stats size (it was
   computing against the header font, not .channel's 1.27em); the chatters
   tally moved inside the .channel block so it shares the stats' baseline,
