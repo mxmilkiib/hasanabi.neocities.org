@@ -809,6 +809,9 @@
   /* the * after a twitch stream retargets the whole page at that channel */
   #helpPanel a.chsw { margin-left: .5em; font-weight: 700; text-decoration: none; }
   #helpPanel a.chadd { margin-left: 2px; color: var(--text-dim); }
+  /* a joined stream's entry reads in azure - a hue apart from the
+     accent/red/green/amber/violet colours already in use */
+  #helpPanel i.chon a.at { color: #5f9dff; }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run long (name + work + dates), so wider columns there */
   #htabAuth .linkcols { columns: 30em; }
@@ -1128,6 +1131,14 @@
   // right-aligns on the same edge
   if (MULTI) document.documentElement.style.setProperty('--chw',
     (Math.max(...CHANNELS.map((c) => c.length)) + 1.4) + 'ch');
+  // resources: tint the entry for each stream the page has joined
+  document.querySelectorAll('a.chsw').forEach((a) => {
+    const m = /[?&]channel=([^&]+)/.exec(a.search || '');
+    if (m && CHANNELS.includes(decodeURIComponent(m[1]))) {
+      const it = a.closest('i');
+      if (it) it.classList.add('chon');
+    }
+  });
   const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? 'HasanAbi' : CHANNEL;
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;

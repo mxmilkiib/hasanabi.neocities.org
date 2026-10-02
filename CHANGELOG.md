@@ -114,6 +114,8 @@ not versions — the page ships continuously to Neocities.
   so the right edge stays inside (or pinned to) the viewport edge
 - Multi-channel #tags right-align on a shared edge, the column
   sized by the longest joined channel name
+- Joined streams stand out in the resources list: any entry whose
+  * switch targets a joined channel goes azure, yt-section *s too
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) use a hue-neutral --popline border: white on dark shades,
