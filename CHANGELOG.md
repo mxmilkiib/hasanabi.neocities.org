@@ -32,6 +32,9 @@ not versions — the page ships continuously to Neocities.
 - Resources tab: `channels` split into **yt channels** and **twitch
   streams**, each streamer carrying a `*` that switches the page to
   them; both rows grouped by kind, streamers ordered by followers
+- Creators present on both platforms are cross-linked - yt-channel
+  entries that stream get `tw`/`*` links, and twitch-stream entries
+  that upload get `yt` links
 
 ### Chat & rendering
 - Page-flip ghost rows rest lighter (45% -> 62% opacity) while the fade
@@ -80,6 +83,8 @@ not versions — the page ships continuously to Neocities.
 - Emote picker orders each section by channel usage: the relay folds
   StreamElements' per-emote chatstats into `emoteUse` and most-used
   emotes lead, uncharted ones keeping the name-stem sort
+- In use-sorted sections a dashed `1h` cell marks where last-seen chat
+  use ages past an hour; emotes not used this session sit below it
 - Emote picker gets an `anim`/`still` filter pair in the toolbar: the
   relay now flags each third-party emote's animation state from 7TV,
   BTTV and FFZ provider metadata (`emoteAnim`), Twitch sets use their

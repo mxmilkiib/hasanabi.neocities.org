@@ -148,8 +148,8 @@ no dependencies beyond CDN-hosted fonts:
   striping (highlighted rows keep their own colour), graduated text shadow, font picker (incl. dyslexia-friendly),
   font size, weight, line height, row separator shades, three-state
   timestamps (off / no seconds / seconds), five sub-chip modes (right /
-  compact `[NN]` / before badges / compact-left / hidden; a dim `[--]`
-  or `[sub --]` marks chatters Twitch reported no month count for),
+  compact `[NN]` / before badges / compact-left / hidden; a dim `[  ]`
+  or `[sub   ]` marks chatters Twitch reported no month count for),
   emote-only row modes,
   page-flip columns (two, or three in landscape) — a full column hands
   its overflow to the next, whose old page lingers as faded ghost rows
