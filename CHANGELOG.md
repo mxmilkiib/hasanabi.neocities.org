@@ -6,6 +6,7 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- `re Hasan` gains `ideologie shop` and `ostonox` (youtube) tail links
 - Emote picker header reshuffles: search, pin and ✕ hold the first row,
   the six option buttons join the source-tab line pushed right, and the
   group drops to its own line when the popup is resized thin
