@@ -342,7 +342,7 @@
     text-align: center;
   }
   #vid .vid-handle::after {
-    content: '⠿⠿⠿⠿⠿⠿⠿';
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #vid:hover .vid-handle, #vid.dragging .vid-handle { opacity: 1; }
   #vid .vid-size {
@@ -761,7 +761,7 @@
     text-align: center;
     opacity: 0; transition: opacity .15s; touch-action: none; }
   #helpPanel .hp-handle::after {
-    content: '⠿⠿⠿⠿⠿⠿⠿';
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #helpPanel:hover .hp-handle, #helpPanel.dragging .hp-handle { opacity: 1; }
   /* corner glyphs mirror the stream overlay's resize grips - they fade in
@@ -804,6 +804,8 @@
   /* height: auto lets the ✕ stretch to the tab row's height instead of
      using the taller hdr-btn height */
   #helpPanel .htabs button { flex: none; padding: 0 8px; height: auto; }
+  /* the emote picker's ✕ takes the same look as the help panel's */
+  #emotePick #emoteX { flex: none; width: auto; padding: 0 8px; height: auto; }
   /* 9em of popup font keeps the glyph column aligned at any popup font
      size while fitting the longest labels ("radicals & labour" etc) */
   #helpPanel .htabpage > div, #helpPanel #authSections > div { margin: 4px 0; display: grid; grid-template-columns: 9em 1fr; gap: 0 8px; }
@@ -938,7 +940,7 @@
     text-align: center;
     opacity: 0; transition: opacity .15s; touch-action: none; }
   #emotePick .epick-handle::after {
-    content: '⠿⠿⠿⠿⠿⠿⠿';
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #emotePick:hover .epick-handle, #emotePick.dragging .epick-handle { opacity: 1; }
   /* corner glyphs mirror the stream overlay's resize grips - they fade in
@@ -1146,7 +1148,7 @@
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button><button class="hdr-btn esort" id="emoteX" type="button" title="close the picker">✕</button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div></div>
 
 <script>
 (() => {
@@ -5187,7 +5189,7 @@
     const move = (ev) => {
       emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
       emotePick.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
-      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
     };
     const drop = () => {
       emotePick.classList.remove('dragging');
@@ -5781,7 +5783,7 @@
     const move = (ev) => {
       helpPanel.style.right = 'auto';
       helpPanel.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
-      helpPanel.style.top = Math.max(0, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+      helpPanel.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
     };
     const drop = () => {
       helpPanel.classList.remove('dragging');
