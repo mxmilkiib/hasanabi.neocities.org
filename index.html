@@ -652,6 +652,11 @@
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07)); }
   /* the quoted author's name carries the mention accent */
   .reply.rq b { color: var(--accent); }
+  /* the quote's channel tag hangs in the row's tag column, left of the
+     band - 13px undoes its margin+border+padding (plain 3+2+8 and zebra
+     0+2+11 both inset the same), so the tag aligns with the tags on
+     ordinary lines and the quote text starts where they do */
+  .reply.rq .chtag { margin-left: -13px; }
   /* the quoted text is italic, but unicode runs stay upright - italic
      font faces lack their glyphs (same dodge as .twcard) */
   .reply.rq .up { font-style: normal; }
@@ -2041,7 +2046,7 @@
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
         reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
-                `↩ <b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span>`;
+                `${chTag}↩ <b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       const lkey = linkKeyOf(message);
@@ -3951,7 +3956,7 @@
       return;
     }
     const chip = e.target.closest('.reply');
-    if (!chip) return;
+    if (!chip || e.target.closest('a')) return;
     const target = rowById.get(chip.dataset.pid);
     if (!target || !target.isConnected) { rowById.delete(chip.dataset.pid); return; }
     target.scrollIntoView({ block: 'center' });
