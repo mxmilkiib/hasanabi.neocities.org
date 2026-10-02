@@ -639,6 +639,9 @@
     cursor: pointer;
   }
   button.hdr-btn { width: 30px; padding: 0; text-align: center; }
+  /* theme slots stretch to share the row; a filled slot reads heavier */
+  #slotRow .slot { flex: 1; width: auto; opacity: .55; }
+  #slotRow .slot.full { opacity: 1; font-weight: 700; }
   /* the block glyphs sit heavier than their neighbours, and ▮▮▮ overflows
      the fixed-width button at full size */
   #splitBtn { font-size: .78em; }
@@ -907,6 +910,12 @@
     <div style="margin-top: 8px"><b></b><span>block words - comma separated; a chat line containing one is hidden:</span></div>
     <input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
     <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
+    <div id="slotRow" style="margin-top: 6px; display: flex; gap: 6px; align-items: center">
+      <span style="font-size: .85em; color: var(--text-dim)">theme slots</span>
+      <button class="hdr-btn slot" data-i="0">➊</button>
+      <button class="hdr-btn slot" data-i="1">➋</button>
+      <button class="hdr-btn slot" data-i="2">➌</button>
+    </div>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
     <div><b>blammobot</b><span class="linkcols xtra wider"><i><b>games</b>!roulette [amount|all] (gamble points on red/black) · !trivia (answer questions for points) · !scramble (unscramble the word)</i><i><b>points</b>!points (check balance) · !top [count] (leaderboard)</i></span></div>
     <div><b>fossabot</b><span class="linkcols xtra wider"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
@@ -2668,31 +2677,36 @@
   // otherwise write partially-applied state back over the source bundle
   let suppressSave = false;
 
+  // the full display-option bundle - what saveOpts persists and what a
+  // theme slot stashes
+  function curOpts() {
+    return {
+      font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode, shade: shadeIdx,
+      lines: lineLevel,
+      hdrmin: document.body.classList.contains('hdrmin'),
+      hdrgraph: document.body.classList.contains('hdrgraph'),
+      subMode,
+      zebra: mainEl.classList.contains('zebra'),
+      pause: pauseOnText,
+      scrollback: MAX_MESSAGES,
+      rev: revFlow,
+      times: timeIdx,
+      shadow: shadLevel,
+      eonly: emoteMode,
+      help: helpMode,
+      video: !vidBox.hidden,
+      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0,
+      hpw: helpWIdx, hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
+      hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
+      split: 1 + !sideEl.hidden + !side2El.hidden,
+    };
+  }
   function saveOpts() {
     try {
       // init calls saveOpts before this declaration line; the try swallows
       // the TDZ throw the same way it already did for OPTS_KEY
       if (suppressSave) return;
-      localStorage.setItem(OPTS_KEY, JSON.stringify({
-        font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode, shade: shadeIdx,
-        lines: lineLevel,
-        hdrmin: document.body.classList.contains('hdrmin'),
-        hdrgraph: document.body.classList.contains('hdrgraph'),
-        subMode,
-        zebra: mainEl.classList.contains('zebra'),
-        pause: pauseOnText,
-        scrollback: MAX_MESSAGES,
-        rev: revFlow,
-        times: timeIdx,
-        shadow: shadLevel,
-        eonly: emoteMode,
-        help: helpMode,
-        video: !vidBox.hidden,
-        kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0,
-        hpw: helpWIdx, hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
-        hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
-        split: 1 + !sideEl.hidden + !side2El.hidden,
-      }));
+      localStorage.setItem(OPTS_KEY, JSON.stringify(curOpts()));
     } catch (e) {}
   }
 
@@ -3443,6 +3457,53 @@
       .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
       .catch(() => { b.textContent = url; });
   });
+
+  // ---- theme slots: three stashable option bundles. Click recalls a
+  // filled slot (or stores into an empty one); shift-click/right-click
+  // overwrites a filled slot with the current options ----
+  const SLOTS_KEY = 'hasan-slots';
+  let slots = [null, null, null];
+  const slotEls = [...document.querySelectorAll('#slotRow .slot')];
+  function readSlots() {
+    try {
+      const s = JSON.parse(localStorage.getItem(SLOTS_KEY));
+      if (Array.isArray(s))
+        slots = [0, 1, 2].map((i) => (s[i] && typeof s[i] === 'object' ? s[i] : null));
+    } catch (e) {}
+  }
+  function saveSlots() {
+    try { localStorage.setItem(SLOTS_KEY, JSON.stringify(slots)); } catch (e) {}
+  }
+  function slotTip(b, i) {
+    if (!b) return `theme slot ${i + 1}: empty - click to store the current options`;
+    const px = Number.isInteger(b.size) ? ` ${FONT_SIZES[b.size]}px` : '';
+    const ft = b.font && FONT_STACKS[b.font] ? ` ${b.font}` : '';
+    return `theme slot ${i + 1}: ${b.theme || 'dark'}·${b.shade == null ? 'auto' : b.shade}${px}${ft} - click to recall, shift/right-click to overwrite`;
+  }
+  function paintSlots() {
+    slotEls.forEach((el, i) => {
+      el.classList.toggle('full', !!slots[i]);
+      el.title = slotTip(slots[i], i);
+    });
+  }
+  readSlots();
+  paintSlots();
+  slotEls.forEach((el, i) => {
+    el.addEventListener('click', (e) => {
+      if (slots[i] && !e.shiftKey) {
+        try { suppressSave = true; applyOpts(slots[i]); markPresets(); }
+        finally { suppressSave = false; }
+        saveOpts();
+      } else {
+        slots[i] = curOpts(); saveSlots(); paintSlots();
+      }
+    });
+    el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      slots[i] = curOpts(); saveSlots(); paintSlots();
+    });
+  });
+
   document.getElementById('resetOpts').addEventListener('click', () => {
     try {
       localStorage.removeItem(OPTS_KEY);
@@ -3450,6 +3511,7 @@
       localStorage.removeItem(HISTORY_KEY);
       localStorage.removeItem(SPARK_KEY);
       localStorage.removeItem(LASTRUN_KEY);
+      localStorage.removeItem(SLOTS_KEY);
     } catch (e) {}
     location.reload();
   });
@@ -4717,6 +4779,9 @@
       try { suppressSave = true; applyOpts(JSON.parse(e.newValue)); markPresets(); }
       catch (err) {}
       finally { suppressSave = false; }
+    } else if (e.key === SLOTS_KEY) {
+      readSlots(); // repaint slot fills written by another tab
+      paintSlots();
     } else if (e.key === AUTH_KEY) {
       if (e.newValue) {
         let a = null;

@@ -5,6 +5,13 @@ not versions — the page ships continuously to Neocities.
 
 ## 2026-10-02
 
+### Additions
+- Theme slots: three store/recall buttons under the copy-settings-URL
+  button hold whole option bundles; click recalls (stores when empty),
+  shift/right-click overwrites, and slots sync across open tabs
+- GitHub Pages mirror at mxmilkiib.github.io/hasanabi.neocities.org
+- Emote-picker era markers pulse out of phase via staggered delays
+
 ### Fixes & polish
 - Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,
   `--` and `md` instead of `[12]`, ` -- ` and `[md]`

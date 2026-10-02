@@ -237,6 +237,10 @@ no dependencies beyond CDN-hosted fonts.
   click, shift+click (reverse) and the scroll wheel. In the popup the
   style and preset links render as live swatches — background, text
   colour and, for presets, the bundled font.
+- Three **theme slots** under the copy-settings-URL button stash whole
+  option bundles — click recalls a filled slot (or stores the current
+  options into an empty one), ⇧click/right-click overwrites; they sync
+  across open tabs and clear with `reset all settings`.
 
 ### Formatting extras
 
