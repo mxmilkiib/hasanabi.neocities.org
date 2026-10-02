@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- `yt channels` gains the young turks (`news · tw *`), between
+  breaking points and secular talk
 - `re Hasan` gains `fear& pod`, `wikipedia`, `hasanabi wiki` and
   `twitchtracker` links ahead of the merch tail
 - `re Hasan` gains `ideologie shop` and `ostonox` (youtube) tail links
