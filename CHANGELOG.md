@@ -64,6 +64,10 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Chatbar tightens: the empty char-count stops reserving 2.5ch
+  between the box and the emote button, and the emote/send buttons
+  now match the one-line textarea height so their tops sit flush
+  instead of floating low
 - Help-popup tab row gets breathing room: the first tab and the ✕
   no longer sit flush against the sticky bar's edges
 - The twitch-streams legend's * and + now render in the accent

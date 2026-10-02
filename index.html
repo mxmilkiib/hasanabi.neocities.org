@@ -923,7 +923,7 @@
     box-shadow: 0 0 0 1px var(--cc); }
   /* character count beside the box: amber past the long-message guess,
      red near twitch's 500 cap; the box border tints along with it */
-  #chatLen { flex: none; align-self: flex-end; padding: 0 1px 6px; min-width: 2.5ch;
+  #chatLen { flex: none; align-self: flex-end; padding: 0 0 6px; min-width: 0;
     text-align: right; font-size: .7em; color: var(--text-dim); opacity: .5; }
   #chatLen.warn { color: var(--accent); opacity: 1; }
   #chatLen.over { color: var(--danger); opacity: 1; }
@@ -935,7 +935,11 @@
   /* pull it a touch toward the input/char-count, push the send button away */
   /* the glyph is scaled up in markup - a modest font-size + clipped box
      keeps it inside the 30x26 button in every state */
-  #emojiBtn { flex: none; font-size: 1.3em; margin-left: -4px; margin-right: 4px; overflow: hidden; }
+  #emojiBtn { flex: none; font-size: 1.3em; margin-left: -2px; margin-right: 2px; overflow: hidden; }
+  /* match the buttons' height to a one-line textarea (lh*font + pad + border,
+     min-height floor) so their tops sit flush instead of bottom-aligning
+     short against the box */
+  #emojiBtn, #msgSend { height: max(26px, calc(var(--chat-font, 15px) * 1.25 + 8px)); }
   #emotePick {
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
     width: 480px; max-width: 94vw; height: 420px;
