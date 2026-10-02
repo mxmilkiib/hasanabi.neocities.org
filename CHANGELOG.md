@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Resource separators get real margins (7px/5px, was 1px/0) so the
+  sections read as blocks
 - Popup ✕ buttons go bold, matching the tab links
 - Channel line nudges a pixel off the header top - a touch more air
   above the status text, a touch less below
