@@ -2241,14 +2241,14 @@
     const cutoff = now - 5000;
     recentTimestamps = recentTimestamps.filter((t) => t > cutoff);
     const rate = recentTimestamps.length / 5;
-    rateEl.textContent = (rate ? rate.toFixed(1) : '-.-') + ' msgs/sec';
+    rateEl.innerHTML = `<b>${rate ? rate.toFixed(1) : '-.-'}</b> msgs/sec`;
     // evict chatters whose last message rolled out of the hour window
     if (chatterSeen.size) {
       const chatCut = now - 60 * 60e3;
       for (const [who, t] of chatterSeen) if (t < chatCut) chatterSeen.delete(who);
     }
     const nc = chatterSeen.size;
-    chattersEl.textContent = nc ? (nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc) + ' chatters' : '';
+    chattersEl.innerHTML = nc ? `<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
     rateSamples.push(rate);
     if (rateSamples.length > sparkWin) rateSamples.shift();
     const gcut = Date.now() - 1000;
