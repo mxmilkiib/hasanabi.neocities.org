@@ -80,12 +80,17 @@ not versions — the page ships continuously to Neocities.
   toggle for a names
   list view; `name - source` tooltips; case-insensitive sort; animated
   FFZ in its own section
-- Emote picker orders each section by channel usage: the relay folds
-  StreamElements' per-emote chatstats into `emoteUse` and most-used
-  emotes lead, uncharted ones keeping the name-stem sort
+- Emote picker orders each section by usage: most-recently-used in chat
+  first, with the relay folding StreamElements' per-emote chatstats into
+  `emoteUse` for tie-breaks and never-seen emotes ordered by lifetime
+  count; live counts and last-use times persist across reloads
 - In use-sorted sections dashed `10m`/`20m`/`30m` cells mark where
-  last-seen chat use ages past each threshold; emotes not used this
-  session sit below them all
+  last-seen chat use ages past each threshold; emotes never seen sit
+  below them all
+- The picker's Twitch emote sections actually load now: the ivr.fi ask
+  re-posts until the relay answers (it could drop while the iframe was
+  still loading), replies for superseded asks merge instead of being
+  dropped, and the relay accepts long `emote-sets` lists
 - Emote picker gets an `anim`/`still` filter pair in the toolbar: the
   relay now flags each third-party emote's animation state from 7TV,
   BTTV and FFZ provider metadata (`emoteAnim`), Twitch sets use their

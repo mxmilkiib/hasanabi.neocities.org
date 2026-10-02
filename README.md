@@ -177,10 +177,13 @@ no dependencies beyond CDN-hosted fonts:
   with search, a
   `recent` row of the last 24 used, still/animated filters, and
   resizable from its left and top edges (size persists). Ordering can be
-  alphabetical or by channel usage (StreamElements chatstats via the
-  relay, plus live session counts); in usage mode the sections sort
-  busiest-first and reshuffles animate emotes sliding to their new
-  spots, while a just-used emote flashes behind its cell. Clicking
+  alphabetical or by usage — most recently used in chat first (StreamElements
+  chatstats via the relay seed lifetime counts for tie-breaks, live session
+  use updates both and persists across reloads); in usage mode the sections
+  sort busiest-first, dashed `10m`/`20m`/`30m` cells sit at the points where
+  emotes were last used over that long ago, and reshuffles animate emotes
+  sliding to their new spots, while a just-used emote flashes behind its
+  cell. Clicking
   inserts at the caret and the panel stays open until `☻` or `Esc`.
 - **Channels** — `?channel=login` points chat, stream embed and status
   at another streamer for the visit; history, graph and tab-sync keys

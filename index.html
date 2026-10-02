@@ -904,7 +904,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <main><div class="col" id="log"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" hidden></div><div class="col" id="side2" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
+  <div id="chatbar" hidden><div id="replyBar" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat"><button class="hdr-btn" id="emojiBtn" type="button"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><div id="emotePick" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
 
 <script>
 (() => {
@@ -3890,15 +3890,28 @@
   let twSetsKey = '';      // set list confirmed loaded
   let twSetsPending = '';  // key asked of the relay, awaiting a reply
   let twSetsAsk = 0;
+  let twSetsTries = 0;
+  let twSetsRetry = 0;
   function loadTwitchSets(ids) {
     // ivr.fi fetch happens in the relay - this page's CSP allows only
     // 'self' connections
     const key = [...new Set(['0', ...ids.split(',')])].filter(Boolean).join(',');
     if (key === twSetsKey) return;
     if (key === twSetsPending && Date.now() - twSetsAsk < 5000) return;
-    twSetsPending = key; twSetsAsk = Date.now();
+    twSetsPending = key; twSetsAsk = Date.now(); twSetsTries = 0;
     if (relayFrame.contentWindow)
       relayFrame.contentWindow.postMessage({ type: 'twsets', ids: key }, RELAY_ORIGIN);
+    // the post drops silently if the relay iframe is still loading, so keep
+    // re-asking until a reply lands; a dead relay gives up and frees the key
+    // for the next picker open to retry
+    if (!twSetsRetry) twSetsRetry = setInterval(() => {
+      if (!twSetsPending) { clearInterval(twSetsRetry); twSetsRetry = 0; return; }
+      if (Date.now() - twSetsAsk < 3000) return;
+      if (++twSetsTries > 6) { twSetsPending = ''; return; }
+      twSetsAsk = Date.now();
+      if (relayFrame.contentWindow)
+        relayFrame.contentWindow.postMessage({ type: 'twsets', ids: twSetsPending }, RELAY_ORIGIN);
+    }, 3000);
   }
   // names view: each emote gets its name alongside, in a wider list grid
   const EPICK_NAMES_KEY = 'hasan-epicknames';
@@ -4002,8 +4015,26 @@
   const EMOJI_SET = new Set(EMOJIS);
   // live usage: emotes seen in chat bump a session count folded into the
   // use-sort, flash their picker button, and lazily resort the open grid
-  const liveUse = {};
-  const useTs = {}
+  // session-use counts and last-seen times, persisted so the use sort and
+  // its age markers keep working across a reload instead of going cold
+  const savedUse = (() => { try { return JSON.parse(localStorage.getItem('hasan-emoteuse')) || {}; } catch (e) { return {}; } })();
+  const liveUse = savedUse.n || {};
+  const useTs = savedUse.t || {};
+  let useSaveTimer = 0;
+  const saveUse = () => {
+    if (useSaveTimer) return;
+    useSaveTimer = setTimeout(() => {
+      useSaveTimer = 0;
+      // cap the map: on overflow, evict the stalest entries first
+      const ks = Object.keys(useTs);
+      if (ks.length > 6000) {
+        ks.sort((a, b) => useTs[a] - useTs[b]);
+        for (const k of ks.slice(0, ks.length - 6000)) { delete useTs[k]; delete liveUse[k]; }
+      }
+      try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs })); } catch (e) {}
+    }, 4000);
+  };
+  addEventListener('pagehide', () => { try { localStorage.setItem('hasan-emoteuse', JSON.stringify({ n: liveUse, t: useTs })); } catch (e) {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   let resortTimer = 0;
@@ -4050,6 +4081,7 @@
   function noteEmoteUse(n) {
     liveUse[n] = (liveUse[n] || 0) + 1;
     useTs[n] = Date.now();
+    saveUse();
     if (emotePick.hidden) return;
     flashSet.add(n);
     poke(n);
@@ -4063,9 +4095,10 @@
     if (epickSort === 'use' && !resortTimer)
       resortTimer = setTimeout(() => { resortTimer = 0; rebuildPicker(); }, 1500);
   }
-  // most-used first; uncharted emotes keep the family/name order
+  // most-recently-used first so the age markers land at real era boundaries;
+  // emotes never seen fall to the bottom, still ordered by lifetime count
   const useOf = (n) => (emoteUse[n] || 0) + (liveUse[n] || 0);
-  const byUse = (a, b) => useOf(b) - useOf(a) || byFam(a, b);
+  const byUse = (a, b) => (useTs[b] || 0) - (useTs[a] || 0) || useOf(b) - useOf(a) || byFam(a, b);
   const pickerSort = () => epickSort === 'az' ? byFam : byUse;
   function buildPicker() {
     const q = emoteQ.value.trim().toLowerCase();
@@ -4124,7 +4157,7 @@
       for (const s of sets) {
         const g = s.emoteList.filter((e) => hit(e.code) && animOk(e.assetType === 'ANIMATED'))
           .sort(epickSort === 'az' ? (a, b) => byName(a.code, b.code)
-              : (a, b) => useOf(b.code) - useOf(a.code) || byName(a.code, b.code));
+              : (a, b) => (useTs[b.code] || 0) - (useTs[a.code] || 0) || useOf(b.code) - useOf(a.code) || byName(a.code, b.code));
         if (!g.length) continue;
         const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                     : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
@@ -4331,14 +4364,14 @@
       }
       if (changed) updateHeader();
     } else if (d.type === 'twsets') {
-      // the relay answers with the key it was asked for; a stale or
-      // mismatched reply is dropped, an empty one leaves the key free so
-      // the next picker open retries
-      if (d.key !== twSetsPending) return;
-      twSets = (d.sets || []).filter((s) => s && s.emoteList && s.emoteList.length);
-      if (twSets.length) twSetsKey = d.key;
-      else twSetsPending = '';
-      if (!emotePick.hidden) buildPicker();
+      // the relay answers with the key it was asked for. A reply for a
+      // superseded ask still carries valid sets - merge it rather than
+      // dropping; an empty reply for the live ask frees the key to retry
+      const sets = (d.sets || []).filter((s) => s && s.emoteList && s.emoteList.length);
+      const have = new Set(twSets.map((s) => s.setID));
+      for (const s of sets) if (!have.has(s.setID)) twSets.push(s);
+      if (d.key === twSetsPending) { if (sets.length) twSetsKey = d.key; twSetsPending = ''; }
+      if (sets.length && !emotePick.hidden) buildPicker();
     } else if (d.type === 'auth') {
       if (d.error) {
         auth = null;
