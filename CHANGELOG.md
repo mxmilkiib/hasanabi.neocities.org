@@ -59,6 +59,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Chatters tally gains a '·' separator before the count, matching the
+  status line's middot convention
 - Popup borders moved to a 60% accent mix so they read as accent-tinted
   frames, distinct from the dim-mix button borders inside them
 - Help panel: content scrolling under the sticky tab row now fades out
