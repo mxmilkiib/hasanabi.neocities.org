@@ -59,6 +59,10 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Bot command reference moved above the copy-settings button in the
+  help popup, the appendix daggers now use relative positioning so they
+  stay with their text when the panel scrolls (absolute had anchored
+  them to the fixed panel), and popup borders mute to a dimmer grey mix
 - Chatters tally gains a '·' separator before the count, matching the
   status line's middot convention
 - Popup borders moved to a 60% accent mix so they read as accent-tinted

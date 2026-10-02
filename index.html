@@ -311,7 +311,7 @@
     width: min(460px, 92vw);
     aspect-ratio: 16/9;
     z-index: 8;
-    border: 1px solid color-mix(in srgb, var(--text) 55%, var(--line));
+    border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--line));
     background: #000;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .45);
   }
@@ -360,7 +360,7 @@
     z-index: 50;
     background: var(--panel);
     color: var(--text);
-    border: 1px solid color-mix(in srgb, var(--text) 55%, var(--line));
+    border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--line));
     border-radius: 4px;
     padding: 3px 8px;
     font-size: 11px;
@@ -707,7 +707,7 @@
     display: flex;
     flex-direction: column;
     background: var(--panel);
-    border: 1px solid color-mix(in srgb, var(--text) 55%, var(--line));
+    border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--line));
     border-radius: 6px;
     padding: 0;
     font-size: min(var(--chat-font, 15px), 18px); /* follow chat, capped */
@@ -801,7 +801,9 @@
   #helpPanel .linkcols.wider { columns: 30em; }
   /* command-group titles head their block in the bot command lists */
   #helpPanel .linkcols > i > b { display: block; font-size: .88em; }
-  #helpPanel sup { position: absolute; font-size: .7em; margin-left: 2px; transform: translateY(-3px); }
+  /* relative not absolute - absolute anchored to the fixed panel, so the
+     daggers stayed pinned while the text beneath them scrolled away */
+  #helpPanel sup { position: relative; top: -3px; font-size: .7em; margin-left: 1px; }
   #helpPanel b.fn { color: var(--text); }
   #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 0 5px; border-radius: 3px; border: 1px solid var(--line); }
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLines { color: var(--accent); cursor: pointer; text-decoration: none; }
@@ -851,7 +853,7 @@
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
     width: 480px; max-width: 94vw; height: 420px;
     display: flex; flex-direction: column; gap: 6px; padding: 3px 8px 8px;
-    background: var(--panel); border: 1px solid color-mix(in srgb, var(--text) 55%, var(--line));
+    background: var(--panel); border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--line));
     border-radius: 6px;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
@@ -1012,6 +1014,9 @@
     <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
     <div style="margin-top: 8px"><b></b><span>block words - comma separated; a chat line containing one is hidden:</span></div>
     <input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
+    <div><b>blammobot</b><span class="linkcols xtra wider"><i><b>games</b>!roulette [amount|all] (gamble points on red/black) · !trivia (answer questions for points) · !scramble (unscramble the word)</i><i><b>points</b>!points (check balance) · !top [count] (leaderboard)</i></span></div>
+    <div><b>fossabot</b><span class="linkcols xtra wider"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
+    <div><b></b><span>this page colours each game's [tag] chip and bolds answers, rolls and point counts</span></div>
     <button id="copyUrl" class="hdr-btn" style="margin-top: 8px; width: 100%; height: 26px">copy settings url</button>
     <div id="slotRow" style="margin-top: 6px; display: flex; gap: 6px; align-items: center">
       <span style="font-size: .85em; color: var(--text-dim)">theme slots</span>
@@ -1020,9 +1025,6 @@
       <button class="hdr-btn slot" data-i="2">➌</button>
     </div>
     <button id="resetOpts" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">reset all settings</button>
-    <div><b>blammobot</b><span class="linkcols xtra wider"><i><b>games</b>!roulette [amount|all] (gamble points on red/black) · !trivia (answer questions for points) · !scramble (unscramble the word)</i><i><b>points</b>!points (check balance) · !top [count] (leaderboard)</i></span></div>
-    <div><b>fossabot</b><span class="linkcols xtra wider"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
-    <div><b></b><span>this page colours each game's [tag] chip and bolds answers, rolls and point counts</span></div>
     </div>
     <div class="htabpage" id="htabRes" hidden>
     <div><b>re Hasan</b><span><a class="at" href="https://www.youtube.com/@HasanAbi" target="_blank" rel="noopener">youtube</a> · <a class="at" href="https://x.com/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://www.tiktok.com/@hasandpiker" target="_blank" rel="noopener">tiktok</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">hascord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://hasanhub.com/" target="_blank" rel="noopener">hasanhub</a> (clips) · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a> (<a class="at" href="https://youtu.be/zoEWotQKiCo" target="_blank" rel="noopener">original</a>)</span></div>
