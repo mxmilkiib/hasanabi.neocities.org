@@ -362,6 +362,9 @@
   #vid .vid-size.bl { left: 0; bottom: 0; cursor: nesw-resize; }
   #vid .vid-size.tr { right: 0; top: 0; cursor: nesw-resize; }
   #vid .vid-size.tl { left: 0; top: 0; cursor: nwse-resize; }
+  #vid .vid-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+  #vid .vid-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+  #vid .vid-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
   #vid:hover .vid-size, #vid.dragging .vid-size { opacity: 1; }
   #tt {
     position: fixed;
@@ -774,6 +777,9 @@
   #helpPanel .hp-size.bl { left: 0; bottom: 0; cursor: nesw-resize; }
   #helpPanel .hp-size.tr { right: 0; top: 0; cursor: nesw-resize; }
   #helpPanel .hp-size.tl { left: 0; top: 0; cursor: nwse-resize; }
+  #helpPanel .hp-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+  #helpPanel .hp-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+  #helpPanel .hp-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
   #helpPanel:hover .hp-size, #helpPanel.dragging .hp-size { opacity: 1; }
   #helpPanel b { color: var(--accent); font-weight: 600; }
   #helpPanel b .dot { display: inline-block; vertical-align: middle; }
@@ -962,6 +968,9 @@
   #emotePick .ep-size.bl { left: 0; bottom: 0; cursor: nesw-resize; }
   #emotePick .ep-size.tr { right: 0; top: 0; cursor: nesw-resize; }
   #emotePick .ep-size.tl { left: 0; top: 0; cursor: nwse-resize; }
+  #emotePick .ep-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+  #emotePick .ep-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+  #emotePick .ep-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
   #emotePick:hover .ep-size, #emotePick.dragging .ep-size { opacity: 1; }
   #emotePick .erow { flex: none; display: flex; gap: 6px; }
   #emotePick #emoteQ { flex: 1; min-width: 0; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 8px; }
@@ -1151,13 +1160,13 @@
     <div><b>free culture</b><span class="linkcols"><i><a class="at" href="https://www.gnu.org/philosophy/philosophy.html" target="_blank" rel="noopener" data-b="1953">richard stallman</a> (free software · b.53)<span class="ag"> (free as in freedom)</span></i><i><a class="at" href="https://wiki.c2.com/?WikiWikiWeb" target="_blank" rel="noopener" data-b="1949">ward cunningham</a> (the first wiki · b.49)<span class="ag"> (the simplest thing that could work)</span></i><i><a class="at" href="http://www.catb.org/~esr/writings/cathedral-bazaar/" target="_blank" rel="noopener" data-b="1957">eric s. raymond</a> (the cathedral and the bazaar · b.57)<span class="ag"> (all bugs are shallow)</span></i><i><a class="at" href="https://lessig.org/product/free-culture/" target="_blank" rel="noopener" data-b="1961">lawrence lessig</a> (free culture, creative commons)<span class="ag"> (code is law)</span></i><i><a class="at" href="https://pluralistic.net/" target="_blank" rel="noopener" data-b="1971">cory doctorow</a> (enshittification · b.71)<span class="ag"> (seize the means of computation)</span></i></span></div>
     </div>
     </div>
-    </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div></div>
+    </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
-  <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
+  <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
 (() => {
@@ -3444,14 +3453,17 @@
       grip.setPointerCapture(e.pointerId);
       vidBox.classList.add('dragging');
       const r = vidBox.getBoundingClientRect();
-      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl');
+      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl') || grip.classList.contains('l');
       const topEdge = grip.classList.contains('tl') || grip.classList.contains('tr');
-      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner
+      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner/edge
       const ay = topEdge ? r.bottom : r.top;
+      const yOnly = !leftEdge && !grip.classList.contains('r') && (topEdge || grip.classList.contains('b'));
       const move = (ev) => {
         const maxW = Math.min(leftEdge ? ax : innerWidth - ax,
           (topEdge ? ay : innerHeight - ay) * vidRatio) - 4;
-        const w = Math.max(180, Math.min(maxW, Math.abs(ev.clientX - ax)));
+        // a pure edge grip drives the box from its one axis; corners use x
+        const w = Math.max(180, Math.min(maxW,
+          yOnly ? Math.abs(ev.clientY - ay) * vidRatio : Math.abs(ev.clientX - ax)));
         vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
         vidBox.style.width = w + 'px';
         vidBox.style.left = (leftEdge ? ax - w : ax) + 'px';
@@ -5262,18 +5274,24 @@
       const r = emotePick.getBoundingClientRect();
       emotePick.style.left = r.left + 'px'; emotePick.style.top = r.top + 'px';
       emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
-      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl');
+      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl') || grip.classList.contains('l');
+      const rightEdge = grip.classList.contains('tr') || grip.classList.contains('br') || grip.classList.contains('r');
       const topEdge = grip.classList.contains('tl') || grip.classList.contains('tr');
-      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner
+      const botEdge = grip.classList.contains('bl') || grip.classList.contains('br') || grip.classList.contains('b');
+      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner/edge
       const ay = topEdge ? r.bottom : r.top;
       const hdrBottom = headerEl.getBoundingClientRect().bottom;
       const move = (ev) => {
-        const w = Math.round(Math.max(220, Math.min(leftEdge ? ax : innerWidth - 4 - ax, Math.abs(ev.clientX - ax))));
-        const h = Math.round(Math.max(160, Math.min(topEdge ? ay - 4 - hdrBottom : innerHeight - 4 - ay, Math.abs(ev.clientY - ay))));
-        emotePick.style.width = w + 'px';
-        emotePick.style.height = h + 'px';
-        emotePick.style.left = (leftEdge ? ax - w : ax) + 'px';
-        emotePick.style.top = (topEdge ? ay - h : ay) + 'px';
+        if (leftEdge || rightEdge) {
+          const w = Math.round(Math.max(220, Math.min(leftEdge ? ax : innerWidth - 4 - ax, Math.abs(ev.clientX - ax))));
+          emotePick.style.width = w + 'px';
+          emotePick.style.left = (leftEdge ? ax - w : ax) + 'px';
+        }
+        if (topEdge || botEdge) {
+          const h = Math.round(Math.max(160, Math.min(topEdge ? ay - 4 - hdrBottom : innerHeight - 4 - ay, Math.abs(ev.clientY - ay))));
+          emotePick.style.height = h + 'px';
+          emotePick.style.top = (topEdge ? ay - h : ay) + 'px';
+        }
       };
       const drop = () => {
         emotePick.classList.remove('dragging');
@@ -5848,25 +5866,31 @@
       const r = helpPanel.getBoundingClientRect();
       helpPanel.style.left = r.left + 'px'; helpPanel.style.top = r.top + 'px';
       helpPanel.style.right = 'auto';
-      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl');
+      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl') || grip.classList.contains('l');
+      const rightEdge = grip.classList.contains('tr') || grip.classList.contains('br') || grip.classList.contains('r');
       const topEdge = grip.classList.contains('tl') || grip.classList.contains('tr');
-      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner
+      const botEdge = grip.classList.contains('bl') || grip.classList.contains('br') || grip.classList.contains('b');
+      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner/edge
       const ay = topEdge ? r.bottom : r.top;
       const move = (ev) => {
-        const w = Math.round(Math.max(280, Math.min(innerWidth - 8, Math.abs(ev.clientX - ax))));
-        const h = Math.round(Math.max(120, Math.min(innerHeight - 8, Math.abs(ev.clientY - ay))));
-        helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
-        helpPanel.style.height = h + 'px';
-        helpPanel.style.maxHeight = 'none';
-        helpPanel.style.left = (leftEdge ? ax - w : ax) + 'px';
-        helpPanel.style.top = (topEdge ? ay - h : ay) + 'px';
+        if (leftEdge || rightEdge) {
+          const w = Math.round(Math.max(280, Math.min(innerWidth - 8, Math.abs(ev.clientX - ax))));
+          helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
+          helpPanel.style.left = (leftEdge ? ax - w : ax) + 'px';
+        }
+        if (topEdge || botEdge) {
+          const h = Math.round(Math.max(120, Math.min(innerHeight - 8, Math.abs(ev.clientY - ay))));
+          helpPanel.style.height = h + 'px';
+          helpPanel.style.maxHeight = 'none';
+          helpPanel.style.top = (topEdge ? ay - h : ay) + 'px';
+        }
       };
       const drop = () => {
         helpPanel.classList.remove('dragging');
         grip.removeEventListener('pointermove', move);
         grip.removeEventListener('pointerup', drop);
         grip.removeEventListener('pointercancel', drop);
-        saveHsize((leftEdge ? 'l' : 'r') + (topEdge ? 't' : 'b'));
+        saveHsize((leftEdge ? 'l' : rightEdge ? 'r' : '') + (topEdge ? 't' : botEdge ? 'b' : ''));
       };
       grip.addEventListener('pointermove', move);
       grip.addEventListener('pointerup', drop);
