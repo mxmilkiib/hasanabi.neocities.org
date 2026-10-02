@@ -5206,6 +5206,19 @@
       if (on) localStorage.setItem(EPICK_PIN_KEY, '1');
       else localStorage.removeItem(EPICK_PIN_KEY);
     } catch {}
+    if (!on) {
+      // unpinned snaps back to the default anchor above the chat bar and
+      // forgets the stashed position - the size survives on its own
+      emotePick.style.left = emotePick.style.top = '';
+      emotePick.style.right = emotePick.style.bottom = '';
+      try {
+        const es = JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null');
+        if (es && es.left != null) {
+          delete es.left; delete es.top;
+          localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(es));
+        }
+      } catch {}
+    }
   }
   function closePicker() {
     emotePick.hidden = true;

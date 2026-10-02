@@ -74,6 +74,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Unpinning the emote picker snaps it back to the chat bar: the
+  inline position clears and the stashed left/top drops from the
+  saved box - the size survives on its own
 - Line-height ↕ and column ▮▮ header glyphs scale up to match the
   neighbours (▮▮ stretches taller than wide)
 - Resource separators get real margins (7px/5px, was 1px/0) so the
