@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- `re Hasan` gains `fear& pod`, `wikipedia`, `hasanabi wiki` and
+  `twitchtracker` links ahead of the merch tail
 - `re Hasan` gains `ideologie shop` and `ostonox` (youtube) tail links
 - Emote picker header reshuffles: search, pin and ✕ hold the first row,
   the six option buttons join the source-tab line pushed right, and the
