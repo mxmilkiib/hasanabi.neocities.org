@@ -1395,7 +1395,7 @@
     const media = c.imgs ? `<span class="twmedia">${c.imgs}</span>` : '';
     if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${media}</span>` : '';
     // unicode runs stay upright: italic faces lack their glyph coverage
-    const text = escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& '))
+    const text = linkifyEsc(escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& ')))
       .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>');
     return `<span class="twcard"><b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
   }
