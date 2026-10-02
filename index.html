@@ -1925,23 +1925,25 @@
 
   // a reply's quote re-uses the row's own columns: its channel tag hangs
   // in the tag column and the quoted text shifts right to sit above the
-  // responder's nick
+  // responder's nick - measured from the first element after the fixed
+  // columns, so badge/role/sub icons don't drift the indent
   function rqIndent(r) {
     const rq = r.querySelector('.reply.rq'), nm = r.querySelector('.name');
     if (!rq || !nm) return;
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
+    const lead = (tg || r.querySelector(':scope > .time')).nextElementSibling || nm;
     if (qt && tg) {
       // the quote's content box starts 13px in either padding scheme;
       // the tag's right margin stretches so ' ↩ name:' lands ~2-3 spaces
-      // past the responder's nick (16px '↩ ' lead minus 14px overshoot)
+      // past the sender column (16px '↩ ' lead minus 14px overshoot)
       qt.style.marginLeft = (tg.offsetLeft - 13) + 'px';
-      qt.style.marginRight = Math.max(1, nm.offsetLeft - 2 - tg.offsetLeft - qt.offsetWidth) + 'px';
+      qt.style.marginRight = Math.max(1, lead.offsetLeft - 2 - tg.offsetLeft - qt.offsetWidth) + 'px';
     } else {
-      // text-indent hangs only the first line out to the nick column;
+      // text-indent hangs only the first line out to the sender column;
       // wrapped lines return to the quote's own left edge like an
       // ordinary multiline row
       const pl = parseFloat(getComputedStyle(rq).paddingLeft);
-      rq.style.textIndent = (nm.offsetLeft - 2 - rq.offsetLeft - 2 - pl) + 'px';
+      rq.style.textIndent = (lead.offsetLeft - 2 - rq.offsetLeft - 2 - pl) + 'px';
     }
   }
   function flush() {
