@@ -97,7 +97,12 @@ pure client-side flow, so no secret ships in the page. `TWITCH_CLIENT_ID`
 in `index.html` must be an app registered at dev.twitch.tv with this
 page's URL as its redirect URI. Chat-scoped tokens live in localStorage
 until logout; channel rules (slow mode etc.) apply to sent messages and
-rejections come back as ordinary `[notice]` rows.
+rejections come back as ordinary `[notice]` rows. A `➤` button sends
+for pointer/voice-only users, slow mode counts down in the input, and
+typing a character anywhere jumps into the box — `↑`/`↓` select a row
+and `r`/`enter` replies to it. Accessibility: a hidden live region
+announces new lines to screen readers (history replays skipped), the
+columns are `feed` landmarks, and the picker is a labelled `dialog`.
 
 ## Frontend — `index.html` (this repo, on Neocities)
 

@@ -278,6 +278,18 @@ not versions — the page ships continuously to Neocities.
   messages echo locally dressed with the sender's real badges, colour
   and display name (USERSTATE/GLOBALUSERSTATE parsing), and are
   excluded from saved history so they don't duplicate on reload
+- The input bar gains a `➤` send button for pointer/voice-only users
+- Slow mode counts down in the input placeholder after each send and
+  holds the next one until zero; mods, broadcasters and VIPs exempt
+- Keyboard ops while the chat bar is up: typing a character jumps into
+  the input, `↑`/`↓` step a selection through rows (accent outline),
+  `r` or `enter` replies to the pick, `esc` drops it
+- Screen-reader support: a hidden live region announces live lines
+  (backfill replays and own echoes skipped), the columns are `feed`
+  landmarks, the picker is a `dialog`, and the chat bar controls carry
+  labels
+- Deleted rows keep their strikethrough but stop dimming so hard
+  (.45 → .8) - the strike is the signal, not the fade
 - Own messages can carry an accent edge (`?self=1`); own-name mentions
   auto-highlight once logged in
 - `@N` chip queues mentions/keyword hits arriving while unfocused —
