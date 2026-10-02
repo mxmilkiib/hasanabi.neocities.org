@@ -775,12 +775,15 @@
   #helpPanel .htabs { display: flex; gap: 4px; margin: -10px -14px 18px;
     padding: 0 6px; position: sticky; top: 0; z-index: 1;
     background: var(--panel); border-radius: 6px 6px 0 0; }
-  /* a panel-coloured tail under the sticky row so content scrolling
-     behind the tabs dissolves instead of cutting at a hard edge; a
-     second mid-stop keeps it denser so the covered text greys out more */
+  /* panel-coloured tails on both sides of the sticky row so content
+     scrolling behind it dissolves instead of cutting at a hard edge;
+     mid-stops keep the fade denser so the covered text greys out more */
   #helpPanel .htabs::after { content: ''; position: absolute; top: 100%;
     left: 0; right: 0; height: 16px; pointer-events: none;
     background: linear-gradient(var(--panel), color-mix(in srgb, var(--panel) 70%, transparent) 55%, transparent); }
+  #helpPanel .htabs::before { content: ''; position: absolute; bottom: 100%;
+    left: 0; right: 0; height: 16px; pointer-events: none;
+    background: linear-gradient(transparent, color-mix(in srgb, var(--panel) 70%, transparent) 45%, var(--panel)); }
   #helpPanel .htabs a { flex: 1; text-align: center; color: var(--accent); text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-color: color-mix(in srgb, var(--text-dim) 65%, var(--line)); border-radius: 4px; font-weight: 700; }
   #helpPanel .htabs a:hover { color: var(--text); background: var(--line); }
   #helpPanel .htabs a.on { color: var(--text); border-color: var(--accent); }
