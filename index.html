@@ -627,6 +627,14 @@
     margin: 0 0 1px 3px; padding-left: 8px; border-left: 2px solid var(--line);
     font-style: normal; line-height: 1.3;
   }
+  /* a reply row counts as two lines: the quote takes the stripe opposite
+     to the reply beneath it. Tinted rows suppress the stripe overlay, so
+     their quotes keep the row's own colour instead */
+  main.zebra .reply.rq { margin-left: 0; padding-left: 11px; }
+  main.zebra .row:not(.z):not(.points):not(.glorp):not(.mention):not(.kw):not(.raid) .reply.rq {
+    background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07)); }
+  main.zebra .row.z:not(.points):not(.glorp):not(.mention):not(.kw):not(.raid) .reply.rq { background-color: var(--bg); }
+  body.selfhl main.zebra .row.self .reply.rq { background: none; }
   /* the quoted author's name carries the mention accent */
   .reply.rq b { color: var(--accent); }
   /* the quoted text is italic, but unicode runs stay upright - italic
@@ -2042,8 +2050,8 @@
       // a reply's quote block renders as its own line above the message, so
       // it consumes a second stripe slot - the following row's parity then
       // matches what strict per-line alternation would give
+      if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = (zFlip = !zFlip) ? ' z' : '';
-      if (reply) zFlip = !zFlip;
       html += `<div data-new class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
