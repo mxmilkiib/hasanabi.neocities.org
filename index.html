@@ -768,10 +768,10 @@
   #emotePick .etabs button.on { opacity: 1; background: var(--line); }
   /* an accent wash when the emote was just used in chat - bright pop,
      slow tail so it stays readable while the grid resorts */
-  #emoteGrid button.justused { animation: eflash 2.8s ease-out; }
+  #emoteGrid button.justused { animation: eflash 3.6s ease-out; }
   @keyframes eflash {
-    from { background: color-mix(in srgb, var(--accent) 78%, transparent); }
-    40% { background: color-mix(in srgb, var(--accent) 38%, transparent); }
+    from { background: color-mix(in srgb, var(--accent) 95%, transparent); }
+    45% { background: color-mix(in srgb, var(--accent) 55%, transparent); }
   }
   /* resort moves animate; set inline by the FLIP step in rebuildPicker */
   #emoteGrid button.emove { transition: transform .35s ease; }
@@ -847,7 +847,7 @@
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
-    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim [&nbsp;&nbsp;] / [sub&nbsp;&nbsp;&nbsp;] means no count was reported, not confirmed zero subscription; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
+    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim " -- " / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>🔗</b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
@@ -1679,8 +1679,8 @@
       if ((tags.badges || '').includes('moderator/'))
         aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? '[md]' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
-      const months = subM ? (+subM[1]).toString().padStart(2, '0') : '  ';
-      const subHtml = `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
+      const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
+      const subHtml = `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? ' -- ' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? `[${months}]` : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the
@@ -2999,7 +2999,7 @@
         sub = document.createElement('span');
         sub.className = 'role sub';
         sub.title = 'No subscriber months reported';
-        sub.textContent = '[  ]';
+        sub.textContent = ' -- ';
       }
       // the left-mode anchor: the sub chip leads, then aux, both ahead of
       // the badge icons - matching the order new rows render with
@@ -3014,8 +3014,9 @@
         sub.hidden = mode === 'hidden';
         // restyle the chip text to match: [sub 12] vs compact [12]
         const months = (sub.title || sub.dataset.tt) === 'No subscriber months reported'
-          ? '  ' : sub.textContent.replace(/\D/g, '');
-        if (months) sub.textContent = mode.startsWith('num') ? `[${months.padStart(2, '0')}]` : `[sub ${months.padStart(2, '0')}]`;
+          ? ' -- ' : sub.textContent.replace(/\D/g, '');
+        if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? ' -- ' : '[sub --]')
+          : mode.startsWith('num') ? `[${months.padStart(2, '0')}]` : `[sub ${months}]`;
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
           if (aux) aux.append(sub); // outermost in the right cluster
@@ -3886,20 +3887,18 @@
     s.emoteList.some((e) => e.code === code && e.assetType === 'ANIMATED'));
   // twitch sets: [{ setID, channelLogin, tier, emoteList: [{ code, id, type }] }]
   let twSets = [];
-  let twSetsKey = '';
-  async function loadTwitchSets(ids) {
-    const list = [...new Set(['0', ...ids.split(',')])].filter(Boolean);
-    const key = list.join(',');
+  let twSetsKey = '';      // set list confirmed loaded
+  let twSetsPending = '';  // key asked of the relay, awaiting a reply
+  let twSetsAsk = 0;
+  function loadTwitchSets(ids) {
+    // ivr.fi fetch happens in the relay - this page's CSP allows only
+    // 'self' connections
+    const key = [...new Set(['0', ...ids.split(',')])].filter(Boolean).join(',');
     if (key === twSetsKey) return;
-    twSetsKey = key;
-    const chunks = [];
-    for (let i = 0; i < list.length; i += 100) chunks.push(list.slice(i, i + 100)); // ivr caps at 100 ids per call
-    try {
-      const res = await Promise.all(chunks.map((c) =>
-        fetch(`https://api.ivr.fi/v2/twitch/emotes/sets?set_id=${c.join(',')}`).then((r) => (r.ok ? r.json() : []))));
-      twSets = res.flat().filter((s) => s && s.emoteList?.length);
-      if (!emotePick.hidden) buildPicker();
-    } catch (e) { twSetsKey = ''; }
+    if (key === twSetsPending && Date.now() - twSetsAsk < 5000) return;
+    twSetsPending = key; twSetsAsk = Date.now();
+    if (relayFrame.contentWindow)
+      relayFrame.contentWindow.postMessage({ type: 'twsets', ids: key }, RELAY_ORIGIN);
   }
   // names view: each emote gets its name alongside, in a wider list grid
   const EPICK_NAMES_KEY = 'hasan-epicknames';
@@ -4060,7 +4059,7 @@
       flashSet.delete(n);
       for (const b of emoteGrid.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
         b.classList.remove('justused');
-    }, 2800));
+    }, 3600));
     if (epickSort === 'use' && !resortTimer)
       resortTimer = setTimeout(() => { resortTimer = 0; rebuildPicker(); }, 1500);
   }
@@ -4077,16 +4076,22 @@
         `<img src="${escapeHTML(img)}" alt="${e}" loading="lazy"><span class="ename">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
-    // in use mode, a '1h' cell marks where last-seen chat use ages past
-    // an hour; emotes never seen this session count as stale
-    const AGE_CUT = Date.now() - 36e5;
+    // in use mode, 10m/20m/30m cells mark where last-seen chat use ages
+    // past each threshold; emotes never seen this session count as stale
+    const AGES = [[6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, 'half an hour']];
     const aged = (items, codeOf, render) => {
       if (epickSort !== 'use') return items.map(render).join('');
-      let i = items.findIndex((x) => !(useTs[codeOf(x)] > AGE_CUT));
-      if (i < 0) i = items.length;
-      return items.slice(0, i).map(render).join('') +
-        (i < items.length ? '<div class="eage" title="emotes below were last used over an hour ago">1h</div>' : '') +
-        items.slice(i).map(render).join('');
+      const now = Date.now();
+      let next = 0; // thresholds fire once each, in order
+      return items.map((x) => {
+        const age = now - (useTs[codeOf(x)] || 0);
+        let m = '';
+        while (next < AGES.length && age >= AGES[next][0]) {
+          const [t, words] = AGES[next++];
+          m += `<div class="eage" title="emotes below were last used over ${words} ago">${t / 6e4}m</div>`;
+        }
+        return m + render(x);
+      }).join('');
     };
     // third-party emotes grouped by provider
     const groups = {};
@@ -4325,6 +4330,15 @@
         lastVod = { start: vs, end: ve }; changed = true;
       }
       if (changed) updateHeader();
+    } else if (d.type === 'twsets') {
+      // the relay answers with the key it was asked for; a stale or
+      // mismatched reply is dropped, an empty one leaves the key free so
+      // the next picker open retries
+      if (d.key !== twSetsPending) return;
+      twSets = (d.sets || []).filter((s) => s && s.emoteList && s.emoteList.length);
+      if (twSets.length) twSetsKey = d.key;
+      else twSetsPending = '';
+      if (!emotePick.hidden) buildPicker();
     } else if (d.type === 'auth') {
       if (d.error) {
         auth = null;

@@ -50,7 +50,7 @@ not versions — the page ships continuously to Neocities.
   ordinary rows keep their alternating stripe
 - Tweet previews keep a space before `[video]` in both tweet text and
   video thumbnail fallback labels
-- When subscriber months are not reported, chat rows show a dim [--]
+- When subscriber months are not reported, chat rows show a dim " -- "
   (or [sub --]) placeholder instead of no chip; existing rows update when
   cycling modes, and the tooltip distinguishes missing data from a real [00]
 - Scrollback row cap can be set from 250 to 100,000 in config/help,
@@ -83,8 +83,9 @@ not versions — the page ships continuously to Neocities.
 - Emote picker orders each section by channel usage: the relay folds
   StreamElements' per-emote chatstats into `emoteUse` and most-used
   emotes lead, uncharted ones keeping the name-stem sort
-- In use-sorted sections a dashed `1h` cell marks where last-seen chat
-  use ages past an hour; emotes not used this session sit below it
+- In use-sorted sections dashed `10m`/`20m`/`30m` cells mark where
+  last-seen chat use ages past each threshold; emotes not used this
+  session sit below them all
 - Emote picker gets an `anim`/`still` filter pair in the toolbar: the
   relay now flags each third-party emote's animation state from 7TV,
   BTTV and FFZ provider metadata (`emoteAnim`), Twitch sets use their
