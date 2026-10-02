@@ -112,6 +112,8 @@ not versions — the page ships continuously to Neocities.
   and the 1976 instead of prisons handbook
 - Width picks on a drag-positioned help popup now push it left
   so the right edge stays inside (or pinned to) the viewport edge
+- Multi-channel #tags right-align on a shared edge, the column
+  sized by the longest joined channel name
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) use a hue-neutral --popline border: white on dark shades,
