@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- `codes of conduct` becomes `conduct` and gains a `safer spaces`
+  sub-group: sisters uncut's policy, aorta, rhizome and tripod
 - The source line's star count becomes a live 88x31 web-badge button -
   a github-dark tile carrying the real stargazer count where the gif's
   text sat; its repo date now reads `started:`
