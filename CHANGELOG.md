@@ -15,6 +15,16 @@ not versions — the page ships continuously to Neocities.
   now extend from 1h through 12h with `Nh` labels
 - First-visit sheen: while the tip banner is up, the video, login, help
   and emote-picker buttons sweep a periodic glint until each is pressed
+- Authors tab can sort by area / activity (death-or-present) / birth:
+  every entry carries data-b/data-d years, era labels now render as
+  bold block heads like the bot lists, and the flat sort dedupes the
+  mark fisher entry that sat in two sections
+- Help tab buttons got contrastier borders and a hover fill; the row
+  sits tighter to the top edge with a little air beneath
+- The `restorative justice` resources block is now `justice` with
+  restorative / transformative sub-groups, and a new `codes of conduct`
+  section links confcoc, contributor covenant, geek feminism, citizen
+  coc and safety first pdx
 
 ### Fixes & polish
 - Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,
