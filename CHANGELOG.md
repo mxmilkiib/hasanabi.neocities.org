@@ -107,6 +107,8 @@ not versions — the page ships continuously to Neocities.
 - The emote-picker button sits flush against the input's right edge and
   its ☻ glyph shrinks slightly so it no longer spills over the button's
   border when pressed
+- Configure tab: the highlight-keyword and block-word inputs now sit
+  below the blammobot/fossabot command blocks
 - Emote-picker era rungs whose window spans an unwatched stretch (tab
   hidden, socket dropped, page closed) get a dotted purple border instead
   of the standard accent dash, flagging that the usage count may be
