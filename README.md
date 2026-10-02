@@ -197,7 +197,9 @@ no dependencies beyond CDN-hosted fonts:
   reshuffles animate emotes
   sliding to their new spots, while a just-used emote flashes behind its
   cell. Clicking
-  inserts at the caret and the panel stays open until `☻` or `Esc`.
+  inserts at the caret; the box drags by its dotted edge strip (position
+  persists), a `📌` pin keeps it open across chat-bar hides and reloads,
+  and `Esc` peels the topmost layer — picker first, then the help panel.
 - **Channels** — `?channel=login` points chat, stream embed and status
   at another streamer for the visit; history, graph and tab-sync keys
   get a per-channel suffix so streams don't bleed into each other, and

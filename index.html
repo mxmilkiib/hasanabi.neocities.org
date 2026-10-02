@@ -761,6 +761,16 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #emotePick[hidden] { display: none; }
+  /* the dotted grip mirrors the stream overlay's handle - it bleeds to the
+     top edge and fades in on hover or while dragging */
+  #emotePick .epick-handle { flex: none; height: 8px; margin: -8px -8px -2px;
+    cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
+    letter-spacing: 4px; overflow: hidden; white-space: nowrap;
+    opacity: 0; transition: opacity .15s; touch-action: none; }
+  #emotePick .epick-handle::after {
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
+  }
+  #emotePick:hover .epick-handle, #emotePick.dragging .epick-handle { opacity: 1; }
   #emotePick .erow { flex: none; display: flex; gap: 6px; }
   #emotePick #emoteQ { flex: 1; min-width: 0; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 8px; }
   #emotePick #emoteNames { flex: none; font-size: 13px; padding: 4px 8px; }
@@ -863,7 +873,7 @@
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
-    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input, ↑/↓ select a row, r or enter replies to it, esc drops the pick</span></div>
+    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input, ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups</span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -919,7 +929,8 @@
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message"><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button><div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div></div>
+  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><input id="chatInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message"><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div>
 
 <script>
 (() => {
@@ -3824,7 +3835,7 @@
     chatInput.placeholder = on ? `chat as ${auth.login}` : 'log in to chat';
     if (toUntil) paintTimeout();
     document.body.classList.toggle('chaton', on);
-    if (!on) { clearReply(); emotePick.hidden = true; emojiBtn.classList.remove('on'); }
+    if (!on) { clearReply(); if (!epickPinned) closePicker(); }
   }
 
   // ---- replies: pick a row with its hover ↩, then Enter sends it as a
@@ -3904,8 +3915,8 @@
     if (auth && auth.token) {
       if (e.shiftKey) { logout(); return; }
       chatbarEl.hidden = !chatbarEl.hidden;
-      if (chatbarEl.hidden) { emotePick.hidden = true; emojiBtn.classList.remove('on'); }
-      else chatInput.focus();
+      if (chatbarEl.hidden && !epickPinned) closePicker();
+      else if (!chatbarEl.hidden) chatInput.focus();
     } else {
       location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
         '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
@@ -4399,21 +4410,46 @@
     }
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
   }
+  // a pinned picker floats free of the chat bar and ignores its closes;
+  // the pin state persists, so a pinned picker reopens on the next load
+  const emotePin = document.getElementById('emotePin');
+  const EPICK_PIN_KEY = 'hasan-epickpin';
+  let epickPinned = false;
+  function setPin(on) {
+    epickPinned = on;
+    emotePin.classList.toggle('on', on);
+    try {
+      if (on) localStorage.setItem(EPICK_PIN_KEY, '1');
+      else localStorage.removeItem(EPICK_PIN_KEY);
+    } catch (e) {}
+  }
+  function closePicker() {
+    emotePick.hidden = true;
+    emojiBtn.classList.remove('on');
+    setPin(false);
+  }
+  emotePin.addEventListener('click', () => setPin(!epickPinned));
   emojiBtn.addEventListener('click', () => {
-    emotePick.hidden = !emotePick.hidden;
-    emojiBtn.classList.toggle('on', !emotePick.hidden);
-    if (!emotePick.hidden) { emoteQ.value = ''; if (!twSetsKey) loadTwitchSets(''); buildPicker(); emoteQ.focus(); }
+    if (!emotePick.hidden) {
+      // a pinned picker shrugs off a ☻ press once - the click releases the
+      // pin instead, and the next press closes it
+      if (epickPinned) { setPin(false); return; }
+      closePicker(); return;
+    }
+    emotePick.hidden = false;
+    emojiBtn.classList.add('on');
+    emoteQ.value = ''; if (!twSetsKey) loadTwitchSets(''); buildPicker(); emoteQ.focus();
   });
   emoteQ.addEventListener('input', buildPicker);
   emoteQ.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') emoteGrid.querySelector('button[data-ins]')?.click();
   });
-  // esc closes the picker wherever focus sits - grid button, page, anywhere
+  // esc peels the topmost layer wherever focus sits: picker first, then
+  // the help panel (both-mode drops back to labels, panel-mode to off)
   document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape' || emotePick.hidden) return;
-    emotePick.hidden = true;
-    emojiBtn.classList.remove('on');
-    chatInput.focus();
+    if (e.key !== 'Escape') return;
+    if (!emotePick.hidden) { closePicker(); if (!chatbarEl.hidden) chatInput.focus(); return; }
+    if (helpMode === 1 || helpMode === 3) { helpMode -= 1; applyHelp(); saveOpts(); }
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
   // several emotes can stack, like chatterino's picker
@@ -4426,12 +4462,47 @@
     chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
     chatInput.focus();
   });
-  // the picker closes via ☻ or esc; outside clicks leave it alone
+  // the picker closes via ☻ or esc (or stays up when 📌 pinned);
+  // outside clicks leave it alone
 
-  // edge resize: the picker anchors bottom-right, so the live edges are
-  // left (width) and top (height); the corner does both. A dragged size
-  // persists across opens and reloads
+  // drag the picker by the dotted strip - same pattern as the stream
+  // overlay: pointer capture, left/top anchoring, clamped to the viewport
   const EPICK_SIZE_KEY = 'hasan-epicksize';
+  const saveEpickBox = () => {
+    try {
+      const rr = emotePick.getBoundingClientRect();
+      localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(
+        { w: Math.round(rr.width), h: Math.round(rr.height),
+          ...(emotePick.style.left ? { left: Math.round(rr.left), top: Math.round(rr.top) } : {}) }));
+    } catch (e2) {}
+  };
+  const epickHandle = emotePick.querySelector('.epick-handle');
+  epickHandle.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || emotePick.hidden) return;
+    e.preventDefault(); e.stopPropagation();
+    try { epickHandle.setPointerCapture(e.pointerId); } catch (e2) {}
+    emotePick.classList.add('dragging');
+    const r = emotePick.getBoundingClientRect();
+    const ox = e.clientX - r.left, oy = e.clientY - r.top;
+    const move = (ev) => {
+      emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
+      emotePick.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
+      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+    };
+    const drop = () => {
+      emotePick.classList.remove('dragging');
+      epickHandle.removeEventListener('pointermove', move);
+      epickHandle.removeEventListener('pointerup', drop);
+      epickHandle.removeEventListener('pointercancel', drop);
+      saveEpickBox();
+    };
+    epickHandle.addEventListener('pointermove', move);
+    epickHandle.addEventListener('pointerup', drop);
+    epickHandle.addEventListener('pointercancel', drop);
+  });
+
+  // edge resize: the live edges are left (width) and top (height); the
+  // corner does both. A dragged size and position persist across reloads
   const EPICK_EDGE = 8;
   const EPICK_CURS = { l: 'ew-resize', t: 'ns-resize', tl: 'nwse-resize' };
   const epickEdge = (e) => {
@@ -4440,7 +4511,7 @@
     return l && t ? 'tl' : l ? 'l' : t ? 't' : '';
   };
   emotePick.addEventListener('pointermove', (e) => {
-    if (e.buttons) return;
+    if (e.buttons || e.target.closest('.epick-handle')) return;
     emotePick.style.cursor = EPICK_CURS[epickEdge(e)] || '';
   });
   emotePick.addEventListener('pointerdown', (e) => {
@@ -4451,22 +4522,28 @@
     try { emotePick.setPointerCapture(e.pointerId); } catch (e2) {}
     emotePick.style.cursor = EPICK_CURS[edge];
     const r = emotePick.getBoundingClientRect();
+    // re-anchor to left/top so the dragged edges stay put under the
+    // pointer regardless of how the box was previously positioned
+    emotePick.style.left = r.left + 'px'; emotePick.style.top = r.top + 'px';
+    emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
     const move = (ev) => {
-      if (edge.includes('l'))
-        emotePick.style.width = Math.round(Math.max(220, Math.min(innerWidth - 20, r.right - ev.clientX))) + 'px';
-      if (edge.includes('t'))
-        emotePick.style.height = Math.round(Math.max(160, Math.min(r.bottom - 8, r.bottom - ev.clientY))) + 'px';
+      if (edge.includes('l')) {
+        const w = Math.round(Math.max(220, Math.min(innerWidth - 20, r.right - ev.clientX)));
+        emotePick.style.left = (r.right - w) + 'px';
+        emotePick.style.width = w + 'px';
+      }
+      if (edge.includes('t')) {
+        const h = Math.round(Math.max(160, Math.min(r.bottom - 8, r.bottom - ev.clientY)));
+        emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom, r.bottom - h) + 'px';
+        emotePick.style.height = h + 'px';
+      }
     };
     const drop = () => {
       emotePick.removeEventListener('pointermove', move);
       emotePick.removeEventListener('pointerup', drop);
       emotePick.removeEventListener('pointercancel', drop);
       emotePick.style.cursor = '';
-      try {
-        const rr = emotePick.getBoundingClientRect();
-        localStorage.setItem(EPICK_SIZE_KEY,
-          JSON.stringify({ w: Math.round(rr.width), h: Math.round(rr.height) }));
-      } catch (e2) {}
+      saveEpickBox();
     };
     emotePick.addEventListener('pointermove', move);
     emotePick.addEventListener('pointerup', drop);
@@ -4477,6 +4554,22 @@
     if (es) {
       if (es.w) emotePick.style.width = es.w + 'px';
       if (es.h) emotePick.style.height = es.h + 'px';
+      if (es.left != null) {
+        emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
+        emotePick.style.left = Math.max(0, Math.min(innerWidth - (es.w || 480), es.left)) + 'px';
+        emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom,
+          Math.min(innerHeight - (es.h || 420), es.top)) + 'px';
+      }
+    }
+  } catch (e) {}
+  // a pinned picker reopens where it was left - no focus steal
+  try {
+    if (localStorage.getItem(EPICK_PIN_KEY) === '1') {
+      setPin(true);
+      emotePick.hidden = false;
+      emojiBtn.classList.add('on');
+      if (!twSetsKey) loadTwitchSets('');
+      buildPicker();
     }
   } catch (e) {}
 

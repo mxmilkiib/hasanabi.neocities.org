@@ -104,6 +104,10 @@ not versions — the page ships continuously to Neocities.
   re-posts until the relay answers (it could drop while the iframe was
   still loading), replies for superseded asks merge instead of being
   dropped, and the relay accepts long `emote-sets` lists
+- The emote picker is draggable by a dotted grip strip on its top edge
+  (same idiom as the stream overlay; position persists), and a `📌` pin
+  keeps it floating when the chat bar hides or the page reloads.
+  Esc peels layers in order - picker, then the help panel
 - Emote picker gets a `mix` toggle that merges every lit source
   into one flat grid - the active sort and age markers run across
   the whole pool, and source tabs still filter what feeds it
