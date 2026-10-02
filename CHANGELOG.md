@@ -10,7 +10,9 @@ not versions — the page ships continuously to Neocities.
   button hold whole option bundles; click recalls (stores when empty),
   shift/right-click overwrites, and slots sync across open tabs
 - GitHub Pages mirror at mxmilkiib.github.io/hasanabi.neocities.org
-- Emote-picker era markers pulse out of phase via staggered delays
+- Emote-picker era markers carry a marching-ants dashed border (an
+  animated svg stroke-dashoffset), still staggered per rung; era rungs
+  now extend from 1h through 12h with `Nh` labels
 
 ### Fixes & polish
 - Compact sub modes (`num-left`/`num-right`) drop the brackets: `12`,

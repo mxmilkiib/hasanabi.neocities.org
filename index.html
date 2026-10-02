@@ -850,17 +850,19 @@
   }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
-    color: var(--text-dim); font-size: .7em; border: 1px dashed var(--line); border-radius: 4px; opacity: .4;
-    animation: eage-dim 2.4s ease-in-out infinite; }
-  #emoteGrid .eage.lit { opacity: 1; color: var(--text); border-color: var(--accent); font-weight: 700;
-    animation-name: eage-pulse; }
-  #emoteGrid .eage.t0 { opacity: .9; color: var(--accent); border: 1px solid var(--accent);
-    animation-name: eage-pulse; }
-  /* borders breathe slowly so the squares catch the eye - dim rungs drift
-     toward the text colour, lit ones toward a paler accent */
-  @keyframes eage-dim { 50% { border-color: color-mix(in srgb, var(--line) 45%, var(--text-dim)); } }
-  @keyframes eage-pulse { 50% { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); } }
-  @media (prefers-reduced-motion: reduce) { #emoteGrid .eage { animation: none; } }
+    position: relative; color: var(--text-dim); font-size: .7em; opacity: .4; }
+  /* the border is a dashed svg rect whose dashoffset marches - the
+     classic processing-ants border; the rung's inline animation-delay
+     is inherited so the marches stay staggered per rung */
+  #emoteGrid .eage .ants { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #emoteGrid .eage .ants rect { fill: none; stroke: var(--line); stroke-width: 1;
+    stroke-dasharray: 4 3; animation: eage-ants .9s linear infinite; animation-delay: inherit; }
+  #emoteGrid .eage.lit { opacity: 1; color: var(--text); font-weight: 700; }
+  #emoteGrid .eage.lit .ants rect { stroke: var(--accent); }
+  #emoteGrid .eage.t0 { opacity: .9; color: var(--accent); }
+  #emoteGrid .eage.t0 .ants rect { stroke: var(--accent); stroke-width: 1.4; }
+  @keyframes eage-ants { to { stroke-dashoffset: -7; } }
+  @media (prefers-reduced-motion: reduce) { #emoteGrid .eage .ants rect { animation: none; } }
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
@@ -4526,7 +4528,8 @@
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // in use mode, the cells mark where last-seen chat use ages past each
     // threshold; emotes never seen this session count as stale
-    const AGES = [[12e4, '2 minutes'], [3e5, '5 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, 'half an hour'], [24e5, '40 minutes'], [3e6, '50 minutes'], [36e5, 'an hour']];
+    const AGES = [[12e4, '2 minutes'], [3e5, '5 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, 'half an hour'], [24e5, '40 minutes'], [3e6, '50 minutes'], [36e5, 'an hour'],
+      ...[...Array(11)].map((_, i) => [(i + 2) * 36e5, `${i + 2} hours`])]; // 2h through 12h
     const aged = (items, codeOf, render) => {
       if (epickSort !== 'use') return items.map(render).join('');
       const now = Date.now();
@@ -4538,20 +4541,25 @@
       marks.push({ t: t0age, t0: true });
       marks.sort((a, b) => a.t - b.t);
       let next = 0; // thresholds fire once each, in order
+      // the marching-ants border - an svg rect whose dashoffset animates;
+      // the rung's inline animation-delay reaches it via inherit
+      const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none">' +
+        '<rect x="1" y="1" width="98" height="98" rx="5" vector-effect="non-scaling-stroke"/></svg>';
       return items.map((x) => {
         const age = now - (useTs[codeOf(x)] || 0);
         let m = '';
         while (next < marks.length && age >= marks[next].t) {
           const mk = marks[next++];
           // a per-rung negative delay starts each square mid-cycle, so
-          // the pulses stagger instead of beating in lockstep
+          // the marches stagger instead of beating in lockstep
           const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
           if (mk.t0) {
             const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
-            m += `<div class="eage t0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${lbl}</div>`;
+            m += `<div class="eage t0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${ANTS}${lbl}</div>`;
           } else {
             const lit = t0age >= mk.t;
-            m += `<div class="eage${lit ? ' lit' : ''}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}">${mk.t / 6e4}m</div>`;
+            const lbl = mk.t >= 36e5 ? `${mk.t / 36e5}h` : `${mk.t / 6e4}m`;
+            m += `<div class="eage${lit ? ' lit' : ''}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}">${ANTS}${lbl}</div>`;
           }
         }
         return m + render(x);
