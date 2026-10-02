@@ -1289,7 +1289,7 @@
   }
   hintEl.addEventListener('click', () => {
     hintEl.remove();
-    try { localStorage.setItem('hasan-hint', '1'); } catch (e) {}
+    try { localStorage.setItem('hasan-hint', '1'); } catch {}
   });
 
   // Colors picked for contrast against --bg, used when a chatter has no
@@ -1335,7 +1335,7 @@
   // in them would render as raw text; honours the clean urls display option
   function linkifyEsc(esc) {
     return esc.replace(
-      /(?:https?:\/\/[^\s<]*|(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#][^\s<]*)?)/gi,
+      /(?:https?:\/\/[^\s<]*|(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#][^\s<]*)?)/gi,
       (raw) => {
         // peel trailing punctuation/entities the same way the main linkifier does
         const m = raw.match(/^(.*?)((?:[)\]”’.,!?;:]|&quot;|&#0?39;)*)$/s);
@@ -1563,16 +1563,16 @@
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
       // peel those off so `(example.com),` still links the bare domain
-      const [, pre, url, post] = tok.match(/^([(\["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s);
+      const [, pre, url, post] = tok.match(/^([(["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s);
       if (/^https?:\/\/\S+$/i.test(url) ||
-          /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i.test(url)) {
+          /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#]\S*)?$/i.test(url)) {
         const u = escapeHTML(/^https?:\/\//i.test(url) ? url : `https://${url}`);
         if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(url)) {
           const src = /\.gifv(?:\?\S*)?$/i.test(url) ? u.replace(/\.gifv/i, '.gif') : u;
           out.push(escapeHTML(pre) + `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>` + escapeHTML(post));
         } else {
           // this site's own domain gets the fossabot shimmer
-          const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?\/#]|$)/i.test(url);
+          const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?/#]|$)/i.test(url);
           out.push(escapeHTML(pre) + `<a${home ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + escapeHTML(post));
         }
       }
@@ -1863,7 +1863,7 @@
 
   // links view: a row qualifies when its text carries a url; the key is the
   // sorted set of normalised urls so a reposted link counts as a dupe
-  const LINK_TLD_RE = /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i;
+  const LINK_TLD_RE = /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#]\S*)?$/i;
   const normUrl = (u) => u.toLowerCase().replace(/^https?:\/\//, '').replace(/^(?:www|mobile)\./, '').replace(/[/?#]+$/, '');
   // display-only cleanup for the 'clean urls' option: drops the scheme, a
   // www. prefix, and a bare trailing / or /index.htm[l]
@@ -1872,7 +1872,7 @@
   function linkKeyOf(msg) {
     const ks = [];
     for (const t of msg.split(/\s+/)) {
-      const u = (t.match(/^([(\["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s) || [])[2] || t;
+      const u = (t.match(/^([(["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s) || [])[2] || t;
       if (/^https?:\/\/\S+$/i.test(u) || LINK_TLD_RE.test(u)) ks.push(normUrl(u));
     }
     return ks.sort().join(' ');
@@ -1989,7 +1989,7 @@
       const ts = when.getTime();
       if (lastRowTs && ts - lastRowTs > GAP_MS) {
         const why = gapCause(lastRowTs, ts);
-        html += `<div class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}"><span class="time">${timeStr}</span>` +
+        html += `<div class="row notice${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}"><span class="time">${timeStr}</span>` +
                 `· ${fmtDur(Math.max(1, Math.round((ts - lastRowTs) / 60000)))} gap${why ? ` · ${why}` : ''} · ` +
                 `${fmtRowTime(new Date(lastRowTs))} → ${timeStr}</div>`;
       }
@@ -2002,12 +2002,12 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> <b>${escapeHTML(who)}</b> ` +
+        html += `<div data-new class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> <b>${escapeHTML(who)}</b> ` +
                 `${linkifyEsc(escapeHTML(sys))}${message ? ' - ' + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
-        html += `<div data-new class="row notice${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
+        html += `<div data-new class="row notice${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
                 `${rawMsg.startsWith('[notice]') ? '<b class="notice-label">[notice]</b>' + linkifyEsc(escapeHTML(rawMsg.slice(8))) : linkifyEsc(escapeHTML(rawMsg))}</div>`;
         continue;
       }
@@ -2038,7 +2038,7 @@
         // their expiry do nothing). the lock is per-channel in multi mode
         const me = !!(target && auth && auth.login && target.toLowerCase() === auth.login.toLowerCase());
         if (me && dur) setTimedOut(ts + dur * 1000, ch);
-        html += `<div class="row notice${me ? ' selfmod' : ''}${(zFlip = !zFlip) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
+        html += `<div class="row notice${me ? ' selfmod' : ''}${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
           (target ? `${me ? 'you were' : escapeHTML(target) + ' was'} ${dur ? `timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
@@ -2119,7 +2119,7 @@
         // Trivia and Roulette are pinned to each other's hash colours
         const TAG_HUES = { trivia: 108, roulette: 323 };
         msgHtml = msgHtml
-          .replace(/\[([A-Za-z][^\[\]&<>]{0,18})\]/g, (m, g) => {
+          .replace(/\[([A-Za-z][^[\]&<>]{0,18})\]/g, (m, g) => {
             let h = TAG_HUES[g.toLowerCase()];
             if (h == null) {
               h = 0;
@@ -2163,7 +2163,7 @@
       // it consumes a second stripe slot - the following row's parity then
       // matches what strict per-line alternation would give
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
-      const zc = (zFlip = !zFlip) ? ' z' : '';
+      const zc = ((zFlip = !zFlip)) ? ' z' : '';
       html += `<div data-new class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
@@ -2379,7 +2379,7 @@
   function saveSpark() {
     try {
       localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, glorp: glorpSamples, chat: [...chatterSeen] }));
-    } catch (e) {}
+    } catch {}
   }
   function restoreSpark() {
     try {
@@ -2399,7 +2399,7 @@
       }
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
       if (glorpSamples.length > win) glorpSamples.splice(0, glorpSamples.length - win);
-    } catch (e) {}
+    } catch {}
   }
 
   let lastTick = Date.now();
@@ -2450,7 +2450,7 @@
   // most recent stream run { started, ended|null }, persisted across reloads
   const LASTRUN_KEY = 'hasan-last-run' + CHAN_SFX;
   let lastRun = null;
-  try { lastRun = JSON.parse(localStorage.getItem(LASTRUN_KEY)) || null; } catch (e) {}
+  try { lastRun = JSON.parse(localStorage.getItem(LASTRUN_KEY)) || null; } catch {}
   // lastVod {start,end} from the latest VOD (exact); lbEnd from ivr's
   // lastBroadcast.startedAt, which despite the name stamps the last
   // run's END for an offline channel (matches the VOD end to seconds)
@@ -2460,7 +2460,7 @@
   // dot or info text cycles it
   let statusView = 0;
   function saveLastRun() {
-    try { localStorage.setItem(LASTRUN_KEY, JSON.stringify(lastRun)); } catch (e) {}
+    try { localStorage.setItem(LASTRUN_KEY, JSON.stringify(lastRun)); } catch {}
   }
 
   function parseUptimeMinutes(text) {
@@ -2830,7 +2830,7 @@
   function switchTab(id) {
     helpPanel.querySelectorAll('.htabs a').forEach((a) => a.classList.toggle('on', a.dataset.htab === id));
     helpPanel.querySelectorAll('.htabpage').forEach((p) => p.hidden = p.id !== id);
-    try { localStorage.setItem('hasan-htab', id); } catch (e) {}
+    try { localStorage.setItem('hasan-htab', id); } catch {}
   }
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
@@ -2844,7 +2844,7 @@
   if (savedTab && helpPanel.querySelector(`[data-htab="${savedTab}"]`)) switchTab(savedTab);
   // a url #fragment pointing into a hidden page activates its tab
   let htabTarget = null;
-  try { htabTarget = location.hash && helpPanel.querySelector(location.hash); } catch (e) {}
+  try { htabTarget = location.hash && helpPanel.querySelector(location.hash); } catch {}
   if (htabTarget) {
     const p = htabTarget.closest('.htabpage');
     if (p) { switchTab(p.id); htabTarget.scrollIntoView(); }
@@ -3086,7 +3086,7 @@
       g.gain.exponentialRampToValueAtTime(.001, t + .3);
       o.connect(g); g.connect(pingCtx.destination);
       o.start(t); o.stop(t + .32);
-    } catch (e) {}
+    } catch {}
   }
   const missed = [];
   const missedEl = document.getElementById('missed');
@@ -3147,12 +3147,12 @@
       // the TDZ throw the same way it already did for OPTS_KEY
       if (suppressSave) return;
       localStorage.setItem(OPTS_KEY, JSON.stringify(curOpts()));
-    } catch (e) {}
+    } catch {}
   }
 
   function loadOpts() {
     let o;
-    try { o = JSON.parse(localStorage.getItem(OPTS_KEY)); } catch (e) {}
+    try { o = JSON.parse(localStorage.getItem(OPTS_KEY)); } catch {}
     try { suppressSave = true; applyOpts(o); }
     finally { suppressSave = false; }
   }
@@ -3257,7 +3257,7 @@
         });
       presetBtn.classList.toggle('on', !!cur);
       presetBtn.title = `Theme preset: ${cur || 'custom'} - click/scroll · ⇧click back`;
-    } catch (e) {}
+    } catch {}
   }
   function applyPreset(name) {
     applyOpts(THEME_PRESETS[name]);
@@ -3302,7 +3302,7 @@
         a.style.background = bg;
         a.style.color = text;
       });
-    } catch (e) {}
+    } catch {}
   }
 
   // steps from whichever preset currently matches; a custom mix restarts at 0
@@ -3324,7 +3324,7 @@
   function loadPlayer() {
     if (loadPlayer.done) return;
     loadPlayer.done = true;
-    const saved = (() => { try { return JSON.parse(localStorage.getItem(VOL_KEY)) || {}; } catch (e) { return {}; } })();
+    const saved = (() => { try { return JSON.parse(localStorage.getItem(VOL_KEY)) || {}; } catch { return {}; } })();
     const s = document.createElement('script');
     s.src = 'https://embed.twitch.tv/embed/v1.js';
     s.onload = () => {
@@ -3345,7 +3345,7 @@
         setInterval(() => {          // poll + persist; the API emits no volume event
           vidState();
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: vidPlayer.getMuted(), p: !vidPlayer.isPaused() });
-          if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch (e) {} }
+          if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}
           // depending on embed version
@@ -3406,7 +3406,7 @@
       vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - h, parseFloat(p.top) || 0)) + 'px';
       vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
     }
-  } catch (e) {}
+  } catch {}
   vidHandle.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     vidHandle.setPointerCapture(e.pointerId);
@@ -3436,7 +3436,7 @@
     try {
       const rr = vidBox.getBoundingClientRect();
       localStorage.setItem(VIDPOS_KEY, JSON.stringify({ left: rr.left + 'px', top: rr.top + 'px', w: vidBox.clientWidth }));
-    } catch (e2) {}
+    } catch {}
   };
   vidBox.querySelectorAll('.vid-size').forEach((grip) => {
     grip.addEventListener('pointerdown', (e) => {
@@ -3926,10 +3926,10 @@
       const s = JSON.parse(localStorage.getItem(SLOTS_KEY));
       if (Array.isArray(s))
         slots = [0, 1, 2].map((i) => (s[i] && typeof s[i] === 'object' ? s[i] : null));
-    } catch (e) {}
+    } catch {}
   }
   function saveSlots() {
-    try { localStorage.setItem(SLOTS_KEY, JSON.stringify(slots)); } catch (e) {}
+    try { localStorage.setItem(SLOTS_KEY, JSON.stringify(slots)); } catch {}
   }
   function slotTip(b, i) {
     if (!b) return `theme slot ${i + 1}: empty - click to store the current options`;
@@ -3971,13 +3971,13 @@
       localStorage.removeItem(SLOTS_KEY);
       localStorage.removeItem(EMOTEUSE_KEY);
       localStorage.removeItem('hasan-htab');
-    } catch (e) {}
+    } catch {}
     location.reload();
   });
   // cache bust: a fresh ?_=ts query makes this a new request, so any
   // stale copy gets bypassed; existing params (channel, state) survive
   document.getElementById('cacheBust').addEventListener('click', () => {
-    try { if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k))); } catch (e) {}
+    try { if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k))); } catch {}
     const u = new URL(location.href);
     u.searchParams.set('_', Date.now());
     location.href = u.toString();
@@ -4259,7 +4259,7 @@
         cl.style.opacity = '';
         return cl.outerHTML;
       })));
-    } catch (e) {}
+    } catch {}
     saveSpark();
   }
   function restoreHistory() {
@@ -4296,7 +4296,7 @@
         : (tEl ? parseRowTimeText(tEl.textContent) : 0);
       applySubMode();
       snapLive(logEl);
-    } catch (e) {}
+    } catch {}
   }
   restoreHistory();
   window.addEventListener('pagehide', saveHistory);
@@ -4369,11 +4369,11 @@
   let auth = null; // { token, login }
   // own badges/colour from USERSTATE/GLOBALUSERSTATE live in selfTagsPer
   // (keyed per channel, defined near the send UI)
-  try { auth = JSON.parse(localStorage.getItem(AUTH_KEY)); } catch (e) {}
+  try { auth = JSON.parse(localStorage.getItem(AUTH_KEY)); } catch {}
   const oauthFrag = new URLSearchParams(location.hash.slice(1));
   if (oauthFrag.get('access_token')) {
     auth = { token: oauthFrag.get('access_token'), login: null };
-    try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch (e) {}
+    try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch {}
     // keep a non-default channel in the url after the token comes back
     const back = new URLSearchParams(location.search);
     if (CHANNEL !== DEFAULT_CHANNEL || MULTI) back.set('channel', CHANNELS.join(','));
@@ -4554,7 +4554,7 @@
     for (const c of CHANNELS) { delete selfTagsPer[c]; delete selfExempts[c]; }
     // exemptions wait for the next login's USERSTATEs to land
     retagKw();
-    try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
+    try { localStorage.removeItem(AUTH_KEY); } catch {}
     if (relayFrame.contentWindow)
       relayFrame.contentWindow.postMessage({ type: 'auth', token: null }, RELAY_ORIGIN);
     updateSendUI();
@@ -4828,13 +4828,13 @@
   emotePick.classList.toggle('names', localStorage.getItem(EPICK_NAMES_KEY) === '1');
   emoteNamesBtn.addEventListener('click', () => {
     const on = emotePick.classList.toggle('names');
-    try { localStorage.setItem(EPICK_NAMES_KEY, on ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem(EPICK_NAMES_KEY, on ? '1' : '0'); } catch {}
     emoteQ.focus();
   });
   // grid ordering: channel usage counts or the alphabetical family sort
   const EPICK_SORT_KEY = 'hasan-epicksort';
   let epickSort = 'use';
-  try { epickSort = localStorage.getItem(EPICK_SORT_KEY) === 'az' ? 'az' : 'use'; } catch (e) {}
+  try { epickSort = localStorage.getItem(EPICK_SORT_KEY) === 'az' ? 'az' : 'use'; } catch {}
   const sortBtns = { az: document.getElementById('emoteSortAz'), use: document.getElementById('emoteSortUse') };
   function paintSort() {
     sortBtns.az.classList.toggle('on', epickSort === 'az');
@@ -4843,7 +4843,7 @@
   paintSort();
   for (const [m, b] of Object.entries(sortBtns)) b.addEventListener('click', () => {
     epickSort = m;
-    try { localStorage.setItem(EPICK_SORT_KEY, m); } catch (e) {}
+    try { localStorage.setItem(EPICK_SORT_KEY, m); } catch {}
     paintSort();
     buildPicker();
     emoteQ.focus();
@@ -4851,12 +4851,12 @@
   // mix merges every lit source into a single sectionless grid
   const EPICK_MIX_KEY = 'hasan-epickmix';
   let epickMerge = false;
-  try { epickMerge = localStorage.getItem(EPICK_MIX_KEY) === '1'; } catch (e) {}
+  try { epickMerge = localStorage.getItem(EPICK_MIX_KEY) === '1'; } catch {}
   const mixBtn = document.getElementById('emoteMix');
   mixBtn.classList.toggle('on', epickMerge);
   mixBtn.addEventListener('click', () => {
     epickMerge = !epickMerge;
-    try { localStorage.setItem(EPICK_MIX_KEY, epickMerge ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem(EPICK_MIX_KEY, epickMerge ? '1' : '0'); } catch {}
     mixBtn.classList.toggle('on', epickMerge);
     buildPicker();
     emoteQ.focus();
@@ -4865,7 +4865,7 @@
   // none lit means both, so a solo chip can't be turned into nothing
   const EPICK_ANIM_KEY = 'hasan-epickanim';
   let epickAnimOn = new Set();
-  try { epickAnimOn = new Set(JSON.parse(localStorage.getItem(EPICK_ANIM_KEY)) || []); } catch (e) {}
+  try { epickAnimOn = new Set(JSON.parse(localStorage.getItem(EPICK_ANIM_KEY)) || []); } catch {}
   const animOk = (a) => !epickAnimOn.size || epickAnimOn.has(a ? 'anim' : 'still');
   const animBtns = { anim: document.getElementById('emoteAnim'), still: document.getElementById('emoteStill') };
   function paintAnim() {
@@ -4879,7 +4879,7 @@
     else if (epickAnimOn.has(k)) epickAnimOn.delete(k);
     else epickAnimOn.add(k);
     if (epickAnimOn.size === 2) epickAnimOn.clear();
-    try { localStorage.setItem(EPICK_ANIM_KEY, JSON.stringify([...epickAnimOn])); } catch (e2) {}
+    try { localStorage.setItem(EPICK_ANIM_KEY, JSON.stringify([...epickAnimOn])); } catch {}
     paintAnim();
     buildPicker();
     emoteQ.focus();
@@ -4888,7 +4888,7 @@
   const EPICK_TABS_KEY = 'hasan-epicktabs';
   const EPICK_GROUPS = ['7tv', 'bttv', 'ffz', 'twitch', 'emoji'];
   let epickOn = new Set();
-  try { epickOn = new Set(JSON.parse(localStorage.getItem(EPICK_TABS_KEY)) || []); } catch (e) {}
+  try { epickOn = new Set(JSON.parse(localStorage.getItem(EPICK_TABS_KEY)) || []); } catch {}
   const groupOn = (g) => !epickOn.size || epickOn.has(g);
   emoteTabs.innerHTML = EPICK_GROUPS.map((g) =>
     `<button type="button" class="hdr-btn" data-g="${g}" title="toggle ${g} emotes (shift-click for only ${g})">${g}</button>`).join('');
@@ -4905,7 +4905,7 @@
     else if (epickOn.has(g)) epickOn.delete(g);
     else epickOn.add(g);
     if (epickOn.size === EPICK_GROUPS.length) epickOn.clear();
-    try { localStorage.setItem(EPICK_TABS_KEY, JSON.stringify([...epickOn])); } catch (e2) {}
+    try { localStorage.setItem(EPICK_TABS_KEY, JSON.stringify([...epickOn])); } catch {}
     paintTabs();
     buildPicker();
     emoteQ.focus();
@@ -4914,13 +4914,13 @@
   const EPICK_RECENT_KEY = 'hasan-epickrecent';
   const EPICK_RECENT_MAX = 24;
   let epickRecent = [];
-  try { epickRecent = JSON.parse(localStorage.getItem(EPICK_RECENT_KEY)) || []; } catch (e) {}
+  try { epickRecent = JSON.parse(localStorage.getItem(EPICK_RECENT_KEY)) || []; } catch {}
   function noteRecent(b) {
     const img = b.querySelector('img');
     const r = { n: b.dataset.ins, a: b.dataset.a === '1' };
     if (img) { r.src = (b.title.split(' - ')[1] || ''); r.img = img.getAttribute('src'); }
     epickRecent = [r, ...epickRecent.filter((x) => x.n !== r.n)].slice(0, EPICK_RECENT_MAX);
-    try { localStorage.setItem(EPICK_RECENT_KEY, JSON.stringify(epickRecent)); } catch (e) {}
+    try { localStorage.setItem(EPICK_RECENT_KEY, JSON.stringify(epickRecent)); } catch {}
   }
   const byName = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' });
   // family stem: the first word of a camel/all-caps name, lowercased, so
@@ -4941,7 +4941,7 @@
   // its age markers keep working across a reload instead of going cold -
   // per-channel, since the emote sets being counted differ per stream
   const EMOTEUSE_KEY = 'hasan-emoteuse' + CHAN_SFX;
-  const savedUse = (() => { try { return JSON.parse(localStorage.getItem(EMOTEUSE_KEY)) || {}; } catch (e) { return {}; } })();
+  const savedUse = (() => { try { return JSON.parse(localStorage.getItem(EMOTEUSE_KEY)) || {}; } catch { return {}; } })();
   const liveUse = savedUse.n || {};
   const useTs = savedUse.t || {};
   // when recording began: age markers stay dim until their era is covered
@@ -4957,10 +4957,10 @@
         ks.sort((a, b) => useTs[a] - useTs[b]);
         for (const k of ks.slice(0, ks.length - 6000)) { delete useTs[k]; delete liveUse[k]; }
       }
-      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {}
+      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch {}
     }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch (e) {} });
+  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   let resortTimer = 0;
@@ -5162,7 +5162,7 @@
     try {
       if (on) localStorage.setItem(EPICK_PIN_KEY, '1');
       else localStorage.removeItem(EPICK_PIN_KEY);
-    } catch (e) {}
+    } catch {}
   }
   function closePicker() {
     emotePick.hidden = true;
@@ -5220,13 +5220,13 @@
       localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(
         { w: Math.round(rr.width), h: Math.round(rr.height),
           ...(emotePick.style.left ? { left: Math.round(rr.left), top: Math.round(rr.top) } : {}) }));
-    } catch (e2) {}
+    } catch {}
   };
   const epickHandle = emotePick.querySelector('.epick-handle');
   epickHandle.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || emotePick.hidden) return;
     e.preventDefault(); e.stopPropagation();
-    try { epickHandle.setPointerCapture(e.pointerId); } catch (e2) {}
+    try { epickHandle.setPointerCapture(e.pointerId); } catch {}
     emotePick.classList.add('dragging');
     const r = emotePick.getBoundingClientRect();
     const ox = e.clientX - r.left, oy = e.clientY - r.top;
@@ -5303,7 +5303,7 @@
     const edge = epickEdge(e);
     if (!edge) return;
     e.preventDefault();
-    try { emotePick.setPointerCapture(e.pointerId); } catch (e2) {}
+    try { emotePick.setPointerCapture(e.pointerId); } catch {}
     emotePick.style.cursor = EPICK_CURS[edge];
     const r = emotePick.getBoundingClientRect();
     // re-anchor to left/top so the dragged edges stay put under the
@@ -5345,7 +5345,7 @@
           Math.min(innerHeight - (es.h || 420), es.top)) + 'px';
       }
     }
-  } catch (e) {}
+  } catch {}
   // a pinned picker reopens where it was left - no focus steal
   try {
     if (localStorage.getItem(EPICK_PIN_KEY) === '1') {
@@ -5355,7 +5355,7 @@
       if (!twSetsKey) loadTwitchSets('');
       buildPicker();
     }
-  } catch (e) {}
+  } catch {}
 
   updateSendUI();
 
@@ -5366,7 +5366,7 @@
   window.addEventListener('storage', (e) => {
     if (e.key === OPTS_KEY && e.newValue) {
       try { suppressSave = true; applyOpts(JSON.parse(e.newValue)); markPresets(); }
-      catch (err) {}
+      catch {}
       finally { suppressSave = false; }
     } else if (e.key === SLOTS_KEY) {
       readSlots(); // repaint slot fills written by another tab
@@ -5374,7 +5374,7 @@
     } else if (e.key === AUTH_KEY) {
       if (e.newValue) {
         let a = null;
-        try { a = JSON.parse(e.newValue); } catch (err) {}
+        try { a = JSON.parse(e.newValue); } catch {}
         if (a && a.token) {
           if (a.token !== (auth && auth.token) && relayFrame.contentWindow)
             relayFrame.contentWindow.postMessage({ type: 'auth', token: a.token }, RELAY_ORIGIN);
@@ -5452,7 +5452,7 @@
         r.setStart(open.n, open.off);
         r.setEnd(n, to + 1);
         const inner = document.createElement('i');
-        try { r.surroundContents(inner); wrapped = true; } catch (e) {}
+        try { r.surroundContents(inner); wrapped = true; } catch {}
         break;
       }
       if (!wrapped) break;
@@ -5578,7 +5578,7 @@
     } else if (d.type === 'auth') {
       if (d.error) {
         auth = null;
-        try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
+        try { localStorage.removeItem(AUTH_KEY); } catch {}
         queueMessage({ tags: {}, login: null, kind: 'NOTICE',
           message: 'twitch login failed or expired - click the twitch button to sign in again' }, false);
       } else if (typeof d.login === 'string' && auth) {
@@ -5586,7 +5586,7 @@
         // own-name mentions join the keyword highlight set
         selfMentionRe = new RegExp('\\b' + auth.login.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
         retagKw();
-        try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch (e) {}
+        try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch {}
       }
       updateSendUI();
     } else if (d.type === 'nitter') {
@@ -5749,8 +5749,8 @@
   // overrides the width presets until one is picked again ----
   const HSIZE_KEY = 'hasan-hsize';
   const EDGE_PX = 8;
-  const readHsize = () => { try { return JSON.parse(localStorage.getItem(HSIZE_KEY)) || {}; } catch (e) { return {}; } };
-  const writeHsize = (s) => { try { localStorage.setItem(HSIZE_KEY, JSON.stringify(s)); } catch (e) {} };
+  const readHsize = () => { try { return JSON.parse(localStorage.getItem(HSIZE_KEY)) || {}; } catch { return {}; } };
+  const writeHsize = (s) => { try { localStorage.setItem(HSIZE_KEY, JSON.stringify(s)); } catch {} };
   const HS_CURS = { l: 'ew-resize', b: 'ns-resize', bl: 'nesw-resize' };
   const edgeAt = (e) => {
     const r = helpPanel.getBoundingClientRect();
@@ -5884,7 +5884,7 @@
       helpPanel.style.left = hs.x + 'px'; helpPanel.style.top = hs.y + 'px';
       helpPanel.style.right = 'auto';
     }
-  } catch (e) {}
+  } catch {}
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
   // when the attribute changes, so hover parks the title in data-tt and a
