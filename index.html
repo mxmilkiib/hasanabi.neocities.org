@@ -4301,7 +4301,7 @@
       : 'Log in with Twitch to send messages';
     chatbarEl.hidden = !on;
     chatInput.placeholder = on
-      ? `chat as ${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}` : 'log in to chat';
+      ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}` : 'log in to chat';
     if (toUntils[sendTarget()]) paintTimeout();
     document.body.classList.toggle('chaton', on);
     // inline rather than clearReply(): that path refreshes this same UI
