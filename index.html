@@ -2520,6 +2520,7 @@
   function switchTab(id) {
     helpPanel.querySelectorAll('.htabs a').forEach((a) => a.classList.toggle('on', a.dataset.htab === id));
     helpPanel.querySelectorAll('.htabpage').forEach((p) => p.hidden = p.id !== id);
+    try { localStorage.setItem('hasan-htab', id); } catch (e) {}
   }
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
@@ -2527,6 +2528,10 @@
     e.preventDefault();
     switchTab(a.dataset.htab);
   });
+  // the last-opened tab survives reloads - a ?channel hop reopens the
+  // panel (persisted helpMode) and used to drop back to config/help
+  const savedTab = localStorage.getItem('hasan-htab');
+  if (savedTab && helpPanel.querySelector(`[data-htab="${savedTab}"]`)) switchTab(savedTab);
   // a url #fragment pointing into a hidden page activates its tab
   let htabTarget = null;
   try { htabTarget = location.hash && helpPanel.querySelector(location.hash); } catch (e) {}
@@ -3607,6 +3612,7 @@
       localStorage.removeItem(LASTRUN_KEY);
       localStorage.removeItem(SLOTS_KEY);
       localStorage.removeItem(EMOTEUSE_KEY);
+      localStorage.removeItem('hasan-htab');
     } catch (e) {}
     location.reload();
   });
