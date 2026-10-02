@@ -109,6 +109,9 @@ not versions — the page ships continuously to Neocities.
   border when pressed
 - Configure tab: the highlight-keyword and block-word inputs now sit
   below the blammobot/fossabot command blocks
+- Authors info cycle gains a 'themes' rung between 'all' and 'works':
+  each entry shows a short tagline (slogan or theme) in place of the
+  work/dates note
 - Emote-picker era rungs whose window spans an unwatched stretch (tab
   hidden, socket dropped, page closed) get a dotted purple border instead
   of the standard accent dash, flagging that the usage count may be
