@@ -854,6 +854,9 @@
   #helpPanel .linkcols.wider { columns: 30em; }
   /* command-group titles head their block in the bot command lists */
   #helpPanel .linkcols > i > b { display: block; font-size: .88em; color: var(--text-dim); font-style: italic; }
+  /* !commands take the page's text colour; only the bracketed
+     arg/descriptor notes keep the dim smaller face */
+  #helpPanel .linkcols.cmds .bc { color: var(--text); font-size: inherit; }
   /* relative not absolute - absolute anchored to the fixed panel, so the
      daggers stayed pinned while the text beneath them scrolled away */
   #helpPanel sup { position: relative; top: -3px; font-size: .7em; margin-left: 1px; }
@@ -1077,8 +1080,8 @@
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles - logged in, a plain click types @name in the chat box (⌃/⌘-click still opens the profile) · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
-    <div><b>blammobot</b><span class="linkcols xtra wider"><i><b>games</b>!roulette [amount|all] (gamble points on red/black) · !trivia (answer questions for points) · !scramble (unscramble the word)</i><i><b>points</b>!points (check balance) · !top [count] (leaderboard)</i></span></div>
-    <div><b>fossabot</b><span class="linkcols xtra wider"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
+    <div><b>blammobot</b><span class="linkcols xtra wider cmds"><i><b>games</b>!roulette <i>[amount|all]</i> (gamble points on red/black) · !trivia (answer questions for points) · !scramble (unscramble the word)</i><i><b>points</b>!points (check balance) · !top <i>[count]</i> (leaderboard)</i></span></div>
+    <div><b>fossabot</b><span class="linkcols xtra wider cmds"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
     <div><b></b><span>this page colours each game's [tag] chip and bolds answers, rolls and point counts</span></div>
     <div style="margin-top: 8px"><b>highlight keywords</b><span>comma separated; a line containing one gets a green edge (own username, phrases…):</span></div>
     <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
@@ -5379,7 +5382,7 @@
   // bracketed "(…)" descriptors beside links take the smaller note face the
   // yt-channel entries already get from their nested <i> - a range wrap also
   // covers parens holding their own links, since only elements can be whole
-  for (const el of helpPanel.querySelectorAll('#htabRes div, #htabAuth div')) {
+  for (const el of helpPanel.querySelectorAll('#htabRes div, #htabAuth div, #htabCfg .cmds')) {
     for (let guard = 0; guard < 50; guard++) {
       const texts = [];
       const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -5407,6 +5410,31 @@
         break;
       }
       if (!wrapped) break;
+    }
+  }
+  // !command tokens in the bot lists take the page text colour, split off
+  // from the dim note face their parent <i> carries
+  for (const el of helpPanel.querySelectorAll('#htabCfg .cmds')) {
+    const texts = [];
+    const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let t;
+    while ((t = walk.nextNode())) {
+      const p = t.parentElement;
+      if (p.closest('a,b') || (p.tagName === 'I' && p.parentElement.closest('i'))) continue;
+      if (t.textContent.includes('!')) texts.push(t);
+    }
+    for (const n of texts) {
+      const frag = document.createDocumentFragment();
+      for (const seg of n.textContent.split(/(!\w+)/)) {
+        if (!seg) continue;
+        if (seg[0] === '!') {
+          const s = document.createElement('i');
+          s.className = 'bc';
+          s.textContent = seg;
+          frag.append(s);
+        } else frag.append(seg);
+      }
+      n.replaceWith(frag);
     }
   }
   // every '*' channel-switch link gets a '+' twin that appends the channel
