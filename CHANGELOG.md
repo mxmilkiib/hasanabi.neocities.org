@@ -116,6 +116,8 @@ not versions — the page ships continuously to Neocities.
   sized by the longest joined channel name
 - Joined streams stand out in the resources list: any entry whose
   * switch targets a joined channel goes azure, yt-section *s too
+- Novara media moves to the yt section (its main outlet); boy boy
+  drops its duplicate twitch-stream entry - the yt channel dwarfs it
 - Joined channels get a colour each (azure/orchid/orange/yellow/
   teal/violet rotation) on their row #tags, and the empty input
   shows chat as @you -> #a #b #c with clickable channel chips that
