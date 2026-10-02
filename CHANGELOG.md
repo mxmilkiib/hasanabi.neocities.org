@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- A `clippers` row joins the resources tab: the youtube clipplex
+  (hasanabi productions, hasan reactions, daily dose, hasanabi clips),
+  the tiktok fan accounts and the hastok hub index
 - README's client comparison table grows to 31 rows, swaps plain
   ticks for ✅/❌ and names each floss client's licence
 - `yt channels` gains the young turks (`news · tw *`), between
