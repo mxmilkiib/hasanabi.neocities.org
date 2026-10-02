@@ -169,6 +169,8 @@ not versions — the page ships continuously to Neocities.
 
 ### Help popup
 - Bot command columns (blammobot, fossabot) widen to 30em
+- Authors tab gains a post-structuralists row (lacan through butler,
+  monoskop-linked)
 - Tab renamed **config/help** with titles bold in every state; the
   stream-status row carries a live copy of the status dot
 - Widths run to 1600px; link-column counts are capped by the popup's
