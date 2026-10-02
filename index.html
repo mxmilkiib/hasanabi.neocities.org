@@ -836,16 +836,17 @@
   #emotePick {
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
     width: 480px; max-width: 94vw; height: 420px;
-    display: flex; flex-direction: column; gap: 6px; padding: 8px;
+    display: flex; flex-direction: column; gap: 6px; padding: 3px 8px 8px;
     background: var(--panel); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
     border-radius: 6px;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #emotePick[hidden] { display: none; }
-  /* the dotted grip mirrors the stream overlay's handle - it bleeds to the
-     top edge (drag anywhere) while the glyph run sits centred, and fades
-     in on hover or while dragging */
-  #emotePick .epick-handle { flex: none; height: 8px; margin: -8px -8px -2px;
+  /* the dotted grip mirrors the stream overlay's handle - absolutely
+     overlaid on the top edge (drag anywhere) so it costs no layout height,
+     while the glyph run sits centred; fades in on hover or while dragging */
+  #emotePick .epick-handle { position: absolute; top: 0; left: 0; right: 0;
+    height: 8px; z-index: 3;
     cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
     letter-spacing: 4px; overflow: hidden; white-space: nowrap;
     text-align: center;
