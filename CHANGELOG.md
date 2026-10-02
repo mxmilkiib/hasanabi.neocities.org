@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- Emote picker header reshuffles: search, pin and ✕ hold the first row,
+  the six option buttons join the source-tab line pushed right, and the
+  group drops to its own line when the popup is resized thin
 - Resources gains a 'dual power' block under codes of conduct: the
   dualpower.app dsa lsc strategy doc and medics for the people move in,
   joined by the bsa dual power map, cooperation jackson, mutual aid
