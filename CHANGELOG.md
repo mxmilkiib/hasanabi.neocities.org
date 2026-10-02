@@ -120,6 +120,9 @@ not versions — the page ships continuously to Neocities.
   (persists as `bw`, shareable as `?bw=`)
 - A `♪` mention ping toggles in config/help - a soft tone when a
   keyword or @you line lands while the page isn't focused
+- A `✂` clean-urls toggle in config/help rewrites link text in chat
+  without the scheme, a `www.` prefix or a trailing `/`/`/index.htm`;
+  the link target is untouched (persists as `clean`, `?clean` shares)
 - Logged in, a plain click on a chatter's name types `@name ` at the
   input caret instead of opening their profile; modifier-clicks still
   open it

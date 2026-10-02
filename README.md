@@ -249,7 +249,9 @@ no dependencies beyond CDN-hosted fonts:
   `help` (off/panel/labels/both). Booleans take `=0` to force off.
   `kw` is a comma-separated keyword list; lines containing one get a
   green edge (e.g. `?kw=malkiii,raid`). `bw` is the same list inverted:
-  matching lines are hidden. `ping` enables the mention ping. `self=1` puts an accent edge on
+  matching lines are hidden. `ping` enables the mention ping. `clean`
+  strips link text of its `https://`, `www.` and a trailing `/` or
+  `/index.htm`. `self=1` puts an accent edge on
   one's own messages when logged in. `min=graph` selects the reduced
   header (option buttons hidden, rate graph across the bar); `min=1`
   minimises to a strip.

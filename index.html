@@ -857,6 +857,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim " -- " / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" class="helpOpt helpSub" data-idx="1">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" class="helpOpt helpSub" data-idx="3">compact [12]</a> / <a href="#" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>🔗</b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
+    <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; dim bands mark time the page wasn't watching (missed lines backfill on wake)</div>
@@ -1251,7 +1252,8 @@
           if (tweetCache.has(st[1])) pendingTw.push(twCard(tweetCache.get(st[1]), text));
           else { reqTweet(st[1]); pendingTw.push(`<span class="twprev" data-twid="${st[1]}"></span>`); }
         }
-        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(`twitter.com${path}`)}</a>`);
+        const twDisp = `twitter.com${path}`;
+        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${escapeHTML(cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
       }
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
@@ -1266,7 +1268,7 @@
         } else {
           // this site's own domain gets the fossabot shimmer
           const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?\/#]|$)/i.test(url);
-          out.push(escapeHTML(pre) + `<a${home ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer">${escapeHTML(url)}</a>` + escapeHTML(post));
+          out.push(escapeHTML(pre) + `<a${home ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + escapeHTML(post));
         }
       }
       else {
@@ -1547,6 +1549,10 @@
   // sorted set of normalised urls so a reposted link counts as a dupe
   const LINK_TLD_RE = /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?\/#]\S*)?$/i;
   const normUrl = (u) => u.toLowerCase().replace(/^https?:\/\//, '').replace(/^(?:www|mobile)\./, '').replace(/[/?#]+$/, '');
+  // display-only cleanup for the 'clean urls' option: drops the scheme, a
+  // www. prefix, and a bare trailing / or /index.htm[l]
+  const cleanUrlDisp = (u) => u.replace(/^https?:\/\//i, '').replace(/^www\./i, '')
+    .replace(/\/index\.html?(?:[?#]\S*)?$/i, '').replace(/\/$/, '');
   function linkKeyOf(msg) {
     const ks = [];
     for (const t of msg.split(/\s+/)) {
@@ -2379,6 +2385,7 @@
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPing')) { setPing(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpClean')) { setCleanUrls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
@@ -2554,6 +2561,15 @@
   let pingOn = false;
   let pingCtx = null;
   function setPing(on) { pingOn = on; markHelp('helpPing', on ? 1 : 0); }
+  // clean-url mode rewrites the visible text of every link anchor rendered
+  // with data-u (the raw display text); the href is untouched either way
+  let cleanUrls = false;
+  function setCleanUrls(on) { cleanUrls = on; markHelp('helpClean', on ? 1 : 0); applyCleanUrls(); }
+  function applyCleanUrls() {
+    mainEl.querySelectorAll('a[data-u]').forEach((a) => {
+      a.textContent = cleanUrls ? cleanUrlDisp(a.dataset.u) : a.dataset.u;
+    });
+  }
   function pingSnd() {
     if (!pingOn) return;
     try {
@@ -2618,7 +2634,7 @@
         eonly: emoteMode,
         help: helpMode,
         video: !vidBox.hidden,
-        kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0,
+        kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0,
         hpw: helpWIdx, hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
         hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
         split: 1 + !sideEl.hidden + !side2El.hidden,
@@ -2683,6 +2699,7 @@
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
     if (o.ping) setPing(true);
+    if (o.clean) setCleanUrls(true);
     if (Number.isInteger(o.hpw) && o.hpw >= 0 && o.hpw < HELP_WIDTHS.length) { helpWIdx = o.hpw; applyHelpW(); }
     // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
     // list, which maps +4 (7-10 were prepended)
@@ -3363,6 +3380,7 @@
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
     if (pingOn) q.set('ping', '1');
+    if (cleanUrls) q.set('clean', '1');
     if (helpWIdx !== 7) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== 7) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
@@ -4668,6 +4686,7 @@
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('bw')) { bwInput.value = q.get('bw'); setBlocked(bwInput.value); }
     if (q.has('ping')) setPing(flag('ping'));
+    if (q.has('clean')) setCleanUrls(flag('clean'));
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
@@ -4681,7 +4700,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
+    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
@@ -4726,6 +4745,7 @@
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
   markHelp('helpPause', pauseOnText ? 1 : 0);
   markHelp('helpPing', pingOn ? 1 : 0);
+  markHelp('helpClean', cleanUrls ? 1 : 0);
   markHelp('helpScrollback', SCROLLBACK_SIZES.indexOf(MAX_MESSAGES));
   markHelp('helpFlow', revFlow ? 1 : 0);
   markHelp('helpTimes', timeIdx);
