@@ -100,7 +100,9 @@ until logout; channel rules (slow mode etc.) apply to sent messages and
 rejections come back as ordinary `[notice]` rows. A `➤` button sends
 for pointer/voice-only users, slow mode counts down in the input, the
 box grows a line at a time as a long draft wraps (⇧`enter` writes a
-newline, capped at five lines before scrolling), and
+newline, capped at five lines before scrolling), a character count
+beside it goes amber past ~200 chars — the guessed fossabot
+long-message cutoff — and red near Twitch's 500 cap, and
 typing a character anywhere jumps into the box — `↑`/`↓` select a row
 and `r`/`enter` replies to it. Accessibility: a hidden live region
 announces new lines to screen readers (history replays skipped), the

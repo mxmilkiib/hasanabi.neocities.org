@@ -70,6 +70,10 @@ not versions — the page ships continuously to Neocities.
   overlap margin are rounded in `syncLh()`, so every row boundary lands
   on a device pixel and paused columns no longer wiggle fractionally on
   each trim/append
+- A character counter sits beside the message box: amber past ~200
+  chars (a guessed fossabot long-message cutoff - its real filter
+  isn't public) and red near Twitch's 500 cap, with the box border
+  tinting to match
 - The message input is a growing textarea: a wrapping draft gains a
   line at a time up to five before scrolling, and ⇧enter writes a
   newline (plain enter still sends). Arrow-key history only hijacks

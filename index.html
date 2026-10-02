@@ -756,6 +756,14 @@
     overflow-y: hidden; line-height: 1.25; padding: 3px 8px; box-sizing: border-box;
   }
   #chatbar { align-items: flex-end; }
+  /* character count beside the box: amber past the long-message guess,
+     red near twitch's 500 cap; the box border tints along with it */
+  #chatLen { flex: none; align-self: flex-end; padding: 0 2px 6px; min-width: 2.5ch;
+    text-align: right; font-size: .7em; color: var(--text-dim); opacity: .5; }
+  #chatLen.warn { color: var(--accent); opacity: 1; }
+  #chatLen.over { color: var(--danger); opacity: 1; }
+  #chatInput.longmsg { border-color: var(--accent); }
+  #chatInput.overcap { border-color: var(--danger); }
   #chatbar input::placeholder, #chatbar textarea::placeholder { color: var(--text-dim); }
   #chatbar input:focus, #chatbar textarea:focus { outline: 1px solid var(--accent); outline-offset: 0; }
   /* emote picker popup over the chatbar - chatterino-style scrollable grid */
@@ -944,7 +952,7 @@
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button></div>
+  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker"><span style="display:inline-block;transform:scale(1.5)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" title="send message" aria-label="send message">➤</button></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌</button></div><div class="etabs" id="emoteTabs"></div><div id="emoteGrid"></div></div>
 
 <script>
@@ -3968,8 +3976,25 @@
     chatInput.style.height = 'auto';
     chatInput.style.height = chatInput.scrollHeight + 'px';
     chatInput.style.overflowY = chatInput.scrollHeight > chatInput.clientHeight ? 'auto' : 'hidden';
+    paintLen();
+  };
+  // fossabot's long-message cutoff isn't public, so the warn rung is a
+  // conservative guess - nudge it if warnings land sooner in practice
+  const LONG_WARN = 200, LONG_OVER = 460;
+  const chatLen = document.getElementById('chatLen');
+  const paintLen = () => {
+    const n = chatInput.value.length;
+    chatLen.textContent = n || '';
+    chatLen.classList.toggle('warn', n >= LONG_WARN && n < LONG_OVER);
+    chatLen.classList.toggle('over', n >= LONG_OVER);
+    chatInput.classList.toggle('longmsg', n >= LONG_WARN && n < LONG_OVER);
+    chatInput.classList.toggle('overcap', n >= LONG_OVER);
+    chatLen.title = n >= LONG_OVER ? `approaching twitch's 500-character cap`
+      : n >= LONG_WARN ? `long messages (~${LONG_WARN}+ chars) can draw a fossabot warning`
+      : '';
   };
   chatInput.addEventListener('input', growInput);
+  paintLen();
 
   chatInput.addEventListener('keydown', (e) => {
     // history walk hijacks arrows only on a single-line draft - once the
