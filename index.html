@@ -2985,8 +2985,7 @@
       document.documentElement.style.setProperty(prop, list[idx] + unit);
       syncLh();
       btn.title = `${label}: ${list[idx]}${unit} - click/scroll · ⇧click back`;
-      if (helpCls) helpPanel.querySelectorAll('a.' + helpCls)
-        .forEach((a) => a.classList.toggle('on', +a.dataset.idx === idx));
+      if (helpCls) markHelp(helpCls, idx);
       repin();
       saveOpts();
     };

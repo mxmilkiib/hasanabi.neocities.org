@@ -59,6 +59,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Font size, line height and weight cycles now refresh the preset 'on'
+  mark - cycle()'s own help-link marking skipped markPresets
 - `heather` preset fields corrected to the url they were specced from:
   emote-only rows at normal size, 1280px help width, 18px header font -
   the three had kept the copied gohu row's values
