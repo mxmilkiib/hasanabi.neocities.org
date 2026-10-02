@@ -74,6 +74,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Star badge goes self-hosted: the ghbtns look rebuilt in css with
+  the count filled from the relay - the iframe embed was blank for
+  anyone on a social-widget blocklist
 - Picking a popup width also docks the panel top-right - the dragged
   position clears and its saved x/y drops; a dragged height stays
 - Links-view row icon pins to text presentation (🔗︎) so it renders

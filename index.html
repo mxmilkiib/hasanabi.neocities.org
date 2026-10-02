@@ -819,9 +819,25 @@
   #helpPanel div.sep { display: block; grid-column: 1 / -1; text-align: center; color: var(--text-dim); opacity: .55; margin: 11px 0 9px; }
   #helpPanel #htabRes div.sep { margin: 7px 0 5px; line-height: 1.1; }
   #helpPanel div.wide > span { grid-column: 1 / -1; text-align: center; }
-  /* the unofficial github star button (ghbtns.com) - hotlinked iframe,
-     live count served from their side */
-  #helpPanel iframe.ghbtn { border: 0; vertical-align: middle; margin-left: 4px; }
+  /* the ghbtns.com star-button look, self-hosted - an iframe embed would
+     be eaten by social-widget blocklists; the count fills from the
+     relay's repo stats instead of their jsonp */
+  #helpPanel .ghbtn { display: inline-flex; align-items: center; vertical-align: middle;
+    margin-left: 6px; font: 700 16px/22px -apple-system, "Segoe UI", Arial, sans-serif; }
+  #helpPanel .ghbtn a { text-decoration: none; white-space: nowrap; }
+  #helpPanel .ghbtn .ghb { display: inline-flex; align-items: center; padding: 3px 10px 3px 8px;
+    color: #24292f; background: linear-gradient(#fcfcfc, #eee);
+    border: 1px solid #d5d5d5; border-radius: 4px; }
+  #helpPanel .ghbtn .ghb:hover { background: linear-gradient(#eee, #ddd); border-color: #ccc; }
+  #helpPanel .ghbtn .ghb svg { width: 20px; height: 20px; margin-right: 4px; }
+  #helpPanel .ghbtn .ghc { position: relative; display: inline-block; margin-left: 6px;
+    padding: 3px 10px; color: #333; background: #fafafa;
+    border: 1px solid #d4d4d4; border-radius: 4px; }
+  #helpPanel .ghbtn .ghc:hover { color: #0366d6; }
+  #helpPanel .ghbtn .ghc::before { content: ""; position: absolute; top: 50%; left: -5px;
+    margin-top: -6px; border: 6px solid transparent; border-right-color: #fafafa; border-left: 0; }
+  #helpPanel .ghbtn .ghc::after { content: ""; position: absolute; top: 50%; left: -6px; z-index: -1;
+    margin-top: -7px; border: 7px solid transparent; border-right-color: #d4d4d4; border-left: 0; }
   #helpPanel i { font-style: normal; color: var(--text-dim); font-size: .85em; }
   /* link-column rows (news): one entry per line, flowing into as many
      ~20em columns as the popup width fits. Column counts are capped so
@@ -1130,7 +1146,7 @@
     <button id="cacheBust" class="hdr-btn" style="flex: 1; height: 26px" title="reload the page bypassing the cache - keeps this url's settings">↻ clear cache</button>
     </div>
     <div class="sep">—</div>
-    <div class="wide" style="margin-top: 8px"><span>source: <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/README.md" target="_blank" rel="noopener">README.md</a> · <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a> · <a class="at" href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License" target="_blank" rel="noopener">AGPL</a>)<iframe class="ghbtn" src="https://ghbtns.com/github-btn.html?user=mxmilkiib&repo=hasanabi.neocities.org&type=star&count=true&size=large" width="150" height="30" title="star the repo on github" loading="lazy"></iframe><span id="repoStats"></span></span></div>
+    <div class="wide" style="margin-top: 8px"><span>source: <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/README.md" target="_blank" rel="noopener">README.md</a> · <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a> · <a class="at" href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License" target="_blank" rel="noopener">AGPL</a>)<span class="ghbtn"><a class="ghb" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener" title="star the repo on github"><svg viewBox="12 12 40 40" aria-hidden="true"><path fill="#333" d="M32 13.4c-10.5 0-19 8.5-19 19 0 8.4 5.5 15.5 13 18 1 .2 1.3-.4 1.3-.9v-3.2c-5.3 1.1-6.4-2.6-6.4-2.6-.9-2.1-2.1-2.7-2.1-2.7-1.7-1.2.1-1.1.1-1.1 1.9.1 2.9 2 2.9 2 1.7 2.9 4.5 2.1 5.5 1.6.2-1.2.7-2.1 1.2-2.6-4.2-.5-8.7-2.1-8.7-9.4 0-2.1.7-3.7 2-5.1-.2-.5-.8-2.4.2-5 0 0 1.6-.5 5.2 2 1.5-.4 3.1-.7 4.8-.7 1.6 0 3.3.2 4.7.7 3.6-2.4 5.2-2 5.2-2 1 2.6.4 4.6.2 5 1.2 1.3 2 3 2 5.1 0 7.3-4.5 8.9-8.7 9.4.7.6 1.3 1.7 1.3 3.5v5.2c0 .5.4 1.1 1.3.9 7.5-2.6 13-9.7 13-18.1 0-10.5-8.5-19-19-19z"/></svg>Star</a><a class="ghc" href="https://github.com/mxmilkiib/hasanabi.neocities.org/stargazers" target="_blank" rel="noopener" title="stargazers"><span id="repoStars"></span></a></span><span id="repoStats"></span></span></div>
     </div>
     <div class="htabpage" id="htabRes" hidden>
     <div><b>re Hasan</b><span><a class="at" href="https://www.youtube.com/@HasanAbi" target="_blank" rel="noopener">youtube</a> · <a class="at" href="https://x.com/hasanthehun" target="_blank" rel="noopener">twitter</a> · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://www.tiktok.com/@hasandpiker" target="_blank" rel="noopener">tiktok</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">hascord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://hasanhub.com/" target="_blank" rel="noopener">hasanhub</a> (clips) · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a> (<a class="at" href="https://youtu.be/zoEWotQKiCo" target="_blank" rel="noopener">original</a>) · <a class="at" href="https://www.youtube.com/@FearandPodcast" target="_blank" rel="noopener">fear&amp; pod</a> · <a class="at" href="https://en.wikipedia.org/wiki/Hasan_Piker" target="_blank" rel="noopener">wikipedia</a> · <a class="at" href="https://hasanabi.fandom.com/" target="_blank" rel="noopener">hasanabi wiki</a> · <a class="at" href="https://twitchtracker.com/hasanabi" target="_blank" rel="noopener">twitchtracker</a> · <a class="at" href="https://ideologie.shop/" target="_blank" rel="noopener">ideologie shop</a> · <a class="at" href="https://youtube.com/@ostonox" target="_blank" rel="noopener">ostonox</a></span></div>
@@ -5672,6 +5688,8 @@
       repin();
     } else if (d.type === 'repo') {
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
+      const rs = document.getElementById('repoStars');
+      if (rs) rs.textContent = Number.isFinite(d.stars) ? d.stars.toLocaleString('en') : '';
       document.getElementById('repoStats').textContent =
         ` · started: ${ymd(d.created)}, updated: ${ymd(d.pushed)}`;
     }
