@@ -843,8 +843,13 @@
      narrow as less text needs room */
   #htabAuth.ainfo2 .ag, #htabAuth.ainfo3 .ag { display: none; }
   /* the (work)/(tagline)/(dates) annotations match the resources tab's
-     nested-note size */
-  #htabAuth .aw, #htabAuth .ad, #htabAuth .ag { font-size: .85em; }
+     nested-note size; .am is the all-mode bracket that merges work and
+     tagline, so the split spans hide by default and resurface only in
+     the sparser modes that need them */
+  #htabAuth .aw, #htabAuth .ad, #htabAuth .ag, #htabAuth .am { font-size: .85em; }
+  #htabAuth .aw, #htabAuth .ag { display: none; }
+  #htabAuth.ainfo1 .ag, #htabAuth.ainfo2 .aw { display: inline; }
+  #htabAuth.ainfo1 .am, #htabAuth.ainfo2 .am, #htabAuth.ainfo3 .am { display: none; }
   #htabAuth.ainfo1 .linkcols { columns: 28em; }
   #htabAuth.ainfo2 .linkcols { columns: 24em; }
   #htabAuth.ainfo3 .linkcols { columns: 15em; }
@@ -2854,6 +2859,35 @@
       (m, w, d) => ` <span class="aw">(${w})</span>` + (d ? `<span class="ad"> (${d})</span>` : ''));
     const ad = el.querySelector('.ad'), ag = el.querySelector('.ag');
     if (ad && ag) ag.after(ad);
+    // 'all' folds the work and tagline notes into one bracket: tagline
+    // words the work already used drop out ('the' only at the head or
+    // beside another drop), and stray connectors/commas are tidied
+    const aw = el.querySelector('.aw');
+    if (aw && ag) {
+      const wset = new Set(aw.textContent.toLowerCase().match(/[a-zà-ÿ0-9']{3,}/g) || []);
+      const toks = ag.textContent.trim().replace(/^\(|\)$/g, '').trim().split(/\s+/);
+      const drop = new Set();
+      toks.forEach((t, i) => {
+        const w = t.toLowerCase().replace(/[^a-zà-ÿ0-9']/g, '');
+        if (w.length > 2 && w !== 'the' && wset.has(w)) drop.add(i);
+      });
+      toks.forEach((t, i) => {
+        if (t.toLowerCase().replace(/[^a-z]/g, '') === 'the' && wset.has('the') &&
+            (i === 0 || drop.has(i - 1) || drop.has(i + 1))) drop.add(i);
+      });
+      const kept = [];
+      toks.forEach((t, i) => {
+        if (!drop.has(i)) { kept.push(t); return; }
+        const p = t.match(/[,.;:]+$/); // a dropped word's tail comma stays
+        if (p && kept.length) kept[kept.length - 1] += p[0];
+      });
+      while (kept.length && /^(and|the|a|an|of|or|to|in|is|for|with|by|as)[,.;:]*$/i.test(kept[kept.length - 1])) kept.pop();
+      if (kept.length) kept[kept.length - 1] = kept[kept.length - 1].replace(/[,.;:]+$/, '');
+      const am = document.createElement('span');
+      am.className = 'am';
+      am.textContent = `(${aw.textContent.slice(1, -1)}${kept.length ? ' · ' + kept.join(' ') : ''})`;
+      aw.after(am);
+    }
   });
   const authOrig = authSecs.innerHTML;
   helpPanel.addEventListener('click', (e) => {
@@ -5400,7 +5434,7 @@
         const p = t.parentElement;
         // link/label/sup text can't hold a descriptor; an i nested in an i
         // or the authors' aw/ad/ag spans already carry the small note face
-        if (p.closest('a,b,sup,.aw,.ad,.ag')) continue;
+        if (p.closest('a,b,sup,.aw,.ad,.ag,.am')) continue;
         if (p.tagName === 'I' && p.parentElement.closest('i')) continue;
         texts.push(t);
       }
