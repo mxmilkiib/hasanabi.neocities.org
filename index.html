@@ -810,7 +810,8 @@
   #helpPanel .linkcols > i { display: block; break-inside: avoid; font-size: 1em; }
   /* the * after a twitch stream retargets the whole page at that channel */
   #helpPanel a.chsw { margin-left: .5em; font-weight: 700; text-decoration: none; }
-  #helpPanel a.chadd { margin-left: 2px; color: var(--text-dim); }
+  /* the merge + sits a space off the switch *, painted the accent gold */
+  #helpPanel a.chadd { margin-left: 5px; color: var(--accent); }
   /* a joined stream's entry reads in azure - a hue apart from the
      accent/red/green/amber/violet colours already in use */
   #helpPanel i.chon a.at { color: #5f9dff; }
@@ -5332,7 +5333,7 @@
     add.classList.add('chadd');
     add.href = `?channel=${[...CHANNELS, target].join(',')}`;
     add.title = `merge #${target} into this page's chats`;
-    a.after(add);
+    a.after(' ', add);
   }
 
   window.addEventListener('message', (event) => {
