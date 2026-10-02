@@ -78,6 +78,10 @@ not versions — the page ships continuously to Neocities.
   line at a time up to five before scrolling, and ⇧enter writes a
   newline (plain enter still sends). Arrow-key history only hijacks
   `↑` on a single-line draft
+- `↓` on a non-empty draft parks it as a navigable slot in the send
+  history and leaves a fresh line - the readline trick of stashing a
+  draft under whatever gets sent next; sending from a parked slot
+  closes it rather than duplicating
 - IRC-style input history: `↑`/`↓` walk sent messages, the draft is
   stashed on the first `↑` and restored by `↓`
 - Emote picker: sections per provider (7TV / BTTV / FFZ / Twitch /
