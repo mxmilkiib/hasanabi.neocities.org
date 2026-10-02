@@ -68,6 +68,9 @@ not versions — the page ships continuously to Neocities.
   longer throws on a missing uptime field
 - Input history arrows now honour caret position in multi-line drafts:
   ↑ walks from the first line, ↓ from the last, ⇧+arrow selects
+- Reply rows consume two zebra stripes: the quoted parent block renders
+  as its own line above the message, so the row flips parity twice and
+  the alternation stays in step per visual line
 
 ## 2026-10-01
 
