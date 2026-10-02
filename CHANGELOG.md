@@ -19,6 +19,8 @@ not versions — the page ships continuously to Neocities.
   every entry carries data-b/data-d years, era labels now render as
   bold block heads like the bot lists, and the flat sort dedupes the
   mark fisher entry that sat in two sections
+- Header shows a rolling `N chatters` tally - distinct senders seen in
+  the last hour, the only audience figure available once a stream ends
 - Help panel is now draggable and corner-resizable like the stream
   overlay and emote picker: a dotted ⠿ strip across the top moves it,
   ◤◥◣◢ glyphs resize each corner, and position persists alongside the
