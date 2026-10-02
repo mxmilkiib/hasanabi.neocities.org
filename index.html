@@ -479,7 +479,8 @@
   .role { margin-right: 4px; color: var(--text-dim); }
   /* multi-channel mode: which room a row came from. Dim while that channel
      is offline, accent-tinted once its stream is live */
-  .chtag { margin-right: 4px; color: var(--text-dim); text-decoration: none;
+  .chtag { display: inline-block; min-width: var(--chw, auto); text-align: right;
+    margin-right: 4px; color: var(--text-dim); text-decoration: none;
     font-size: .85em; opacity: .8; }
   .chtag.live { color: var(--accent); opacity: 1; }
   .chtag:hover { color: var(--text); text-decoration: underline; }
@@ -1123,6 +1124,10 @@
   const CHANNEL = CHANNELS[0] || DEFAULT_CHANNEL;
   if (!CHANNELS.length) CHANNELS.push(DEFAULT_CHANNEL);
   const MULTI = CHANNELS.length > 1;
+  // the widest channel name sizes the #tag column so every row's tag
+  // right-aligns on the same edge
+  if (MULTI) document.documentElement.style.setProperty('--chw',
+    (Math.max(...CHANNELS.map((c) => c.length)) + 1.4) + 'ch');
   const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? 'HasanAbi' : CHANNEL;
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
