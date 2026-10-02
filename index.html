@@ -691,17 +691,43 @@
     width: calc(100vw - 24px);
     max-width: 720px;
     max-height: 75vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 6px;
-    padding: 10px 14px;
+    padding: 0;
     font-size: min(var(--chat-font, 15px), 18px); /* follow chat, capped */
     line-height: 1.5;
     z-index: 10;
     container-type: inline-size;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
+  #helpPanel[hidden] { display: none; }
+  /* the scrollable region lives one level in so the drag handle and
+     corner grips can sit fixed over it */
+  #helpPanel .hp-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 14px; border-radius: 5px; }
+  /* the dotted grip mirrors the stream overlay's handle - it bleeds
+     across the top edge and fades in on hover or while dragging */
+  #helpPanel .hp-handle { flex: none; height: 8px; align-self: stretch;
+    cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
+    letter-spacing: 4px; overflow: hidden; white-space: nowrap;
+    opacity: 0; transition: opacity .15s; touch-action: none; }
+  #helpPanel .hp-handle::after {
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
+  }
+  #helpPanel:hover .hp-handle, #helpPanel.dragging .hp-handle { opacity: 1; }
+  /* corner glyphs mirror the stream overlay's resize grips - they fade in
+     on hover and each drags its own corner with the far one anchored */
+  #helpPanel .hp-size { position: absolute; width: 22px; height: 22px; z-index: 3;
+    color: var(--text-dim); font-size: 12px; line-height: 1;
+    display: grid; place-items: center; opacity: 0;
+    transition: opacity .15s; touch-action: none; }
+  #helpPanel .hp-size.br { right: 0; bottom: 0; cursor: nwse-resize; }
+  #helpPanel .hp-size.bl { left: 0; bottom: 0; cursor: nesw-resize; }
+  #helpPanel .hp-size.tr { right: 0; top: 0; cursor: nesw-resize; }
+  #helpPanel .hp-size.tl { left: 0; top: 0; cursor: nwse-resize; }
+  #helpPanel:hover .hp-size, #helpPanel.dragging .hp-size { opacity: 1; }
   #helpPanel b { color: var(--accent); font-weight: 600; }
   #helpPanel b .dot { display: inline-block; vertical-align: middle; }
   #helpPanel b.rowstyle { padding: 0 4px; }
@@ -909,7 +935,7 @@
     <button class="hdr-btn" id="helpBtn" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back">–</button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back">↕</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.35)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back">☺</button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back">▮▮</button><button class="hdr-btn" id="vidBtn" title="Stream video - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
   </header>
-  <div id="helpPanel" hidden>
+  <div id="helpPanel" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
     <nav class="htabs"><a href="#" class="htab" data-htab="htabRes">resources</a><a href="#" class="htab" data-htab="htabAuth">authors</a><a href="#" class="htab on" data-htab="htabCfg">config/help</a></nav>
     <div class="htabpage" id="htabCfg">
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
@@ -1000,7 +1026,7 @@
     <div><b>free culture</b><span class="linkcols"><i><a class="at" href="https://www.gnu.org/philosophy/philosophy.html" target="_blank" rel="noopener" data-b="1953">richard stallman</a> (free software · b.53)</i><i><a class="at" href="https://wiki.c2.com/?WikiWikiWeb" target="_blank" rel="noopener" data-b="1949">ward cunningham</a> (the first wiki · b.49)</i><i><a class="at" href="http://www.catb.org/~esr/writings/cathedral-bazaar/" target="_blank" rel="noopener" data-b="1957">eric s. raymond</a> (the cathedral and the bazaar · b.57)</i><i><a class="at" href="https://lessig.org/product/free-culture/" target="_blank" rel="noopener" data-b="1961">lawrence lessig</a> (free culture, creative commons)</i><i><a class="at" href="https://pluralistic.net/" target="_blank" rel="noopener" data-b="1971">cory doctorow</a> (enshittification · b.71)</i></span></div>
     </div>
     </div>
-  </div>
+    </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
@@ -5237,9 +5263,24 @@
     return l && b ? 'bl' : l ? 'l' : b ? 'b' : '';
   };
   helpPanel.addEventListener('pointermove', (e) => {
-    if (e.buttons) return;
+    if (e.buttons || e.target.closest('.hp-handle, .hp-size')) return;
     helpPanel.style.cursor = HS_CURS[edgeAt(e)] || '';
   });
+  // w/h and position live in the same key; a width that lands on a
+  // preset re-marks the preset button instead of storing the px
+  const saveHsize = (edges) => {
+    const rr = helpPanel.getBoundingClientRect();
+    const s = readHsize();
+    if (edges.includes('l') || edges.includes('r')) {
+      s.w = Math.round(rr.width);
+      const i = HELP_WIDTHS.indexOf(s.w);
+      if (i >= 0) { helpWIdx = i; markHelp('helpW', i); markHelpW(0); delete s.w; }
+      else { markHelp('helpW', -1); markHelpW(s.w); }
+    }
+    if (edges.includes('b') || edges.includes('t')) s.h = Math.round(rr.height);
+    if (helpPanel.style.left) { s.x = Math.round(rr.left); s.y = Math.round(rr.top); }
+    writeHsize(s);
+  };
   helpPanel.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || helpPanel.hidden) return;
     const edge = edgeAt(e);
@@ -5248,9 +5289,14 @@
     helpPanel.setPointerCapture(e.pointerId);
     const r = helpPanel.getBoundingClientRect();
     helpPanel.style.cursor = HS_CURS[edge];
+    // re-anchor to left/top so the dragged edges stay put under the
+    // pointer regardless of how the panel was previously positioned
+    helpPanel.style.left = r.left + 'px'; helpPanel.style.top = r.top + 'px';
+    helpPanel.style.right = 'auto';
     const move = (ev) => {
       if (edge.includes('l')) {
         const w = Math.round(Math.max(280, Math.min(innerWidth - 24, r.right - ev.clientX)));
+        helpPanel.style.left = (r.right - w) + 'px';
         helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
       }
       if (edge.includes('b')) {
@@ -5264,20 +5310,73 @@
       helpPanel.removeEventListener('pointerup', drop);
       helpPanel.removeEventListener('pointercancel', drop);
       helpPanel.style.cursor = '';
-      const rr = helpPanel.getBoundingClientRect();
-      const s = readHsize();
-      if (edge.includes('l')) {
-        s.w = Math.round(rr.width);
-        const i = HELP_WIDTHS.indexOf(s.w);
-        if (i >= 0) { helpWIdx = i; markHelp('helpW', i); markHelpW(0); delete s.w; }
-        else { markHelp('helpW', -1); markHelpW(s.w); }
-      }
-      if (edge.includes('b')) s.h = Math.round(rr.height);
-      writeHsize(s);
+      saveHsize(edge);
     };
     helpPanel.addEventListener('pointermove', move);
     helpPanel.addEventListener('pointerup', drop);
     helpPanel.addEventListener('pointercancel', drop);
+  });
+
+  // the dotted strip drags the panel; the corner glyphs resize with the
+  // opposite corner anchored - same idiom as the stream overlay
+  helpPanel.querySelector('.hp-handle').addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || helpPanel.hidden) return;
+    e.preventDefault(); e.stopPropagation();
+    const hdl = e.currentTarget;
+    hdl.setPointerCapture(e.pointerId);
+    helpPanel.classList.add('dragging');
+    const r = helpPanel.getBoundingClientRect();
+    const ox = e.clientX - r.left, oy = e.clientY - r.top;
+    const move = (ev) => {
+      helpPanel.style.right = 'auto';
+      helpPanel.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
+      helpPanel.style.top = Math.max(0, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+    };
+    const drop = () => {
+      helpPanel.classList.remove('dragging');
+      hdl.removeEventListener('pointermove', move);
+      hdl.removeEventListener('pointerup', drop);
+      hdl.removeEventListener('pointercancel', drop);
+      saveHsize(''); // '' skips w/h - position only
+    };
+    hdl.addEventListener('pointermove', move);
+    hdl.addEventListener('pointerup', drop);
+    hdl.addEventListener('pointercancel', drop);
+  });
+  helpPanel.querySelectorAll('.hp-size').forEach((grip) => {
+    grip.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation(); // keep the invisible edge resize out of it
+      grip.setPointerCapture(e.pointerId);
+      helpPanel.classList.add('dragging');
+      const r = helpPanel.getBoundingClientRect();
+      helpPanel.style.left = r.left + 'px'; helpPanel.style.top = r.top + 'px';
+      helpPanel.style.right = 'auto';
+      const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl');
+      const topEdge = grip.classList.contains('tl') || grip.classList.contains('tr');
+      const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner
+      const ay = topEdge ? r.bottom : r.top;
+      const move = (ev) => {
+        const w = Math.round(Math.max(280, Math.min(innerWidth - 8, Math.abs(ev.clientX - ax))));
+        const h = Math.round(Math.max(120, Math.min(innerHeight - 8, Math.abs(ev.clientY - ay))));
+        helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
+        helpPanel.style.height = h + 'px';
+        helpPanel.style.maxHeight = 'none';
+        helpPanel.style.left = (leftEdge ? ax - w : ax) + 'px';
+        helpPanel.style.top = (topEdge ? ay - h : ay) + 'px';
+      };
+      const drop = () => {
+        helpPanel.classList.remove('dragging');
+        grip.removeEventListener('pointermove', move);
+        grip.removeEventListener('pointerup', drop);
+        grip.removeEventListener('pointercancel', drop);
+        saveHsize((leftEdge ? 'l' : 'r') + (topEdge ? 't' : 'b'));
+      };
+      grip.addEventListener('pointermove', move);
+      grip.addEventListener('pointerup', drop);
+      grip.addEventListener('pointercancel', drop);
+    });
   });
   // restore a dragged size once saved options and url params have settled;
   // an explicit ?hpw= beats a stored width
@@ -5286,6 +5385,10 @@
     const q2 = new URLSearchParams(location.search);
     if (hs.w && !q2.has('hpw')) { helpPanel.style.width = helpPanel.style.maxWidth = hs.w + 'px'; markHelpW(hs.w); }
     if (hs.h) { helpPanel.style.height = hs.h + 'px'; helpPanel.style.maxHeight = 'none'; }
+    if (hs.x != null) {
+      helpPanel.style.left = hs.x + 'px'; helpPanel.style.top = hs.y + 'px';
+      helpPanel.style.right = 'auto';
+    }
   } catch (e) {}
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
