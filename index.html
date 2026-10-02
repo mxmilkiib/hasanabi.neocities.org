@@ -637,7 +637,9 @@
   /* a reply row counts as two lines: the quote takes the stripe opposite
      to the reply beneath it. Tinted rows suppress the stripe overlay, so
      their quotes keep the row's own colour instead */
-  main.zebra .reply.rq { margin-left: 0; padding-left: 11px; }
+  /* stretch the quote's shade to the row edge and up over the row's
+     top padding, so its stripe band is contiguous with the line above */
+  main.zebra .reply.rq { margin: -4px 0 1px; padding: 4px 0 0 11px; }
   main.zebra .row:not(.z):not(.points):not(.glorp):not(.mention):not(.kw):not(.raid) .reply.rq {
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07)); }
   main.zebra .row.z:not(.points):not(.glorp):not(.mention):not(.kw):not(.raid) .reply.rq { background-color: var(--bg); }

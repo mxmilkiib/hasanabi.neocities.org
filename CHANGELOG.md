@@ -100,7 +100,8 @@ not versions — the page ships continuously to Neocities.
   ↑ walks from the first line, ↓ from the last, ⇧+arrow selects
 - Reply rows consume two zebra stripes: the quoted parent line takes
   the stripe opposite the reply beneath it, so the alternation holds
-  per visual line (tinted rows keep their own colour on both lines)
+  per visual line (tinted rows keep their own colour on both lines); its stripe band
+  extends over the row's top padding so it meets the line above
 - The header's msgs/sec and chatters values bold like the stream times
 - Floating surfaces (help panel, emote picker, stream overlay, hover
   tooltip) use a hue-neutral --popline border: white on dark shades,
