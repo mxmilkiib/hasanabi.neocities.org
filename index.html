@@ -1931,7 +1931,11 @@
       qt.style.marginLeft = (tg.offsetLeft - 13) + 'px';
       qt.style.marginRight = Math.max(1, nm.offsetLeft - 2 - tg.offsetLeft - qt.offsetWidth) + 'px';
     } else {
-      rq.style.paddingLeft = (nm.offsetLeft - 2 - rq.offsetLeft - 2) + 'px';
+      // text-indent hangs only the first line out to the nick column;
+      // wrapped lines return to the quote's own left edge like an
+      // ordinary multiline row
+      const pl = parseFloat(getComputedStyle(rq).paddingLeft);
+      rq.style.textIndent = (nm.offsetLeft - 2 - rq.offsetLeft - 2 - pl) + 'px';
     }
   }
   function flush() {
