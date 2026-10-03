@@ -2143,7 +2143,7 @@
       const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
       // bots never carry a sub count - skip the placeholder chip entirely
       const subHtml = shimmer && !subM ? '' :
-        `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
+        `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${SUB_MODES[subMode] === 'num-left' ? ' style="margin-right:6px"' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the

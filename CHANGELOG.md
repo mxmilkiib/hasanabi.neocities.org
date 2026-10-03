@@ -37,7 +37,7 @@ not versions — the page ships continuously to Neocities.
 - The `▮▮` page-flip glyph eases its vertical stretch to 1.3x so it
   clears the button's bottom edge
 - The left-positioned sub chip picks up 1px of air after the
-  time/channel tag
+  time/channel tag, and its compact form gets 2px more on its right
 - Zebra striping's description reads `bg shading on alternating rows`;
   the font menu row drops its redundant `chat font:` label
 
