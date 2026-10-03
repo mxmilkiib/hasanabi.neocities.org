@@ -23,8 +23,8 @@ not versions — the page ships continuously to Neocities.
   wikipedia ahead of fear& pod; the `—` spacer between it and `clips`
   goes, as do the ones between free software/open hardware and the
   trailing one after extra links
-- The `—` section separators open up to 13px/11px in config and
-  9px/7px in resources, and the config ones dim to opacity .4
+- Section rows in the popup get more margin between them (7px over the
+  old 4px), and the config `—` separators dim to opacity .4
 - The authors tab's info and sort filters share a line whenever the
   popup is wide enough, wrapping back to two centered lines when narrow,
   and 'all' folds the dates into the merged bracket after a comma rather
