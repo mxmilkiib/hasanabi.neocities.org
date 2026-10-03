@@ -911,6 +911,9 @@
   /* !commands take the page's text colour; only the bracketed
      arg/descriptor notes keep the dim smaller face */
   #helpPanel .linkcols.cmds .bc { color: var(--text); font-size: inherit; }
+  /* an nw chunk holds one !command plus its arg/descriptor note - the
+     text may still wrap, but only at the · separators between chunks */
+  #helpPanel .linkcols.cmds nw { white-space: nowrap; }
   /* relative not absolute - absolute anchored to the fixed panel, so the
      daggers stayed pinned while the text beneath them scrolled away */
   #helpPanel sup { position: relative; top: -3px; font-size: .7em; margin-left: 1px; }
@@ -1142,7 +1145,7 @@
     <div><b></b>names link to twitch profiles - logged in, a plain click types @name in the chat box (⌃/⌘-click still opens the profile) · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
     <div class="sep">—</div>
-    <div><b>blammobot</b><span class="linkcols xtra cmds"><i><b>games</b>!roulette <i>[amount|all]</i> (gamble points on red/black) · !trivia (answer questions for points) · !scramble (unscramble the word)</i><i><b>points</b>!points (check balance) · !top <i>[count]</i> (leaderboard)</i></span></div>
+    <div><b>blammobot</b><span class="linkcols wider cmds"><i><b>games</b><nw>!roulette <i>[amount|all]</i> (gamble points on red/black)</nw> · <nw>!trivia (answer questions for points)</nw> · <nw>!scramble (unscramble the word)</nw></i><i><b>points</b><nw>!points (check balance)</nw> · <nw>!top <i>[count]</i> (leaderboard)</nw></i></span></div>
     <div><b>fossabot</b><span class="linkcols xtra cmds"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
     <div><b></b><span>this page colours each game's [tag] chip and bolds answers, rolls and point counts</span></div>
     <div class="sep">—</div>
