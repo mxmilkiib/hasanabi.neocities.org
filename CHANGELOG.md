@@ -19,12 +19,15 @@ not versions — the page ships continuously to Neocities.
   wikipedia ahead of fear& pod; the `—` spacer between it and `clips`
   goes, as do the ones between free software/open hardware and the
   trailing one after extra links
-- The config/help `—` separators dim to opacity .4
+- The `—` section separators open up to 11px/9px in config and 7px/5px
+  in resources, and the config ones dim to opacity .4
 - The authors tab's sort and info filters share a line whenever the
   popup is wide enough, wrapping back to two centered lines when narrow
 - Bot command lists stop splitting mid-`!command`: each command plus
   its arg/descriptor is an atomic chunk and text wraps only at the ·
-  separators; blammobot's columns widen to fit
+  separators; both bots' columns widen to fit
+- Author sub-heads (classical, founders…) get a breath of margin above
+  them inside their column
 - `follow chat` now literally matches the chat size - the popup was
   capped at 18px and the narrow-screen header ran at 87% of chat
 - Text scrolling under the ? popup's pinned tabs greys out harder -
