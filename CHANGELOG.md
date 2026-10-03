@@ -8,6 +8,8 @@ not versions — the page ships continuously to Neocities.
 ### Additions
 - `extra links` gains mettasutta and brahmavihara links after og
   mindfulness
+- Mao joins the marxists authors, heading the mid 20c group with a link
+  to his marxists.org archive
 - A `mutual aid` row joins resources under `dual power`, taking the
   disaster relief, big door brigade and food not bombs links down with
   it and gaining mutual aid hub, the mutual aid wiki, freedge, common
@@ -23,8 +25,10 @@ not versions — the page ships continuously to Neocities.
   trailing one after extra links
 - The `—` section separators open up to 13px/11px in config and
   9px/7px in resources, and the config ones dim to opacity .4
-- The authors tab's sort and info filters share a line whenever the
-  popup is wide enough, wrapping back to two centered lines when narrow
+- The authors tab's info and sort filters share a line whenever the
+  popup is wide enough, wrapping back to two centered lines when narrow,
+  and 'all' folds the dates into the merged bracket after a comma rather
+  than a second bracket
 - Bot command lists stop splitting mid-`!command`: each command plus
   its arg/descriptor is an atomic chunk and text wraps only at the ·
   separators; both bots' columns widen to fit

@@ -897,6 +897,8 @@
   #htabAuth .aw, #htabAuth .ag { display: none; }
   #htabAuth.ainfo1 .ag, #htabAuth.ainfo2 .aw { display: inline; }
   #htabAuth.ainfo1 .am, #htabAuth.ainfo2 .am, #htabAuth.ainfo3 .am { display: none; }
+  /* dates folded into the merged .am bracket don't repeat beside it */
+  #htabAuth .am ~ .ad { display: none; }
   #htabAuth.ainfo1 .linkcols { columns: 28em; }
   #htabAuth.ainfo2 .linkcols { columns: 24em; }
   #htabAuth.ainfo3 .linkcols { columns: 15em; }
@@ -2923,7 +2925,8 @@
   const authSecs = document.getElementById('authSections');
   // split each entry's "(work · dates)" tail into hideable spans: aw
   // carries "(work)", ad "(dates)" - the info cycle drops dates or the
-  // whole note; ad is moved after the tagline so dates read rightmost
+  // whole note; ad moves after the tagline, and 'all' folds it into the
+  // merged bracket after a comma instead of a second bracket
   authSecs.querySelectorAll('.linkcols > i').forEach((el) => {
     el.innerHTML = el.innerHTML.replace(/ \(([^()]*?)(?: · ([^()]*))?\)/,
       (m, w, d) => ` <span class="aw">(${w})</span>` + (d ? `<span class="ad"> (${d})</span>` : ''));
@@ -2955,7 +2958,7 @@
       if (kept.length) kept[kept.length - 1] = kept[kept.length - 1].replace(/[,.;:]+$/, '');
       const am = document.createElement('span');
       am.className = 'am';
-      am.textContent = `(${aw.textContent.slice(1, -1)}${kept.length ? ' · ' + kept.join(' ') : ''})`;
+      am.textContent = `(${aw.textContent.slice(1, -1)}${kept.length ? ' · ' + kept.join(' ') : ''}${ad ? ', ' + ad.textContent.trim() : ''})`;
       aw.after(am);
     }
   });
