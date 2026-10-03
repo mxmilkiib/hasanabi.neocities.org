@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Section separators tighten again: 9/7px in config, 5/3px in
+  resources (were 11/9 and 6/4)
 - Popup resize-grip glyphs shrink and hug their own edge of the
   hitbox instead of floating centre-box
 - Star badge shrinks to ghbtns' small size and its palette follows
