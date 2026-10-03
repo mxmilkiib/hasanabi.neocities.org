@@ -21,8 +21,8 @@ not versions — the page ships continuously to Neocities.
   wikipedia ahead of fear& pod; the `—` spacer between it and `clips`
   goes, as do the ones between free software/open hardware and the
   trailing one after extra links
-- The `—` section separators open up to 11px/9px in config and 7px/5px
-  in resources, and the config ones dim to opacity .4
+- The `—` section separators open up to 13px/11px in config and
+  9px/7px in resources, and the config ones dim to opacity .4
 - The authors tab's sort and info filters share a line whenever the
   popup is wide enough, wrapping back to two centered lines when narrow
 - Bot command lists stop splitting mid-`!command`: each command plus
