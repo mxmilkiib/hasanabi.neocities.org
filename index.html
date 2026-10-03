@@ -1142,7 +1142,7 @@
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
-    <div><b></b>names link to twitch profiles - logged in, a plain click types @name in the chat box (⌃/⌘-click still opens the profile) · fossabot + blammobot names shimmer · urls are clickable · images and gifs embed pinned right</div>
+    <div><b></b>names link to twitch profiles - logged in, a plain click types @name in the chat box (⌃/⌘-click still opens the profile) · fossabot + blammobot names shimmer, as do urls they post · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
     <div class="sep">—</div>
     <div><b>blammobot</b><span class="linkcols wider cmds"><i><b>games</b><nw>!roulette <i>[amount|all]</i> (gamble points on red/black)</nw> · <nw>!trivia (answer questions for points)</nw> · <nw>!scramble (unscramble the word)</nw></i><i><b>points</b><nw>!points (check balance)</nw> · <nw>!top <i>[count]</i> (leaderboard)</nw></i></span></div>
@@ -1558,7 +1558,7 @@
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
   // and bolding @username mentions like real chat. Zero-width emotes stack
   // onto the previous emote; cheermotes resolve when the message has bits.
-  function renderTextHTML(text, hasBits, ch) {
+  function renderTextHTML(text, hasBits, ch, shiny) {
     const em = emotesOf(ch || CHANNEL), es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL);
     const out = [];
     let lastEmote = -1; // index in out of the last emote img, for zw stacking
@@ -1615,7 +1615,7 @@
           else { reqTweet(st[1]); pendingTw.push(`<span class="twprev" data-twid="${st[1]}"></span>`); }
         }
         const twDisp = `twitter.com${path}`;
-        out.push(`<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${escapeHTML(cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
+        out.push(`<a${shiny ? ' class="shimmer"' : ''} href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${escapeHTML(cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
       }
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
@@ -1628,9 +1628,10 @@
           const src = /\.gifv(?:\?\S*)?$/i.test(url) ? u.replace(/\.gifv/i, '.gif') : u;
           out.push(escapeHTML(pre) + `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>` + escapeHTML(post));
         } else {
-          // this site's own domain gets the fossabot shimmer
+          // this site's own domain gets the fossabot shimmer; so does any
+          // url in a line the bots post - their !link commands output urls
           const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?/#]|$)/i.test(url);
-          out.push(escapeHTML(pre) + `<a${home ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + escapeHTML(post));
+          out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + escapeHTML(post));
         }
       }
       else {
@@ -1662,9 +1663,9 @@
   // Turns message text + the "emotes" tag into HTML, swapping emote spans for
   // <img> tags and escaping everything else. Also returns the native emote
   // names so callers can tell emote-only messages apart.
-  function renderMessageHTML(message, emotesTag, hasBits, ch) {
+  function renderMessageHTML(message, emotesTag, hasBits, ch, shiny) {
     const names = new Set();
-    if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch), names };
+    if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch, shiny), names };
     const emotes = [];
     for (const part of emotesTag.split('/')) {
       const [id, ranges] = part.split(':');
@@ -1674,12 +1675,12 @@
         emotes.push({ id, start, end });
       }
     }
-    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits, ch), names };
+    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits, ch, shiny), names };
     emotes.sort((a, b) => a.start - b.start);
     let html = '', cursor = 0;
     for (const e of emotes) {
       if (e.start < cursor) continue; // ignore malformed/overlapping ranges
-      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch);
+      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch, shiny);
       const name = message.slice(e.start, e.end + 1);
       names.add(name);
       const alt = escapeHTML(name);
@@ -1690,7 +1691,7 @@
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
     }
-    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch);
+    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch, shiny);
     return { html, names };
   }
 
@@ -2165,7 +2166,7 @@
         ? { html: `<a href="https://giphy.com/search/${encodeURIComponent(gifm[1].replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(message)}</a>`, names: new Set() }
         : fossa && /[⠀-⣿]/.test(message)
           ? { html: '<br>' + message.split(' ').map((w) => linkifyEsc(escapeHTML(w))).join('<br>'), names: new Set() }
-          : renderMessageHTML(message, tags.emotes, !!tags.bits, ch);
+          : renderMessageHTML(message, tags.emotes, !!tags.bits, ch, shimmer);
       let msgHtml = rendered.html;
       const twTail = pendingTw.splice(0).join('');
       // chatterino-style: messages made of only emotes render them bigger
