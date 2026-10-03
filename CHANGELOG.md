@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Bot command lists drop `wider` so they actually columnise - 30em
+  columns never fit twice in the default-width panel
 - Resources separators ease back a pixel each side (6px/4px)
 - Theme slots move above the copy-url button with a proper bold
   label; empty slots lose the ghosting and filled ones read as on.
