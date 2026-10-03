@@ -750,7 +750,7 @@
     border: 1px solid var(--popline);
     border-radius: 6px;
     padding: 0;
-    font-size: min(var(--chat-font, 15px), 18px); /* follow chat, capped */
+    font-size: var(--chat-font, 15px); /* follow chat */
     line-height: 1.5;
     z-index: 10;
     container-type: inline-size;
@@ -1082,7 +1082,7 @@
   /* narrow screens: the header wraps onto a second row, controls get a
      larger touch target, and the spark canvas clamps so it can't hog the row */
   @media (max-width: 720px) {
-    header { padding: 3px 8px 2px; padding-right: 92px; column-gap: 8px; font-size: var(--hdr-fs, calc(var(--chat-font, 15px) * 0.87)); }
+    header { padding: 3px 8px 2px; padding-right: 92px; column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
     #helpBtn { right: 6px; }
     #hdrMin { right: 48px; }
     body.hdrmin #hdrMin { right: 48px; }
