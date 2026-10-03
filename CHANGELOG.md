@@ -74,6 +74,7 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Resources separators ease back a pixel each side (6px/4px)
 - Theme slots move above the copy-url button with a proper bold
   label; empty slots lose the ghosting and filled ones read as on.
   Reset and clear-cache warn in the theme's danger hue on hover
