@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- `re Hasan` gains hasan's vlog and gaming youtube channels and an
+  old.reddit twin on r/Hasan_Piker; the dead hasanabi wiki link goes
 - `codes of conduct` becomes `conduct` and gains a `safer spaces`
   sub-group: sisters uncut's policy, aorta, rhizome and tripod
 - The source line's star count becomes a live 88x31 web-badge button -
