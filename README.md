@@ -253,7 +253,8 @@ no dependencies beyond CDN-hosted fonts.
   logged in; a block-words field does the inverse, hiding any matching
   line outright.
 - GLORP/F red rows, channel-point tints, fossabot/blammobot name
-  shimmer and game-line styling, braille art restacking.
+  shimmer (and the urls in their posts), game-line styling, braille
+  art restacking.
 - Image/GIF/Giphy embeds pinned right; X/Twitter preview cards via
   fxtwitter rendered below the whole message (text skipped when a bot
   like fossabot already pasted it, video thumbs playable inline;
@@ -308,12 +309,12 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Help popup & resources
 
-- Three tabs — config/help, resources (re Hasan, news, yt channels,
-  twitch streams, usa pol, the largest DSA chapter per state, left
-  parties, organising, free software, open hardware, restorative
-  justice, extra links) and authors (era-grouped reading lists) —
-  laid out in link columns whose count is capped by the popup's own
-  width via container queries.
+- Three tabs — config/help, resources (re Hasan, clips, news, yt
+  channels, twitch streams, usa pol, dsa chapters, left parties,
+  organising, conduct, dual power, mutual aid, free software, open
+  hardware, justice, extra links) and authors (era-grouped reading
+  lists) — laid out in link columns whose count is capped by the
+  popup's own width via container queries.
 - The popup resizes from its edges and offers widths from 480 to
   1600px.
 

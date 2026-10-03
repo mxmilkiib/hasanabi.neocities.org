@@ -3,27 +3,58 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-03
+
+### Additions
+- A `mutual aid` row joins resources under `dual power`, taking the
+  disaster relief, big door brigade and food not bombs links down with
+  it and gaining mutual aid hub, the mutual aid wiki, freedge, common
+  ground relief, solidarity apothecary, kropotkin's mutual aid book on
+  the anarchist library and dean spade's mutual aid page
+- Urls in fossabot/blammobot posts shimmer like the bots' names do -
+  their !link commands output urls, and twitter/x links count too
+
+### Fixes & polish
+- `re Hasan` pairs twitchtracker with the media tracker and moves
+  wikipedia ahead of fear& pod; the `—` spacer between it and `clips`
+  goes, as do the ones between free software/open hardware and the
+  trailing one after extra links
+- The config/help `—` separators dim to opacity .4
+- The authors tab's sort and info filters share a line whenever the
+  popup is wide enough, wrapping back to two centered lines when narrow
+- Bot command lists stop splitting mid-`!command`: each command plus
+  its arg/descriptor is an atomic chunk and text wraps only at the ·
+  separators; blammobot's columns widen to fit
+- `follow chat` now literally matches the chat size - the popup was
+  capped at 18px and the narrow-screen header ran at 87% of chat
+- Text scrolling under the ? popup's pinned tabs greys out harder -
+  the fade tail now starts at 30% panel opacity rather than clear
+- The `▮▮` page-flip glyph eases its vertical stretch to 1.3x so it
+  clears the button's bottom edge
+- The left-positioned sub chip picks up 1px of air after the
+  time/channel tag
+- Zebra striping's description reads `bg shading on alternating rows`;
+  the font menu row drops its redundant `chat font:` label
+
 ## 2026-10-02
 
 ### Additions
-- The clippers row becomes `clips`, gains hank pecker on tiktok, and
-  hasanhub moves over from `re Hasan` to head it
+- A `clips` row joins the resources tab, headed by hasanhub: the
+  youtube clipplex (hasanabi productions, hasan reactions, daily dose,
+  hasanabi clips), the tiktok fan accounts, the hastok hub index and
+  hank pecker
 - `re Hasan` gains hasan's vlog and gaming youtube channels and an
-  old.reddit twin on r/Hasan_Piker; the dead hasanabi wiki link goes
-- `codes of conduct` becomes `conduct` and gains a `safer spaces`
-  sub-group: sisters uncut's policy, aorta, rhizome and tripod
-- The source line's star count becomes a live 88x31 web-badge button -
-  a github-dark tile carrying the real stargazer count where the gif's
-  text sat; its repo date now reads `started:`
-- A `clippers` row joins the resources tab: the youtube clipplex
-  (hasanabi productions, hasan reactions, daily dose, hasanabi clips),
-  the tiktok fan accounts and the hastok hub index
+  old.reddit twin on r/Hasan_Piker
+- The source line gains a github star badge in the ghbtns style at
+  small size, self-hosted - the live stargazer count comes from the
+  relay feed and the palette follows the shade axis, dark shades
+  getting github's dark chrome; the repo date now reads `started:`
 - README's client comparison table grows to 31 rows, swaps plain
   ticks for ✅/❌ and names each floss client's licence
 - `yt channels` gains the young turks (`news · tw *`), between
   breaking points and secular talk
-- `re Hasan` gains `fear& pod`, `wikipedia`, `hasanabi wiki` and
-  `twitchtracker` links ahead of the merch tail
+- `re Hasan` gains `fear& pod`, `wikipedia` and `twitchtracker` links
+  ahead of the merch tail
 - `re Hasan` gains `ideologie shop` and `ostonox` (youtube) tail links
 - Emote picker header reshuffles: search, pin and ✕ hold the first row,
   the six option buttons join the source-tab line pushed right, and the
@@ -33,12 +64,13 @@ not versions — the page ships continuously to Neocities.
   joined by the bsa dual power map, cooperation jackson, mutual aid
   disaster relief, big door brigade, food not bombs, the us federation
   of worker coops and ripess
-- Emote picker gains an ✕ close button right of the pin
+- Emote picker gains a bold ✕ close button right of the pin
 - urls inside notice/system-msg text, reply quotes and fossa columns now
   linkify - they bypassed renderTextHTML so they rendered as raw text
-- Theme slots: three store/recall buttons under the copy-settings-URL
-  button hold whole option bundles; click recalls (stores when empty),
-  shift/right-click overwrites, and slots sync across open tabs
+- Theme slots: three store/recall buttons above the copy-settings-URL
+  row hold whole option bundles; click recalls (stores when empty),
+  shift/right-click overwrites, filled slots read as `on`, and slots
+  sync across open tabs
 - GitHub Pages mirror at mxmilkiib.github.io/hasanabi.neocities.org
 - Emote-picker era markers carry a marching-ants dashed border (an
   animated svg stroke-dashoffset), still staggered per rung; era rungs
@@ -62,9 +94,10 @@ not versions — the page ships continuously to Neocities.
 - Help tab buttons got contrastier borders and a hover fill; the row
   sits tighter to the top edge with a little air beneath
 - The `restorative justice` resources block is now `justice` with
-  restorative / transformative sub-groups, and a new `codes of conduct`
-  section links confcoc, contributor covenant, geek feminism, citizen
-  coc and safety first pdx
+  restorative / transformative sub-groups, and a new `conduct` section
+  links confcoc, contributor covenant, geek feminism, citizen coc and
+  safety first pdx plus a `safer spaces` sub-group: sisters uncut's
+  policy, aorta, rhizome and tripod
 - Multi-channel watching: `?channel=a,b,c` (up to 6) joins several rooms
   into one merged log. The first channel stays focused (title, stream
   status, video, chat target, storage keys); each row carries a `#chan`
@@ -78,51 +111,33 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
-- Dragging the emote picker pins it, and its pin glyph gets the
+- Dragging the emote picker pins it, and unpinning snaps it back to
+  the chat-bar anchor - the stashed position drops from the saved box
+  while the size survives on its own; the pin glyph gets a
   text-presentation hint
-- Links-view icon is a drawn svg chain - the fe0e text-presentation
-  hint lost to the emoji font, this can't
+- The links-view row icon becomes a drawn svg chain - a
+  text-presentation hint couldn't beat the coloured emoji font, this
+  can't
 - Config rows sort with the header-control settings first; the
   chat-side settings (pause, ping, scrollback, flow, clean urls)
   follow after them
-- Section separators tighten again: 9/7px in config, 5/3px in
-  resources (were 11/9 and 6/4)
-- Popup resize-grip glyphs shrink and hug their own edge of the
-  hitbox instead of floating centre-box
-- Star badge shrinks to ghbtns' small size and its palette follows
-  the shade axis - dark shades get github's dark chrome
+- Section `—` separators gain real margins - 9px/7px in config,
+  5px/3px in resources - so sections read as blocks
 - Bot command lists drop `wider` so they actually columnise - 30em
   columns never fit twice in the default-width panel
-- Resources separators ease back a pixel each side (6px/4px)
-- Theme slots move above the copy-url button with a proper bold
-  label; empty slots lose the ghosting and filled ones read as on.
-  Reset and clear-cache warn in the theme's danger hue on hover
-- Star badge goes self-hosted: the ghbtns look rebuilt in css with
-  the count filled from the relay - the iframe embed was blank for
-  anyone on a social-widget blocklist
+- Reset and clear-cache warn in the theme's danger hue on hover
 - Picking a popup width also docks the panel top-right - the dragged
   position clears and its saved x/y drops; a dragged height stays
-- Links-view row icon pins to text presentation (🔗︎) so it renders
-  monochrome like the rest of the list
-- Star badge swaps the hand-rolled tile for the real ghbtns.com
-  embed - their iframe serves the count, so the repoStars span and
-  its fill go with the old tile
-- Unpinning the emote picker snaps it back to the chat bar: the
-  inline position clears and the stashed left/top drops from the
-  saved box - the size survives on its own
 - Line-height ↕ and column ▮▮ header glyphs scale up to match the
   neighbours (▮▮ stretches taller than wide)
-- Resource separators get real margins (7px/5px, was 1px/0) so the
-  sections read as blocks
-- Popup ✕ buttons go bold, matching the tab links
+- The help popup's ✕ goes bold, matching the tab links
 - Channel line nudges a pixel off the header top - a touch more air
   above the status text, a touch less below
 - `usa pol` splits in two - the dsa block keeps the labelled row,
   act blue / votehub / vote-vote-vote drop to a line of their own
-- A — separator also opens the bot-command block at blammobot
-- Config's keyword inputs retitle `to highlight`/`to block`, and —
-  separators now break the tab into sections around the pair and
-  above the source line
+- Config's keyword inputs retitle `to highlight`/`to block`, and `—`
+  separators section the tab: above the bot commands, around the pair
+  and above the source line
 - Chatbar tightens: the empty char-count stops reserving 2.5ch
   between the box and the emote button, and the emote/send buttons
   now match the one-line textarea height so their tops sit flush
@@ -145,7 +160,8 @@ not versions — the page ships continuously to Neocities.
   when they speak, and @-mentions of them in message text sparkle too
 - Mid-edge resize arrows (◀ ▶ ▼) fade in on hover over the help, emote
   and video popups alongside the corner glyphs, each dragging its own
-  edge with the opposite side anchored
+  edge with the opposite side anchored; the glyphs sit small and near
+  their panel edge inside the unchanged hitbox
 - Bot command reference moved above the copy-settings button in the
   help popup, the appendix daggers now use relative positioning so they
   stay with their text when the panel scrolls (absolute had anchored
@@ -197,8 +213,6 @@ not versions — the page ships continuously to Neocities.
 - Resources justice section gains an anarchist subgroup: an
   anarchist faq 'what about crime?', ferrell's against the law,
   and the 1976 instead of prisons handbook
-- Width picks on a drag-positioned help popup now push it left
-  so the right edge stays inside (or pinned to) the viewport edge
 - Multi-channel #tags right-align on a shared edge, the column
   sized by the longest joined channel name
 - Joined streams stand out in the resources list: any entry whose
