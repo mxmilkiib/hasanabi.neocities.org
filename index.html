@@ -908,6 +908,9 @@
   #helpPanel .linkcols.wider { columns: 30em; }
   /* command-group titles head their block in the bot command lists */
   #helpPanel .linkcols > i > b { display: block; font-size: .88em; color: var(--text-dim); font-style: italic; }
+  /* author sub-heads (classical / founders / …) get a breath above them
+     so a group's first entry doesn't crowd the item overhead */
+  #htabAuth .linkcols > i > b { margin-top: .45em; }
   /* !commands take the page's text colour; only the bracketed
      arg/descriptor notes keep the dim smaller face */
   #helpPanel .linkcols.cmds .bc { color: var(--text); font-size: inherit; }
