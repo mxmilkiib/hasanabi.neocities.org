@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Star badge shrinks to ghbtns' small size and its palette follows
+  the shade axis - dark shades get github's dark chrome
 - Bot command lists drop `wider` so they actually columnise - 30em
   columns never fit twice in the default-width panel
 - Resources separators ease back a pixel each side (6px/4px)
