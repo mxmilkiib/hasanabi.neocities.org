@@ -20,9 +20,10 @@ not versions — the page ships continuously to Neocities.
 
 ### Fixes & polish
 - `re Hasan` pairs twitchtracker with the media tracker and moves
-  wikipedia ahead of fear& pod; the `—` spacer between it and `clips`
-  goes, as do the ones between free software/open hardware and the
-  trailing one after extra links
+  wikipedia ahead of fear& pod; `justice` slides up under `conduct`,
+  and the `—` spacers between re Hasan/clips, free software/open
+  hardware and after extra links go; `extra links` columns widen to
+  match the other sections
 - Section rows in the popup get more margin between them (7px over the
   old 4px), and the config `—` separators dim to opacity .4
 - The authors tab's info and sort filters share a line whenever the
