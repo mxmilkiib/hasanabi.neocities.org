@@ -74,6 +74,9 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Config rows sort with the header-control settings first; the
+  chat-side settings (pause, ping, scrollback, flow, clean urls)
+  follow after them
 - Section separators tighten again: 9/7px in config, 5/3px in
   resources (were 11/9 and 6/4)
 - Popup resize-grip glyphs shrink and hug their own edge of the
