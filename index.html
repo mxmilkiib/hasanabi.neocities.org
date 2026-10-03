@@ -499,6 +499,9 @@
   .role.vip { color: var(--vip); }
   .role.host { color: var(--accent); }
   .role.sub { color: #4fbecd; }
+  /* in the left-positioned sub modes the chip is a direct row child sat
+     flush after the time/channel tag - a hair of air keeps it off it */
+  .row > .role.sub { margin-left: 1px; }
   .role.sub[title] { color: var(--text-dim); }
   .role.bits { color: var(--accent); }
   .role.first { color: #ff69b4; font-weight: 700; }
