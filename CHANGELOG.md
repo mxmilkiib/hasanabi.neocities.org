@@ -28,7 +28,7 @@ not versions — the page ships continuously to Neocities.
 - The authors tab's info and sort filters share a line whenever the
   popup is wide enough, wrapping back to two centered lines when narrow,
   and 'all' folds the dates into the merged bracket after a comma rather
-  than a second bracket
+  than a second bracket; names-only columns widen to 20em
 - Bot command lists stop splitting mid-`!command`: each command plus
   its arg/descriptor is an atomic chunk and text wraps only at the ·
   separators; both bots' columns widen to fit
