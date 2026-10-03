@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-02
 
 ### Additions
+- The clippers row becomes `clips`, gains hank pecker on tiktok, and
+  hasanhub moves over from `re Hasan` to head it
 - `re Hasan` gains hasan's vlog and gaming youtube channels and an
   old.reddit twin on r/Hasan_Piker; the dead hasanabi wiki link goes
 - `codes of conduct` becomes `conduct` and gains a `safer spaces`
