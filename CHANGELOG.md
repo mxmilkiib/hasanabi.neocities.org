@@ -78,6 +78,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Dragging the emote picker pins it, and its pin glyph gets the
+  text-presentation hint
 - Links-view icon is a drawn svg chain - the fe0e text-presentation
   hint lost to the emoji font, this can't
 - Config rows sort with the header-control settings first; the
