@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   cycle), and backfills all rooms merged by timestamp
 
 ### Fixes & polish
+- Links-view icon is a drawn svg chain - the fe0e text-presentation
+  hint lost to the emoji font, this can't
 - Config rows sort with the header-control settings first; the
   chat-side settings (pause, ping, scrollback, flow, clean urls)
   follow after them
