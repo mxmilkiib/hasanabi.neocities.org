@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-03
 
 ### Additions
+- `extra links` gains mettasutta and brahmavihara links after og
+  mindfulness
 - A `mutual aid` row joins resources under `dual power`, taking the
   disaster relief, big door brigade and food not bombs links down with
   it and gaining mutual aid hub, the mutual aid wiki, freedge, common
