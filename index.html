@@ -662,6 +662,10 @@
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07)); }
   /* the quoted author's name carries the mention accent */
   .reply.rq b { color: var(--accent); }
+  /* the ↩ hangs in the gutter ahead of the quoted nick - its width and
+     negative margin cancel so it takes no layout space and the nick
+     starts on the responder's name column */
+  .reply.rq .rarr { display: inline-block; width: 1.2em; margin-left: -1.2em; }
   /* the quote's channel tag hangs in the row's tag column, left of the
      band - 13px undoes its margin+border+padding (plain 3+2+8 and zebra
      0+2+11 both inset the same), so the tag aligns with the tags on
@@ -1990,26 +1994,25 @@
   }
 
   // a reply's quote re-uses the row's own columns: its channel tag hangs
-  // in the tag column and the quoted text shifts right to sit above the
-  // responder's nick - measured from the first element after the fixed
-  // columns, so badge/role/sub icons don't drift the indent
+  // in the tag column and the quoted nick shifts right to land exactly on
+  // the responder's name, so both nicks line up - the ↩ hangs in the
+  // gutter via .rarr's cancelling width+margin
   function rqIndent(r) {
     const rq = r.querySelector('.reply.rq'), nm = r.querySelector('.name');
     if (!rq || !nm) return;
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
-    const lead = (tg || r.querySelector(':scope > .time')).nextElementSibling || nm;
     if (qt && tg) {
-      // the quote's content box starts 13px in either padding scheme;
-      // the tag's right margin stretches so ' ↩ name:' lands ~2-3 spaces
-      // past the sender column (16px '↩ ' lead minus 14px overshoot)
+      // the tag's right margin stretches so the quoted nick lands on the
+      // name column (the -13 margin-left and the content box's 13px inset
+      // cancel out)
       qt.style.marginLeft = (tg.offsetLeft - 13) + 'px';
-      qt.style.marginRight = Math.max(1, lead.offsetLeft - 2 - tg.offsetLeft - qt.offsetWidth) + 'px';
+      qt.style.marginRight = Math.max(1, nm.offsetLeft - tg.offsetLeft - qt.offsetWidth) + 'px';
     } else {
-      // text-indent hangs only the first line out to the sender column;
-      // wrapped lines return to the quote's own left edge like an
-      // ordinary multiline row
+      // text-indent hangs only the first line so the quoted nick sits on
+      // the sender column; wrapped lines return to the quote's own left
+      // edge like an ordinary multiline row
       const pl = parseFloat(getComputedStyle(rq).paddingLeft);
-      rq.style.textIndent = (lead.offsetLeft - 2 - rq.offsetLeft - 2 - pl) + 'px';
+      rq.style.textIndent = (nm.offsetLeft - rq.offsetLeft - 2 - pl) + 'px';
     }
   }
   function flush() {
@@ -2159,7 +2162,7 @@
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
         reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
-                `${chTag} ↩ <b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span>`;
+                `${chTag}<span class="rarr">↩</span><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       const lkey = linkKeyOf(message);
