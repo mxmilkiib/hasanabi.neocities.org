@@ -4159,11 +4159,17 @@
   // cache bust: a fresh ?_=ts query makes this a new request, so any
   // stale copy gets bypassed; existing params (channel, state) survive
   document.getElementById('cacheBust').addEventListener('click', () => {
-    try { if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k))); } catch {}
+    // a PWA has no reload button: drop the worker and every cache, then
+    // reload so the next load fetches and re-registers everything fresh
     sweepEmoteCache(true);
-    const u = new URL(location.href);
-    u.searchParams.set('_', Date.now());
-    location.href = u.toString();
+    const wipe = [];
+    try { if (window.caches) wipe.push(caches.keys().then((ks) => Promise.all(ks.map((k) => caches.delete(k))))); } catch {}
+    try { if (navigator.serviceWorker) wipe.push(navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister())))); } catch {}
+    Promise.allSettled(wipe).then(() => {
+      const u = new URL(location.href);
+      u.searchParams.set('_', Date.now());
+      location.href = u.toString();
+    });
   });
 
   linesBtn.addEventListener('click', (e) => { setLines(lineLevel + (e.shiftKey ? -1 : 1)); saveOpts(); });
