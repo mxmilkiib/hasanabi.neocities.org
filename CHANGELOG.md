@@ -6,6 +6,13 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-04
 
 ### Additions
+- `live tv` doubles its count and splits into region subsections led
+  by us: pbs, scripps, livenow fox, court tv, voa, democracy now and
+  free speech tv join the us block; national broadcasters join
+  worldwide — al arabiya and sky news arabia, tagesschau24, rai, tve
+  and lci, arirang and wion, channels tv and sabc, and tn in latam
+- `conduct`'s safer spaces group fills out with good night out,
+  right to be, consent academy, avp, galop and take this
 - `re Hasan` gains twitch (heading the row), bluesky after twitter, a
   `vods` channel in the youtube group, and the deprogram podcast after
   fear& pod
@@ -55,8 +62,13 @@ not versions — the page ships continuously to Neocities.
   before canada, matching audience geography
 - `nonviolent communication` moves from `organising` to the top of
   `conduct`, where it belongs with the facilitation resources
+- the aorta, rhizome and tripod facilitation co-ops move the other
+  way, `conduct` to `organising`, next to the other co-ops
 
 ### Fixes & polish
+- player events attach to the twitch embed object, not the getPlayer()
+  proxy - the proxy is control-only and threw `addEventListener is not
+  a function` when the video first reported ready
 - the service worker now caches for offline use: the page and its files
   go network-first (deploys still arrive on the next load, the cached copy
   only serves offline), and images from any origin - emotes, badges, gifs -
