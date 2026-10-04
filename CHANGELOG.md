@@ -57,6 +57,24 @@ not versions — the page ships continuously to Neocities.
   `conduct`, where it belongs with the facilitation resources
 
 ### Fixes & polish
+- an uncaught error or rejected promise now raises a small notice
+  naming the problem, with a `copy error` button that copies the message,
+  location, stack, page url (token masked), time and user agent
+- the relay's emote lists are cached per channel in localStorage for 24h
+  and painted on load before the relay answers; the relay's fresh list
+  always replaces them, expired entries are swept, and `clear cache`
+  drops them
+- saved options and presets store font size, line height and weight as
+  real values (px, line-height, weight), and saved options also store the
+  shade by name and help width in px, so reordering a list can't shift
+  a stored setting; old index-based saves still load
+- default option indices live in one `DEF` table shared by the controls
+  and the copy-url diff; the `heather` preset now matches its source url
+- on phones the header type caps at 15px; help, emote and video panels
+  follow the dynamic viewport and are pulled back on-screen on resize
+- the login button preflights id.twitch.tv before the oauth redirect,
+  so a dead connection fails in-page with a danger flash instead of
+  pinning the button white then losing the tab to a timeout error
 - `re Hasan` tucks wikipedia after twitchtracker and parks fear& pod
   last, after ostonox
 - `clips` groups its two index links up front, moving hastok hub next
