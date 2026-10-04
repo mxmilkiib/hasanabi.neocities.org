@@ -763,6 +763,7 @@
     width: calc(100vw - 24px);
     max-width: 720px;
     max-height: 75vh;
+    max-height: 75dvh; /* tracks mobile browser chrome */
     display: flex;
     flex-direction: column;
     background: var(--panel);
@@ -1006,7 +1007,7 @@
   #emojiBtn, #msgSend { height: max(26px, calc(var(--chat-font, 15px) * 1.25 + 8px)); }
   #emotePick {
     position: fixed; right: 10px; bottom: 44px; z-index: 11;
-    width: 480px; max-width: 94vw; height: 420px;
+    width: 480px; max-width: 94vw; height: 420px; max-height: calc(100vh - 90px); max-height: calc(100dvh - 90px);
     display: flex; flex-direction: column; gap: 6px; padding: 12px 8px 8px; /* top pad clears the drag-strip glyphs */
     background: var(--panel); border: 1px solid var(--popline);
     border-radius: 6px;
@@ -1121,8 +1122,12 @@
     #fontSel { max-width: 92px; }
     #spark { max-width: 70px; }
     body.hdrgraph header { padding-right: 130px; min-height: 32px; } /* fits the 28px buttons */
-    #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; }
+    #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; max-height: 70dvh; }
     .col { padding: 6px 10px 6px 6px; }
+  }
+  /* phones: cap the header type so a large header size can't eat a third of the screen */
+  @media (max-width: 480px) {
+    header { font-size: min(var(--hdr-fs, var(--chat-font, 15px)), 15px); }
   }
 </style>
 </head>
@@ -4009,6 +4014,13 @@
     // the third pane only exists in landscape; dropping to portrait folds it
     if (!side2El.hidden && window.innerWidth <= window.innerHeight) setSplit(2);
     if (document.body.classList.contains('hdrgraph')) sparkSize();
+    // rotating or shrinking the window mustn't strand a dragged panel off-screen
+    [vidBox, emotePick].forEach((el) => {
+      if (el.hidden || !el.style.left) return;
+      const r = el.getBoundingClientRect();
+      el.style.left = Math.max(0, Math.min(innerWidth - r.width, r.left)) + 'px';
+      if (el.style.top) el.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - r.height, r.top)) + 'px';
+    });
   });
   // builds a ?param url from the current non-default options
   document.getElementById('copyUrl').addEventListener('click', (e) => {
