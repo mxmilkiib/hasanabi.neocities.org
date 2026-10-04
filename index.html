@@ -268,7 +268,7 @@
   [data-theme="console"] .dot.offline { background: #1a4a24; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
   @media (prefers-reduced-motion: reduce) {
-    .dot.connecting, .dot.reconnecting { animation: none; }
+    .dot.connecting, .dot.reconnecting, .hdr-btn.busy { animation: none; }
   }
   /* flex-shrink 0: the mode chips are short status info - let stream-info
      take all the truncation instead of clipping 'follow req' off its value */
@@ -709,6 +709,11 @@
   #spark { height: 22px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  /* login preflight: busy pulses while id.twitch.tv is probed, err flashes
+     danger if unreachable - the oauth navigation only runs once reachable,
+     so a dead connection can't strand the tab on a browser timeout page */
+  .hdr-btn.busy { animation: pulse 1.2s ease-in-out infinite; }
+  .hdr-btn.err { color: var(--danger); border-color: var(--danger); }
   /* destructive config buttons warn in the theme's danger hue */
   #resetOpts:hover, #cacheBust:hover { color: var(--danger); }
   /* the states paint only the glyph - the border stays standard (or
@@ -4648,11 +4653,32 @@
       if (chatbarEl.hidden && !epickPinned) closePicker();
       else if (!chatbarEl.hidden) chatInput.focus();
     } else {
-      location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
-        '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
-        (CHANNEL !== DEFAULT_CHANNEL || MULTI ? '&state=' + encodeURIComponent(CHANNELS.join(',')) : '') +
-        '&response_type=token&scope=' +
-        encodeURIComponent('chat:read chat:edit user:read:chat user:write:chat');
+      // preflight id.twitch.tv before handing the tab to oauth - a stalled
+      // navigation pins the focused button for ~30s then dies on the
+      // browser's timeout page, so probe first and keep the error in-page
+      if (sendBtn.classList.contains('busy')) return;
+      sendBtn.blur();
+      sendBtn.classList.remove('err');
+      sendBtn.classList.add('busy');
+      sendBtn.title = 'connecting to twitch…';
+      const loginFail = () => {
+        sendBtn.classList.remove('busy');
+        sendBtn.classList.add('err');
+        sendBtn.title = "can't reach twitch - connection problem; click to retry";
+        setTimeout(() => sendBtn.classList.remove('err'), 6000);
+      };
+      const loginGo = () => {
+        location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
+          '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
+          (CHANNEL !== DEFAULT_CHANNEL || MULTI ? '&state=' + encodeURIComponent(CHANNELS.join(',')) : '') +
+          '&response_type=token&scope=' +
+          encodeURIComponent('chat:read chat:edit user:read:chat user:write:chat');
+        // if the navigation never commits, unstick the button anyway
+        setTimeout(() => sendBtn.classList.remove('busy'), 12000);
+      };
+      if (!navigator.onLine) { loginFail(); return; }
+      fetch('https://id.twitch.tv', { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(6000) })
+        .then(loginGo, loginFail);
     }
   });
 

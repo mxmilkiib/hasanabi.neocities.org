@@ -31,6 +31,7 @@ export default [
         scrollTo: 'readonly', scrollY: 'readonly', scrollX: 'readonly',
         requestIdleCallback: 'readonly', queueMicrotask: 'readonly',
         structuredClone: 'readonly', AbortController: 'readonly',
+        AbortSignal: 'readonly',
         SpeechSynthesisUtterance: 'readonly', speechSynthesis: 'readonly',
       },
     },
