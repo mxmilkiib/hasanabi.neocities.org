@@ -268,7 +268,7 @@
   [data-theme="console"] .dot.offline { background: #1a4a24; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
   @media (prefers-reduced-motion: reduce) {
-    .dot.connecting, .dot.reconnecting, .hdr-btn.busy { animation: none; }
+    .dot.connecting, .dot.reconnecting, .hdr-btn.busy, #sendBtn.wait { animation: none; }
   }
   /* flex-shrink 0: the mode chips are short status info - let stream-info
      take all the truncation instead of clipping 'follow req' off its value */
@@ -709,10 +709,13 @@
   #spark { height: 22px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  #sendBtn.on { border-color: #9146ff; } /* twitch purple while logged in */
+  #hdrMin .dash { display: inline-block; transform: translateY(-1px); } /* the en dash sits low in its glyph box */
   /* login preflight: busy pulses while id.twitch.tv is probed, err flashes
      danger if unreachable - the oauth navigation only runs once reachable,
      so a dead connection can't strand the tab on a browser timeout page */
-  .hdr-btn.busy { animation: pulse 1.2s ease-in-out infinite; }
+  .hdr-btn.busy, #sendBtn.wait { animation: pulse 1.2s ease-in-out infinite; }
+  #sendBtn.wait { color: #9146ff; border-color: #9146ff; }
   .hdr-btn.err { color: var(--danger); border-color: var(--danger); }
   /* destructive config buttons warn in the theme's danger hue */
   #resetOpts:hover, #cacheBust:hover { color: var(--danger); }
@@ -4544,6 +4547,7 @@
   // the echo arrives back as an ordinary chat line.
   const AUTH_KEY = 'hasanabi-auth';
   let auth = null; // { token, login }
+  let loginTimer = 0; // gives up a token the relay never confirms
   // own badges/colour from USERSTATE/GLOBALUSERSTATE live in selfTagsPer
   // (keyed per channel, defined near the send UI)
   try { auth = JSON.parse(localStorage.getItem(AUTH_KEY)); } catch {}
@@ -4642,15 +4646,33 @@
     if (!toTimer) toTimer = setInterval(paintTimeout, 1000);
   }
 
+  function loginTimedOut() {
+    loginTimer = 0;
+    if (!(auth && auth.token && !auth.login)) return;
+    logout();
+    sendBtn.classList.add('err');
+    setTimeout(() => sendBtn.classList.remove('err'), 6000);
+    queueMessage({ tags: {}, login: null, kind: 'NOTICE',
+      message: 'twitch login did not complete within 20s - the relay may be unreachable or the token expired; click the twitch button to try again' }, false);
+  }
   function updateSendUI() {
     const on = !!(auth && auth.login);
+    // a token is back from twitch but the relay hasn't confirmed the login
+    // yet - typing now would go nowhere, so the box locks and the button pulses
+    const pending = !!(auth && auth.token && !auth.login);
     sendBtn.classList.toggle('on', on);
+    sendBtn.classList.toggle('wait', pending);
+    if (pending && !loginTimer) loginTimer = setTimeout(loginTimedOut, 20000);
+    else if (!pending && loginTimer) { clearTimeout(loginTimer); loginTimer = 0; }
     sendBtn.title = on
       ? `Logged in as ${auth.login} - click for the chat box · ⇧click to log out`
-      : 'Log in with Twitch to send messages';
-    chatbarEl.hidden = !on;
+      : pending ? 'Finishing the twitch login… chat unlocks once it completes · ⇧click to cancel'
+        : 'Log in with Twitch to send messages';
+    chatbarEl.hidden = !on && !(pending && !chatbarEl.hidden);
+    chatInput.disabled = pending;
     chatInput.placeholder = on
-      ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}` : 'log in to chat';
+      ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}`
+      : pending ? 'finishing twitch login…' : 'log in to chat';
     if (toUntils[sendTarget()]) paintTimeout();
     paintChatPick();
     document.body.classList.toggle('chaton', on);
