@@ -3609,9 +3609,11 @@
         if (saved.m != null) vidPlayer.setMuted(saved.m);
         if (saved.p === false) vidPlayer.pause();
         vidState();
-        vidPlayer.addEventListener(Twitch.Player.PLAYING, vidState);
-        vidPlayer.addEventListener(Twitch.Player.PAUSE, vidState);
-        vidPlayer.addEventListener(Twitch.Player.ENDED, vidState);
+        // player events are forwarded on the embed - getPlayer() is a
+        // control-only proxy without addEventListener
+        emb.addEventListener(Twitch.Player.PLAYING, vidState);
+        emb.addEventListener(Twitch.Player.PAUSE, vidState);
+        emb.addEventListener(Twitch.Player.ENDED, vidState);
         let last = '';
         setInterval(() => {          // poll + persist; the API emits no volume event
           vidState();
