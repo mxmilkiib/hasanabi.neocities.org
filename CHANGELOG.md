@@ -6,6 +6,16 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-04
 
 ### Additions
+- the authors tab links the named work in each qualifier: 46 more
+  `data-w` targets join the original 13 - theanarchistlibrary,
+  marxists.org, gutenberg, wikisource, monoskop and archive.org pdfs
+  and texts for berkman, ervin, scott, graeber, mao, haywood,
+  c.l.r. james, sartre, che, debord, zinn, kanafani, harvey, russell,
+  orwell, malcolm x, mlk, mike davis, beauvoir, lorde, selma james,
+  ehrlich, hooks, sappho, whitman, carpenter, proust, lorca, woolf,
+  hall, ginsberg, foucault, wittig, feinberg, butler, horkheimer,
+  marcuse, adorno, arendt, bauman, habermas, bourdieu, boal, raymond,
+  lessig and doctorow
 - `live tv` doubles its count and splits into region subsections led
   by us: pbs, scripps, livenow fox, court tv, voa, democracy now and
   free speech tv join the us block; national broadcasters join
