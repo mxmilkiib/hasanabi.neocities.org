@@ -750,6 +750,10 @@
   .aux .role:last-child { margin-right: 0; }
   .auxr { float: right; margin: 0 0 0 5px; }
   #subBtn { width: 30px; padding: 0 1px; display: flex; align-items: center; }
+  .gifimg { max-height: 9em; max-width: 100%; vertical-align: middle; border-radius: 3px; }
+  #offBar { flex: none; text-align: center; padding: 3px 8px; font-size: .9em; background: var(--danger); color: #fff; }
+  #offBar[hidden] { display: none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   #errBox {
     position: fixed; left: 10px; bottom: 10px; z-index: 30; max-width: min(560px, calc(100vw - 20px));
     display: flex; align-items: center; gap: 8px; padding: 6px 8px;
@@ -1173,6 +1177,7 @@
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads. Large values use more memory<sup>†</sup></span></div>
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
+    <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
@@ -1188,6 +1193,7 @@
     <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
     <div style="margin-top: 8px"><b>to block</b><span>comma separated; a chat line containing one is hidden:</span></div>
     <input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
+    <div style="margin-top: 8px"><b>safe gifs</b><span>limit giphy lookups for gif posts to a PG-13 rating: <span id="helpGifList"></span><sup>†</sup></span></div>
     <div class="sep">—</div>
     <div id="slotRow" style="margin-top: 8px; display: flex; gap: 6px; align-items: center">
       <b>theme slots</b>
@@ -1572,6 +1578,62 @@
     const text = linkifyEsc(escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& ')))
       .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>');
     return `<span class="twcard"><b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
+  }
+  // native twitch gif posts name the gif only by its giphy title; the relay
+  // searches giphy for it (best match) and the link swaps for the image.
+  // gifCache: query -> { url, page } | null (no hit); unresolved rows keep
+  // the plain giphy-search link
+  const gifCache = new Map();
+  const gifWait = new Set();
+  let gifSafe = false; // true limits the lookup to pg-13 (help panel toggle)
+  const gifLink = (q, label, g) => g
+    ? `<a class="gifq" data-q="${escapeHTML(q)}" href="${escapeHTML(g.page)}" target="_blank" rel="noopener noreferrer"><img class="gifimg" src="${escapeHTML(g.url)}" alt="${escapeHTML(label)}" title="${escapeHTML(label)}"></a>`
+    : `<a class="gifq" data-q="${escapeHTML(q)}" href="https://giphy.com/search/${encodeURIComponent(q.replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a>`;
+  // hits persist in localStorage (30 days, 300 entries, keyed with the rating
+  // flag) so a reload or a repeated title never spends a lookup; the image
+  // files themselves are cached by the service worker. Lookups leave one
+  // at a time, at least 1.2s apart and 80 an hour, and a 429 from giphy
+  // pauses them for 5 minutes - a history walkback full of gif posts would
+  // otherwise burn the key's hourly allowance in seconds
+  const GIF_KEY = 'hasan-gifs', GIF_TTL = 30 * 864e5, GIF_MAX = 300, GIF_GAP = 1200, GIF_HOURLY = 80;
+  let gifStore = {};
+  try { gifStore = JSON.parse(localStorage.getItem(GIF_KEY)) || {}; } catch {}
+  const gifSk = (q) => (gifSafe ? '1|' : '0|') + q;
+  function gifSave(q, g) {
+    gifStore[gifSk(q)] = { u: g.url, p: g.page, t: Date.now() };
+    const ks = Object.keys(gifStore);
+    if (ks.length > GIF_MAX) ks.sort((a, b) => gifStore[a].t - gifStore[b].t).slice(0, ks.length - GIF_MAX).forEach((k) => delete gifStore[k]);
+    try { localStorage.setItem(GIF_KEY, JSON.stringify(gifStore)); } catch {}
+  }
+  const gifQueue = [], gifSent = [];
+  let gifTimer = 0, gifPause = 0;
+  function gifPump() {
+    if (gifTimer || !gifQueue.length) return;
+    gifTimer = setTimeout(() => {
+      gifTimer = 0;
+      const now = Date.now();
+      while (gifSent.length && now - gifSent[0] > 36e5) gifSent.shift();
+      const q = gifQueue.shift();
+      if (q !== undefined) {
+        if (gifSent.length >= GIF_HOURLY || !joined || !relayFrame.contentWindow) gifWait.delete(q);
+        else { gifSent.push(now); relayFrame.contentWindow.postMessage({ type: 'giphy', q, safe: gifSafe }, RELAY_ORIGIN); }
+      }
+      gifPump();
+    }, Math.max(GIF_GAP, gifPause - Date.now()));
+  }
+  function gifHtml(title, label) {
+    const q = title.replace(/\bGIF\b/gi, '').replace(/\s+/g, ' ').trim() || title;
+    let hit = gifCache.get(q);
+    if (hit === undefined) {
+      const s = gifStore[gifSk(q)];
+      if (s && Date.now() - s.t < GIF_TTL) { hit = { url: s.u, page: s.p }; gifCache.set(q, hit); }
+    }
+    if (hit === undefined && !gifWait.has(q)) {
+      gifWait.add(q); gifQueue.push(q);
+      if (gifQueue.length > 30) gifWait.delete(gifQueue.shift()); // newest first matter most
+      gifPump();
+    }
+    return gifLink(q, label, hit);
   }
   const tweetWait = new Set();
   function reqTweet(id) {
@@ -2242,7 +2304,7 @@
       // no id or url - so link the title to a giphy search for it
       const gifm = message.match(/^\[([^\]]*\bGIF\b[^\]]*)\]$/i);
       const rendered = gifm
-        ? { html: `<a href="https://giphy.com/search/${encodeURIComponent(gifm[1].replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(message)}</a>`, names: new Set() }
+        ? { html: gifHtml(gifm[1], message), names: new Set() }
         : fossa && /[⠀-⣿]/.test(message)
           ? { html: '<br>' + message.split(' ').map((w) => linkifyEsc(escapeHTML(w))).join('<br>'), names: new Set() }
           : renderMessageHTML(message, tags.emotes, !!tags.bits, ch, shimmer);
@@ -2346,6 +2408,7 @@
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self')) {
         missed.push(r);
         pingSnd();
+        notifyMention(r);
       }
       if (r.classList.contains('local')) {
         const k = pendingEcho.shift();
@@ -2654,7 +2717,9 @@
         title: d.title || '',
       };
     }
+    const prevSt = streamStates[sch];
     streamStates[sch] = st;
+    if (prevSt && !prevSt.live && st.live) notifyLive(sch, st.title);
     paintChTags(sch);
     if (sch !== CHANNEL) return;
     if (!st.live) {
@@ -2955,6 +3020,8 @@
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPing')) { setPing(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpClean')) { setCleanUrls(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpNotify')) { setNotify(+a.dataset.idx === 1, true); saveOpts(); }
+    else if (a.classList.contains('helpGif')) { setGifSafe(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
@@ -3225,9 +3292,41 @@
   let pingOn = false;
   let pingCtx = null;
   function setPing(on) { pingOn = on; markHelp('helpPing', on ? 1 : 0); }
+  // live alerts: a system notification when a watched stream goes live
+  // while the page is hidden. Turning it on asks for permission; the
+  // notification goes through the service worker where the page-level
+  // constructor isn't allowed (android pwas)
+  let notifyOn = false;
+  function setNotify(on, ask) {
+    notifyOn = on; markHelp('helpNotify', on ? 1 : 0);
+    if (on && ask && window.Notification && Notification.permission === 'default') Notification.requestPermission();
+  }
+  function notifyShow(head, body, tag) {
+    if (!notifyOn || !document.hidden || !window.Notification || Notification.permission !== 'granted') return;
+    const opts = { body: body || '', icon: 'icon-192.png', tag };
+    if (navigator.serviceWorker) navigator.serviceWorker.ready.then((r) => r.showNotification(head, opts)).catch(() => { try { new Notification(head, opts); } catch {} });
+    else try { new Notification(head, opts); } catch {}
+  }
+  const notifyLive = (ch, title) => notifyShow(`${ch} is live`, title, 'live-' + ch);
+  // one notification at a time for mentions (same tag replaces), throttled
+  // so a burst of pings doesn't machine-gun the system tray
+  let lastMentionNote = 0;
+  function notifyMention(row) {
+    if (Date.now() - lastMentionNote < 8000) return;
+    lastMentionNote = Date.now();
+    const name = (row.querySelector('.name') || {}).textContent || 'someone';
+    const full = row.textContent, at = full.indexOf(': ');
+    const body = (at >= 0 ? full.slice(at + 2) : full).replace(/↩\s*$/, '').trim().slice(0, 140);
+    notifyShow(`${name.trim()} mentioned you`, body, 'mention');
+  }
   // clean-url mode rewrites the visible text of every link anchor rendered
   // with data-u (the raw display text); the href is untouched either way
   let cleanUrls = true;
+  function setGifSafe(on) {
+    if (on === gifSafe) return markHelp('helpGif', on ? 1 : 0);
+    gifSafe = on; markHelp('helpGif', on ? 1 : 0);
+    gifCache.clear(); gifWait.clear(); gifQueue.length = 0; // results depend on the rating filter
+  }
   function setCleanUrls(on) { cleanUrls = on; markHelp('helpClean', on ? 1 : 0); applyCleanUrls(); }
   function applyCleanUrls() {
     mainEl.querySelectorAll('a[data-u]').forEach((a) => {
@@ -3296,7 +3395,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0,
+      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0,
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
       split: 1 + !sideEl.hidden + !side2El.hidden,
@@ -3379,6 +3478,8 @@
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
     if (o.ping !== undefined) setPing(!!o.ping);
     if (o.clean !== undefined) setCleanUrls(!!o.clean);
+    if (o.gifsafe !== undefined) setGifSafe(!!o.gifsafe);
+    if (o.notify !== undefined) setNotify(!!o.notify, false);
     const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
     if (Number.isInteger(hw) && hw >= 0 && hw < HELP_WIDTHS.length) { helpWIdx = hw; applyHelpW(); }
     // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
@@ -5807,6 +5908,21 @@
         try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch {}
       }
       updateSendUI();
+    } else if (d.type === 'giphy' && typeof d.q === 'string') {
+      gifWait.delete(d.q);
+      if (d.limited) gifPause = Date.now() + 5 * 60000; // 429: back off, cache nothing
+      else {
+        const g = d.url && /^https:\/\/media\d*\.giphy\.com\//.test(d.url) && /^https:\/\/giphy\.com\//.test(d.page || '')
+          ? { url: d.url, page: d.page } : null;
+        gifCache.set(d.q, g);
+        if (g) {
+          gifSave(d.q, g);
+          document.querySelectorAll('a.gifq').forEach((a) => {
+            if (a.dataset.q !== d.q || a.querySelector('img')) return;
+            a.outerHTML = gifLink(d.q, a.textContent, g);
+          });
+        }
+      }
     } else if (d.type === 'nitter') {
       nitterHost = /^https:\/\//.test(d.host || '') ? d.host : null;
     } else if (d.type === 'tweet' && /^\d+$/.test(d.id || '')) {
@@ -5969,7 +6085,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
+    helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
@@ -6014,6 +6130,25 @@
   markHelp('helpZebra', mainEl.classList.contains('zebra') ? 1 : 0);
   markHelp('helpPause', pauseOnText ? 1 : 0);
   markHelp('helpPing', pingOn ? 1 : 0);
+  markHelp('helpGif', gifSafe ? 1 : 0);
+  markHelp('helpNotify', notifyOn ? 1 : 0);
+  // offline banner: the browser's own online/offline signal
+  const offBar = document.getElementById('offBar');
+  const netPaint = () => { offBar.hidden = navigator.onLine; };
+  addEventListener('online', netPaint); addEventListener('offline', netPaint); netPaint();
+  // header controls are glyph-only: mirror each title into an aria-label so
+  // screen readers announce them, and keep it in step as titles change
+  const ariaSync = (el) => {
+    const t = (el.getAttribute('title') || '').split(/\n| - /)[0].trim();
+    if (t) el.setAttribute('aria-label', t);
+  };
+  const ariaEls = document.querySelectorAll('header [title], #chatbar [title]');
+  ariaEls.forEach(ariaSync);
+  new MutationObserver((ms) => ms.forEach((m) => ariaSync(m.target)))
+    .observe(document.querySelector('header'), { attributes: true, attributeFilter: ['title'], subtree: true });
+  // pages holding a web lock aren't eligible for freezing in a hidden tab,
+  // so the socket keeps delivering (and live alerts keep firing) longer
+  if (navigator.locks) navigator.locks.request('hasan-keepalive', () => new Promise(() => {})).catch(() => {});
   markHelp('helpClean', cleanUrls ? 1 : 0);
   markHelp('helpScrollback', SCROLLBACK_SIZES.indexOf(MAX_MESSAGES));
   markHelp('helpFlow', revFlow ? 1 : 0);
