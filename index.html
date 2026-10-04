@@ -4139,6 +4139,7 @@
   // stale copy gets bypassed; existing params (channel, state) survive
   document.getElementById('cacheBust').addEventListener('click', () => {
     try { if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k))); } catch {}
+    sweepEmoteCache(true);
     const u = new URL(location.href);
     u.searchParams.set('_', Date.now());
     location.href = u.toString();
@@ -5736,39 +5737,7 @@
       loadStep(3, 'metadata loaded - waiting for messages…');
       onStream(d);
     } else if (d.type === 'emotes') {
-      const ech = (d.channel || CHANNEL).toLowerCase();
-      chanSets[ech] = {
-        emotes: d.emotes || {},
-        emoteSrc: d.emoteSrc || {},
-        emoteUse: d.emoteUse || {},
-        emoteAnim: new Set(d.emoteAnim || []),
-        zeroWidth: new Set(d.zeroWidth || []),
-        badges: d.badges || {},
-      };
-      loadStep(3, 'emotes loaded - waiting for messages…');
-      // rows from any channel retokenize; the picker's source maps and the
-      // broadcast/VOD bookkeeping only care about the focused channel
-      if (ech === CHANNEL) {
-        thirdPartyEmotes = chanSets[ech].emotes;
-        emoteSrc = chanSets[ech].emoteSrc;
-        emoteUse = chanSets[ech].emoteUse;
-        emoteAnim = chanSets[ech].emoteAnim;
-      }
-      retokenizeRows();
-      if (ech === CHANNEL && !emotePick.hidden) rebuildPicker();
-      // lastBroadcast.startedAt is actually the last run's END for an
-      // offline channel; the VOD carries the real start and end
-      if (ech === CHANNEL) {
-        const lb = d.lastBroadcast && Date.parse(d.lastBroadcast.startedAt);
-        const vs = d.lastVod && Date.parse(d.lastVod.start);
-        const ve = d.lastVod && Date.parse(d.lastVod.end);
-        let changed = false;
-        if (lb && lb !== lbEnd) { lbEnd = lb; changed = true; }
-        if (vs && ve > vs && (!lastVod || lastVod.end !== ve)) {
-          lastVod = { start: vs, end: ve }; changed = true;
-        }
-        if (changed) updateHeader();
-      }
+      onEmotes(d, false);
     } else if (d.type === 'twsets') {
       // the relay answers with the key it was asked for. A reply for a
       // superseded ask still carries valid sets - merge it rather than
@@ -5829,7 +5798,76 @@
     }
   });
 
+  // ---- emote-list cache: the relay's 'emotes' payload is kept per channel in
+  // localStorage so a reload paints third-party emotes before the relay
+  // answers. stale-while-revalidate: the relay's fresh payload always
+  // replaces the cached one; the TTL only bounds how old a copy may be and
+  // still be used (relay slow or down), and expired entries are swept ----
+  const EMOTE_CACHE_PREFIX = 'hasan-emotes-';
+  const EMOTE_CACHE_TTL = 24 * 3600 * 1000;
+  function onEmotes(d, cached) {
+    const ech = (d.channel || CHANNEL).toLowerCase();
+    chanSets[ech] = {
+      emotes: d.emotes || {},
+      emoteSrc: d.emoteSrc || {},
+      emoteUse: d.emoteUse || {},
+      emoteAnim: new Set(d.emoteAnim || []),
+      zeroWidth: new Set(d.zeroWidth || []),
+      badges: d.badges || {},
+    };
+    if (!cached) {
+      loadStep(3, 'emotes loaded - waiting for messages…');
+      try { localStorage.setItem(EMOTE_CACHE_PREFIX + ech, JSON.stringify({ t: Date.now(), d })); }
+      catch { sweepEmoteCache(true); }
+    }
+    // rows from any channel retokenize; the picker's source maps and the
+    // broadcast/VOD bookkeeping only care about the focused channel
+    if (ech === CHANNEL) {
+      thirdPartyEmotes = chanSets[ech].emotes;
+      emoteSrc = chanSets[ech].emoteSrc;
+      emoteUse = chanSets[ech].emoteUse;
+      emoteAnim = chanSets[ech].emoteAnim;
+    }
+    retokenizeRows();
+    if (ech === CHANNEL && !emotePick.hidden) rebuildPicker();
+    // lastBroadcast.startedAt is actually the last run's END for an
+    // offline channel; the VOD carries the real start and end. A cached
+    // payload's broadcast times are stale, so only a live one feeds them
+    if (ech === CHANNEL && !cached) {
+      const lb = d.lastBroadcast && Date.parse(d.lastBroadcast.startedAt);
+      const vs = d.lastVod && Date.parse(d.lastVod.start);
+      const ve = d.lastVod && Date.parse(d.lastVod.end);
+      let changed = false;
+      if (lb && lb !== lbEnd) { lbEnd = lb; changed = true; }
+      if (vs && ve > vs && (!lastVod || lastVod.end !== ve)) {
+        lastVod = { start: vs, end: ve }; changed = true;
+      }
+      if (changed) updateHeader();
+    }
+  }
+  // drops expired entries; all=true (storage full) drops every cached list
+  function sweepEmoteCache(all) {
+    try {
+      for (const k of Object.keys(localStorage)) {
+        if (!k.startsWith(EMOTE_CACHE_PREFIX)) continue;
+        let t = 0;
+        try { t = JSON.parse(localStorage.getItem(k)).t; } catch {}
+        if (all || !(Date.now() - t < EMOTE_CACHE_TTL)) localStorage.removeItem(k);
+      }
+    } catch {}
+  }
+  function restoreEmoteCache() {
+    sweepEmoteCache(false);
+    for (const ch of CHANNELS.length ? CHANNELS : [CHANNEL]) {
+      try {
+        const c = JSON.parse(localStorage.getItem(EMOTE_CACHE_PREFIX + ch));
+        if (c && c.d && !chanSets[ch]) onEmotes(c.d, true);
+      } catch {}
+    }
+  }
+
   loadOpts();
+  restoreEmoteCache();
 
   // ---- url params apply on top of saved options, e.g. ?split&theme=dark&size=18 ----
   {
