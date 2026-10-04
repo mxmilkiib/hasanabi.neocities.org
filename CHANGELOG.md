@@ -3,6 +3,76 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-04
+
+### Additions
+- `re Hasan` gains twitch (heading the row), bluesky after twitter, a
+  `vods` channel in the youtube group, and the deprogram podcast after
+  fear& pod
+- a `sharing` row joins resources between `mutual aid` and the
+  open-hardware block, covering real-goods sharing: shareable,
+  giveaway apps (freecycle, buy nothing, olio), library of things,
+  repair cafés, the uk cic regulator, hacklabs directories and the
+  ellen macarthur circular economy foundation
+- `sharing` also gains the whole earth index, the 1968–2002 catalog
+  archive whose access-to-tools slogan the row descends from
+- an `open knowledge` row joins the open cluster after `open
+  hardware`: wiki projects, archives and public-domain libraries, open
+  access research, open data and maps, then transparency - corporate
+  and campaign-finance trackers, foia tooling, leak archives and the
+  icij/occrp investigations. wikileaks moves here from `extra links`
+- a `wellbeing` row joins between `mutual aid` and `sharing`: helpline
+  directories and crisis lines, mental health charities, affordable
+  therapy, the activist trauma archive, free meditation and free
+  workouts. the buddhist links consolidate into it from `extra links`,
+  which empties and is retired
+- an `open learning` row closes the open cluster after `open
+  knowledge`: free courseware (mit ocw, openlearn, khan, freecodecamp,
+  saylor, p2pu), course indexes, open textbooks and wikiversity
+- a `live tv` row joins after `news`: the major free 24/7 streams
+  grouped by region — al jazeera, west asian, uk, eu, us nets and
+  c-span, asia-pacific, canada, nigeria and telesur
+- the open cluster completes: `open access` (preprints, shadow
+  libraries, unlockers, the swartz manifesto), `open science` (osf,
+  zenodo, openalex, pubpeer, protocols.io + open pharma), and `open
+  government` (money transparency, foia, us civic data, civic tech,
+  participatory platforms) join between `open knowledge` and `open
+  learning`. the research and civic groups migrate out of `open
+  knowledge` to match, which gains a free media group instead
+- related spheres fold into existing rows: community networks (nyc
+  mesh, guifi, freifunk) and the new mesh stacks (meshtastic,
+  meshcore, reticulum, yggdrasil) into `open hardware`, open
+  agriculture (open source seeds, farm hack, l'atelier paysan) into
+  `sharing`, and the platform co-op consortium into `dual power`
+- `dsa chapters` lists sibling chapters after slashes for the
+  multi-chapter states: tucson, seven more california chapters,
+  boulder, tampa, bloomington + lafayette, iowa city, baton rouge,
+  worcester, grand rapids, mid-missouri, central + south jersey, five
+  more new york chapters, charlotte + wnc, columbus + dayton, tulsa,
+  pittsburgh + delco, memphis + knoxville, houston + dallas + san
+  antonio, nova + charlottesville, tacoma and milwaukee
+- `left parties` leads its north america block with the us parties
+  before canada, matching audience geography
+- `nonviolent communication` moves from `organising` to the top of
+  `conduct`, where it belongs with the facilitation resources
+
+### Fixes & polish
+- `re Hasan` tucks wikipedia after twitchtracker and parks fear& pod
+  last, after ostonox
+- `clips` groups its two index links up front, moving hastok hub next
+  to hasanhub
+- `yt channels` and `twitch streams` merge into `channels/streams`,
+  ordered by content type with each entry keeping its primary link,
+  secondary platform link and chat-switch star
+- `news` entries gain youtube links for the outlets that run channels,
+  skipping the few without one and novara, whose channel already sits
+  in `channels/streams`
+- `left parties` leads with north america, then south america, with
+  europe moved behind them
+- reply quotes now hang the ↩ in the gutter so the quoted nick lands
+  exactly on the responder's name column, keeping the two nicks aligned
+  even when the reply carries badges
+
 ## 2026-10-03
 
 ### Additions
