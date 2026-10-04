@@ -2396,7 +2396,8 @@
   // label mode, font changes - refit the buffer to whatever it lands on
   new ResizeObserver(() => sparkSize()).observe(sparkEl);
   // flag when .hdr-side wraps onto a second header line so CSS can centre it
-  const hdrBarEl = document.querySelector('header');
+  const headerEl = document.querySelector('header');
+  const hdrBarEl = headerEl;
   const hdrSideEl = document.querySelector('.hdr-side');
   new ResizeObserver(() => {
     hdrBarEl.classList.toggle('hdrwrap', hdrSideEl.offsetTop > 10);
@@ -2889,7 +2890,10 @@
   // nine shade stops, lightest → darkest; null follows the system
   const SHADE_NAMES = ['white', 'lightest', 'light', 'pale', 'mid', 'dusk', 'dark', 'deep', 'black'];
   const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●'];
-  let shadeIdx = 6;
+  // default option indices - the controls, the copy-url diffing and the
+  // 'default' preset all read from here
+  const DEF = { shade: 6, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7 };
+  let shadeIdx = DEF.shade;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
     else document.documentElement.dataset.shade = shadeIdx;
@@ -3120,11 +3124,11 @@
     return { set: (i) => { idx = i; apply(); }, get: () => idx };
   }
 
-  const fontCtl = cycle(fontBtn, FONT_SIZES, 10, '--chat-font', 'Font size', 'px', 'helpFont');
-  const lhCtl = cycle(lhBtn, LINE_HEIGHTS, 7, '--chat-lh', 'Line height', '', 'helpLh');
+  const fontCtl = cycle(fontBtn, FONT_SIZES, DEF.size, '--chat-font', 'Font size', 'px', 'helpFont');
+  const lhCtl = cycle(lhBtn, LINE_HEIGHTS, DEF.lh, '--chat-lh', 'Line height', '', 'helpLh');
   const WEIGHTS = [300, 400, 500, 600, 700];
   const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
-  const weightCtl = cycle(weightBtn, WEIGHTS, 1, '--chat-w', 'Font weight', '', 'helpWg');
+  const weightCtl = cycle(weightBtn, WEIGHTS, DEF.weight, '--chat-w', 'Font weight', '', 'helpWg');
   document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
     `<a href="#" class="helpOpt helpWg" data-idx="${i}">${n}</a>`).join(' ');
   // the help descriptions embed the same option lists as clickable links
@@ -3529,7 +3533,6 @@
   // dragging: pointer capture keeps move events flowing to the handle even
   // when the pointer crosses over the iframe, which would eat them otherwise
   const VIDPOS_KEY = 'hasan-vidpos';
-  const headerEl = document.querySelector('header');
   const vidHandle = vidBox.querySelector('.vid-handle');
   try {
     const p = JSON.parse(localStorage.getItem(VIDPOS_KEY));
@@ -3971,7 +3974,7 @@
   // the left/right insets regardless of the inline max-width ----
   const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280, 1440, 1600];
   const HDR_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20];
-  let hdrFs = 7; // -1 = follow the chat font
+  let hdrFs = DEF.hfs; // -1 = follow the chat font
   function applyHdrFs() {
     const s = document.documentElement.style;
     if (hdrFs < 0) s.removeProperty('--hdr-fs');
@@ -3979,7 +3982,7 @@
     markHelp('helpHfs', hdrFs + 1);
     saveOpts();
   }
-  let helpWIdx = 7;
+  let helpWIdx = DEF.hpw;
   const helpWCur = document.getElementById('helpWCur');
   function applyHelpW() {
     helpPanel.style.width = '';
@@ -4028,11 +4031,11 @@
     const q = new URLSearchParams();
     if (CHANNEL !== DEFAULT_CHANNEL || MULTI) q.set('channel', CHANNELS.join(','));
     if (themeMode !== 'dark') q.set('style', themeMode);
-    if (shadeIdx !== 6) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
+    if (shadeIdx !== DEF.shade) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
     if (fontSel.value !== 'sourcecodepro') q.set('font', fontSel.value);
-    if (fontCtl.get() !== 10) q.set('size', FONT_SIZES[fontCtl.get()]);
-    if (lhCtl.get() !== 7) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
-    if (weightCtl.get() !== 1) q.set('wght', WEIGHTS[weightCtl.get()]);
+    if (fontCtl.get() !== DEF.size) q.set('size', FONT_SIZES[fontCtl.get()]);
+    if (lhCtl.get() !== DEF.lh) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
+    if (weightCtl.get() !== DEF.weight) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
@@ -4054,9 +4057,9 @@
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
     if (pingOn) q.set('ping', '1');
     if (cleanUrls) q.set('clean', '1');
-    if (helpWIdx !== 7) q.set('hpw', HELP_WIDTHS[helpWIdx]);
+    if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
-    if (hdrFs !== 7) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
+    if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
       .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
