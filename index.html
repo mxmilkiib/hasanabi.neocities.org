@@ -744,6 +744,16 @@
   .aux .role:last-child { margin-right: 0; }
   .auxr { float: right; margin: 0 0 0 5px; }
   #subBtn { width: 30px; padding: 0 1px; display: flex; align-items: center; }
+  #errBox {
+    position: fixed; left: 10px; bottom: 10px; z-index: 30; max-width: min(560px, calc(100vw - 20px));
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    background: var(--panel); color: var(--text); border: 1px solid var(--danger);
+    border-radius: 6px; box-shadow: 0 4px 18px rgba(0, 0, 0, .35); font-size: .9em;
+  }
+  #errBox[hidden] { display: none; }
+  #errBox b { color: var(--danger); white-space: nowrap; }
+  #errBox .em { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim); }
+  #errBox .hdr-btn { flex: none; width: auto; height: auto; padding: 2px 8px; }
   #helpPanel {
     position: fixed;
     top: 36px;
@@ -1235,6 +1245,46 @@
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
+// global safety net: an uncaught error or rejected promise raises a small
+// notice naming the problem, with a button copying the full details for a
+// bug report. repeats of one error only bump a counter
+{
+  const seen = new Map();
+  let box, last = '';
+  const show = (kind, err, where) => {
+    const msg = String((err && err.message) || err || 'unknown error');
+    if (/ResizeObserver loop/.test(msg)) return;
+    const stack = (err && err.stack) || '';
+    const key = kind + msg + stack.split('\n')[1];
+    seen.set(key, (seen.get(key) || 0) + 1);
+    const detail = [
+      `${kind}: ${msg}`, where ? `at ${where}` : '', stack,
+      `count: ${seen.get(key)}`, `page: ${location.href.replace(/access_token=[^&]*/, 'access_token=…')}`,
+      `time: ${new Date().toISOString()}`, `ua: ${navigator.userAgent}`,
+    ].filter(Boolean).join('\n');
+    last = detail;
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'errBox';
+      box.innerHTML = '<b>something broke</b> <span class="em"></span> <button class="hdr-btn ec">copy error</button><button class="hdr-btn ex" title="dismiss">×</button>';
+      box.querySelector('.ec').onclick = (e) => {
+        const b = e.currentTarget;
+        navigator.clipboard.writeText(last).then(() => { b.textContent = 'copied'; setTimeout(() => { b.textContent = 'copy error'; }, 1200); }, () => { b.textContent = 'copy failed'; });
+      };
+      box.querySelector('.ex').onclick = () => { box.hidden = true; };
+      (document.body || document.documentElement).appendChild(box);
+    }
+    box.hidden = false;
+    const n = seen.get(key);
+    box.querySelector('.em').textContent = msg.slice(0, 160) + (n > 1 ? ` (x${n})` : '');
+    box.title = `${kind}${where ? ' at ' + where : ''} - copy error has the full details`;
+  };
+  window.addEventListener('error', (e) => {
+    if (!e.message) return; // resource load failures (images etc.) carry no message
+    show('error', e.error || e.message, e.filename ? `${e.filename.split('/').pop()}:${e.lineno}:${e.colno}` : '');
+  });
+  window.addEventListener('unhandledrejection', (e) => show('unhandled rejection', e.reason, ''));
+}
 (() => {
   // ---- change this to point the page at a different channel ----
   // ?channel=login retargets chat, video embed and stream status for the
