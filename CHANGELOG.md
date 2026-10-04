@@ -57,6 +57,50 @@ not versions — the page ships continuously to Neocities.
   `conduct`, where it belongs with the facilitation resources
 
 ### Fixes & polish
+- the service worker now caches for offline use: the page and its files
+  go network-first (deploys still arrive on the next load, the cached copy
+  only serves offline), and images from any origin - emotes, badges, gifs -
+  go cache-first with a 600-entry cap
+- `clear cache` also unregisters the service worker and drops every cache
+  before reloading, as a refresh for installed PWAs that have no reload button
+- key texts sit in their own sections: `organising` gains the tyranny of
+  structurelessness, `justice` the combahee river collective statement,
+  `dual power` state and revolution, reform or revolution, the ecology of
+  freedom and öcalan's democratic confederalism, `mutual aid` the
+  conquest of bread
+- the authors tab links the work titles of 13 authors (engels, marx,
+  kropotkin, luxemburg, lenin, trotsky, einstein, wells, wilde, benjamin,
+  freeman, federici, öcalan) to a full copy of the work
+- `safe gifs` (below `to block` in the help panel) caps the giphy lookup
+  at PG-13; off by default, so gif posts resolve unfiltered
+- `live alert` sends a system notification when a watched stream goes
+  live, or a keyword or @you line lands, while the page is hidden - via
+  the service worker; the page also holds a web lock so browsers are less
+  eager to freeze it in the background
+- a twitch login the relay never confirms gives up after 20s: the token
+  is dropped, the button flashes the error colour and a notice says why
+- an offline banner appears under the header while the browser reports no
+  connection
+- header and chat-bar controls get `aria-label`s mirrored from their titles
+  (kept in step as titles change), and keyboard focus shows an accent outline
+- gif lookups persist in localStorage (30 days, 300 entries) so reloads and
+  repeated titles skip the api, and leave one at a time, 1.2s apart, 80 an
+  hour, pausing five minutes after a giphy 429; the gif images themselves
+  were already cached by the service worker
+- the header timestamps and emote buttons' glyphs scale 1.75, and the
+  chat box emote button's face is larger and sits lower
+- native twitch gif posts resolve to the actual gif: the relay searches
+  giphy for the post's title and the bracketed link swaps for the image
+  (best match; unresolved titles keep the giphy search link)
+- the twitch button wears a purple border while logged in, and pulses
+  purple while a returned token awaits the relay's confirmation; during
+  that window the chat box is locked with a `finishing twitch login…`
+  placeholder instead of accepting text that would go nowhere
+- the header `–` is centred in its button, the timestamps glyph is a
+  size larger, and the stream button's tooltip says to use the video's
+  pause button to stop the stream
+- the page height follows the dynamic viewport, so the chat box is no
+  longer pushed below the visible edge by mobile browser toolbars
 - an uncaught error or rejected promise now raises a small notice
   naming the problem, with a `copy error` button that copies the message,
   location, stack, page url (token masked), time and user agent
