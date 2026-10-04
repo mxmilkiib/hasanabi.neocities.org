@@ -2842,20 +2842,20 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 6,    font: 'sourcecodepro', size: 10, lh: 7,  weight: 1, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1 },
-    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       size: 8,  lh: 2,  lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3 },
-    print:    { theme: 'light',   shade: 0,    font: 'sans',       size: 11, lh: 4,  lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2 },
-    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       size: 9,  lh: 14, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3 },
-    cinema:   { theme: 'black',   shade: 8,    font: 'lexend',     size: 16, lh: 9,  lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
-    phosphor: { theme: 'amber',   shade: 8,    font: 'vt323',      size: 11, lh: 7,  lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
-    dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   size: 13, lh: 13, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    midnight: { theme: 'nord',    shade: 5,    font: 'inter',      size: 7,  lh: 10, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
-    solar:    { theme: 'solarized',shade: 6,    font: 'mono',  size: 9,  lh: 7,  lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
-    minimal:  { theme: 'mirc',    shade: 2,    font: 'lexend',     size: 9,  lh: 4,  weight: 0, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: true, hfspx: -1 },
-    retro:    { theme: 'console', shade: 7,    font: 'terminus',   size: 16, lh: 4,  lines: 1, zebra: false, times: 1,  shadow: 2, subMode: 0, eonly: 0, hfspx: 18 },
-    irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   size: 15, lh: 4,  weight: 0, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18 },
-    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       size: 12, lh: 9,  lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15 },
-    heather:  { theme: 'lavender',shade: 6,    font: 'sourcecodepro', size: 11, lh: 9, weight: 0, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18 },
+    default:  { theme: 'dark',    shade: 6,    font: 'sourcecodepro', px: 17, lhv: 1.3, wv: 400, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1 },
+    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3 },
+    print:    { theme: 'light',   shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2 },
+    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3 },
+    cinema:   { theme: 'black',   shade: 8,    font: 'lexend',     px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1 },
+    phosphor: { theme: 'amber',   shade: 8,    font: 'vt323',      px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0 },
+    dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   px: 20, lhv: 2, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    midnight: { theme: 'nord',    shade: 5,    font: 'inter',      px: 14, lhv: 1.65, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0 },
+    solar:    { theme: 'solarized',shade: 6,    font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0 },
+    minimal:  { theme: 'mirc',    shade: 2,    font: 'lexend',     px: 16, lhv: 1, wv: 300, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: true, hfspx: -1 },
+    retro:    { theme: 'console', shade: 7,    font: 'terminus',   px: 28, lhv: 1, lines: 1, zebra: false, times: 1,  shadow: 2, subMode: 0, eonly: 0, hfspx: 18 },
+    irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18 },
+    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15 },
+    heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
   const THEMES = ['console', 'amber', 'black', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'steel', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
@@ -3261,7 +3261,7 @@
   // theme slot stashes
   function curOpts() {
     return {
-      font: fontSel.value, size: fontCtl.get(), lh: lhCtl.get(), weight: weightCtl.get(), theme: themeMode, shade: shadeIdx,
+      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], theme: themeMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -3276,7 +3276,7 @@
       help: helpMode,
       video: !vidBox.hidden,
       kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0,
-      hpw: helpWIdx, hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
+      hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
       split: 1 + !sideEl.hidden + !side2El.hidden,
     };
@@ -3310,12 +3310,20 @@
     if (typeof o.theme === 'string' && o.shade === undefined && THEME_SHADE[o.theme] != null) {
       shadeIdx = THEME_SHADE[o.theme]; applyShade();
     }
-    if (o.shade === null || (Number.isInteger(o.shade) && o.shade >= 0 && o.shade < SHADE_NAMES.length)) {
-      shadeIdx = o.shade; applyShade();
+    // saved bundles carry the stop's name beside its index, so widening the
+    // scale can't shift a stored shade; the bare index is the legacy form
+    const sh = typeof o.shadeName === 'string' && (o.shadeName === 'system' || SHADE_NAMES.includes(o.shadeName))
+      ? (o.shadeName === 'system' ? null : SHADE_NAMES.indexOf(o.shadeName)) : o.shade;
+    if (sh === null || (Number.isInteger(sh) && sh >= 0 && sh < SHADE_NAMES.length)) {
+      shadeIdx = sh; applyShade();
     }
-    if (Number.isInteger(o.size) && o.size >= 0 && o.size < FONT_SIZES.length) fontCtl.set(o.size);
-    if (Number.isInteger(o.lh) && o.lh >= 0 && o.lh < LINE_HEIGHTS.length) lhCtl.set(o.lh);
-    if (Number.isInteger(o.weight) && o.weight >= 0 && o.weight < WEIGHTS.length) weightCtl.set(o.weight);
+    // size/line-height/weight travel as real values (px, lhv, wv) so the
+    // option lists can change without remapping; bare size/lh/weight are
+    // legacy list indices, honoured only when the value key is absent
+    [[o.px, 'size', FONT_SIZES, fontCtl], [o.lhv, 'lh', LINE_HEIGHTS, lhCtl], [o.wv, 'weight', WEIGHTS, weightCtl]].forEach(([v, k, list, ctl]) => {
+      const i = v !== undefined ? list.indexOf(v) : Number.isInteger(o[k]) ? o[k] : -1;
+      if (i >= 0 && i < list.length) ctl.set(i);
+    });
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
     // a saved bundle always carries both booleans, so an explicit false
@@ -3350,7 +3358,8 @@
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
     if (o.ping !== undefined) setPing(!!o.ping);
     if (o.clean !== undefined) setCleanUrls(!!o.clean);
-    if (Number.isInteger(o.hpw) && o.hpw >= 0 && o.hpw < HELP_WIDTHS.length) { helpWIdx = o.hpw; applyHelpW(); }
+    const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
+    if (Number.isInteger(hw) && hw >= 0 && hw < HELP_WIDTHS.length) { helpWIdx = hw; applyHelpW(); }
     // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
     // list, which maps +4 (7-10 were prepended)
     if (Number.isInteger(o.hfspx)) {
@@ -3377,8 +3386,8 @@
     // listed here (weight, hpw, hfspx…) still break the mark. the stream
     // embed is deliberately outside presets - one toggles it by hand
     const cmp = {
-      theme: themeMode, shade: shadeIdx, font: fontSel.value, size: fontCtl.get(),
-      lh: lhCtl.get(), weight: weightCtl.get(), lines: lineLevel,
+      theme: themeMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
+      lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lines: lineLevel,
       zebra: mainEl.classList.contains('zebra'), times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
       split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0,
@@ -4084,7 +4093,8 @@
   }
   function slotTip(b, i) {
     if (!b) return `theme slot ${i + 1}: empty - click to store the current options`;
-    const px = Number.isInteger(b.size) ? ` ${FONT_SIZES[b.size]}px` : '';
+    const pxv = b.px ?? FONT_SIZES[b.size];
+    const px = pxv ? ` ${pxv}px` : '';
     const ft = b.font && FONT_STACKS[b.font] ? ` ${b.font}` : '';
     return `theme slot ${i + 1}: ${b.theme || 'dark'}·${b.shade == null ? 'auto' : b.shade}${px}${ft} - click to recall, shift/right-click to overwrite`;
   }
