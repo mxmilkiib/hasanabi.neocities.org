@@ -3649,6 +3649,10 @@
   function repin() {
     if (isSplit()) flipCols();
     else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
+    // font/metric changes move the name column in px - the reply quote
+    // indents cached there go stale, so re-measure them
+    for (const col of [logEl, sideEl, side2El])
+      for (const r of col.querySelectorAll('.row')) rqIndent(r);
   }
 
   // the row's line box and negative margin, resolved to whole pixels:
@@ -4408,6 +4412,9 @@
         if (aux?.children.length) row.insertBefore(aux, lead);
         else aux?.remove();
       }
+      // the chips just moved - the reply quote's name-column alignment is
+      // measured from the responder's leading edge, so re-indent it now
+      rqIndent(row);
     });
   }
 
@@ -4432,6 +4439,7 @@
     setOn(emoteBtn, m !== 'off');
     emoteBtn.title = `Emote-only rows: ${m} - click/scroll · ⇧click back`;
     markHelp('helpEonly', emoteMode);
+    repin();
   }
 
   function stepEmote(dir) {
@@ -4505,6 +4513,9 @@
     setOn(timeBtn, timeIdx > 0);
     timeBtn.title = `Timestamps: ${TIME_MODES[timeIdx]} - click/scroll · ⇧click back`;
     markHelp('helpTimes', timeIdx);
+    // hiding/narrowing the time column shifts every name left - the
+    // reply quote indents measured against it need re-doing
+    repin();
   }
 
   function stepTime(dir) {

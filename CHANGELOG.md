@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- reply quote bands re-measure their name-column alignment when the
+  column moves - sub-mode flips, timestamp modes and font changes used
+  to leave the indent stale, sliding the quoted nick under the ↩
 - the per-row reply button now centres on the message's bottom line
   (a wrapped row keeps it low instead of top-corner) and docks left of
   the right-side sub/mod chips rather than overlapping them
