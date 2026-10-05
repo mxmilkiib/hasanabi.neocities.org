@@ -587,7 +587,7 @@
   .role.sub[title] { color: var(--text-dim); }
   .role.bits { color: var(--accent); }
   .role.first { color: #ff69b4; font-weight: 700; }
-  .row.notice { color: var(--text-dim); font-style: italic; }
+  .row.notice { color: color-mix(in oklch, var(--text-dim), var(--text) 70%); font-style: italic; }
   .row.notice .notice-label { font-style: normal; }
   /* the rainbow sweep: notice labels and @hasanabi mentions share it */
   .row.notice .notice-label, .row .at.rbw {

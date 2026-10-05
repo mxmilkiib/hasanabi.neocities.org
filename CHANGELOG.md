@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- notice rows brighten: the body text sat at --text-dim (55-68% of the
+  text colour) which paired with the italic read murky; it now blends
+  70% toward --text, so only the [notice] label's rainbow and the
+  italic separate it from plain chat
 - duplicate twitch emotes in the picker: the classic emoticons (:P, <3
   and friends) ship inside more than one emote set, so each set they
   repeated in drew its own button. codes now dedupe across sets, first
