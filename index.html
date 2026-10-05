@@ -1093,8 +1093,8 @@
   /* the message box is a one-row textarea that grows a line at a time as
      the draft wraps, capping at five lines before scrolling */
   #chatbar textarea {
-    resize: none; height: auto; min-height: 26px; max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 8px);
-    overflow-y: hidden; line-height: 1.25; padding: 3px 8px; box-sizing: border-box;
+    resize: none; height: auto; min-height: 26.5px; max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 8.5px);
+    overflow-y: hidden; line-height: 1.25; padding: 3.5px 8px 3px; box-sizing: border-box;
   }
   #chatbar { align-items: flex-end; position: relative; }
   /* multi-channel send picker: sits over the empty textarea like a
@@ -1132,7 +1132,7 @@
   /* match the buttons' height to a one-line textarea (lh*font + pad + border,
      min-height floor) so their tops sit flush instead of bottom-aligning
      short against the box */
-  #emojiBtn, #msgSend { height: max(26px, calc(var(--chat-font, 15px) * 1.25 + 8px)); }
+  #emojiBtn, #msgSend { height: max(26.5px, calc(var(--chat-font, 15px) * 1.25 + 8.5px)); }
   /* hover previews the twitch-purple border the send button carries
      while logged in */
   #msgSend:hover { color: #9146ff; border-color: #9146ff; }
@@ -5450,6 +5450,11 @@
     chatInput.style.height = 'auto';
     chatInput.style.height = chatInput.scrollHeight + 'px';
     chatInput.style.overflowY = chatInput.scrollHeight > chatInput.clientHeight ? 'auto' : 'hidden';
+    // the taller bar shrinks the columns from below; keep a following
+    // column pinned or the newest rows slide under it
+    if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
+    if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
+    if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
     paintLen();
   };
   // fossabot's long-message cutoff isn't public, so the warn rung is a

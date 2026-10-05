@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- a growing message box no longer lets fresh rows slide under it - a
+  following column re-snaps to the bottom when the bar's height changes
 - the reply quote's violet highlight hugs the quoted nick+text - a few
   px on each side instead of the row's full width; under zebra the rest
   of the line keeps the alternate stripe, and the ↩ and channel tag sit
