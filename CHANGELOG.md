@@ -145,11 +145,10 @@ not versions — the page ships continuously to Neocities.
   (`report.pdf · PDF · 2.3 MB`); the worker also throttles uncached
   lookups per ip since workers.dev can't take a waf rule
 - youtube watch, shorts, live and youtu.be links gain a ▶ glyph beside
-  the link; hovering the url or the glyph previews a muted autoplay
-  youtube-nocookie embed under the row (with the link's start time) that
-  folds when the pointer leaves, and clicking the glyph pins it with
-  sound - toggleable via `youtube embeds` in the `?` popup; the hover
-  preview still applies
+  the link; clicking it unfolds a youtube-nocookie embed under the row
+  (with the link's start time), and a second click folds it back - so
+  nothing loads from google until asked; toggleable via
+  `youtube embeds` in the `?` popup; the hover preview still applies
 - chat links can lead with the site's favicon, fetched from
   duckduckgo's icon service - `link favicons` in the `?` popup
 - the rate graph splits its outage bands by cause: red for a socket that

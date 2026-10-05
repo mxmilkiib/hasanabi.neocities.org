@@ -389,7 +389,7 @@
   /* hover card for external links - populated by the linkpeek worker via
      the relay; text-only fields plus an optional og:image */
   #peek {
-    position: fixed; z-index: 50; width: 400px; max-width: 90vw;
+    position: fixed; z-index: 50; width: 533px; max-width: 90vw;
     background: var(--panel); color: var(--text);
     border: 1px solid var(--popline); border-radius: 6px;
     padding: 8px 10px; font-size: var(--chat-font, 15px); line-height: 1.4;
@@ -1281,7 +1281,7 @@
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link shows its title and description, and where a shortened link really lands; looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
-    <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph; hovering the url or glyph previews the player muted under the row, and clicking the glyph pins it with sound<sup>†</sup></span></div>
+    <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph; clicking it unfolds the player under the row (a second click folds it) - nothing loads from google until then<sup>†</sup></span></div>
     <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
@@ -1927,12 +1927,12 @@
             try { ico = `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(new URL(u.replace(/&amp;/g, '&')).hostname)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`; }
             catch { /* a malformed url keeps the bare text */ }
           }
-          // a watchable youtube link gets a ▶ glyph; hovering the url or
-          // the glyph previews the embed muted under the row, and a click
-          // on the glyph pins it with sound
+          // a watchable youtube link gets a ▶ glyph that unfolds the
+          // embed under the row on click; the url itself previews like
+          // any other link
           const yt = ytEmbed ? ytIdOf(url) : null;
           const ytgl = yt ? `<a class="ytemb" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} href="https://youtu.be/${yt.id}" title="play the video here">▶</a>` : '';
-          out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}"${yt ? ` data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''}` : ''}>${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
+          out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
         }
       }
       else {
@@ -4751,22 +4751,24 @@
       tv.replaceWith(v);
       return;
     }
-    // the ▶ on a youtube link pins the embed under its row with sound;
-    // a click on a pinned glyph folds it back. hover previews are muted
+    // the ▶ on a youtube link unfolds the embed under its row, and folds
+    // it back on a second click - the player, and its connection to
+    // google, only ever loads on this click
     const ytg = e.target.closest('a.ytemb');
     if (ytg && ytg.dataset.ytid) {
       e.preventDefault();
       const row = ytg.closest('.row');
-      const card = row && row.querySelector('.ytcard');
-      if (card && card.dataset.pin) { card.remove(); return; }
-      if (card) { // hover preview is already up - pin it and unmute
-        card.dataset.pin = '1';
-        const f = card.querySelector('iframe');
-        if (f) f.src = f.src.replace('&mute=1', '');
-        return;
-      }
-      const wrap = ytOpen(ytg, false);
-      if (wrap) wrap.dataset.pin = '1';
+      const old = row && row.querySelector('.ytcard');
+      if (old) { old.remove(); return; }
+      const wrap = document.createElement('span');
+      wrap.className = 'ytcard';
+      const f = document.createElement('iframe');
+      f.className = 'ytplay';
+      f.src = `https://www.youtube-nocookie.com/embed/${ytg.dataset.ytid}?autoplay=1${ytg.dataset.ytt ? `&start=${ytg.dataset.ytt}` : ''}`;
+      f.allow = 'autoplay; encrypted-media; picture-in-picture';
+      f.allowFullscreen = true;
+      wrap.appendChild(f);
+      (row || ytg.parentElement).appendChild(wrap);
       return;
     }
     const chip = e.target.closest('.reply');
@@ -4779,49 +4781,7 @@
     target.classList.add('jump');
   });
 
-  // hovering a youtube link's url text (or its ▶) previews the embed muted
-  // under the row; it folds when the pointer leaves the row, unless a glyph
-  // click pinned it. the 350ms dwell keeps a cursor sweep from loading
-  // iframes it never meant to
-  function ytSrcOf(el, muted) {
-    return `https://www.youtube-nocookie.com/embed/${el.dataset.ytid}?autoplay=1${muted ? '&mute=1' : ''}${el.dataset.ytt ? `&start=${el.dataset.ytt}` : ''}`;
-  }
-  function ytOpen(el, muted) {
-    const row = el.closest('.row');
-    if (!row) return null;
-    let wrap = row.querySelector('.ytcard');
-    if (wrap) return wrap;
-    wrap = document.createElement('span');
-    wrap.className = 'ytcard';
-    const f = document.createElement('iframe');
-    f.className = 'ytplay';
-    f.src = ytSrcOf(el, muted);
-    f.allow = 'autoplay; encrypted-media; picture-in-picture';
-    f.allowFullscreen = true;
-    wrap.appendChild(f);
-    row.appendChild(wrap);
-    return wrap;
-  }
-  let ytHoverT = 0;
-  mainEl.addEventListener('mouseover', (e) => {
-    const a = e.target instanceof Element ? e.target.closest('a[data-ytid]') : null;
-    if (!a || !ytEmbed || peekTouch.matches) return;
-    clearTimeout(ytHoverT);
-    ytHoverT = setTimeout(() => ytOpen(a, true), 350);
-  });
-  mainEl.addEventListener('mouseout', (e) => {
-    if (e.target instanceof Element && e.target.closest('a[data-ytid]')) clearTimeout(ytHoverT);
-  });
-  // an unpinned card folds as soon as the pointer hovers anything outside
-  // its row. nothing fires while the pointer sits inside the embed iframe
-  // (and :hover can't see through it either), so this is also the only
-  // signal that it was left - the dwell is what closes it on exit
-  document.addEventListener('mouseover', (e) => {
-    for (const c of document.querySelectorAll('.ytcard:not([data-pin])')) {
-      const row = c.closest('.row');
-      if (!row || !row.contains(e.target)) c.remove();
-    }
-  });
+
 
   // ---- split view: page-flip columns. New rows fill the active column;
   // once a row drops below the fold the other column is cleared and becomes
