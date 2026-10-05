@@ -2822,7 +2822,7 @@
         // of the line - link it like a name so hover and the profile work
         msgHtml = msgHtml
           .replace(/(^|[\s>.,;:!])([a-z0-9_]{1,25})(\s+just\s+sub)/i,
-            '$1<a class="at" href="https://www.twitch.tv/$2" target="_blank" rel="noopener noreferrer">$2</a>$3')
+            '$1<a class="at" href="https://www.twitch.tv/$2" target="_blank" rel="noopener noreferrer">@$2</a>$3')
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
       // a real copy of a locally-echoed message adopts the echo row:
