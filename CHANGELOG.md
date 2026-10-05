@@ -47,6 +47,9 @@ not versions — the page ships continuously to Neocities.
   rows but scales art and type too); clicking a lit size drops back to
   normal, and the pick persists like the other option chips - old '1'
   saves still read as 2x
+- emote completion in the chat input: :word opens a narrowing list of
+  loaded emote codes (with previews), and a bare 3+ letter word plus
+  tab does the same, chatterino-style; tab/⇧tab cycles, enter accepts
 - authors audit batch: tagline source links for makhno (struggle
   against the state), feinberg (transgender liberation) and bauman
   (liquid fear); remaining plain annotations are deliberately plain -

@@ -1186,6 +1186,7 @@
     color: var(--cc, var(--text)); cursor: pointer; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis; text-decoration: none; }
   #chatComp .cpick.on { background: color-mix(in srgb, var(--cc, var(--accent)) 28%, transparent); }
+  #chatComp .cpick img { height: 1.35em; width: auto; vertical-align: -0.3em; margin-right: 5px; }
   /* character count beside the box: amber past the long-message guess,
      red near twitch's 500 cap; the box border tints along with it */
   #chatLen { flex: none; align-self: center; padding: 2px 6px 2px 5px; min-width: 0;
@@ -1434,7 +1435,7 @@
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns violet once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
-    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in</span></div>
+    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
@@ -5638,30 +5639,66 @@
     if (seenNicks.size > 600) seenNicks.delete(seenNicks.keys().next().value);
   };
   let compList = [], compIdx = 0;
-  // the active token is an @word ending at the caret - a selection or a
-  // caret parked mid-text means the comp stays shut
+  // bare-word tab opened the list without a trigger char - it stays open
+  // while the word keeps being typed, so compTok treats it as an emote
+  // token even though nothing marks it as one
+  let compBare = false;
+  // the active token is an @word (nicks), a :word (emotes), or - while
+  // compBare holds - a bare word ending at the caret (emotes again). a
+  // selection or a caret parked mid-text means the comp stays shut
   const compTok = () => {
     const at = chatInput.selectionStart ?? chatInput.value.length;
     if (at !== (chatInput.selectionEnd ?? at)) return null;
-    const m = chatInput.value.slice(0, at).match(/(?:^|\s)@([a-z0-9_]{0,25})$/i);
-    return m ? { start: at - m[1].length, q: m[1].toLowerCase() } : null;
+    const before = chatInput.value.slice(0, at);
+    let m = before.match(/(?:^|\s)@([a-z0-9_]{0,25})$/i);
+    if (m) return { start: at - m[1].length, q: m[1].toLowerCase(), mode: 'nick' };
+    // ':word' completes emote codes; start covers the colon so accept
+    // replaces the whole token with just the code
+    m = before.match(/(?:^|[^\w:]):([a-z0-9_]+)$/i);
+    if (m) return { start: at - m[1].length - 1, q: m[1].toLowerCase(), mode: 'emote' };
+    if (compBare) {
+      m = before.match(/(?:^|\s)([a-z0-9_]{2,})$/i);
+      if (m) return { start: at - m[1].length, q: m[1].toLowerCase(), mode: 'emote' };
+    }
+    return null;
   };
   function compPaint() {
     chatComp.innerHTML = compList.map((r, i) =>
       `<a class="cpick${i === compIdx ? ' on' : ''}" role="option" data-i="${i}" href="#" ` +
-      `style="--cc:${escapeHTML(r.c || colorForName(r.n))}">${escapeHTML(r.n)}</a>`).join('');
+      `style="--cc:${escapeHTML(r.c || colorForName(r.n))}">` +
+      (r.img ? `<img src="${escapeHTML(r.img)}" alt="" loading="lazy">` : '') +
+      `${escapeHTML(r.n)}</a>`).join('');
     chatComp.hidden = !compList.length;
     if (compList.length) chatComp.style.left = chatInput.offsetLeft + 'px';
   }
-  const compClose = () => { chatComp.hidden = true; };
+  const compClose = () => { chatComp.hidden = true; compBare = false; };
   function compUpdate() {
     const tok = compTok();
     if (!tok) { compClose(); return; }
     compList = [];
-    // the map's tail is most recent - walk it backwards for freshest-first
-    for (const [lg, rec] of [...seenNicks].reverse()) {
-      if (lg.startsWith(tok.q) || rec.n.toLowerCase().startsWith(tok.q)) compList.push(rec);
-      if (compList.length >= 9) break;
+    if (tok.mode === 'emote') {
+      // codes dedupe across providers - first source scanned keeps its
+      // image; prefix matches lead, substring matches follow, both
+      // ordered recent-use first
+      const seen = new Set(), pre = [], sub = [];
+      const add = (n, img) => {
+        if (seen.has(n)) return;
+        seen.add(n);
+        const lc = n.toLowerCase();
+        if (lc.startsWith(tok.q)) pre.push({ n, img });
+        else if (lc.includes(tok.q)) sub.push({ n, img });
+      };
+      for (const n of Object.keys(thirdPartyEmotes)) add(n, thirdPartyEmotes[n]);
+      for (const s of twSets) for (const e of s.emoteList)
+        add(e.code, twEmoteUrl(e.id, e.assetType === 'ANIMATED'));
+      const ord = (a, b) => (useTs[b.n] || 0) - (useTs[a.n] || 0) || byName(a.n, b.n);
+      compList = pre.sort(ord).concat(sub.sort(ord)).slice(0, 9);
+    } else {
+      // the map's tail is most recent - walk it backwards for freshest-first
+      for (const [lg, rec] of [...seenNicks].reverse()) {
+        if (lg.startsWith(tok.q) || rec.n.toLowerCase().startsWith(tok.q)) compList.push(rec);
+        if (compList.length >= 9) break;
+      }
     }
     compIdx = Math.min(compIdx, Math.max(0, compList.length - 1));
     compPaint();
@@ -5976,6 +6013,19 @@
       }
       if (e.key === 'Enter' && !e.isComposing && !e.shiftKey) { e.preventDefault(); compAccept(); return; }
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); compClose(); return; }
+    }
+    // bare-word tab: caret at the end of a 3+ char word opens the emote
+    // list - chatterino-style completion with no trigger char. opening
+    // takes the key; no matches lets tab fall through to focus
+    if (e.key === 'Tab' && chatComp.hidden && !e.shiftKey) {
+      const at = chatInput.selectionStart ?? 0;
+      if (at === (chatInput.selectionEnd ?? at) &&
+          /[a-z0-9_]{3,}$/i.test(chatInput.value.slice(0, at).match(/\S*$/)?.[0] || '')) {
+        compBare = true;
+        compUpdate();
+        if (!chatComp.hidden) { e.preventDefault(); return; }
+        compBare = false;
+      }
     }
     // history walk hijacks arrows at the draft's outer lines - ↑ from the
     // first line, ↓ from the last - so multi-line text keeps caret movement
