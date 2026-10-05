@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- `live tv` drops scripps news (wound down its 24/7 service) and the
+  state/corporate-aligned tier (trt world, i24, ndtv, wion, telesur) -
+  the latam subsection goes with them
 - reply quote indentation anchors to the leading edge of the
   badge/role/name cluster instead of the name itself - a responder
   without badge icons no longer leaves the quoted line shallow
