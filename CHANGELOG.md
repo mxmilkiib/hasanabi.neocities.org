@@ -6,6 +6,17 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- accessibility pass: every `.on` toggle now mirrors `aria-pressed`;
+  the help panel and stream player are labelled dialogs; help tabs
+  expose tablist/tab/tabpanel with `aria-selected`; feed rows are
+  `role="article"`; the reply chip, `@N` mentions chip and option
+  anchors expose `role="button"` (the mentions chip and option picks
+  answer enter and space); the connection dot and rate canvas are
+  labelled images; the active send-target chip marks
+  `aria-current`; emote-picker buttons carry a single `aria-label`
+  instead of announcing their name twice; age squares announce as
+  separators; drag handles and resize grips drop out of the
+  accessibility tree; the boot label announces its progress
 - the send button loses its tooltip and gains a hover that previews
   the twitch-purple border it carries while logged in
 - the emote picker's `use` sort gains a `▤` toggle: on, each age
