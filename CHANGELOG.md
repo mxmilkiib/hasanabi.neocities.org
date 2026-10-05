@@ -34,7 +34,8 @@ not versions — the page ships continuously to Neocities.
   timer, so merely hiding the page no longer paints dead-time bands or
   sheds backlog; delayed sampler ticks refill from rendered-row counts,
   leaving bands for socket loss or a closed page
-- the `?` popup width list gains 1760px and 1920px stops
+- the `?` popup width list gains 1760px and 1920px stops, and its
+  font-size row sits directly underneath
 - the resources organising list adds cluetrain and the opencivics
   knowledge commons; open hardware gains instructables and precious
   plastic
