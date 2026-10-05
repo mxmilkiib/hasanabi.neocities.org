@@ -18,6 +18,8 @@ not versions — the page ships continuously to Neocities.
   caps at big-emote height
 - the chat-bar emote button's ☻ stretches 1px wider leftwards so its
   centre sits centred in the button
+- the chat box's placeholder text italicises and fades out while the
+  box has focus
 - the rate graph grows to the header's full 26px row height, and its
   ticks, trace and glorp marks quantise to the device-pixel grid so
   strokes render crisp at any display scaling; the canvas box now pins
