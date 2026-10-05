@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- @mentions now get their bold accent chip everywhere, not just message
+  bodies - reply quotes, notice rows, tweet cards and fossa columns all
+  go through linkifyEsc, which gained a mention alternative after the
+  url branch so @s inside links stay links (@hasanabi/@ostonox keep
+  their rainbow/shimmer in these spots too)
 - in use sort, an emote seen within the last minute pins to the very
   top of the picker grid - a negative grid order puts it ahead of the
   recents strip and every section header, freshest first. the pin drops
