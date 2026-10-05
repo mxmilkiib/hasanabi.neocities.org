@@ -1227,6 +1227,11 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #emotePick[hidden] { display: none; }
+  /* the hold chip breathes while the pointer is actually holding the
+     grid - the class only rides while cursor and option agree */
+  #emoteHold.held { animation: ehold-pulse 1.8s ease-in-out infinite; }
+  @keyframes ehold-pulse { 50% { filter: brightness(1.55) saturate(1.3); } }
+  @media (prefers-reduced-motion: reduce) { #emoteHold.held { animation: none; } }
   /* the dotted grip mirrors the stream overlay's handle - absolutely
      overlaid on the top edge (drag anywhere) so it costs no layout
      height, while the glyph run spans the middle two-thirds; fades in
@@ -6516,12 +6521,18 @@
     try { localStorage.setItem(EPICK_HOLD_KEY, epickHold ? '1' : '0'); } catch {}
     setOn(holdBtn, epickHold);
     gridHeld = false;
+    holdBtn.classList.remove('held');
     if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
     emoteQ.focus();
   });
-  emotePick.addEventListener('pointerenter', () => { gridHeld = epickHold; });
+  // the chip breathes while the pointer is actually holding the grid
+  emotePick.addEventListener('pointerenter', () => {
+    gridHeld = epickHold;
+    holdBtn.classList.toggle('held', gridHeld);
+  });
   emotePick.addEventListener('pointerleave', () => {
     gridHeld = false;
+    holdBtn.classList.remove('held');
     if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
   });
   // animation filter: anim/still chips work like the source tabs -

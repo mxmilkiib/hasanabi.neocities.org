@@ -29,6 +29,10 @@ not versions — the page ships continuously to Neocities.
   video field, the card keeps instagram's own metadata, and a 6h ttl
   means cached signed urls are dropped long before they rot
 ### Fixes & polish
+- the emote picker's hold chip breathes (a soft brightness pulse) while
+  the pointer is actually holding the grid still - off when the cursor
+  leaves, when hold is toggled off, or never on if hold is disabled;
+  reduced-motion keeps it static
 - usernotice rows dedupe the nick: twitch's system-msg already leads
   with the display name ('Nick watched at…'), so the row printed it
   twice - now the leading copy is dropped and the bold name becomes an
