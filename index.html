@@ -5539,8 +5539,17 @@
         setTimeout(() => sendBtn.classList.remove('busy'), 12000);
       };
       if (!navigator.onLine) { loginFail(); return; }
-      fetch('https://id.twitch.tv', { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(6000) })
-        .then(loginGo, loginFail);
+      // connect-src 'self' blocks a fetch probe, but img-src is open, so
+      // reachability is probed with an image: any quick response - even a
+      // 404 onerror - means the host answered; silence means unreachable
+      const probe = new Image();
+      const probeDone = (ok) => {
+        probe.onload = probe.onerror = null;
+        ok ? loginGo() : loginFail();
+      };
+      const probeTimer = setTimeout(() => probeDone(false), 6000);
+      probe.onload = probe.onerror = () => { clearTimeout(probeTimer); probeDone(true); };
+      probe.src = 'https://id.twitch.tv/favicon.ico?probe=' + Date.now();
     }
   });
 

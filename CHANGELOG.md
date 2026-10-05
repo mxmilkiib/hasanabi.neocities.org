@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- twitch login was dead everywhere, not just phones: the reachability
+  preflight used fetch(), which neocities' connect-src 'self' csp always
+  blocks, so the button could only ever say "connection problem". the
+  probe is now an image load (img-src is unrestricted) - any response,
+  even a 404, counts as reachable
 - twitter links now lead with the twitter favicon like every other
   chat link - including profile links rewritten to nitter, and nitter
   urls pasted raw (ddg has no icon for twitter.com, so x.com's serves)
