@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the per-row reply button now centres on the message's bottom line
+  (a wrapped row keeps it low instead of top-corner) and docks left of
+  the right-side sub/mod chips rather than overlapping them
 - youtube link previews now show the upload date (as an age) and view
   count under the title - the worker reads them from the watch page's
   embedded player json since oEmbed carries neither

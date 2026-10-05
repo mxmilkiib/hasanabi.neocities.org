@@ -530,10 +530,15 @@
     word-wrap: break-word;
     position: relative;
   }
-  /* hover reply affordance - hidden unless logged in (body.chaton) */
-  .rplybtn { position: absolute; top: 1px; right: 0; z-index: 1; padding: 0 5px;
+  /* hover reply affordance - hidden unless logged in (body.chaton). The
+     box spans the last line's full height so the glyph lands centred on
+     the bottom row of a wrapped message (and centred in a single-line
+     row); JS shifts it left of any right-floated chips */
+  .rplybtn { position: absolute; bottom: 2px; right: 0; z-index: 1;
+    display: inline-flex; align-items: center;
+    height: var(--chat-lhpx, 1.35em); box-sizing: border-box; padding: 0 5px;
     border: 1px solid var(--line); border-radius: 3px; background: var(--panel);
-    color: var(--text-dim); font-size: .8em; line-height: 1.35; cursor: pointer;
+    color: var(--text-dim); font-size: .8em; line-height: 1; cursor: pointer;
     opacity: 0; pointer-events: none; }
   .row:hover .rplybtn { opacity: .95; pointer-events: auto; }
   body:not(.chaton) .rplybtn { display: none; }
@@ -2408,6 +2413,28 @@
       rq.style.textIndent = (nx - rq.offsetLeft - pl) + 'px';
     }
   }
+  // the reply button docks left of the right-side chips (sub/aux) but
+  // right of any right-pinned emotes: offset it by the chip cluster's
+  // left edge. Measured lazily on row entry so it always sees the layout
+  // as it stands - render, restore, mode flips and font changes alike
+  function rplyInset(row) {
+    const b = row.querySelector(':scope > .rplybtn');
+    if (!b) return;
+    const eflex = row.classList.contains('eonly') && mainEl.classList.contains('em-right');
+    let left = Infinity;
+    for (const el of row.children) {
+      if (!el.matches('.aux, .sub') || !(eflex || el.classList.contains('auxr'))) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width) left = Math.min(left, r.left);
+    }
+    b.style.right = (left === Infinity ? 0
+      : Math.max(0, row.getBoundingClientRect().right - left)) + 'px';
+  }
+  document.addEventListener('mouseover', (e) => {
+    const r = e.target instanceof Element && e.target.closest('.row');
+    if (!r || r.contains(e.relatedTarget)) return;
+    rplyInset(r);
+  });
   // a quote band echoes the parent's rendered message - emotes, links and
   // all - cloned from the live row once it sits in the log; a parent that
   // never arrived keeps the plain-text body the band rendered with
