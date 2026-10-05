@@ -7317,6 +7317,7 @@
       color: /^#[0-9a-f]{3,8}$/i.test(s('color')) ? s('color') : '',
       author: s('author').slice(0, 80),
       published: /^\d{4}-\d\d-\d\d$/.test(s('published')) ? s('published') : '',
+      views: s('views').slice(0, 40),
       final: /^https?:\/\//.test(s('url')) ? s('url') : '',
     } : null;
     // bound the cache - a long session can hover thousands of unique urls
@@ -7388,7 +7389,7 @@
       t.className = 'ptitle'; t.textContent = p.title;
       peekEl.appendChild(t);
     }
-    const by = p && [p.author && 'by ' + p.author, p.published && peekAge(p.published)].filter(Boolean).join(' · ');
+    const by = p && [p.author && 'by ' + p.author, p.views, p.published && peekAge(p.published)].filter(Boolean).join(' · ');
     if (by) {
       const m = document.createElement('div');
       m.className = 'pmeta'; m.textContent = by;

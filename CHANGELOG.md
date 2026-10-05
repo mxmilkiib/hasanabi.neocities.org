@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- youtube link previews now show the upload date (as an age) and view
+  count under the title - the worker reads them from the watch page's
+  embedded player json since oEmbed carries neither
 - a reply's quote band no longer doubles the colon after the quoted
   nick - the parent's own colon span was being cloned into the body
 - a link preview's body text now wraps into the space under the floated
