@@ -552,6 +552,9 @@
     font: inherit; cursor: pointer; padding: 0 2px; }
   #replyBar button:hover { color: var(--text); }
   .time { color: var(--text-dim); margin-right: 5px; margin-left: 3px; }
+  /* a replayed line recovered over an outage - the glyph marks it as
+     backfilled history rather than traffic that just arrived */
+  .row.replay .time::before { content: '↻'; margin-right: 2px; opacity: .45; }
   main.notime .time { display: none; }
   main.nosec .time .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
@@ -2501,6 +2504,10 @@
         // an unexplained silence (quiet chat, or a stall that never dropped
         // the socket) still marks the span so the graph can band it grey
         if (!why) quietGaps.push([lastRowTs, ts]);
+        // a gap with a recorded cause is a confirmed outage - robotty can
+        // replay its recent window, so fetch it. unexplained gaps stay a
+        // marker only: silence needs no fetching to confirm
+        else backfill();
         if (quietGaps.length > 50) quietGaps.splice(0, quietGaps.length - 50);
         html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}"><span class="time">${timeStr}</span>` +
                 `· ${fmtDur(Math.max(1, Math.round((ts - lastRowTs) / 60000)))} gap${why ? ` · ${why}` : ''} · ` +
@@ -2686,7 +2693,7 @@
       // matches what strict per-line alternation would give
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
-      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}"` +
+      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
