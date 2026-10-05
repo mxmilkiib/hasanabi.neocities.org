@@ -34,6 +34,9 @@ not versions — the page ships continuously to Neocities.
   washing accent, so several just-used cells glow in different colours
   at once; the fade timing and the mid-fade resume on rebuilds are
   unchanged
+- age squares in the emote picker no longer clip their left border: the
+  marching-ants svg now insets 1px so the stroke's outer half lands
+  inside the cell instead of clipping at the grid edge
 - 'was banned'/'timed out' notice rows link the target's name to their
   twitch channel like other nick links - hover previews the channel,
   click opens it - and the login joins the @completion list
