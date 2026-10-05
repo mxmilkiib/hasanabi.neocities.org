@@ -139,14 +139,16 @@ not versions — the page ships continuously to Neocities.
 - link previews on Hacker News items come from its official firebase
   api - the site itself refuses datacentre fetches - so the card shows
   the story title, points, comment count, submitter and linked host
-- preview cards lay the image to the right of the text, allow a longer
+- preview cards widen a third to 400px, lay the image to the right of
+  the text, allow a longer
   description, and answer non-html links with filename, type and size
   (`report.pdf · PDF · 2.3 MB`); the worker also throttles uncached
   lookups per ip since workers.dev can't take a waf rule
-- youtube watch, shorts, live and youtu.be links gain a thumbnail card
-  under the row; clicking it swaps in a youtube-nocookie embed (with
-  the link's start time), so nothing loads from google until asked;
-  toggleable via `youtube embeds` in the `?` popup
+- youtube watch, shorts, live and youtu.be links gain a ▶ glyph beside
+  the link; clicking it unfolds a youtube-nocookie embed under the row
+  (with the link's start time), and a second click folds it back - so
+  nothing loads from google until asked; toggleable via
+  `youtube embeds` in the `?` popup; the hover preview still applies
 - chat links can lead with the site's favicon, fetched from
   duckduckgo's icon service - `link favicons` in the `?` popup
 - moderator-action rows (timeouts, bans, a cleared chat) shade blue;
