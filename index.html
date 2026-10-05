@@ -1362,7 +1362,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; reduced-motion switches them off too<sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage and lifts anything seen in the last minute to the very top, 'a-z' sorts alphabetically; mix merges the providers into one grid, then names, zoom and anim/still filters</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage and lifts anything seen in the last minute to the very top, 'a-z' sorts alphabetically; mix merges the providers into one grid, then names, zoom and anim/still filters; 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -1459,7 +1459,7 @@
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
 // global safety net: an uncaught error or rejected promise raises a small
@@ -6348,6 +6348,30 @@
     buildPicker();
     emoteQ.focus();
   });
+  // hold: while the pointer is over the picker, automatic reshuffles
+  // defer so cells can't slide out from under a cursor mid-pick - the
+  // pending rebuild lands on pointer-leave, and user-made changes
+  // (sort, filters, search, tabs) still rebuild at once
+  const EPICK_HOLD_KEY = 'hasan-epickhold';
+  let epickHold = true;
+  try { epickHold = localStorage.getItem(EPICK_HOLD_KEY) !== '0'; } catch {}
+  let gridHeld = false, heldRebuild = false;
+  const heldOr = () => gridHeld ? heldRebuild = true : rebuildPicker();
+  const holdBtn = document.getElementById('emoteHold');
+  setOn(holdBtn, epickHold);
+  holdBtn.addEventListener('click', () => {
+    epickHold = !epickHold;
+    try { localStorage.setItem(EPICK_HOLD_KEY, epickHold ? '1' : '0'); } catch {}
+    setOn(holdBtn, epickHold);
+    gridHeld = false;
+    if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
+    emoteQ.focus();
+  });
+  emotePick.addEventListener('pointerenter', () => { gridHeld = epickHold; });
+  emotePick.addEventListener('pointerleave', () => {
+    gridHeld = false;
+    if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
+  });
   // animation filter: anim/still chips work like the source tabs -
   // none lit means both, so a solo chip can't be turned into nothing
   const EPICK_ANIM_KEY = 'hasan-epickanim';
@@ -6532,7 +6556,7 @@
         b.classList.remove('justused');
     }, 3600));
     if (epickSort === 'use' && !resortTimer)
-      resortTimer = setTimeout(() => { resortTimer = 0; rebuildPicker(); }, 1500);
+      resortTimer = setTimeout(() => { resortTimer = 0; heldOr(); }, 1500);
   }
   // most-recently-used first so the age markers land at real era boundaries;
   // emotes never seen fall to the bottom, still ordered by lifetime count
@@ -6686,7 +6710,7 @@
     clearTimeout(freshTimer);
     freshTimer = freshEdge ? setTimeout(() => {
       freshTimer = 0;
-      if (!emotePick.hidden) rebuildPicker();
+      if (!emotePick.hidden) heldOr();
     }, FRESH_MS - freshEdge + 250) : 0;
   }
   // a pinned picker floats free of the chat bar and ignores its closes;
