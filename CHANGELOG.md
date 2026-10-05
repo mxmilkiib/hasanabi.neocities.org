@@ -29,6 +29,11 @@ not versions — the page ships continuously to Neocities.
   video field, the card keeps instagram's own metadata, and a 6h ttl
   means cached signed urls are dropped long before they rot
 ### Fixes & polish
+- just-used emote flashes cycle colours: each use claims the next
+  golden-angle hue (a bright hsl) as the flash's --fc instead of always
+  washing accent, so several just-used cells glow in different colours
+  at once; the fade timing and the mid-fade resume on rebuilds are
+  unchanged
 - 'was banned'/'timed out' notice rows link the target's name to their
   twitch channel like other nick links - hover previews the channel,
   click opens it - and the login joins the @completion list

@@ -1284,9 +1284,11 @@
   /* an accent wash when the emote was just used in chat - bright pop,
      slow tail so it stays readable while the grid resorts */
   #emoteGrid button.justused, #emoteRecent button.justused { animation: eflash 3.6s ease-out; }
+  /* each flash takes the next golden-angle hue via --fc, so simultaneous
+     flashes glow in different colours rather than one accent wash */
   @keyframes eflash {
-    from { background: color-mix(in srgb, var(--accent) 95%, transparent); }
-    45% { background: color-mix(in srgb, var(--accent) 55%, transparent); }
+    from { background: color-mix(in srgb, var(--fc, var(--accent)) 95%, transparent); }
+    45% { background: color-mix(in srgb, var(--fc, var(--accent)) 55%, transparent); }
   }
   /* resort moves animate; set inline by the FLIP step in rebuildPicker */
   #emoteGrid button.emove { transition: transform .35s ease; }
@@ -6662,6 +6664,10 @@
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
+  // each use claims the next golden-angle hue so simultaneous flashes
+  // glow in different colours; the map keeps it stable across rebuilds
+  const flashHues = new Map();
+  let flashHueNext = Math.floor(Math.random() * 360);
   let resortTimer = 0;
   // a use within the last minute pins its button to the very top of the
   // scroll grid (grid order beats every section header; the recents band
@@ -6672,8 +6678,10 @@
     // a delay phases the fresh animation to mid-fade - rebuilt buttons
     // resume their dimming instead of renewing to full brightness
     const d = delay ? `-${Math.max(0, delay).toFixed(2)}s` : '';
+    const fc = `hsl(${flashHues.get(name) ?? 220} 90% 62%)`;
     for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`)) {
       b.style.animationDelay = d;
+      b.style.setProperty('--fc', fc);
       b.classList.remove('justused');
       void b.offsetWidth; // reflow so a repeat use restarts the fade
       b.classList.add('justused');
@@ -6716,6 +6724,7 @@
     flashTimers.delete(n);
     flashSet.delete(n);
     flashT0.delete(n);
+    flashHues.delete(n);
     for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
       b.classList.remove('justused');
   }
@@ -6730,6 +6739,7 @@
     if (emotePick.hidden) return;
     flashSet.add(n);
     flashT0.set(n, Date.now());
+    flashHues.set(n, flashHueNext = (flashHueNext + 137.508) % 360);
     poke(n);
     flashLater(n);
     if (epickSort === 'use' && !resortTimer)
