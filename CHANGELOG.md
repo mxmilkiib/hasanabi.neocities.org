@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the emote picker's `use` sort gains a `▤` toggle: on, each age
+  square breaks to its own row as a thin labelled divider; the
+  button stays dimmed and unpressable under the a-z sort
 - tweet preview cards colour the author handle twitter blue
 - row separators and highlights now paint inside each row's pitch
   slot, not its overlapping box: below 1.15 line-height rows pull in
