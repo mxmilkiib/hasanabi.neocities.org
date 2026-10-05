@@ -6559,8 +6559,21 @@
         b.addEventListener('transitionend', () => b.classList.remove('emove'), { once: true });
       }
     }
-    for (const f of flashSet) poke(f);
+    for (const f of flashSet) { poke(f); flashLater(f); }
   };
+  function unflash(n) {
+    flashTimers.delete(n);
+    flashSet.delete(n);
+    for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
+      b.classList.remove('justused');
+  }
+  // a re-poke restarts the 3.6s fade, so the class-removal timer must
+  // restart with it - firing on the original clock yanks the class
+  // mid-fade and the background snaps off instead of tailing out
+  function flashLater(n) {
+    clearTimeout(flashTimers.get(n));
+    flashTimers.set(n, setTimeout(() => unflash(n), 3600));
+  }
   function noteEmoteUse(n) {
     liveUse[n] = (liveUse[n] || 0) + 1;
     useTs[n] = Date.now();
@@ -6568,13 +6581,7 @@
     if (emotePick.hidden) return;
     flashSet.add(n);
     poke(n);
-    clearTimeout(flashTimers.get(n));
-    flashTimers.set(n, setTimeout(() => {
-      flashTimers.delete(n);
-      flashSet.delete(n);
-      for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
-        b.classList.remove('justused');
-    }, 3600));
+    flashLater(n);
     if (epickSort === 'use' && !resortTimer)
       resortTimer = setTimeout(() => { resortTimer = 0; heldOr(); }, 1500);
   }
