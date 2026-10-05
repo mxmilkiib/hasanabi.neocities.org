@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- nick styles got a rate limit and a dial: the sweeps slowed a touch at
+  the base rate (shimmer 2.5s->3s, rainbow 4s->6s), and the ✦ row now
+  steps off / super slow / slow / on - the slow modes stretch the same
+  sweep's period via css vars (2x and 4x). the stored/URL level keeps
+  its meaning (anim=1 still on), old off stays off
 - new 'hold' chip on the emote picker (on by default): while the
   pointer is over the picker, automatic reshuffles - the 1.5s use
   resort and the fresh-pin expiry - defer instead of sliding cells out
