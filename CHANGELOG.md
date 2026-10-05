@@ -6,6 +6,16 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- hover previews no longer die in busy chat: the scroll listener that
+  hides the card was also catching the follow pin's own programmatic
+  scroll, so every incoming row dropped an open preview. snapLive now
+  stamps its scrolls and the listener ignores the 150ms after one -
+  manual scrolls still hide it
+- @hasanabi mention palettes are stable per author now instead of
+  next-in-sequence: the rainbow seed hashes the enclosing row's nick
+  (the quoted nick inside reply bands), so one chatter's mentions keep
+  a signature scheme across messages and reloads while different
+  authors still spread across the palette space
 - new config option kills the nick style animations: 'nick styles:
   off/on' under the ✦ row toggles body.noanim, which drops the
   shimmer/rainbow animation from styled nicks, shimmering urls, @

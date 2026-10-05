@@ -1699,11 +1699,16 @@
     let h = 0;
     for (let i = 0; i < e.target.textContent.length; i++)
       h = (h * 31 + e.target.textContent.charCodeAt(i)) >>> 0;
-    // .rbw mentions also draw the next palette - the sequence both
-    // varies the scheme and un-locksteps identical @hasanabi texts
+    // .rbw mentions draw a palette hashed from the author nick - a given
+    // chatter's @hasanabi always wears the same scheme, in and out of
+    // quote bands; the sequence counter covers nameless contexts
     let seq = 0;
     if (e.target.classList.contains('rbw')) {
-      seq = rbwSeq++;
+      const rqt = e.target.closest('.rqt');
+      const who = (rqt ? rqt.querySelector('b') : e.target.closest('.row')?.querySelector(':scope > .name'))?.textContent || '';
+      let w = 0;
+      for (let i = 0; i < who.length; i++) w = (w * 31 + who.toLowerCase().charCodeAt(i)) >>> 0;
+      seq = who ? w : rbwSeq++;
       e.target.style.backgroundImage = rbwPalette(seq);
     }
     e.target.style.animationDelay = -(((h + seq * 53) % 160) / 40).toFixed(2) + 's';
