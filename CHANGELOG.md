@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the emote picker can no longer slide over the chat input row - drags,
+  resizes, restored positions and reopen spots all clamp to the chat
+  bar's top edge, and the bar appearing under an open picker pushes it
+  up out of the way
 - a tweet video or youtube embed opened mid-session was saved into row
   history with its autoplay intact, so the next page load replayed it
   with no click - saves now strip yt iframes back to the ▶ toggle and

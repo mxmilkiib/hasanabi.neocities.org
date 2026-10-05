@@ -6562,9 +6562,23 @@
   }
   emotePin.addEventListener('click', () => setPin(!epickPinned));
   document.getElementById('emoteX').addEventListener('click', closePicker);
+  // the picker's lower bound is the chat bar's top edge when the bar is
+  // up - same idea as the header clamp above it
+  const epickFloor = () => chatbarEl.hidden ? innerHeight : chatbarEl.getBoundingClientRect().top;
+  // the bar appearing under an open picker pushes the picker up
+  new MutationObserver(() => {
+    if (chatbarEl.hidden || emotePick.hidden || !emotePick.style.top) return;
+    const r = emotePick.getBoundingClientRect();
+    if (r.bottom > epickFloor()) emotePick.style.top = (epickFloor() - r.height) + 'px';
+  }).observe(chatbarEl, { attributes: true, attributeFilter: ['hidden'] });
   emojiBtn.addEventListener('click', () => {
     if (!emotePick.hidden) { closePicker(); return; }
     emotePick.hidden = false;
+    // a spot parked while the chat bar was hidden can sit under it now
+    if (emotePick.style.top) {
+      const r = emotePick.getBoundingClientRect();
+      if (r.bottom > epickFloor()) emotePick.style.top = (epickFloor() - r.height) + 'px';
+    }
     emojiBtn.classList.add('on');
     emojiBtn.setAttribute('aria-expanded', 'true');
     emoteQ.value = ''; if (!twSetsKey) loadTwitchSets(''); buildPicker(); emoteQ.focus();
@@ -6622,8 +6636,9 @@
       if (!epickPinned) setPin(true);
       emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
       emotePick.style.transform = 'none';
+      const floor = epickFloor();
       emotePick.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
-      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(floor - r.height, ev.clientY - oy)) + 'px';
     };
     const drop = () => {
       emotePick.classList.remove('dragging');
@@ -6667,7 +6682,7 @@
           emotePick.style.left = (leftEdge ? ax - w : ax) + 'px';
         }
         if (topEdge || botEdge) {
-          const h = Math.round(Math.max(160, Math.min(topEdge ? ay - 4 - hdrBottom : innerHeight - 4 - ay, Math.abs(ev.clientY - ay))));
+          const h = Math.round(Math.max(160, Math.min(topEdge ? ay - 4 - hdrBottom : epickFloor() - 4 - ay, Math.abs(ev.clientY - ay))));
           emotePick.style.height = h + 'px';
           emotePick.style.top = (topEdge ? ay - h : ay) + 'px';
         }
@@ -6741,7 +6756,7 @@
         emotePick.style.transform = 'none';
         emotePick.style.left = Math.max(0, Math.min(innerWidth - (es.w || 480), es.left)) + 'px';
         emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom,
-          Math.min(innerHeight - (es.h || 420), es.top)) + 'px';
+          Math.min(epickFloor() - (es.h || 420), es.top)) + 'px';
       }
     }
   } catch {}
