@@ -755,6 +755,13 @@
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
   .reply.rq :is(.rarr, .chtag) { position: relative; z-index: 1; }
+  /* a separator on the seam between quote line and reply, matching the
+     row separators - full row width, invisible when they're off */
+  .reply.rq { position: relative; }
+  .reply.rq::after {
+    content: ""; position: absolute; left: -3px; right: 0; bottom: -1px;
+    height: 1px; background: var(--rowline);
+  }
   /* quoted emotes render at three-quarter size - the eonly override
      keeps an emote-only reply row from blowing them back up; other
      inline media caps at big-emote height so it stays a thumbnail */

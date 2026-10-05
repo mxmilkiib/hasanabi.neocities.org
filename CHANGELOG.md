@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- row separators now draw a line on the seam between a reply's quote
+  line and the reply itself
 - a growing message box no longer lets fresh rows slide under it - a
   following column re-snaps to the bottom when the bar's height changes
 - the reply quote's violet highlight hugs the quoted nick+text - ~3
