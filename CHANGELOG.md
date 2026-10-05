@@ -17,7 +17,8 @@ not versions — the page ships continuously to Neocities.
   close, so reopening lands the picker back at its dragged position.
   the 📌 chip still unpins and snaps it home explicitly
 - the emoji section leads with the hand gestures, then runs the rest
-  in the traditional group order
+  in the traditional group order; in merged mode they keep that order
+  at the grid's tail instead of being shaken through the a-z/use sort
 - blammobot trivia posts that carry the chatting emote now pin it
   against the right edge of the [ Trivia ] chip instead of wherever
   it fell in the line

@@ -6458,10 +6458,13 @@
         }
         if (!twSets.length && !q) h += head('twitch - loading…');
       }
+      // emoji sit out of the sort: they keep the list order (hands
+      // first, then the traditional groups) at the tail of the grid
+      const ejs = [];
       if (groupOn('emoji') && animOk(false))
-        for (const c of EMOJIS) if (ehit(c)) all.push({ c, r: ejiBtn(c) });
+        for (const c of EMOJIS) if (ehit(c)) ejs.push({ c, r: ejiBtn(c) });
       all.sort((a, b) => epickSort === 'az' ? byFam(a.c, b.c) : byUse(a.c, b.c));
-      h += aged(all, (x) => x.c, (x) => x.r);
+      h += aged(all.concat(ejs), (x) => x.c, (x) => x.r);
     } else {
       for (const src of ['7TV', 'BTTV', 'FFZ', 'FFZ animated', 'other']) {
         const g = groups[src];
