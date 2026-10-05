@@ -6,6 +6,7 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- tweet preview cards colour the author handle twitter blue
 - row separators and highlights now paint inside each row's pitch
   slot, not its overlapping box: below 1.15 line-height rows pull in
   under negative margins and a box-edge line/tint landed inside the
