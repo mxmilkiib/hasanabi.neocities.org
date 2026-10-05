@@ -47,6 +47,10 @@ not versions — the page ships continuously to Neocities.
   rows but scales art and type too); clicking a lit size drops back to
   normal, and the pick persists like the other option chips - old '1'
   saves still read as 2x
+- the emote picker's geometry rides the settings bundle too: a dragged
+  size (and floating position, when torn free) now lands in copied
+  settings urls as epgeo=WxH or epgeo=WxH,L,T, in saved opts and theme
+  slots; a copied position pins the picker, the same as dragging does
 - emote codes dedupe across providers now: bttv and the twitch sets
   both ship <3 (and the classics overlap elsewhere), so the first
   source scanned wins and later copies drop - plus the fresh-pin no

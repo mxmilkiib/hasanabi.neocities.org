@@ -4141,6 +4141,7 @@
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSort,
       epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
+      epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
       split: 1 + !sideEl.hidden + !side2El.hidden,
@@ -4240,6 +4241,13 @@
     if (o.ephold !== undefined) setHold(!!o.ephold);
     if (Array.isArray(o.eptabs)) { setTabs(o.eptabs); epDirty = true; }
     if (Array.isArray(o.epanim)) { setAnimFilter(o.epanim); epDirty = true; }
+    // a floating geometry only means something while pinned - same as
+    // what dragging free does
+    if (o.epgeo && o.epgeo.w) {
+      applyEpickBox(o.epgeo);
+      try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
+      if (o.epgeo.left != null) setPin(true);
+    }
     if (epDirty) buildPicker();
     if (o.notify !== undefined) setNotify(!!o.notify, false);
     const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
@@ -5021,6 +5029,10 @@
     if (!epickHold) q.set('ephold', '0');
     if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
     if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
+    try {
+      const es = JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null');
+      if (es && es.w) q.set('epgeo', es.w + 'x' + (es.h || 0) + (es.left != null ? ',' + es.left + ',' + es.top : ''));
+    } catch {}
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
@@ -7222,20 +7234,21 @@
     emotePick.addEventListener('pointerup', drop);
     emotePick.addEventListener('pointercancel', drop);
   });
-  try {
-    const es = JSON.parse(localStorage.getItem(EPICK_SIZE_KEY));
-    if (es) {
-      if (es.w) emotePick.style.width = es.w + 'px';
-      if (es.h) emotePick.style.height = es.h + 'px';
-      if (es.left != null) {
-        emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
-        emotePick.style.transform = 'none';
-        emotePick.style.left = Math.max(0, Math.min(innerWidth - (es.w || 480), es.left)) + 'px';
-        emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom,
-          Math.min(epickFloor() - (es.h || 420), es.top)) + 'px';
-      }
+  // a saved or bundled {w,h,left?,top?} box: size always applies, the
+  // position clamps into the current viewport
+  const applyEpickBox = (es) => {
+    if (!es) return;
+    if (es.w) emotePick.style.width = es.w + 'px';
+    if (es.h) emotePick.style.height = es.h + 'px';
+    if (es.left != null) {
+      emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
+      emotePick.style.transform = 'none';
+      emotePick.style.left = Math.max(0, Math.min(innerWidth - (es.w || 480), es.left)) + 'px';
+      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom,
+        Math.min(epickFloor() - (es.h || 420), es.top)) + 'px';
     }
-  } catch {}
+  };
+  try { applyEpickBox(JSON.parse(localStorage.getItem(EPICK_SIZE_KEY))); } catch {}
   // a pinned picker reopens where it was left - no focus steal
   try {
     if (localStorage.getItem(EPICK_PIN_KEY) === '1') {
@@ -7635,7 +7648,7 @@
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 1 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     // emote-picker options: ?epnames=1&epzoom=sm|q|big&epsort=az&epage=1&
-    // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|still
+    // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|still&epgeo=WxH[,L,T]
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(flag('epnames')); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
@@ -7645,6 +7658,17 @@
     if (q.has('ephold')) setHold(flag('ephold'));
     if (q.has('eptabs')) { setTabs(q.get('eptabs').split(',')); epUrlDirty = true; }
     if (q.has('epanim')) { setAnimFilter(q.get('epanim').split(',')); epUrlDirty = true; }
+    if (q.has('epgeo')) {
+      const [wh, l, t] = q.get('epgeo').split(',');
+      const [w, h] = wh.split('x').map(Number);
+      if (w > 0) {
+        const es = { w, h };
+        if (l !== undefined && t !== undefined) { es.left = +l; es.top = +t; }
+        applyEpickBox(es);
+        try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(es)); } catch {}
+        if (es.left != null) setPin(true);
+      }
+    }
     if (epUrlDirty) buildPicker();
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
