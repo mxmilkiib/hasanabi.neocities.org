@@ -38,8 +38,14 @@ not versions — the page ships continuously to Neocities.
   font-size row uses the same centred line directly underneath
 - hovering an external link pops a preview card under the cursor:
   site name, title and description scraped by a Cloudflare worker
-  and brokered through the chat relay, with a bounded per-session
-  cache; failures fall back to the bare hostname
+  and brokered through the chat relay; a shortened or redirected
+  link also names where it lands; the card follows keyboard focus,
+  skips image, gif, tweet and own-domain links, and stays off on
+  touch screens; hits cache for a day across reloads, misses for a
+  minute, and a lookup with no answer gives up after eight seconds
+- a `link previews` option in the `?` popup (off / text / text +
+  image), saved with the other options and carried in the settings
+  url as `peek`
 - the resources organising list adds cluetrain and the opencivics
   knowledge commons; open hardware gains instructables and precious
   plastic

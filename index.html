@@ -398,7 +398,8 @@
   #peek[hidden] { display: none; }
   #peek img { display: block; max-width: 100%; max-height: 140px; border-radius: 4px; margin-bottom: 6px; }
   #peek .psite { color: var(--accent); font-weight: 600; font-size: 11px; }
-  #peek .ptitle { font-weight: 600; margin: 2px 0; }
+  #peek .ptitle { font-weight: 600; margin: 2px 0; overflow-wrap: anywhere; }
+  #peek .pto { color: var(--accent); font-size: 11px; overflow-wrap: anywhere; }
   #peek .pdesc {
     color: var(--text-dim); overflow: hidden;
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
@@ -1262,6 +1263,7 @@
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
+    <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link shows its title and description, and where a shortened link really lands; looked up through a Cloudflare worker, so the linked address leaves this page; the image loads from the linked site; not shown on touch screens<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -3273,6 +3275,7 @@
     else if (a.classList.contains('helpClean')) { setCleanUrls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpNotify')) { setNotify(+a.dataset.idx === 1, true); saveOpts(); }
     else if (a.classList.contains('helpGif')) { setGifSafe(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
@@ -3609,6 +3612,10 @@
     gifCache.clear(); gifWait.clear(); gifQueue.length = 0; // results depend on the rating filter
   }
   function setCleanUrls(on) { cleanUrls = on; markHelp('helpClean', on ? 1 : 0); applyCleanUrls(); }
+  // link-preview hover card: off / text only / text + the page's image
+  const PEEK_MODES = ['off', 'text', 'text + image'];
+  let peekMode = 2;
+  function setPeek(i) { peekMode = i; markHelp('helpPeek', i); }
   function applyCleanUrls() {
     mainEl.querySelectorAll('a[data-u]').forEach((a) => {
       // italic image-url links keep their <i> wrapper on a retoggle
@@ -3684,7 +3691,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0,
+      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode,
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
       split: 1 + !sideEl.hidden + !side2El.hidden,
@@ -3768,6 +3775,7 @@
     if (o.ping !== undefined) setPing(!!o.ping);
     if (o.clean !== undefined) setCleanUrls(!!o.clean);
     if (o.gifsafe !== undefined) setGifSafe(!!o.gifsafe);
+    if (Number.isInteger(o.peek) && o.peek >= 0 && o.peek < PEEK_MODES.length) setPeek(o.peek);
     if (o.notify !== undefined) setNotify(!!o.notify, false);
     const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
     if (Number.isInteger(hw) && hw >= 0 && hw < HELP_WIDTHS.length) { helpWIdx = hw; applyHelpW(); }
@@ -4490,6 +4498,7 @@
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
     if (pingOn) q.set('ping', '1');
     if (cleanUrls) q.set('clean', '1');
+    if (peekMode !== 2) q.set('peek', peekMode);
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
@@ -6291,18 +6300,7 @@
         .forEach((el) => { const row = el.closest('.row'); el.outerHTML = twCard(entry, row ? row.textContent : ''); });
       repin();
     } else if (d.type === 'linkpeek' && typeof d.url === 'string') {
-      peekInflight.delete(d.url);
-      const p = d.peek && typeof d.peek === 'object' ? {
-        title: typeof d.peek.title === 'string' ? d.peek.title : '',
-        description: typeof d.peek.description === 'string' ? d.peek.description : '',
-        site: typeof d.peek.site === 'string' ? d.peek.site : '',
-        image: typeof d.peek.image === 'string' && /^https:\/\//.test(d.peek.image) ? d.peek.image : '',
-      } : null;
-      // bound the cache - a long session can hover thousands of unique urls
-      if (peekCache.size > 300) peekCache.delete(peekCache.keys().next().value);
-      peekCache.set(d.url, p);
-      // refresh the card only while its link is still hovered
-      if (peekUrl === d.url && !peekEl.hidden) peekShow(p, d.url, false);
+      peekGot(d.url, d.peek);
     } else if (d.type === 'repo') {
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
       const rs = document.getElementById('repoStars');
@@ -6430,6 +6428,7 @@
     if (q.has('bw')) { bwInput.value = q.get('bw'); setBlocked(bwInput.value); }
     if (q.has('ping')) setPing(flag('ping'));
     if (q.has('clean')) setCleanUrls(flag('clean'));
+    if (q.has('peek') && +q.get('peek') >= 0 && +q.get('peek') < PEEK_MODES.length) setPeek(+q.get('peek'));
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
@@ -6446,7 +6445,7 @@
     helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES,
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpFs: ['follow chat'].concat(HDR_SIZES),
@@ -6490,6 +6489,7 @@
   markHelp('helpPing', pingOn ? 1 : 0);
   markHelp('helpGif', gifSafe ? 1 : 0);
   markHelp('helpNotify', notifyOn ? 1 : 0);
+  markHelp('helpPeek', peekMode);
   // offline banner: the browser's own online/offline signal
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };
@@ -6683,20 +6683,73 @@
   peekEl.id = 'peek';
   peekEl.hidden = true;
   document.body.appendChild(peekEl);
-  const peekCache = new Map();    // url -> {title,description,site,image} | null
-  const peekInflight = new Set(); // urls with a request out, dedupes re-hovers
-  let peekSeq = 0, peekTimer = 0, peekUrl = '', peekX = 0, peekY = 0;
+  // hits live a day (and persist across reloads), misses a minute so a
+  // transient failure heals; a lookup with no answer after PEEK_WAIT gives up
+  const PEEK_KEY = 'hasan-peek', PEEK_TTL = 864e5, PEEK_FAIL_TTL = 6e4, PEEK_MAX = 300, PEEK_WAIT = 8000;
+  const peekCache = new Map();    // url -> { p: {title,description,site,image,final} | null, t }
+  const peekInflight = new Map(); // url -> give-up timer; dedupes re-hovers
+  const peekTouch = matchMedia('(hover: none) and (pointer: coarse)');
+  let peekSeq = 0, peekTimer = 0, peekUrl = '', peekX = 0, peekY = 0, peekSaveT = 0;
+  const peekGood = (p) => !!(p && (p.title || p.description));
+  try {
+    const s = JSON.parse(localStorage.getItem(PEEK_KEY)) || {};
+    for (const [u, e] of Object.entries(s)) if (e && peekGood(e.p) && Date.now() - e.t < PEEK_TTL) peekCache.set(u, e);
+  } catch {}
+  function peekSave() {
+    clearTimeout(peekSaveT);
+    peekSaveT = setTimeout(() => {
+      const o = {};
+      for (const [u, e] of [...peekCache].slice(-150)) if (peekGood(e.p)) o[u] = e;
+      try { localStorage.setItem(PEEK_KEY, JSON.stringify(o)); } catch {}
+    }, 2000);
+  }
+  // links that already carry their own embed, or that never hold a page
+  function peekLink(a) {
+    if (peekMode === 0 || peekTouch.matches || a.matches('.imglnk, .gifq, .twvid, .chsw, .chadd') || a.querySelector('img')) return false;
+    let u;
+    try { u = new URL(a.href); } catch { return false; }
+    const h = u.hostname.replace(/^www\./, '');
+    if (h === 'hasanabi.neocities.org' || h === location.hostname) return false;
+    if (/^(?:x|twitter|mobile\.twitter)\.com$/.test(h) && /\/status\//.test(u.pathname)) return false;
+    return !/\.(?:gif|gifv|webp|png|jpe?g|avif|mp4|webm)$/i.test(u.pathname);
+  }
+  function peekGot(url, raw) {
+    clearTimeout(peekInflight.get(url)); peekInflight.delete(url);
+    const s = (k) => (raw && typeof raw[k] === 'string' ? raw[k] : '');
+    const p = raw && typeof raw === 'object' ? {
+      title: s('title'), description: s('description'), site: s('site'),
+      image: /^https:\/\//.test(s('image')) ? s('image') : '',
+      final: /^https?:\/\//.test(s('url')) ? s('url') : '',
+    } : null;
+    // bound the cache - a long session can hover thousands of unique urls
+    peekCache.delete(url);
+    if (peekCache.size >= PEEK_MAX) peekCache.delete(peekCache.keys().next().value);
+    peekCache.set(url, { p, t: Date.now() });
+    if (peekGood(p)) peekSave();
+    // refresh the card only while its link is still hovered
+    if (peekUrl === url && !peekEl.hidden) peekShow(p, url, false);
+  }
+  function peekAsk(url) {
+    if (peekInflight.has(url)) return true;
+    if (!joined || !relayFrame.contentWindow) return false;
+    peekInflight.set(url, setTimeout(() => peekGot(url, null), PEEK_WAIT));
+    relayFrame.contentWindow.postMessage({ type: 'linkpeek', id: ++peekSeq, url }, RELAY_ORIGIN);
+    return true;
+  }
   function peekPlace() {
     peekEl.style.left = Math.max(4, Math.min(innerWidth - peekEl.offsetWidth - 4, peekX + 12)) + 'px';
     peekEl.style.top = Math.max(4, Math.min(innerHeight - peekEl.offsetHeight - 4, peekY + 18)) + 'px';
   }
   function peekShow(p, url, loading) {
     peekEl.textContent = '';
-    if (p && p.image) {
+    if (p && p.image && peekMode === 2) {
       const im = document.createElement('img');
-      im.src = p.image;
       im.referrerPolicy = 'no-referrer';
       im.alt = '';
+      // the card grows once the image lands - re-clamp it to the viewport
+      im.addEventListener('load', peekPlace);
+      im.addEventListener('error', () => { im.remove(); peekPlace(); });
+      im.src = p.image;
       peekEl.appendChild(im);
     }
     const site = document.createElement('div');
@@ -6704,6 +6757,17 @@
     try { site.textContent = (p && p.site) || new URL(url).hostname; }
     catch { site.textContent = ''; }
     peekEl.appendChild(site);
+    // a shortened or redirected link names where it really lands
+    try {
+      const to = p && p.final && new URL(p.final);
+      const from = new URL(url);
+      if (to && to.hostname.replace(/^www\./, '') !== from.hostname.replace(/^www\./, '')) {
+        const d = document.createElement('div');
+        d.className = 'pto';
+        d.textContent = '→ ' + cleanUrlDisp(to.href).slice(0, 70);
+        peekEl.appendChild(d);
+      }
+    } catch {}
     if (p && p.title) {
       const t = document.createElement('div');
       t.className = 'ptitle'; t.textContent = p.title;
@@ -6723,29 +6787,34 @@
     clearTimeout(peekTimer); peekTimer = 0;
     peekUrl = ''; peekEl.hidden = true;
   }
-  document.addEventListener('mouseover', (e) => {
-    const a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
-    const url = a ? a.href : '';
-    // hops between child nodes of the same anchor don't restart the delay
-    if (url === peekUrl) return;
-    peekUrl = url;
+  function peekStart(a, x, y) {
+    const url = a.href;
+    peekUrl = url; peekX = x; peekY = y;
     peekEl.hidden = true;
     clearTimeout(peekTimer);
-    if (!a) return;
-    peekX = e.clientX; peekY = e.clientY;
     peekTimer = setTimeout(() => {
       peekTimer = 0;
       if (peekUrl !== url) return;
-      const hit = peekCache.get(url);
-      if (hit !== undefined) { peekShow(hit, url, false); return; }
-      peekShow(null, url, true);
-      if (!peekInflight.has(url)) {
-        peekInflight.add(url);
-        if (joined && relayFrame.contentWindow)
-          relayFrame.contentWindow.postMessage({ type: 'linkpeek', id: ++peekSeq, url }, RELAY_ORIGIN);
-      }
+      const e = peekCache.get(url);
+      if (e && Date.now() - e.t < (peekGood(e.p) ? PEEK_TTL : PEEK_FAIL_TTL)) { peekShow(e.p, url, false); return; }
+      peekShow(null, url, peekAsk(url));
     }, 350);
+  }
+  document.addEventListener('mouseover', (e) => {
+    let a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
+    if (a && !peekLink(a)) a = null;
+    // hops between child nodes of the same anchor don't restart the delay
+    if ((a ? a.href : '') === peekUrl) return;
+    if (!a) peekHide(); else peekStart(a, e.clientX, e.clientY);
   });
+  // keyboard focus gets the card too; :focus-visible skips click focus
+  document.addEventListener('focusin', (e) => {
+    const a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
+    if (!a || !a.matches(':focus-visible') || !peekLink(a)) return;
+    const r = a.getBoundingClientRect();
+    peekStart(a, r.left, r.bottom - 18);
+  });
+  document.addEventListener('focusout', peekHide);
   // the card stays put once shown; only the debounce tracks the cursor
   document.addEventListener('mousemove', (e) => { if (peekUrl) { peekX = e.clientX; peekY = e.clientY; } });
   // relatedTarget null means the pointer left the window entirely
