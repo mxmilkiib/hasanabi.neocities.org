@@ -1105,8 +1105,8 @@
   /* the message box is a one-row textarea that grows a line at a time as
      the draft wraps, capping at five lines before scrolling */
   #chatbar textarea {
-    resize: none; height: auto; min-height: 26.5px; max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 8.5px);
-    overflow-y: hidden; line-height: 1.25; padding: 3.5px 8px 3px; box-sizing: border-box;
+    resize: none; height: auto; min-height: 27px; max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 9px);
+    overflow-y: hidden; line-height: 1.25; padding: 4px 8px 3px; box-sizing: border-box;
   }
   #chatbar { align-items: flex-end; position: relative; }
   /* multi-channel send picker: sits over the empty textarea like a
@@ -1148,7 +1148,7 @@
   /* match the buttons' height to a one-line textarea (lh*font + pad + border,
      min-height floor) so their tops sit flush instead of bottom-aligning
      short against the box */
-  #emojiBtn, #msgSend { height: max(26.5px, calc(var(--chat-font, 15px) * 1.25 + 8.5px)); }
+  #emojiBtn, #msgSend { height: max(27px, calc(var(--chat-font, 15px) * 1.25 + 9px)); }
   /* hover previews the twitch-purple border the send button carries
      while logged in */
   #msgSend:hover { color: #9146ff; border-color: #9146ff; }
