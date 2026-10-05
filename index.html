@@ -2142,19 +2142,28 @@
   function rqIndent(r) {
     const rq = r.querySelector('.reply.rq'), nm = r.querySelector('.name');
     if (!rq || !nm) return;
+    // badge icons (or the role chip that stands in for them) push the
+    // name right - anchor on the cluster's leading edge instead so the
+    // quote column is identical whether the responder has any or not
+    let anchor = nm;
+    for (let el = nm.previousElementSibling; el; el = el.previousElementSibling) {
+      if (el.matches('img.badge, .role')) anchor = el;
+      else break;
+    }
+    const nx = anchor.offsetLeft;
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
     if (qt && tg) {
       // the tag's right margin stretches so the quoted nick lands on the
       // name column (the -13 margin-left and the content box's 13px inset
       // cancel out)
       qt.style.marginLeft = (tg.offsetLeft - 13) + 'px';
-      qt.style.marginRight = Math.max(1, nm.offsetLeft - tg.offsetLeft - qt.offsetWidth) + 'px';
+      qt.style.marginRight = Math.max(1, nx - tg.offsetLeft - qt.offsetWidth) + 'px';
     } else {
       // text-indent hangs only the first line so the quoted nick sits on
       // the sender column; wrapped lines return to the quote's own left
       // edge like an ordinary multiline row
       const pl = parseFloat(getComputedStyle(rq).paddingLeft);
-      rq.style.textIndent = (nm.offsetLeft - rq.offsetLeft - 2 - pl) + 'px';
+      rq.style.textIndent = (nx - rq.offsetLeft - 2 - pl) + 'px';
     }
   }
   function flush() {

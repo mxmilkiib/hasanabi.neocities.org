@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- reply quote indentation anchors to the leading edge of the
+  badge/role/name cluster instead of the name itself - a responder
+  without badge icons no longer leaves the quoted line shallow
 - row separators move from border-bottom to border-top: at line
   heights above 1.15 rows pull up under negative margins and a lower
   row's zebra/highlight background painted over the line between them;
