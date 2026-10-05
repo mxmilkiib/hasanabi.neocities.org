@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the reply quote's left edge no longer wanders between rows: the
+  name-column anchor sweep counted any .role chip (sub/mod/bits/first)
+  as part of the name cluster, so the box jumped ~40px with an aux
+  cluster and, in hidden-chip mode, slid 13px off the row's left edge
+  (a display:none anchor reports x=0). Only .vip/.host - the chips that
+  stand in for badges - count now
 - the emote picker can no longer slide over the chat input row - drags,
   resizes, restored positions and reopen spots all clamp to the chat
   bar's top edge, and the bar appearing under an open picker pushes it

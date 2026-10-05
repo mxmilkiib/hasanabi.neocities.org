@@ -2419,10 +2419,13 @@
     if (!rq || !nm) return;
     // badge icons (or the role chip that stands in for them) push the
     // name right - anchor on the cluster's leading edge instead so the
-    // quote column is identical whether the responder has any or not
+    // quote column is identical whether the responder has any or not.
+    // Only .vip/.host count - .sub/.mod/.bits/.first are status chips
+    // that live ahead of the name column, not part of it (a hidden sub
+    // chip would anchor at x=0 and drag the box off the row's edge)
     let anchor = nm;
     for (let el = nm.previousElementSibling; el; el = el.previousElementSibling) {
-      if (el.matches('img.badge, .role')) anchor = el;
+      if (el.matches('img.badge, .role.vip, .role.host')) anchor = el;
       else break;
     }
     const nx = anchor.offsetLeft;
