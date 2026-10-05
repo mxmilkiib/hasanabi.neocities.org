@@ -106,7 +106,7 @@ not versions — the page ships continuously to Neocities.
   marcuse, adorno, arendt, bauman, habermas, bourdieu, boal, raymond,
   lessig and doctorow
 - `live tv` doubles its count and splits into region subsections led
-  by us: pbs, livenow fox, court tv, democracy now and free speech
+  by us: pbs, livenow fox, democracy now and free speech
   tv join the us block; arirang joins asia, channels tv and sabc
   join africa
 - `conduct`'s safer spaces group fills out with good night out,
