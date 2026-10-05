@@ -99,6 +99,8 @@ not versions — the page ships continuously to Neocities.
   monoskop, archive.org and author or foundation sites
 - blammobot's `[Trivia]` chip spaces its brackets - other game tags
   keep their posted spelling
+- bot `!command` tokens stay intact when their list wraps - no more
+  break after `!`
 - a url whose fragment ends in an image extension (`…#/media/
   File:x.png`) no longer embeds as a broken image - the extension
   check now tests the path only, so the wiki page links as text
