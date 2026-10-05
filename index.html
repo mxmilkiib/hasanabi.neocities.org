@@ -5709,9 +5709,15 @@
   const emoteQ = document.getElementById('emoteQ');
   const emoteGrid = document.getElementById('emoteGrid');
   const emoteTabs = document.getElementById('emoteTabs');
-  const EMOJIS = ['😀', '😂', '🤣', '😅', '😊', '😍', '🥰', '😘', '😜', '🤪',
-    '😎', '🤔', '🙄', '😴', '😳', '🥺', '😭', '😤', '🥹', '🫡', '🙏', '👍',
-    '👎', '👏', '🤝', '💪', '👀', '💀', '🔥', '✨', '🎉', '💯', '❤️', '💜', '🌈',
+  // hand gestures lead, then the rest in the traditional group order
+  const EMOJIS = ['🙏', '👍', '👎', '👏', '🤝', '💪',
+    '🤌', '🤞', '✌️', '🫰', '🤟', '🤘', '🫶', '👌', '🖐️', '✋', '🫵', '👆',
+    '👇', '👈', '👉', '✊', '👊', '🤛', '🤜', '👐', '🙌', '👋', '✍️',
+    '🤏', '🫳', '🫴', '🫸', '🫷', '🫱', '🫲', '🤲', '☝️', '🤙', '🤚', '🖖',
+    '🖕', '🤳',
+    '😀', '😂', '🤣', '😅', '😊', '😍', '🥰', '😘', '😜', '🤪',
+    '😎', '🤔', '🙄', '😴', '😳', '🥺', '😭', '😤', '🥹', '🫡',
+    '👀', '💀', '🔥', '✨', '🎉', '💯', '❤️', '💜', '🌈',
     '😁', '😆', '🙂', '😉', '😋', '😛', '🤤', '😏', '😌', '😇', '🤗', '🤭',
     '🤫', '🫣', '😐', '😑', '😬', '🥱', '😷', '🤢', '🥵', '🤯', '😱', '😨',
     '😢', '😥', '😞', '😖', '😣', '😫', '🫠', '😈', '👿', '🤡', '💩', '👻',
@@ -5720,10 +5726,6 @@
     '🤒', '🤧', '🥴', '🤮', '🤠', '🤑', '🤓', '🤩', '🥳', '🤬', '😡', '😠',
     '😕', '😔', '☹️', '🙁', '😒', '😪',
     '☠️', '👽', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '😾', '😿', '🙀',
-    '🤌', '🤞', '✌️', '🫰', '🤟', '🤘', '🫶', '👌', '🖐️', '✋', '🫵', '👆',
-    '👇', '👈', '👉', '✊', '👊', '🤛', '🤜', '👐', '🙌', '👋', '✍️',
-    '🤏', '🫳', '🫴', '🫸', '🫷', '🫱', '🫲', '🤲', '☝️', '🤙', '🤚', '🖖',
-    '🖕', '🤳',
     '🧡', '💛', '💚', '💙', '🩷', '🤍', '🖤', '💔', '❤️‍🔥', '💕', '💗', '💖',
     '💘', '💝',
     '⭐', '🌟', '💫', '⚡', '🌙', '☀️', '❄️', '☁️', '🌧️', '🌊',
@@ -6539,17 +6541,13 @@
     emotePick.hidden = true;
     emojiBtn.classList.remove('on');
     emojiBtn.setAttribute('aria-expanded', 'false');
-    setPin(false);
+    // closing isn't unpinning: a pinned picker keeps its pin and its
+    // stashed position, so the next ☻ press reopens it where it was
   }
   emotePin.addEventListener('click', () => setPin(!epickPinned));
   document.getElementById('emoteX').addEventListener('click', closePicker);
   emojiBtn.addEventListener('click', () => {
-    if (!emotePick.hidden) {
-      // a pinned picker shrugs off a ☻ press once - the click releases the
-      // pin instead, and the next press closes it
-      if (epickPinned) { setPin(false); return; }
-      closePicker(); return;
-    }
+    if (!emotePick.hidden) { closePicker(); return; }
     emotePick.hidden = false;
     emojiBtn.classList.add('on');
     emojiBtn.setAttribute('aria-expanded', 'true');

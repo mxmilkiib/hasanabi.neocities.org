@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the emote button now just closes the picker when it's pinned open,
+  instead of spending one press on unpinning; the pin survives the
+  close, so reopening lands the picker back at its dragged position.
+  the 📌 chip still unpins and snaps it home explicitly
+- the emoji section leads with the hand gestures, then runs the rest
+  in the traditional group order
 - blammobot trivia posts that carry the chatting emote now pin it
   against the right edge of the [ Trivia ] chip instead of wherever
   it fell in the line
