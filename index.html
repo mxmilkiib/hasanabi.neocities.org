@@ -1659,20 +1659,47 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // each @hasanabi mention takes the next generated palette: a hue arc
+  // at a golden-angle start (so consecutive schemes open on unrelated
+  // colours) with its own spread, saturation and lightness, mirrored
+  // into a palindrome so the position sweep loops seamlessly whatever
+  // the arc length - mentions cycle distinct moods, not one rainbow
+  let rbwSeq = 0;
+  function rbwPalette(i) {
+    const h0 = (i * 137.508) % 360;
+    const arc = [360, 220, 160, 280][i % 4];
+    const s = 62 + (i * 13) % 26, l = 57 + (i * 7) % 16;
+    const fwd = [];
+    for (let k = 0; k <= 4; k++)
+      fwd.push(`hsl(${Math.round((h0 + arc * k / 4) % 360)} ${s}% ${l}%)`);
+    // a full arc lands back on its start hue for a one-way march; a
+    // partial arc mirrors into a breathing palindrome - either way the
+    // period ends on its first colour, so two copies tile the 200% box
+    // with no seam where the sweep wraps
+    const per = arc === 360 ? fwd : fwd.concat(fwd.slice(1, -1).reverse());
+    return `linear-gradient(90deg, ${per.concat(per).join(',')})`;
+  }
+
   // every shimmer/rainbow element runs the same gradient sweep - left
   // alone they pulse in lockstep. A negative animation-delay phases each
-  // into a different point of the cycle; hashing the text keeps a given
-  // nick or url on the same offset every time. Catches names, links, @s
-  // and history-restored rows alike since animationstart bubbles
+  // into a different point of the cycle; hashing the text plus the
+  // mention's palette index keeps every element on its own offset.
+  // Catches names, links, @s and history-restored rows alike since
+  // animationstart bubbles
   document.addEventListener('animationstart', (e) => {
     if ((e.animationName !== 'shimmer' && e.animationName !== 'notice-rainbow') || e.target.dataset.sd) return;
     e.target.dataset.sd = 1;
     let h = 0;
     for (let i = 0; i < e.target.textContent.length; i++)
       h = (h * 31 + e.target.textContent.charCodeAt(i)) >>> 0;
-    // the 4s span covers notice-rainbow's whole cycle; the shorter
-    // shimmer sweep wraps the same range into a phase
-    e.target.style.animationDelay = -((h % 160) / 40).toFixed(2) + 's';
+    // .rbw mentions also draw the next palette - the sequence both
+    // varies the scheme and un-locksteps identical @hasanabi texts
+    let seq = 0;
+    if (e.target.classList.contains('rbw')) {
+      seq = rbwSeq++;
+      e.target.style.backgroundImage = rbwPalette(seq);
+    }
+    e.target.style.animationDelay = -(((h + seq * 53) % 160) / 40).toFixed(2) + 's';
   }, true);
 
   // linkifies url-looking tokens inside already-escaped text - system msgs,

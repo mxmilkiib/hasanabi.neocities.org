@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the @hasanabi rainbow is generated per mention now, not fixed: each
+  draws the next palette - a hue arc at a golden-angle start with its
+  own spread/sat/light; full arcs march one way, partial arcs breathe
+  as palindromes, both tile the 200% gradient box seamlessly. the
+  palette index also feeds the phase delay so identical @hasanabi texts
+  don't lockstep
 - @hasanabi mentions get the notice label's rainbow sweep instead of the
   bots' shimmer (ostonox keeps it) - the shared gradient/keyframes live
   in one :is() rule, and the phase stagger now covers notice-rainbow too
