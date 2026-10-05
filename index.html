@@ -1240,7 +1240,7 @@
   #emotePick .etabs button.on { opacity: 1; background: var(--line); }
   /* an accent wash when the emote was just used in chat - bright pop,
      slow tail so it stays readable while the grid resorts */
-  #emoteGrid button.justused { animation: eflash 3.6s ease-out; }
+  #emoteGrid button.justused, #emoteRecent button.justused { animation: eflash 3.6s ease-out; }
   @keyframes eflash {
     from { background: color-mix(in srgb, var(--accent) 95%, transparent); }
     45% { background: color-mix(in srgb, var(--accent) 55%, transparent); }
@@ -1253,16 +1253,28 @@
     /* rows size to content so section heads don't sit in a 40px track */
     gap: 2px; align-content: start;
   }
-  #emoteGrid button {
+  #emoteGrid button, #emoteRecent button {
     height: 40px;
     background: none; border: 0; border-radius: 4px; padding: 0;
     color: var(--text); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
-  #emoteGrid button:hover { background: var(--line); }
-  #emoteGrid button img { max-width: 34px; max-height: 34px; pointer-events: none; } /* else animation repaints kill the button's tooltip */
-  #emoteGrid button.eji { font-size: 21px; }
-  #emoteGrid .ename { display: none; }
+  #emoteGrid button:hover, #emoteRecent button:hover { background: var(--line); }
+  #emoteGrid button img, #emoteRecent button img { max-width: 34px; max-height: 34px; pointer-events: none; } /* else animation repaints kill the button's tooltip */
+  #emoteGrid button.eji, #emoteRecent button.eji { font-size: 21px; }
+  #emoteGrid .ename, #emoteRecent .ename { display: none; }
+  /* the user's own trail rides in a fixed band above the scroll grid:
+     tinted, bottom-ruled, capped at two rows so it can't eat the panel,
+     and it stays put while the provider lists flow beneath */
+  #emoteRecent {
+    flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
+    max-height: 84px; overflow-y: auto; padding: 3px 4px;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--line) 45%, transparent);
+  }
+  #emoteRecent[hidden] { display: none; }
+  #emoteRecent .rlabel { flex: none; color: var(--text-dim); font-size: .8em; padding: 0 4px 0 2px; }
+  #emoteRecent button { flex: none; width: 40px; }
   /* names view: wider cells, image left, name ellipsised right */
   #emotePick.names #emoteGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   #emotePick.names #emoteGrid button { justify-content: flex-start; gap: 6px; padding: 0 4px; }
@@ -1350,7 +1362,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; reduced-motion switches them off too<sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a 'recent' strip leads and counts picks plus emotes typed and sent; 'use' sorts by channel usage and lifts anything seen in the last minute to the very top, 'a-z' sorts alphabetically; mix merges the providers into one grid, then names, zoom and anim/still filters</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage and lifts anything seen in the last minute to the very top, 'a-z' sorts alphabetically; mix merges the providers into one grid, then names, zoom and anim/still filters</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -1447,7 +1459,7 @@
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
 // global safety net: an uncaught error or rejected promise raises a small
@@ -5827,6 +5839,7 @@
   const emotePick = document.getElementById('emotePick');
   const emoteQ = document.getElementById('emoteQ');
   const emoteGrid = document.getElementById('emoteGrid');
+  const emoteRecent = document.getElementById('emoteRecent');
   const emoteTabs = document.getElementById('emoteTabs');
   // hand gestures lead, then the rest in the traditional group order
   const EMOJIS = ['🙏', '👍', '👎', '👏', '🤝', '💪',
@@ -6460,11 +6473,12 @@
   const flashTimers = new Map();
   let resortTimer = 0;
   // a use within the last minute pins its button to the very top of the
-  // grid (grid order beats the recent strip and every section header)
+  // scroll grid (grid order beats every section header; the recents band
+  // above keeps its own MRU order)
   const FRESH_MS = 6e4;
   let freshTimer = 0;
   const poke = (name) => {
-    for (const b of emoteGrid.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`)) {
+    for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`)) {
       b.classList.remove('justused');
       void b.offsetWidth; // reflow so a repeat use restarts the fade
       b.classList.add('justused');
@@ -6478,7 +6492,7 @@
     // a name shows twice when it's both recent and in its home section -
     // queue rects per name so each button animates from its own spot
     const before = new Map();
-    for (const b of emoteGrid.querySelectorAll('button[data-ins]'))
+    for (const b of emotePick.querySelectorAll('button[data-ins]'))
       (before.get(b.dataset.ins) || before.set(b.dataset.ins, []).get(b.dataset.ins))
         .push(b.getBoundingClientRect());
     buildPicker();
@@ -6486,7 +6500,7 @@
     // write all offsets first, reflow once, then release to 0 together -
     // a reflow per button would thrash layout on a full-grid resort
     const movers = [];
-    for (const b of emoteGrid.querySelectorAll('button[data-ins]')) {
+    for (const b of emotePick.querySelectorAll('button[data-ins]')) {
       const r0 = before.get(b.dataset.ins)?.shift();
       if (!r0) continue;
       const r1 = b.getBoundingClientRect();
@@ -6514,7 +6528,7 @@
     flashTimers.set(n, setTimeout(() => {
       flashTimers.delete(n);
       flashSet.delete(n);
-      for (const b of emoteGrid.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
+      for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
         b.classList.remove('justused');
     }, 3600));
     if (epickSort === 'use' && !resortTimer)
@@ -6541,10 +6555,10 @@
       if (age > freshEdge) freshEdge = age;
       return ` style="order:${Math.round((age - FRESH_MS) / 1e3)}"`;
     };
-    const ejiBtn = (c) => `<button type="button" class="eji" data-ins="${c}"${pin(c)} title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
-    const btn = (n, src, img, a) => {
+    const ejiBtn = (c, strip) => `<button type="button" class="eji" data-ins="${c}"${strip ? '' : pin(c)} title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
+    const btn = (n, src, img, a, strip) => {
       const e = escapeHTML(n);
-      return `<button type="button" data-ins="${e}"${pin(n)}${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
+      return `<button type="button" data-ins="${e}"${strip ? '' : pin(n)}${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
         `<img src="${escapeHTML(img)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
@@ -6595,13 +6609,14 @@
     const groups = {};
     for (const n of Object.keys(thirdPartyEmotes).sort(pickerSort())) if (hit(n) && animOk(emoteAnim.has(n))) (groups[emoteSrc[n] || 'other'] ||= []).push(n);
     let h = '';
-    // recents lead when not searching - a search already surfaces them
-    if (!q && epickRecent.length) {
-      const recs = epickRecent.filter((r) => animOk(r.a !== undefined ? r.a
-        : r.img ? emoteAnim.has(r.n) || twAnim(r.n) : false));
-      if (recs.length) h += head('recent') + recs.map((r) =>
-        r.img ? btn(r.n, r.src, r.img, r.a) : ejiBtn(r.n)).join('');
-    }
+    // the user's own recents ride in the fixed band above the grid, kept
+    // distinct from the provider lists; a search already surfaces them so
+    // the band folds away while one is running
+    const recs = !q && epickRecent.length ? epickRecent.filter((r) => animOk(r.a !== undefined ? r.a
+      : r.img ? emoteAnim.has(r.n) || twAnim(r.n) : false)) : [];
+    emoteRecent.hidden = !recs.length;
+    emoteRecent.innerHTML = recs.length ? '<span class="rlabel">recent</span>' + recs.map((r) =>
+      r.img ? btn(r.n, r.src, r.img, r.a, 1) : ejiBtn(r.n, 1)).join('') : '';
     const srcTab = { '7TV': '7tv', 'BTTV': 'bttv', 'FFZ': 'ffz', 'FFZ animated': 'ffz' };
     // sections collect as (usage total, html) so the use sort can order
     // the groups by what chat actually runs, not just their members
@@ -6743,8 +6758,9 @@
     if (helpMode === 1 || helpMode === 3) { helpMode -= 1; applyHelp(); saveOpts(); }
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
-  // several emotes can stack, like chatterino's picker
-  emoteGrid.addEventListener('click', (e) => {
+  // several emotes can stack, like chatterino's picker - the recents band
+  // above the grid picks the same way
+  const pickClick = (e) => {
     const b = e.target.closest('button[data-ins]');
     if (!b) return;
     noteRecent(b); // the row itself redraws on the next open, so the grid doesn't shift mid-click
@@ -6756,7 +6772,9 @@
     chatbarEl.hidden = false;
     growInput();
     chatInput.focus();
-  });
+  };
+  emoteGrid.addEventListener('click', pickClick);
+  emoteRecent.addEventListener('click', pickClick);
   // the picker closes via ☻ or esc (or stays up when 📌 pinned);
   // outside clicks leave it alone
 

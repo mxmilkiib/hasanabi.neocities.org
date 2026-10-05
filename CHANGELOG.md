@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the recents strip is its own band now, not a grid section: it sits
+  fixed above the scroll grid in a tinted, ruled strip of its own, so
+  the user's trail stays put and readable while the provider lists
+  flow beneath - clicks pick the same way, and its MRU order is safe
+  from the fresh-use pin since grid order can't reach it
 - the ? popup caught up with the new behaviour: link previews now
   cover nicks and @mentions (and twitch cards list live state,
   followers and chat modes), the rowstyle legend gained blue mod rows
