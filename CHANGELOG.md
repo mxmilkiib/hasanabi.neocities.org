@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- a `2x` chip in the emote picker doubles the cell size for a closer
+  look at the art - persists, and the age markers scale with it
 - the emote picker's emoji are searchable by name and keyword
   (cldr/emojibase annotations - 'heart', 'cat', 'pizza'), and each
   emoji's tooltip names it
