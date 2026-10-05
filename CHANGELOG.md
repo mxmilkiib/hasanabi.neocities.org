@@ -5,6 +5,11 @@ not versions — the page ships continuously to Neocities.
 
 ## 2026-10-04
 
+### Fixes & polish
+- `live tv` drops from 30em to 18em columns (new `.live` modifier):
+  the row rendered as one or two wide columns at typical popup widths;
+  it now fits three to five
+
 ### Additions
 - the authors tab links the named work in each qualifier: 46 more
   `data-w` targets join the original 13 - theanarchistlibrary,
