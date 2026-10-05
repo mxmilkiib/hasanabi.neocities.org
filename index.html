@@ -946,9 +946,9 @@
      corner grips can sit fixed over it */
   #helpPanel .hp-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 14px; border-radius: 5px; }
   /* the dotted grip mirrors the stream overlay's handle - absolutely
-     overlaid on the top edge so it costs no layout height, and fades in
-     on hover or while dragging */
-  #helpPanel .hp-handle { position: absolute; top: 0; left: 0; right: 0;
+     overlaid on the top edge's middle two-thirds so it costs no layout
+     height, and fades in on hover or while dragging */
+  #helpPanel .hp-handle { position: absolute; top: 0; left: 16.67%; right: 16.67%;
     height: 8px; z-index: 3;
     cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
     letter-spacing: 4px; overflow: hidden; white-space: nowrap;
@@ -1198,9 +1198,10 @@
   }
   #emotePick[hidden] { display: none; }
   /* the dotted grip mirrors the stream overlay's handle - absolutely
-     overlaid on the top edge (drag anywhere) so it costs no layout height,
-     while the glyph run sits centred; fades in on hover or while dragging */
-  #emotePick .epick-handle { position: absolute; top: 0; left: 0; right: 0;
+     overlaid on the top edge's middle two-thirds so it costs no layout
+     height, while the glyph run sits centred; fades in on hover or while
+     dragging */
+  #emotePick .epick-handle { position: absolute; top: 0; left: 16.67%; right: 16.67%;
     height: 8px; z-index: 3;
     cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
     letter-spacing: 4px; overflow: hidden; white-space: nowrap;
