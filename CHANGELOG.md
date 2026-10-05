@@ -6,6 +6,13 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Features
+- @hasanabi rainbow motion variants in the ? popup's nick-styles row:
+  sweep (the existing position march), wave (a palindrome slosh back and
+  forth), hue cycle (the palette spins through the colour wheel in
+  place), pulse (a brightness breathe) and flicker (stepped neon jitter).
+  a body class swaps the keyframes on the same clipped gradient, so the
+  nick-styles rate option still stretches or kills the period; the pick
+  saves with the rest of the theme and rides ?rbw= in settings urls
 - @nick completion in the chat input: typing @ at a word boundary opens
   a strip of nicks seen scrolling by (freshest first, each in its own
   chat colour), further typing narrows it, tab/⇧tab walks the pick,
