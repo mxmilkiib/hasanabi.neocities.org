@@ -105,6 +105,8 @@ not versions — the page ships continuously to Neocities.
   balagoon, sitrin, bookchin, camus, le guin and fisher's two
   entries - and malcolm x's *ballot or the bullet* moves off a
   host-blocked copy
+- blammobot's game-tag chips space their brackets - `[ Trivia ]`,
+  `[ Roulette ]` and friends match the `[sub 12]` chip style
 
 ## 2026-10-04
 
