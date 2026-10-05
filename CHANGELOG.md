@@ -29,6 +29,9 @@ not versions — the page ships continuously to Neocities.
   video field, the card keeps instagram's own metadata, and a 6h ttl
   means cached signed urls are dropped long before they rot
 ### Fixes & polish
+- popup resize arrows ease 1px back off the edges on the help and emote
+  popups, and the stream overlay's top-edge grab glyphs get the same
+  centred four-fifths run as the other popups (hit area stays full width)
 - the emote picker's hold chip breathes (a soft brightness pulse) while
   the pointer is actually holding the grid still - off when the cursor
   leaves, when hold is toggled off, or never on if hold is disabled;
