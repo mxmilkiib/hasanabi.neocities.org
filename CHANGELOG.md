@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- resolved giphy gifs pin to the right edge like image embeds, and
+  the row keeps its line height; unresolved gif titles stay inline
 - reply quote indentation anchors to the leading edge of the
   badge/role/name cluster instead of the name itself - a responder
   without badge icons no longer leaves the quoted line shallow
