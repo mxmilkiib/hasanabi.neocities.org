@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- new config option kills the nick style animations: 'nick styles:
+  off/on' under the ✦ row toggles body.noanim, which drops the
+  shimmer/rainbow animation from styled nicks, shimmering urls, @
+  mentions and the notice label - the same set the reduced-motion
+  rules cover. persists in the options bundle, theme slots and the
+  settings url (anim=0)
 - @mentions in chat text get hover previews now: they aren't anchors,
   so the hover handler synthesizes the nick's twitch.tv profile url and
   feeds it through the same peek pipeline - same cache key as hovering
