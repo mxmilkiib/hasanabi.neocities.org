@@ -1096,9 +1096,9 @@
   #emotePick .esort { flex: none; width: auto; font-size: 12px; padding: 0 8px; opacity: .55; }
   #emotePick .esort.on { opacity: 1; background: var(--line); }
   #emotePick .esort:disabled { opacity: .25; cursor: default; }
-  /* agerows: each age square breaks to its own grid line, stretched
-     thin so it reads as a labelled divider */
-  #emotePick.agerows #emoteGrid .eage { grid-column: 1 / -1; height: 16px; }
+  /* agerows: each age square starts a new grid row, keeping its 40px
+     cell on the left while the older emotes flow on to its right */
+  #emotePick.agerows #emoteGrid .eage { grid-column-start: 1; }
   /* the source tabs sit left, the option buttons right; a thin popup
      wraps .eopts onto its own line, still hugging the right edge */
   #emotePick .etabsrow { flex: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
