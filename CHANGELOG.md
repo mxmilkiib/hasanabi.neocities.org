@@ -94,6 +94,8 @@ not versions — the page ships continuously to Neocities.
 - author work qualifiers link only when they identify concrete source
   material through `data-w`; movements, doctrines, organisations and
   descriptive labels stay plain instead of pretending to be titles
+- authors' names mode appends life dates - birth year, or birth-death
+  where known
 - the author-source audit adds full-text, archive and publisher links
   across anarchist library, marxists.org, gutenberg, wikisource,
   monoskop, archive.org and author or foundation sites
