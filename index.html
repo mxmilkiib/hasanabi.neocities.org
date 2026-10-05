@@ -724,6 +724,9 @@
     cursor: pointer;
   }
   button.hdr-btn { width: 30px; padding: 0; text-align: center; }
+  /* icon glyphs ride a hair high in the fixed-height box - 1px of top
+     padding lands the spare pixel below them */
+  .hdr-side button.hdr-btn { padding-top: 1px; }
   /* theme slots stretch to share the row; a filled slot reads as on */
   #slotRow .slot { flex: 1; width: auto; }
   #slotRow .slot.full { font-weight: 700; color: var(--accent); border-color: var(--accent); }
