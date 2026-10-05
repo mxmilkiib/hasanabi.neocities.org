@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the send button loses its tooltip and gains a hover that previews
+  the twitch-purple border it carries while logged in
 - the emote picker's `use` sort gains a `▤` toggle: on, each age
   square starts a new grid row on the left with its older emotes to
   the right; the button stays dimmed and unpressable under the a-z
