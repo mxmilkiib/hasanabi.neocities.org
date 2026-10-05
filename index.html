@@ -758,7 +758,7 @@
      (rows saved before this keep the old inline chip) */
   .reply.rq {
     display: block; flex: 0 0 100%; white-space: normal; overflow-wrap: anywhere;
-    margin: 0 0 1px 3px; padding-left: 8px;
+    margin: 0 0 1px; padding-left: 8px;
     font-style: normal; line-height: inherit;
   }
   /* the violet used to wash the row's full width; as an inline box on the
@@ -778,7 +778,7 @@
      row separators - full row width, invisible when they're off */
   .reply.rq { position: relative; }
   .reply.rq::after {
-    content: ""; position: absolute; left: -3px; right: 0; bottom: -1px;
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
     height: 1px; background: var(--rowline);
   }
   /* quoted emotes render at three-quarter size - the eonly override
@@ -791,16 +791,16 @@
   /* zebra never touches the quote highlight - it keeps its own violet
      tint whatever parity the row beneath carries */
   /* under zebra the quote's whole line - gutter, the space right of the
-     text, and the margin slivers around it (3px left, the 4px padding
-     strip above, 1px below) - takes the line's own parity: plain when
-     the reply beneath is striped, striped when it isn't */
+     text, and the slivers around it (the 4px padding strip above, 1px
+     below) - takes the line's own parity: plain when the reply beneath
+     is striped, striped when it isn't */
   main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
     background-color: var(--bg);
-    box-shadow: -3px -4px 0 var(--bg), 0 -4px 0 var(--bg), 0 1px 0 var(--bg);
+    box-shadow: 0 -4px 0 var(--bg), 0 1px 0 var(--bg);
   }
   main.zebra .row:not(.z):not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
     background-color: rgba(128, 128, 128, .07);
-    box-shadow: -3px -4px 0 rgba(128, 128, 128, .07), 0 -4px 0 rgba(128, 128, 128, .07), 0 1px 0 rgba(128, 128, 128, .07);
+    box-shadow: 0 -4px 0 rgba(128, 128, 128, .07), 0 1px 0 rgba(128, 128, 128, .07);
   }
   /* the quoted author's name carries the mention accent */
   .reply.rq b { color: var(--accent); }
@@ -810,7 +810,7 @@
   /* the quote's channel tag hangs in the row's tag column, left of the
      band - 11px undoes its margin+padding (3+8), so the tag aligns with
      the tags on ordinary lines and the quote text starts where they do */
-  .reply.rq .chtag { margin-left: -11px; }
+  .reply.rq .chtag { margin-left: -8px; }
   /* the quoted text is italic, but unicode runs stay upright - italic
      font faces lack their glyphs (same dodge as .twcard) */
   .reply.rq .up { font-style: normal; }
@@ -2416,9 +2416,9 @@
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
     if (qt && tg) {
       // the tag's right margin stretches so the quoted nick lands on the
-      // name column (the -11 margin-left and the content box's 11px inset
-      // cancel out)
-      qt.style.marginLeft = (tg.offsetLeft - 11) + 'px';
+      // name column (the -8 margin-left and the content box's 8px
+      // padding inset cancel out)
+      qt.style.marginLeft = (tg.offsetLeft - 8) + 'px';
       qt.style.marginRight = Math.max(1, nx - tg.offsetLeft - qt.offsetWidth) + 'px';
     } else {
       // text-indent hangs only the first line so the quoted nick sits on

@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the reply quote band's 3px left margin is gone: its parity background
+  reaches the row's left edge like ordinary lines. the seam separator,
+  zebra shadow and channel-tag hang all re-zeroed to match
 - sub chips rendered while num-left mode was active carried a baked
   6px right margin that followed them into right-aligned modes,
   holding the chip off the right edge; the mode switcher now sets or
