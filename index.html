@@ -386,6 +386,23 @@
     pointer-events: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
   }
+  /* hover card for external links - populated by the linkpeek worker via
+     the relay; text-only fields plus an optional og:image */
+  #peek {
+    position: fixed; z-index: 50; width: 300px; max-width: 90vw;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--popline); border-radius: 6px;
+    padding: 8px 10px; font-size: 12px; line-height: 1.4;
+    pointer-events: none; box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+  }
+  #peek[hidden] { display: none; }
+  #peek img { display: block; max-width: 100%; max-height: 140px; border-radius: 4px; margin-bottom: 6px; }
+  #peek .psite { color: var(--accent); font-weight: 600; font-size: 11px; }
+  #peek .ptitle { font-weight: 600; margin: 2px 0; }
+  #peek .pdesc {
+    color: var(--text-dim); overflow: hidden;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
+  }
   #vid #vidFrame { position: absolute; inset: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
@@ -6273,6 +6290,19 @@
       document.querySelectorAll(`.twprev[data-twid="${d.id}"]`)
         .forEach((el) => { const row = el.closest('.row'); el.outerHTML = twCard(entry, row ? row.textContent : ''); });
       repin();
+    } else if (d.type === 'linkpeek' && typeof d.url === 'string') {
+      peekInflight.delete(d.url);
+      const p = d.peek && typeof d.peek === 'object' ? {
+        title: typeof d.peek.title === 'string' ? d.peek.title : '',
+        description: typeof d.peek.description === 'string' ? d.peek.description : '',
+        site: typeof d.peek.site === 'string' ? d.peek.site : '',
+        image: typeof d.peek.image === 'string' && /^https:\/\//.test(d.peek.image) ? d.peek.image : '',
+      } : null;
+      // bound the cache - a long session can hover thousands of unique urls
+      if (peekCache.size > 300) peekCache.delete(peekCache.keys().next().value);
+      peekCache.set(d.url, p);
+      // refresh the card only while its link is still hovered
+      if (peekUrl === d.url && !peekEl.hidden) peekShow(p, d.url, false);
     } else if (d.type === 'repo') {
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
       const rs = document.getElementById('repoStars');
@@ -6645,6 +6675,85 @@
       helpPanel.style.right = 'auto';
     }
   } catch {}
+
+  // ---- link previews: hovering an external url asks the linkpeek worker
+  // (through the relay - connect-src only allows self) for og metadata and
+  // shows a small card under the cursor. everything lands via textContent ----
+  const peekEl = document.createElement('div');
+  peekEl.id = 'peek';
+  peekEl.hidden = true;
+  document.body.appendChild(peekEl);
+  const peekCache = new Map();    // url -> {title,description,site,image} | null
+  const peekInflight = new Set(); // urls with a request out, dedupes re-hovers
+  let peekSeq = 0, peekTimer = 0, peekUrl = '', peekX = 0, peekY = 0;
+  function peekPlace() {
+    peekEl.style.left = Math.max(4, Math.min(innerWidth - peekEl.offsetWidth - 4, peekX + 12)) + 'px';
+    peekEl.style.top = Math.max(4, Math.min(innerHeight - peekEl.offsetHeight - 4, peekY + 18)) + 'px';
+  }
+  function peekShow(p, url, loading) {
+    peekEl.textContent = '';
+    if (p && p.image) {
+      const im = document.createElement('img');
+      im.src = p.image;
+      im.referrerPolicy = 'no-referrer';
+      im.alt = '';
+      peekEl.appendChild(im);
+    }
+    const site = document.createElement('div');
+    site.className = 'psite';
+    try { site.textContent = (p && p.site) || new URL(url).hostname; }
+    catch { site.textContent = ''; }
+    peekEl.appendChild(site);
+    if (p && p.title) {
+      const t = document.createElement('div');
+      t.className = 'ptitle'; t.textContent = p.title;
+      peekEl.appendChild(t);
+    }
+    if (p && p.description || loading) {
+      const dd = document.createElement('div');
+      dd.className = 'pdesc'; dd.textContent = loading ? '…' : p.description;
+      peekEl.appendChild(dd);
+    }
+    peekEl.hidden = false;
+    peekPlace();
+    // a live tooltip would stack over the card on titled anchors
+    if (ttEl) ttEl.hidden = true;
+  }
+  function peekHide() {
+    clearTimeout(peekTimer); peekTimer = 0;
+    peekUrl = ''; peekEl.hidden = true;
+  }
+  document.addEventListener('mouseover', (e) => {
+    const a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
+    const url = a ? a.href : '';
+    // hops between child nodes of the same anchor don't restart the delay
+    if (url === peekUrl) return;
+    peekUrl = url;
+    peekEl.hidden = true;
+    clearTimeout(peekTimer);
+    if (!a) return;
+    peekX = e.clientX; peekY = e.clientY;
+    peekTimer = setTimeout(() => {
+      peekTimer = 0;
+      if (peekUrl !== url) return;
+      const hit = peekCache.get(url);
+      if (hit !== undefined) { peekShow(hit, url, false); return; }
+      peekShow(null, url, true);
+      if (!peekInflight.has(url)) {
+        peekInflight.add(url);
+        if (joined && relayFrame.contentWindow)
+          relayFrame.contentWindow.postMessage({ type: 'linkpeek', id: ++peekSeq, url }, RELAY_ORIGIN);
+      }
+    }, 350);
+  });
+  // the card stays put once shown; only the debounce tracks the cursor
+  document.addEventListener('mousemove', (e) => { if (peekUrl) { peekX = e.clientX; peekY = e.clientY; } });
+  // relatedTarget null means the pointer left the window entirely
+  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) peekHide(); });
+  addEventListener('scroll', peekHide, true);
+  addEventListener('mousedown', peekHide, true);
+  addEventListener('blur', peekHide);
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') peekHide(); });
 
   // ---- live tooltips: a displayed native title tooltip does not refresh
   // when the attribute changes, so hover parks the title in data-tt and a

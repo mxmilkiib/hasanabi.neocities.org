@@ -36,6 +36,10 @@ not versions — the page ships continuously to Neocities.
   leaving bands for socket loss or a closed page
 - the `?` popup width list gains 1760px and 1920px stops, and its
   font-size row uses the same centred line directly underneath
+- hovering an external link pops a preview card under the cursor:
+  site name, title and description scraped by a Cloudflare worker
+  and brokered through the chat relay, with a bounded per-session
+  cache; failures fall back to the bare hostname
 - the resources organising list adds cluetrain and the opencivics
   knowledge commons; open hardware gains instructables and precious
   plastic
