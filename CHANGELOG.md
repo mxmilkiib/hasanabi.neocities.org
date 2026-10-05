@@ -6,8 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
-- the header's icon buttons shift their spare pixel of padding from
-  above the glyph to below it
+- the header's vertical spacing balances at 3px above and below the
+  buttons (was 4/2); the corner `?`/`–` pair and their labels track
+  the new top edge
 - zebra striping no longer shades the reply quote band - it keeps
   its violet tint on every row, and the quote still consumes its
   stripe slot so the rows below keep the alternation

@@ -151,7 +151,7 @@
     /* a bare gap: shorthand would also widen the row gap; keep them apart */
     column-gap: 12px;
     row-gap: 4px;
-    padding: 4px 18px 2px;
+    padding: 3px 18px 3px;
     /* ? and – live at the absolute top-right corner whatever the wrap
        state; padding-right keeps flowing content clear of them */
     padding-right: 84px;
@@ -164,7 +164,7 @@
   }
   /* the corner pair is out of flow, so in labels mode their labels anchor
      beside them by hand; – slides left to make room for the help label */
-  .hdr-lbl.corner { position: absolute; top: 4px; line-height: 26px; }
+  .hdr-lbl.corner { position: absolute; top: 3px; line-height: 26px; }
   .hdr-lbl.c-help { right: 40px; }
   .hdr-lbl.c-hdr { right: 112px; }
   body.hdrlbl:not(.hdrgraph):not(.hdrmin) #hdrMin { right: 80px; }
@@ -172,7 +172,7 @@
   /* pinned to the first header line, not the box centre - when labels make
      .hdr-side wrap onto a second line the buttons stay put up top. top
      matches the header's padding so they line up with the flowing row */
-  #helpBtn, #hdrMin { position: absolute; top: 4px; }
+  #helpBtn, #hdrMin { position: absolute; top: 3px; }
   #helpBtn { right: 8px; font-weight: 700; }
   #hdrMin { right: 44px; }
   body.hdrmin header {
@@ -724,9 +724,6 @@
     cursor: pointer;
   }
   button.hdr-btn { width: 30px; padding: 0; text-align: center; }
-  /* icon glyphs ride a hair high in the fixed-height box - 1px of top
-     padding lands the spare pixel below them */
-  .hdr-side button.hdr-btn { padding-top: 1px; }
   /* theme slots stretch to share the row; a filled slot reads as on */
   #slotRow .slot { flex: 1; width: auto; }
   #slotRow .slot.full { font-weight: 700; color: var(--accent); border-color: var(--accent); }
