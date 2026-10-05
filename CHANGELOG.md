@@ -110,6 +110,9 @@ not versions — the page ships continuously to Neocities.
 - a url whose fragment ends in an image extension (`…#/media/
   File:x.png`) no longer embeds as a broken image - the extension
   check now tests the path only, so the wiki page links as text
+- image and giphy urls keep their link text on the row as italics
+  beside the floated embed instead of being swallowed by it; the
+  clean-urls retoggle rewrites inside the italic wrapper
 
 ## 2026-10-04
 

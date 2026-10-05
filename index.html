@@ -1806,7 +1806,10 @@
       if (giphy) {
         const u = escapeHTML(tok);
         const src = escapeHTML(`https://media.giphy.com/media/${giphy[1]}/giphy.gif`);
-        out.push(`<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>`);
+        // the floated image leads so it pins the line's right edge; the
+        // url follows as visible italic link text
+        out.push(`<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="gif"></a>` +
+                 `<a href="${u}" target="_blank" rel="noopener noreferrer" data-u="${u}"><i>${escapeHTML(cleanUrls ? cleanUrlDisp(tok) : tok)}</i></a>`);
       } else {
       // twitter/x links display as twitter.com. profile pages route through
       // nitter when the relay has a live instance, else bird.makeup (a
@@ -1837,7 +1840,10 @@
         // '#/media/File:x.png' suffix is a page anchor, not the resource
         if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(url.split('#')[0])) {
           const src = /\.gifv(?:\?\S*)?$/i.test(url) ? u.replace(/\.gifv/i, '.gif') : u;
-          out.push(escapeHTML(pre) + `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>` + escapeHTML(post));
+          // the floated image leads so it pins the line's right edge; the
+          // url follows as visible italic link text
+          out.push(escapeHTML(pre) + `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>` +
+                   `<a href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}"><i>${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</i></a>` + escapeHTML(post));
         } else {
           // this site's own domain gets the fossabot shimmer; so does any
           // url in a line the bots post - their !link commands output urls
@@ -3498,7 +3504,8 @@
   function setCleanUrls(on) { cleanUrls = on; markHelp('helpClean', on ? 1 : 0); applyCleanUrls(); }
   function applyCleanUrls() {
     mainEl.querySelectorAll('a[data-u]').forEach((a) => {
-      a.textContent = cleanUrls ? cleanUrlDisp(a.dataset.u) : a.dataset.u;
+      // italic image-url links keep their <i> wrapper on a retoggle
+      (a.firstElementChild || a).textContent = cleanUrls ? cleanUrlDisp(a.dataset.u) : a.dataset.u;
     });
   }
   function pingSnd() {
