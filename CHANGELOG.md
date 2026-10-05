@@ -34,6 +34,10 @@ not versions — the page ships continuously to Neocities.
   washing accent, so several just-used cells glow in different colours
   at once; the fade timing and the mid-fade resume on rebuilds are
   unchanged
+- the emote picker gains a ½x size chip next to 2x: 20px cells for a
+  denser overview (names mode keeps wide rows but scales art and type
+  down too); clicking a lit size drops back to normal, and the pick
+  persists like the other option chips - old '1' saves still read as 2x
 - age squares in the emote picker no longer clip their left border: the
   marching-ants svg now insets 1px so the stroke's outer half lands
   inside the cell instead of clipping at the grid edge
