@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- duplicate twitch emotes in the picker: the classic emoticons (:P, <3
+  and friends) ship inside more than one emote set, so each set they
+  repeated in drew its own button. codes now dedupe across sets, first
+  sorted set wins - the channel's own copy beats a generic one
 - the just-used flash stops renewing on other emotes' uses: every resort
   re-poked still-flashing names at full brightness, so a busy chat held
   every flash near-max and renewed them all on each use. rebuilt

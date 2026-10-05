@@ -6688,12 +6688,15 @@
         for (const n of g) all.push({ c: n, r: btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n)) });
       }
       if (groupOn('twitch')) {
+        const seenTw = new Set(); // codes recur across twitch sets; first wins
         for (const s of twSets) {
           const srcName = s.channelLogin ? s.channelLogin + (s.tier ? ' t' + s.tier : '')
                         : (s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ');
           for (const e of s.emoteList)
-            if (hit(e.code) && animOk(e.assetType === 'ANIMATED'))
+            if (!seenTw.has(e.code) && hit(e.code) && animOk(e.assetType === 'ANIMATED')) {
+              seenTw.add(e.code);
               all.push({ c: e.code, r: btn(e.code, srcName, twEmoteUrl(e.id, e.assetType === 'ANIMATED'), e.assetType === 'ANIMATED') });
+            }
         }
         if (!twSets.length && !q) h += head('twitch - loading…');
       }
@@ -6717,11 +6720,13 @@
         // this channel's sets first, then other channels by name, globals last
         const rank = (s) => s.channelLogin === CHANNEL ? 0 : s.channelLogin ? 1 : 2;
         const sets = [...twSets].sort((a, b) => rank(a) - rank(b) || byName(a.channelLogin || '', b.channelLogin || '') || (+a.tier || 0) - (+b.tier || 0));
+        const seenTw = new Set(); // the classics ship in several sets; first wins
         for (const s of sets) {
-          const g = s.emoteList.filter((e) => hit(e.code) && animOk(e.assetType === 'ANIMATED'))
+          const g = s.emoteList.filter((e) => !seenTw.has(e.code) && hit(e.code) && animOk(e.assetType === 'ANIMATED'))
             .sort(epickSort === 'az' ? (a, b) => byName(a.code, b.code)
                 : (a, b) => (useTs[b.code] || 0) - (useTs[a.code] || 0) || useOf(b.code) - useOf(a.code) || byName(a.code, b.code));
           if (!g.length) continue;
+          for (const e of g) seenTw.add(e.code);
           const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                       : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
           pushSec(g.reduce((t, e) => t + useOf(e.code), 0), label,
