@@ -4348,7 +4348,13 @@
       // put the float - appended after the body text it would sink to the
       // last line of a long message instead of the first
       const after = row.querySelector('.colon') || row.querySelector('.name');
-      const rightAt = after ? after.nextSibling : row.querySelector('.imglnk');
+      // resolved lazily: moving the sub chip below can pull the old anchor
+      // (e.g. the chip itself, when it sat right after the colon) out of the
+      // row, leaving insertBefore with a reference that isn't a child
+      const rightAt = () => {
+        const a = after ? after.nextSibling : row.querySelector('.imglnk');
+        return a && a.parentNode === row ? a : null;
+      };
       if (sub) {
         sub.hidden = mode === 'hidden';
         // restyle the chip text to match: [sub 12] vs compact 12
@@ -4359,7 +4365,7 @@
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
           if (aux) aux.append(sub); // outermost in the right cluster
-          else row.insertBefore(sub, rightAt);
+          else row.insertBefore(sub, rightAt());
         }
       }
       if (aux) {
@@ -4368,7 +4374,7 @@
         if (modChip) modChip.textContent = mode.startsWith('num') ? 'md' : '[ mod. ]';
         aux.classList.toggle('auxr', !left);
         aux.hidden = mode === 'hidden' && aux.children.length === 1 && aux.firstElementChild === sub;
-        if (!left) row.insertBefore(aux, rightAt);
+        if (!left) row.insertBefore(aux, rightAt());
       }
       if (left) {
         if (sub) row.insertBefore(sub, lead);
