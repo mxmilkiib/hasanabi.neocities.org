@@ -97,8 +97,8 @@ not versions — the page ships continuously to Neocities.
 - the author-source audit adds full-text, archive and publisher links
   across anarchist library, marxists.org, gutenberg, wikisource,
   monoskop, archive.org and author or foundation sites
-- blammobot's game-tag chips space their brackets - `[ Trivia ]`,
-  `[ Roulette ]` and friends match the `[sub 12]` chip style
+- blammobot's `[Trivia]` chip spaces its brackets - other game tags
+  keep their posted spelling
 - a url whose fragment ends in an image extension (`…#/media/
   File:x.png`) no longer embeds as a broken image - the extension
   check now tests the path only, so the wiki page links as text

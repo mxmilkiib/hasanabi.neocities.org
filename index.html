@@ -2431,7 +2431,7 @@
               for (const c of g) h = (h * 31 + c.charCodeAt(0)) >>> 0;
               h %= 360;
             }
-            return `<b class="tag" style="background:hsl(${h} 60% 45%/.3)">[ ${g} ]</b>`;
+            return `<b class="tag" style="background:hsl(${h} 60% 45%/.3)">[${g.toLowerCase() === 'trivia' ? ` ${g} ` : g}]</b>`;
           })
           .replace(/(the (?:answer|word) was:?\s*)&quot;(.+?)&quot;\s*$/i, '$1&quot;<b>$2</b>&quot;')
           .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>')
