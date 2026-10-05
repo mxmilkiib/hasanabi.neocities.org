@@ -1138,8 +1138,11 @@
     box-shadow: 0 0 0 1px var(--cc); }
   /* character count beside the box: amber past the long-message guess,
      red near twitch's 500 cap; the box border tints along with it */
-  #chatLen { flex: none; align-self: center; padding: 2px 6px; min-width: 0;
+  #chatLen { flex: none; align-self: center; padding: 2px 6px 2px 5px; min-width: 0;
     text-align: right; font-size: .85em; color: var(--text); opacity: .75; }
+  /* no count yet: collapse to nothing and margin in the emote side's
+     spacing, so the input-to-send gap matches it exactly */
+  #chatLen:empty { padding: 0; margin-right: 2px; }
   #chatLen.warn { color: var(--accent); opacity: 1; }
   #chatLen.over { color: var(--danger); opacity: 1; }
   #chatInput.longmsg { border-color: var(--accent); }
