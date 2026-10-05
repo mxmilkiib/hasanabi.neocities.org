@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the reply quote's violet highlight hugs the quoted nick+text - a few
+  px on each side instead of the row's full width; under zebra the rest
+  of the line keeps the alternate stripe, and the ↩ and channel tag sit
+  in the gutter outside the highlight
 - a `2x` chip in the emote picker doubles the cell size for a closer
   look at the art - persists, and the age markers scale with it
 - the emote picker's emoji are searchable by name and keyword

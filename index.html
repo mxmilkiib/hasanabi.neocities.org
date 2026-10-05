@@ -739,9 +739,19 @@
      (rows saved before this keep the old inline chip) */
   .reply.rq {
     display: block; flex: 0 0 100%; white-space: normal; overflow-wrap: anywhere;
-    margin: 0 0 1px 3px; padding-left: 8px; border-left: 2px solid color-mix(in srgb, #a878ee 55%, var(--line));
-    background-color: color-mix(in srgb, var(--bg) 90%, #a878ee);
+    margin: 0 0 1px 3px; padding-left: 8px;
     font-style: normal; line-height: inherit;
+  }
+  /* the violet used to wash the row's full width; as an inline box on the
+     quoted nick+text it hugs the text instead - clone carries the border
+     and padding onto wrapped lines, and the -4px margin undoes its own
+     border+pad so the text stays on the name column. the gutter tag and
+     ↩ stay outside, in the line's surround */
+  .reply.rq .rqt {
+    margin-left: -4px; padding-left: 2px; padding-right: 4px;
+    border-left: 2px solid color-mix(in srgb, #a878ee 55%, var(--line));
+    background-color: color-mix(in srgb, var(--bg) 90%, #a878ee);
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
   /* quoted emotes render at three-quarter size - the eonly override
      keeps an emote-only reply row from blowing them back up; other
@@ -750,16 +760,18 @@
   main.em-inline .row.eonly .reply.rq .emote,
   main.em-right .row.eonly .reply.rq .emote { height: 1.125em; margin: -.26em 1px; }
   .reply.rq :is(.gifimg, .chat-img, .twvid img, .twcard img) { max-height: 2.2em; }
-  /* zebra never touches the quote band - it keeps its own violet tint
-     whatever parity the row beneath carries */
-  /* under zebra, the row-tinted surround of the band (3px left, the 4px
-     padding strip above, 1px below) takes the quote line's own parity -
-     plain when the reply beneath is striped, striped when it isn't - so
-     the gap reads as the quote's line, not as part of the reply's stripe */
+  /* zebra never touches the quote highlight - it keeps its own violet
+     tint whatever parity the row beneath carries */
+  /* under zebra the quote's whole line - gutter, the space right of the
+     text, and the margin slivers around it (3px left, the 4px padding
+     strip above, 1px below) - takes the line's own parity: plain when
+     the reply beneath is striped, striped when it isn't */
   main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
+    background-color: var(--bg);
     box-shadow: -3px -4px 0 var(--bg), 0 -4px 0 var(--bg), 0 1px 0 var(--bg);
   }
   main.zebra .row:not(.z):not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
+    background-color: rgba(128, 128, 128, .07);
     box-shadow: -3px -4px 0 rgba(128, 128, 128, .07), 0 -4px 0 rgba(128, 128, 128, .07), 0 1px 0 rgba(128, 128, 128, .07);
   }
   /* the quoted author's name carries the mention accent */
@@ -769,10 +781,9 @@
      starts on the responder's name column */
   .reply.rq .rarr { display: inline-block; width: 1.2em; margin-left: -1.2em; }
   /* the quote's channel tag hangs in the row's tag column, left of the
-     band - 13px undoes its margin+border+padding (3+2+8), so the tag
-     aligns with the tags on ordinary lines and the quote text starts
-     where they do */
-  .reply.rq .chtag { margin-left: -13px; }
+     band - 11px undoes its margin+padding (3+8), so the tag aligns with
+     the tags on ordinary lines and the quote text starts where they do */
+  .reply.rq .chtag { margin-left: -11px; }
   /* the quoted text is italic, but unicode runs stay upright - italic
      font faces lack their glyphs (same dodge as .twcard) */
   .reply.rq .up { font-style: normal; }
@@ -2367,16 +2378,16 @@
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
     if (qt && tg) {
       // the tag's right margin stretches so the quoted nick lands on the
-      // name column (the -13 margin-left and the content box's 13px inset
+      // name column (the -11 margin-left and the content box's 11px inset
       // cancel out)
-      qt.style.marginLeft = (tg.offsetLeft - 13) + 'px';
+      qt.style.marginLeft = (tg.offsetLeft - 11) + 'px';
       qt.style.marginRight = Math.max(1, nx - tg.offsetLeft - qt.offsetWidth) + 'px';
     } else {
       // text-indent hangs only the first line so the quoted nick sits on
       // the sender column; wrapped lines return to the quote's own left
       // edge like an ordinary multiline row
       const pl = parseFloat(getComputedStyle(rq).paddingLeft);
-      rq.style.textIndent = (nx - rq.offsetLeft - 2 - pl) + 'px';
+      rq.style.textIndent = (nx - rq.offsetLeft - pl) + 'px';
     }
   }
   // a quote band echoes the parent's rendered message - emotes, links and
@@ -2555,7 +2566,7 @@
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
         reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
-                `${chTag}<span class="rarr">↩</span><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span>`;
+                `${chTag}<span class="rarr">↩</span><span class="rqt"><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       const lkey = linkKeyOf(message);
@@ -5041,6 +5052,17 @@
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
       for (const rq of logEl.querySelectorAll('.reply.rq')) {
+        // rows saved before the tight highlight: wrap the nick and body
+        // in .rqt so they match the new markup
+        if (!rq.querySelector(':scope > .rqt')) {
+          const t = document.createElement('span');
+          t.className = 'rqt';
+          for (let n = rq.querySelector('.rarr')?.nextSibling || rq.firstChild, nx; n; n = nx) {
+            nx = n.nextSibling;
+            t.appendChild(n);
+          }
+          rq.appendChild(t);
+        }
         const r = rq.closest('.row');
         fillRq(r);
         rqIndent(r);
