@@ -2567,9 +2567,9 @@
     if (!r || r.contains(e.relatedTarget)) return;
     rplyInset(r);
   });
-  // a quote band echoes the parent's rendered message - emotes, links and
-  // all - cloned from the live row once it sits in the log; a parent that
-  // never arrived keeps the plain-text body the band rendered with
+  // a quote band echoes the parent's rendered message - emotes and links,
+  // but not the preview cards under them: a .twprev clone would get its
+  // whole card injected mid-quote once the tweet data lands
   function fillRq(r) {
     const rq = r.querySelector(':scope > .reply.rq');
     const pr = rq && rowById.get(rq.dataset.pid);
@@ -2578,7 +2578,7 @@
     const qi = rq.querySelector('i');
     qi.textContent = '';
     for (let n = pnm.nextSibling; n; n = n.nextSibling)
-      if (n.nodeType !== 1 || !n.matches('.rplybtn, .colon, .aux, .auxr, .sub'))
+      if (n.nodeType !== 1 || !n.matches('.rplybtn, .colon, .aux, .auxr, .sub, .twprev, .twcard'))
         qi.appendChild(n.cloneNode(true));
   }
   function flush() {
@@ -7243,7 +7243,13 @@
       // bound the cache - a long session can link thousands of unique tweets
       if (tweetCache.size > 2000) tweetCache.delete(tweetCache.keys().next().value);
       document.querySelectorAll(`.twprev[data-twid="${d.id}"]`)
-        .forEach((el) => { const row = el.closest('.row'); el.outerHTML = twCard(entry, row ? row.textContent : ''); });
+        .forEach((el) => {
+          // a placeholder that reached a reply quote gets dropped - a
+          // card swap there would shove a full tweet into the band
+          if (el.closest('.rqt')) { el.remove(); return; }
+          const row = el.closest('.row');
+          el.outerHTML = twCard(entry, row ? row.textContent : '');
+        });
       repin();
     } else if (d.type === 'linkpeek' && typeof d.url === 'string') {
       peekGot(d.url, d.peek);

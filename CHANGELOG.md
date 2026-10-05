@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- reply quotes no longer inherit the parent's tweet preview: fillRq
+  cloned every rendered node into the quote band, so a .twprev
+  placeholder (or a filled .twcard) rode along and the async fill then
+  shoved a whole tweet card mid-quote. card nodes are skipped in the
+  clone and the twprev fill drops placeholders inside .rqt
 - @hasanabi pastel contrast nudge: 34-47% sat -> 38-52%, 74-85% light
   -> 68-79% - still washed, just legible against the row
 - notice rows brighten: the body text sat at --text-dim (55-68% of the
