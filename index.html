@@ -960,14 +960,14 @@
     text-align: center;
     opacity: 0; transition: opacity .15s; touch-action: none; }
   #helpPanel .hp-handle::after {
-    display: block; width: 66.67%; margin: 0 auto; overflow: hidden;
+    display: block; width: 80%; margin: 0 auto; overflow: hidden;
     content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #helpPanel:hover .hp-handle, #helpPanel.dragging .hp-handle { opacity: 1; }
   /* corner glyphs mirror the stream overlay's resize grips - they fade in
      on hover and each drags its own corner with the far one anchored */
   #helpPanel .hp-size { position: absolute; width: 22px; height: 22px; z-index: 3;
-    color: var(--text-dim); font-size: 9px; line-height: 1; padding: 2px;
+    color: var(--text-dim); font-size: 9px; line-height: 1; padding: 0;
     display: grid; place-items: center; opacity: 0;
     transition: opacity .15s; touch-action: none; }
   #helpPanel .hp-size.br { right: 0; bottom: 0; cursor: nwse-resize; place-items: end end; }
@@ -1214,7 +1214,7 @@
     text-align: center;
     opacity: 0; transition: opacity .15s; touch-action: none; }
   #emotePick .epick-handle::after {
-    display: block; width: 66.67%; margin: 0 auto; overflow: hidden;
+    display: block; width: 80%; margin: 0 auto; overflow: hidden;
     content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #emotePick:hover .epick-handle, #emotePick.dragging .epick-handle { opacity: 1; }
@@ -1224,13 +1224,13 @@
     color: var(--text-dim); font-size: 12px; line-height: 1;
     display: grid; place-items: center; opacity: 0;
     transition: opacity .15s; touch-action: none; }
-  #emotePick .ep-size.br { right: 0; bottom: 0; cursor: nwse-resize; }
-  #emotePick .ep-size.bl { left: 0; bottom: 0; cursor: nesw-resize; }
-  #emotePick .ep-size.tr { right: 0; top: 0; cursor: nesw-resize; }
-  #emotePick .ep-size.tl { left: 0; top: 0; cursor: nwse-resize; }
-  #emotePick .ep-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-  #emotePick .ep-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-  #emotePick .ep-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  #emotePick .ep-size.br { right: 0; bottom: 0; cursor: nwse-resize; place-items: end end; }
+  #emotePick .ep-size.bl { left: 0; bottom: 0; cursor: nesw-resize; place-items: end start; }
+  #emotePick .ep-size.tr { right: 0; top: 0; cursor: nesw-resize; place-items: start end; }
+  #emotePick .ep-size.tl { left: 0; top: 0; cursor: nwse-resize; place-items: start start; }
+  #emotePick .ep-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; place-items: center start; }
+  #emotePick .ep-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; place-items: center end; }
+  #emotePick .ep-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; place-items: end center; }
   #emotePick:hover .ep-size, #emotePick.dragging .ep-size { opacity: 1; }
   #emotePick .erow { flex: none; display: flex; gap: 6px; }
   #emotePick #emoteQ { flex: 1; min-width: 0; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 8px; }
