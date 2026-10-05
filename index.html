@@ -6840,11 +6840,14 @@
     const ehit = (c) => !q || (EMOJI_KW[c] || '').toLowerCase().includes(q);
     // used in the last minute and not searching? the button floats to
     // the top of the whole grid, freshest first - and a timer rebuilds
-    // the grid when the oldest pin lapses so it drops back home
+    // the grid when the oldest pin lapses so it drops back home. only in
+    // mix mode: sectioned mode already lifts fresh uses to the top of
+    // their own section, and a cross-grid pin just leaks emotes above
+    // unrelated headers
     const now = Date.now();
     let freshEdge = 0;
     const pin = (n) => {
-      if (q || epickSort !== 'use') return '';
+      if (q || epickSort !== 'use' || !epickMerge) return '';
       const age = now - (useTs[n] || 0);
       if (age >= FRESH_MS) return '';
       if (age > freshEdge) freshEdge = age;
@@ -6928,7 +6931,9 @@
         for (const n of g) all.push({ c: n, r: btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n)) });
       }
       if (groupOn('twitch')) {
-        const seenTw = new Set(); // codes recur across twitch sets; first wins
+        // codes recur across twitch sets AND third-party providers
+        // (bttv ships a <3 too) - whoever was scanned first wins
+        const seenTw = new Set(all.map((x) => x.c));
         for (const s of twSets) {
           const srcName = s.channelLogin ? s.channelLogin + (s.tier ? ' t' + s.tier : '')
                         : (s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ');
@@ -6948,11 +6953,16 @@
       all.sort((a, b) => epickSort === 'az' ? byFam(a.c, b.c) : byUse(a.c, b.c));
       h += aged(all.concat(ejs), (x) => x.c, (x) => x.r);
     } else {
+      // codes dedupe across sources too - 7tv/bttv both ship <3 and the
+      // classics - first section scanned wins, later copies drop out
+      const seenAll = new Set();
       for (const src of ['7TV', 'BTTV', 'FFZ', 'FFZ animated', 'other']) {
-        const g = groups[src];
+        const g0 = groups[src];
         // unlabelled extras ride along with whichever third-party tab is lit
         const on = src === 'other' ? ['7tv', 'bttv', 'ffz'].some(groupOn) : groupOn(srcTab[src]);
-        if (!g || !g.length || !on) continue;
+        if (!g0 || !on) continue;
+        const g = g0.filter((n) => !seenAll.has(n) && (seenAll.add(n), true));
+        if (!g.length) continue;
         pushSec(g.reduce((t, n) => t + useOf(n), 0), src === 'other' ? 'emotes' : src.toLowerCase(),
           aged(g, (n) => n, (n) => btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n))));
       }
@@ -6960,7 +6970,7 @@
         // this channel's sets first, then other channels by name, globals last
         const rank = (s) => s.channelLogin === CHANNEL ? 0 : s.channelLogin ? 1 : 2;
         const sets = [...twSets].sort((a, b) => rank(a) - rank(b) || byName(a.channelLogin || '', b.channelLogin || '') || (+a.tier || 0) - (+b.tier || 0));
-        const seenTw = new Set(); // the classics ship in several sets; first wins
+        const seenTw = seenAll; // keeps deduping twitch sets - now vs third-party too
         for (const s of sets) {
           const g = s.emoteList.filter((e) => !seenTw.has(e.code) && hit(e.code) && animOk(e.assetType === 'ANIMATED'))
             .sort(epickSort === 'az' ? (a, b) => byName(a.code, b.code)
