@@ -136,6 +136,9 @@ not versions — the page ships continuously to Neocities.
   the text, and decode HTML entities left over-encoded by the source
   site (`Fear&amp;` no longer renders literally); a `text + icons`
   mode shows the site favicon without loading the big preview image
+- link previews on Hacker News items come from its official firebase
+  api - the site itself refuses datacentre fetches - so the card shows
+  the story title, points, comment count, submitter and linked host
 - moderator-action rows (timeouts, bans, a cleared chat) shade blue;
   a `…m gap` silence notice shades red, and when no outage was
   recorded for its span the graph now bands it grey rather than
