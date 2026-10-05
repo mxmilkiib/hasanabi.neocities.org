@@ -6,11 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
-- the just-used emote flash now actually fades out: a resort re-pokes
-  still-flashing names, which restarts the 3.6s animation, but the
-  class-removal timer kept the original clock - it fired mid-fade and
-  the background snapped off. the timer now re-arms on every re-poke so
-  removal only lands after the tail completes
+- the just-used flash stops renewing on other emotes' uses: every resort
+  re-poked still-flashing names at full brightness, so a busy chat held
+  every flash near-max and renewed them all on each use. rebuilt
+  buttons now carry a negative animation-delay equal to the flash's
+  elapsed age - they resume mid-fade, finish on the original 3.6s
+  clock, and the removal timer lands exactly as the tail completes
 - @hasanabi palettes pushed further into pastel: 44-61% sat -> 34-47%,
   69-81% light -> 74-85%
 - the video popup picks up a stream that starts while it's open: the

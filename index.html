@@ -6515,14 +6515,19 @@
   addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch {} });
   const flashSet = new Set();
   const flashTimers = new Map();
+  const flashT0 = new Map();
   let resortTimer = 0;
   // a use within the last minute pins its button to the very top of the
   // scroll grid (grid order beats every section header; the recents band
   // above keeps its own MRU order)
   const FRESH_MS = 6e4;
   let freshTimer = 0;
-  const poke = (name) => {
+  const poke = (name, delay) => {
+    // a delay phases the fresh animation to mid-fade - rebuilt buttons
+    // resume their dimming instead of renewing to full brightness
+    const d = delay ? `-${Math.max(0, delay).toFixed(2)}s` : '';
     for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`)) {
+      b.style.animationDelay = d;
       b.classList.remove('justused');
       void b.offsetWidth; // reflow so a repeat use restarts the fade
       b.classList.add('justused');
@@ -6559,17 +6564,15 @@
         b.addEventListener('transitionend', () => b.classList.remove('emove'), { once: true });
       }
     }
-    for (const f of flashSet) { poke(f); flashLater(f); }
+    for (const f of flashSet) poke(f, (Date.now() - flashT0.get(f)) / 1e3);
   };
   function unflash(n) {
     flashTimers.delete(n);
     flashSet.delete(n);
+    flashT0.delete(n);
     for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
       b.classList.remove('justused');
   }
-  // a re-poke restarts the 3.6s fade, so the class-removal timer must
-  // restart with it - firing on the original clock yanks the class
-  // mid-fade and the background snaps off instead of tailing out
   function flashLater(n) {
     clearTimeout(flashTimers.get(n));
     flashTimers.set(n, setTimeout(() => unflash(n), 3600));
@@ -6580,6 +6583,7 @@
     saveUse();
     if (emotePick.hidden) return;
     flashSet.add(n);
+    flashT0.set(n, Date.now());
     poke(n);
     flashLater(n);
     if (epickSort === 'use' && !resortTimer)
