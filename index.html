@@ -950,16 +950,18 @@
      corner grips can sit fixed over it */
   #helpPanel .hp-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 14px; border-radius: 5px; }
   /* the dotted grip mirrors the stream overlay's handle - absolutely
-     overlaid on the top edge's middle two-thirds so it costs no layout
-     height, and fades in on hover or while dragging */
-  #helpPanel .hp-handle { position: absolute; top: 0; left: 16.67%; right: 16.67%;
+     overlaid on the top edge (drag anywhere) so it costs no layout
+     height, and fades in on hover or while dragging; the glyph run
+     itself spans the middle two-thirds */
+  #helpPanel .hp-handle { position: absolute; top: 0; left: 0; right: 0;
     height: 8px; z-index: 3;
     cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
     letter-spacing: 4px; overflow: hidden; white-space: nowrap;
     text-align: center;
     opacity: 0; transition: opacity .15s; touch-action: none; }
   #helpPanel .hp-handle::after {
-    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
+    display: block; width: 66.67%; margin: 0 auto; overflow: hidden;
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #helpPanel:hover .hp-handle, #helpPanel.dragging .hp-handle { opacity: 1; }
   /* corner glyphs mirror the stream overlay's resize grips - they fade in
@@ -1202,17 +1204,18 @@
   }
   #emotePick[hidden] { display: none; }
   /* the dotted grip mirrors the stream overlay's handle - absolutely
-     overlaid on the top edge's middle two-thirds so it costs no layout
-     height, while the glyph run sits centred; fades in on hover or while
-     dragging */
-  #emotePick .epick-handle { position: absolute; top: 0; left: 16.67%; right: 16.67%;
+     overlaid on the top edge (drag anywhere) so it costs no layout
+     height, while the glyph run spans the middle two-thirds; fades in
+     on hover or while dragging */
+  #emotePick .epick-handle { position: absolute; top: 0; left: 0; right: 0;
     height: 8px; z-index: 3;
     cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
     letter-spacing: 4px; overflow: hidden; white-space: nowrap;
     text-align: center;
     opacity: 0; transition: opacity .15s; touch-action: none; }
   #emotePick .epick-handle::after {
-    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
+    display: block; width: 66.67%; margin: 0 auto; overflow: hidden;
+    content: '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿';
   }
   #emotePick:hover .epick-handle, #emotePick.dragging .epick-handle { opacity: 1; }
   /* corner glyphs mirror the stream overlay's resize grips - they fade in
