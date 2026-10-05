@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- chat emotes now paint above the row furniture: their negative-margin
+  overhang can no longer be clipped by zebra stripes, seam separators,
+  chips or the reply button
 - the emote button now just closes the picker when it's pinned open,
   instead of spending one press on unpinning; the pin survives the
   close, so reopening lands the picker back at its dragged position.

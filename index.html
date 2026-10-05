@@ -640,7 +640,9 @@
   @media (prefers-reduced-motion: reduce) { .name.shimmer, .row a.shimmer, .row .at.shimmer { animation: none; } }
   /* Negative vertical margins keep the line box at the fixed line-height
      while the image paints above and below the row. */
-  .emote { height: 1.5em; vertical-align: middle; margin: -.35em 1px; }
+  /* emotes ride above the row furniture - stripes, seams, chips, the
+     reply button - since their negative margins overhang the line box */
+  .emote { position: relative; z-index: 4; height: 1.5em; vertical-align: middle; margin: -.35em 1px; }
   /* emote-only messages scale up like chatterino, either inline or pinned
      to the right edge like gif embeds so the row keeps its line height */
   main.em-inline .row.eonly .emote, main.em-right .row.eonly .emote { height: 2.2em; }
@@ -655,7 +657,7 @@
      flex order instead: emotes first, then [mod]/[sub]/bits at the tip */
   main.em-right .row.eonly > .aux, main.em-right .row.eonly > .sub { order: 1; float: none; margin-left: 5px; }
   /* zero-width overlay emotes stack on the previous emote's box */
-  .estk { position: relative; display: inline-block; }
+  .estk { position: relative; display: inline-block; z-index: 4; }
   .estk .emote { height: 1.5em; }
   main.em-inline .row.eonly .estk .emote, main.em-right .row.eonly .estk .emote { height: 2.2em; margin-top: -.7em; margin-bottom: -.7em; }
   .estk .zw { position: absolute; left: 0; top: 0; height: 100%; width: auto; margin: 0; }
@@ -721,7 +723,7 @@
   /* a right-pinned sub chip or emote stack stays above a gif that
      reaches into its row's space from below */
   .auxr { position: relative; z-index: 3; }
-  main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { z-index: 3; }
+  main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { z-index: 4; }
   .row.mention {
     --rowtint: linear-gradient(rgba(232, 163, 61, .13) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
