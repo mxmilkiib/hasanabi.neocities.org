@@ -6,9 +6,6 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
-- `live tv` drops scripps news (wound down its 24/7 service) and the
-  state/corporate-aligned tier (trt world, i24, ndtv, wion, telesur) -
-  the latam subsection goes with them
 - reply quote indentation anchors to the leading edge of the
   badge/role/name cluster instead of the name itself - a responder
   without badge icons no longer leaves the quoted line shallow
@@ -22,13 +19,11 @@ not versions — the page ships continuously to Neocities.
   dragged sizes grow back when the window does), pulls a dragged-off
   position back inside on show and window resize, and corner-grip
   resizes stop at the edge they face
-- `live tv` reorders to us, uk, eu, west asia, asia, au/ca, africa,
-  latam, and fox news + ms now join the us cable group
+- `live tv` reorders to us, uk, eu, west asia, asia, au/ca and
+  africa, and fox news + ms now join the us cable group
   (tv-login streams); the us block also gains bloomberg, yahoo
-  finance, and la locals ktla, abc7 and fox 11. livenow fox sits
-  beside fox news; the non-english domestics (tagesschau24, rai,
-  tve, lci, al arabiya, sky news arabia, tn) and the shuttered voa
-  come back out
+  finance, and la locals ktla, abc7 and fox 11, with livenow fox
+  parked beside fox news
 
 ## 2026-10-04
 
@@ -49,10 +44,9 @@ not versions — the page ships continuously to Neocities.
   marcuse, adorno, arendt, bauman, habermas, bourdieu, boal, raymond,
   lessig and doctorow
 - `live tv` doubles its count and splits into region subsections led
-  by us: pbs, scripps, livenow fox, court tv, voa, democracy now and
-  free speech tv join the us block; national broadcasters join
-  worldwide — al arabiya and sky news arabia, tagesschau24, rai, tve
-  and lci, arirang and wion, channels tv and sabc, and tn in latam
+  by us: pbs, livenow fox, court tv, democracy now and free speech
+  tv join the us block; arirang joins asia, channels tv and sabc
+  join africa
 - `conduct`'s safer spaces group fills out with good night out,
   right to be, consent academy, avp, galop and take this
 - `re Hasan` gains twitch (heading the row), bluesky after twitter, a
@@ -80,7 +74,7 @@ not versions — the page ships continuously to Neocities.
   saylor, p2pu), course indexes, open textbooks and wikiversity
 - a `live tv` row joins after `news`: the major free 24/7 streams
   grouped by region — al jazeera, west asian, uk, eu, us nets and
-  c-span, asia-pacific, canada, nigeria and telesur
+  c-span, asia-pacific, canada and nigeria
 - the open cluster completes: `open access` (preprints, shadow
   libraries, unlockers, the swartz manifesto), `open science` (osf,
   zenodo, openalex, pubpeer, protocols.io + open pharma), and `open
