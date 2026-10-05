@@ -29,11 +29,11 @@ not versions — the page ships continuously to Neocities.
   video field, the card keeps instagram's own metadata, and a 6h ttl
   means cached signed urls are dropped long before they rot
 ### Fixes & polish
-- just-used emote flashes cycle colours: each use claims the next
-  golden-angle hue (a bright hsl) as the flash's --fc instead of always
-  washing accent, so several just-used cells glow in different colours
-  at once; the fade timing and the mid-fade resume on rebuilds are
-  unchanged
+- just-used emote flashes cycle colours: each use steps the flash's
+  --fc ~24 degrees round the hue wheel (a bright hsl) instead of always
+  washing accent, so simultaneous cells glow differently and the order
+  of uses reads as a slow spectral walk; the fade timing and the
+  mid-fade resume on rebuilds are unchanged
 - the emote picker gains a ½x size chip next to 2x: 20px cells for a
   denser overview (names mode keeps wide rows but scales art and type
   down too); clicking a lit size drops back to normal, and the pick
