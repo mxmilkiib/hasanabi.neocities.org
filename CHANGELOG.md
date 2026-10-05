@@ -19,7 +19,10 @@ not versions — the page ships continuously to Neocities.
 - `live tv` reorders to us, uk, eu, west asia, asia, au/ca, africa,
   latam, and fox news + ms now join the us cable group
   (tv-login streams); the us block also gains bloomberg, yahoo
-  finance, and la locals ktla, abc7 and fox 11
+  finance, and la locals ktla, abc7 and fox 11. livenow fox sits
+  beside fox news; the non-english domestics (tagesschau24, rai,
+  tve, lci, al arabiya, sky news arabia, tn) and the shuttered voa
+  come back out
 
 ## 2026-10-04
 
