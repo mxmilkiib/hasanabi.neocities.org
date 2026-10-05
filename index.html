@@ -7516,9 +7516,11 @@
   const peekTouch = matchMedia('(hover: none) and (pointer: coarse)');
   let peekSeq = 0, peekTimer = 0, peekUrl = '', peekX = 0, peekY = 0, peekSaveT = 0;
   const peekGood = (p) => !!(p && (p.title || p.description));
+  // workers flag volatile previews (eg live twitch) with a short ttl in s
+  const peekTtlOf = (p) => peekGood(p) ? Math.min(PEEK_TTL, (p.ttl || PEEK_TTL / 1e3) * 1e3) : PEEK_FAIL_TTL;
   try {
     const s = JSON.parse(localStorage.getItem(PEEK_KEY)) || {};
-    for (const [u, e] of Object.entries(s)) if (e && peekGood(e.p) && Date.now() - e.t < PEEK_TTL) peekCache.set(u, e);
+    for (const [u, e] of Object.entries(s)) if (e && peekGood(e.p) && Date.now() - e.t < peekTtlOf(e.p)) peekCache.set(u, e);
   } catch {}
   function peekSave() {
     clearTimeout(peekSaveT);
@@ -7634,6 +7636,12 @@
       m.className = 'pmeta'; m.textContent = by;
       peekEl.appendChild(m);
     }
+    // provider-supplied fact chips (twitch: live state, followers, modes)
+    if (p && Array.isArray(p.facts) && p.facts.length) {
+      const m = document.createElement('div');
+      m.className = 'pmeta'; m.textContent = p.facts.join(' · ');
+      peekEl.appendChild(m);
+    }
     if (p && p.description || loading) {
       const dd = document.createElement('div');
       dd.className = 'pdesc'; dd.textContent = loading ? '…' : p.description;
@@ -7657,7 +7665,7 @@
       peekTimer = 0;
       if (peekUrl !== url) return;
       const e = peekCache.get(url);
-      if (e && Date.now() - e.t < (peekGood(e.p) ? PEEK_TTL : PEEK_FAIL_TTL)) { peekShow(e.p, url, false); return; }
+      if (e && Date.now() - e.t < peekTtlOf(e.p)) { peekShow(e.p, url, false); return; }
       peekShow(null, url, peekAsk(url));
     }, 350);
   }

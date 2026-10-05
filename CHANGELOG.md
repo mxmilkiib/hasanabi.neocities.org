@@ -6,6 +6,13 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- twitch channel hovers now say a lot more: the worker surfaces a facts
+  line from ivr.fi - live viewer count and game, followers, chatters,
+  join date, partner/affiliate standing, and the channel's chat modes
+  (followers-only, slow, emote-only, link blocks...) - plus the nick's
+  chatColor on the card's left edge and, when live, the stream title
+  above the bio. live previews flag a 5-minute ttl so the card doesn't
+  go stale in either the worker's or the page's cache
 - the picker's recents strip now counts emotes typed or pasted into the
   box and sent, not just grid clicks: sent tokens resolve through the
   emoji set, case-folded third-party names, then twitch set codes, and a
