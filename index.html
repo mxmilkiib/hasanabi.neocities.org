@@ -752,15 +752,15 @@
   .reply.rq :is(.gifimg, .chat-img, .twvid img, .twcard img) { max-height: 2.2em; }
   /* zebra never touches the quote band - it keeps its own violet tint
      whatever parity the row beneath carries */
-  /* under zebra, the row-tinted slivers around the band (3px left, 1px
-     below) take the quote line's own parity - plain when the reply beneath
-     is striped, striped when it isn't - so the gap doesn't read as part
-     of the reply's stripe */
+  /* under zebra, the row-tinted surround of the band (3px left, the 4px
+     padding strip above, 1px below) takes the quote line's own parity -
+     plain when the reply beneath is striped, striped when it isn't - so
+     the gap reads as the quote's line, not as part of the reply's stripe */
   main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
-    box-shadow: -3px 0 0 var(--bg), 0 1px 0 var(--bg);
+    box-shadow: -3px -4px 0 var(--bg), 0 -4px 0 var(--bg), 0 1px 0 var(--bg);
   }
   main.zebra .row:not(.z):not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
-    box-shadow: -3px 0 0 rgba(128, 128, 128, .07), 0 1px 0 rgba(128, 128, 128, .07);
+    box-shadow: -3px -4px 0 rgba(128, 128, 128, .07), 0 -4px 0 rgba(128, 128, 128, .07), 0 1px 0 rgba(128, 128, 128, .07);
   }
   /* the quoted author's name carries the mention accent */
   .reply.rq b { color: var(--accent); }
