@@ -2829,7 +2829,7 @@
     // just the tab being away, and they shouldn't read the same
     sparkCtx.globalAlpha = .25;
     for (let i = 0; i < n; i++) {
-      if (!Number.isFinite(rateSamples[i])) continue;
+      if (Number.isFinite(rateSamples[i])) continue;
       sparkCtx.fillStyle = /closed|discarded/.test(rateWhy[i] || '')
         ? sparkCols.vip : sparkCols.danger;
       sparkCtx.fillRect(snapFill((i + SPARK_N - n) * step), 0,
