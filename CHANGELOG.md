@@ -41,11 +41,12 @@ not versions — the page ships continuously to Neocities.
   eptabs=7tv,bttv epanim=anim - only off-default options enter the url,
   and bundles lacking the keys (older saves, presets) leave the picker
   alone
-- the emote picker gains ½x and ¾x size chips next to 2x: 20px cells
-  for a dense overview and 30px for a middle ground (names mode keeps
-  wide rows but scales art and type too); clicking a lit size drops
-  back to normal, and the pick persists like the other option chips -
-  old '1' saves still read as 2x
+- the emote picker gains ½x, ¾x and 1x size chips next to 2x: 20px
+  cells for a dense overview, 30px for a middle ground, and an explicit
+  reset that stays lit when normal is active (names mode keeps wide
+  rows but scales art and type too); clicking a lit size drops back to
+  normal, and the pick persists like the other option chips - old '1'
+  saves still read as 2x
 - age squares in the emote picker no longer clip their left border: the
   marching-ants svg now insets 1px so the stroke's outer half lands
   inside the cell instead of clipping at the grid edge
