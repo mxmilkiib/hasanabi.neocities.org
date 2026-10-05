@@ -4130,6 +4130,9 @@
       help: helpMode,
       video: !vidBox.hidden,
       kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, anim: nickAnim, rbw: rbwStyle,
+      epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSort,
+      epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
+      eptabs: [...epickOn], epanim: [...epickAnimOn],
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
       split: 1 + !sideEl.hidden + !side2El.hidden,
@@ -4218,6 +4221,18 @@
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.anim !== undefined) setNickAnim(+o.anim);
     if (o.rbw !== undefined) setRbwStyle(+o.rbw);
+    // emote-picker display options ride the bundle too; one rebuild
+    // covers any combination of them
+    let epDirty = false;
+    if (o.epnames !== undefined) { setNames(!!o.epnames); epDirty = true; }
+    if (o.epzoom !== undefined) { setZoom(o.epzoom); epDirty = true; }
+    if (o.epsort !== undefined) { setSort(o.epsort); epDirty = true; }
+    if (o.epage !== undefined) { setAge(!!o.epage); epDirty = true; }
+    if (o.epmix !== undefined) { setMix(!!o.epmix); epDirty = true; }
+    if (o.ephold !== undefined) setHold(!!o.ephold);
+    if (Array.isArray(o.eptabs)) { setTabs(o.eptabs); epDirty = true; }
+    if (Array.isArray(o.epanim)) { setAnimFilter(o.epanim); epDirty = true; }
+    if (epDirty) buildPicker();
     if (o.notify !== undefined) setNotify(!!o.notify, false);
     const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
     if (Number.isInteger(hw) && hw >= 0 && hw < HELP_WIDTHS.length) { helpWIdx = hw; applyHelpW(); }
@@ -4989,6 +5004,15 @@
     if (!lkIco) q.set('lkico', '0');
     if (nickAnim !== 1) q.set('anim', nickAnim);
     if (rbwStyle) q.set('rbw', rbwStyle);
+    // emote-picker options only enter the url off their defaults
+    if (emotePick.classList.contains('names')) q.set('epnames', '1');
+    if (epickZoom) q.set('epzoom', epickZoom);
+    if (epickSort !== 'use') q.set('epsort', epickSort);
+    if (epickAge) q.set('epage', '1');
+    if (epickMerge) q.set('epmix', '1');
+    if (!epickHold) q.set('ephold', '0');
+    if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
+    if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
@@ -6457,12 +6481,14 @@
   // names view: each emote gets its name alongside, in a wider list grid
   const EPICK_NAMES_KEY = 'hasan-epicknames';
   const emoteNamesBtn = document.getElementById('emoteNames');
-  const namesInit = emotePick.classList.toggle('names', localStorage.getItem(EPICK_NAMES_KEY) === '1');
-  emoteNamesBtn.setAttribute('aria-pressed', String(namesInit));
-  emoteNamesBtn.addEventListener('click', () => {
-    const on = emotePick.classList.toggle('names');
-    emoteNamesBtn.setAttribute('aria-pressed', String(on));
+  const setNames = (on) => {
+    emotePick.classList.toggle('names', !!on);
+    emoteNamesBtn.setAttribute('aria-pressed', String(!!on));
     try { localStorage.setItem(EPICK_NAMES_KEY, on ? '1' : '0'); } catch {}
+  };
+  setNames(localStorage.getItem(EPICK_NAMES_KEY) === '1');
+  emoteNamesBtn.addEventListener('click', () => {
+    setNames(!emotePick.classList.contains('names'));
     emoteQ.focus();
   });
   // cell-size chips: 2x for a closer look at the art, ½x for a denser
@@ -6478,10 +6504,13 @@
     setOn(zoomBtns.big, epickZoom === 'big');
     setOn(zoomBtns.sm, epickZoom === 'sm');
   }
-  for (const [k, b] of Object.entries(zoomBtns)) b.addEventListener('click', () => {
-    epickZoom = epickZoom === k ? '' : k;
+  const setZoom = (v) => {
+    epickZoom = v === 'big' || v === 'sm' ? v : '';
     try { localStorage.setItem(EPICK_ZOOM_KEY, epickZoom); } catch {}
     paintZoom();
+  };
+  for (const [k, b] of Object.entries(zoomBtns)) b.addEventListener('click', () => {
+    setZoom(epickZoom === k ? '' : k);
     emoteQ.focus();
   });
   paintZoom();
@@ -6501,10 +6530,13 @@
     setOn(ageBtn, epickAge && epickSort === 'use');
     emotePick.classList.toggle('agerows', epickAge && epickSort === 'use');
   }
-  ageBtn.addEventListener('click', () => {
-    epickAge = !epickAge;
+  const setAge = (on) => {
+    epickAge = !!on;
     try { localStorage.setItem(EPICK_AGE_KEY, epickAge ? '1' : '0'); } catch {}
     paintAge();
+  };
+  ageBtn.addEventListener('click', () => {
+    setAge(!epickAge);
     emoteQ.focus();
   });
   function paintSort() {
@@ -6513,10 +6545,13 @@
     paintAge();
   }
   paintSort();
-  for (const [m, b] of Object.entries(sortBtns)) b.addEventListener('click', () => {
-    epickSort = m;
-    try { localStorage.setItem(EPICK_SORT_KEY, m); } catch {}
+  const setSort = (m) => {
+    epickSort = m === 'az' ? 'az' : 'use';
+    try { localStorage.setItem(EPICK_SORT_KEY, epickSort); } catch {}
     paintSort();
+  };
+  for (const [m, b] of Object.entries(sortBtns)) b.addEventListener('click', () => {
+    setSort(m);
     buildPicker();
     emoteQ.focus();
   });
@@ -6525,11 +6560,14 @@
   let epickMerge = false;
   try { epickMerge = localStorage.getItem(EPICK_MIX_KEY) === '1'; } catch {}
   const mixBtn = document.getElementById('emoteMix');
-  setOn(mixBtn, epickMerge);
-  mixBtn.addEventListener('click', () => {
-    epickMerge = !epickMerge;
+  const setMix = (on) => {
+    epickMerge = !!on;
     try { localStorage.setItem(EPICK_MIX_KEY, epickMerge ? '1' : '0'); } catch {}
     setOn(mixBtn, epickMerge);
+  };
+  setOn(mixBtn, epickMerge);
+  mixBtn.addEventListener('click', () => {
+    setMix(!epickMerge);
     buildPicker();
     emoteQ.focus();
   });
@@ -6543,14 +6581,17 @@
   let gridHeld = false, heldRebuild = false;
   const heldOr = () => gridHeld ? heldRebuild = true : rebuildPicker();
   const holdBtn = document.getElementById('emoteHold');
-  setOn(holdBtn, epickHold);
-  holdBtn.addEventListener('click', () => {
-    epickHold = !epickHold;
+  const setHold = (on) => {
+    epickHold = !!on;
     try { localStorage.setItem(EPICK_HOLD_KEY, epickHold ? '1' : '0'); } catch {}
     setOn(holdBtn, epickHold);
     gridHeld = false;
     holdBtn.classList.remove('held');
     if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
+  };
+  setOn(holdBtn, epickHold);
+  holdBtn.addEventListener('click', () => {
+    setHold(!epickHold);
     emoteQ.focus();
   });
   // the chip breathes while the pointer is actually holding the grid
@@ -6575,14 +6616,18 @@
     setOn(animBtns.still, animOk(false));
   }
   paintAnim();
-  for (const [k, b] of Object.entries(animBtns)) b.addEventListener('click', (e) => {
-    if (e.shiftKey) epickAnimOn = new Set([k]);
-    else if (!epickAnimOn.size) epickAnimOn = new Set(k === 'anim' ? ['still'] : ['anim']);
-    else if (epickAnimOn.has(k)) epickAnimOn.delete(k);
-    else epickAnimOn.add(k);
+  const setAnimFilter = (list) => {
+    epickAnimOn = new Set((list || []).filter((k) => k === 'anim' || k === 'still'));
     if (epickAnimOn.size === 2) epickAnimOn.clear();
     try { localStorage.setItem(EPICK_ANIM_KEY, JSON.stringify([...epickAnimOn])); } catch {}
     paintAnim();
+  };
+  for (const [k, b] of Object.entries(animBtns)) b.addEventListener('click', (e) => {
+    let next;
+    if (e.shiftKey) next = [k];
+    else if (!epickAnimOn.size) next = k === 'anim' ? ['still'] : ['anim'];
+    else { next = [...epickAnimOn]; epickAnimOn.has(k) ? next.splice(next.indexOf(k), 1) : next.push(k); }
+    setAnimFilter(next);
     buildPicker();
     emoteQ.focus();
   });
@@ -6598,17 +6643,21 @@
     for (const b of emoteTabs.children) setOn(b, groupOn(b.dataset.g));
   }
   paintTabs();
+  const setTabs = (list) => {
+    epickOn = new Set((list || []).filter((g) => EPICK_GROUPS.includes(g)));
+    if (epickOn.size === EPICK_GROUPS.length) epickOn.clear();
+    try { localStorage.setItem(EPICK_TABS_KEY, JSON.stringify([...epickOn])); } catch {}
+    paintTabs();
+  };
   emoteTabs.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-g]');
     if (!b) return;
     const g = b.dataset.g;
-    if (e.shiftKey) epickOn = new Set([g]);
-    else if (!epickOn.size) epickOn = new Set(EPICK_GROUPS.filter((x) => x !== g));
-    else if (epickOn.has(g)) epickOn.delete(g);
-    else epickOn.add(g);
-    if (epickOn.size === EPICK_GROUPS.length) epickOn.clear();
-    try { localStorage.setItem(EPICK_TABS_KEY, JSON.stringify([...epickOn])); } catch {}
-    paintTabs();
+    let next;
+    if (e.shiftKey) next = [g];
+    else if (!epickOn.size) next = EPICK_GROUPS.filter((x) => x !== g);
+    else { next = [...epickOn]; epickOn.has(g) ? next.splice(next.indexOf(g), 1) : next.push(g); }
+    setTabs(next);
     buildPicker();
     emoteQ.focus();
   });
@@ -7564,6 +7613,18 @@
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 1 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
+    // emote-picker options: ?epnames=1&epzoom=sm|big&epsort=az&epage=1&
+    // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|still
+    let epUrlDirty = false;
+    if (q.has('epnames')) { setNames(flag('epnames')); epUrlDirty = true; }
+    if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
+    if (q.has('epsort')) { setSort(q.get('epsort')); epUrlDirty = true; }
+    if (q.has('epage')) { setAge(flag('epage')); epUrlDirty = true; }
+    if (q.has('epmix')) { setMix(flag('epmix')); epUrlDirty = true; }
+    if (q.has('ephold')) setHold(flag('ephold'));
+    if (q.has('eptabs')) { setTabs(q.get('eptabs').split(',')); epUrlDirty = true; }
+    if (q.has('epanim')) { setAnimFilter(q.get('epanim').split(',')); epUrlDirty = true; }
+    if (epUrlDirty) buildPicker();
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }

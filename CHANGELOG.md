@@ -34,6 +34,13 @@ not versions — the page ships continuously to Neocities.
   washing accent, so simultaneous cells glow differently and the order
   of uses reads as a slow spectral walk; the fade timing and the
   mid-fade resume on rebuilds are unchanged
+- emote-picker display options join the settings bundle: names, cell
+  size, sort, age rows, mix, hold, source tabs and the anim filter now
+  save with hasan-opts, stash into theme slots and copy into settings
+  urls as epnames=1 epzoom=sm|big epsort=az epage=1 epmix=1 ephold=0
+  eptabs=7tv,bttv epanim=anim - only off-default options enter the url,
+  and bundles lacking the keys (older saves, presets) leave the picker
+  alone
 - the emote picker gains a ½x size chip next to 2x: 20px cells for a
   denser overview (names mode keeps wide rows but scales art and type
   down too); clicking a lit size drops back to normal, and the pick
