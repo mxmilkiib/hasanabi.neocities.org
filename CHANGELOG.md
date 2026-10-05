@@ -39,7 +39,10 @@ not versions — the page ships continuously to Neocities.
 - hovering an external link pops a preview card under the cursor:
   site name, title and description scraped by a Cloudflare worker
   and brokered through the chat relay; a shortened or redirected
-  link also names where it lands; the card follows keyboard focus,
+  link also names where it lands; the worker reads og/twitter tags,
+  schema.org JSON-LD and the page's own oEmbed endpoint, so cards can
+  carry the site's favicon and theme-colour edge plus a byline and
+  article age; the card follows keyboard focus,
   skips image, gif, tweet and own-domain links, and stays off on
   touch screens; hits cache for a day across reloads, misses for a
   minute, and a lookup with no answer gives up after eight seconds

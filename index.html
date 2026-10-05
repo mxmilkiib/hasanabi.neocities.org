@@ -399,6 +399,8 @@
   #peek img { display: block; max-width: 100%; max-height: 140px; border-radius: 4px; margin-bottom: 6px; }
   #peek .psite { color: var(--accent); font-weight: 600; font-size: 11px; }
   #peek .ptitle { font-weight: 600; margin: 2px 0; overflow-wrap: anywhere; }
+  #peek .pico { width: 12px; height: 12px; margin: 0 5px -2px 0; border-radius: 2px; display: inline-block; max-height: none; }
+  #peek .pmeta { color: var(--text-dim); font-size: 11px; }
   #peek .pto { color: var(--accent); font-size: 11px; overflow-wrap: anywhere; }
   #peek .pdesc {
     color: var(--text-dim); overflow: hidden;
@@ -6719,6 +6721,10 @@
     const p = raw && typeof raw === 'object' ? {
       title: s('title'), description: s('description'), site: s('site'),
       image: /^https:\/\//.test(s('image')) ? s('image') : '',
+      icon: /^https:\/\//.test(s('icon')) ? s('icon') : '',
+      color: /^#[0-9a-f]{3,8}$/i.test(s('color')) ? s('color') : '',
+      author: s('author').slice(0, 80),
+      published: /^\d{4}-\d\d-\d\d$/.test(s('published')) ? s('published') : '',
       final: /^https?:\/\//.test(s('url')) ? s('url') : '',
     } : null;
     // bound the cache - a long session can hover thousands of unique urls
@@ -6740,8 +6746,15 @@
     peekEl.style.left = Math.max(4, Math.min(innerWidth - peekEl.offsetWidth - 4, peekX + 12)) + 'px';
     peekEl.style.top = Math.max(4, Math.min(innerHeight - peekEl.offsetHeight - 4, peekY + 18)) + 'px';
   }
+  // 'today', '3d ago', '4mo ago' - the age of an article's iso date
+  function peekAge(iso) {
+    const d = Math.floor((Date.now() - Date.parse(iso)) / 864e5);
+    return d < 0 ? iso : d === 0 ? 'today' : d === 1 ? 'yesterday' : d < 60 ? `${d}d ago` : d < 730 ? `${Math.floor(d / 30)}mo ago` : `${Math.floor(d / 365)}y ago`;
+  }
   function peekShow(p, url, loading) {
     peekEl.textContent = '';
+    // the site's own theme-color edges the card
+    peekEl.style.borderLeft = p && p.color ? `3px solid ${p.color}` : '';
     if (p && p.image && peekMode === 2) {
       const im = document.createElement('img');
       im.referrerPolicy = 'no-referrer';
@@ -6756,6 +6769,15 @@
     site.className = 'psite';
     try { site.textContent = (p && p.site) || new URL(url).hostname; }
     catch { site.textContent = ''; }
+    if (p && p.icon && peekMode === 2) {
+      const ic = document.createElement('img');
+      ic.className = 'pico';
+      ic.referrerPolicy = 'no-referrer';
+      ic.alt = '';
+      ic.addEventListener('error', () => ic.remove());
+      ic.src = p.icon;
+      site.prepend(ic);
+    }
     peekEl.appendChild(site);
     // a shortened or redirected link names where it really lands
     try {
@@ -6772,6 +6794,12 @@
       const t = document.createElement('div');
       t.className = 'ptitle'; t.textContent = p.title;
       peekEl.appendChild(t);
+    }
+    const by = p && [p.author && 'by ' + p.author, p.published && peekAge(p.published)].filter(Boolean).join(' · ');
+    if (by) {
+      const m = document.createElement('div');
+      m.className = 'pmeta'; m.textContent = by;
+      peekEl.appendChild(m);
     }
     if (p && p.description || loading) {
       const dd = document.createElement('div');
