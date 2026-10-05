@@ -416,6 +416,13 @@
   #peek .pdesc {
     color: var(--text-dim); font-size: var(--peek-font, 13px); max-height: 8.4em; clip-path: inset(0);
   }
+  /* the emote hover card: a big preview over code + source, pointer-events
+     none so it never swallows the hover it was summoned by */
+  #epop { position: fixed; z-index: 60; padding: 8px 10px; background: var(--panel); border: 1px solid var(--popline); border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.4); pointer-events: none; text-align: center; font-size: var(--chat-font, 15px); color: var(--text); }
+  #epop[hidden] { display: none; }
+  #epop .epbig { display: block; margin: 0 auto 5px; max-width: 112px; max-height: 112px; }
+  #epop .epemo { font-size: 64px; line-height: 1.1; margin: 0; max-width: none; max-height: none; }
+  #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; }
   #vid #vidFrame { position: absolute; inset: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
@@ -8221,6 +8228,73 @@
   addEventListener('blur', peekHide);
   addEventListener('keydown', (e) => { if (e.key === 'Escape') peekHide(); });
 
+  // ---- emote hover card: bttv's big preview - the image upscaled per
+  // provider, the code, and which set it came from. Covers chat rows
+  // (img.emote) and picker cells (button[data-ins]) alike; the tt
+  // tooltip stands down for these via its own exclusion ----
+  const epop = document.createElement('div');
+  epop.id = 'epop';
+  epop.hidden = true;
+  document.body.appendChild(epop);
+  let epopEl = null, epopT = 0;
+  const ebig = (u) => u
+    .replace(/(\/emote\/[^/]+\/)[12]x\.webp$/, '$14x.webp')  // 7tv
+    .replace(/(\/emote\/[^/]+\/)[12]x$/, '$13x')             // bttv
+    .replace(/(cdn\.frankerfacez\.com\/emote\/\d+\/)1$/, '$14')   // ffz
+    .replace(/(emoticons\/v2\/[^/]+\/(?:default|animated)\/(?:dark|light))\/2\.0$/, '$1/3.0'); // twitch
+  const epopHide = () => { clearTimeout(epopT); epopT = 0; epopEl = null; epop.hidden = true; };
+  function epopShow(t) {
+    const btn = t.tagName === 'BUTTON' ? t : null;
+    const img = btn ? btn.querySelector('img') : t;
+    const label = t.dataset.tt || t.title || '';
+    const dash = label.indexOf(' - ');
+    epop.textContent = '';
+    if (btn && btn.classList.contains('eji')) {
+      const s = document.createElement('span');
+      s.className = 'epbig epemo'; s.textContent = btn.dataset.ins;
+      epop.appendChild(s);
+    } else if (img && img.src) {
+      const p = document.createElement('img');
+      p.className = 'epbig'; p.referrerPolicy = 'no-referrer'; p.alt = '';
+      p.src = ebig(img.src);
+      // the size bump is best-effort - fall back to the cell's own url
+      p.addEventListener('error', () => { if (p.src !== img.src) p.src = img.src; });
+      epop.appendChild(p);
+    }
+    const isEji = btn && btn.classList.contains('eji');
+    const n = document.createElement('b');
+    // an emoji cell's title is its search keywords - the char is the name
+    n.textContent = isEji ? btn.dataset.ins : (dash > 0 ? label.slice(0, dash) : label || (btn ? btn.dataset.ins : ''));
+    epop.appendChild(n);
+    const sub = isEji ? label : dash > 0 ? label.slice(dash + 3) : '';
+    if (sub) {
+      const s = document.createElement('div');
+      s.className = 'epsrc'; s.textContent = sub;
+      epop.appendChild(s);
+    }
+    epop.hidden = false;
+    // centered above the emote, clamped to the viewport
+    const r = t.getBoundingClientRect();
+    epop.style.left = Math.max(4, Math.min(innerWidth - epop.offsetWidth - 4, r.left + r.width / 2 - epop.offsetWidth / 2)) + 'px';
+    epop.style.top = Math.max(4, r.top - epop.offsetHeight - 8) + 'px';
+  }
+  document.addEventListener('mouseover', (e) => {
+    const t = e.target instanceof Element ? e.target.closest('img.emote, button[data-ins]') : null;
+    if (t === epopEl) return;
+    if (!t) { if (epopEl) epopHide(); return; }
+    epopEl = t;
+    clearTimeout(epopT);
+    // a card already up swaps targets instantly; a cold hover waits a beat
+    epopT = setTimeout(() => { epopT = 0; epopShow(t); }, epop.hidden ? 220 : 0);
+  });
+  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) epopHide(); });
+  // the log's own autoscroll churns constantly under a hover - only a user
+  // scroll (past the autoScrollAt window, same guard as peek) dismisses
+  addEventListener('scroll', () => { if (performance.now() - autoScrollAt > 150) epopHide(); }, true);
+  addEventListener('mousedown', epopHide, true);
+  addEventListener('blur', epopHide);
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') epopHide(); });
+
   // ---- live tooltips: a displayed native title tooltip does not refresh
   // when the attribute changes, so hover parks the title in data-tt and a
   // div renders it; a MutationObserver keeps it in sync as setters write ----
@@ -8235,7 +8309,9 @@
     ttEl.style.top = Math.max(4, Math.min(innerHeight - ttEl.offsetHeight - 4, e.clientY + 18)) + 'px';
   };
   document.addEventListener('mouseover', (e) => {
-    const el = e.target instanceof Element ? e.target.closest('[title]') : null;
+    // emotes get the epop card instead of a text tooltip
+    const el = e.target instanceof Element && !e.target.closest('img.emote, button[data-ins]')
+      ? e.target.closest('[title]') : null;
     if (el === ttTarget) return;
     if (ttTarget) {
       ttTarget.title = ttTarget.dataset.tt;

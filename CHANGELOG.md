@@ -28,6 +28,14 @@ not versions — the page ships continuously to Neocities.
   dismisses it. failsafes: kkclip down or a non-reel url just loses the
   video field, the card keeps instagram's own metadata, and a 6h ttl
   means cached signed urls are dropped long before they rot
+- bttv-style emote hover card: hovering an emote in chat or a picker
+  cell pops a card with the art at the provider's largest size (7tv
+  4x, bttv 3x, ffz 4, twitch 3.0), the code, and which set it came
+  from; emoji cells show the glyph large with its search keywords
+  underneath. a cold hover waits a beat while cell-to-cell moves swap
+  instantly, the text tooltip stands down for emotes, and the card
+  rides peek's autoscroll guard so the chat's own scrolling doesn't
+  shake it loose
 ### Fixes & polish
 - just-used emote flashes cycle colours: each use steps the flash's
   --fc ~24 degrees round the hue wheel (a bright hsl) instead of always
