@@ -1175,8 +1175,8 @@
     stroke-dasharray: 4 3; animation: eage-ants .9s linear infinite; animation-delay: inherit; }
   #emoteGrid .eage.lit { opacity: 1; color: var(--text); font-weight: 700; }
   #emoteGrid .eage.lit .ants rect { stroke: var(--accent); }
-  /* a lit era whose window spans a stretch the page wasn't watching -
-     the count could be understated, so the border turns purple and its
+  /* a lit era whose window spans a stretch chat wasn't logging - the
+     count could be understated, so the border turns purple and its
      ants thin to dots, clearly broken against the standard rungs */
   #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
@@ -1236,7 +1236,7 @@
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
-    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark time the page wasn't watching (missed lines backfill on wake)</div>
+    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark confirmed logging gaps - socket loss or a closed page (missed lines backfill on wake)</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups</span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -1406,7 +1406,7 @@
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
   const SCROLLBACK_SIZES = [250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
   let MAX_MESSAGES = 1000;
-  const BACKLOG_MAX = 1000;
+  const BACKLOG_FLUSH = 1000;
   const HISTORY_SAVE_MAX = 1000;
   // '@channel' pings highlight per the row's own channel - cached per name
   const MENTION_RES = {};
@@ -1937,11 +1937,18 @@
     return out.join(' ');
   }
 
-  // ---- batched rendering: incoming lines only queue, a single
-  // requestAnimationFrame per batch does all the DOM work ----
+  // ---- batched rendering: incoming lines only queue; rAF batches while
+  // visible, a 1s timer keeps them draining in a hidden tab ----
   let queue = [];
   let scheduled = false;
+  let hiddenFlush = 0;
+  let flushFrame = 0;
+  let hiddenFlushAt = 0;
   let recentTimestamps = [];
+  // per-second rendered counts let a delayed sampler fill its missing
+  // slots from observed traffic instead of painting the span dead
+  const rateCounts = new Map();
+  const glorpCounts = new Map();
   // rolling one-hour window of distinct chatters seen talking - the only
   // audience figure available once the stream is offline
   const chatterSeen = new Map(); // login -> last-seen ts
@@ -2104,17 +2111,24 @@
   // across trimming, deletions and page-flip column moves
   let zFlip = false;
 
-  // windows where the page wasn't watching chat: [start, end, cause] - fed
-  // by visibilitychange, missed spark ticks (suspended timers), and the
-  // spark save's last-write time (closed/reloaded). flush() drops a gap
+  // windows where the page wasn't logging chat: [start, end, cause] - fed
+  // by a dropped socket and the spark save's last-write time
+  // (closed/reloaded). flush() drops a gap
   // notice when consecutive rows span a stretch over GAP_MS
   const GAP_MS = 90000;
   const away = [];
-  let hiddenAt = 0;
   let lastRowTs = 0; // wall-clock ms of the newest rendered row
   function gapCause(a, b) {
     for (const [s, e, why] of away) if (s < b && e > a) return why;
     return '';
+  }
+  function markAway(s, e, why) {
+    away.push([s, e, why]);
+    if (away.length > 50) away.shift();
+    // rateTimes is parallel to rateSamples; a reconnect can shade the
+    // socket-down span even when its samples were already drawn as 0
+    for (let i = 0; i < rateSamples.length; i++)
+      if (rateTimes[i] && s < rateTimes[i] && e > rateTimes[i] - 1000) rateSamples[i] = NaN;
   }
   // '19:27[:43] PM' back to wall-clock ms for restored rows saved before
   // data-ts existed; assumes today, stepping back a day if it lands ahead
@@ -2128,12 +2142,23 @@
     return d.getTime();
   }
 
+  function scheduleFlush() {
+    if (scheduled) return;
+    scheduled = true;
+    if (document.hidden) hiddenFlush = setTimeout(flush, 1000);
+    else flushFrame = requestAnimationFrame(flush);
+  }
+  function flushNow() {
+    if (hiddenFlush) clearTimeout(hiddenFlush);
+    if (flushFrame) window.cancelAnimationFrame(flushFrame);
+    scheduled = false;
+    hiddenFlush = 0;
+    flushFrame = 0;
+    flush();
+  }
+
   function queueMessage(parsed, replay) {
     queue.push(parsed);
-    // rAF doesn't fire in a backgrounded tab but relay messages keep
-    // arriving - cap the backlog so wake-up isn't a minutes-long flush;
-    // the robotty backfill refetches the gap on visibility return anyway
-    if (document.hidden && queue.length > BACKLOG_MAX) queue.shift();
     // replayed backfill lines are historical, not live traffic - the rate
     // counts live rows at flush time instead, after dedup drops repeats
     if (!replay) parsed.live = true;
@@ -2151,10 +2176,14 @@
       if (t) srLiveEl.textContent = (MULTI ? (parsed.channel || '') + ' ' : '') +
         (parsed.login ? parsed.login + ': ' : '') + t;
     }
-    if (!scheduled) {
-      scheduled = true;
-      requestAnimationFrame(flush);
+    // relay traffic itself paces hidden rendering, so suspended timers
+    // cannot strand a backlog; the timer catches a quiet trailing batch
+    if (document.hidden &&
+        (queue.length >= BACKLOG_FLUSH || Date.now() - hiddenFlushAt >= 1000)) {
+      flushNow();
+      return;
     }
+    scheduleFlush();
   }
 
   // links view: a row qualifies when its text carries a url; the key is the
@@ -2266,6 +2295,9 @@
   }
   function flush() {
     scheduled = false;
+    hiddenFlush = 0;
+    flushFrame = 0;
+    if (document.hidden) hiddenFlushAt = Date.now();
     if (emptyEl) {
       // show the bar at 100% for a beat before the rows take over
       loadStep(LOAD_STEPS, null);
@@ -2296,9 +2328,12 @@
         if (seenIds.size > 20000) { seenIds.clear(); seenIds.add(dedupKey); }
       }
       if (live) {
-        recentTimestamps.push(Date.now()); // counted once rendered, not at queue time
+        const now = Date.now();
+        recentTimestamps.push(now); // counted once rendered, not at queue time
+        const sec = Math.floor(now / 1000);
+        rateCounts.set(sec, (rateCounts.get(sec) || 0) + 1);
         const chatWho = (login || tags['display-name'] || '').toLowerCase();
-        if (chatWho) chatterSeen.set(chatWho, Date.now());
+        if (chatWho) chatterSeen.set(chatWho, now);
       }
       const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
       const timeStr = fmtRowTime(when);
@@ -2387,7 +2422,12 @@
       const points = tags['msg-id'] === 'highlighted-message';
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim()) ||
                     (fossa && /trigger is pulled.*bullet fired/i.test(message));
-      if (glorp) glorpTimestamps.push(Date.now());
+      if (glorp) {
+        const now = Date.now();
+        glorpTimestamps.push(now);
+        const sec = Math.floor(now / 1000);
+        glorpCounts.set(sec, (glorpCounts.get(sec) || 0) + 1);
+      }
       // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
       if ((tags.badges || '').includes('moderator/'))
@@ -2573,6 +2613,7 @@
   const snapFill = (v) => Math.round(v * DPR) / DPR;
   const devPx = (w) => Math.max(1, Math.round(w * DPR));
   const rateSamples = [];
+  const rateTimes = []; // wall-clock end of each sample, parallel to rateSamples
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
   let sparkCols = null; // theme colours, resolved once instead of per draw
@@ -2599,9 +2640,10 @@
     const hCss = (sparkEl.height / DPR) + 'px';
     if (sparkEl.style.height !== hCss) sparkEl.style.height = hCss;
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · red bands mark time the page wasn't watching`;
+    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · red bands mark socket loss or a closed page`;
     sparkEl.setAttribute('aria-label', sparkEl.title);
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
+    if (rateTimes.length > n) rateTimes.splice(0, rateTimes.length - n);
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
     drawSpark();
   }
@@ -2694,9 +2736,9 @@
     if (!n) return;
     const accent = sparkCols.accent;
     const max = Math.max(1, ...rateSamples.filter(Number.isFinite));
-    // NaN samples = seconds the page wasn't observing (backgrounded, closed,
-    // relay down); the danger wash marks the dead zone so it doesn't read
-    // as a fuzzy smudge or a quiet chat
+    // NaN samples = seconds the page wasn't logging (socket loss or a
+    // closed page); the danger wash marks the dead zone so it doesn't
+    // read as a fuzzy smudge or a quiet chat
     sparkCtx.fillStyle = sparkCols.danger;
     sparkCtx.globalAlpha = .25;
     for (let i = 0; i < n; i++)
@@ -2757,10 +2799,16 @@
       const d = JSON.parse(localStorage.getItem(SPARK_KEY));
       if (!d || !Array.isArray(d.rate)) return;
       const win = sparkWin;
-      const gap = Math.min(win, Math.max(0, Math.round((Date.now() - d.t) / 1000)));
-      if (d.t) away.push([d.t, Date.now(),
-        document.wasDiscarded ? 'tab discarded by browser' : 'page closed']);
-      rateSamples.push(...d.rate.slice(-win).map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN));
+      const now = Date.now();
+      const savedAt = d.t || now;
+      const gap = Math.min(win, Math.max(0, Math.round((now - savedAt) / 1000)));
+      const oldRate = d.rate.slice(-win).map((v) => (v === null ? NaN : v));
+      rateSamples.push(...oldRate, ...Array(gap).fill(NaN));
+      rateTimes.push(
+        ...oldRate.map((_, i) => savedAt - (oldRate.length - i) * 1000),
+        ...Array.from({ length: gap }, (_, i) => savedAt + (i + 1) * 1000));
+      if (d.t) markAway(savedAt, now,
+        document.wasDiscarded ? 'tab discarded by browser' : 'page closed');
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
       // keep the rolling chatter tally going across a reload - entries
       // already older than the hour window come back to expire at once
@@ -2769,6 +2817,7 @@
         for (const [who, t] of d.chat) if (t >= cut) chatterSeen.set(who, t);
       }
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
+      if (rateTimes.length > win) rateTimes.splice(0, rateTimes.length - win);
       if (glorpSamples.length > win) glorpSamples.splice(0, glorpSamples.length - win);
     } catch {}
   }
@@ -2779,14 +2828,29 @@
   drawSpark();
   setInterval(() => {
     const now = Date.now();
-    // a suspended tab misses ticks; push one NaN per missed second so the
-    // graph shades the unobserved span instead of quietly compressing it
+    // a delayed tick fills each missed second from rendered-row counts;
+    // only a confirmed away window still gets a dead NaN sample
     const missed = Math.min(sparkWin,
       Math.max(0, Math.round((now - lastTick) / 1000) - 1));
-    for (let i = 0; i < missed; i++) { rateSamples.push(NaN); glorpSamples.push(0); }
-    // hidden spans are recorded by visibilitychange instead; don't double-tag
-    if (missed && !hiddenAt) { away.push([lastTick, now, 'timers suspended']); if (away.length > 50) away.shift(); }
+    for (let i = 0; i < missed; i++) {
+      const t = lastTick + (i + 1) * 1000;
+      const sec = Math.floor(t / 1000);
+      let n = 0;
+      for (let j = 0; j < 5; j++) n += rateCounts.get(sec - j) || 0;
+      rateSamples.push(gapCause(t - 1000, t) ? NaN : n / 5);
+      rateTimes.push(t);
+      glorpSamples.push(glorpCounts.get(sec) || 0);
+    }
     lastTick = now;
+    const oldSec = Math.floor(now / 1000) - sparkWin - 5;
+    for (const sec of rateCounts.keys()) {
+      if (sec >= oldSec) break;
+      rateCounts.delete(sec);
+    }
+    for (const sec of glorpCounts.keys()) {
+      if (sec >= oldSec) break;
+      glorpCounts.delete(sec);
+    }
     const cutoff = now - 5000;
     recentTimestamps = recentTimestamps.filter((t) => t > cutoff);
     const rate = recentTimestamps.length / 5;
@@ -2799,12 +2863,14 @@
     const nc = chatterSeen.size;
     chattersEl.hidden = !nc;
     chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
-    rateSamples.push(rate);
-    if (rateSamples.length > sparkWin) rateSamples.shift();
+    rateSamples.push(downAt ? NaN : rate);
+    rateTimes.push(now);
+    if (rateSamples.length > sparkWin) rateSamples.splice(0, rateSamples.length - sparkWin);
+    if (rateTimes.length > sparkWin) rateTimes.splice(0, rateTimes.length - sparkWin);
     const gcut = Date.now() - 1000;
     while (glorpTimestamps.length && glorpTimestamps[0] < gcut) glorpTimestamps.shift();
     glorpSamples.push(glorpTimestamps.length);
-    if (glorpSamples.length > sparkWin) glorpSamples.shift();
+    if (glorpSamples.length > sparkWin) glorpSamples.splice(0, glorpSamples.length - sparkWin);
     drawSpark();
     updateHeader();
   }, 1000);
@@ -4858,18 +4924,28 @@
     if (!streamHeard) { streamDead = true; updateHeader(); }
   }, 10000);
 
-  // A suspended page misses live lines, so on wake it asks the relay for the
-  // backlog (recent-messages.robotty.de); already-rendered ids are skipped
+  // A page can still miss live lines while suspended, so on wake it asks the
+  // relay for the backlog (recent-messages.robotty.de); rendered ids are skipped
   function backfill() {
     if (joined && relayFrame.contentWindow)
       relayFrame.contentWindow.postMessage({ type: 'backfill' }, RELAY_ORIGIN);
   }
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') hiddenAt = Date.now();
-    else {
-      if (hiddenAt) { away.push([hiddenAt, Date.now(), 'tab hidden']); hiddenAt = 0; }
-      backfill();
+    if (document.visibilityState === 'hidden') {
+      if (scheduled && !hiddenFlush) {
+        if (flushFrame) { window.cancelAnimationFrame(flushFrame); flushFrame = 0; }
+        hiddenFlush = setTimeout(flush, 1000);
+      }
+      return;
     }
+    hiddenFlushAt = 0;
+    if (hiddenFlush) {
+      clearTimeout(hiddenFlush);
+      hiddenFlush = 0;
+      scheduled = false;
+    }
+    if (!scheduled && queue.length) scheduleFlush();
+    backfill();
   });
   window.addEventListener('pageshow', backfill);
 
@@ -5623,8 +5699,8 @@
       const marks = AGES.map(([t, words]) => ({ t, words }));
       marks.push({ t: t0age, t0: true });
       marks.sort((a, b) => a.t - b.t);
-      // a rung whose era reaches back into an 'away' window (tab hidden,
-      // socket dropped, page closed) covers time chat wasn't logging
+      // a rung whose era reaches back into an 'away' window (socket
+      // dropped or page closed) covers time chat wasn't logging
       for (const mk of marks)
         if (!mk.t0) mk.missed = away.some(([s, e]) => s < now && e > now - mk.t);
       let next = 0; // thresholds fire once each, in order
@@ -6105,8 +6181,7 @@
       if (joined) wsCause = '';
       if (joined) {
         if (downAt) {
-          away.push([downAt, Date.now(), 'socket dropped']);
-          if (away.length > 50) away.shift();
+          markAway(downAt, Date.now(), 'socket dropped');
           downAt = 0;
         }
         clearInterval(joinTimer); backfill();

@@ -30,6 +30,10 @@ not versions — the page ships continuously to Neocities.
   danger colour instead of a faint grey smudge; refits also watch the
   channel block and coalesce a frame's triggers so reload-time content
   arriving in stages can't strand a gap at the graph's right edge
+- hidden tabs drain queued chat rows on relay traffic and a one-second
+  timer, so merely hiding the page no longer paints dead-time bands or
+  sheds backlog; delayed sampler ticks refill from rendered-row counts,
+  leaving bands for socket loss or a closed page
 - the header's vertical spacing balances at 3px above and below the
   buttons (was 4/2); the corner `?`/`–` pair and their labels track
   the new top edge, and the channel block keeps a 2px nudge so its
