@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- @hasanabi mentions get the notice label's rainbow sweep instead of the
+  bots' shimmer (ostonox keeps it) - the shared gradient/keyframes live
+  in one :is() rule, and the phase stagger now covers notice-rainbow too
 - shimmering names/urls/mentions no longer pulse in lockstep - each
   element gets a negative animation-delay hashed from its text, so they
   run staggered points of the same 2.5s sweep (and a given nick or url

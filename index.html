@@ -588,7 +588,8 @@
   .role.bits { color: var(--accent); }
   .role.first { color: #ff69b4; font-weight: 700; }
   .row.notice { color: var(--text-dim); font-style: italic; }
-  .row.notice .notice-label {
+  /* the rainbow sweep: notice labels and @hasanabi mentions share it */
+  .row.notice .notice-label, .row .at.rbw {
     color: transparent;
     background: linear-gradient(90deg, #ff6868, #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868,
       #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868);
@@ -598,7 +599,7 @@
     animation: notice-rainbow 4s linear infinite;
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .row .at.rbw { animation: none; } }
   /* links view: rows without a url, and repeat posts of a url, hide */
   body.linkview .row:not([data-lk]), body.linkview .row.linkdup { display: none; }
   .row.notice.selfmod {
@@ -1658,18 +1659,20 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  // every shimmer element runs the same 2.5s gradient sweep - left alone
-  // they pulse in lockstep. A negative animation-delay phases each into
-  // a different point of the cycle; hashing the text keeps a given nick
-  // or url on the same offset every time. Catches names, links, @s and
-  // history-restored rows alike since animationstart bubbles
+  // every shimmer/rainbow element runs the same gradient sweep - left
+  // alone they pulse in lockstep. A negative animation-delay phases each
+  // into a different point of the cycle; hashing the text keeps a given
+  // nick or url on the same offset every time. Catches names, links, @s
+  // and history-restored rows alike since animationstart bubbles
   document.addEventListener('animationstart', (e) => {
-    if (e.animationName !== 'shimmer' || e.target.dataset.sd) return;
+    if ((e.animationName !== 'shimmer' && e.animationName !== 'notice-rainbow') || e.target.dataset.sd) return;
     e.target.dataset.sd = 1;
     let h = 0;
     for (let i = 0; i < e.target.textContent.length; i++)
       h = (h * 31 + e.target.textContent.charCodeAt(i)) >>> 0;
-    e.target.style.animationDelay = -((h % 100) / 40).toFixed(2) + 's';
+    // the 4s span covers notice-rainbow's whole cycle; the shorter
+    // shimmer sweep wraps the same range into a phase
+    e.target.style.animationDelay = -((h % 160) / 40).toFixed(2) + 's';
   }, true);
 
   // linkifies url-looking tokens inside already-escaped text - system msgs,
@@ -2031,10 +2034,12 @@
       }
       else {
       const at = tok.match(/^(@\w+)(.*)$/s);
-      // @hasanabi and @ostonox mentions get the bots' shimmer treatment
+      // the streamer's mention runs the notice-label rainbow; ostonox's
+      // keeps the bots' shimmer
       if (at) {
-        const shiny = /^(hasanabi|ostonox)$/i.test(at[1].slice(1));
-        out.push(`<b class="at${shiny ? ' shimmer' : ''}">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]));
+        const has = /^hasanabi$/i.test(at[1].slice(1));
+        const shiny = has || /^ostonox$/i.test(at[1].slice(1));
+        out.push(`<b class="at${has ? ' rbw' : shiny ? ' shimmer' : ''}">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]));
       }
       // Fear& / Fear& PODCAST shout-outs get bolded; the bold wraps the
       // PODCAST token too when it directly follows.
