@@ -151,6 +151,9 @@ not versions — the page ships continuously to Neocities.
   `youtube embeds` in the `?` popup; the hover preview still applies
 - chat links can lead with the site's favicon, fetched from
   duckduckgo's icon service - `link favicons` in the `?` popup
+- under zebra striping, the slivers of row background around a reply's
+  quote band take the opposite stripe to the reply beneath, so the quote
+  reads as its own line instead of sharing the reply's shade
 - the rate graph splits its outage bands by cause: red for a socket that
   dropped under an open page, violet for the page itself having been
   closed or discarded; the cause rides along in the spark save, so a
