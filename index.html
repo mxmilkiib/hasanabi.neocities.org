@@ -4377,9 +4377,9 @@
   helpBtn.addEventListener('click', (e) => stepHelp(e.shiftKey ? -1 : 1));
   helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY < 0 ? 1 : -1); }, { passive: false });
 
-  // ---- help popup width: five steps; narrow screens still get clamped by
-  // the left/right insets regardless of the inline max-width ----
-  const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280, 1440, 1600];
+  // ---- help popup width stops; narrow screens still get clamped by the
+  // left/right insets regardless of the inline max-width ----
+  const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280, 1440, 1600, 1760, 1920];
   const HDR_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20];
   let hdrFs = DEF.hfs; // -1 = follow the chat font
   function applyHdrFs() {

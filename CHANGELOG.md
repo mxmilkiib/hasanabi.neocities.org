@@ -34,6 +34,7 @@ not versions — the page ships continuously to Neocities.
   timer, so merely hiding the page no longer paints dead-time bands or
   sheds backlog; delayed sampler ticks refill from rendered-row counts,
   leaving bands for socket loss or a closed page
+- the `?` popup width list gains 1760px and 1920px stops
 - the header's vertical spacing balances at 3px above and below the
   buttons (was 4/2); the corner `?`/`–` pair and their labels track
   the new top edge, and the channel block keeps a 2px nudge so its
