@@ -745,6 +745,9 @@
   }
   .at { color: var(--accent); }
   .at:hover { color: var(--text); text-decoration: underline; }
+  /* mentions are styled like links; give them the hand instead of the
+     text i-beam so they read as interactive at a glance */
+  .row .at { cursor: pointer; }
   .row a { color: var(--accent); }
   .reply {
     color: var(--text-dim);
