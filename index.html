@@ -1259,13 +1259,13 @@
   }
   /* 2x zoom doubles the cells for a closer preview; names mode keeps
      its wide rows but the art and type scale too */
-  #emotePick.big #emoteGrid { grid-template-columns: repeat(auto-fill, 78px); gap: 4px; }
+  #emotePick.big #emoteGrid { grid-template-columns: repeat(auto-fill, 78px); }
   #emotePick.big.names #emoteGrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
   #emotePick.big #emoteGrid button { height: 78px; }
   #emotePick.big #emoteGrid button img { max-width: 68px; max-height: 68px; }
   #emotePick.big #emoteGrid button.eji { font-size: 40px; }
   #emotePick.big #emoteGrid .ename { font-size: 16px; }
-  #emotePick.big #emoteGrid .eage { height: 78px; }
+  #emotePick.big #emoteGrid .eage { height: 78px; font-size: 1.4em; }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
     position: relative; color: var(--text-dim); font-size: .7em; opacity: .4; }
