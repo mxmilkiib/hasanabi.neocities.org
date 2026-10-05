@@ -3,6 +3,18 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-05
+
+### Fixes & polish
+- the `?` popup can no longer sit past a screen edge: a new clamp caps
+  its width/height to the viewport below the header (presets and
+  dragged sizes grow back when the window does), pulls a dragged-off
+  position back inside on show and window resize, and corner-grip
+  resizes stop at the edge they face
+- `live tv` reorders to us, uk, eu, west asia, asia, au/ca, africa,
+  latam, and fox news + ms now join the us cable group
+  (tv-login streams)
+
 ## 2026-10-04
 
 ### Fixes & polish

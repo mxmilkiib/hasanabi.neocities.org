@@ -4084,7 +4084,7 @@
     // labels mode widens the corner reserve so the pinned labels clear content
     document.body.classList.toggle('hdrlbl', helpMode >= 2);
     // anchor below whatever height the header wraps to once labels are in
-    if (showPanel) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
+    if (showPanel) clampHelpPanel();
     helpBtn.classList.toggle('on', helpMode !== 0);
     helpBtn.title = `Help: ${HELP_MODES[helpMode]} - click/scroll · ⇧click back`;
     markHelp('helpHelp', helpMode);
@@ -4123,16 +4123,25 @@
     helpPanel.style.maxWidth = HELP_WIDTHS[helpWIdx] + 'px';
     markHelp('helpW', helpWIdx);
     helpWCur.textContent = '';
-    // a dragged panel is left-anchored, so growing the width would spill
-    // off the right edge - push it left; if the right edge was already at
-    // the viewport edge it stays pinned there
-    if (helpPanel.style.left && !helpPanel.hidden) {
-      const r = helpPanel.getBoundingClientRect();
-      if (r.right > innerWidth) {
-        helpPanel.style.left = Math.max(0, innerWidth - r.width) + 'px';
-        saveHsize(''); // '' skips w/h - position only
-      }
-    }
+    clampHelpPanel();
+  }
+  // the popup must never sit past a screen edge: its intended size (the
+  // preset or a dragged px) goes inside a viewport-capped min() so a
+  // smaller window shrinks it and a bigger one grows it back, and a
+  // dragged-off position is pulled back inside
+  function clampHelpPanel() {
+    if (helpPanel.hidden) return;
+    const top = headerEl.getBoundingClientRect().bottom + 4;
+    // re-reading the leading px out of a previous min() keeps the base
+    const wpx = parseFloat(helpPanel.style.maxWidth.match(/[\d.]+/)?.[0]) || HELP_WIDTHS[helpWIdx];
+    helpPanel.style.maxWidth = `min(${wpx}px, calc(100vw - 16px))`;
+    const hpx = parseFloat(helpPanel.style.maxHeight.match(/[\d.]+/)?.[0] || helpPanel.style.height) || Math.round(innerHeight * .75);
+    helpPanel.style.maxHeight = `min(${hpx}px, calc(100dvh - ${Math.round(top) + 8}px))`;
+    const r = helpPanel.getBoundingClientRect();
+    if (helpPanel.style.left) {
+      helpPanel.style.left = Math.max(0, Math.min(innerWidth - r.width, r.left)) + 'px';
+      helpPanel.style.top = Math.max(top, Math.min(innerHeight - r.height, r.top)) + 'px';
+    } else helpPanel.style.top = top + 'px';
   }
   // a dragged width isn't one of the stops - note it in brackets
   const markHelpW = (w) => { helpWCur.textContent = w ? ` (${w}px)` : ''; };
@@ -4147,7 +4156,7 @@
   }
   // header height changes with width when the controls wrap - re-anchor
   window.addEventListener('resize', () => {
-    if (!helpPanel.hidden) helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px';
+    clampHelpPanel();
     // the third pane only exists in landscape; dropping to portrait folds it
     if (!side2El.hidden && window.innerWidth <= window.innerHeight) setSplit(2);
     if (document.body.classList.contains('hdrgraph')) sparkSize();
@@ -6281,14 +6290,16 @@
       const botEdge = grip.classList.contains('bl') || grip.classList.contains('br') || grip.classList.contains('b');
       const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner/edge
       const ay = topEdge ? r.bottom : r.top;
+      const htop = headerEl.getBoundingClientRect().bottom + 4;
       const move = (ev) => {
         if (leftEdge || rightEdge) {
-          const w = Math.round(Math.max(280, Math.min(innerWidth - 8, Math.abs(ev.clientX - ax))));
+          // cap the grown edge at the screen it faces, so it can't push past
+          const w = Math.round(Math.min(leftEdge ? ax - 8 : innerWidth - ax - 8, Math.max(280, Math.abs(ev.clientX - ax))));
           helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
           helpPanel.style.left = (leftEdge ? ax - w : ax) + 'px';
         }
         if (topEdge || botEdge) {
-          const h = Math.round(Math.max(120, Math.min(innerHeight - 8, Math.abs(ev.clientY - ay))));
+          const h = Math.round(Math.min(topEdge ? ay - htop : innerHeight - ay - 8, Math.max(120, Math.abs(ev.clientY - ay))));
           helpPanel.style.height = h + 'px';
           helpPanel.style.maxHeight = 'none';
           helpPanel.style.top = (topEdge ? ay - h : ay) + 'px';
