@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the ↩ in reply quote bands moved off the gutter: it now trails the
+  quoted text inside the highlight, a character's space after the last
+  word, so it can never land on the quoted nick. restored rows relocate
+  it to match
 - gaps with a recorded cause (socket dropped, page closed) now trigger
   a recent-messages backfill, so the missed stretch is recovered;
   recovered rows carry a small ↻ on the timestamp and a hover note.

@@ -759,15 +759,15 @@
      quoted nick+text it hugs the text instead, reaching ~3 chars out on
      each side - clone carries the border and padding onto wrapped lines,
      and the -3ch margin undoes its own border+pad so the text stays on
-     the name column. the gutter tag and ↩ sit over the band where it
-     reaches under them */
+     the name column. the gutter tag sits over the band where it
+     reaches under it */
   .reply.rq .rqt {
     margin-left: -3ch; padding-left: calc(3ch - 2px); padding-right: 3ch;
     border-left: 2px solid color-mix(in srgb, #a878ee 55%, var(--line));
     background-color: color-mix(in srgb, var(--bg) 90%, #a878ee);
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
-  .reply.rq :is(.rarr, .chtag) { position: relative; z-index: 1; }
+  .reply.rq .chtag { position: relative; z-index: 1; }
   /* a separator on the seam between quote line and reply, matching the
      row separators - full row width, invisible when they're off */
   .reply.rq { position: relative; }
@@ -798,10 +798,9 @@
   }
   /* the quoted author's name carries the mention accent */
   .reply.rq b { color: var(--accent); }
-  /* the ↩ hangs in the gutter ahead of the quoted nick - its width and
-     negative margin cancel so it takes no layout space and the nick
-     starts on the responder's name column */
-  .reply.rq .rarr { display: inline-block; width: 1.2em; margin-left: -1.2em; }
+  /* the ↩ trails the quoted text inside the band, a character's space
+     after the last word */
+  .reply.rq .rarr { margin-left: 1ch; }
   /* the quote's channel tag hangs in the row's tag column, left of the
      band - 11px undoes its margin+padding (3+8), so the tag aligns with
      the tags on ordinary lines and the quote text starts where they do */
@@ -2387,8 +2386,8 @@
 
   // a reply's quote re-uses the row's own columns: its channel tag hangs
   // in the tag column and the quoted nick shifts right to land exactly on
-  // the responder's name, so both nicks line up - the ↩ hangs in the
-  // gutter via .rarr's cancelling width+margin
+  // the responder's name, so both nicks line up - the ↩ trails the
+  // quoted text inside the band
   function rqIndent(r) {
     const rq = r.querySelector('.reply.rq'), nm = r.querySelector('.name');
     if (!rq || !nm) return;
@@ -2618,7 +2617,7 @@
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
         reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
-                `${chTag}<span class="rarr">↩</span><span class="rqt"><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i></span></span>`;
+                `${chTag}<span class="rqt"><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i><span class="rarr">↩</span></span></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       const lkey = linkKeyOf(message);
@@ -5135,6 +5134,9 @@
           }
           rq.appendChild(t);
         }
+        // rows saved with the ↩ in the gutter: move it inside the band
+        const arr = rq.querySelector(':scope > .rarr');
+        if (arr) rq.querySelector('.rqt').appendChild(arr);
         const r = rq.closest('.row');
         fillRq(r);
         rqIndent(r);
