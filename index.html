@@ -7577,6 +7577,8 @@
       author: s('author').slice(0, 80),
       published: /^\d{4}-\d\d-\d\d$/.test(s('published')) ? s('published') : '',
       views: s('views').slice(0, 40),
+      facts: Array.isArray(raw.facts) ? raw.facts.filter((f) => typeof f === 'string').slice(0, 8).map((f) => f.slice(0, 80)) : [],
+      ttl: +raw.ttl > 0 ? Math.min(+raw.ttl, 86400) : 0,
       final: /^https?:\/\//.test(s('url')) ? s('url') : '',
     } : null;
     // bound the cache - a long session can hover thousands of unique urls
@@ -7674,8 +7676,7 @@
     clearTimeout(peekTimer); peekTimer = 0;
     peekUrl = ''; peekEl.hidden = true;
   }
-  function peekStart(a, x, y) {
-    const url = a.href;
+  function peekStart(url, x, y) {
     peekUrl = url; peekX = x; peekY = y;
     peekEl.hidden = true;
     clearTimeout(peekTimer);
@@ -7690,16 +7691,22 @@
   document.addEventListener('mouseover', (e) => {
     let a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
     if (a && !peekLink(a)) a = null;
-    // hops between child nodes of the same anchor don't restart the delay
-    if ((a ? a.href : '') === peekUrl) return;
-    if (!a) peekHide(); else peekStart(a, e.clientX, e.clientY);
+    let url = a ? a.href : '';
+    // @mentions in rows aren't anchors - peek the nick's twitch profile
+    if (!url && peekMode && !peekTouch.matches) {
+      const m = e.target instanceof Element ? e.target.closest('.row .at') : null;
+      if (m) url = 'https://twitch.tv/' + m.textContent.replace(/^@/, '').toLowerCase();
+    }
+    // hops between child nodes of the same target don't restart the delay
+    if (url === peekUrl) return;
+    if (!url) peekHide(); else peekStart(url, e.clientX, e.clientY);
   });
   // keyboard focus gets the card too; :focus-visible skips click focus
   document.addEventListener('focusin', (e) => {
     const a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
     if (!a || !a.matches(':focus-visible') || !peekLink(a)) return;
     const r = a.getBoundingClientRect();
-    peekStart(a, r.left, r.bottom - 18);
+    peekStart(a.href, r.left, r.bottom - 18);
   });
   document.addEventListener('focusout', peekHide);
   // the card stays put once shown; only the debounce tracks the cursor

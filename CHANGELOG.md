@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- @mentions in chat text get hover previews now: they aren't anchors,
+  so the hover handler synthesizes the nick's twitch.tv profile url and
+  feeds it through the same peek pipeline - same cache key as hovering
+  the name link itself, so the two share one entry. the client's own
+  peek sanitizer also learned to forward facts/ttl, which the worker
+  and relay added for twitch facts
 - a red gap band on the rate graph turns violet once its lines come
   back: any replayed row landing inside a recorded outage window marks
   that window's dead samples 'filled', and the band recolors to the
