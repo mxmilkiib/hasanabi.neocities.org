@@ -1658,6 +1658,20 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // every shimmer element runs the same 2.5s gradient sweep - left alone
+  // they pulse in lockstep. A negative animation-delay phases each into
+  // a different point of the cycle; hashing the text keeps a given nick
+  // or url on the same offset every time. Catches names, links, @s and
+  // history-restored rows alike since animationstart bubbles
+  document.addEventListener('animationstart', (e) => {
+    if (e.animationName !== 'shimmer' || e.target.dataset.sd) return;
+    e.target.dataset.sd = 1;
+    let h = 0;
+    for (let i = 0; i < e.target.textContent.length; i++)
+      h = (h * 31 + e.target.textContent.charCodeAt(i)) >>> 0;
+    e.target.style.animationDelay = -((h % 100) / 40).toFixed(2) + 's';
+  }, true);
+
   // linkifies url-looking tokens inside already-escaped text - system msgs,
   // notice rows, reply quotes and fossa columns skip renderTextHTML so urls
   // in them would render as raw text; honours the clean urls display option

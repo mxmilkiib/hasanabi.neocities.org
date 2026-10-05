@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- shimmering names/urls/mentions no longer pulse in lockstep - each
+  element gets a negative animation-delay hashed from its text, so they
+  run staggered points of the same 2.5s sweep (and a given nick or url
+  always lands on the same offset)
 - the reply quote's left edge no longer wanders between rows: the
   name-column anchor sweep counted any .role chip (sub/mod/bits/first)
   as part of the name cluster, so the box jumped ~40px with an aux
