@@ -392,16 +392,16 @@
     position: fixed; z-index: 50; width: 300px; max-width: 90vw;
     background: var(--panel); color: var(--text);
     border: 1px solid var(--popline); border-radius: 6px;
-    padding: 8px 10px; font-size: 12px; line-height: 1.4;
+    padding: 8px 10px; font-size: var(--chat-font, 15px); line-height: 1.4;
     pointer-events: none; box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
   }
   #peek[hidden] { display: none; }
-  #peek img { display: block; max-width: 100%; max-height: 140px; border-radius: 4px; margin-bottom: 6px; }
-  #peek .psite { color: var(--accent); font-weight: 600; font-size: 11px; }
+  #peek img { display: block; max-width: 100%; max-height: 140px; border-radius: 4px; margin-top: 6px; }
+  #peek .psite { color: var(--accent); font-weight: 600; font-size: .78em; }
   #peek .ptitle { font-weight: 600; margin: 2px 0; overflow-wrap: anywhere; }
-  #peek .pico { width: 12px; height: 12px; margin: 0 5px -2px 0; border-radius: 2px; display: inline-block; max-height: none; }
-  #peek .pmeta { color: var(--text-dim); font-size: 11px; }
-  #peek .pto { color: var(--accent); font-size: 11px; overflow-wrap: anywhere; }
+  #peek .pico { width: .85em; height: .85em; margin: 0 .35em -.1em 0; border-radius: 2px; display: inline-block; max-height: none; }
+  #peek .pmeta { color: var(--text-dim); font-size: .78em; }
+  #peek .pto { color: var(--accent); font-size: .78em; overflow-wrap: anywhere; }
   #peek .pdesc {
     color: var(--text-dim); overflow: hidden;
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
@@ -1271,7 +1271,7 @@
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
-    <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link shows its title and description, and where a shortened link really lands; looked up through a Cloudflare worker, so the linked address leaves this page; the image loads from the linked site; not shown on touch screens<sup>†</sup></span></div>
+    <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link shows its title and description, and where a shortened link really lands; looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -3650,7 +3650,7 @@
   }
   function setCleanUrls(on) { cleanUrls = on; markHelp('helpClean', on ? 1 : 0); applyCleanUrls(); }
   // link-preview hover card: off / text only / text + the page's image
-  const PEEK_MODES = ['off', 'text', 'text + image'];
+  const PEEK_MODES = ['off', 'text', 'text + image', 'text + icons'];
   let peekMode = 2;
   function setPeek(i) { peekMode = i; markHelp('helpPeek', i); }
   function applyCleanUrls() {
@@ -6750,9 +6750,15 @@
     if (/^(?:x|twitter|mobile\.twitter)\.com$/.test(h) && /\/status\//.test(u.pathname)) return false;
     return !/\.(?:gif|gifv|webp|png|jpe?g|avif|mp4|webm)$/i.test(u.pathname);
   }
+  // one decode pass - the worker decodes its output already, but entries
+  // cached before that fix (and sites that ship over-encoded tags) can
+  // still carry a literal '&amp;'; a detached textarea parses entities as
+  // text, so markup can't execute
+  const peekDec = document.createElement('textarea');
+  const peekText = (s) => { peekDec.innerHTML = s; return peekDec.value; };
   function peekGot(url, raw) {
     clearTimeout(peekInflight.get(url)); peekInflight.delete(url);
-    const s = (k) => (raw && typeof raw[k] === 'string' ? raw[k] : '');
+    const s = (k) => (raw && typeof raw[k] === 'string' ? peekText(raw[k]) : '');
     const p = raw && typeof raw === 'object' ? {
       title: s('title'), description: s('description'), site: s('site'),
       image: /^https:\/\//.test(s('image')) ? s('image') : '',
@@ -6790,21 +6796,11 @@
     peekEl.textContent = '';
     // the site's own theme-color edges the card
     peekEl.style.borderLeft = p && p.color ? `3px solid ${p.color}` : '';
-    if (p && p.image && peekMode === 2) {
-      const im = document.createElement('img');
-      im.referrerPolicy = 'no-referrer';
-      im.alt = '';
-      // the card grows once the image lands - re-clamp it to the viewport
-      im.addEventListener('load', peekPlace);
-      im.addEventListener('error', () => { im.remove(); peekPlace(); });
-      im.src = p.image;
-      peekEl.appendChild(im);
-    }
     const site = document.createElement('div');
     site.className = 'psite';
     try { site.textContent = (p && p.site) || new URL(url).hostname; }
     catch { site.textContent = ''; }
-    if (p && p.icon && peekMode === 2) {
+    if (p && p.icon && peekMode >= 2) {
       const ic = document.createElement('img');
       ic.className = 'pico';
       ic.referrerPolicy = 'no-referrer';
@@ -6840,6 +6836,16 @@
       const dd = document.createElement('div');
       dd.className = 'pdesc'; dd.textContent = loading ? '…' : p.description;
       peekEl.appendChild(dd);
+    }
+    if (p && p.image && peekMode === 2) {
+      const im = document.createElement('img');
+      im.referrerPolicy = 'no-referrer';
+      im.alt = '';
+      // the card grows once the image lands - re-clamp it to the viewport
+      im.addEventListener('load', peekPlace);
+      im.addEventListener('error', () => { im.remove(); peekPlace(); });
+      im.src = p.image;
+      peekEl.appendChild(im);
     }
     peekEl.hidden = false;
     peekPlace();

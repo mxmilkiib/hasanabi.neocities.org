@@ -132,6 +132,10 @@ not versions — the page ships continuously to Neocities.
 - image and giphy urls keep their link text on the row as italics
   beside the floated embed instead of being swallowed by it; the
   clean-urls retoggle rewrites inside the italic wrapper
+- link preview cards follow the chat font size, place the image below
+  the text, and decode HTML entities left over-encoded by the source
+  site (`Fear&amp;` no longer renders literally); a `text + icons`
+  mode shows the site favicon without loading the big preview image
 - moderator-action rows (timeouts, bans, a cleared chat) shade blue;
   a `…m gap` silence notice shades red, and when no outage was
   recorded for its span the graph now bands it grey rather than
