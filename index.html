@@ -408,7 +408,7 @@
      the -webkit-box clamp traded that wrap for an ellipsis - clip-path
      caps the height without creating a formatting context */
   #peek .pdesc {
-    color: var(--text-dim); max-height: 8.4em; clip-path: inset(0);
+    color: var(--text-dim); font-size: var(--peek-font, 13px); max-height: 8.4em; clip-path: inset(0);
   }
   #vid #vidFrame { position: absolute; inset: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -3635,6 +3635,9 @@
     const de = document.documentElement.style;
     de.setProperty('--chat-lhpx', Math.round(fs * Math.max(lh, 1.15)) + 'px');
     de.setProperty('--chat-lhm', Math.round(Math.max(-3, Math.min(0, (lh - 1.15) * 0.5 * fs))) + 'px');
+    // the preview card's body text runs two ladder steps below chat font
+    const pi = FONT_SIZES.indexOf(fs);
+    de.setProperty('--peek-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 2)] : Math.max(7, fs - 2)) + 'px');
   }
   function cycle(btn, list, idx, prop, label, unit, helpCls) {
     const apply = () => {
