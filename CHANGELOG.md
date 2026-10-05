@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- reply quote bands echo the parent's rendered message - emotes,
+  links and media included - cloned from the live row at three-quarter
+  emote size with the band on the full row line-height; a parent that
+  left the log keeps the plain-text fallback, and other inline media
+  caps at big-emote height
 - the chat-bar emote button's ☻ shifts 1px right to sit centred
 - the rate graph grows to the header's full 26px row height, and its
   ticks, trace and glorp marks quantise to the device-pixel grid so

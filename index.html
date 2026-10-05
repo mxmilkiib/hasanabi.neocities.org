@@ -688,8 +688,15 @@
     display: block; flex: 0 0 100%; white-space: normal; overflow-wrap: anywhere;
     margin: 0 0 1px 3px; padding-left: 8px; border-left: 2px solid color-mix(in srgb, #a878ee 55%, var(--line));
     background-color: color-mix(in srgb, var(--bg) 90%, #a878ee);
-    font-style: normal; line-height: 1.3;
+    font-style: normal; line-height: inherit;
   }
+  /* quoted emotes render at three-quarter size - the eonly override
+     keeps an emote-only reply row from blowing them back up; other
+     inline media caps at big-emote height so it stays a thumbnail */
+  .reply.rq .emote { height: 1.125em; margin: -.26em 1px; }
+  main.em-inline .row.eonly .reply.rq .emote,
+  main.em-right .row.eonly .reply.rq .emote { height: 1.125em; margin: -.26em 1px; }
+  .reply.rq :is(.gifimg, .chat-img, .twvid img, .twcard img) { max-height: 2.2em; }
   /* zebra never touches the quote band - it keeps its own violet tint
      whatever parity the row beneath carries */
   /* the quoted author's name carries the mention accent */
@@ -2204,6 +2211,20 @@
       rq.style.textIndent = (nx - rq.offsetLeft - 2 - pl) + 'px';
     }
   }
+  // a quote band echoes the parent's rendered message - emotes, links and
+  // all - cloned from the live row once it sits in the log; a parent that
+  // never arrived keeps the plain-text body the band rendered with
+  function fillRq(r) {
+    const rq = r.querySelector(':scope > .reply.rq');
+    const pr = rq && rowById.get(rq.dataset.pid);
+    const pnm = pr && pr.isConnected ? pr.querySelector(':scope > .name') : null;
+    if (!pnm) return;
+    const qi = rq.querySelector('i');
+    qi.textContent = '';
+    for (let n = pnm.nextSibling; n; n = n.nextSibling)
+      if (n.nodeType !== 1 || !n.matches('.rplybtn, .aux, .auxr, .sub'))
+        qi.appendChild(n.cloneNode(true));
+  }
   function flush() {
     scheduled = false;
     if (emptyEl) {
@@ -2458,6 +2479,7 @@
       r.removeAttribute('data-new');
       rqIndent(r);
       if (r.dataset.mid) rowById.set(r.dataset.mid, r);
+      fillRq(r);
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self')) {
@@ -4672,7 +4694,11 @@
       }
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
-      for (const rq of logEl.querySelectorAll('.reply.rq')) rqIndent(rq.closest('.row'));
+      for (const rq of logEl.querySelectorAll('.reply.rq')) {
+        const r = rq.closest('.row');
+        fillRq(r);
+        rqIndent(r);
+      }
       // echoes kept their send-time key - re-register them so a real copy
       // arriving through backfill adopts the row instead of duplicating it
       for (const el of logEl.querySelectorAll('.row.local[data-ek]')) {
