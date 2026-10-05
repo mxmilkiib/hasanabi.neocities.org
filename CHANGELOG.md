@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the channel row drops the extra 1px of spacing below the header's
+  top edge
 - accessibility pass: every `.on` toggle now mirrors `aria-pressed`;
   the help panel and stream player are labelled dialogs; help tabs
   expose tablist/tab/tabpanel with `aria-selected`; feed rows are
