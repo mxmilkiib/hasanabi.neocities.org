@@ -101,6 +101,7 @@ not versions — the page ships continuously to Neocities.
   keep their posted spelling
 - bot `!command` tokens stay intact when their list wraps - no more
   break after `!`
+- the jump-to-live counter's dashed edge now marches around its border
 - a url whose fragment ends in an image extension (`…#/media/
   File:x.png`) no longer embeds as a broken image - the extension
   check now tests the path only, so the wiki page links as text

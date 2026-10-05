@@ -388,13 +388,14 @@
   }
   #vid #vidFrame { position: absolute; inset: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
+  @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
     position: absolute;
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
     background: var(--panel);
-    border: 1px solid var(--accent);
+    border: 1px solid transparent;
     color: var(--accent);
     border-radius: 15px;
     min-width: 92px;
@@ -407,6 +408,22 @@
     opacity: .9;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
   }
+  .jdown::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: repeating-conic-gradient(from var(--jdash), var(--accent) 0 10deg, transparent 10deg 20deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: jdown-march 3s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes jdown-march { to { --jdash: 1turn; } }
+  @media (prefers-reduced-motion: reduce) { .jdown::before { animation: none; } }
   .jdown .arr { font-size: 19px; vertical-align: -1px; }
   .jdown .cnt { color: var(--text); font-weight: 600; margin-left: 4px; }
   .jdown .secs { font-size: 12px; font-weight: 400; opacity: .8; }
