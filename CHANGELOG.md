@@ -86,6 +86,25 @@ not versions — the page ships continuously to Neocities.
   (tv-login streams); the us block also gains bloomberg, yahoo
   finance, and la locals ktla, abc7 and fox 11, with livenow fox
   parked beside fox news
+- the authors tab's `all` mode no longer wraps dates in a second
+  pair of brackets - entries read `(work · tagline, dates)` again
+- author taglines that quote a different work than the named one now
+  link to their own source via `data-g`: proudhon's *what is
+  property*, stirner's *ego and its own*, bakunin's *reaction in
+  germany*, kropotkin's *conquest of bread*, chomsky's *responsibility
+  of intellectuals*, scott's *weapons of the weak*, engels' *socialism:
+  utopian and scientific*, the communist manifesto, debs' court
+  statement, luxemburg's *russian revolution*, the april theses, mao's
+  *serve the people*, c.l.r. james' *every cook can govern*, claudia
+  jones' *neglect of the negro woman*, woolf's *a room of one's own*,
+  benjamin's *theses on history*, harvey's *right to the city*,
+  lessig's *code v2*, stallman's free-software essay, lorca's *duende*
+  lecture and doctorow's *seize the means of computation*; a tagline
+  naming the already-linked work stays plain
+- nine more author works gain `data-w` links - rocker, de cleyre,
+  balagoon, sitrin, bookchin, camus, le guin and fisher's two
+  entries - and malcolm x's *ballot or the bullet* moves off a
+  host-blocked copy
 
 ## 2026-10-04
 
