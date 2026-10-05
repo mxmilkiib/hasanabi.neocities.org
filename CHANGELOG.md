@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- a red gap band on the rate graph turns violet once its lines come
+  back: any replayed row landing inside a recorded outage window marks
+  that window's dead samples 'filled', and the band recolors to the
+  violet already used for closed/discarded page gaps - the recorded
+  cause keeps riding in rateWhy, so it survives reloads and stays
+  readable in saves
 - mentions stay visibly heavier at every Font weight setting: b's
   relative 'bolder' resolves to 900 once --chat-w reaches 600-700,
   which most fonts render as the same 700 glyph, so mentions vanished
