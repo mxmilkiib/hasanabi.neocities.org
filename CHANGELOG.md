@@ -8,10 +8,10 @@ not versions — the page ships continuously to Neocities.
 ### Fixes & polish
 - a growing message box no longer lets fresh rows slide under it - a
   following column re-snaps to the bottom when the bar's height changes
-- the reply quote's violet highlight hugs the quoted nick+text - a few
-  px on each side instead of the row's full width; under zebra the rest
-  of the line keeps the alternate stripe, and the ↩ and channel tag sit
-  in the gutter outside the highlight
+- the reply quote's violet highlight hugs the quoted nick+text - ~3
+  chars on each side instead of the row's full width; under zebra the
+  rest of the line keeps the alternate stripe, and the ↩ and channel
+  tag sit in the gutter over the band's reach
 - a `2x` chip in the emote picker doubles the cell size for a closer
   look at the art - persists, and the age markers scale with it
 - the emote picker's emoji are searchable by name and keyword

@@ -743,16 +743,18 @@
     font-style: normal; line-height: inherit;
   }
   /* the violet used to wash the row's full width; as an inline box on the
-     quoted nick+text it hugs the text instead - clone carries the border
-     and padding onto wrapped lines, and the -4px margin undoes its own
-     border+pad so the text stays on the name column. the gutter tag and
-     ↩ stay outside, in the line's surround */
+     quoted nick+text it hugs the text instead, reaching ~3 chars out on
+     each side - clone carries the border and padding onto wrapped lines,
+     and the -3ch margin undoes its own border+pad so the text stays on
+     the name column. the gutter tag and ↩ sit over the band where it
+     reaches under them */
   .reply.rq .rqt {
-    margin-left: -4px; padding-left: 2px; padding-right: 4px;
+    margin-left: -3ch; padding-left: calc(3ch - 2px); padding-right: 3ch;
     border-left: 2px solid color-mix(in srgb, #a878ee 55%, var(--line));
     background-color: color-mix(in srgb, var(--bg) 90%, #a878ee);
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
+  .reply.rq :is(.rarr, .chtag) { position: relative; z-index: 1; }
   /* quoted emotes render at three-quarter size - the eonly override
      keeps an emote-only reply row from blowing them back up; other
      inline media caps at big-emote height so it stays a thumbnail */
