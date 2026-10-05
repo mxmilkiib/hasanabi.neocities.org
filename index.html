@@ -396,7 +396,8 @@
     pointer-events: none; box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
   }
   #peek[hidden] { display: none; }
-  #peek img { display: block; max-width: 100%; max-height: 140px; border-radius: 4px; margin-top: 6px; }
+  /* the preview image floats right and the card text wraps its left */
+  #peek > img { float: right; max-width: 40%; max-height: 9em; border-radius: 4px; margin: 0 0 .3em .6em; }
   #peek .psite { color: var(--accent); font-weight: 600; font-size: .78em; }
   #peek .ptitle { font-weight: 600; margin: 2px 0; overflow-wrap: anywhere; }
   #peek .pico { width: .85em; height: .85em; margin: 0 .35em -.1em 0; border-radius: 2px; display: inline-block; max-height: none; }
@@ -404,7 +405,7 @@
   #peek .pto { color: var(--accent); font-size: .78em; overflow-wrap: anywhere; }
   #peek .pdesc {
     color: var(--text-dim); overflow: hidden;
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6;
   }
   #vid #vidFrame { position: absolute; inset: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -670,6 +671,16 @@
   .twcard b { color: #1d9bf0; }
   .twcard .up { font-style: normal; }
   .twcard .twmedia img { max-height: 5em; max-width: 12em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
+  /* inline site icons lead chat links; a 404 hides the chip rather than
+     showing a broken image */
+  .lkico { width: 1em; height: 1em; vertical-align: -.12em; margin-right: .2em; border-radius: 2px; }
+  /* youtube links gain a thumbnail card; a click swaps in the embed */
+  .ytcard { display: block; margin: 2px 0; }
+  a.ytvid { position: relative; display: inline-block; }
+  a.ytvid img { display: block; max-height: 9em; max-width: 17em; border-radius: 4px; }
+  a.ytvid b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.8em; color: #fff; text-shadow: 0 1px 5px #000; }
+  a.ytvid:hover b { color: #f33; }
+  iframe.ytplay { display: block; border: 0; border-radius: 4px; margin: 2px 0; width: min(30em, 100%); aspect-ratio: 16 / 9; }
   .twcard .twmedia a.twvid { position: relative; display: inline-block; }
   .twcard .twmedia video.twvid { max-height: 12em; max-width: 18em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
   .twcard .twmedia a.twvid i {
@@ -1272,6 +1283,8 @@
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link shows its title and description, and where a shortened link really lands; looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
+    <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gains a thumbnail card under the row; clicking it swaps in the player iframe - nothing loads from google until that click<sup>†</sup></span></div>
+    <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -1743,6 +1756,25 @@
     }
     return gifLink(q, label, hit);
   }
+  // youtube video id (+ optional start seconds) from watch, shorts, live,
+  // embed and youtu.be links; '' when the link isn't a playable video
+  function ytIdOf(url) {
+    let u;
+    try { u = new URL(/^https?:\/\//i.test(url) ? url : `https://${url}`); } catch { return null; }
+    const h = u.hostname.toLowerCase().replace(/^(?:www|m|music)\./, '');
+    let id = '';
+    if (h === 'youtu.be') id = (u.pathname.match(/^\/([\w-]{11})/) || [])[1] || '';
+    else if (h === 'youtube.com' || h === 'youtube-nocookie.com') {
+      const v = u.searchParams.get('v');
+      id = /^[\w-]{11}$/.test(v || '') ? v : (u.pathname.match(/^\/(?:shorts|live|embed|v)\/([\w-]{11})/) || [])[1] || '';
+    }
+    if (!id) return null;
+    // t / start accept 90, 90s, 1m30s, 1h2m3s
+    const t = u.searchParams.get('t') || u.searchParams.get('start') || '';
+    const tm = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(\d+)s?$/);
+    const start = tm ? (+tm[1] || 0) * 3600 + (+tm[2] || 0) * 60 + +tm[3] : 0;
+    return { id, start };
+  }
   const tweetWait = new Set();
   function reqTweet(id) {
     if (tweetWait.has(id) || tweetCache.has(id)) return;
@@ -1892,7 +1924,16 @@
           // this site's own domain gets the fossabot shimmer; so does any
           // url in a line the bots post - their !link commands output urls
           const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?/#]|$)/i.test(url);
-          out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + escapeHTML(post));
+          let ico = '';
+          if (lkIco) {
+            try { ico = `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(new URL(u.replace(/&amp;/g, '&')).hostname)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`; }
+            catch { /* a malformed url keeps the bare text */ }
+          }
+          out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + escapeHTML(post));
+          // a watchable youtube link gains a thumbnail card under the row;
+          // the iframe player only loads when it's clicked
+          const yt = ytEmbed ? ytIdOf(url) : null;
+          if (yt) pendingTw.push(`<span class="ytcard"><a class="ytvid" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} href="https://youtu.be/${yt.id}" title="play the video here"><img src="https://i.ytimg.com/vi/${yt.id}/hqdefault.jpg" alt="" loading="lazy"><b>▶</b></a></span>`);
         }
       }
       else {
@@ -2113,6 +2154,11 @@
     });
   }
   logEl.addEventListener('load', resnap, true);
+  // a favicon that never resolves (duckduckgo 404s unknown hosts) leaves no
+  // broken-image chip behind
+  mainEl.addEventListener('error', (e) => {
+    if (e.target instanceof HTMLImageElement && e.target.classList.contains('lkico')) e.target.remove();
+  }, true);
   sideEl.addEventListener('load', resnap, true);
   side2El.addEventListener('load', resnap, true);
 
@@ -3312,6 +3358,8 @@
     else if (a.classList.contains('helpClean')) { setCleanUrls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpNotify')) { setNotify(+a.dataset.idx === 1, true); saveOpts(); }
     else if (a.classList.contains('helpGif')) { setGifSafe(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpYtem')) { setYtEmb(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpFav')) { setLkIco(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
@@ -3653,6 +3701,11 @@
   const PEEK_MODES = ['off', 'text', 'text + image', 'text + icons'];
   let peekMode = 2;
   function setPeek(i) { peekMode = i; markHelp('helpPeek', i); }
+  // ytEmbed adds a click-to-play thumbnail card under youtube links;
+  // lkIco leads each chat link with the site's favicon (via duckduckgo)
+  let ytEmbed = true, lkIco = true;
+  function setYtEmb(on) { ytEmbed = on; markHelp('helpYtem', on ? 1 : 0); }
+  function setLkIco(on) { lkIco = on; markHelp('helpFav', on ? 1 : 0); }
   function applyCleanUrls() {
     mainEl.querySelectorAll('a[data-u]').forEach((a) => {
       // italic image-url links keep their <i> wrapper on a retoggle
@@ -3728,7 +3781,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode,
+      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0,
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? -1 : HDR_SIZES[helpFs],
       split: 1 + !sideEl.hidden + !side2El.hidden,
@@ -3813,6 +3866,8 @@
     if (o.clean !== undefined) setCleanUrls(!!o.clean);
     if (o.gifsafe !== undefined) setGifSafe(!!o.gifsafe);
     if (Number.isInteger(o.peek) && o.peek >= 0 && o.peek < PEEK_MODES.length) setPeek(o.peek);
+    if (o.yt !== undefined) setYtEmb(!!o.yt);
+    if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.notify !== undefined) setNotify(!!o.notify, false);
     const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
     if (Number.isInteger(hw) && hw >= 0 && hw < HELP_WIDTHS.length) { helpWIdx = hw; applyHelpW(); }
@@ -4536,6 +4591,8 @@
     if (pingOn) q.set('ping', '1');
     if (cleanUrls) q.set('clean', '1');
     if (peekMode !== 2) q.set('peek', peekMode);
+    if (!ytEmbed) q.set('yt', '0');
+    if (!lkIco) q.set('lkico', '0');
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
@@ -4670,6 +4727,19 @@
       v.controls = true; v.autoplay = true; v.playsInline = true;
       v.loop = gif; v.muted = gif;
       tv.replaceWith(v);
+      return;
+    }
+    // a youtube thumbnail swaps for the embed iframe - the player, and its
+    // connection to google, only ever loads on this click
+    const ytv = e.target.closest('a.ytvid');
+    if (ytv && ytv.dataset.ytid) {
+      e.preventDefault();
+      const f = document.createElement('iframe');
+      f.className = 'ytplay';
+      f.src = `https://www.youtube-nocookie.com/embed/${ytv.dataset.ytid}?autoplay=1${ytv.dataset.ytt ? `&start=${ytv.dataset.ytt}` : ''}`;
+      f.allow = 'autoplay; encrypted-media; picture-in-picture';
+      f.allowFullscreen = true;
+      ytv.replaceWith(f);
       return;
     }
     const chip = e.target.closest('.reply');
@@ -6466,6 +6536,8 @@
     if (q.has('ping')) setPing(flag('ping'));
     if (q.has('clean')) setCleanUrls(flag('clean'));
     if (q.has('peek') && +q.get('peek') >= 0 && +q.get('peek') < PEEK_MODES.length) setPeek(+q.get('peek'));
+    if (q.has('yt')) setYtEmb(flag('yt'));
+    if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
@@ -6482,7 +6554,7 @@
     helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES,
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpFav: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpFs: ['follow chat'].concat(HDR_SIZES),
@@ -6527,6 +6599,8 @@
   markHelp('helpGif', gifSafe ? 1 : 0);
   markHelp('helpNotify', notifyOn ? 1 : 0);
   markHelp('helpPeek', peekMode);
+  markHelp('helpYtem', ytEmbed ? 1 : 0);
+  markHelp('helpFav', lkIco ? 1 : 0);
   // offline banner: the browser's own online/offline signal
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };
@@ -6796,6 +6870,17 @@
     peekEl.textContent = '';
     // the site's own theme-color edges the card
     peekEl.style.borderLeft = p && p.color ? `3px solid ${p.color}` : '';
+    // the image leads in the dom so its right float lets the text wrap left
+    if (p && p.image && peekMode === 2) {
+      const im = document.createElement('img');
+      im.referrerPolicy = 'no-referrer';
+      im.alt = '';
+      // the card grows once the image lands - re-clamp it to the viewport
+      im.addEventListener('load', peekPlace);
+      im.addEventListener('error', () => { im.remove(); peekPlace(); });
+      im.src = p.image;
+      peekEl.appendChild(im);
+    }
     const site = document.createElement('div');
     site.className = 'psite';
     try { site.textContent = (p && p.site) || new URL(url).hostname; }
@@ -6836,16 +6921,6 @@
       const dd = document.createElement('div');
       dd.className = 'pdesc'; dd.textContent = loading ? '…' : p.description;
       peekEl.appendChild(dd);
-    }
-    if (p && p.image && peekMode === 2) {
-      const im = document.createElement('img');
-      im.referrerPolicy = 'no-referrer';
-      im.alt = '';
-      // the card grows once the image lands - re-clamp it to the viewport
-      im.addEventListener('load', peekPlace);
-      im.addEventListener('error', () => { im.remove(); peekPlace(); });
-      im.src = p.image;
-      peekEl.appendChild(im);
     }
     peekEl.hidden = false;
     peekPlace();
