@@ -1284,8 +1284,9 @@
   /* an accent wash when the emote was just used in chat - bright pop,
      slow tail so it stays readable while the grid resorts */
   #emoteGrid button.justused, #emoteRecent button.justused { animation: eflash 3.6s ease-out; }
-  /* each flash takes the next golden-angle hue via --fc, so simultaneous
-     flashes glow in different colours rather than one accent wash */
+  /* each flash takes the next hue in a slow spectral walk via --fc -
+     sequential uses read as a colour progression, ~15 steps round the
+     wheel */
   @keyframes eflash {
     from { background: color-mix(in srgb, var(--fc, var(--accent)) 95%, transparent); }
     45% { background: color-mix(in srgb, var(--fc, var(--accent)) 55%, transparent); }
@@ -6686,8 +6687,9 @@
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
-  // each use claims the next golden-angle hue so simultaneous flashes
-  // glow in different colours; the map keeps it stable across rebuilds
+  // each use steps the flash hue ~24 degrees round the wheel so the
+  // order of uses reads as a slow spectral walk; the map keeps a cell's
+  // colour stable across rebuilds
   const flashHues = new Map();
   let flashHueNext = Math.floor(Math.random() * 360);
   let resortTimer = 0;
@@ -6761,7 +6763,7 @@
     if (emotePick.hidden) return;
     flashSet.add(n);
     flashT0.set(n, Date.now());
-    flashHues.set(n, flashHueNext = (flashHueNext + 137.508) % 360);
+    flashHues.set(n, flashHueNext = (flashHueNext + 24) % 360);
     poke(n);
     flashLater(n);
     if (epickSort === 'use' && !resortTimer)
