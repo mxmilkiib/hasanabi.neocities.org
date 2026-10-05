@@ -18,7 +18,8 @@ not versions — the page ships continuously to Neocities.
   resizes stop at the edge they face
 - `live tv` reorders to us, uk, eu, west asia, asia, au/ca, africa,
   latam, and fox news + ms now join the us cable group
-  (tv-login streams)
+  (tv-login streams); the us block also gains bloomberg, yahoo
+  finance and fox weather, plus la locals ktla, abc7 and fox 11
 
 ## 2026-10-04
 
