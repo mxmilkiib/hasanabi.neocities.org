@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- twitter links now lead with the twitter favicon like every other
+  chat link - including profile links rewritten to nitter, and nitter
+  urls pasted raw (ddg has no icon for twitter.com, so x.com's serves)
 - the trivia Chatting emote actually relocates now: the lift matches the
   rendered img in the message html, so bttv emotes move too - the old
   scan only read the twitch emote spec, which never lists bttv's

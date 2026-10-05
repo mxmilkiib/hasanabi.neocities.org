@@ -1973,7 +1973,10 @@
           else { reqTweet(st[1]); pendingTw.push(`<span class="twprev" data-twid="${st[1]}"></span>`); }
         }
         const twDisp = `twitter.com${path}`;
-        out.push(`<a${shiny ? ' class="shimmer"' : ''} href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${escapeHTML(cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
+        // the icon always asks for x.com: profile hrefs reroute to nitter
+        // (whose own favicon means nothing), and ddg 404s twitter.com
+        const twIco = lkIco ? '<img class="lkico" src="https://icons.duckduckgo.com/ip3/x.com.ico" alt="" loading="lazy" referrerpolicy="no-referrer">' : '';
+        out.push(`<a${shiny ? ' class="shimmer"' : ''} href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${twIco}${escapeHTML(cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
       }
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
@@ -1996,7 +1999,12 @@
           const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?/#]|$)/i.test(url);
           let ico = '';
           if (lkIco) {
-            try { ico = `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(new URL(u.replace(/&amp;/g, '&')).hostname)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`; }
+            try {
+              // nitter mirrors of twitter get the x icon, not the
+              // instance's own (usually absent) one
+              const icoHost = new URL(u.replace(/&amp;/g, '&')).hostname;
+              ico = `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(/(?:^|\.)nitter/i.test(icoHost) ? 'x.com' : icoHost)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
+            }
             catch { /* a malformed url keeps the bare text */ }
           }
           // a watchable youtube link gets a ▶ glyph that unfolds the
