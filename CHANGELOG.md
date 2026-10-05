@@ -47,6 +47,10 @@ not versions — the page ships continuously to Neocities.
   rows but scales art and type too); clicking a lit size drops back to
   normal, and the pick persists like the other option chips - old '1'
   saves still read as 2x
+- authors audit batch: tagline source links for makhno (struggle
+  against the state), feinberg (transgender liberation) and bauman
+  (liquid fear); remaining plain annotations are deliberately plain -
+  movements, orgs and descriptive labels have no single source text
 - input history persists across reloads: sent lines and ↓-parked
   drafts save to localStorage (100-deep ring, same as before), so ↑
   after a refresh still walks them
