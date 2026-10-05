@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the emote picker's emoji are searchable by name and keyword
+  (cldr/emojibase annotations - 'heart', 'cat', 'pizza'), and each
+  emoji's tooltip names it
 - emote tokens resolve case-insensitively, so lower-case bot commands
   (`fishh`, `farmm`) paint their emote; a folded index maps each token
   back to its canonical name for the image, tooltip, usage stats,
