@@ -12,7 +12,11 @@ not versions — the page ships continuously to Neocities.
   neighbour's territory - the line now sits on the seam between slots
   and tints can't bleed over it
 - resolved giphy gifs pin to the right edge like image embeds, and
-  the row keeps its line height; unresolved gif titles stay inline
+  the row keeps its line height; unresolved gif titles stay inline.
+  gifs paint above the separator lines, sit left of a right-pinned
+  sub chip (with a width cap so they don't drop below it), and the
+  right cluster/pinned emotes stay above a gif reaching up from a
+  lower row. gifs inside reply quotes stay in the quote's flow
 - reply quote indentation anchors to the leading edge of the
   badge/role/name cluster instead of the name itself - a responder
   without badge icons no longer leaves the quoted line shallow

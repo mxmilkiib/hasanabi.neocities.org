@@ -638,9 +638,16 @@
      overflow lands on empty space rather than over message text. */
   .imglnk { float: right; margin-left: 6px; }
   /* Resolved gif posts pin the same way once the image lands; the
-     negative top margin keeps the row at its line height. */
-  .gifq:has(.gifimg) { float: right; margin-left: 6px; }
-  .gifq .gifimg { margin-top: -4em; }
+     negative top margin keeps the row at its line height. Top-level
+     gifs only - one inside a reply quote stays in the quote's flow so
+     the row's right chips keep the edge. The cap keeps the float
+     beside a right chip rather than dropping below it. */
+  .row > .gifq:has(.gifimg) { float: right; margin-left: 6px; position: relative; z-index: 2; }
+  .gifq .gifimg { margin-top: -4em; max-width: 60%; }
+  /* a right-pinned sub chip or emote stack stays above a gif that
+     reaches into its row's space from below */
+  .auxr { position: relative; z-index: 3; }
+  main.em-right .row.eonly > .emote, main.em-right .row.eonly > .estk { z-index: 3; }
   .row.mention {
     --rowtint: linear-gradient(rgba(232, 163, 61, .13) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
