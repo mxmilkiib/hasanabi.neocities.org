@@ -738,7 +738,7 @@
   #themeBtn.tall { font-size: .88em; }
   /* flexes to fill the free header space; sparkSize() matches the buffer to
      the laid-out width whenever it changes so it never rasterises blurry */
-  #spark { height: 22px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
+  #spark { height: 26px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   #sendBtn.on { border-color: #9146ff; } /* twitch purple while logged in */
@@ -1296,7 +1296,7 @@
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(2px,1px) scale(2)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
+  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(1px,1px) scale(2)">☻</span></button><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button></div></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
@@ -2494,7 +2494,7 @@
 
   // ---- msgs/sec sparkline: one sample per second, 4-minute window ----
   const DPR = window.devicePixelRatio || 1;
-  const SPARK_H = 22;
+  const SPARK_H = 26;
   const SPARK_WINDOWS = [30, 60, 120, 240];
   // the window grows with the rendered width (~3px per second of history),
   // so the stretched graph-mode bar shows longer history instead of a
@@ -2502,6 +2502,13 @@
   let sparkWin = SPARK_WINDOWS[SPARK_WINDOWS.length - 1];
   sparkEl.height = SPARK_H * DPR;
   const sparkCtx = sparkEl.getContext('2d');
+  // stroke positions quantise to the device grid: a wDev-pixel line
+  // centres on a half-pixel when wDev is odd and a pixel edge when even,
+  // so strokes land crisp at any scaling factor; fills snap their edges
+  // to whole device pixels
+  const snapDev = (v, wDev) => (Math.round(v * DPR) + (wDev % 2 ? .5 : 0)) / DPR;
+  const snapFill = (v) => Math.round(v * DPR) / DPR;
+  const devPx = (w) => Math.max(1, Math.round(w * DPR));
   const rateSamples = [];
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
@@ -2513,6 +2520,7 @@
     sparkEl.width = Math.max(1, Math.round(sparkEl.clientWidth * DPR)); // resets the transform
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
     sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · dim bands mark time the page wasn't watching`;
+    sparkEl.setAttribute('aria-label', sparkEl.title);
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
     drawSpark();
@@ -2574,11 +2582,12 @@
     for (let p = 0; p < SPARK_N; p++) {
       const sec = newestSec - (SPARK_N - 1 - p);
       if (sec % 10) continue;
-      const x = Math.round(p * step) + .5;
       const minute = sec % 60 === 0;
       const half = !minute && sec % 30 === 0;
+      const wDev = devPx(minute ? 2 : half ? 1.5 : 1);
+      const x = snapDev(p * step, wDev);
       sparkCtx.beginPath();
-      sparkCtx.lineWidth = minute ? 2 : half ? 1.5 : 1;
+      sparkCtx.lineWidth = wDev / DPR;
       sparkCtx.globalAlpha = minute ? .75 : half ? .6 : .45;
       sparkCtx.moveTo(x, 0);
       sparkCtx.lineTo(x, SPARK_H);
@@ -2595,19 +2604,21 @@
     sparkCtx.globalAlpha = .2;
     for (let i = 0; i < n; i++)
       if (!Number.isFinite(rateSamples[i]))
-        sparkCtx.fillRect((i + SPARK_N - n) * step, 0, Math.max(step, 1), SPARK_H);
+        sparkCtx.fillRect(snapFill((i + SPARK_N - n) * step), 0,
+          Math.max(snapFill(step), 1 / DPR), SPARK_H);
     sparkCtx.globalAlpha = 1;
     sparkCtx.beginPath();
+    const tDev = devPx(1);
     let penDown = false;
     for (let i = 0; i < n; i++) {
       if (!Number.isFinite(rateSamples[i])) { penDown = false; continue; }
-      const x = (i + SPARK_N - n) * step;
-      const y = SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3);
+      const x = snapDev((i + SPARK_N - n) * step, tDev);
+      const y = snapDev(SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3), tDev);
       penDown ? sparkCtx.lineTo(x, y) : sparkCtx.moveTo(x, y);
       penDown = true;
     }
     sparkCtx.strokeStyle = accent;
-    sparkCtx.lineWidth = 1;
+    sparkCtx.lineWidth = tDev / DPR;
     sparkCtx.stroke();
     sparkCtx.lineTo(SPARK_W, SPARK_H);
     sparkCtx.lineTo((SPARK_N - n) * step, SPARK_H);
@@ -2619,15 +2630,16 @@
     // seconds with more than two glorp/F messages get a red segment
     const danger = sparkCols.danger;
     sparkCtx.strokeStyle = danger;
-    sparkCtx.lineWidth = 2;
+    const gDev = devPx(2);
+    sparkCtx.lineWidth = gDev / DPR;
     for (let i = 0; i < n; i++) {
       if (!Number.isFinite(rateSamples[i]) || (glorpSamples[i] || 0) <= 2) continue;
-      const x = (i + SPARK_N - n) * step;
-      const y = SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3);
+      const x = snapDev((i + SPARK_N - n) * step, gDev);
+      const y = snapDev(SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3), gDev);
       sparkCtx.beginPath();
       if (i && Number.isFinite(rateSamples[i - 1])) {
-        sparkCtx.moveTo((i - 1 + SPARK_N - n) * step,
-          SPARK_H - 1 - (rateSamples[i - 1] / max) * (SPARK_H - 3));
+        sparkCtx.moveTo(snapDev((i - 1 + SPARK_N - n) * step, gDev),
+          snapDev(SPARK_H - 1 - (rateSamples[i - 1] / max) * (SPARK_H - 3), gDev));
       } else sparkCtx.moveTo(x, y);
       sparkCtx.lineTo(x, y);
       sparkCtx.stroke();

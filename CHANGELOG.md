@@ -6,7 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
-- the chat-bar emote button's ☻ shifts 2px right to sit centred
+- the chat-bar emote button's ☻ shifts 1px right to sit centred
+- the rate graph grows to the header's full 26px row height, and its
+  ticks, trace and glorp marks quantise to the device-pixel grid so
+  strokes render crisp at any display scaling
 - the header's vertical spacing balances at 3px above and below the
   buttons (was 4/2); the corner `?`/`–` pair and their labels track
   the new top edge, and the channel block keeps a 2px nudge so its
