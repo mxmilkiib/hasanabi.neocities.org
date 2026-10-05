@@ -88,23 +88,15 @@ not versions — the page ships continuously to Neocities.
   parked beside fox news
 - the authors tab's `all` mode no longer wraps dates in a second
   pair of brackets - entries read `(work · tagline, dates)` again
-- author taglines that quote a different work than the named one now
-  link to their own source via `data-g`: proudhon's *what is
-  property*, stirner's *ego and its own*, bakunin's *reaction in
-  germany*, kropotkin's *conquest of bread*, chomsky's *responsibility
-  of intellectuals*, scott's *weapons of the weak*, engels' *socialism:
-  utopian and scientific*, the communist manifesto, debs' court
-  statement, luxemburg's *russian revolution*, the april theses, mao's
-  *serve the people*, c.l.r. james' *every cook can govern*, claudia
-  jones' *neglect of the negro woman*, woolf's *a room of one's own*,
-  benjamin's *theses on history*, harvey's *right to the city*,
-  lessig's *code v2*, stallman's free-software essay, lorca's *duende*
-  lecture and doctorow's *seize the means of computation*; a tagline
-  naming the already-linked work stays plain
-- nine more author works gain `data-w` links - rocker, de cleyre,
-  balagoon, sitrin, bookchin, camus, le guin and fisher's two
-  entries - and malcolm x's *ballot or the bullet* moves off a
-  host-blocked copy
+- author taglines that quote or name source material now link through
+  `data-g`; a same-source tagline links in themes mode, while merged
+  all mode suppresses a duplicate link to the same url
+- author work qualifiers link only when they identify concrete source
+  material through `data-w`; movements, doctrines, organisations and
+  descriptive labels stay plain instead of pretending to be titles
+- the author-source audit adds full-text, archive and publisher links
+  across anarchist library, marxists.org, gutenberg, wikisource,
+  monoskop, archive.org and author or foundation sites
 - blammobot's game-tag chips space their brackets - `[ Trivia ]`,
   `[ Roulette ]` and friends match the `[sub 12]` chip style
 - a url whose fragment ends in an image extension (`…#/media/
@@ -122,16 +114,10 @@ not versions — the page ships continuously to Neocities.
   it now fits three to five
 
 ### Additions
-- the authors tab links the named work in each qualifier: 46 more
-  `data-w` targets join the original 13 - theanarchistlibrary,
-  marxists.org, gutenberg, wikisource, monoskop and archive.org pdfs
-  and texts for berkman, ervin, scott, graeber, mao, haywood,
-  c.l.r. james, sartre, che, debord, zinn, kanafani, harvey, russell,
-  orwell, malcolm x, mlk, mike davis, beauvoir, lorde, selma james,
-  ehrlich, hooks, sappho, whitman, carpenter, proust, lorca, woolf,
-  hall, ginsberg, foucault, wittig, feinberg, butler, horkheimer,
-  marcuse, adorno, arendt, bauman, habermas, bourdieu, boal, raymond,
-  lessig and doctorow
+- the authors tab links named works and source-derived taglines in
+  every info mode: works use `data-w`, taglines use `data-g`, and
+  sorting or switching modes preserves the links without duplicating
+  the same source in the merged `all` annotation
 - `live tv` doubles its count and splits into region subsections led
   by us: pbs, livenow fox, democracy now and free speech
   tv join the us block; arirang joins asia, channels tv and sabc
