@@ -510,18 +510,21 @@
     --rowtint: linear-gradient(transparent, transparent);
     --rowbar: linear-gradient(transparent, transparent);
     background-image:
-      linear-gradient(var(--rowline, var(--line)) 0 0),
       var(--rowbar),
-      var(--rowtint);
+      var(--rowtint),
+      linear-gradient(var(--rowline, var(--line)) 0 0);
     background-repeat: no-repeat;
     background-size:
-      100% 1px,
       4px calc(100% - var(--rowin) * 2),
-      100% calc(100% - var(--rowin) * 2);
+      100% calc(100% - var(--rowin) * 2),
+      100% 1px;
+    /* the separator rides 1px into the seam above the slot - a highlight's
+       top edge stays clean like its bottom edge, and the layer order lets
+       the tint win outright when there's no seam to sit in */
     background-position:
       0 var(--rowin),
       0 var(--rowin),
-      0 var(--rowin);
+      0 max(0px, calc(var(--rowin) - 1px));
     word-wrap: break-word;
     position: relative;
   }

@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- row separators sit 1px into the seam above each row's tint, so a
+  highlighted row's top edge stays clean like its bottom edge; where
+  there's no seam to sit in, the tint simply paints over the line
 - row separators now draw a line on the seam between a reply's quote
   line and the reply itself
 - a growing message box no longer lets fresh rows slide under it - a
