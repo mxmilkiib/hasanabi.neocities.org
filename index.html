@@ -1434,7 +1434,7 @@
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns violet once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
-    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in</span></div>
+    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in</span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
@@ -5887,6 +5887,22 @@
   // parked draft sits under whatever gets sent after it
   const hist = [];
   const parked = new Set(); // hist indexes holding parked drafts, not sent
+  // the walk survives reloads - sent lines and parked drafts restore
+  const INHIST_KEY = 'hasan-inhist' + CHAN_SFX;
+  try {
+    const sv = JSON.parse(localStorage.getItem(INHIST_KEY) || 'null');
+    if (sv && Array.isArray(sv.h)) {
+      hist.push(...sv.h.slice(-100));
+      for (const i of sv.p || []) if (i >= 0 && i < hist.length) parked.add(i);
+    }
+  } catch {}
+  const writeHist = () => { try { localStorage.setItem(INHIST_KEY, JSON.stringify({ h: hist, p: [...parked] })); } catch {} };
+  let histSaveT = 0;
+  const saveHist = (now) => {
+    clearTimeout(histSaveT);
+    if (now) writeHist(); else histSaveT = setTimeout(writeHist, 300);
+  };
+  addEventListener('pagehide', () => saveHist(true));
   let histIdx = null, histDraft = '';
   const histGo = (dir) => {
     if (histIdx === null) {
@@ -5894,6 +5910,7 @@
         if (!chatInput.value) return;
         hist.push(chatInput.value);
         parked.add(hist.length - 1);
+        saveHist();
         chatInput.value = '';
         chatInput.setSelectionRange(0, 0);
         growInput();
@@ -5943,7 +5960,7 @@
     // typing while walking edits the shown history entry in place - a
     // walk back out would otherwise revert to the stale stashed draft
     // and silently discard the added text
-    if (histIdx !== null && histIdx < hist.length) hist[histIdx] = chatInput.value;
+    if (histIdx !== null && histIdx < hist.length) { hist[histIdx] = chatInput.value; saveHist(); }
     growInput();
   });
   paintLen();
@@ -6032,6 +6049,7 @@
         for (const i of [...parked]) { parked.delete(i); if (i > 0) parked.add(i - 1); }
       }
     }
+    saveHist();
     // a send from inside a walk hands the stashed draft back to the box -
     // the entry was sent but the half-written text was never its own
     const shelved = histIdx !== null && histDraft;

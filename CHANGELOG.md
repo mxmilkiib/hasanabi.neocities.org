@@ -47,6 +47,9 @@ not versions — the page ships continuously to Neocities.
   rows but scales art and type too); clicking a lit size drops back to
   normal, and the pick persists like the other option chips - old '1'
   saves still read as 2x
+- input history persists across reloads: sent lines and ↓-parked
+  drafts save to localStorage (100-deep ring, same as before), so ↑
+  after a refresh still walks them
 - the emote picker's geometry rides the settings bundle too: a dragged
   size (and floating position, when torn free) now lands in copied
   settings urls as epgeo=WxH or epgeo=WxH,L,T, in saved opts and theme
