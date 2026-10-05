@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- in use sort, an emote seen within the last minute pins to the very
+  top of the picker grid - a negative grid order puts it ahead of the
+  recents strip and every section header, freshest first. the pin drops
+  on a rebuild timer when the minute lapses, and re-use resets it
 - the @hasanabi rainbow is generated per mention now, not fixed: each
   draws the next palette - a hue arc at a golden-angle start with its
   own spread/sat/light; full arcs march one way, partial arcs breathe

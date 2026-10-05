@@ -6381,6 +6381,10 @@
   const flashSet = new Set();
   const flashTimers = new Map();
   let resortTimer = 0;
+  // a use within the last minute pins its button to the very top of the
+  // grid (grid order beats the recent strip and every section header)
+  const FRESH_MS = 6e4;
+  let freshTimer = 0;
   const poke = (name) => {
     for (const b of emoteGrid.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`)) {
       b.classList.remove('justused');
@@ -6447,10 +6451,22 @@
     const q = emoteQ.value.trim().toLowerCase();
     const hit = (n) => !q || n.toLowerCase().includes(q);
     const ehit = (c) => !q || (EMOJI_KW[c] || '').toLowerCase().includes(q);
-    const ejiBtn = (c) => `<button type="button" class="eji" data-ins="${c}" title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
+    // used in the last minute and not searching? the button floats to
+    // the top of the whole grid, freshest first - and a timer rebuilds
+    // the grid when the oldest pin lapses so it drops back home
+    const now = Date.now();
+    let freshEdge = 0;
+    const pin = (n) => {
+      if (q || epickSort !== 'use') return '';
+      const age = now - (useTs[n] || 0);
+      if (age >= FRESH_MS) return '';
+      if (age > freshEdge) freshEdge = age;
+      return ` style="order:${Math.round((age - FRESH_MS) / 1e3)}"`;
+    };
+    const ejiBtn = (c) => `<button type="button" class="eji" data-ins="${c}"${pin(c)} title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
     const btn = (n, src, img, a) => {
       const e = escapeHTML(n);
-      return `<button type="button" data-ins="${e}"${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
+      return `<button type="button" data-ins="${e}"${pin(n)}${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
         `<img src="${escapeHTML(img)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
@@ -6574,6 +6590,11 @@
       for (const s of secs) h += s[1];
     }
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
+    clearTimeout(freshTimer);
+    freshTimer = freshEdge ? setTimeout(() => {
+      freshTimer = 0;
+      if (!emotePick.hidden) rebuildPicker();
+    }, FRESH_MS - freshEdge + 250) : 0;
   }
   // a pinned picker floats free of the chat bar and ignores its closes;
   // the pin state persists, so a pinned picker reopens on the next load
