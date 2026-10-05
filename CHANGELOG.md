@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- @hasanabi mention palettes went pastel: the generator's saturation
+  band dropped from 62-87% to 44-61% and lightness lifted from 57-72%
+  to 69-81%, so the per-author sweeps read as soft tints rather than
+  candy; the notice label's own rainbow is unchanged
 - the [notice] label stands upright inside its italic notice row -
   clearer as a chip than slanted text
 - fossabot resub lines link their subber now: 'Nick just subbed for N

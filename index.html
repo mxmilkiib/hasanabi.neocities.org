@@ -1687,14 +1687,14 @@
 
   // each @hasanabi mention takes the next generated palette: a hue arc
   // at a golden-angle start (so consecutive schemes open on unrelated
-  // colours) with its own spread, saturation and lightness, mirrored
-  // into a palindrome so the position sweep loops seamlessly whatever
-  // the arc length - mentions cycle distinct moods, not one rainbow
+  // colours) with its own spread, saturation and lightness - low sat,
+  // high light keeps them pastel - mirrored into a palindrome so the
+  // position sweep loops seamlessly whatever the arc length
   let rbwSeq = 0;
   function rbwPalette(i) {
     const h0 = (i * 137.508) % 360;
     const arc = [360, 220, 160, 280][i % 4];
-    const s = 62 + (i * 13) % 26, l = 57 + (i * 7) % 16;
+    const s = 44 + (i * 13) % 18, l = 69 + (i * 7) % 13;
     const fwd = [];
     for (let k = 0; k <= 4; k++)
       fwd.push(`hsl(${Math.round((h0 + arc * k / 4) % 360)} ${s}% ${l}%)`);
