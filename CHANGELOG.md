@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- a reply's quote band no longer doubles the colon after the quoted
+  nick - the parent's own colon span was being cloned into the body
 - a link preview's body text now wraps into the space under the floated
   image instead of staying squeezed beside it - the line clamp moved
   from -webkit-box to a clip-path so the wrap survives

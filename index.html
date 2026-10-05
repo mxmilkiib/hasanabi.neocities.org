@@ -2419,7 +2419,7 @@
     const qi = rq.querySelector('i');
     qi.textContent = '';
     for (let n = pnm.nextSibling; n; n = n.nextSibling)
-      if (n.nodeType !== 1 || !n.matches('.rplybtn, .aux, .auxr, .sub'))
+      if (n.nodeType !== 1 || !n.matches('.rplybtn, .colon, .aux, .auxr, .sub'))
         qi.appendChild(n.cloneNode(true));
   }
   function flush() {
