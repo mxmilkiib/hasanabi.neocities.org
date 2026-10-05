@@ -1133,7 +1133,11 @@
   /* the hint reads as a prompt, not typed text, and steps aside on focus */
   #chatInput::placeholder { font-style: italic; }
   #chatInput:focus::placeholder { opacity: 0; }
-  #chatbar input:focus, #chatbar textarea:focus { outline: 1px solid var(--accent); outline-offset: 0; }
+  /* focus recolours the box's own 1px border instead of drawing an
+     outline - an outline adds a ring outside the box and reads as growth;
+     the long-message warn tints keep theirs */
+  #chatbar textarea:focus { outline: none; }
+  #chatbar textarea:focus:not(.longmsg, .overcap) { border-color: var(--accent); }
   /* emote picker popup over the chatbar - chatterino-style scrollable grid */
   /* a touch of breathing room either side */
   /* the glyph is scaled up in markup - a modest font-size + clipped box
