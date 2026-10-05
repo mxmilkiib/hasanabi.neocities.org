@@ -2168,7 +2168,10 @@
   const liveDist = (col) => revFlow
     ? col.scrollTop + col.scrollHeight - col.clientHeight
     : col.scrollHeight - col.scrollTop - col.clientHeight;
-  const snapLive = (col) => { col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : col.scrollHeight; };
+  // the scroll event from a follow pin is programmatic, not a user scroll -
+  // the peek card ignores it or every new row would drop an open preview
+  let autoScrollAt = 0;
+  const snapLive = (col) => { autoScrollAt = performance.now(); col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : col.scrollHeight; };
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
   // every msg id already handled, so replayed backfill lines can't duplicate
@@ -7733,7 +7736,7 @@
   document.addEventListener('mousemove', (e) => { if (peekUrl) { peekX = e.clientX; peekY = e.clientY; } });
   // relatedTarget null means the pointer left the window entirely
   document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) peekHide(); });
-  addEventListener('scroll', peekHide, true);
+  addEventListener('scroll', () => { if (performance.now() - autoScrollAt > 150) peekHide(); }, true);
   addEventListener('mousedown', peekHide, true);
   addEventListener('blur', peekHide);
   addEventListener('keydown', (e) => { if (e.key === 'Escape') peekHide(); });
