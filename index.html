@@ -1694,7 +1694,7 @@
   function rbwPalette(i) {
     const h0 = (i * 137.508) % 360;
     const arc = [360, 220, 160, 280][i % 4];
-    const s = 44 + (i * 13) % 18, l = 69 + (i * 7) % 13;
+    const s = 34 + (i * 13) % 14, l = 74 + (i * 7) % 12;
     const fwd = [];
     for (let k = 0; k <= 4; k++)
       fwd.push(`hsl(${Math.round((h0 + arc * k / 4) % 360)} ${s}% ${l}%)`);

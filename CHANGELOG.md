@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- @hasanabi palettes pushed further into pastel: 44-61% sat -> 34-47%,
+  69-81% light -> 74-85%
 - the video popup picks up a stream that starts while it's open: the
   embed sits paused/ended on the offline slate, so a real offline->live
   flip now calls play() on the idle player - already-playing embeds
