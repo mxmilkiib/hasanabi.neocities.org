@@ -1271,7 +1271,7 @@
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
-    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark confirmed logging gaps - socket loss or a closed page (missed lines backfill on wake); grey bands mark stretches where chat went silent with no outage recorded</div>
+    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups</span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -2203,7 +2203,10 @@
     // rateTimes is parallel to rateSamples; a reconnect can shade the
     // socket-down span even when its samples were already drawn as 0
     for (let i = 0; i < rateSamples.length; i++)
-      if (rateTimes[i] && s < rateTimes[i] && e > rateTimes[i] - 1000) rateSamples[i] = NaN;
+      if (rateTimes[i] && s < rateTimes[i] && e > rateTimes[i] - 1000) {
+        rateSamples[i] = NaN;
+        rateWhy[i] = why;
+      }
   }
   // '19:27[:43] PM' back to wall-clock ms for restored rows saved before
   // data-ts existed; assumes today, stepping back a day if it lands ahead
@@ -2695,6 +2698,9 @@
   const rateTimes = []; // wall-clock end of each sample, parallel to rateSamples
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
+  // outage cause per sample, parallel to rateSamples - '' for live ones;
+  // lets dead bands colour socket loss and a closed page differently
+  const rateWhy = [];
   let sparkCols = null; // theme colours, resolved once instead of per draw
 
   function sparkSize() {
@@ -2719,10 +2725,11 @@
     const hCss = (sparkEl.height / DPR) + 'px';
     if (sparkEl.style.height !== hCss) sparkEl.style.height = hCss;
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · red bands mark socket loss or a closed page · grey bands mark a silent stretch with no recorded outage`;
+    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · red bands mark socket loss · violet bands mark a closed or discarded page · grey bands mark a silent stretch with no recorded outage`;
     sparkEl.setAttribute('aria-label', sparkEl.title);
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (rateTimes.length > n) rateTimes.splice(0, rateTimes.length - n);
+    if (rateWhy.length > n) rateWhy.splice(0, rateWhy.length - n);
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
     drawSpark();
   }
@@ -2788,6 +2795,7 @@
         accent: styles.getPropertyValue('--spark').trim() ||
           complement(styles.getPropertyValue('--accent').trim() || '#e8a33d', parseFloat(styles.getPropertyValue('--sh-bg')) || -1),
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
+        vip: styles.getPropertyValue('--vip') || '#a050c0',
       };
     }
     const step = SPARK_W / (SPARK_N - 1); // ~1px per sample
@@ -2815,15 +2823,18 @@
     if (!n) return;
     const accent = sparkCols.accent;
     const max = Math.max(1, ...rateSamples.filter(Number.isFinite));
-    // NaN samples = seconds the page wasn't logging (socket loss or a
-    // closed page); the danger wash marks the dead zone so it doesn't
-    // read as a fuzzy smudge or a quiet chat
-    sparkCtx.fillStyle = sparkCols.danger;
+    // NaN samples = seconds the page wasn't logging. the band colour names
+    // the cause: danger for a socket that dropped under an open page, vip
+    // for a page that was closed or discarded - one's a fault, the other's
+    // just the tab being away, and they shouldn't read the same
     sparkCtx.globalAlpha = .25;
-    for (let i = 0; i < n; i++)
-      if (!Number.isFinite(rateSamples[i]))
-        sparkCtx.fillRect(snapFill((i + SPARK_N - n) * step), 0,
-          Math.max(snapFill(step), 1 / DPR), SPARK_H);
+    for (let i = 0; i < n; i++) {
+      if (!Number.isFinite(rateSamples[i])) continue;
+      sparkCtx.fillStyle = /closed|discarded/.test(rateWhy[i] || '')
+        ? sparkCols.vip : sparkCols.danger;
+      sparkCtx.fillRect(snapFill((i + SPARK_N - n) * step), 0,
+        Math.max(snapFill(step), 1 / DPR), SPARK_H);
+    }
     sparkCtx.globalAlpha = 1;
     // silent stretches with no recorded outage (a gap notice that named no
     // cause) band in a quiet grey - a flatter look than the danger wash so
@@ -2888,7 +2899,7 @@
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
   function saveSpark() {
     try {
-      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, glorp: glorpSamples, chat: [...chatterSeen], quiet: quietGaps }));
+      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, chat: [...chatterSeen], quiet: quietGaps }));
     } catch {}
   }
   function restoreSpark() {
@@ -2904,6 +2915,11 @@
       rateTimes.push(
         ...oldRate.map((_, i) => savedAt - (oldRate.length - i) * 1000),
         ...Array.from({ length: gap }, (_, i) => savedAt + (i + 1) * 1000));
+      // saved causes ride with the samples; older saves have none, and the
+      // closed-gap positions get theirs from markAway just below
+      const oldWhy = (Array.isArray(d.why) ? d.why.slice(-win) : []);
+      while (oldWhy.length < oldRate.length) oldWhy.unshift('');
+      rateWhy.push(...oldWhy, ...Array(gap).fill(''));
       if (d.t) markAway(savedAt, now,
         document.wasDiscarded ? 'tab discarded by browser' : 'page closed');
       if (Array.isArray(d.quiet)) {
@@ -2919,6 +2935,7 @@
       }
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
       if (rateTimes.length > win) rateTimes.splice(0, rateTimes.length - win);
+      if (rateWhy.length > win) rateWhy.splice(0, rateWhy.length - win);
       if (glorpSamples.length > win) glorpSamples.splice(0, glorpSamples.length - win);
     } catch {}
   }
@@ -2938,7 +2955,9 @@
       const sec = Math.floor(t / 1000);
       let n = 0;
       for (let j = 0; j < 5; j++) n += rateCounts.get(sec - j) || 0;
-      rateSamples.push(gapCause(t - 1000, t) ? NaN : n / 5);
+      const why = gapCause(t - 1000, t);
+      rateSamples.push(why ? NaN : n / 5);
+      rateWhy.push(why);
       rateTimes.push(t);
       glorpSamples.push(glorpCounts.get(sec) || 0);
     }
@@ -2965,9 +2984,11 @@
     chattersEl.hidden = !nc;
     chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
     rateSamples.push(downAt ? NaN : rate);
+    rateWhy.push(downAt ? 'socket dropped' : '');
     rateTimes.push(now);
     if (rateSamples.length > sparkWin) rateSamples.splice(0, rateSamples.length - sparkWin);
     if (rateTimes.length > sparkWin) rateTimes.splice(0, rateTimes.length - sparkWin);
+    if (rateWhy.length > sparkWin) rateWhy.splice(0, rateWhy.length - sparkWin);
     const gcut = Date.now() - 1000;
     while (glorpTimestamps.length && glorpTimestamps[0] < gcut) glorpTimestamps.shift();
     glorpSamples.push(glorpTimestamps.length);
@@ -3166,7 +3187,9 @@
     const since = stream.startedAt ? fmtTime(stream.startedAt) : '';
     const viewers = stream.viewers != null ? ` · ${stream.viewers.toLocaleString()} watching` : '';
     const chatSuffix = chatState === 'connected' ? '' : ` · ${chatTxt}`;
-    setDot('connected');
+    // a dropped socket under a live stream still shows on the dot (and so
+    // the favicon) - green stays honest only while chat is up too
+    setDot(chatState === 'connected' ? 'connected' : chatState || 'reconnecting');
     infoEl.innerHTML = statusView === 2 ? '<b>live</b>'
       : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')

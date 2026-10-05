@@ -152,6 +152,12 @@ not versions — the page ships continuously to Neocities.
   preview still applies
 - chat links can lead with the site's favicon, fetched from
   duckduckgo's icon service - `link favicons` in the `?` popup
+- the rate graph splits its outage bands by cause: red for a socket that
+  dropped under an open page, violet for the page itself having been
+  closed or discarded; the cause rides along in the spark save, so a
+  reload keeps the distinction
+- a dropped socket now shows on the status dot and favicon even while
+  the stream is live - the live state used to pin them green regardless
 - nitter profile links no longer carry a doubled slash that some
   instances answer with a 400 - the relay strips the tracker href's
   trailing slash and the page normalises too, so an older relay keeps
