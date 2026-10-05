@@ -11,7 +11,8 @@ not versions — the page ships continuously to Neocities.
   emote size with the band on the full row line-height; a parent that
   left the log keeps the plain-text fallback, and other inline media
   caps at big-emote height
-- the chat-bar emote button's ☻ shifts 1px right to sit centred
+- the chat-bar emote button's ☻ stretches 1px wider leftwards so its
+  centre sits centred in the button
 - the rate graph grows to the header's full 26px row height, and its
   ticks, trace and glorp marks quantise to the device-pixel grid so
   strokes render crisp at any display scaling
