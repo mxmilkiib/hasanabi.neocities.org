@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the picker's recents strip now counts emotes typed or pasted into the
+  box and sent, not just grid clicks: sent tokens resolve through the
+  emoji set, case-folded third-party names, then twitch set codes, and a
+  matched send redraws an open picker so the strip updates live. strip
+  items still appear in their normal sections below
 - @mentions now get their bold accent chip everywhere, not just message
   bodies - reply quotes, notice rows, tweet cards and fossa columns all
   go through linkifyEsc, which gained a mention alternative after the

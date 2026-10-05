@@ -5736,6 +5736,10 @@
         'reply-parent-msg-body': ctx.body } : {}) }, login: auth.login,
       kind: 'PRIVMSG', message: shown, channel: '#' + target, local: true };
     queueMessage(echoMsg, false);
+    // typed and pasted emotes count as recents too, same as picker clicks
+    let bumped = false;
+    for (const t of inner.split(/\s+/)) if (t && noteRecentName(t, target)) bumped = true;
+    if (bumped && !emotePick.hidden) rebuildPicker();
     if (chan) chan.postMessage({ type: 'echo', msg: echoMsg });
     pendingEcho.push(target + '\x00' + echoKey(auth.login, echoMsg.tags, shown));
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
@@ -6343,8 +6347,29 @@
     const img = b.querySelector('img');
     const r = { n: b.dataset.ins, a: b.dataset.a === '1' };
     if (img) { r.src = (b.title.split(' - ')[1] || ''); r.img = img.getAttribute('src'); }
+    addRecent(r);
+  }
+  function addRecent(r) {
     epickRecent = [r, ...epickRecent.filter((x) => x.n !== r.n)].slice(0, EPICK_RECENT_MAX);
     try { localStorage.setItem(EPICK_RECENT_KEY, JSON.stringify(epickRecent)); } catch {}
+    return r;
+  }
+  // a token the user sent counts as a recent too, not just picker
+  // clicks - resolves through the same maps the grid does: emoji chars,
+  // case-folded third-party names, then twitch set codes
+  function noteRecentName(t, ch) {
+    if (EMOJI_SET.has(t)) return addRecent({ n: t });
+    const en = emoteNameOf(ch, t);
+    if (en) return addRecent({ n: en, src: emoteSrcOf(ch)[en] || 'emote',
+      img: emotesOf(ch)[en], a: !!setFor(ch).emoteAnim?.has(en) });
+    for (const s of twSets) {
+      const e = s.emoteList.find((e) => e.code === t);
+      if (!e) continue;
+      const src = s.channelLogin ? s.channelLogin + (s.tier ? ' t' + s.tier : '')
+                : (s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ');
+      return addRecent({ n: e.code, src,
+        img: twEmoteUrl(e.id, e.assetType === 'ANIMATED'), a: e.assetType === 'ANIMATED' });
+    }
   }
   const byName = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' });
   // family stem: the first word of a camel/all-caps name, lowercased, so
