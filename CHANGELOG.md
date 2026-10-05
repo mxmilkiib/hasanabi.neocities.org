@@ -151,6 +151,10 @@ not versions — the page ships continuously to Neocities.
   `youtube embeds` in the `?` popup; the hover preview still applies
 - chat links can lead with the site's favicon, fetched from
   duckduckgo's icon service - `link favicons` in the `?` popup
+- nitter profile links no longer carry a doubled slash that some
+  instances answer with a 400 - the relay strips the tracker href's
+  trailing slash and the page normalises too, so an older relay keeps
+  working
 - moderator-action rows (timeouts, bans, a cleared chat) shade blue;
   a `…m gap` silence notice shades red, and when no outage was
   recorded for its span the graph now bands it grey rather than

@@ -6384,7 +6384,9 @@
         }
       }
     } else if (d.type === 'nitter') {
-      nitterHost = /^https:\/\//.test(d.host || '') ? d.host : null;
+      // trailing slashes would double against the profile path's leading
+      // slash, and some instances answer that with a 400
+      nitterHost = /^https:\/\//.test(d.host || '') ? d.host.replace(/\/+$/, '') : null;
     } else if (d.type === 'tweet' && /^\d+$/.test(d.id || '')) {
       tweetWait.delete(d.id);
       const t = d.tweet;
