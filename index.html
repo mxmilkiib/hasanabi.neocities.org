@@ -2668,8 +2668,13 @@
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
-        html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> <b>${escapeHTML(who)}</b> ` +
-                `${linkifyEsc(escapeHTML(sys))}${message ? ' - ' + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
+        // system-msg re-states the nick ('Nick watched…') - drop the
+        // echo and carry the name on a link to their channel instead
+        const dup = who && sys.slice(0, who.length).toLowerCase() === who.toLowerCase() && !/\w/.test(sys[who.length] || '');
+        const sysText = dup ? sys.slice(who.length).replace(/^\s*[-–—,:]?\s*/, '') : sys;
+        const whoLink = `<a class="at" href="https://www.twitch.tv/${escapeHTML(tags.login || login || who)}" target="_blank" rel="noopener noreferrer">${escapeHTML(who)}</a>`;
+        html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> ${whoLink} ` +
+                `${linkifyEsc(escapeHTML(sysText))}${message ? ' - ' + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {

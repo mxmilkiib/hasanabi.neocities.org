@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- usernotice rows dedupe the nick: twitch's system-msg already leads
+  with the display name ('Nick watched at…'), so the row printed it
+  twice - now the leading copy is dropped and the bold name becomes an
+  a.at channel link (hover preview + click-through like a mention)
 - reply quotes no longer inherit the parent's tweet preview: fillRq
   cloned every rendered node into the quote band, so a .twprev
   placeholder (or a filled .twcard) rode along and the async fill then
