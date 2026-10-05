@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- row separators and highlights now paint inside each row's pitch
+  slot, not its overlapping box: below 1.15 line-height rows pull in
+  under negative margins and a box-edge line/tint landed inside the
+  neighbour's territory - the line now sits on the seam between slots
+  and tints can't bleed over it
 - resolved giphy gifs pin to the right edge like image embeds, and
   the row keeps its line height; unresolved gif titles stay inline
 - reply quote indentation anchors to the leading edge of the

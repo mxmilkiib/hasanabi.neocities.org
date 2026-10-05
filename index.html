@@ -461,11 +461,27 @@
     margin-top: var(--chat-lhm, max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em)));
     margin-bottom: var(--chat-lhm, max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em)));
     padding: 4px 0 2px;
-    /* top edge, not bottom: rows pull up under negative --chat-lhm margins,
-       so a lower row's box overlaps the row above - a bottom border would
-       be painted over by that row's highlight, while a top border is drawn
-       by the covering row itself and stays visible */
-    border-top: 1px solid var(--rowline, var(--line));
+    /* --rowin is the overlap depth from the negative --chat-lhm margins:
+       each row's box reaches that far into its neighbours' territory top
+       and bottom. The separator and every row tint paint inside the pitch
+       slot - the box inset by --rowin - so a line lands on the seam
+       between slots and a highlight can't bleed over it */
+    --rowin: calc(var(--chat-lhm, max(-3px, min(0px, (var(--chat-lh, 1.65) - 1.15) * 0.5em))) * -1);
+    --rowtint: linear-gradient(transparent, transparent);
+    --rowbar: linear-gradient(transparent, transparent);
+    background-image:
+      linear-gradient(var(--rowline, var(--line)) 0 0),
+      var(--rowbar),
+      var(--rowtint);
+    background-repeat: no-repeat;
+    background-size:
+      100% 1px,
+      4px calc(100% - var(--rowin) * 2),
+      100% calc(100% - var(--rowin) * 2);
+    background-position:
+      0 var(--rowin),
+      0 var(--rowin),
+      0 var(--rowin);
     word-wrap: break-word;
     position: relative;
   }
@@ -532,16 +548,16 @@
   .row.action { font-style: italic; }
   .row.action .aux, .row.action .sub, .row.action .time { font-style: normal; }
   .tag { padding: 0 3px; border-radius: 3px; }
-  .row.points { background-color: rgba(232, 93, 93, .12); }
-  main.zebra .row.z {
-    background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07));
+  .row.points { --rowtint: linear-gradient(rgba(232, 93, 93, .12) 0 0); }
+  main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .raid)) {
+    --rowtint: linear-gradient(rgba(128, 128, 128, .07) 0 0);
   }
-  main.zebra .row.z:is(.points, .glorp, .mention, .kw, .raid),
-  body.selfhl main.zebra .row.z.self { background-image: none; }
+  body.selfhl main.zebra .row.z.self {
+    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0); }
   main.shadowed .row { text-shadow: var(--row-sh); }
   .row.glorp {
-    background-color: rgba(232, 93, 93, .13);
-    box-shadow: inset 4px 0 0 var(--danger);
+    --rowtint: linear-gradient(rgba(232, 93, 93, .13) 0 0);
+    --rowbar: linear-gradient(var(--danger) 0 0);
     margin-left: -8px;
     padding-left: 8px;
   }
@@ -592,11 +608,11 @@
      depth as a pixel-distance gradient - applied inline by ghostFade() */
   /* invisible spacer repaying ghost-height overage so the faded page keeps
      its layout while fresh rows overwrite it */
-  .row.ghostgap { padding: 0; margin: 0; border-top: none; }
+  .row.ghostgap { padding: 0; margin: 0; --rowline: transparent; }
   /* no separator above the first row of a column (the .empty placeholder
      is removed once rows land, so this matches in every column) */
-  .col > .row:first-child { border-top: none; }
-  .row.notice.raid { background-color: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .col > .row:first-child { --rowline: transparent; }
+  .row.notice.raid { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 0 0); }
   .twcard {
     display: block;
     margin: 2px 0;
@@ -626,21 +642,21 @@
   .gifq:has(.gifimg) { float: right; margin-left: 6px; }
   .gifq .gifimg { margin-top: -4em; }
   .row.mention {
-    background-color: rgba(232, 163, 61, .13);
-    box-shadow: inset 4px 0 0 var(--accent);
+    --rowtint: linear-gradient(rgba(232, 163, 61, .13) 0 0);
+    --rowbar: linear-gradient(var(--accent) 0 0);
     margin-left: -8px;
     padding-left: 8px;
   }
   .row.kw {
-    background-color: color-mix(in srgb, var(--good) 11%, transparent);
-    box-shadow: inset 4px 0 0 var(--good);
+    --rowtint: linear-gradient(color-mix(in srgb, var(--good) 11%, transparent) 0 0);
+    --rowbar: linear-gradient(var(--good) 0 0);
     margin-left: -8px;
     padding-left: 8px;
   }
   .row.blk { display: none; }
   body.selfhl .row.self {
-    background-color: color-mix(in srgb, var(--accent) 11%, transparent);
-    box-shadow: inset 4px 0 0 var(--accent);
+    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
+    --rowbar: linear-gradient(var(--accent) 0 0);
     margin-left: -8px;
     padding-left: 8px;
   }
@@ -669,9 +685,10 @@
      to the reply beneath it - its violet tint stays on top, and the grey
      zebra overlay still lands on it for non-z rows, so the alternation
      holds as tinted-plain vs tinted-striped */
-  /* stretch the quote's shade to the row edge and up over the row's
-     top padding, so its stripe band is contiguous with the line above */
-  main.zebra .reply.rq { margin: -4px 0 1px; padding: 4px 0 0 11px; }
+  /* stretch the quote's shade to the row edge and up to just under the
+     separator seam, so its stripe band stays contiguous without
+     covering the line */
+  main.zebra .reply.rq { margin: calc(var(--rowin) - 3px) 0 1px; padding: calc(3px - var(--rowin)) 0 0 11px; }
   main.zebra .row:not(.z):not(.points):not(.glorp):not(.mention):not(.kw):not(.raid) .reply.rq {
     background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07)); }
   /* the quoted author's name carries the mention accent */
