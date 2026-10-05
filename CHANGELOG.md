@@ -35,7 +35,7 @@ not versions — the page ships continuously to Neocities.
   sheds backlog; delayed sampler ticks refill from rendered-row counts,
   leaving bands for socket loss or a closed page
 - the `?` popup width list gains 1760px and 1920px stops, and its
-  font-size row sits directly underneath
+  font-size row uses the same centred line directly underneath
 - the resources organising list adds cluetrain and the opencivics
   knowledge commons; open hardware gains instructables and precious
   plastic
