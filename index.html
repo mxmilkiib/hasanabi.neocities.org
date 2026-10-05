@@ -1160,6 +1160,17 @@
   #chatPick a.on { color: var(--text); font-weight: 700; padding: 0 3px;
     border-radius: 3px; background: color-mix(in srgb, var(--cc) 30%, transparent);
     box-shadow: 0 0 0 1px var(--cc); }
+  /* nick completion floats above the input; each option wears the
+     nick's own chat colour and the tab-walked one lifts on the row */
+  #chatComp { position: absolute; z-index: 2; bottom: calc(100% + 4px);
+    min-width: 10em; max-width: 320px; max-height: 12em; overflow-y: auto;
+    padding: 3px; background: var(--panel); border: 1px solid var(--popline);
+    border-radius: 6px; box-shadow: 0 -4px 16px rgba(0, 0, 0, .4);
+    font-size: var(--chat-font, 15px); }
+  #chatComp .cpick { display: block; padding: 1px 8px; border-radius: 4px;
+    color: var(--cc, var(--text)); cursor: pointer; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; text-decoration: none; }
+  #chatComp .cpick.on { background: color-mix(in srgb, var(--cc, var(--accent)) 28%, transparent); }
   /* character count beside the box: amber past the long-message guess,
      red near twitch's 500 cap; the box border tints along with it */
   #chatLen { flex: none; align-self: center; padding: 2px 6px 2px 5px; min-width: 0;
@@ -1380,7 +1391,7 @@
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns violet once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
-    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups</span></div>
+    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in</span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
@@ -1470,7 +1481,7 @@
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
-  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span></div>
+  <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
@@ -2674,6 +2685,7 @@
       if (kind === 'USERNOTICE') {
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
+        if (who) noteNick(login || who, who);
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
         // system-msg re-states the nick ('Nick watched…') - drop the
         // echo and carry the name on a link to their channel instead
@@ -2729,6 +2741,7 @@
       }
       const name = tags['display-name'] || '(unknown)';
       const color = monoNames ? colorForName(name) : (ensureLegible(tags.color) || colorForName(name));
+      noteNick(login, name, color);
       // real badge icons left of the name; text chips only as fallback
       const renderedSets = new Set();
       const badgeImgs = (tags.badges || '').split(',').map((b) => {
@@ -5514,6 +5527,70 @@
     chatInput.focus();
   });
   chatInput.addEventListener('input', paintChatPick);
+
+  // ---- @nick completion: nicks seen scrolling by feed a strip above
+  // the input; further typing narrows it, tab/⇧tab walks the pick and
+  // enter/click fills the name in ----
+  const chatComp = document.getElementById('chatComp');
+  const seenNicks = new Map(); // login -> { n: display, c: colour }
+  const noteNick = (login, name, color) => {
+    const k = (login || '').toLowerCase();
+    if (!/^[a-z0-9_]{2,25}$/.test(k)) return;
+    seenNicks.delete(k); // reinsert keeps the tail end most-recent
+    seenNicks.set(k, { n: name || login, c: color || '' });
+    if (seenNicks.size > 600) seenNicks.delete(seenNicks.keys().next().value);
+  };
+  let compList = [], compIdx = 0;
+  // the active token is an @word ending at the caret - a selection or a
+  // caret parked mid-text means the comp stays shut
+  const compTok = () => {
+    const at = chatInput.selectionStart ?? chatInput.value.length;
+    if (at !== (chatInput.selectionEnd ?? at)) return null;
+    const m = chatInput.value.slice(0, at).match(/(?:^|\s)@([a-z0-9_]{0,25})$/i);
+    return m ? { start: at - m[1].length, q: m[1].toLowerCase() } : null;
+  };
+  function compPaint() {
+    chatComp.innerHTML = compList.map((r, i) =>
+      `<a class="cpick${i === compIdx ? ' on' : ''}" role="option" data-i="${i}" href="#" ` +
+      `style="--cc:${escapeHTML(r.c || colorForName(r.n))}">${escapeHTML(r.n)}</a>`).join('');
+    chatComp.hidden = !compList.length;
+    if (compList.length) chatComp.style.left = chatInput.offsetLeft + 'px';
+  }
+  const compClose = () => { chatComp.hidden = true; };
+  function compUpdate() {
+    const tok = compTok();
+    if (!tok) { compClose(); return; }
+    compList = [];
+    // the map's tail is most recent - walk it backwards for freshest-first
+    for (const [lg, rec] of [...seenNicks].reverse()) {
+      if (lg.startsWith(tok.q) || rec.n.toLowerCase().startsWith(tok.q)) compList.push(rec);
+      if (compList.length >= 9) break;
+    }
+    compIdx = Math.min(compIdx, Math.max(0, compList.length - 1));
+    compPaint();
+  }
+  function compAccept(i) {
+    const tok = compTok(), pick = compList[i ?? compIdx];
+    compClose();
+    if (!tok || !pick) return;
+    // fire input so the length/growth/channel-chip listeners all re-run;
+    // tok.start sits after the @, so the query alone gets replaced
+    chatInput.setRangeText(`${pick.n} `, tok.start, chatInput.selectionEnd ?? tok.start, 'end');
+    chatInput.dispatchEvent(new Event('input'));
+  }
+  chatComp.addEventListener('mousedown', (e) => e.preventDefault()); // keep the input's focus
+  chatComp.addEventListener('click', (e) => {
+    const a = e.target.closest('.cpick');
+    if (!a) return;
+    e.preventDefault();
+    compAccept(+a.dataset.i);
+    chatInput.focus();
+  });
+  chatInput.addEventListener('input', compUpdate);
+  chatInput.addEventListener('click', compUpdate); // caret hops close or refilter
+  chatInput.addEventListener('keyup', (e) => { if (!chatComp.hidden && /^(Arrow|Home|End|Page)/.test(e.key)) compUpdate(); });
+  chatInput.addEventListener('blur', compClose);
+
   function paintSlow() {
     const tch = sendTarget();
     const left = Math.ceil(((slowUntils[tch] || 0) - Date.now()) / 1000);
@@ -5775,6 +5852,17 @@
   paintLen();
 
   chatInput.addEventListener('keydown', (e) => {
+    // an open @nick completer owns tab/enter/esc before history or send
+    if (!chatComp.hidden) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        compIdx = (compIdx + (e.shiftKey ? -1 : 1) + compList.length) % compList.length;
+        compPaint();
+        return;
+      }
+      if (e.key === 'Enter' && !e.isComposing && !e.shiftKey) { e.preventDefault(); compAccept(); return; }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); compClose(); return; }
+    }
     // history walk hijacks arrows at the draft's outer lines - ↑ from the
     // first line, ↓ from the last - so multi-line text keeps caret movement
     // in between, and ⇧+arrow still extends the selection
@@ -5853,6 +5941,7 @@
     histIdx = null; histDraft = '';
     if (ctx) clearReply();
     chatInput.value = shelved || '';
+    compClose();
     growInput();
     const tSlow = (roomStates[target] || {}).slow || 0;
     if (tSlow > 0 && !selfExempts[target]) {

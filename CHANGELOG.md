@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Features
+- @nick completion in the chat input: typing @ at a word boundary opens
+  a strip of nicks seen scrolling by (freshest first, each in its own
+  chat colour), further typing narrows it, tab/⇧tab walks the pick,
+  enter or a click fills the name plus a trailing space. works mid-draft
+  and mid-mention, ignores email-style a@b, and esc closes it without
+  touching the draft or the popup stack
 - instagram reel links get a playable preview: the worker asks kkclip
   (the kkscript fixer) for the reel's signed cdn mp4 - a bot ua 302s
   straight to the file - and merges it over instagram's own og: title,
