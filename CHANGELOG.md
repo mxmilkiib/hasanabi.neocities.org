@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- row separators move from border-bottom to border-top: at line
+  heights above 1.15 rows pull up under negative margins and a lower
+  row's zebra/highlight background painted over the line between them;
+  drawing the separator on the row that overlaps keeps it visible
+- `open government` shortens to `open gov`
 - the `?` popup can no longer sit past a screen edge: a new clamp caps
   its width/height to the viewport below the header (presets and
   dragged sizes grow back when the window does), pulls a dragged-off
