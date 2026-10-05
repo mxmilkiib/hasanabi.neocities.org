@@ -27,7 +27,9 @@ not versions — the page ships continuously to Neocities.
   bitmap, the rate label absorbs the header's slack instead, and the
   pixel ratio is re-read on every refit and per-second draw so zoom or
   monitor moves re-fit the buffer; the dead-time bands wash in the
-  danger colour instead of a faint grey smudge
+  danger colour instead of a faint grey smudge; refits also watch the
+  channel block and coalesce a frame's triggers so reload-time content
+  arriving in stages can't strand a gap at the graph's right edge
 - the header's vertical spacing balances at 3px above and below the
   buttons (was 4/2); the corner `?`/`–` pair and their labels track
   the new top edge, and the channel block keeps a 2px nudge so its

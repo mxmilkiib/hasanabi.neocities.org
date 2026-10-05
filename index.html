@@ -2586,14 +2586,24 @@
   const hdrSideEl = document.querySelector('.hdr-side');
   // flex sizing means the box changes on window resize, graph-mode toggles,
   // label mode, font changes - refit the buffer to whatever it lands on.
-  // the pinned width can't follow the header flexing wider, so the header
-  // itself gets an observer too
-  new ResizeObserver(() => sparkSize()).observe(sparkEl);
-  new ResizeObserver(() => sparkSize()).observe(hdrSideEl);
+  // the pinned width can't follow siblings flexing, so the header, the
+  // icon strip and the channel block each get an observer, and a frame's
+  // worth of triggers coalesce into one refit
+  let sparkPending = false;
+  const queueSparkSize = () => {
+    if (sparkPending) return;
+    sparkPending = true;
+    requestAnimationFrame(() => { sparkPending = false; sparkSize(); });
+  };
+  new ResizeObserver(queueSparkSize).observe(sparkEl);
+  new ResizeObserver(queueSparkSize).observe(hdrSideEl);
+  new ResizeObserver(queueSparkSize).observe(headerEl.querySelector('.channel'));
   new ResizeObserver(() => {
-    sparkSize();
+    queueSparkSize();
     hdrBarEl.classList.toggle('hdrwrap', hdrSideEl.offsetTop > 10);
   }).observe(hdrBarEl);
+  // late webfont swaps shift every width the flex maths used
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => sparkSize());
 
   // the trace draws in the accent's complement so it reads as its own
   // element against the header; the canvas resolves whatever colour
