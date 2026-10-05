@@ -2749,8 +2749,9 @@
         // their expiry do nothing). the lock is per-channel in multi mode
         const me = !!(target && auth && auth.login && target.toLowerCase() === auth.login.toLowerCase());
         if (me && dur) setTimedOut(ts + dur * 1000, ch);
+        if (target) noteNick(target, target);
         html += `<div role="article" class="row notice ${me ? 'selfmod' : 'mod'}${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
-          (target ? `${me ? 'you were' : escapeHTML(target) + ' was'} ${dur ? `timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'banned'}`
+          (target ? `${me ? 'you were' : `<a class="at" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(target))}" target="_blank" rel="noopener noreferrer">${escapeHTML(target)}</a> was`} ${dur ? `timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
       }

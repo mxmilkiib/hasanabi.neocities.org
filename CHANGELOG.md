@@ -29,6 +29,9 @@ not versions — the page ships continuously to Neocities.
   video field, the card keeps instagram's own metadata, and a 6h ttl
   means cached signed urls are dropped long before they rot
 ### Fixes & polish
+- 'was banned'/'timed out' notice rows link the target's name to their
+  twitch channel like other nick links - hover previews the channel,
+  click opens it - and the login joins the @completion list
 - popup resize arrows ease 1px back off the edges on the help and emote
   popups, and the stream overlay's top-edge grab glyphs get the same
   centred four-fifths run as the other popups (hit area stays full width)
