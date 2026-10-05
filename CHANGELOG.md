@@ -132,6 +132,10 @@ not versions — the page ships continuously to Neocities.
 - image and giphy urls keep their link text on the row as italics
   beside the floated embed instead of being swallowed by it; the
   clean-urls retoggle rewrites inside the italic wrapper
+- moderator-action rows (timeouts, bans, a cleared chat) shade blue;
+  a `…m gap` silence notice shades red, and when no outage was
+  recorded for its span the graph now bands it grey rather than
+  leaving it indistinguishable from a quiet-but-live trace
 
 ## 2026-10-04
 
