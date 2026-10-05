@@ -6,6 +6,13 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the ? popup caught up with the new behaviour: link previews now
+  cover nicks and @mentions (and twitch cards list live state,
+  followers and chat modes), the rowstyle legend gained blue mod rows
+  and red gap rows, the emote picker got its own row (recents strip,
+  one-minute fresh pin, mix/names/zoom/anim filters), the names footer
+  documents @ostonox/@hasanabi mention styles and the ✦ kill-switch,
+  and the history row notes saved media stays paused on restore
 - hover previews no longer die in busy chat: the scroll listener that
   hides the card was also catching the follow pin's own programmatic
   scroll, so every incoming row dropped an open preview. snapLive now
