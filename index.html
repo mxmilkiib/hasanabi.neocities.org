@@ -1612,6 +1612,12 @@
   const zwOf = (ch) => setFor(ch).zeroWidth || ZERO;
   const badgesOf = (ch) => setFor(ch).badges || {};
   const ZERO = new Set();
+  const EMPTY_MAP = {};
+  const emotesLcOf = (ch) => setFor(ch).emotesLc || EMPTY_MAP;
+  // bots read commands in whatever case the chatter typed ('fishh' is
+  // Fishh's command), so a token resolves through a folded index back to
+  // its canonical emote name - the exact match still wins
+  const emoteNameOf = (ch, tok) => emotesOf(ch)[tok] ? tok : emotesLcOf(ch)[tok.toLowerCase()];
   // Nitter host for twitter/x link rewriting; the relay picks a live one
   // from status.d420.de, this is only the fallback until then.
   let nitterHost = null; // set once the relay confirms a live instance
@@ -1732,19 +1738,20 @@
     for (const node of nodes) {
       if (node.parentElement.closest('.time,.reply,.aux,a')) continue;
       const rowCh = (node.parentElement.closest('.row') || {}).dataset || {};
-      const em = emotesOf(rowCh.ch || CHANNEL);
+      const em = emotesOf(rowCh.ch || CHANNEL), eml = emotesLcOf(rowCh.ch || CHANNEL);
       const parts = node.nodeValue.split(/(\s+)/);
-      if (!parts.some((t) => em[t])) continue;
+      if (!parts.some((t) => em[t] || eml[t.toLowerCase()])) continue;
       const frag = document.createDocumentFragment();
       const es = emoteSrcOf(rowCh.ch || CHANNEL);
       for (const tok of parts) {
-        const url = em[tok];
+        const name = em[tok] ? tok : eml[tok.toLowerCase()];
+        const url = name && em[name];
         if (url) {
           const img = document.createElement('img');
           img.className = 'emote';
           img.src = url;
-          img.alt = tok;
-        img.title = tok + (es[tok] ? ' - ' + es[tok] : '');
+          img.alt = name;
+        img.title = name + (es[name] ? ' - ' + es[name] : '');
           frag.appendChild(img);
         } else frag.appendChild(document.createTextNode(tok));
       }
@@ -1756,22 +1763,24 @@
   // and bolding @username mentions like real chat. Zero-width emotes stack
   // onto the previous emote; cheermotes resolve when the message has bits.
   function renderTextHTML(text, hasBits, ch, shiny) {
-    const em = emotesOf(ch || CHANNEL), es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL);
+    const em = emotesOf(ch || CHANNEL), eml = emotesLcOf(ch || CHANNEL),
+          es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL);
     const out = [];
     let lastEmote = -1; // index in out of the last emote img, for zw stacking
     text.split(/(\s+)/).forEach((tok, i, arr) => {
-      const url = em[tok];
+      const name = em[tok] ? tok : eml[tok.toLowerCase()];
+      const url = name && em[name];
       if (url) {
-        const alt = escapeHTML(tok);
+        const alt = escapeHTML(name);
         const img = `<img class="emote" src="${escapeHTML(url)}" alt="${alt}"` +
-                    ` title="${alt}${es[tok] ? ' - ' + es[tok] : ''}">`;
-        if (zw.has(tok) && lastEmote >= 0) {
+                    ` title="${alt}${es[name] ? ' - ' + es[name] : ''}">`;
+        if (zw.has(name) && lastEmote >= 0) {
           if (out[lastEmote].endsWith('</span>'))
             out[lastEmote] = out[lastEmote].slice(0, -7) + img + '</span>';
           else out[lastEmote] = `<span class="estk">${out[lastEmote]}${img}</span>`;
         } else {
           out.push(img);
-          if (!zw.has(tok)) lastEmote = out.length - 1;
+          if (!zw.has(name)) lastEmote = out.length - 1;
         }
         return;
       }
@@ -2392,10 +2401,12 @@
       const mtoks = message.trim().split(/\s+/).filter(Boolean);
       // usage-age stats belong to the focused channel's store; other rooms'
       // rows would only pollute them
-      for (const t of mtoks)
-        if (ch === CHANNEL && (rendered.names.has(t) || emotesOf(ch)[t] || EMOJI_SET.has(t))) noteEmoteUse(t);
+      for (const t of mtoks) {
+        const en = ch === CHANNEL && emoteNameOf(ch, t);
+        if (en || rendered.names.has(t) || EMOJI_SET.has(t)) noteEmoteUse(en || t);
+      }
       const eonly = mtoks.length > 0 &&
-        mtoks.every((t) => rendered.names.has(t) || emotesOf(ch)[t] || zwOf(ch).has(t));
+        mtoks.every((t) => rendered.names.has(t) || emoteNameOf(ch, t) || zwOf(ch).has(t));
       if (blammo) {
         // bracketed tags ([Roulette], [Scramble], ...) get a bold chip
         // shaded by the tag text's hash, so matching games share a hue;
@@ -6155,7 +6166,13 @@
       emoteAnim: new Set(d.emoteAnim || []),
       zeroWidth: new Set(d.zeroWidth || []),
       badges: d.badges || {},
+      // folded-name index for emoteNameOf - first wins when two emotes
+      // differ only by case
+      emotesLc: {},
     };
+    for (const n of Object.keys(chanSets[ech].emotes))
+      if (!(n.toLowerCase() in chanSets[ech].emotesLc))
+        chanSets[ech].emotesLc[n.toLowerCase()] = n;
     if (!cached) {
       loadStep(3, 'emotes loaded - waiting for messages…');
       try { localStorage.setItem(EMOTE_CACHE_PREFIX + ech, JSON.stringify({ t: Date.now(), d })); }

@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- emote tokens resolve case-insensitively, so lower-case bot commands
+  (`fishh`, `farmm`) paint their emote; a folded index maps each token
+  back to its canonical name for the image, tooltip, usage stats,
+  zero-width stacking and the emote-only enlargement - an exact match
+  still wins, and the first registered name wins a case-collision
 - reply quote bands echo the parent's rendered message - emotes,
   links and media included - cloned from the live row at three-quarter
   emote size with the band on the full row line-height; a parent that
