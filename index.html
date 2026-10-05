@@ -1112,10 +1112,12 @@
   #chatInput:focus::placeholder { opacity: 0; }
   #chatbar input:focus, #chatbar textarea:focus { outline: 1px solid var(--accent); outline-offset: 0; }
   /* emote picker popup over the chatbar - chatterino-style scrollable grid */
-  /* pull it a touch toward the input on its right */
+  /* a touch of breathing room either side */
   /* the glyph is scaled up in markup - a modest font-size + clipped box
      keeps it inside the 30x26 button in every state */
-  #emojiBtn { flex: none; font-size: 1.3em; margin-right: -2px; overflow: hidden; }
+  #emojiBtn { flex: none; font-size: 1.3em; margin: 0 2px; overflow: hidden; }
+  /* snug the send button up to the input's end of the bar */
+  #msgSend { margin-left: -2px; }
   /* match the buttons' height to a one-line textarea (lh*font + pad + border,
      min-height floor) so their tops sit flush instead of bottom-aligning
      short against the box */
@@ -1124,7 +1126,7 @@
      while logged in */
   #msgSend:hover { color: #9146ff; border-color: #9146ff; }
   #emotePick {
-    position: fixed; right: 10px; bottom: 44px; z-index: 11;
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: 44px; z-index: 11;
     width: 480px; max-width: 94vw; height: 420px; max-height: calc(100vh - 90px); max-height: calc(100dvh - 90px);
     display: flex; flex-direction: column; gap: 6px; padding: 12px 8px 8px; /* top pad clears the drag-strip glyphs */
     background: var(--panel); border: 1px solid var(--popline);
@@ -5993,6 +5995,7 @@
       // forgets the stashed position - the size survives on its own
       emotePick.style.left = emotePick.style.top = '';
       emotePick.style.right = emotePick.style.bottom = '';
+      emotePick.style.transform = '';
       try {
         const es = JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null');
         if (es && es.left != null) {
@@ -6074,6 +6077,7 @@
       // dragged free of its anchor, so it floats - pin it
       if (!epickPinned) setPin(true);
       emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
+      emotePick.style.transform = 'none';
       emotePick.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
       emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
     };
@@ -6104,6 +6108,7 @@
       const r = emotePick.getBoundingClientRect();
       emotePick.style.left = r.left + 'px'; emotePick.style.top = r.top + 'px';
       emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
+      emotePick.style.transform = 'none';
       const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl') || grip.classList.contains('l');
       const rightEdge = grip.classList.contains('tr') || grip.classList.contains('br') || grip.classList.contains('r');
       const topEdge = grip.classList.contains('tl') || grip.classList.contains('tr');
@@ -6157,6 +6162,7 @@
     // re-anchor to left/top so the dragged edges stay put under the
     // pointer regardless of how the box was previously positioned
     emotePick.style.left = r.left + 'px'; emotePick.style.top = r.top + 'px';
+    emotePick.style.transform = 'none';
     emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
     const move = (ev) => {
       if (edge.includes('l')) {
@@ -6188,6 +6194,7 @@
       if (es.h) emotePick.style.height = es.h + 'px';
       if (es.left != null) {
         emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
+        emotePick.style.transform = 'none';
         emotePick.style.left = Math.max(0, Math.min(innerWidth - (es.w || 480), es.left)) + 'px';
         emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom,
           Math.min(innerHeight - (es.h || 420), es.top)) + 'px';
