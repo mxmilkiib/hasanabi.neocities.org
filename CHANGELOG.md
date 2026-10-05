@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- a link preview's body text now wraps into the space under the floated
+  image instead of staying squeezed beside it - the line clamp moved
+  from -webkit-box to a clip-path so the wrap survives
 - row separators sit 1px into the seam above each row's tint, so a
   highlighted row's top edge stays clean like its bottom edge; where
   there's no seam to sit in, the tint simply paints over the line
