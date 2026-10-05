@@ -4430,6 +4430,9 @@
           ? ' -- ' : sub.textContent.replace(/\D/g, '');
         if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? '--' : '[sub --]')
           : mode.startsWith('num') ? months.padStart(2, '0') : `[sub ${months}]`;
+        // the lead gap belongs to num-left rows only - clear it in other
+        // modes or it holds the chip a few px off the right edge
+        sub.style.marginRight = mode === 'num-left' ? '6px' : '';
         sub.classList.toggle('auxr', !left && !aux);
         if (!left) {
           if (aux) aux.append(sub); // outermost in the right cluster

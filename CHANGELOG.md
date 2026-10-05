@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- sub chips rendered while num-left mode was active carried a baked
+  6px right margin that followed them into right-aligned modes,
+  holding the chip off the right edge; the mode switcher now sets or
+  clears that margin so it only exists where it belongs
 - the ↩ in reply quote bands moved off the gutter: it now trails the
   quoted text inside the highlight, a character's space after the last
   word, so it can never land on the quoted nick. restored rows relocate
