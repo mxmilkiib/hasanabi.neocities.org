@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- fossabot resub lines link their subber now: 'Nick just subbed for N
+  months' kept the name as bare text, so it now wraps in an a.at
+  profile anchor - accent styling, hover preview and the twitch profile
+  on click, same as a name link. @-mentions were already linked and
+  stay untouched
 - nick styles got a rate limit and a dial: the sweeps slowed a touch at
   the base rate (shimmer 2.5s->3s, rainbow 4s->6s), and the ✦ row now
   steps off / super slow / slow / on - the slow modes stretch the same
