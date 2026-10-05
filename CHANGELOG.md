@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- @hasanabi pastel contrast nudge: 34-47% sat -> 38-52%, 74-85% light
+  -> 68-79% - still washed, just legible against the row
 - notice rows brighten: the body text sat at --text-dim (55-68% of the
   text colour) which paired with the italic read murky; it now blends
   70% toward --text, so only the [notice] label's rainbow and the
