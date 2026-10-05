@@ -1833,7 +1833,9 @@
       if (/^https?:\/\/\S+$/i.test(url) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#]\S*)?$/i.test(url)) {
         const u = escapeHTML(/^https?:\/\//i.test(url) ? url : `https://${url}`);
-        if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(url)) {
+        // the image check ignores the fragment - a wiki-style
+        // '#/media/File:x.png' suffix is a page anchor, not the resource
+        if (/\.(?:gif|webp|png|jpe?g|avif|gifv)(?:\?\S*)?$/i.test(url.split('#')[0])) {
           const src = /\.gifv(?:\?\S*)?$/i.test(url) ? u.replace(/\.gifv/i, '.gif') : u;
           out.push(escapeHTML(pre) + `<a class="imglnk" href="${u}" target="_blank" rel="noopener noreferrer"><img class="chat-img" src="${src}" alt="image"></a>` + escapeHTML(post));
         } else {
