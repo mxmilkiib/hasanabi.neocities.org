@@ -399,6 +399,10 @@
   #peek[hidden] { display: none; }
   /* the preview image floats right and the card text wraps its left */
   #peek > img { float: right; max-width: 40%; max-height: 9em; border-radius: 4px; margin: 0 0 .3em .6em; }
+  /* a card carrying a playable file takes the pointer so its controls
+     work - text cards stay click-through */
+  #peek.pint { pointer-events: auto; }
+  #peek video.pvid { display: block; width: 100%; max-height: 14em; border-radius: 4px; margin: .2em 0 .4em; background: #000; }
   #peek .psite { color: var(--accent); font-weight: 600; font-size: .78em; }
   #peek .ptitle { font-weight: 600; margin: 2px 0; overflow-wrap: anywhere; }
   #peek .pico { width: .85em; height: .85em; margin: 0 .35em -.1em 0; border-radius: 2px; display: inline-block; max-height: none; }
@@ -1380,7 +1384,7 @@
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
-    <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
+    <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
     <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph; clicking it unfolds the player under the row (a second click folds it) - nothing loads from google until then<sup>†</sup></span></div>
     <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
@@ -7654,7 +7658,7 @@
   const peekInflight = new Map(); // url -> give-up timer; dedupes re-hovers
   const peekTouch = matchMedia('(hover: none) and (pointer: coarse)');
   let peekSeq = 0, peekTimer = 0, peekUrl = '', peekX = 0, peekY = 0, peekSaveT = 0;
-  const peekGood = (p) => !!(p && (p.title || p.description));
+  const peekGood = (p) => !!(p && (p.title || p.description || p.video));
   // workers flag volatile previews (eg live twitch) with a short ttl in s
   const peekTtlOf = (p) => peekGood(p) ? Math.min(PEEK_TTL, (p.ttl || PEEK_TTL / 1e3) * 1e3) : PEEK_FAIL_TTL;
   try {
@@ -7700,6 +7704,7 @@
       views: s('views').slice(0, 40),
       facts: Array.isArray(raw.facts) ? raw.facts.filter((f) => typeof f === 'string').slice(0, 8).map((f) => f.slice(0, 80)) : [],
       ttl: +raw.ttl > 0 ? Math.min(+raw.ttl, 86400) : 0,
+      video: /^https:\/\//.test(s('video')) ? s('video') : '',
       final: /^https?:\/\//.test(s('url')) ? s('url') : '',
     } : null;
     // bound the cache - a long session can hover thousands of unique urls
@@ -7730,8 +7735,19 @@
     peekEl.textContent = '';
     // the site's own theme-color edges the card
     peekEl.style.borderLeft = p && p.color ? `3px solid ${p.color}` : '';
-    // the image leads in the dom so its right float lets the text wrap left
-    if (p && p.image && peekMode === 2) {
+    // a playable file (eg an instagram reel via kkclip) leads over the
+    // poster image and makes the card interactive - pointer events stay
+    // off otherwise so it never eats a click meant for a link
+    peekEl.classList.toggle('pint', !!(p && p.video));
+    if (p && p.video && peekMode === 2) {
+      const v = document.createElement('video');
+      v.className = 'pvid'; v.controls = true; v.muted = true;
+      v.playsInline = true; v.preload = 'metadata';
+      if (p.image) v.poster = p.image;
+      v.addEventListener('error', () => { v.remove(); peekPlace(); });
+      v.src = p.video;
+      peekEl.appendChild(v);
+    } else if (p && p.image && peekMode === 2) {
       const im = document.createElement('img');
       im.referrerPolicy = 'no-referrer';
       im.alt = '';
@@ -7796,6 +7812,8 @@
   function peekHide() {
     clearTimeout(peekTimer); peekTimer = 0;
     peekUrl = ''; peekEl.hidden = true;
+    // a playing card video keeps sounding while hidden - pause it out
+    for (const v of peekEl.querySelectorAll('video')) v.pause();
   }
   function peekStart(url, x, y) {
     peekUrl = url; peekX = x; peekY = y;
@@ -7813,6 +7831,9 @@
     let a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
     if (a && !peekLink(a)) a = null;
     let url = a ? a.href : '';
+    // a card holding a video takes pointer events - hovering onto it is
+    // not leaving the link's preview
+    if (peekEl.contains(e.target)) return;
     // @mentions in rows aren't anchors - peek the nick's twitch profile
     if (!url && peekMode && !peekTouch.matches) {
       const m = e.target instanceof Element ? e.target.closest('.row .at') : null;
@@ -7835,7 +7856,7 @@
   // relatedTarget null means the pointer left the window entirely
   document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) peekHide(); });
   addEventListener('scroll', () => { if (performance.now() - autoScrollAt > 150) peekHide(); }, true);
-  addEventListener('mousedown', peekHide, true);
+  addEventListener('mousedown', (e) => { if (!peekEl.contains(e.target)) peekHide(); }, true);
   addEventListener('blur', peekHide);
   addEventListener('keydown', (e) => { if (e.key === 'Escape') peekHide(); });
 

@@ -5,6 +5,16 @@ not versions — the page ships continuously to Neocities.
 
 ## 2026-10-05
 
+### Features
+- instagram reel links get a playable preview: the worker asks kkclip
+  (the kkscript fixer) for the reel's signed cdn mp4 - a bot ua 302s
+  straight to the file - and merges it over instagram's own og: title,
+  poster and caption. the peek card renders a muted, metadata-preload
+  video with controls, and becomes pointer-interactive only while it
+  carries one; hide pauses playback, mousedown inside no longer
+  dismisses it. failsafes: kkclip down or a non-reel url just loses the
+  video field, the card keeps instagram's own metadata, and a 6h ttl
+  means cached signed urls are dropped long before they rot
 ### Fixes & polish
 - usernotice rows dedupe the nick: twitch's system-msg already leads
   with the display name ('Nick watched at…'), so the row printed it
