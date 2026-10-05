@@ -1120,7 +1120,7 @@
   /* the message box is a one-row textarea that grows a line at a time as
      the draft wraps, capping at five lines before scrolling */
   #chatbar textarea {
-    resize: none; height: auto; min-height: 28px; max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 10px);
+    resize: none; height: auto; min-height: max(28px, calc(var(--chat-font, 15px) * 1.25 + 10px)); max-height: calc(var(--chat-font, 15px) * 1.25 * 5 + 10px);
     overflow-y: hidden; line-height: 1.25; padding: 5px 8px 3px; box-sizing: border-box;
   }
   #chatbar { align-items: flex-end; position: relative; }
