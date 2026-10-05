@@ -8,7 +8,8 @@ not versions — the page ships continuously to Neocities.
 ### Fixes & polish
 - the header's vertical spacing balances at 3px above and below the
   buttons (was 4/2); the corner `?`/`–` pair and their labels track
-  the new top edge
+  the new top edge, and the channel block keeps a 2px nudge so its
+  offset from the top edge is unchanged
 - zebra striping no longer shades the reply quote band - it keeps
   its violet tint on every row, and the quote still consumes its
   stripe slot so the rows below keep the alternation

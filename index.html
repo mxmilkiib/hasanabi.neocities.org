@@ -246,8 +246,10 @@
     font-weight: 600;
     min-width: 0;
     /* pin to the line top like the buttons - centring against the line
-       box left the channel block sitting visibly lower than them */
+       box left the channel block sitting visibly lower than them; the
+       2px nudge restores its old offset under the 3px header padding */
     align-self: flex-start;
+    margin-top: 2px;
   }
   #channelName { color: inherit; text-decoration: none; }
   #channelName:hover { text-decoration: underline; }
