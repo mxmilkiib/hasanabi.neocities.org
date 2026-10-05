@@ -2257,6 +2257,10 @@
   // the graph bands these grey, distinct from the red of a confirmed gap
   const quietGaps = [];
   let lastRowTs = 0; // wall-clock ms of the newest rendered row
+  // a caused gap whose row is deferred: the backfill fetch confirms whether
+  // anything actually went missing - a recovered line inside the span emits
+  // the marker before it, an empty batch means the stretch was just quiet
+  let pendingGap = null;
   function gapCause(a, b) {
     for (const [s, e, why] of away) if (s < b && e > a) return why;
     return '';
@@ -2504,19 +2508,34 @@
       // a long silence means the page missed a stretch - mark the gap with
       // its span and, when an away window overlaps, the cause
       const ts = when.getTime();
+      // a deferred gap resolves here: the first recovered line inside its
+      // span gets the marker prepended, carrying the recorded cause
+      if (pendingGap && !live && !pendingGap.emitted && ts > pendingGap.from && ts < pendingGap.to) {
+        const pg = pendingGap;
+        pg.emitted = true;
+        html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${pg.to}"><span class="time">${fmtRowTime(new Date(pg.to))}</span>` +
+                `· ${fmtDur(Math.max(1, Math.round((pg.to - pg.from) / 60000)))} gap · ${pg.why} · ` +
+                `${fmtRowTime(new Date(pg.from))} → ${fmtRowTime(new Date(pg.to))}</div>`;
+      }
       if (lastRowTs && ts - lastRowTs > GAP_MS) {
         const why = gapCause(lastRowTs, ts);
-        // an unexplained silence (quiet chat, or a stall that never dropped
-        // the socket) still marks the span so the graph can band it grey
-        if (!why) quietGaps.push([lastRowTs, ts]);
-        // a gap with a recorded cause is a confirmed outage - robotty can
-        // replay its recent window, so fetch it. unexplained gaps stay a
-        // marker only: silence needs no fetching to confirm
-        else backfill();
+        if (!why) {
+          // an unexplained silence (quiet chat, or a stall that never
+          // dropped the socket) still marks the span so the graph can
+          // band it grey
+          quietGaps.push([lastRowTs, ts]);
+          html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}"><span class="time">${timeStr}</span>` +
+                  `· ${fmtDur(Math.max(1, Math.round((ts - lastRowTs) / 60000)))} gap · ` +
+                  `${fmtRowTime(new Date(lastRowTs))} → ${timeStr}</div>`;
+        } else {
+          // a caused gap defers its row to the backfill: if the replay
+          // returns lines from inside the span the marker lands ahead of
+          // them; an empty response means nothing was missed and the
+          // stretch gets no problem row
+          pendingGap = { from: lastRowTs, to: ts, why };
+          backfill();
+        }
         if (quietGaps.length > 50) quietGaps.splice(0, quietGaps.length - 50);
-        html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}"><span class="time">${timeStr}</span>` +
-                `· ${fmtDur(Math.max(1, Math.round((ts - lastRowTs) / 60000)))} gap${why ? ` · ${why}` : ''} · ` +
-                `${fmtRowTime(new Date(lastRowTs))} → ${timeStr}</div>`;
       }
       if (ts > lastRowTs) lastRowTs = ts;
       // \x01ACTION ...\x01 is an IRC /me action - strip the CTCP wrapper
@@ -2706,6 +2725,9 @@
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
     }
     queue = [];
+    // a batch settled the deferred gap: emitted marker or not, it clears -
+    // an empty find means the stretch was just quiet
+    if (pendingGap && pendingGap.batch) pendingGap = null;
     histDirty = true;
     // rev never marks stales (its overflow cascades instead of flipping),
     // and any stragglers sit at the bottom edge where a tail append still
@@ -6860,6 +6882,8 @@
       if (emptyEl) emptyLabel.textContent = `socket closed (${wsCause}) - retrying…`;
       updateHeader();
     } else if (d.type === 'lines') {
+      // a replay batch is what settles a deferred gap marker
+      if (d.replay && pendingGap) pendingGap.batch = true;
       for (const line of d.lines) handleLine(line, !!d.replay);
     } else if (d.type === 'stream') {
       loadStep(3, 'metadata loaded - waiting for messages…');

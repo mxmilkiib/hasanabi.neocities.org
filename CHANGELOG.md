@@ -10,8 +10,10 @@ not versions — the page ships continuously to Neocities.
   quoted text inside the highlight, a character's space after the last
   word, so it can never land on the quoted nick. restored rows relocate
   it to match
-- gaps with a recorded cause (socket dropped, page closed) now trigger
-  a recent-messages backfill, so the missed stretch is recovered;
+- gaps with a recorded cause (socket dropped, page closed) now defer
+  their marker to the backfill: if the replay returns lines from inside
+  the span the gap row lands ahead of them; an empty response means
+  nothing was actually missed and no problem row is printed.
   recovered rows carry a subtle left bar (the highlight-row marker,
   without the tint) and a hover note.
   unexplained silences still mark the gap without fetching
