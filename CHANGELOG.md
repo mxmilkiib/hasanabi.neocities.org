@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- blammobot trivia posts that carry the chatting emote now pin it
+  against the right edge of the [ Trivia ] chip instead of wherever
+  it fell in the line
 - the reply quote band's 3px left margin is gone: its parity background
   reaches the row's left edge like ordinary lines. the seam separator,
   zebra shadow and channel-tag hang all re-zeroed to match

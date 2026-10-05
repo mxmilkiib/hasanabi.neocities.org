@@ -2670,6 +2670,24 @@
       const eonly = mtoks.length > 0 &&
         mtoks.every((t) => rendered.names.has(t) || emoteNameOf(ch, t) || zwOf(ch).has(t));
       if (blammo) {
+        // the chatting emote on a trivia post pins against the chip's
+        // right edge instead of wherever it fell in the line
+        let chatImg = '';
+        if (tags.emotes) {
+          for (const part of tags.emotes.split('/')) {
+            const [eid, ranges] = part.split(':');
+            if (!ranges) continue;
+            const [s, e] = ranges.split(',')[0].split('-').map(Number);
+            if (/chatting/i.test(message.slice(s, e + 1))) {
+              const tone = lightMode ? 'light' : 'dark';
+              const alt = escapeHTML(message.slice(s, e + 1));
+              chatImg = `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${escapeHTML(eid)}/animated/${tone}/2.0"` +
+                        ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${escapeHTML(eid)}/default/${tone}/2.0'"` +
+                        ` alt="${alt}" title="${alt} - Twitch">`;
+              break;
+            }
+          }
+        }
         // bracketed tags ([Roulette], [Scramble], ...) get a bold chip
         // shaded by the tag text's hash, so matching games share a hue;
         // Trivia and Roulette are pinned to each other's hash colours
@@ -2688,6 +2706,13 @@
           .replace(/(the (?:answer|word) was:\s*)(.+)$/i, '$1<b>$2</b>')
           .replace(/\b(\d[\d,]* points?)\b/gi, '<b>$1</b>')
           .replace(/\b(hint:\s*)(.+)$/i, '$1<i>$2</i>');
+        if (chatImg) {
+          // lift the emote out of its typed position and park it after
+          // the chip - replace() drops only the first occurrence
+          msgHtml = msgHtml
+            .replace(chatImg, '')
+            .replace(/(<b class="tag"[^>]*>\[\s*trivia\s*\]<\/b>)/i, '$1 ' + chatImg);
+        }
       }
       if (fossa) {
         msgHtml = msgHtml
