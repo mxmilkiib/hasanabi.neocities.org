@@ -6,6 +6,7 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the chat-bar emote button's ☻ shifts 2px right to sit centred
 - the header's vertical spacing balances at 3px above and below the
   buttons (was 4/2); the corner `?`/`–` pair and their labels track
   the new top edge, and the channel block keeps a 2px nudge so its
