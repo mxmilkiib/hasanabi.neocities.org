@@ -37,14 +37,15 @@ not versions — the page ships continuously to Neocities.
 - emote-picker display options join the settings bundle: names, cell
   size, sort, age rows, mix, hold, source tabs and the anim filter now
   save with hasan-opts, stash into theme slots and copy into settings
-  urls as epnames=1 epzoom=sm|big epsort=az epage=1 epmix=1 ephold=0
+  urls as epnames=1 epzoom=sm|q|big epsort=az epage=1 epmix=1 ephold=0
   eptabs=7tv,bttv epanim=anim - only off-default options enter the url,
   and bundles lacking the keys (older saves, presets) leave the picker
   alone
-- the emote picker gains a ½x size chip next to 2x: 20px cells for a
-  denser overview (names mode keeps wide rows but scales art and type
-  down too); clicking a lit size drops back to normal, and the pick
-  persists like the other option chips - old '1' saves still read as 2x
+- the emote picker gains ½x and ¾x size chips next to 2x: 20px cells
+  for a dense overview and 30px for a middle ground (names mode keeps
+  wide rows but scales art and type too); clicking a lit size drops
+  back to normal, and the pick persists like the other option chips -
+  old '1' saves still read as 2x
 - age squares in the emote picker no longer clip their left border: the
   marching-ants svg now insets 1px so the stroke's outer half lands
   inside the cell instead of clipping at the grid edge

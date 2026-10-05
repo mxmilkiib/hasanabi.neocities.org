@@ -1338,6 +1338,14 @@
   #emotePick.sm #emoteGrid button.eji { font-size: 11px; }
   #emotePick.sm #emoteGrid .ename { font-size: 9px; }
   #emotePick.sm #emoteGrid .eage { height: 20px; font-size: .55em; }
+  /* ¾x sits between dense and normal: 30px cells */
+  #emotePick.q #emoteGrid { grid-template-columns: repeat(auto-fill, 30px); }
+  #emotePick.q.names #emoteGrid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  #emotePick.q #emoteGrid button { height: 30px; }
+  #emotePick.q #emoteGrid button img { max-width: 25px; max-height: 25px; }
+  #emotePick.q #emoteGrid button.eji { font-size: 15px; }
+  #emotePick.q #emoteGrid .ename { font-size: 10px; }
+  #emotePick.q #emoteGrid .eage { height: 30px; font-size: .6em; }
   /* 2x zoom doubles the cells for a closer preview; names mode keeps
      its wide rows but the art and type scale too */
   #emotePick.big #emoteGrid { grid-template-columns: repeat(auto-fill, 78px); }
@@ -1517,7 +1525,7 @@
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
 // global safety net: an uncaught error or rejected promise raises a small
@@ -6494,18 +6502,18 @@
   // cell-size chips: 2x for a closer look at the art, ½x for a denser
   // overview; clicking the lit size drops back to normal
   const EPICK_ZOOM_KEY = 'hasan-epickzoom';
-  const zoomBtns = { big: document.getElementById('emoteZoom'), sm: document.getElementById('emoteZoomSm') };
+  const zoomBtns = { big: document.getElementById('emoteZoom'), q: document.getElementById('emoteZoomQ'), sm: document.getElementById('emoteZoomSm') };
   let epickZoom = '';
   try { epickZoom = localStorage.getItem(EPICK_ZOOM_KEY) || ''; } catch {}
   if (epickZoom === '1') epickZoom = 'big'; // the old boolean save
   function paintZoom() {
-    emotePick.classList.toggle('big', epickZoom === 'big');
-    emotePick.classList.toggle('sm', epickZoom === 'sm');
-    setOn(zoomBtns.big, epickZoom === 'big');
-    setOn(zoomBtns.sm, epickZoom === 'sm');
+    for (const k of ['big', 'q', 'sm']) {
+      emotePick.classList.toggle(k, epickZoom === k);
+      setOn(zoomBtns[k], epickZoom === k);
+    }
   }
   const setZoom = (v) => {
-    epickZoom = v === 'big' || v === 'sm' ? v : '';
+    epickZoom = zoomBtns[v] ? v : '';
     try { localStorage.setItem(EPICK_ZOOM_KEY, epickZoom); } catch {}
     paintZoom();
   };
@@ -7613,7 +7621,7 @@
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 1 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
-    // emote-picker options: ?epnames=1&epzoom=sm|big&epsort=az&epage=1&
+    // emote-picker options: ?epnames=1&epzoom=sm|q|big&epsort=az&epage=1&
     // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|still
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(flag('epnames')); epUrlDirty = true; }
