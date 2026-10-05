@@ -3329,6 +3329,13 @@
       stream = { live: false };
     } else {
       stream = st;
+      // an open embed idling on the offline slate doesn't pick the
+      // stream up on its own - nudge the player on a real offline->live
+      // flip; already-playing embeds treat play() as a no-op
+      if (prevSt && !prevSt.live && vidPlayer && !vidBox.hidden &&
+          (vidPlayer.isPaused() || (vidPlayer.isEnded && vidPlayer.isEnded()))) {
+        try { vidPlayer.play(); } catch {}
+      }
       if (stream.startedAt && (!lastRun || lastRun.ended || lastRun.started !== stream.startedAt)) {
         lastRun = { started: stream.startedAt, ended: null, seen: Date.now() };
         saveLastRun();

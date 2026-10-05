@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the video popup picks up a stream that starts while it's open: the
+  embed sits paused/ended on the offline slate, so a real offline->live
+  flip now calls play() on the idle player - already-playing embeds
+  treat it as a no-op, and a player the stream went offline under gets
+  nudged only on the actual transition, not every poll
 - @hasanabi mention palettes went pastel: the generator's saturation
   band dropped from 62-87% to 44-61% and lightness lifted from 57-72%
   to 69-81%, so the per-author sweeps read as soft tints rather than
