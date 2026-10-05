@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the trivia Chatting emote actually relocates now: the lift matches the
+  rendered img in the message html, so bttv emotes move too - the old
+  scan only read the twitch emote spec, which never lists bttv's
 - chat emotes now paint above the row furniture: their negative-margin
   overhang can no longer be clipped by zebra stripes, seam separators,
   chips or the reply button
