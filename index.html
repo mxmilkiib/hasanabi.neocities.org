@@ -743,9 +743,11 @@
   /* ◍ renders tall in the symbol fallback font and spills over the
      button's top edge - shrinking it a touch keeps it inside */
   #themeBtn.tall { font-size: .88em; }
-  /* flexes to fill the free header space; sparkSize() matches the buffer to
-     the laid-out width whenever it changes so it never rasterises blurry */
+  /* sparkSize() pins the box to the device grid (see its comment); the rate
+     span takes over as the header's flexible space absorber so the icon
+     strip still hugs the right edge */
   #spark { height: 26px; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
+  #rate { flex: 1; min-width: 0; white-space: nowrap; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   #sendBtn.on { border-color: #9146ff; } /* twitch purple while logged in */
@@ -2515,7 +2517,7 @@
   }
 
   // ---- msgs/sec sparkline: one sample per second, 4-minute window ----
-  const DPR = window.devicePixelRatio || 1;
+  let DPR = window.devicePixelRatio || 1; // re-read on refit - zoom and monitor moves change it
   const SPARK_H = 26;
   const SPARK_WINDOWS = [30, 60, 120, 240];
   // the window grows with the rendered width (~3px per second of history),
@@ -2537,9 +2539,26 @@
   let sparkCols = null; // theme colours, resolved once instead of per draw
 
   function sparkSize() {
-    const n = Math.max(240, Math.min(1800, Math.round(sparkEl.clientWidth / 3 / 30) * 30));
+    DPR = window.devicePixelRatio || 1;
+    // the box is flex-sized, so clientWidth is usually fractional while a
+    // canvas bitmap is always whole pixels - bitmap != css*DPR and the
+    // browser resamples the difference as blur; drop the last snap,
+    // measure the flexed ideal, then pin the box to the device grid
+    sparkEl.style.flex = '';
+    sparkEl.style.width = '';
+    rateEl.style.flex = '0 0 auto'; // starve the slack absorber so the ideal reads the full free space
+    const ideal = sparkEl.clientWidth;
+    rateEl.style.flex = '';
+    const n = Math.max(240, Math.min(1800, Math.round(ideal / 3 / 30) * 30));
     sparkWin = n;
-    sparkEl.width = Math.max(1, Math.round(sparkEl.clientWidth * DPR)); // resets the transform
+    const snapped = Math.max(1, Math.floor(ideal * DPR) / DPR);
+    sparkEl.width = Math.round(snapped * DPR); // resets the transform
+    sparkEl.height = Math.round(SPARK_H * DPR);
+    const wCss = snapped + 'px';
+    if (sparkEl.style.width !== wCss) sparkEl.style.width = wCss;
+    if (sparkEl.style.flex !== '0 1 auto') sparkEl.style.flex = '0 1 auto';
+    const hCss = (sparkEl.height / DPR) + 'px';
+    if (sparkEl.style.height !== hCss) sparkEl.style.height = hCss;
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
     sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'} · dim bands mark time the page wasn't watching`;
     sparkEl.setAttribute('aria-label', sparkEl.title);
@@ -2547,14 +2566,18 @@
     if (glorpSamples.length > n) glorpSamples.splice(0, glorpSamples.length - n);
     drawSpark();
   }
-  // flex sizing means the box changes on window resize, graph-mode toggles,
-  // label mode, font changes - refit the buffer to whatever it lands on
-  new ResizeObserver(() => sparkSize()).observe(sparkEl);
   // flag when .hdr-side wraps onto a second header line so CSS can centre it
   const headerEl = document.querySelector('header');
   const hdrBarEl = headerEl;
   const hdrSideEl = document.querySelector('.hdr-side');
+  // flex sizing means the box changes on window resize, graph-mode toggles,
+  // label mode, font changes - refit the buffer to whatever it lands on.
+  // the pinned width can't follow the header flexing wider, so the header
+  // itself gets an observer too
+  new ResizeObserver(() => sparkSize()).observe(sparkEl);
+  new ResizeObserver(() => sparkSize()).observe(hdrSideEl);
   new ResizeObserver(() => {
+    sparkSize();
     hdrBarEl.classList.toggle('hdrwrap', hdrSideEl.offsetTop > 10);
   }).observe(hdrBarEl);
 
@@ -2580,6 +2603,9 @@
     return `hsl(${h.toFixed(0)} ${(s * 100).toFixed(0)}% ${(l * 100).toFixed(0)}%)`;
   }
   function drawSpark() {
+    // a zoom or monitor move changes the ratio without resizing the css
+    // box - the per-second redraw is a free place to catch it
+    if (DPR !== (window.devicePixelRatio || 1)) { sparkSize(); return; }
     const SPARK_N = sparkWin;
     const SPARK_W = sparkEl.width / DPR; // stretched past SPARK_N in graph mode
     sparkCtx.clearRect(0, 0, SPARK_W, SPARK_H);
