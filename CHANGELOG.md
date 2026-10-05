@@ -12,7 +12,8 @@ not versions — the page ships continuously to Neocities.
   it to match
 - gaps with a recorded cause (socket dropped, page closed) now trigger
   a recent-messages backfill, so the missed stretch is recovered;
-  recovered rows carry a small ↻ on the timestamp and a hover note.
+  recovered rows carry a subtle left bar (the highlight-row marker,
+  without the tint) and a hover note.
   unexplained silences still mark the gap without fetching
 - reply quote bands re-measure their name-column alignment when the
   column moves - sub-mode flips, timestamp modes and font changes used

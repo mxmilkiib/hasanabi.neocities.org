@@ -552,9 +552,15 @@
     font: inherit; cursor: pointer; padding: 0 2px; }
   #replyBar button:hover { color: var(--text); }
   .time { color: var(--text-dim); margin-right: 5px; margin-left: 3px; }
-  /* a replayed line recovered over an outage - the glyph marks it as
-     backfilled history rather than traffic that just arrived */
-  .row.replay .time::before { content: '↻'; margin-right: 2px; opacity: .45; }
+  /* a replayed line recovered over an outage carries a left bar like a
+     highlighted row, but in the dim line shade and with no tint -
+     visible without shifting any column. rows with their own bar
+     (mention, kw) keep theirs */
+  .row.replay {
+    --rowbar: linear-gradient(var(--line) 0 0);
+    margin-left: -8px;
+    padding-left: 8px;
+  }
   main.notime .time { display: none; }
   main.nosec .time .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
