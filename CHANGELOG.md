@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- the [notice] label stands upright inside its italic notice row -
+  clearer as a chip than slanted text
 - fossabot resub lines link their subber now: 'Nick just subbed for N
   months' kept the name as bare text, so it now wraps in an a.at
   profile anchor - accent styling, hover preview and the twitch profile
