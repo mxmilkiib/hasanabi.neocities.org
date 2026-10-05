@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- a tweet video or youtube embed opened mid-session was saved into row
+  history with its autoplay intact, so the next page load replayed it
+  with no click - saves now strip yt iframes back to the ▶ toggle and
+  drop autoplay off <video>/<audio>, which restore paused but playable
 - twitch login was dead everywhere, not just phones: the reachability
   preflight used fetch(), which neocities' connect-src 'self' csp always
   blocks, so the button could only ever say "connection problem". the

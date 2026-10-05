@@ -5153,10 +5153,16 @@
         if (rows.length >= limit) break;
       }
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.reverse().map((r) => {
-        if (!r.classList.contains('stale')) return r.outerHTML;
+        const media = r.querySelector('.ytcard, video, audio');
+        if (!r.classList.contains('stale') && !media) return r.outerHTML;
         const cl = r.cloneNode(true);
         cl.classList.remove('stale');
         cl.style.opacity = '';
+        // a live media embed saved into history would autostart on the
+        // next load without any click - drop yt iframes back to their
+        // ▶ toggle and let saved <video> restore paused but playable
+        cl.querySelectorAll('.ytcard').forEach((e) => e.remove());
+        cl.querySelectorAll('video, audio').forEach((v) => v.removeAttribute('autoplay'));
         return cl.outerHTML;
       })));
     } catch {}
