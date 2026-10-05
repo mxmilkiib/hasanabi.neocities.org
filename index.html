@@ -688,16 +688,8 @@
     background-color: color-mix(in srgb, var(--bg) 90%, #a878ee);
     font-style: normal; line-height: 1.3;
   }
-  /* a reply row counts as two lines: the quote takes the stripe opposite
-     to the reply beneath it - its violet tint stays on top, and the grey
-     zebra overlay still lands on it for non-z rows, so the alternation
-     holds as tinted-plain vs tinted-striped */
-  /* stretch the quote's shade to the row edge and up to just under the
-     separator seam, so its stripe band stays contiguous without
-     covering the line */
-  main.zebra .reply.rq { margin: calc(var(--rowin) - 3px) 0 1px; padding: calc(3px - var(--rowin)) 0 0 11px; }
-  main.zebra .row:not(.z):not(.points):not(.glorp):not(.mention):not(.kw):not(.raid) .reply.rq {
-    background-image: linear-gradient(rgba(128, 128, 128, .07), rgba(128, 128, 128, .07)); }
+  /* zebra never touches the quote band - it keeps its own violet tint
+     whatever parity the row beneath carries */
   /* the quoted author's name carries the mention accent */
   .reply.rq b { color: var(--accent); }
   /* the ↩ hangs in the gutter ahead of the quoted nick - its width and
@@ -705,9 +697,9 @@
      starts on the responder's name column */
   .reply.rq .rarr { display: inline-block; width: 1.2em; margin-left: -1.2em; }
   /* the quote's channel tag hangs in the row's tag column, left of the
-     band - 13px undoes its margin+border+padding (plain 3+2+8 and zebra
-     0+2+11 both inset the same), so the tag aligns with the tags on
-     ordinary lines and the quote text starts where they do */
+     band - 13px undoes its margin+border+padding (3+2+8), so the tag
+     aligns with the tags on ordinary lines and the quote text starts
+     where they do */
   .reply.rq .chtag { margin-left: -13px; }
   /* the quoted text is italic, but unicode runs stay upright - italic
      font faces lack their glyphs (same dodge as .twcard) */

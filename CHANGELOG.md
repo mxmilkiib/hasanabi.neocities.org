@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- zebra striping no longer shades the reply quote band - it keeps
+  its violet tint on every row, and the quote still consumes its
+  stripe slot so the rows below keep the alternation
 - the channel row drops the extra 1px of spacing below the header's
   top edge
 - accessibility pass: every `.on` toggle now mirrors `aria-pressed`;
