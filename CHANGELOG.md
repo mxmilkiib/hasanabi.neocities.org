@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-05
 
 ### Fixes & polish
+- mentions stay visibly heavier at every Font weight setting: b's
+  relative 'bolder' resolves to 900 once --chat-w reaches 600-700,
+  which most fonts render as the same 700 glyph, so mentions vanished
+  into the text. .at now computes max(700, chat-w + 200) - always a
+  step heavier wherever the font has the cut for it
 - twitch channel hovers now say a lot more: the worker surfaces a facts
   line from ivr.fi - live viewer count and game, followers, chatters,
   join date, partner/affiliate standing, and the channel's chat modes

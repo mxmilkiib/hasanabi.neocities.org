@@ -744,7 +744,10 @@
     margin-left: -8px;
     padding-left: 8px;
   }
-  .at { color: var(--accent); }
+  /* a fixed +200 step over the chat weight keeps mentions visibly heavier
+     at any Font weight setting - b's relative 'bolder' collapses to the
+     same glyph once --chat-w reaches 600-700 */
+  .at { color: var(--accent); font-weight: max(700, calc(var(--chat-w, 400) + 200)); }
   .at:hover { color: var(--text); text-decoration: underline; }
   /* mentions are styled like links; give them the hand instead of the
      text i-beam so they read as interactive at a glance */
