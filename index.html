@@ -2674,7 +2674,7 @@
         const sysText = dup ? sys.slice(who.length).replace(/^\s*[-–—,:]?\s*/, '') : sys;
         const whoLink = `<a class="at" href="https://www.twitch.tv/${escapeHTML(tags.login || login || who)}" target="_blank" rel="noopener noreferrer">${escapeHTML(who)}</a>`;
         html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> ${whoLink} ` +
-                `${linkifyEsc(escapeHTML(sysText))}${message ? ' - ' + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
+                `${linkifyEsc(escapeHTML(sysText))}${message ? (sysText ? ' - ' : '') + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
