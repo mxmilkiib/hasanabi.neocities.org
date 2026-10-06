@@ -257,6 +257,9 @@ no dependencies beyond CDN-hosted fonts.
 - Page-flip columns — two, or three in landscape; a full column hands
   its overflow to the next, whose old page lingers as faded ghost rows
   that incoming messages overwrite in a dimming wave from the fold.
+- `live?` in the resources tab pings every linked Twitch channel
+  through the relay; live links gain a green dot and an
+  uptime/viewers/title tooltip, offline ones grey out.
 - Stream video overlay — draggable, resizable, loads only when
   enabled; its glyph goes green while the stream is live, red when a
   stopped player exists and the stream is not.

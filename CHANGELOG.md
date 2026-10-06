@@ -47,6 +47,10 @@ not versions — the page ships continuously to Neocities.
 - stats tab in the ? popup: session chatter and message counts, the
   top 15 chatters in their nick colours, top 15 emotes by channel
   usage, and the rate graph's three loudest bursts
+- "live?" next to channels/streams in the ? popup's resources tab
+  probes every twitch link through the relay (a streamprobe message
+  type, small worker pool against decapi): live channels get a green
+  dot plus viewers/title on hover, offline ones grey out
 - presets pin the header help mode now: default keeps the button
   labels showing, every other preset runs the bare header with labels
   off - the current-preset underline counts the mode like every other
