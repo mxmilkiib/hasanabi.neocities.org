@@ -1260,13 +1260,11 @@
   #htabRes a.at.livon::before { content: '●'; color: #43b581;
     font-size: .7em; margin-right: 2px; }
   #htabRes a.at.livoff { opacity: .5; }
-  /* each entry's own name link (the first anchor in the item) gets a
-     tunable weight; the default keeps the usual .at bold */
-  #htabRes .linkcols > i > a.at:first-of-type,
-  #htabAuth .linkcols > i > a.at:first-of-type { font-weight: var(--linkw, 700); }
-  /* bracketed annotation links (work/theme sources) stay at text
-     weight - only the name carries the pick above */
-  #htabAuth .linkcols > i span a.at { font-weight: var(--chat-w, 400); }
+  /* ml = an entry's own name link(s) - the weight pick, default bold;
+     tl = the small bracketed descriptor/source links - text weight
+     with tighter tracking to match the annotation face */
+  #helpPanel .linkcols > i > a.ml { font-weight: var(--linkw, 700); }
+  #helpPanel .linkcols > i a.tl { font-weight: var(--chat-w, 400); letter-spacing: -0.05em; }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run longest (name + work + dates + tagline), so
      the widest columns there */
@@ -4424,6 +4422,23 @@
     if (wurl && aw) {
       const work = aw.textContent.slice(1, -1);
       for (const sp of el.querySelectorAll('.aw, .am')) linkify(sp, work, wurl);
+    }
+  });
+  // mark each res/author item's links by role: anchors before the
+  // entry's first '(' are its name links (ml - 'x · y · z' entries
+  // included, not just the first anchor); the parenthesised tail and
+  // any nested-note links are the small descriptors (tl). the switch,
+  // merge and drop controls keep their own look
+  helpPanel.querySelectorAll('#htabRes .linkcols > i, #htabAuth .linkcols > i').forEach((el) => {
+    let tail = false;
+    for (const n of el.childNodes) {
+      if (n.nodeType === 3 && n.textContent.includes('(')) tail = true;
+      if (n.nodeType !== 1) continue;
+      if (n.tagName === 'A') {
+        if (!n.classList.contains('chsw') && !n.classList.contains('chadd') && !n.classList.contains('chdel'))
+          n.classList.add(tail ? 'tl' : 'ml');
+      }
+      else n.querySelectorAll('a.at').forEach((a) => a.classList.add('tl'));
     }
   });
   const authOrig = authSecs.innerHTML;
