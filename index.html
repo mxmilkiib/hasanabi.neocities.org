@@ -1504,6 +1504,9 @@
     <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
     <div style="margin-top: 8px"><b>to block</b><span>comma separated; a chat line containing one is hidden:</span></div>
     <input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
+    <div style="margin-top: 8px"><b>to hide (users)</b><span>comma separated logins; their messages: <span id="helpHideList"></span><sup>†</sup></span></div>
+    <input id="hwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="login, another login" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
+    <div><b></b><span>vanish drops the rows outright · stub folds them into a running count line · ghost strikes them dim like deleted rows</span></div>
     <div style="margin-top: 8px"><b>safe gifs</b><span>limit giphy lookups for gif posts to a PG-13 rating: <span id="helpGifList"></span><sup>†</sup></span></div>
     <div class="sep">—</div>
     <div id="slotRow" style="margin-top: 8px; display: flex; gap: 6px; align-items: center">
@@ -3059,6 +3062,7 @@
       rqIndent(r);
       if (r.dataset.mid) rowById.set(r.dataset.mid, r);
       fillRq(r);
+      applyHideRow(r);
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self')) {
@@ -3825,6 +3829,7 @@
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpHide')) { setHideMode(+a.dataset.idx); saveOpts(); }
   });
   // anchors only fire on enter natively, and only when href'd - the
   // role=button and tab picks answer space, plus enter on the bare ones
@@ -4111,6 +4116,66 @@
   function setBlocked(str) { bwRe = wordsRe(str); retagKw(); }
   bwInput.addEventListener('input', () => { setBlocked(bwInput.value); saveOpts(); });
 
+  // ---- user hide: a login list beside the blocklist, tri-state -
+  // vanish drops the rows outright, stub folds them into a running
+  // count line, ghost keeps them in place struck dim like deletions ----
+  const hwInput = document.getElementById('hwInput');
+  const HIDE_MODES = ['vanish', 'stub', 'ghost'];
+  const hideUsers = new Set();
+  let hideMode = 1; // stub: hidden chatter stays audible as a count
+  // login -> { el, n }: the stub row that login's hidden lines count into
+  const hideStubs = new Map();
+  // rows a display:none path hid, however it did so - page-flip reads
+  // offsetTop 0 off one and mistakes it for inside the fold
+  const rowCollapsed = (r) =>
+    r.classList.contains('blk') || r.classList.contains('uhide') || r.classList.contains('fhide');
+  function applyHideRow(r) {
+    const u = r.dataset.u;
+    if (!u || !hideUsers.has(u)) return;
+    if (hideMode === 2) { r.classList.add('ughost'); return; }
+    r.classList.add('uhide');
+    if (hideMode !== 1) return;
+    // stub mode: each login counts into one line at its first hidden row;
+    // a stub trimmed out of scrollback re-spawns at the next one
+    const st = hideStubs.get(u);
+    if (st && st.el.isConnected) {
+      st.n++;
+      st.el.querySelector('b').textContent = `${st.n} hidden message${st.n === 1 ? '' : 's'}`;
+    } else {
+      const el = document.createElement('div');
+      el.className = 'row hidestub';
+      el.innerHTML = `<span class="time">${fmtRowTime(new Date(+r.dataset.ts || Date.now()))}</span>` +
+        `<b>1 hidden message</b> from ${escapeHTML(u)}`;
+      r.before(el);
+      hideStubs.set(u, { el, n: 1 });
+    }
+  }
+  // retag the rendered scrollback when the list or mode changes: strips
+  // every mark and stub, then replays the current state over data-u rows
+  function retagHide() {
+    hideStubs.clear();
+    for (const c of cols()) {
+      c.querySelectorAll('.row.hidestub').forEach((r) => r.remove());
+      c.querySelectorAll('.row.uhide, .row.ughost').forEach((r) => r.classList.remove('uhide', 'ughost'));
+      c.querySelectorAll('.row[data-u]').forEach(applyHideRow);
+    }
+  }
+  function setHideList(str) {
+    hideUsers.clear();
+    for (const s of str.split(',')) {
+      const lg = s.trim().toLowerCase();
+      if (/^[a-z0-9_]{2,25}$/.test(lg)) hideUsers.add(lg);
+    }
+    retagHide();
+  }
+  function setHideMode(i) {
+    if (i < 0 || i >= HIDE_MODES.length) return;
+    hideMode = i;
+    markHelp('helpHide', i);
+    retagHide();
+  }
+  hwInput.addEventListener('input', () => { setHideList(hwInput.value); saveOpts(); });
+
   // ---- missed mentions: rows flagged while the page lacks focus queue on
   // the @N chip; each click scrolls to the next one and flashes it ----
   let pingOn = false;
@@ -4381,7 +4446,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, anim: nickAnim, rbw: rbwStyle,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, anim: nickAnim, rbw: rbwStyle,
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSort,
       epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
@@ -4466,6 +4531,8 @@
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
+    if (typeof o.hw === 'string') { hwInput.value = o.hw; setHideList(o.hw); }
+    if (Number.isInteger(o.hwm)) setHideMode(o.hwm);
     if (o.ping !== undefined) setPing(!!o.ping);
     if (o.clean !== undefined) setCleanUrls(!!o.clean);
     if (o.gifsafe !== undefined) setGifSafe(!!o.gifsafe);
@@ -5258,6 +5325,10 @@
     if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
+    if (hwInput.value.trim()) {
+      q.set('hw', hwInput.value.trim());
+      if (hideMode !== 1) q.set('hwm', HIDE_MODES[hideMode]);
+    }
     if (pingOn) q.set('ping', '1');
     if (cleanUrls) q.set('clean', '1');
     if (peekMode !== 2) q.set('peek', peekMode);
@@ -5488,13 +5559,13 @@
     while ((last = from.lastElementChild)) {
       // ghost tail already displaced below the fold: drop, don't carry over
       if (last.classList.contains('stale')) { last.remove(); continue; }
-      // a display:none (.blk) row reports offsetTop 0, which would read as
-      // inside the fold - hidden tail rows ride along only once a visible
-      // row has started moving
-      if (last.classList.contains('blk')) {
+      // a display:none row reports offsetTop 0, which would read as inside
+      // the fold - hidden tail rows ride along only once a visible row has
+      // started moving
+      if (rowCollapsed(last)) {
         if (!moved) {
           let p = last.previousElementSibling;
-          while (p && p.classList.contains('blk')) p = p.previousElementSibling;
+          while (p && rowCollapsed(p)) p = p.previousElementSibling;
           if (!p || p.classList.contains('stale') ||
               p.offsetTop - from.offsetTop + p.offsetHeight <= from.clientHeight) break;
         }
@@ -7974,6 +8045,8 @@
     if (q.has('video')) setVideo(flag('video'));
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('bw')) { bwInput.value = q.get('bw'); setBlocked(bwInput.value); }
+    if (q.has('hw')) { hwInput.value = q.get('hw'); setHideList(hwInput.value); }
+    if (q.has('hwm')) { const i = HIDE_MODES.indexOf(q.get('hwm')); if (i >= 0) setHideMode(i); }
     if (q.has('ping')) setPing(flag('ping'));
     if (q.has('clean')) setCleanUrls(flag('clean'));
     if (q.has('peek') && +q.get('peek') >= 0 && +q.get('peek') < PEEK_MODES.length) setPeek(+q.get('peek'));
@@ -8027,6 +8100,7 @@
     helpFs: ['follow chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'on'],
+    helpHide: HIDE_MODES,
     helpRbw: ['sweep', 'wave', 'hue cycle', 'pulse', 'flicker'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
@@ -8039,6 +8113,8 @@
   // each font name renders in its own face
   document.getElementById('helpFontFamList').innerHTML = [...fontSel.options].map((o, i) =>
     `<a href="#" role="button" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value]}">${o.text}</a>`).join(' · ');
+  // the hide-mode default (stub) is set by no setter at boot - mark it
+  markHelp('helpHide', hideMode);
   // bold each leading 'name:' in the description cells - whether it sits
   // in a <span> or a bare text node beside the row's <b> label
   helpPanel.querySelectorAll('div').forEach((d) => {
