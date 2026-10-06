@@ -83,6 +83,11 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- reddit links preview properly: reddit serves a bare js shell to
+  non-browser fetches, so the worker's generic scrape found nothing -
+  it now reads the atom feeds instead (post .rss for title, body,
+  u/author, date and embedded media; a sub or user feed for the
+  subtitle and recent post titles; redd.it shortlinks resolve first)
 - the ? popup's "follow" font size now tracks one ladder step below the
   chat font rather than matching it - the option is labelled 'chat −1',
   and explicit px picks still override
