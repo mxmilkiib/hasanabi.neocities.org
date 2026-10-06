@@ -615,6 +615,9 @@
   .role.first { color: #ff69b4; font-weight: 700; }
   .row.notice { color: color-mix(in oklch, var(--text-dim), var(--text) 70%); font-style: italic; }
   .row.notice .notice-label { font-style: normal; }
+  /* the noticed user's link goes another step above .at's +200 so the
+     name reads clearly bolder inside the dim italic row */
+  .row.notice .nwho { font-weight: max(800, calc(var(--chat-w, 400) + 400)); }
   /* the rainbow sweep: notice labels, merged-channel tags and
      @hasanabi mentions share it */
   .row.notice .notice-label, .row .rbw {
@@ -3004,7 +3007,7 @@
         // echo and carry the name on a link to their channel instead
         const dup = who && sys.slice(0, who.length).toLowerCase() === who.toLowerCase() && !/\w/.test(sys[who.length] || '');
         const sysText = dup ? sys.slice(who.length).replace(/^\s*[-–—,:]?\s*/, '') : sys;
-        const whoLink = `<a class="at" style="color:${escapeHTML(wcol)}" href="https://www.twitch.tv/${escapeHTML(tags.login || login || who)}" target="_blank" rel="noopener noreferrer">${escapeHTML(who)}</a>`;
+        const whoLink = `<a class="at nwho" style="color:${escapeHTML(wcol)}" href="https://www.twitch.tv/${escapeHTML(tags.login || login || who)}" target="_blank" rel="noopener noreferrer">${escapeHTML(who)}</a>`;
         html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> ${whoLink} ` +
                 `${linkifyEsc(escapeHTML(sysText))}${message ? (sysText ? ' - ' : '') + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;

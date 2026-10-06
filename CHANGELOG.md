@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-06
 
 ### Features
+- [notice] rows (gifted subs, raids, milestones) put the noticed
+  user's name link a weight step above the rest - it was already at
+  the .at bold and read thin inside the dim italic row
 - link weight option for the ? popup's resources/authors tabs: a
   light…bold pick on its own row under popup font size sets the weight
   of each entry's own name link (first anchor per item) while the
