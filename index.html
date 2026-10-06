@@ -840,6 +840,29 @@
   #findres .fr[data-mid] { cursor: pointer; }
   #findres .fr[data-mid]:hover { background: var(--line); }
   #findres .fr b { color: var(--accent); font-weight: 600; }
+  /* the nick-click inspector: a peek-styled card that stays up until
+     dismissed, carrying facts and the mod/quick-action rows */
+  #ucard {
+    position: fixed; z-index: 55; width: 330px; max-width: 92vw;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--popline); border-radius: 6px;
+    padding: 8px 10px; font-size: var(--chat-font, 15px); line-height: 1.45;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+  }
+  #ucard[hidden] { display: none; }
+  #ucard .uc-name { font-weight: 700; font-size: 1.08em; }
+  #ucard .uc-login { color: var(--text-dim); font-size: .82em; }
+  #ucard .uc-facts { color: var(--text-dim); font-size: .82em; margin: 4px 0; }
+  #ucard .uc-msgs { margin: 6px 0 2px; max-height: 9em; overflow-y: auto;
+    border-top: 1px solid var(--line); padding-top: 4px; font-size: .82em;
+    color: var(--text-dim); }
+  #ucard .uc-msgs div { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #ucard .uc-btns { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px;
+    align-items: center; }
+  #ucard .uc-btns .hdr-btn { height: 22px; padding: 0 8px; font-size: .82em; }
+  #ucard .uc-mod { border-top: 1px solid var(--line); margin-top: 7px; padding-top: 5px; }
+  #ucard .uc-mod button[data-armed] { color: var(--danger); border-color: var(--danger); }
+  #ucardX { float: right; padding: 0 5px; }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -1486,7 +1509,7 @@
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.75)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /">⌕</button></div>
   </header>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
-    <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">resources</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
+    <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">resources</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
     <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
@@ -1555,6 +1578,9 @@
     <div class="sep">—</div>
     <div class="wide" style="margin-top: 8px"><span>source: <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/README.md" target="_blank" rel="noopener">README.md</a> · <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a> · <a class="at" href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License" target="_blank" rel="noopener">AGPL</a>)<span class="ghbtn"><a class="ghb" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener" title="star the repo on github"><svg viewBox="12 12 40 40" aria-hidden="true"><path fill="currentColor" d="M32 13.4c-10.5 0-19 8.5-19 19 0 8.4 5.5 15.5 13 18 1 .2 1.3-.4 1.3-.9v-3.2c-5.3 1.1-6.4-2.6-6.4-2.6-.9-2.1-2.1-2.7-2.1-2.7-1.7-1.2.1-1.1.1-1.1 1.9.1 2.9 2 2.9 2 1.7 2.9 4.5 2.1 5.5 1.6.2-1.2.7-2.1 1.2-2.6-4.2-.5-8.7-2.1-8.7-9.4 0-2.1.7-3.7 2-5.1-.2-.5-.8-2.4.2-5 0 0 1.6-.5 5.2 2 1.5-.4 3.1-.7 4.8-.7 1.6 0 3.3.2 4.7.7 3.6-2.4 5.2-2 5.2-2 1 2.6.4 4.6.2 5 1.2 1.3 2 3 2 5.1 0 7.3-4.5 8.9-8.7 9.4.7.6 1.3 1.7 1.3 3.5v5.2c0 .5.4 1.1 1.3.9 7.5-2.6 13-9.7 13-18.1 0-10.5-8.5-19-19-19z"/></svg>Star</a><a class="ghc" href="https://github.com/mxmilkiib/hasanabi.neocities.org/stargazers" target="_blank" rel="noopener" title="stargazers"><span id="repoStars"></span></a></span><span id="repoStats"></span></span></div>
     </div>
+    <div class="htabpage" role="tabpanel" id="htabStats" hidden>
+    <div id="statsBody"></div>
+    </div>
     <div class="htabpage" role="tabpanel" id="htabRes" hidden>
     <div><b>re Hasan</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener">twitch</a> · <a class="at" href="https://www.youtube.com/@HasanAbi" target="_blank" rel="noopener">youtube</a> (<a class="at" href="https://www.youtube.com/@hasan" target="_blank" rel="noopener">vlogs</a> · <a class="at" href="https://www.youtube.com/@hasanabigaming" target="_blank" rel="noopener">gaming</a> · <a class="at" href="https://www.youtube.com/@HasanAbiVODs3" target="_blank" rel="noopener">vods</a>) · <a class="at" href="https://x.com/hasanthehun" target="_blank" rel="noopener">twitter</a> (<a class="at" href="https://x.com/hasanabiupdates" target="_blank" rel="noopener">updates</a>) · <a class="at" href="https://instagram.com/hasandpiker" target="_blank" rel="noopener">instagram</a> · <a class="at" href="https://www.tiktok.com/@hasandpiker" target="_blank" rel="noopener">tiktok</a> · <a class="at" href="https://discord.gg/hasan" target="_blank" rel="noopener">hascord</a> · <a class="at" href="https://www.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">r/Hasan_Piker</a> (<a class="at" href="https://old.reddit.com/r/Hasan_Piker/" target="_blank" rel="noopener">old</a>) · <a class="at" href="https://hasanabi.m44.cl/" target="_blank" rel="noopener">media tracker</a> · <a class="at" href="https://twitchtracker.com/hasanabi" target="_blank" rel="noopener">twitchtracker</a> · <a class="at" href="https://en.wikipedia.org/wiki/Hasan_Piker" target="_blank" rel="noopener">wikipedia</a> · <a class="at" href="https://www.youtube.com/watch?v=HFavZzbxjto" target="_blank" rel="noopener">hasan is streaming</a> (<a class="at" href="https://youtu.be/zoEWotQKiCo" target="_blank" rel="noopener">original</a>) · <a class="at" href="https://ideologie.shop/" target="_blank" rel="noopener">ideologie shop</a> · <a class="at" href="https://youtube.com/@ostonox" target="_blank" rel="noopener">ostonox</a> · <a class="at" href="https://www.youtube.com/@FearandPodcast" target="_blank" rel="noopener">fear&amp; pod</a> · <a class="at" href="https://www.youtube.com/@TheDeprogram9999" target="_blank" rel="noopener">deprogram pod</a></span></div>
     <div><b>clips</b><span class="linkcols"><i><a class="at" href="https://hasanhub.com/" target="_blank" rel="noopener">hasanhub</a> <i>(clip hub)</i></i><i><a class="at" href="https://tiktok.hasanabitv.com/" target="_blank" rel="noopener">hastok hub</a> <i>(clip-complex index)</i></i><i><a class="at" href="https://www.youtube.com/@hasanabiproductionsfanchannel" target="_blank" rel="noopener">hasanabi productions</a> <i>(yt · biggest)</i></i><i><a class="at" href="https://www.youtube.com/@hasanreactionsfantwo" target="_blank" rel="noopener">hasan reactions</a> <i>(yt · edited)</i></i><i><a class="at" href="https://www.youtube.com/@dailydoseofhasanabifanchannel" target="_blank" rel="noopener">daily dose of hasanabi</a> <i>(yt)</i></i><i><a class="at" href="https://www.youtube.com/@hasanabiclips3" target="_blank" rel="noopener">hasanabi clips</a> <i>(yt)</i></i><i><a class="at" href="https://www.tiktok.com/@pikerbroadcasting" target="_blank" rel="noopener">pikerbroadcasting</a> <i>(tiktok)</i></i><i><a class="at" href="https://www.tiktok.com/@hasan_archive" target="_blank" rel="noopener">hasan archive</a> <i>(tiktok)</i></i><i><a class="at" href="https://www.tiktok.com/@dailydoseofhasanabiclips" target="_blank" rel="noopener">daily dose of hasanabi</a> <i>(tiktok)</i></i><i><a class="at" href="https://www.tiktok.com/@hasanabi_afterdark" target="_blank" rel="noopener">hasanabi afterdark</a> <i>(tiktok)</i></i><i><a class="at" href="https://www.tiktok.com/@hank_pecker_real" target="_blank" rel="noopener">hank pecker</a> <i>(tiktok)</i></i></span></div>
@@ -1605,6 +1631,7 @@
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
+  <div id="ucard" role="dialog" aria-label="user card" hidden></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
@@ -2909,6 +2936,7 @@
       const name = tags['display-name'] || '(unknown)';
       const color = monoNames ? colorForName(name) : (ensureLegible(tags.color) || colorForName(name));
       noteNick(login, name, color);
+      if (login) nickMsgs.set(login, (nickMsgs.get(login) || 0) + 1);
       // real badge icons left of the name; text chips only as fallback
       const renderedSets = new Set();
       const badgeImgs = (tags.badges || '').split(',').map((b) => {
@@ -3104,6 +3132,15 @@
         if (findOnlyOn && !hit) r.classList.add('fhide');
         if (hit) { findHits.push(r); findCnt.textContent = `${findIdx + 1}/${findHits.length}`; }
       }
+      // every rendered row archives flat fields for the archive search;
+      // whispers never reach the log so they stay out of the index too
+      if (r.dataset.mid) archBuf.push({
+        mid: r.dataset.mid, ts: +r.dataset.ts || 0, ch: r.dataset.ch || '',
+        login: r.dataset.u || '',
+        kind: r.classList.contains('notice') ? 'notice' : 'msg',
+        name: (r.querySelector('.name') || {}).textContent || '',
+        text: (r.textContent || '').slice(0, 500),
+      });
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self')) {
@@ -3132,6 +3169,7 @@
     // evicted rows leave their ids behind - drop only the disconnected
     if (rowById.size > MAX_MESSAGES + 1000)
       for (const [mid, el] of rowById) if (!el.isConnected) rowById.delete(mid);
+    archFlush(); // archive writes are queued on the same batch as the rows
     if (!isSplit() && nearBottom && !pausedCols.has(activeEl)) snapLive(activeEl);
     jdownSet(jdownLog, logEl);
     jdownSet(jdownSide, sideEl, sideEl.hidden);
@@ -3889,7 +3927,39 @@
       a.setAttribute('aria-selected', String(on));
     });
     helpPanel.querySelectorAll('.htabpage').forEach((p) => p.hidden = p.id !== id);
+    if (id === 'htabStats') setTimeout(renderStats); // the maps it reads init below; defer past the first pass
     try { localStorage.setItem('hasan-htab', id); } catch {}
+  }
+  // the stats tab builds fresh on each open: session chatters and message
+  // counts, channel emote usage, and the rate graph's loudest samples
+  function renderStats() {
+    const el = document.getElementById('statsBody');
+    if (!el) return;
+    const chat = [...nickMsgs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15)
+      .map(([lg, n], i) => {
+        const rec = seenNicks.get(lg) || {};
+        const nm = rec.n || lg;
+        const col = rec.c || colorForName(nm);
+        return `<div><b>${i + 1}.</b> <a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a> <i>${n}</i></div>`;
+      }).join('');
+    const all = new Set([...Object.keys(emoteUse), ...Object.keys(liveUse)]);
+    const emo = [...all].map((n) => [n, useOf(n)]).sort((a, b) => b[1] - a[1]).slice(0, 15)
+      .map(([n, c], i) => {
+        const set = twSets.flatMap((s) => s.emoteList).find((e) => e.code === n);
+        const url = emotesOf(CHANNEL)[n] || (set && twEmoteUrl(set.id, set.assetType === 'ANIMATED'));
+        const vis = url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}">` : escapeHTML(n);
+        return `<div><b>${i + 1}.</b> ${vis} ${escapeHTML(n)} <i>${c.toLocaleString('en')}</i></div>`;
+      }).join('');
+    const bursts = rateSamples.map((r, i) => [r, rateTimes[i]])
+      .filter(([r, t]) => Number.isFinite(r) && t)
+      .sort((a, b) => b[0] - a[0]).slice(0, 3)
+      .map(([r, t]) => `<div><b>burst</b><span>${r.toFixed(1)} msgs/s at ${fmtRowTime(new Date(t))}</span></div>`).join('');
+    const total = [...nickMsgs.values()].reduce((a, b) => a + b, 0);
+    el.innerHTML =
+      `<div><b>session</b><span>${nickMsgs.size} chatters · ${total} message${total === 1 ? '' : 's'} rendered</span></div>` +
+      (chat ? `<div><b>top chatters</b><span>${chat}</span></div>` : '') +
+      (emo ? `<div><b>top emotes</b><span>${emo}</span></div>` : '') +
+      (bursts || `<div><b>bursts</b><span>no rate data yet - the graph fills in as chat flows</span></div>`);
   }
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
@@ -4319,6 +4389,11 @@
       const e = peekCache.get(peekUrl);
       if (e) peekShow(e.p, peekUrl, false);
     }
+    // the inspector gets the same in-place update when the lookup lands
+    if (label && ucardLogin === login && !ucard.hidden) {
+      const f = ucard.querySelector('.uc-facts');
+      if (f && !f.textContent.includes(label)) f.textContent = label + ' · ' + f.textContent;
+    }
     pronSave();
     pronTimer = pronQueue.size ? setTimeout(pronTick, 300) : 0;
   }
@@ -4578,6 +4653,202 @@
       setFindOpen(true);
     }
   });
+
+  // ---- chat archive: every rendered row indexes flat fields into
+  // IndexedDB so the find-bar can reach past scrollback's edge. Kept 30
+  // days, capped near 50MB (estimating total origin usage - the archive
+  // dwarfs everything else this page stores). Whispers stay out of it ----
+  const ARCH_MAX_AGE = 30 * 864e5, ARCH_CAP = 50e6;
+  let archDb = null, archBuf = [];
+  if (window.indexedDB) {
+    const req = indexedDB.open('hasan-archive' + CHAN_SFX, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('msgs')) {
+        const st = db.createObjectStore('msgs', { keyPath: 'mid' });
+        st.createIndex('ts', 'ts');
+        st.createIndex('ch', 'ch');
+      }
+    };
+    req.onsuccess = () => {
+      archDb = req.result;
+      document.getElementById('findArch').hidden = false;
+      archPrune();
+    };
+    req.onerror = () => { archDb = null; };
+  }
+  function archPrune() {
+    if (!archDb) return;
+    // age first, size second: over-cap trims the oldest ~15% and leaves
+    // the rest regardless of how young it is
+    try {
+      const cutoff = Date.now() - ARCH_MAX_AGE;
+      const tx = archDb.transaction('msgs', 'readwrite');
+      const idx = tx.objectStore('msgs').index('ts');
+      idx.openCursor(IDBKeyRange.upperBound(cutoff)).onsuccess = (e) => {
+        const cur = e.target.result;
+        if (cur) { cur.delete(); cur.continue(); }
+      };
+      if (navigator.storage && navigator.storage.estimate) {
+        navigator.storage.estimate().then((est) => {
+          if (!est || (est.usage || 0) < ARCH_CAP) return;
+          // ~15% of a 30-day window is 4.5 days - delete by age, not count
+          const hi = Date.now() - ARCH_MAX_AGE * .15;
+          const tx2 = archDb.transaction('msgs', 'readwrite');
+          tx2.objectStore('msgs').index('ts')
+            .openCursor(IDBKeyRange.upperBound(hi)).onsuccess = (e) => {
+            const cur = e.target.result;
+            if (cur) { cur.delete(); cur.continue(); }
+          };
+        }).catch(() => {});
+      }
+    } catch {}
+  }
+  function archFlush() {
+    if (!archDb || !archBuf.length) return;
+    const buf = archBuf;
+    archBuf = [];
+    try {
+      const tx = archDb.transaction('msgs', 'readwrite');
+      const st = tx.objectStore('msgs');
+      for (const rec of buf) st.put(rec);
+    } catch {}
+  }
+  // the same tokens the find-bar parses, run against stored rows - a
+  // cursor walks newest-first and stops once 300 hits are collected
+  function archSearch(toks, cb) {
+    if (!archDb || !toks.length) return cb([]);
+    const hits = [];
+    try {
+      const tx = archDb.transaction('msgs', 'readonly');
+      tx.objectStore('msgs').index('ts').openCursor(null, 'prev').onsuccess = (e) => {
+        const cur = e.target.result;
+        if (!cur || hits.length >= 300) return cb(hits);
+        const r = cur.value;
+        const ok = toks.every(([k, v]) => {
+          if (k === 'user') return (r.login + '|' + r.name).toLowerCase().includes(v);
+          if (k === 'kind') return v === 'notice' ? r.kind === 'notice' : r.kind === 'msg' || r.kind === v;
+          return (r.text || '').toLowerCase().includes(v);
+        });
+        if (ok) hits.push(r);
+        cur.continue();
+      };
+      tx.onerror = () => cb(hits);
+    } catch { cb(hits); }
+  }
+  document.getElementById('findArch').addEventListener('click', () => {
+    const toks = findTokens();
+    findRes.hidden = false;
+    findRes.textContent = 'searching archive…';
+    archSearch(toks, (hits) => {
+      if (!hits.length) { findRes.textContent = 'no archived matches'; return; }
+      findRes.innerHTML = hits.map((r) =>
+        `<div class="fr" data-mid="${escapeHTML(r.mid)}" data-ts="${r.ts}"><b>${escapeHTML(r.name || r.login || '?')}</b>: ${escapeHTML((r.text || '').slice(0, 160))}</div>`).join('');
+    });
+  });
+  // an archived hit whose row still renders jumps to it; gone rows just
+  // flash nothing - the list already shows what was said
+  findRes.addEventListener('click', (e) => {
+    const fr = e.target.closest('.fr[data-mid]');
+    if (!fr) return;
+    const r = document.querySelector(`.row[data-mid="${CSS.escape(fr.dataset.mid)}"]`);
+    if (r) {
+      r.scrollIntoView({ block: 'center' });
+      r.classList.remove('jump');
+      void r.offsetWidth;
+      r.classList.add('jump');
+    }
+  });
+
+  // ---- user inspector: a nick click pins a card with what the page
+  // knows about the chatter - colour, pronouns, first-seen, session
+  // count, recent lines - plus quick actions. Modifier-clicks still
+  // open the profile; the card's @mention does the old plain-click
+  // insert. The mod row shows only where own USERSTATE earns it ----
+  const ucard = document.getElementById('ucard');
+  let ucardLogin = '', ucardCh = '', ucardMid = '';
+  const ucardHide = () => { ucard.hidden = true; ucardLogin = ''; };
+  function ucardShow(login, ch, mid, x, y) {
+    const lg = (login || '').toLowerCase();
+    if (!lg) return;
+    ucardLogin = lg; ucardCh = ch || CHANNEL; ucardMid = mid || '';
+    const rec = seenNicks.get(lg) || {};
+    const name = rec.n || login;
+    const col = rec.c || colorForName(name);
+    pronSeen(lg);
+    const first = nickFirst.get(lg);
+    const count = nickMsgs.get(lg) || 0;
+    const pron = pronouns.get(lg) || '';
+    const rows = [];
+    for (const c of cols()) for (const r of c.querySelectorAll(`.row[data-u="${CSS.escape(lg)}"]`)) rows.push(r);
+    const recent = rows.slice(-5).map((r) => {
+      const t = (r.textContent || '').replace(/\s+/g, ' ').trim();
+      return `<div title="${escapeHTML(t)}">${escapeHTML(t.slice(0, 120))}</div>`;
+    }).join('');
+    const canMod = !!(auth && auth.login && selfExempts[ucardCh]) && lg !== auth.login.toLowerCase();
+    ucard.innerHTML =
+      `<button class="hdr-btn" id="ucardX" title="close">✕</button>` +
+      `<span class="uc-name" style="color:${escapeHTML(col)}">${escapeHTML(name)}</span>` +
+      (name.toLowerCase() !== lg ? ` <span class="uc-login">@${escapeHTML(lg)}</span>` : '') +
+      `<div class="uc-facts">${pron ? escapeHTML(pron) + ' · ' : ''}` +
+      `seen ${first ? fmtRowTime(new Date(first)) : '—'} · ${count} msg${count === 1 ? '' : 's'} this session</div>` +
+      (recent ? `<div class="uc-msgs">${recent}</div>` : '') +
+      `<div class="uc-btns">` +
+        `<a class="hdr-btn" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(lg))}" target="_blank" rel="noopener noreferrer">profile ↗</a>` +
+        (auth && auth.login ? `<button class="hdr-btn" data-uc="mention">@mention</button>` : '') +
+        `<button class="hdr-btn" data-uc="hide">hide user</button>` +
+      `</div>` +
+      (canMod ? `<div class="uc-btns uc-mod"><button class="hdr-btn" data-uc="to">timeout 10m</button>` +
+        `<button class="hdr-btn" data-uc="ban">ban</button>` +
+        (ucardMid ? `<button class="hdr-btn" data-uc="del">delete msg</button>` : '') + `</div>` : '');
+    ucard.hidden = false;
+    const w = ucard.offsetWidth, h = ucard.offsetHeight;
+    ucard.style.left = Math.max(4, Math.min(innerWidth - w - 4, x - 20)) + 'px';
+    ucard.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - h - 4, y - 10)) + 'px';
+  }
+  ucard.addEventListener('click', (e) => {
+    if (e.target.closest('#ucardX')) { ucardHide(); return; }
+    const b = e.target.closest('button[data-uc]');
+    if (!b) return;
+    const act = b.dataset.uc;
+    if (act === 'mention') {
+      chatInput.value = '@' + ucardLogin + ' ' + chatInput.value;
+      chatbarEl.hidden = false;
+      growInput();
+      chatInput.focus();
+      return;
+    }
+    if (act === 'hide') {
+      if (!hideUsers.has(ucardLogin)) {
+        hwInput.value = (hwInput.value.trim() ? hwInput.value.trim() + ', ' : '') + ucardLogin;
+        setHideList(hwInput.value);
+        saveOpts();
+      }
+      ucardHide();
+      return;
+    }
+    // mod actions arm first - a second click inside 3s sends the irc
+    // command through the relay; a timeout never re-arms
+    if (b.dataset.armed) {
+      const cmd = act === 'to' ? `/timeout ${ucardLogin} 600`
+        : act === 'ban' ? `/ban ${ucardLogin}`
+        : `/delete ${ucardMid}`;
+      if (relayFrame.contentWindow)
+        relayFrame.contentWindow.postMessage({ type: 'send', channel: ucardCh, text: cmd }, RELAY_ORIGIN);
+      b.textContent = 'sent';
+      delete b.dataset.armed;
+      setTimeout(ucardHide, 400);
+      return;
+    }
+    b.dataset.armed = '1';
+    const label = b.textContent;
+    b.textContent = 'sure?';
+    setTimeout(() => { if (b.isConnected && b.dataset.armed) { delete b.dataset.armed; b.textContent = label; } }, 3000);
+  });
+  document.addEventListener('mousedown', (e) => {
+    if (!ucard.hidden && !e.target.closest('#ucard')) ucardHide();
+  });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') ucardHide(); });
 
   // ---- option persistence ----
   const OPTS_KEY = 'hasan-opts';
@@ -5634,19 +5905,30 @@
       e.preventDefault();
       return;
     }
-    // logged in, a plain click on a chatter's name types @name at the input
-    // caret instead of opening the profile; modifier-clicks still open it
+    // a nick click pins the user card: colour, pronouns, first-seen,
+    // session count, recent lines and quick actions. ⇧/⌃/⌘-click opens
+    // the twitch profile like any link; the card's @mention button does
+    // the insert a plain click used to
     const nm = e.target.closest('a.name');
-    if (nm && auth && auth.login && !(e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || e.button)) {
+    if (nm && !(e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || e.button)) {
       e.preventDefault();
-      const t = '@' + nm.textContent + ' ';
-      const at = chatInput.selectionStart ?? chatInput.value.length;
-      chatInput.value = chatInput.value.slice(0, at) + t + chatInput.value.slice(chatInput.selectionEnd ?? at);
-      growInput();
-      chatbarEl.hidden = false;
-      chatInput.focus();
-      chatInput.setSelectionRange(at + t.length, at + t.length);
+      const row = nm.closest('.row');
+      ucardShow((row && row.dataset.u) || nm.textContent, (row && row.dataset.ch) || CHANNEL,
+        (row && row.dataset.mid) || '', e.clientX, e.clientY);
       return;
+    }
+    // @mentions and notice target links inside rows get the same card -
+    // the login parses out of the profile href
+    const at = e.target.closest('a.at');
+    if (at && at.closest('.row') && !(e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || e.button)) {
+      const m = /twitch\.tv\/([^/?#]+)/.exec(at.getAttribute('href') || '');
+      if (m) {
+        e.preventDefault();
+        const row = at.closest('.row');
+        ucardShow(decodeURIComponent(m[1]), (row && row.dataset.ch) || CHANNEL,
+          (row && row.dataset.mid) || '', e.clientX, e.clientY);
+        return;
+      }
     }
     const rb = e.target.closest('.rplybtn');
     if (rb) { setReply(rb.closest('.row')); return; }
@@ -6122,9 +6404,12 @@
   // enter/click fills the name in ----
   const chatComp = document.getElementById('chatComp');
   const seenNicks = new Map(); // login -> { n: display, c: colour }
+  const nickFirst = new Map(); // login -> wall-ms first noted this session
+  const nickMsgs = new Map();  // login -> rendered PRIVMSGs this session
   const noteNick = (login, name, color) => {
     const k = (login || '').toLowerCase();
     if (!/^[a-z0-9_]{2,25}$/.test(k)) return;
+    if (!nickFirst.has(k)) nickFirst.set(k, Date.now());
     // a note without a colour (a clearchat target, etc) keeps whatever a
     // real message already stored - the lookup would otherwise erase it
     const prev = seenNicks.get(k);
