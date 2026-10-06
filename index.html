@@ -4241,9 +4241,9 @@
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = 'alltime';
   try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
-  // the badge list caps at 40 rows; its 'show all' link flips this and a
-  // sort/window/scope pick folds it back
-  let statBadgeAll = false;
+  // the badge and emote lists cap at 40 rows; their 'show all' links
+  // flip these and a sort/window/source/scope pick folds them back
+  let statBadgeAll = false, statEmoteAll = false;
   let lastStatPaint = 0;
   function renderStats() {
     const el = document.getElementById('statsBody');
@@ -4351,8 +4351,9 @@
     if (!twSets.some((s) => s.setID === '0')) loadTwitchSets('');
     const all = new Set(win === 0 ? Object.keys(eUse)
       : win === -1 ? Object.keys(lUse) : Object.keys(dayBag));
-    const emo = [...all].map((n) => [n, useS(n)]).sort((a, b) => b[1] - a[1]).slice(0, 40)
-      .map(([n, c], i) => {
+    const eRanked = [...all].map((n) => [n, useS(n)]).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
+    const eVis = statEmoteAll ? eRanked : eRanked.slice(0, 40);
+    const emo = eVis.map(([n, c], i) => {
         // a scoped view reads its channel's sets first, then the other
         // joins' - an emote living only in another channel still images
         const chs = sc ? [sc, ...CHANNELS.filter((c) => c !== sc)] : CHANNELS;
@@ -4373,7 +4374,12 @@
           twEmoteUrl(useIds[n] || useIds[en], false));
         return row(i + 1, (url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}"> ` : '') + escapeHTML(n),
           c.toLocaleString('en'));
-      }).join('');
+      }).join('') +
+      (eRanked.length > eVis.length
+        ? `<div class="st-row st-all"><button type="button" class="st-s" data-eall>` +
+          `${(eRanked.length - eVis.length).toLocaleString('en')} more - show all</button></div>`
+        : statEmoteAll && eRanked.length > 40
+          ? `<div class="st-row st-all"><button type="button" class="st-s" data-efold>collapse to top 40</button></div>` : '');
     const bSeries = sc ? (rateSamplesPer[sc] || []) : rateSamples;
     const bOff = rateTimes.length - bSeries.length;
     const bursts = bSeries.map((r, i) => [r, rateTimes[bOff + i]])
@@ -4561,10 +4567,22 @@
       renderStats();
       return;
     }
+    const eall = e.target.closest('[data-eall]');
+    if (eall) {
+      statEmoteAll = true;
+      renderStats();
+      return;
+    }
+    const efold = e.target.closest('[data-efold]');
+    if (efold) {
+      statEmoteAll = false;
+      renderStats();
+      return;
+    }
     const scb = e.target.closest('.st-s[data-sscope]');
     if (scb) {
       statScope = scb.dataset.sscope;
-      statBadgeAll = false;
+      statBadgeAll = statEmoteAll = false;
       try { localStorage.setItem(STAT_SCOPE_KEY, statScope); } catch {}
       renderStats();
       return;
@@ -4572,6 +4590,7 @@
     const esb = e.target.closest('.st-s[data-esrc]');
     if (esb) {
       emoteStatSrc = esb.dataset.esrc;
+      statEmoteAll = false;
       try { localStorage.setItem(EMOTE_SRC_KEY, emoteStatSrc); } catch {}
       renderStats();
       return;

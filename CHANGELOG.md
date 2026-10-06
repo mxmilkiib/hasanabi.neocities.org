@@ -13,9 +13,10 @@ not versions — the page ships continuously to Neocities.
   the same series that paints the rate graph's red segments (>2/sec),
   ranked with their timestamps; a per-channel series keeps the scope
   picker honest
-- stats badge lists cap at the top 40 rows with a 'N more - show all'
-  row that expands the full ranking (and a 'collapse to top 40' row
-  to fold it again); a sort, window or scope pick folds it back
+- stats badge and top-emote lists cap at the top 40 rows with a
+  'N more - show all' row that expands the full ranking (and a
+  'collapse to top 40' row to fold it again); a sort, window, source
+  or scope pick folds it back
 
 ### Fixes
 - tweet video previews erroring with "no video with supported format
