@@ -234,12 +234,14 @@ no dependencies beyond CDN-hosted fonts.
   hide; `?`, `–` and the `▶` stream-play stay pinned at the right edge
   at their full size) → minimised, a 10px strip carrying just `–` that
   restores on click.
-- Messages-per-second sparkline with 10s/minute ticks and red glorp/F
-  bursts; dim bands shade spans the page wasn't watching (suspended
-  timers, reloads) instead of drawing them flat. It flexes to fill
-  whatever header space is free (the whole bar in reduced mode),
-  re-rasterises to match its box so it stays sharp through resizes,
-  and persists across reloads.
+- Messages-per-second sparkline with 10s/minute ticks and red-on-halo
+  glorp/F bursts; dim bands shade spans the page wasn't watching
+  (suspended timers, reloads) instead of drawing them flat. Hovering
+  reads the sample under the cursor — msgs/s (or the band's cause on
+  a gap), glorp count, wall-clock time. It flexes to fill whatever
+  header space is free (the whole bar in reduced mode), re-rasterises
+  to match its box so it stays sharp through resizes, and persists
+  across reloads.
 
 ### Display options
 
@@ -293,7 +295,10 @@ no dependencies beyond CDN-hosted fonts.
 - `🔗` links view filters the log to rows carrying a URL and shows
   each link only once (session-only, not saved); `✂` clean urls
   rewrites link text without the `https://`, `www.` or a trailing
-  `/index.htm` while leaving the target alone.
+  `/index.htm`. Share-tracking parameters (`utm_*`, ig's `stkn`,
+  yt's `si`, x's `s`/`t` and friends) are stripped from the target
+  itself on render, so the clean form is also what stats tallies and
+  dedupe folds on.
 - Find bar — `ctrl+f`, `/` or the `⌕` button floats a search over the
   rendered scrollback: bare words match text, `user:login` the
   chatter, `kind:notice|mod|gap|action|emote|mention|kw|deleted|sub`
@@ -362,14 +367,18 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Help popup & resources
 
-- Four tabs — config/help, stats (session top chatters, top emotes by
-  channel usage, the rate graph's loudest bursts), resources (re Hasan,
-  clips, news, yt
-  channels, twitch streams, usa pol, dsa chapters, left parties,
-  organising, conduct, dual power, mutual aid, free software, open
-  hardware, justice, extra links), and authors (era-grouped reading
-  lists) — laid out in link columns whose count is capped by the
-  popup's own width via container queries.
+- Four tabs — config/help, stats (a session cell with chatter/message/
+  badge counts and peak viewers; top chatters and badges over
+  all-time/month/week/today windows; top emotes by channel usage,
+  day buckets or StreamElements lifetime counts; top links with
+  favicons and fetched page titles; and the rate graph's loudest
+  bursts and glorp peaks, timestamps linked to that day's supa chat
+  log), resources (re Hasan, clips, news, yt channels, twitch
+  streams, usa pol, dsa chapters, left parties, organising, conduct,
+  dual power, mutual aid, free software, open hardware, open social,
+  justice, extra links), and authors (era-grouped reading lists) —
+  laid out in link columns whose count is capped by the popup's own
+  width via container queries.
 - The popup resizes from its edges and offers widths from 480 to
   1600px.
 
@@ -390,7 +399,7 @@ force off.
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
-| `lw` | `300`–`700` | weight of the name links on the `?` resources/authors tabs |
+| `lw` | `300`–`700` | weight of entry links across the `?` popup — resources, authors, stats |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
 | `hpfs` | px | help popup font size |
 | `hpw` | `480`–`1600` | help popup width |
@@ -478,8 +487,8 @@ Where this sits relative to the usual suspects:
 | gap notices (missed spans) | ✅ timed + cause | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | scrollback limit | ✅ 250–100k | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | draft length warn | ✅ fossa + 500 cap | ❌ | ❌ | ❌ | ❌ | n/a | ❌ | ❌ |
-| usercard / mod UI | ❌ slash cmds pass through | ✅ | partial | ✅ | ✅ | ❌ | ✅ | partial |
-| whispers | ❌ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| usercard / mod UI | ✅ inspector + timeout/ban/delete | ✅ | partial | ✅ | ✅ | ❌ | ✅ | partial |
+| whispers | ✅ pane + unread chip | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ |
 | stream stats line | ✅ uptime·viewers·chatters | viewers/uptime | ❌ | partial | ✅ | ❌ | partial | partial |
 | stream video alongside | ✅ drag/resize overlay | ✅ | ❌ | ❌ | partial ext. | ❌ | ❌ | ❌ |
 | multi-column log | ✅ 2-3 page-flip | ❌ | ❌ | ✅ splits | partial | ❌ | ❌ | ❌ |
