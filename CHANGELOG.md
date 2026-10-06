@@ -5,6 +5,13 @@ not versions — the page ships continuously to Neocities.
 
 ## 2026-10-06
 
+### Fixes
+- tweet video previews erroring with "no video with supported format
+  and mime type found": video.twimg.com 403s any request carrying a
+  foreign Referer, and where a browser leaks one past the srcdoc's
+  no-referrer meta the player now retries through a referrerless
+  fetch (the CDN answers CORS) and plays the blob
+
 ### Features
 - stats badges read tighter: the sentence-length descriptions (set
   blurbs and per-version text) moved to tooltips on the set summary

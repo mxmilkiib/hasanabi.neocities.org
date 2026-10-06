@@ -6419,7 +6419,9 @@
       const gif = tv.querySelector('i').textContent === 'GIF';
       // video.twimg.com 403s any request carrying a foreign Referer and
       // <video> can't set referrerpolicy; a srcdoc document whose meta
-      // forces no-referrer loads the mp4 cleanly instead
+      // forces no-referrer loads the mp4 cleanly, and where a browser
+      // still leaks a Referer the onerror retries through a no-referrer
+      // fetch (the CDN answers CORS) into a blob url
       const f = document.createElement('iframe');
       f.className = 'twvid';
       f.allow = 'autoplay; fullscreen';
@@ -6428,7 +6430,10 @@
       if (+wh[0] && +wh[1]) f.style.aspectRatio = `${+wh[0]} / ${+wh[1]}`;
       f.srcdoc = '<meta name="referrer" content="no-referrer">' +
         '<style>html,body{margin:0;height:100%;background:#000}video{width:100%;height:100%;object-fit:contain}</style>' +
-        `<video src="${tv.dataset.vsrc.replace(/"/g, '&quot;')}" controls autoplay playsinline${gif ? ' loop muted' : ''}></video>`;
+        `<video src="${tv.dataset.vsrc.replace(/"/g, '&quot;')}" controls autoplay playsinline${gif ? ' loop muted' : ''}` +
+        ' onerror="var t=this;if(t.dataset.r)return;t.dataset.r=1;' +
+        'fetch(t.src,{referrerPolicy:\'no-referrer\'}).then(function(r){return r.blob()})' +
+        '.then(function(b){t.src=top.URL.createObjectURL(b)})"></video>';
       tv.replaceWith(f);
       return;
     }
