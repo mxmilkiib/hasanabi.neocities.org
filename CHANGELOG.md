@@ -47,6 +47,10 @@ not versions — the page ships continuously to Neocities.
 - stats tab in the ? popup: session chatter and message counts, the
   top 15 chatters in their nick colours, top 15 emotes by channel
   usage, and the rate graph's three loudest bursts
+- top emotes in the stats tab now lists 30 and resolves far more names
+  to images: channel sub emotes arrive unasked (the relay fetches
+  subscriptionProducts via gql, so anonymous viewers get them too), the
+  global set is requested when missing, and a late set landing repaints
 - blammobot and fossabot no longer crowd the stats tab's top-chatters
   ranking; they still count in the session chatter/message totals
 - "live?" next to channels/streams in the ? popup's resources tab
