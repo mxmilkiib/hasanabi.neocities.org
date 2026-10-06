@@ -2005,6 +2005,9 @@
   function unescapeTag(s) {
     return s.replace(/\\(.)/g, (m, c) => ({ s: ' ', ':': ';', r: '', n: ' ', '\\': '\\' }[c] ?? c));
   }
+  // inverse of unescapeTag, for values planted into a locally-built tag set
+  // (the echo's reply-parent-msg-body) so the render's unescape round-trips
+  const escapeTag = (s) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\:').replace(/ /g, '\\s');
 
   // Parses one Twitch IRC line into {tags, channel, message}.
   function parseTwitchMessage(raw) {
@@ -2087,8 +2090,8 @@
     const avi = c.avatar ? `<img class="twavi" src="${escapeHTML(c.avatar)}" alt="" referrerpolicy="no-referrer">` : '';
     if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${avi}<b>@${escapeHTML(c.author)}</b> ${media}</span>` : '';
     // unicode runs stay upright: italic faces lack their glyph coverage
-    const text = linkifyEsc(escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& ')))
-      .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>');
+    const text = linkifyEsc(escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& '))
+      .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'));
     return `<span class="twcard">${avi}<b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
   }
   // native twitch gif posts name the gif only by its giphy title; the relay
@@ -2437,6 +2440,10 @@
   const snapLive = (col) => { autoScrollAt = performance.now(); col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : col.scrollHeight; };
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
+  // mid → raw message text, so quoting a row uses the real text rather
+  // than textContent - which glues furniture glyphs (the ▶ play button,
+  // chip labels, card text) into the quoted body
+  const rowBody = new Map();
   // every msg id already handled, so replayed backfill lines can't duplicate
   // rows - bounded, since the backfill window is small anyway
   const seenIds = new Set();
@@ -3059,7 +3066,7 @@
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
         reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
-                `${chTag}<span class="rqt"><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody)).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>')}</i><span class="rarr">↩</span></span></span>`;
+                `${chTag}<span class="rqt"><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'))}</i><span class="rarr">↩</span></span></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       const lkey = linkKeyOf(message);
@@ -3138,6 +3145,7 @@
             el.dataset.mid = tags.id;
             rowById.set(tags.id, el);
             seenIds.add(tags.id);
+            rowBody.set(tags.id, message);
           }
           continue;
         }
@@ -3154,6 +3162,10 @@
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
+      if (tags.id) {
+        rowBody.set(tags.id, message.slice(0, 500));
+        if (rowBody.size > MAX_MESSAGES + 1000) rowBody.delete(rowBody.keys().next().value);
+      }
     } catch (err) {
       console.error('chat line dropped:', err, rawMsg);
     }
@@ -6899,10 +6911,17 @@
     if (!auth || !row || row.classList.contains('notice')) return;
     const nameEl = row.querySelector('.name');
     if (!row.dataset.mid || !nameEl) return;
-    let body = '';
-    for (let n = nameEl.nextSibling; n; n = n.nextSibling) {
-      if (n.nodeType === 1 && n.classList.contains('rplybtn')) break;
-      body += n.textContent;
+    // the stored raw text is exact; restored rows fall back to a walk that
+    // skips rendered furniture so glyphs like the ▶ play button and chip
+    // labels don't glue into the quoted body
+    let body = rowBody.get(row.dataset.mid) || '';
+    if (!body) {
+      for (let n = nameEl.nextSibling; n; n = n.nextSibling) {
+        if (n.nodeType !== 1) { body += n.textContent; continue; }
+        if (n.classList.contains('rplybtn')) break;
+        if (!n.matches('.aux, .auxr, .sub, .ytemb, .ytcard, .twprev, .twcard, .lkico'))
+          body += n.textContent;
+      }
     }
     replyCtx = {
       id: row.dataset.mid,
@@ -7183,7 +7202,7 @@
       ...(ctx ? { 'reply-parent-msg-id': ctx.id,
         'reply-parent-display-name': ctx.name,
         'reply-parent-user-login': ctx.login,
-        'reply-parent-msg-body': ctx.body } : {}) }, login: auth.login,
+        'reply-parent-msg-body': escapeTag(ctx.body) } : {}) }, login: auth.login,
       kind: 'PRIVMSG', message: shown, channel: '#' + target, local: true };
     queueMessage(echoMsg, false);
     // typed and pasted emotes count as recents too, same as picker clicks

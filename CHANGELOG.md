@@ -75,6 +75,16 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- reply quotes can no longer leak anchor markup into the quoted body:
+  replyCtx.body came from textContent, which glued the ▶ play glyph
+  (and any chip/card text) onto the message tail - the linkifier then
+  ate the glyph into the url and the unicode .up wrap injected its span
+  inside the new anchor's attributes, so " target=... data-u=..." showed
+  as text. rows now keep their raw text in a mid-keyed map (restored
+  rows fall back to a walk that skips furniture), the echo's
+  reply-parent-msg-body gets proper tag escaping, and the .up wrap runs
+  before linkification at both sites so a unicode url can't corrupt an
+  attribute again
 - picking a non-panel help mode (labels or off) from inside the open ?
   popup no longer ejects it - the mode is also the panel's visibility,
   so the pick used to close the very panel being configured. the panel
