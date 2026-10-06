@@ -83,6 +83,11 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- the #room tags on rows in a merged multi-channel view now run the
+  same pastel rainbow sweep as @hasanabi mentions, with each channel's
+  palette hashed from its name instead of the flat per-channel hues -
+  the motion option's wave/hue/pulse/flick variants and the nick-styles
+  off switch govern them the same way
 - merged channels can be dropped from the resources tab: a stream
   already in the ?channel= list shows a blue '-' where the merge '+'
   sits, linking to the list minus that channel - removing the last one
