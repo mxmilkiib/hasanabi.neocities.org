@@ -736,6 +736,7 @@
     white-space: normal;
   }
   .twcard b { color: #1d9bf0; }
+  .twcard .twavi { height: 1.5em; border-radius: 50%; vertical-align: -0.4em; margin-right: .25em; }
   .twcard .up { font-style: normal; }
   .twcard .twmedia img { max-height: 5em; max-width: 12em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
   /* inline site icons lead chat links; a 404 hides the chip rather than
@@ -2071,11 +2072,12 @@
     if (!c) return '';
     const head = twNorm(c.text).slice(0, 40);
     const media = c.imgs ? `<span class="twmedia">${c.imgs}</span>` : '';
-    if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${media}</span>` : '';
+    const avi = c.avatar ? `<img class="twavi" src="${escapeHTML(c.avatar)}" alt="" referrerpolicy="no-referrer">` : '';
+    if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${avi}<b>@${escapeHTML(c.author)}</b> ${media}</span>` : '';
     // unicode runs stay upright: italic faces lack their glyph coverage
     const text = linkifyEsc(escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& ')))
       .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>');
-    return `<span class="twcard"><b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
+    return `<span class="twcard">${avi}<b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
   }
   // native twitch gif posts name the gif only by its giphy title; the relay
   // searches giphy for it (best match) and the link swaps for the image.
@@ -8636,7 +8638,8 @@
               return ` <a class="twvid" href="${escapeHTML(twurl)}"${play} target="_blank" rel="noopener noreferrer" title="play - ⇧click opens x.com"><img src="${escapeHTML(v.thumb)}" alt="[video]"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`;
             }))
           .join('');
-        entry = { text: t.text, author: t.author && t.author.screen_name || '', imgs };
+        entry = { text: t.text, author: t.author && t.author.screen_name || '',
+          avatar: t.author && t.author.avatar_url || '', imgs };
       }
       tweetCache.set(d.id, entry);
       // bound the cache - a long session can link thousands of unique tweets

@@ -111,6 +111,10 @@ not versions — the page ships continuously to Neocities.
 - the stats tab lays out properly: the help page's 9em label grid was
   flowing its sections into one narrow column with counts wrapped onto
   their own lines
+- tweet preview cards show the author's avatar: the relay now forwards
+  fxtwitter's author.avatar_url and the card renders it round beside
+  the @handle - including the media-only variant, which used to drop
+  the author entirely when a bot had already pasted the tweet text
 
 ## 2026-10-05
 
