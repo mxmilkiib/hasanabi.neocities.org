@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-06
 
 ### Features
+- link weight option for the ? popup's resources/authors tabs: a
+  light…bold pick on the same row as popup font size sets the weight
+  of each entry's own name link (first anchor per item) while the
+  switch/merge/remove and descriptor links stay at the usual .at
+  bold; saved as lwv, shareable as ?lw=500
 - letter spacing (tracking) control: a new ⇄ header button beside the
   line-height one cycles an em ladder from -0.08em tight to +0.12em
   loose, resolved to px against the live chat size so the proportion

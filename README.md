@@ -390,6 +390,7 @@ force off.
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
+| `lw` | `300`–`700` | weight of the name links on the `?` resources/authors tabs |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
 | `hpfs` | px | help popup font size |
 | `hpw` | `480`–`1600` | help popup width |

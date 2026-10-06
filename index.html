@@ -1253,6 +1253,10 @@
   #htabRes a.at.livon::before { content: '●'; color: #43b581;
     font-size: .7em; margin-right: 2px; }
   #htabRes a.at.livoff { opacity: .5; }
+  /* each entry's own name link (the first anchor in the item) gets a
+     tunable weight; the default keeps the usual .at bold */
+  #htabRes .linkcols > i > a.at:first-of-type,
+  #htabAuth .linkcols > i > a.at:first-of-type { font-weight: var(--linkw, 700); }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run longest (name + work + dates + tagline), so
      the widest columns there */
@@ -1586,7 +1590,7 @@
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">resources</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
-    <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
+    <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup> · resources/authors link weight: <span id="helpLwList"></span> - each entry's own name link<sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
@@ -4072,6 +4076,7 @@
     else if (a.classList.contains('helpLh')) lhCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpWg')) weightCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLs')) lsCtl.set(+a.dataset.idx);
+    else if (a.classList.contains('helpLw')) setLinkW(+a.dataset.idx);
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
@@ -4546,6 +4551,17 @@
   lhCtl.set(lhCtl.get());
   weightCtl.set(weightCtl.get());
   lsCtl.set(lsCtl.get());
+  // resources/authors name links: an absolute weight pick, default bold
+  let linkW = WEIGHTS.length - 1;
+  function setLinkW(i) {
+    linkW = i;
+    document.documentElement.style.setProperty('--linkw', WEIGHTS[i]);
+    markHelp('helpLw', i);
+    saveOpts();
+  }
+  document.getElementById('helpLwList').innerHTML = WEIGHT_NAMES.map((n, i) =>
+    `<a href="#" role="button" class="helpOpt helpLw" data-idx="${i}">${n}</a>`).join(' ');
+  setLinkW(linkW);
 
   function applyFont() {
     document.documentElement.style.setProperty('--chat-ff',
@@ -5239,7 +5255,7 @@
   // theme slot stashes
   function curOpts() {
     return {
-      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], theme: themeMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
+      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], theme: themeMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -5303,7 +5319,7 @@
     // size/line-height/weight travel as real values (px, lhv, wv) so the
     // option lists can change without remapping; bare size/lh/weight are
     // legacy list indices, honoured only when the value key is absent
-    [[o.px, 'size', FONT_SIZES, fontCtl], [o.lhv, 'lh', LINE_HEIGHTS, lhCtl], [o.wv, 'weight', WEIGHTS, weightCtl], [o.lsv, 'ls', LS_STEPS, lsCtl]].forEach(([v, k, list, ctl]) => {
+    [[o.px, 'size', FONT_SIZES, fontCtl], [o.lhv, 'lh', LINE_HEIGHTS, lhCtl], [o.wv, 'weight', WEIGHTS, weightCtl], [o.lsv, 'ls', LS_STEPS, lsCtl], [o.lwv, 'lw', WEIGHTS, { set: setLinkW }]].forEach(([v, k, list, ctl]) => {
       const i = v !== undefined ? list.indexOf(v) : Number.isInteger(o[k]) ? o[k] : -1;
       if (i >= 0 && i < list.length) ctl.set(i);
     });
@@ -5400,7 +5416,7 @@
     // embed is deliberately outside presets - one toggles it by hand
     const cmp = {
       theme: themeMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
-      lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lines: lineLevel,
+      lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: mainEl.classList.contains('zebra'), times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
       split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode,
@@ -6159,6 +6175,7 @@
     if (lhCtl.get() !== DEF.lh) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (weightCtl.get() !== DEF.weight) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (lsCtl.get() !== DEF.ls) q.set('ls', LS_STEPS[lsCtl.get()]);
+    if (linkW !== WEIGHTS.length - 1) q.set('lw', WEIGHTS[linkW]);
     if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
@@ -9020,6 +9037,7 @@
     if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
     if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('ls')) { const i = LS_STEPS.indexOf(+q.get('ls')); if (i >= 0) lsCtl.set(i); }
+    if (q.has('lw')) { const i = WEIGHTS.indexOf(+q.get('lw')); if (i >= 0) setLinkW(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
