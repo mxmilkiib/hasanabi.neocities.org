@@ -2724,9 +2724,11 @@
   // in the tag column and the quoted nick shifts right to land exactly on
   // the responder's name, so both nicks line up - the ↩ trails the
   // quoted text inside the band
-  function rqIndent(r) {
+  // split into measure and apply so repin's full-column re-pass reads
+  // every offset in one layout instead of forcing a fresh one per row
+  function rqMeasure(r) {
     const rq = r.querySelector('.reply.rq'), nm = r.querySelector('.name');
-    if (!rq || !nm) return;
+    if (!rq || !nm) return null;
     // badge icons (or the role chip that stands in for them) push the
     // name right - anchor on the cluster's leading edge instead so the
     // quote column is identical whether the responder has any or not.
@@ -2740,20 +2742,25 @@
     }
     const nx = anchor.offsetLeft;
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
-    if (qt && tg) {
+    if (qt && tg) return { qt, nx, tgl: tg.offsetLeft, qtw: qt.offsetWidth };
+    return { rq, nx, rql: rq.offsetLeft, pl: parseFloat(getComputedStyle(rq).paddingLeft) };
+  }
+  function rqApply(m) {
+    if (!m) return;
+    if (m.qt) {
       // the tag's right margin stretches so the quoted nick lands on the
       // name column (the -8 margin-left and the content box's 8px
       // padding inset cancel out)
-      qt.style.marginLeft = (tg.offsetLeft - 8) + 'px';
-      qt.style.marginRight = Math.max(1, nx - tg.offsetLeft - qt.offsetWidth) + 'px';
+      m.qt.style.marginLeft = (m.tgl - 8) + 'px';
+      m.qt.style.marginRight = Math.max(1, m.nx - m.tgl - m.qtw) + 'px';
     } else {
       // text-indent hangs only the first line so the quoted nick sits on
       // the sender column; wrapped lines return to the quote's own left
       // edge like an ordinary multiline row
-      const pl = parseFloat(getComputedStyle(rq).paddingLeft);
-      rq.style.textIndent = (nx - rq.offsetLeft - pl) + 'px';
+      m.rq.style.textIndent = (m.nx - m.rql - m.pl) + 'px';
     }
   }
+  function rqIndent(r) { rqApply(rqMeasure(r)); }
   // the reply button docks left of the right-side chips (sub/aux) but
   // right of any right-pinned emotes: offset it by the chip cluster's
   // left edge. Measured lazily on row entry so it always sees the layout
@@ -4151,13 +4158,27 @@
 
   // After a layout-affecting change: keep the live column pinned, or in
   // split mode re-run the page overflow check.
+  // a preset or applyOpts run calls this once per metric setter - the
+  // scroll pin and re-measure only need the final state, so the flood
+  // coalesces into a single pass on a microtask (still before paint)
+  let repinQ = false;
   function repin() {
-    if (isSplit()) flipCols();
-    else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
-    // font/metric changes move the name column in px - the reply quote
-    // indents cached there go stale, so re-measure them
-    for (const col of [logEl, sideEl, side2El])
-      for (const r of col.querySelectorAll('.row')) rqIndent(r);
+    if (repinQ) return;
+    repinQ = true;
+    queueMicrotask(() => {
+      repinQ = false;
+      if (isSplit()) flipCols();
+      else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
+      // font/metric changes move the name column in px - the reply quote
+      // indents cached there go stale, so re-measure them. measure pass
+      // first, write pass second - each row's offsets read while layout
+      // stays clean, and non-reply rows cost one querySelector
+      for (const col of [logEl, sideEl, side2El]) {
+        const ms = [...col.querySelectorAll('.reply.rq')]
+          .map((rq) => rqMeasure(rq.closest('.row')));
+        for (const m of ms) rqApply(m);
+      }
+    });
   }
 
   // the row's line box and negative margin, resolved to whole pixels:
@@ -5104,6 +5125,11 @@
   }
   function previewSwatches() {
     try { // lists may not be built yet during early init
+      // each paletteOf read restyles the whole document; containment on
+      // the row forest keeps every one of those passes off the rows
+      const keepCv = mainEl.style.contentVisibility;
+      mainEl.style.contentVisibility = 'hidden';
+      try {
       helpPanel.querySelectorAll('a.helpTheme').forEach((a) => {
         const { bg, text } = paletteOf(a.dataset.theme === 'auto' ? null : a.dataset.theme, THEME_SHADE[a.dataset.theme] ?? shadeIdx);
         a.style.background = bg;
@@ -5126,6 +5152,7 @@
         a.style.background = bg;
         a.style.color = text;
       });
+      } finally { mainEl.style.contentVisibility = keepCv; }
     } catch {}
   }
 
@@ -6066,7 +6093,10 @@
   }
   // Moves rows below the fold of `from` to the top of `to`. The outgoing
   // contents stay as faded ghosts and are evicted one by one as the new
-  // rows push them below the fold.
+  // rows push them below the fold. The scan collects the moving run in
+  // one pass while nothing mutates - reading a row's offsetTop right
+  // after moving it forced a layout per row, which made a full-column
+  // deal quadratic.
   function pushOverflow(from, to) {
     if (revFlow) {
       // the flipped column keeps its newest page at the top; rows past
@@ -6074,45 +6104,54 @@
       // A column's stale stragglers and the last column's spill just drop.
       // rects because the flipped axis gives rows negative offsetTops, and
       // the fold is measured from the content's top edge, not the viewport
-      let r, moved = false;
-      while ((r = from.firstElementChild)) {
-        const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
+      const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
+      const head = [];
+      for (let r = from.firstElementChild; r; r = r.nextElementSibling) {
         if (r.getBoundingClientRect().top < fold) break;
-        if (to && !r.classList.contains('stale')) { to.appendChild(r); moved = true; }
+        head.push(r);
+      }
+      let moved = false;
+      const frag = to ? document.createDocumentFragment() : null;
+      for (const r of head) {
+        if (frag && !r.classList.contains('stale')) { frag.appendChild(r); moved = true; }
         else r.remove();
       }
+      if (frag) to.appendChild(frag);
       return moved;
     }
-    let last, moved = false;
-    while ((last = from.lastElementChild)) {
+    const staleTail = [], moveTail = [];
+    let moved = false;
+    for (let r = from.lastElementChild; r; r = r.previousElementSibling) {
       // ghost tail already displaced below the fold: drop, don't carry over
-      if (last.classList.contains('stale')) { last.remove(); continue; }
+      if (r.classList.contains('stale')) { staleTail.push(r); continue; }
       // a display:none row reports offsetTop 0, which would read as inside
       // the fold - hidden tail rows ride along only once a visible row has
       // started moving
-      if (rowCollapsed(last)) {
+      if (rowCollapsed(r)) {
         if (!moved) {
-          let p = last.previousElementSibling;
+          let p = r.previousElementSibling;
           while (p && rowCollapsed(p)) p = p.previousElementSibling;
           if (!p || p.classList.contains('stale') ||
               p.offsetTop - from.offsetTop + p.offsetHeight <= from.clientHeight) break;
         }
-      } else if (last.offsetTop - from.offsetTop + last.offsetHeight <= from.clientHeight) break;
-      if (!moved) {
-        for (const r of to.children) r.classList.add('stale');
-        moved = true;
-      }
-      // consume ghost height equal to the moved row's height at the
-      // fresh/ghost boundary, so it overwrites the old page in place
-      // rather than pushing it down
-      const firstGhost = to.querySelector('.row.stale');
-      if (firstGhost) {
-        const boundary = firstGhost.offsetTop;
-        to.prepend(last);
-        consumeGhosts(firstGhost, firstGhost.offsetTop - boundary);
-      } else to.prepend(last);
-      evictGhosts(to);
+      } else if (r.offsetTop - from.offsetTop + r.offsetHeight <= from.clientHeight) break;
+      moveTail.push(r); moved = true;
     }
+    for (const r of staleTail) r.remove();
+    if (!moveTail.length) return false;
+    // ghost height consumption wants the height each moved row had in
+    // `from` (same-width column, so the wrap - and the height - carry
+    // over); read them before the first dom move so the batch below
+    // costs one layout instead of one per row
+    const heights = moveTail.map((r) => r.offsetHeight);
+    for (const r of to.children) r.classList.add('stale');
+    let need = 0;
+    const frag = document.createDocumentFragment();
+    for (let i = moveTail.length - 1; i >= 0; i--) { frag.appendChild(moveTail[i]); need += heights[i]; }
+    to.prepend(frag);
+    const firstGhost = to.querySelector('.row.stale');
+    if (firstGhost) consumeGhosts(firstGhost, need);
+    evictGhosts(to);
     ghostFade(to);
     return moved;
   }
@@ -6121,13 +6160,16 @@
   // covered. A ghost taller than the remainder repays the overage as a
   // spacer, so the surviving ghost rows keep their original offsets.
   function consumeGhosts(firstGhost, need) {
+    // gather before removing - a height read after each removal would
+    // force a fresh layout for every ghost in the chain
+    const gone = [];
     let g = firstGhost;
     while (need > 0 && g?.classList.contains('stale')) {
       need -= g.offsetHeight;
-      const nx = g.nextElementSibling;
-      g.remove();
-      g = nx;
+      gone.push(g);
+      g = g.nextElementSibling;
     }
+    for (const x of gone) x.remove();
     if (need < 0 && g?.classList.contains('stale')) {
       const sp = document.createElement('div');
       sp.className = 'row stale ghostgap';
@@ -6138,14 +6180,13 @@
 
   // Drops any ghost rows that have already fallen below `col`'s fold.
   function evictGhosts(col) {
-    let g = col.lastElementChild;
-    while (g?.classList.contains('stale') &&
-           (g.classList.contains('blk') || // no offsetTop while display:none
-            g.offsetTop - col.offsetTop + g.offsetHeight > col.clientHeight)) {
-      const prev = g.previousElementSibling;
-      g.remove();
-      g = prev;
-    }
+    const gone = [];
+    for (let g = col.lastElementChild;
+         g?.classList.contains('stale') &&
+         (g.classList.contains('blk') || // no offsetTop while display:none
+          g.offsetTop - col.offsetTop + g.offsetHeight > col.clientHeight);
+         g = g.previousElementSibling) gone.push(g);
+    for (const g of gone) g.remove();
   }
 
   // Ghost rows fade as a smooth gradient by pixel distance below the
@@ -6181,8 +6222,16 @@
     // in rev's drain order) - then re-deal
     const c = cols();
     const i = c.indexOf(activeEl);
-    for (const col of (revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)]))
-      for (const r of [...col.children]) logEl.appendChild(r);
+    const order = revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)];
+    for (let k = 0; k < order.length; k++) {
+      const col = order[k];
+      // logEl's own tail re-append only matters when earlier columns'
+      // rows must land ahead of it - first in the sequence it's a no-op
+      if (k === 0 && col === logEl) continue;
+      const frag = document.createDocumentFragment();
+      for (const r of [...col.children]) frag.appendChild(r);
+      logEl.appendChild(frag);
+    }
     sideEl.hidden = level < 2;
     side2El.hidden = level < 3;
     mainEl.classList.toggle('split', level >= 2);

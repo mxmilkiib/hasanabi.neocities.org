@@ -78,6 +78,15 @@ not versions — the page ships continuously to Neocities.
   12-hour + seconds - and ?times= accepts 24h and 24hsec aliases
 - the find-bar's word buttons (only / archive) sized to their labels
   instead of overlapping inside hdr-btn's fixed 30px cell
+- theme/shade/preset switches no longer stall on big scrollbacks:
+  previewSwatches read each palette by flipping :root attrs and
+  flushing a full-document restyle per chip (~41 passes), so the row
+  forest now sits under style containment for the pass; pushOverflow's
+  column re-deal read every row's geometry right after moving it - a
+  layout per row, quadratic over a column - and now scans once, then
+  moves the run in one fragment; the same batching went into
+  consumeGhosts, evictGhosts and repin's reply-indent re-measure, and
+  applyOpts' repin calls coalesce to one pass on a microtask
 - the stats tab lays out properly: the help page's 9em label grid was
   flowing its sections into one narrow column with counts wrapped onto
   their own lines
