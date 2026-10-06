@@ -30,6 +30,9 @@ not versions — the page ships continuously to Neocities.
 - stats burst rows link their timestamp to that utc day's supa chat
   log (the deepest address its ?c/&d= urls reach; its search only
   matches message text, not times)
+- the bots' evergreen promo urls (prime sub, fear&'s linktree and
+  twitter) are hidden from top links - they live in the re Hasan row
+  now: prime sub beside ideologie shop, tw/links off fear& pod
 
 ### Fixes
 - link and emote hover previews dying on the stats tab: its ~3s live
