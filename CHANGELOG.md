@@ -54,7 +54,7 @@ not versions — the page ships continuously to Neocities.
 - the stats tab ends with a badge reference: every set collapsible,
   channel badges first then everyday globals; common sets carry a
   written meaning and versions show their titles
-- top emotes in the stats tab now lists 30 and resolves far more names
+- top emotes in the stats tab now lists 40 and resolves far more names
   to images: channel sub emotes arrive unasked (the relay fetches
   subscriptionProducts via gql, so anonymous viewers get them too), the
   global set is requested when missing, and a late set landing repaints

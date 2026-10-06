@@ -4052,7 +4052,7 @@
     // whenever it is missing so a second render can image those too
     if (!twSets.some((s) => s.setID === '0')) loadTwitchSets('');
     const all = new Set([...Object.keys(emoteUse), ...Object.keys(liveUse)]);
-    const emo = [...all].map((n) => [n, useOf(n)]).sort((a, b) => b[1] - a[1]).slice(0, 30)
+    const emo = [...all].map((n) => [n, useOf(n)]).sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([n, c], i) => {
         const en = emoteNameOf(CHANNEL, n) || n;
         const set = twSets.flatMap((s) => s.emoteList).find((e) => e.code === n || e.code === en);
