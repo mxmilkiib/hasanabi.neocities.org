@@ -1646,6 +1646,7 @@
       <button class="hdr-btn slot" data-i="2">➌</button>
     </div>
     <button id="copyUrl" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">copy settings url</button>
+    <div style="margin-top: 4px; font-size: .85em"><span>the copied url also carries this popup's open state and selected tab (?help/?htab): <span id="helpCopyHelpList"></span></span></div>
     <div style="margin-top: 6px; display: flex; gap: 6px">
     <button id="resetOpts" class="hdr-btn" style="flex: 3; height: 26px">reset all settings</button>
     <button id="cacheBust" class="hdr-btn" style="flex: 1; height: 26px" title="reload the page bypassing the cache - keeps this url's settings">↻ clear cache</button>
@@ -4102,6 +4103,7 @@
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpHide')) { setHideMode(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx === 1);
   });
   // anchors only fire on enter natively, and only when href'd - the
   // role=button and tab picks answer space, plus enter on the bare ones
@@ -4123,6 +4125,9 @@
     if (id === 'htabStats') setTimeout(renderStats); // the maps it reads init below; defer past the first pass
     try { localStorage.setItem('hasan-htab', id); } catch {}
   }
+  // short names for the ?htab= settings param, both directions
+  const HTAB_URL = { config: 'htabCfg', resources: 'htabRes', authors: 'htabAuth', stats: 'htabStats' };
+  const HTAB_URL_INV = Object.fromEntries(Object.entries(HTAB_URL).map(([k, v]) => [v, k]));
   // the stats tab builds fresh on each open: session chatters and message
   // counts, channel emote usage, and the rate graph's loudest samples
   // logins the top-chatters ranking ignores - channel bots whose volume
@@ -6117,6 +6122,16 @@
       if (el.style.top) el.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - r.height, r.top)) + 'px';
     });
   });
+  // whether the copied settings url also carries the ? popup's open
+  // state and selected tab - a copy-side choice, not a chat option
+  const COPYHELP_KEY = 'hasan-copyhelp';
+  let copyHelp = false;
+  try { copyHelp = localStorage.getItem(COPYHELP_KEY) === '1'; } catch {}
+  function setCopyHelp(on) {
+    copyHelp = !!on;
+    try { localStorage.setItem(COPYHELP_KEY, copyHelp ? '1' : '0'); } catch {}
+    markHelp('helpCopyHelp', copyHelp ? 1 : 0);
+  }
   // builds a ?param url from the current non-default options
   document.getElementById('copyUrl').addEventListener('click', (e) => {
     const b = e.currentTarget;
@@ -6176,6 +6191,14 @@
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs >= 0) q.set('hpfs', HDR_SIZES[helpFs]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
+    if (copyHelp) {
+      // emit the mode that reproduces what's visible now - the panel can
+      // be held open (helpForced) under a non-panel mode
+      const pOpen = !helpPanel.hidden;
+      q.set('help', HELP_MODES[pOpen ? (helpMode >= 2 ? 3 : 1) : (helpMode >= 2 ? 2 : 0)]);
+      const t = helpPanel.querySelector('.htabs a.on');
+      if (t && HTAB_URL_INV[t.dataset.htab]) q.set('htab', HTAB_URL_INV[t.dataset.htab]);
+    }
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
       .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
@@ -8991,6 +9014,16 @@
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
     if (q.has('help')) { const i = HELP_MODES.indexOf(q.get('help')); if (i >= 0) { helpMode = i; applyHelp(); } }
+    // ?htab=config|resources|authors|stats picks the panel's tab; on its
+    // own (no ?help=) it opens the panel too
+    if (q.has('htab')) {
+      const v = q.get('htab');
+      const id = HTAB_URL[v] || (helpPanel.querySelector(`[data-htab="${v}"]`) ? v : '');
+      if (id) {
+        switchTab(id);
+        if (!q.has('help') && helpMode !== 1 && helpMode !== 3) { helpMode |= 1; applyHelp(); }
+      }
+    }
     if (q.has('split')) {
       const n = q.get('split');
       const v = parseInt(n, 10);
@@ -9080,6 +9113,7 @@
     helpAnim: ['off', 'super slow', 'slow', 'on'],
     helpHide: HIDE_MODES,
     helpRbw: ['sweep', 'wave', 'hue cycle', 'pulse', 'flicker'],
+    helpCopyHelp: ['off', 'on'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
@@ -9127,6 +9161,7 @@
   markHelp('helpYtem', ytEmbed ? 1 : 0);
   markHelp('helpFav', lkIco ? 1 : 0);
   markHelp('helpPn', pronounsOn ? 1 : 0);
+  markHelp('helpCopyHelp', copyHelp ? 1 : 0);
   // offline banner: the browser's own online/offline signal
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };

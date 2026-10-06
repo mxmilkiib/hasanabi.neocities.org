@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-06
 
 ### Features
+- settings urls can carry the ? popup's state: a new off/on toggle
+  under "copy settings url" adds help= (the mode reproducing what's
+  visible - panel open, labels, both or closed) and htab=
+  (config/resources/authors/stats, the selected tab) to the copied
+  link; a bare ?htab= with no help mode opens the panel on that tab,
+  and htab still applies when the panel stays closed
 - whispers get their own pane: incoming WHISPER lines render in a
   floating panel beside the log rather than being filtered out, an
   unread count badges a ✉ header chip styled like the @N mentions chip
