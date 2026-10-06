@@ -2391,16 +2391,7 @@
           // url in a line the bots post - their !link commands output urls
           const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?/#]|$)/i.test(url);
           let ico = '';
-          if (lkIco) {
-            try {
-              // twitter mirrors (nitter, the fx-family fixers) get the x
-              // icon, not the instance's own - fxtwitter's apex serves
-              // the github mark, which reads as a repo link
-              const icoHost = new URL(u.replace(/&amp;/g, '&')).hostname;
-              ico = `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(/(?:^|\.)(?:nitter|fxtwitter|vxtwitter|fixupx|betterfox)/i.test(icoHost) ? 'x.com' : icoHost)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
-            }
-            catch { /* a malformed url keeps the bare text */ }
-          }
+          if (lkIco) ico = lkIcoImg(u.replace(/&amp;/g, '&'));
           // a watchable youtube link gets a ▶ glyph that unfolds the
           // embed under the row on click; the url itself previews like
           // any other link
@@ -2786,6 +2777,17 @@
   // sorted set of normalised urls so a reposted link counts as a dupe
   const LINK_TLD_RE = /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#]\S*)?$/i;
   const normUrl = (u) => u.toLowerCase().replace(/^https?:\/\//, '').replace(/^(?:www|mobile)\./, '').replace(/[/?#]+$/, '');
+  // twitter mirrors (nitter, the fx-family fixers) get the x icon, not the
+  // instance's own - fxtwitter's apex serves the github mark, which reads
+  // as a repo link
+  const LINK_TWMIRROR = /(?:^|\.)(?:nitter|fxtwitter|vxtwitter|fixupx|betterfox)/i;
+  const lkIcoImg = (u) => {
+    try {
+      const h = new URL(u).hostname;
+      return `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(LINK_TWMIRROR.test(h) ? 'x.com' : h)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
+    }
+    catch { return ''; }
+  };
   // display-only cleanup for the 'clean urls' option: drops the scheme, a
   // www. prefix, and a bare trailing / or /index.htm[l]
   const cleanUrlDisp = (u) => u.replace(/^https?:\/\//i, '').replace(/^www\./i, '')
@@ -4346,9 +4348,20 @@
     // form links-view dedup uses, so scheme/www/case variants fold
     const uUseM = sc ? (urlUsePer[sc] || new Map()) : urlUse;
     const topLinks = [...uUseM.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40)
-      .map(([k, n], i) => row(i + 1,
-        `<a class="at" href="https://${escapeHTML(k)}" target="_blank" rel="noopener noreferrer">${escapeHTML(k)}</a>`,
-        n.toLocaleString('en'))).join('');
+      .map(([k, n], i) => {
+        // a cached hover-peek's og title becomes the label; an unpeeked
+        // link labels by url and asks the worker - the ~3s render tick
+        // swaps titles in as answers land (misses re-ask after a minute)
+        const pk = new URL('https://' + k).href;
+        const pe = peekCache.get(pk);
+        let label = k;
+        if (pe && Date.now() - pe.t < peekTtlOf(pe.p)) {
+          if (pe.p && pe.p.title) label = pe.p.title;
+        } else peekAsk(pk);
+        return row(i + 1,
+          `<a class="at" href="https://${escapeHTML(k)}" title="${escapeHTML(k)}" target="_blank" rel="noopener noreferrer">${lkIco ? lkIcoImg('https://' + k) : ''}${escapeHTML(label)}</a>`,
+          n.toLocaleString('en'));
+      }).join('');
     // names in the counts outlive set loads: third-party lookups fold case,
     // twitch codes resolve once any set is in hand - ask for the global set
     // whenever it is missing so a second render can image those too

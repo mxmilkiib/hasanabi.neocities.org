@@ -8,7 +8,10 @@ not versions — the page ships continuously to Neocities.
 ### Features
 - stats gains a top links section: every url in a rendered PRIVMSG is
   normalised (scheme/www/case folded) and tallied, ranked by posts,
-  scoped per channel and persisted in the session-stats blob
+  scoped per channel and persisted in the session-stats blob; rows lead
+  with the site's favicon and label by the page's og title once the
+  linkpeek cache has it (the url stays on the tooltip; unpeeked links
+  ask the worker and fall back to the url meanwhile)
 - stats glorps lists only the peak glorp/F moments - the loudest
   samples of the same series that paints the rate graph's red
   segments (>2/sec), ranked with their timestamps; a per-channel
