@@ -3108,6 +3108,11 @@
         const bs = perMap(badgeUsePer, ch), bv = perMap(badgeVerUsePer, ch);
         bs.set(b.split('/')[0], (bs.get(b.split('/')[0]) || 0) + 1);
         bv.set(b, (bv.get(b) || 0) + 1);
+        const bd0 = Math.floor(Date.now() / 864e5);
+        const bd = badgeDay[b] || (badgeDay[b] = {});
+        bd[bd0] = (bd[bd0] || 0) + 1;
+        const bdc = perObj(badgeDayPer, ch), bde = bdc[b] || (bdc[b] = {});
+        bde[bd0] = (bde[bd0] || 0) + 1;
       }
       const badgeImgs = btags.map((b) => {
         const u = b && badgeUrl(b, ch);
@@ -4203,6 +4208,12 @@
   const CHAT_SORT_KEY = 'hasan-chatsort';
   let chatSort = 'msgs';
   try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'msgs'; } catch {}
+  // badge counts also window like the emote ones: alltime is the plain
+  // tally, the rest read trailing days out of the per-version buckets
+  const BADGE_WINS = { alltime: 0, month: 31, week: 7, day: 1 };
+  const BADGE_WIN_KEY = 'hasan-badgewin';
+  let badgeWin = 'alltime';
+  try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
   let lastStatPaint = 0;
   function renderStats() {
     const el = document.getElementById('statsBody');
@@ -4234,6 +4245,23 @@
     const useS = win === 0 ? (n) => (eUse[n] || 0) : lCount;
     const bUseM = sc ? (badgeUsePer[sc] || new Map()) : badgeUse;
     const bVUseM = sc ? (badgeVerUsePer[sc] || new Map()) : badgeVerUse;
+    // windowed badge counts fold the per-version day buckets into set
+    // and version tallies; alltime is the plain session tally
+    const bWinD = BADGE_WINS[badgeWin] ?? 0;
+    const bWSet = new Map(), bWVer = new Map();
+    if (bWinD) {
+      const wD0 = Math.floor(Date.now() / 864e5) - (bWinD - 1);
+      for (const [kv, e] of Object.entries(sc ? (badgeDayPer[sc] || {}) : badgeDay)) {
+        let c = 0;
+        for (const [d, v] of Object.entries(e)) if (+d >= wD0) c += v;
+        if (!c) continue;
+        bWVer.set(kv, c);
+        const s = kv.split('/')[0];
+        bWSet.set(s, (bWSet.get(s) || 0) + c);
+      }
+    }
+    const bVerUseM = bWinD ? bWVer : bVUseM;
+    const bSeenN = bVerUseM.size;
     const scopeBtns = MULTI
       ? `<div class="st-h st-scope">scope ` + ['', ...CHANNELS].map((c) =>
           `<button type="button" class="st-s${sc === c ? ' on' : ''}" data-sscope="${c}">${c ? '#' + escapeHTML(c) : 'all'}</button>`).join(' ') + `</div>`
@@ -4350,14 +4378,14 @@
     const bOwner = (id) => (sc ? [sc] : CHANNELS).find((c) =>
       (setFor(c).badgeChan || []).includes(id)) || '';
     const bRank = (id) => bOwner(id) ? -1 : (CORE_BADGES.indexOf(id) + 1 || CORE_BADGES.length + 1);
-    const bUse = (id) => bUseM.get(id) || 0;
+    const bUse = (id) => (bWinD ? bWSet : bUseM).get(id) || 0;
     // the right-hand number tracks the sort: messages seen carrying the
     // set under use, version count otherwise
     const BSORTS = {
       use: (a, b) => bUse(b) - bUse(a) || bRank(a) - bRank(b) || byName(a, b),
-      name: (a, b) => byName(a, b),
       vers: (a, b) => Object.keys(bInfo[b]).length - Object.keys(bInfo[a]).length || byName(a, b),
       kind: (a, b) => bRank(a) - bRank(b) || byName(a, b),
+      name: (a, b) => byName(a, b),
     };
     const badgeRow = (id) => {
       const vs = Object.entries(bInfo[id])
@@ -4370,7 +4398,7 @@
       return `<details class="st-badge" data-set="${escapeHTML(id)}"><summary${tip(BADGE_BLURB[id])}><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
         `${escapeHTML(bOwner(id) ? bOwner(id) + ' ' + name : name)}<i>${metric}</i></summary>` +
         vs.map(([ver, v]) => {
-          const n = bVUseM.get(id + '/' + ver) || 0;
+          const n = bVerUseM.get(id + '/' + ver) || 0;
           return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
             `<span class="bt">${escapeHTML(v.t || '')}</span>` +
             (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
@@ -4391,7 +4419,7 @@
       const flat = [];
       for (const [id, vers] of Object.entries(bInfo))
         for (const [ver, v] of Object.entries(vers)) {
-          const n = bVUseM.get(id + '/' + ver) || 0;
+          const n = bVerUseM.get(id + '/' + ver) || 0;
           if (n) flat.push({ id, v, n });
         }
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
@@ -4416,6 +4444,9 @@
     const badgeSortBtns = Object.keys(BSORTS)
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
+    const badgeWinBtns = Object.keys(BADGE_WINS)
+      .map((s) => `<button type="button" class="st-s${badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="count window">${s}</button>`)
+      .join('');
     const chatSortBtns = ['msgs', 'a-z', 'new', 'active']
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="sort chatters">${s}</button>`)
       .join('');
@@ -4434,14 +4465,14 @@
         `<div><div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
         `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
-        `<div class="st-row"><span class="nm">${bVUseM.size} badge${bVUseM.size === 1 ? '' : 's'} seen</span></div></div>` +
+        `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div></div>` +
         `<div><div class="st-h">glorps</div>` +
         `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
         `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `</div>` +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
       `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
-      `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
+      `<div class="st-h">badges <span class="st-sort">${badgeWinBtns}</span> <span class="st-sort">${badgeSortBtns}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div>`;
@@ -4470,6 +4501,13 @@
     if (b) {
       badgeSort = b.dataset.bsort;
       try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
+      renderStats();
+      return;
+    }
+    const bw = e.target.closest('.st-s[data-bwin]');
+    if (bw) {
+      badgeWin = bw.dataset.bwin;
+      try { localStorage.setItem(BADGE_WIN_KEY, badgeWin); } catch {}
       renderStats();
       return;
     }
@@ -7161,9 +7199,14 @@
   const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
   const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
   const glorpUse = new Map();    // login -> rendered GLORP/F rows
+  // per-day badge buckets keep the stats tab's badge windows (day/week/
+  // month) honest, like the emote useDay ones; entries past 31 days
+  // evict on save
+  const badgeDay = {};           // 'set/ver' -> { dayIdx: count }
   // the same tallies again per channel, for the stats tab's scope picker:
   // channel -> Map/obj shaped like the global counters above
-  const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {}, glorpPer = {};
+  const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {}, glorpPer = {},
+    badgeDayPer = {};
   const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
   const perObj = (o, ch) => o[ch] || (o[ch] = {});
   // the ranked counters restore like the history rows they tallied -
@@ -7183,14 +7226,20 @@
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.glp || {})) intoMap(perMap(glorpPer, ch), arr);
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
+  Object.assign(badgeDay, savedStats.bd);
+  for (const [ch, o] of Object.entries(savedStats.bdp || {})) Object.assign(perObj(badgeDayPer, ch), o);
   const saveStats = () => {
     const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
+    const bD0 = Math.floor(Date.now() / 864e5) - 31;
+    for (const bag of [badgeDay, ...Object.values(badgeDayPer)])
+      for (const e of Object.values(bag))
+        for (const d of Object.keys(e)) if (+d < bD0) delete e[d];
     try {
       localStorage.setItem(STATS_KEY, JSON.stringify({
         nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst], nl: [...nickLast],
         bu: [...badgeUse], bv: [...badgeVerUse], gl: [...glorpUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
-        glp: per(glorpPer), lup: liveUsePer,
+        glp: per(glorpPer), lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer,
       }));
     } catch {}
   };
