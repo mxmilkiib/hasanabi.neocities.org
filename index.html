@@ -929,7 +929,6 @@
     padding: 1px 0 1px 1.9em; line-height: 1.6; }
   #statsBody .st-brow .emote { max-height: 1.3em; }
   #statsBody .st-brow .bt { font-weight: 600; white-space: nowrap; }
-  #statsBody .st-brow .bd { color: var(--text-dim); font-size: .92em; }
   #statsBody .st-brow i { margin-left: auto; font-style: normal;
     color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
   @media (max-width: 640px) { #statsBody .st-grid { grid-template-columns: 1fr; } }
@@ -4277,14 +4276,15 @@
         .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
       const name = id.replace(/[-_]/g, ' ');
       const metric = badgeSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
-      return `<details class="st-badge"><summary><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
+      // the sentence-length text goes on tooltips so an opened set
+      // lists every version compactly: icon, title, count
+      const tip = (t) => t ? ` title="${escapeHTML(t)}"` : '';
+      return `<details class="st-badge"><summary${tip(BADGE_BLURB[id])}><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
         `${escapeHTML(bChan.has(id) ? (sc || CHANNEL) + ' ' + name : name)}<i>${metric}</i></summary>` +
-        (BADGE_BLURB[id] ? `<div class="st-brow"><span class="bd">${escapeHTML(BADGE_BLURB[id])}</span></div>` : '') +
         vs.map(([ver, v]) => {
           const n = bVUseM.get(id + '/' + ver) || 0;
-          return `<div class="st-brow"><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
+          return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
             `<span class="bt">${escapeHTML(v.t || '')}</span>` +
-            (v.d && v.d !== v.t ? `<span class="bd">${escapeHTML(v.d)}</span>` : '') +
             (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
         }).join('') +
         `</details>`;

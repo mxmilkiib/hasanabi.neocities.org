@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-06
 
 ### Features
+- stats badges read tighter: the sentence-length descriptions (set
+  blurbs and per-version text) moved to tooltips on the set summary
+  and version rows, so an opened set lists every version as icon +
+  title + count; channel sets, core globals and seen sets stay
+  listed while the promo tail keeps folding under 'N more sets'
 - [notice] rows (gifted subs, raids, milestones) put the noticed
   user's name link a weight step above the rest - it was already at
   the .at bold and read thin inside the dim italic row
