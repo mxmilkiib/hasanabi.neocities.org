@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-06
 
 ### Features
+- letter spacing (tracking) control: a new ⇄ header button beside the
+  line-height one cycles an em ladder from -0.08em tight to +0.12em
+  loose, resolved to px against the live chat size so the proportion
+  holds across fonts; also in ? > config/help beside font weight,
+  saved as lsv, shareable as ?ls=0.05
 - settings urls can carry the ? popup's state: a new off/on toggle
   under "copy settings url" adds help= (the mode reproducing what's
   visible - panel open, labels, both or closed) and htab=

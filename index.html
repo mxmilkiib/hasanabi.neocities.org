@@ -139,6 +139,9 @@
     color: var(--text);
     font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
     font-weight: var(--chat-w, 400);
+    /* tracking follows the chat font size - syncLh resolves the em
+       step to px so the same proportion applies across the page */
+    letter-spacing: var(--chat-ls, normal);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1577,7 +1580,7 @@
     <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
     <canvas id="spark" role="img" title="msgs/sec over the last 2 minutes - ticks every 10s" aria-label="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
-    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.75)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.75)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
   </header>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">resources</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
@@ -1590,7 +1593,7 @@
     <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span> - chips preview and apply each style's designed shade (the ◐ cycle leaves shade alone); right-click resets to <a href="#" role="button" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" role="button" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
     <div><b>font menu</b> <span><span id="helpFontFamList"></span><sup>†</sup></span></div>
-    <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span></div>
+    <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span><b>⇄</b><span>letter spacing: <span id="helpLsList"></span> - em steps, so they scale with the font size<sup>†</sup></span></div>
     <div><b>hdr</b><span>header font size: <span id="helpHfsList"></span><sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> - bg shading on alternating rows<sup>†</sup></span></div>
@@ -1828,6 +1831,7 @@
   const fontBtn = document.getElementById('fontBtn');
   const weightBtn = document.getElementById('weightBtn');
   const lhBtn = document.getElementById('lhBtn');
+  const kernBtn = document.getElementById('kernBtn');
   const themeBtn = document.getElementById('themeBtn');
   const shadeBtn = document.getElementById('shadeBtn');
   const presetBtn = document.getElementById('presetBtn');
@@ -4016,7 +4020,7 @@
   const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●'];
   // default option indices - the controls, the copy-url diffing and the
   // 'default' preset all read from here
-  const DEF = { shade: 6, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7 };
+  const DEF = { shade: 6, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4 };
   let shadeIdx = DEF.shade;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
@@ -4053,7 +4057,7 @@
   document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
     `<a href="#" role="button" class="helpTheme" data-theme="${t}">${t}</a>`).join(' / ');
   helpPanel.addEventListener('click', (e) => {
-    const a = e.target.closest('a.helpTheme, a.helpShade, a.helpFont, a.helpLh, a.helpLines, a.helpOpt');
+    const a = e.target.closest('a.helpTheme, a.helpShade, a.helpFont, a.helpLh, a.helpLs, a.helpLines, a.helpOpt');
     if (!a) return;
     e.preventDefault();
     if (a.classList.contains('helpTheme')) {
@@ -4067,6 +4071,7 @@
     else if (a.classList.contains('helpFont')) fontCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLh')) lhCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpWg')) weightCtl.set(+a.dataset.idx);
+    else if (a.classList.contains('helpLs')) lsCtl.set(+a.dataset.idx);
     else if (a.classList.contains('helpLines')) { setLines(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpZebra')) { setZebra(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPause')) { setPause(+a.dataset.idx === 1); saveOpts(); }
@@ -4497,6 +4502,10 @@
     const pi = FONT_SIZES.indexOf(fs);
     de.setProperty('--peek-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 2)] : Math.max(7, fs - 2)) + 'px');
     de.setProperty('--help-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 1)] : Math.max(7, fs - 1)) + 'px');
+    // tracking travels as an em step so it scales with the font, but the
+    // property is inherited through body which doesn't use --chat-font -
+    // resolve to px here so the same proportion reaches every element
+    de.setProperty('--chat-ls', Math.round(fs * (parseFloat(cs.getPropertyValue('--chat-lse')) || 0) * 1000) / 1000 + 'px');
   }
   function cycle(btn, list, idx, prop, label, unit, helpCls) {
     const apply = () => {
@@ -4521,6 +4530,9 @@
   const WEIGHTS = [300, 400, 500, 600, 700];
   const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
   const weightCtl = cycle(weightBtn, WEIGHTS, DEF.weight, '--chat-w', 'Font weight', '', 'helpWg');
+  // em steps - syncLh multiplies by the live chat size into --chat-ls px
+  const LS_STEPS = [-0.08, -0.05, -0.03, -0.015, 0, 0.015, 0.03, 0.05, 0.08, 0.12];
+  const lsCtl = cycle(kernBtn, LS_STEPS, DEF.ls, '--chat-lse', 'Letter spacing', 'em', 'helpLs');
   document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
     `<a href="#" role="button" class="helpOpt helpWg" data-idx="${i}">${n}</a>`).join(' ');
   // the help descriptions embed the same option lists as clickable links
@@ -4528,9 +4540,12 @@
     `<a href="#" role="button" class="helpFont" data-idx="${i}">${px}</a>`).join(' ');
   document.getElementById('helpLhList').innerHTML = LINE_HEIGHTS.map((lh, i) =>
     `<a href="#" role="button" class="helpLh" data-idx="${i}">${lh}</a>`).join(' ');
+  document.getElementById('helpLsList').innerHTML = LS_STEPS.map((v, i) =>
+    `<a href="#" role="button" class="helpLs" data-idx="${i}">${v}</a>`).join(' ');
   fontCtl.set(fontCtl.get());
   lhCtl.set(lhCtl.get());
   weightCtl.set(weightCtl.get());
+  lsCtl.set(lsCtl.get());
 
   function applyFont() {
     document.documentElement.style.setProperty('--chat-ff',
@@ -5224,7 +5239,7 @@
   // theme slot stashes
   function curOpts() {
     return {
-      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], theme: themeMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
+      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], theme: themeMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -5288,7 +5303,7 @@
     // size/line-height/weight travel as real values (px, lhv, wv) so the
     // option lists can change without remapping; bare size/lh/weight are
     // legacy list indices, honoured only when the value key is absent
-    [[o.px, 'size', FONT_SIZES, fontCtl], [o.lhv, 'lh', LINE_HEIGHTS, lhCtl], [o.wv, 'weight', WEIGHTS, weightCtl]].forEach(([v, k, list, ctl]) => {
+    [[o.px, 'size', FONT_SIZES, fontCtl], [o.lhv, 'lh', LINE_HEIGHTS, lhCtl], [o.wv, 'weight', WEIGHTS, weightCtl], [o.lsv, 'ls', LS_STEPS, lsCtl]].forEach(([v, k, list, ctl]) => {
       const i = v !== undefined ? list.indexOf(v) : Number.isInteger(o[k]) ? o[k] : -1;
       if (i >= 0 && i < list.length) ctl.set(i);
     });
@@ -5385,7 +5400,7 @@
     // embed is deliberately outside presets - one toggles it by hand
     const cmp = {
       theme: themeMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
-      lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lines: lineLevel,
+      lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lines: lineLevel,
       zebra: mainEl.classList.contains('zebra'), times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
       split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode,
@@ -6011,7 +6026,7 @@
   let helpForced = false;
   const HDR_LABELS = [
     [presetBtn, 'theme'], [themeBtn, 'style'], [shadeBtn, 'shade'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
-    [fontSel, 'font'], [fontBtn, 'size'], [weightBtn, 'weight'], [lhBtn, 'height'],
+    [fontSel, 'font'], [fontBtn, 'size'], [weightBtn, 'weight'], [lhBtn, 'height'], [kernBtn, 'spacing'],
     [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [emoteBtn, 'emote'], [linkBtn, 'links'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'msg rate'], [sendBtn, 'chat'], [findBtn, 'find'],
     [helpBtn, 'help'], [hdrMinBtn, 'header'], // corner buttons are absolute - the labels land in flow beside the side cluster
   ];
@@ -6143,6 +6158,7 @@
     if (fontCtl.get() !== DEF.size) q.set('size', FONT_SIZES[fontCtl.get()]);
     if (lhCtl.get() !== DEF.lh) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (weightCtl.get() !== DEF.weight) q.set('wght', WEIGHTS[weightCtl.get()]);
+    if (lsCtl.get() !== DEF.ls) q.set('ls', LS_STEPS[lsCtl.get()]);
     if (!mainEl.classList.contains('zebra')) q.set('zebra', '0');
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
@@ -9003,6 +9019,7 @@
     if (q.has('size')) { const i = FONT_SIZES.indexOf(+q.get('size')); if (i >= 0) fontCtl.set(i); }
     if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
     if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
+    if (q.has('ls')) { const i = LS_STEPS.indexOf(+q.get('ls')); if (i >= 0) lsCtl.set(i); }
     if (q.has('zebra')) setZebra(flag('zebra'));
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));

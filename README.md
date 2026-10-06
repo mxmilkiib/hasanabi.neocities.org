@@ -389,6 +389,7 @@ force off.
 | `size` | `7`–`32` | chat font px |
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
+| `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
 | `hpfs` | px | help popup font size |
 | `hpw` | `480`–`1600` | help popup width |
