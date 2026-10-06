@@ -817,6 +817,29 @@
   body.overlay #emotePick, body.overlay #peek, body.overlay #epop,
   body.overlay #tt { display: none !important; }
   body.overlay main { height: 100vh; }
+  /* the floating find-bar docks under the header - 'only' toggles like a
+     header button, archive results list below it */
+  #findbar {
+    position: fixed; z-index: 40;
+    display: flex; align-items: center; gap: 5px;
+    background: var(--panel); border: 1px solid var(--popline); border-radius: 6px;
+    padding: 5px 7px; box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+  }
+  #findbar[hidden] { display: none; }
+  #findIn { width: min(300px, 44vw); text-align: left; }
+  #findCnt { color: var(--text-dim); font-size: .85em; min-width: 2.8em; text-align: center;
+    font-variant-numeric: tabular-nums; }
+  #findres {
+    position: absolute; top: 100%; left: -1px; right: -1px;
+    max-height: 40vh; overflow-y: auto; margin-top: 4px;
+    background: var(--panel); border: 1px solid var(--popline); border-radius: 6px;
+    font-size: .82em; padding: 4px 6px; line-height: 1.5;
+  }
+  #findres[hidden] { display: none; }
+  #findres .fr { padding: 1px 3px; overflow-wrap: anywhere; }
+  #findres .fr[data-mid] { cursor: pointer; }
+  #findres .fr[data-mid]:hover { background: var(--line); }
+  #findres .fr b { color: var(--accent); font-weight: 600; }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -1460,7 +1483,7 @@
     <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
     <canvas id="spark" role="img" title="msgs/sec over the last 2 minutes - ticks every 10s" aria-label="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
-    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.75)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.75)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /">⌕</button></div>
   </header>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">resources</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
@@ -1581,6 +1604,7 @@
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
+  <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
@@ -3072,6 +3096,14 @@
       if (r.dataset.mid) rowById.set(r.dataset.mid, r);
       fillRq(r);
       applyHideRow(r);
+      // a live row landing while find is open joins the marks - or the
+      // hidden side of 'only' mode - so the filter stays truthful
+      if (!findEl.hidden && findToks.length) {
+        const hit = findMatch(r, findToks);
+        r.classList.toggle('hit', hit);
+        if (findOnlyOn && !hit) r.classList.add('fhide');
+        if (hit) { findHits.push(r); findCnt.textContent = `${findIdx + 1}/${findHits.length}`; }
+      }
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self')) {
@@ -4430,6 +4462,122 @@
     while (whisLog.children.length > 200) whisLog.firstElementChild.remove();
     whisLog.scrollTop = whisLog.scrollHeight;
   }
+
+  // ---- find-bar: ctrl+f or / floats a search over the rendered
+  // scrollback. bare tokens match text, user:x the chatter, kind:k the
+  // row type. 'only' collapses non-matching rows like a blocklist hit;
+  // 'archive' reaches into the indexed store past scrollback ----
+  const findEl = document.getElementById('findbar');
+  const findIn = document.getElementById('findIn');
+  const findCnt = document.getElementById('findCnt');
+  const findOnlyBtn = document.getElementById('findOnly');
+  const findRes = document.getElementById('findres');
+  let findOnlyOn = false, findT = 0;
+  let findHits = [], findIdx = -1, findToks = [];
+  const KIND_TESTS = {
+    msg: (r) => !r.classList.contains('notice'),
+    notice: (r) => r.classList.contains('notice') && !r.classList.contains('mod') && !r.classList.contains('selfmod') && !r.classList.contains('gap'),
+    mod: (r) => r.classList.contains('mod') || r.classList.contains('selfmod'),
+    gap: (r) => r.classList.contains('gap'),
+    action: (r) => r.classList.contains('action'),
+    emote: (r) => r.classList.contains('eonly'),
+    mention: (r) => r.classList.contains('mention'),
+    kw: (r) => r.classList.contains('kw'),
+    deleted: (r) => r.classList.contains('deleted'),
+    sub: (r) => !!r.querySelector('.role.sub'),
+  };
+  function findMatch(r, toks) {
+    for (const [k, v] of toks) {
+      if (k === 'user') {
+        const nm = (r.querySelector('.name') || {}).textContent || '';
+        if (!(r.dataset.u + '|' + nm).toLowerCase().includes(v)) return false;
+      } else if (k === 'kind') {
+        if (!(KIND_TESTS[v] || (() => false))(r)) return false;
+      } else {
+        // the reply band's quoted text is the parent's words, not this
+        // row's - a match on it would surface the wrong message
+        const rq = r.querySelector('.reply.rq');
+        const t = rq ? (r.textContent || '').replace(rq.textContent, '') : (r.textContent || '');
+        if (!t.toLowerCase().includes(v)) return false;
+      }
+    }
+    return true;
+  }
+  function findTokens() {
+    const toks = [];
+    for (const raw of findIn.value.trim().toLowerCase().split(/\s+/).filter(Boolean)) {
+      const m = raw.match(/^(user|kind):(.*)$/);
+      toks.push(m && m[2] ? [m[1], m[2]] : ['text', raw]);
+    }
+    return toks;
+  }
+  function runFind() {
+    findToks = findTokens();
+    findHits = [];
+    findIdx = -1;
+    for (const c of cols()) for (const r of c.querySelectorAll('.row')) {
+      const hit = !!findToks.length && !r.classList.contains('hidestub') && findMatch(r, findToks);
+      r.classList.toggle('hit', hit);
+      r.classList.toggle('fhide', !!(findOnlyOn && findToks.length && !hit));
+      if (hit) findHits.push(r);
+    }
+    findCnt.textContent = findToks.length
+      ? (findHits.length ? `-/${findHits.length}` : '0')
+      : '';
+  }
+  function findJump(dir) {
+    // drops rows scrollback trimmed since the last runFind
+    findHits = findHits.filter((r) => r.isConnected);
+    if (!findHits.length) { runFind(); if (!findHits.length) { findCnt.textContent = '0'; return; } }
+    if (findIdx >= findHits.length) findIdx = findHits.length - 1;
+    findIdx = (findIdx + dir + findHits.length) % findHits.length;
+    const r = findHits[findIdx];
+    r.scrollIntoView({ block: 'center' });
+    r.classList.remove('jump');
+    void r.offsetWidth;
+    r.classList.add('jump');
+    findCnt.textContent = `${findIdx + 1}/${findHits.length}`;
+  }
+  function setFindOpen(on) {
+    findEl.hidden = !on;
+    if (on) {
+      findEl.style.top = (headerEl.getBoundingClientRect().bottom + 6) + 'px';
+      findEl.style.left = Math.max(8, (innerWidth - findEl.offsetWidth) / 2) + 'px';
+      findIn.focus();
+      findIn.select();
+      if (findIn.value) runFind();
+      return;
+    }
+    // closing drops every mark: hits, hidden rows, the counter, results
+    findIn.value = '';
+    findToks = [];
+    findHits = [];
+    findIdx = -1;
+    findCnt.textContent = '';
+    findRes.hidden = true;
+    for (const c of cols()) for (const r of c.querySelectorAll('.row.hit, .row.fhide'))
+      r.classList.remove('hit', 'fhide');
+  }
+  document.getElementById('findBtn').addEventListener('click', () => setFindOpen(findEl.hidden));
+  document.getElementById('findX').addEventListener('click', () => setFindOpen(false));
+  document.getElementById('findPrev').addEventListener('click', () => findJump(-1));
+  document.getElementById('findNext').addEventListener('click', () => findJump(1));
+  findOnlyBtn.addEventListener('click', () => { setOn(findOnlyBtn, findOnlyOn = !findOnlyOn); runFind(); });
+  findIn.addEventListener('input', () => { clearTimeout(findT); findT = setTimeout(runFind, 150); });
+  findIn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); findJump(e.shiftKey ? -1 : 1); }
+    else if (e.key === 'Escape') { e.preventDefault(); setFindOpen(false); }
+  });
+  addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'f') {
+      e.preventDefault();
+      setFindOpen(true);
+    } else if (e.key === '/' && findEl.hidden && !e.ctrlKey && !e.metaKey && !e.altKey &&
+               !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '')) {
+      e.preventDefault();
+      setFindOpen(true);
+    }
+  });
 
   // ---- option persistence ----
   const OPTS_KEY = 'hasan-opts';
