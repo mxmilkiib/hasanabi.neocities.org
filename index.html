@@ -2727,27 +2727,20 @@
         const pg = pendingGap;
         pg.emitted = true;
         html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${pg.to}"><span class="time">${fmtRowTime(new Date(pg.to))}</span>` +
-                `· ${fmtDur(Math.max(1, Math.round((pg.to - pg.from) / 60000)))} gap · ${pg.why} · ` +
+                `· ${fmtDur(Math.max(1, Math.round((pg.to - pg.from) / 60000)))} gap · ${pg.why || 'lines missed - socket stayed open'} · ` +
                 `${fmtRowTime(new Date(pg.from))} → ${fmtRowTime(new Date(pg.to))}</div>`;
       }
       if (lastRowTs && ts - lastRowTs > GAP_MS) {
         const why = gapCause(lastRowTs, ts);
-        if (!why) {
-          // an unexplained silence (quiet chat, or a stall that never
-          // dropped the socket) still marks the span so the graph can
-          // band it grey
-          quietGaps.push([lastRowTs, ts]);
-          html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}"><span class="time">${timeStr}</span>` +
-                  `· ${fmtDur(Math.max(1, Math.round((ts - lastRowTs) / 60000)))} gap · ` +
-                  `${fmtRowTime(new Date(lastRowTs))} → ${timeStr}</div>`;
-        } else {
-          // a caused gap defers its row to the backfill: if the replay
-          // returns lines from inside the span the marker lands ahead of
-          // them; an empty response means nothing was missed and the
-          // stretch gets no problem row
-          pendingGap = { from: lastRowTs, to: ts, why };
-          backfill();
-        }
+        // every long stretch defers to the backlog, cause or not: a replayed
+        // line inside the span proves lines went missing and earns the
+        // marker ahead of them; an empty batch means chat was just quiet
+        // and emits nothing - unexplained silences get the same verdict
+        // instead of a marker on suspicion alone
+        pendingGap = { from: lastRowTs, to: ts, why };
+        backfill();
+        // grey-band the span on the graph either way, while it was quiet
+        if (!why) quietGaps.push([lastRowTs, ts]);
         if (quietGaps.length > 50) quietGaps.splice(0, quietGaps.length - 50);
       }
       if (ts > lastRowTs) lastRowTs = ts;

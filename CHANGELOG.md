@@ -43,6 +43,12 @@ not versions — the page ships continuously to Neocities.
   rides peek's autoscroll guard so the chat's own scrolling doesn't
   shake it loose
 ### Fixes & polish
+- quiet stretches no longer print a gap row on suspicion alone: every
+  >90s span now defers to the backlog like caused gaps always did - a
+  replayed line inside the span earns the marker (reading "lines missed
+  - socket stayed open" when no outage was recorded), an empty batch
+  means chat was just quiet and emits nothing; the graph still bands
+  the span grey
 - resources tab link audit: hasan's bluesky link removed; anna's archive
   moved to the live .li mirror; safety first pdx (domain lapsed) now
   points at its wayback capture; twelve stale domains updated to their
