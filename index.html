@@ -865,6 +865,25 @@
   #ucard .uc-mod { border-top: 1px solid var(--line); margin-top: 7px; padding-top: 5px; }
   #ucard .uc-mod button[data-armed] { color: var(--danger); border-color: var(--danger); }
   #ucardX { float: right; padding: 0 5px; }
+  /* the stats tab: headed sections, chatters and emotes in paired
+     columns with tabular counts pinned right */
+  /* display:block - #helpPanel .htabpage > div's label grid must not
+     flow the sections into its 9em column (it outranks a bare #id) */
+  #helpPanel #statsBody { display: block; padding: 2px 2px 8px; margin: 7px 0; }
+  #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
+    margin: 12px 0 2px; }
+  #statsBody .st-h:first-child { margin-top: 0; }
+  #statsBody .st-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+  #statsBody .st-row { display: flex; align-items: baseline; gap: 6px;
+    min-width: 0; padding: 1px 0; line-height: 1.7; }
+  #statsBody .st-row .n { color: var(--accent); font-weight: 600; min-width: 1.5em;
+    font-variant-numeric: tabular-nums; }
+  #statsBody .st-row .nm { overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; min-width: 0; }
+  #statsBody .st-row .emote { max-height: 1.4em; vertical-align: -0.3em; }
+  #statsBody .st-row i { margin-left: auto; font-style: normal;
+    color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
+  @media (max-width: 640px) { #statsBody .st-grid { grid-template-columns: 1fr; } }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -3941,31 +3960,38 @@
   function renderStats() {
     const el = document.getElementById('statsBody');
     if (!el) return;
+    const row = (i, inner, count) =>
+      `<div class="st-row"><span class="n">${i}.</span><span class="nm">${inner}</span><i>${count}</i></div>`;
     const chat = [...nickMsgs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15)
       .map(([lg, n], i) => {
         const rec = seenNicks.get(lg) || {};
         const nm = rec.n || lg;
         const col = rec.c || colorForName(nm);
-        return `<div><b>${i + 1}.</b> <a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a> <i>${n}</i></div>`;
+        return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
+          n.toLocaleString('en'));
       }).join('');
     const all = new Set([...Object.keys(emoteUse), ...Object.keys(liveUse)]);
     const emo = [...all].map((n) => [n, useOf(n)]).sort((a, b) => b[1] - a[1]).slice(0, 15)
       .map(([n, c], i) => {
         const set = twSets.flatMap((s) => s.emoteList).find((e) => e.code === n);
         const url = emotesOf(CHANNEL)[n] || (set && twEmoteUrl(set.id, set.assetType === 'ANIMATED'));
-        const vis = url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}">` : escapeHTML(n);
-        return `<div><b>${i + 1}.</b> ${vis} ${escapeHTML(n)} <i>${c.toLocaleString('en')}</i></div>`;
+        return row(i + 1, (url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}"> ` : '') + escapeHTML(n),
+          c.toLocaleString('en'));
       }).join('');
     const bursts = rateSamples.map((r, i) => [r, rateTimes[i]])
       .filter(([r, t]) => Number.isFinite(r) && t)
       .sort((a, b) => b[0] - a[0]).slice(0, 3)
-      .map(([r, t]) => `<div><b>burst</b><span>${r.toFixed(1)} msgs/s at ${fmtRowTime(new Date(t))}</span></div>`).join('');
+      .map(([r, t]) => `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ${fmtRowTime(new Date(t))}</span></div>`).join('');
     const total = [...nickMsgs.values()].reduce((a, b) => a + b, 0);
     el.innerHTML =
-      `<div><b>session</b><span>${nickMsgs.size} chatters · ${total} message${total === 1 ? '' : 's'} rendered</span></div>` +
-      (chat ? `<div><b>top chatters</b><span>${chat}</span></div>` : '') +
-      (emo ? `<div><b>top emotes</b><span>${emo}</span></div>` : '') +
-      (bursts || `<div><b>bursts</b><span>no rate data yet - the graph fills in as chat flows</span></div>`);
+      `<div class="st-h">session</div>` +
+      `<div class="st-row"><span class="nm">${nickMsgs.size} chatter${nickMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
+      `<div class="st-grid">` +
+        `<div><div class="st-h">top chatters</div>${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
+        `<div><div class="st-h">top emotes</div>${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
+      `</div>` +
+      `<div class="st-h">bursts</div>` +
+      (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`);
   }
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
