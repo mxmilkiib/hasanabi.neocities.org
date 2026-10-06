@@ -43,6 +43,15 @@ not versions — the page ships continuously to Neocities.
   rides peek's autoscroll guard so the chat's own scrolling doesn't
   shake it loose
 ### Fixes & polish
+- message-drop audit: USERNOTICEs with no user text (message-less subs,
+  raids, gifts) end at the channel arg so the parser now passes them
+  through instead of returning null; a throwing row can no longer wedge
+  the flush queue - each line renders inside its own try, and a bad parse
+  no longer drops the rest of a postMessage batch; notice dedup keys
+  gained system-msg entropy so two text-less subs in the same ms can't
+  collide; relay-side, a chat line merely containing "RECONNECT" no longer
+  kills the socket (Twitch's is a bare ':tmi.twitch.tv RECONNECT' line)
+  and the remaining lines in that chunk still forward
 - backfill replays no longer duplicate rows after the dedup set
   overflowed: the cap evicts the oldest ids instead of wiping the set
   (a clear forgot ids still inside the replay window), and rendered

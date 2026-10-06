@@ -1873,7 +1873,10 @@
       // USERSTATE carries a channel arg; GLOBALUSERSTATE ends the line
       if (cmd[1] === 'USERSTATE' || cmd[1] === 'GLOBALUSERSTATE')
         return { tags, login, channel: afterCmd, message: '', kind: cmd[1] };
-      return null;
+      // a USERNOTICE without a user message ends at the channel - no ' :'
+      // param - so subs/raids without a text would drop here entirely
+      if (cmd[1] === 'PRIVMSG') return null;
+      return { tags, login, channel: afterCmd, message: '', kind: cmd[1] };
     }
     return { tags, login, channel: afterCmd.slice(0, msgIdx), message: afterCmd.slice(msgIdx + 2), kind: cmd[1] };
   }
@@ -2671,7 +2674,10 @@
     // logins a clearchat struck this flush - marks their already-rendered
     // rows at the event and the batch's own rows after insertion
     const ghosted = new Set();
-    for (const { tags, login, message: rawMsg, kind, local, live, channel } of queue) {
+    // try per line: a throwing row must not wedge the queue - without it the
+    // accumulated html dies, earlier ids stay recorded, and the poison line
+    // throws again on every retry, stalling ingest for good
+    for (const { tags, login, message: rawMsg, kind, local, live, channel } of queue) try {
       const ch = (channel || '').replace(/^#/, '').toLowerCase() || CHANNEL;
       const chTag = MULTI
         ? `<a class="chtag${streamStates[ch] && streamStates[ch].live ? ' live' : ''}" data-ch="${escapeHTML(ch)}" ` +
@@ -2681,9 +2687,11 @@
         : '';
       // replayed backfill lines carry ids the page has already rendered;
       // notice-type events carry no id, so key them on kind+ts+sender+body
+      // system-msg in the notice key: two message-less subs in the same ms
+      // would otherwise share kind:ts:login:body and drop each other
       const dedupKey = tags.id ||
         (kind !== 'PRIVMSG'
-          ? `${kind}:${tags['tmi-sent-ts'] || ''}:${login || ''}:${rawMsg}` : '');
+          ? `${kind}:${tags['tmi-sent-ts'] || ''}:${login || ''}:${tags['system-msg'] || ''}:${rawMsg}` : '');
       if (dedupKey) {
         // rowById mirrors rendered rows, so it still catches a replay whose
         // id seenIds has already evicted (a trimmed row replaying is fine to
@@ -2965,6 +2973,8 @@
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
+    } catch (err) {
+      console.error('chat line dropped:', err, rawMsg);
     }
     queue = [];
     // a batch settled the deferred gap: emitted marker or not, it clears -
@@ -7612,7 +7622,10 @@
     } else if (d.type === 'lines') {
       // a replay batch is what settles a deferred gap marker
       if (d.replay && pendingGap) pendingGap.batch = true;
-      for (const line of d.lines) handleLine(line, !!d.replay);
+      for (const line of d.lines) {
+        try { handleLine(line, !!d.replay); }
+        catch (err) { console.error('irc line dropped:', err, line); }
+      }
     } else if (d.type === 'stream') {
       loadStep(3, 'metadata loaded - waiting for messages…');
       onStream(d);
