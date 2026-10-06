@@ -4550,14 +4550,16 @@
       .map((s) => `<button type="button" class="st-s${emoteStatSrc === s ? ' on' : ''}" data-esrc="${s}" title="count source">${s}</button>`)
       .join('');
     const badgeSortBtns = { vers: 'grouped', kind: 'kind', name: 'name' };
+    const badgeSortTips = { vers: 'group by set, most versions first', kind: "group by set, the channel's own first", name: 'group by set, a-z' };
     const badgeSortBtnsHtml = Object.entries(badgeSortBtns)
-      .map(([s, l]) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${l}</button>`)
+      .map(([s, l]) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="${badgeSortTips[s]}">${l}</button>`)
       .join('');
     // the window buttons take the sort row's lead slot: each one is
     // 'use' ranked within that window, so they only light when the
     // ranked view is showing
+    const badgeWinTips = { alltime: 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', day: 'flat ranking by use, today' };
     const badgeWinBtns = Object.keys(BADGE_WINS)
-      .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="rank by use in window">${s}</button>`)
+      .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
     const chatSortBtns = ['msgs', 'a-z', 'new', 'active']
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="sort chatters">${s}</button>`)
