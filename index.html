@@ -638,11 +638,8 @@
   .row.notice.gap { --rowtint: linear-gradient(color-mix(in srgb, var(--danger) 8%, transparent) 0 0); }
   .row.htag { font-style: italic; }
   .row.htag .name, .row.htag .colon, .row.htag .aux, .row.htag .sub, .row.htag .time { font-style: normal; }
-  .row.htag .pn, .row.action .pn { font-style: normal; }
   .row.action { font-style: italic; }
   .row.action .aux, .row.action .sub, .row.action .time { font-style: normal; }
-  /* pronoun chip after the nick - quiet dim text, no chrome */
-  .pn { font-size: .72em; font-style: normal; color: var(--text-dim); margin: 0 .4em 0 .25em; vertical-align: .15em; }
   .tag { padding: 0 3px; border-radius: 3px; }
   .row.points { --rowtint: linear-gradient(rgba(232, 93, 93, .12) 0 0); }
   main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) {
@@ -1455,7 +1452,7 @@
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
     <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph; clicking it unfolds the player under the row (a second click folds it) - nothing loads from google until then<sup>†</sup></span></div>
     <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service<sup>†</sup></span></div>
-    <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a small tag after the nick for chatters who set pronouns on alejo.io; each chatter is looked up once and cached for a month<sup>†</sup></span></div>
+    <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a fact line on the twitch-profile hover card for chatters who set pronouns on alejo.io; looked up when a profile is previewed and cached for a month<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -2951,7 +2948,7 @@
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
-              ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${pronTag(login)}${action ? ' ' : '<span class="colon">: </span>'}` +
+              ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}${msgHtml}${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
     }
     queue = [];
@@ -4089,9 +4086,10 @@
   let ytEmbed = true, lkIco = true;
   function setYtEmb(on) { ytEmbed = on; markHelp('helpYtem', on ? 1 : 0); }
   function setLkIco(on) { lkIco = on; markHelp('helpFav', on ? 1 : 0); }
-  // ---- pronoun chips (pronouns.alejo.io): one lookup per chatter, cached
-  // for a month (a week when unset, so new sign-ups surface), applied as a
-  // dim tag after the nick. The queue drains at ~4 lookups/sec ----
+  // ---- pronouns (pronouns.alejo.io): looked up when a twitch profile
+  // hover card opens, cached for a month (a week when unset, so new
+  // sign-ups surface), shown as a fact line on the card. The queue
+  // drains at ~4 lookups/sec ----
   const PRON_KEY = 'hasan-pronouns';
   const PRON_LABELS = {
     hehim: 'he/him', sheher: 'she/her', theythem: 'they/them', any: 'any',
@@ -4124,16 +4122,6 @@
       else if (!t) t = setTimeout(() => { t = 0; write(); }, 800);
     };
   })();
-  function markPron(login, label) {
-    for (const a of document.querySelectorAll(`.row[data-u="${CSS.escape(login)}"] a.name`)) {
-      const nx = a.nextElementSibling;
-      if (nx && nx.classList.contains('pn')) continue;
-      const i = document.createElement('i');
-      i.className = 'pn'; i.textContent = label;
-      i.title = label + ' - pronouns.alejo.io';
-      a.after(i);
-    }
-  }
   async function pronTick() {
     const login = pronQueue.values().next().value;
     if (login === undefined) { pronTimer = 0; return; }
@@ -4145,7 +4133,11 @@
       if (id) label = PRON_LABELS[id] || id;
     } catch {}
     pronouns.set(login, label);
-    if (label) markPron(login, label);
+    // a hover card still showing that profile gains the line in place
+    if (label && peekUrl && peekUrl.toLowerCase().endsWith('/' + login)) {
+      const e = peekCache.get(peekUrl);
+      if (e) peekShow(e.p, peekUrl, false);
+    }
     pronSave();
     pronTimer = pronQueue.size ? setTimeout(pronTick, 300) : 0;
   }
@@ -4154,25 +4146,10 @@
     pronQueue.add(login);
     if (!pronTimer) pronTimer = setTimeout(pronTick, 300);
   }
-  // nick-suffix html for a row; unknown logins enqueue a lookup here
-  function pronTag(login) {
-    if (!pronounsOn || !login) return '';
-    const p = pronouns.get(login);
-    if (p === undefined) { pronSeen(login); return ''; }
-    return p ? `<i class="pn" title="${escapeHTML(p)} - pronouns.alejo.io">${escapeHTML(p)}</i>` : '';
-  }
   function setPronouns(on) {
     pronounsOn = on;
     markHelp('helpPn', on ? 1 : 0);
-    if (!on) {
-      pronQueue.clear();
-      document.querySelectorAll('.row .pn').forEach((e) => e.remove());
-    } else {
-      for (const r of document.querySelectorAll('.row[data-u]')) {
-        const p = pronouns.get(r.dataset.u);
-        if (p) markPron(r.dataset.u, p); else pronSeen(r.dataset.u);
-      }
-    }
+    if (!on) pronQueue.clear();
   }
   function applyCleanUrls() {
     mainEl.querySelectorAll('a[data-u]').forEach((a) => {
@@ -8260,6 +8237,18 @@
       const m = document.createElement('div');
       m.className = 'pmeta'; m.textContent = p.facts.join(' · ');
       peekEl.appendChild(m);
+    }
+    // a bare twitch profile url earns an alejo.io pronouns line; a login
+    // the cache doesn't know yet gets queued and lands mid-hover
+    const pl = pronounsOn && /twitch\.tv\/([a-z0-9_]+)\/?$/i.exec(url);
+    if (pl) {
+      pronSeen(pl[1].toLowerCase());
+      const pn = pronouns.get(pl[1].toLowerCase());
+      if (pn) {
+        const m = document.createElement('div');
+        m.className = 'pmeta'; m.textContent = 'pronouns: ' + pn;
+        peekEl.appendChild(m);
+      }
     }
     if (p && p.description || loading) {
       const dd = document.createElement('div');
