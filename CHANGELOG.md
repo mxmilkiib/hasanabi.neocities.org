@@ -40,6 +40,9 @@ not versions — the page ships continuously to Neocities.
   tracked and bare posts of one url now dedupe and count together,
   and keys persisted before the strip re-fold on load so a link's
   old tracked tally merges into the clean one
+- a top links row whose peeked title is just the site's own name
+  labels from the link instead - a twitch clip slug embeds the
+  clip's title in pascal case, so "Twitch" becomes the real name
 - top chatters' sort pick becomes a time window - all-time, month,
   week and today (default), folded out of new per-login day buckets
   (nickDay, per-channel too, persisted as nd/ndp) like the badge

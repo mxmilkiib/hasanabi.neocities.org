@@ -2243,6 +2243,15 @@
     const start = tm ? (+tm[1] || 0) * 3600 + (+tm[2] || 0) * 60 + +tm[3] : 0;
     return { id, start };
   }
+  // a twitch clip slug embeds the clip's title in pascal case ahead of a
+  // random suffix - a readable label for links whose peek only found the
+  // site's own boilerplate name (or the clip is gone)
+  const clipTitleOf = (u) => {
+    const seg = (u.match(/(?:\/clip\/|clips\.twitch\.tv\/)([\w-]+)/i) || [])[1] || '';
+    const s = (seg.includes('-') ? seg.slice(0, seg.lastIndexOf('-')) : seg)
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+    return /^[A-Za-z]/.test(s) && s.length > 3 ? s : '';
+  };
   const tweetWait = new Set();
   function reqTweet(id) {
     if (tweetWait.has(id) || tweetCache.has(id)) return;
@@ -4419,6 +4428,11 @@
         let label = orig;
         if (pe && Date.now() - pe.t < peekTtlOf(pe.p)) {
           if (pe.p && pe.p.title) label = pe.p.title;
+          // a title that is just the site's own name is boilerplate -
+          // a clip slug still carries the real title
+          const weak = !pe.p || !pe.p.title ||
+            (pe.p.site && pe.p.title.toLowerCase() === pe.p.site.toLowerCase());
+          if (weak) label = clipTitleOf(orig) || label;
         } else peekAsk(pk);
         return row(i + 1,
           `<a class="at" href="https://${escapeHTML(orig)}" title="${escapeHTML(orig)}" target="_blank" rel="noopener noreferrer">${lkIco ? lkIcoImg('https://' + orig) : ''}${escapeHTML(label)}</a>`,
