@@ -3,6 +3,51 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-06
+
+### Features
+- whispers get their own pane: incoming WHISPER lines render in a
+  floating panel beside the log rather than being filtered out, an
+  unread count badges a ✉ header chip styled like the @N mentions chip
+  (click opens, ⇧click clears, esc closes), a name click there arms a
+  /w reply, and /w name text sends through #jtv with a local echo.
+  receiving whispers needs the login to carry whispers:read and
+  user:read:whispers - the oauth url now requests them, so accounts
+  logged in before this need a fresh twitch sign-in to see any
+- per-user hiding, tri-state: a comma list of logins in ? > config/help
+  hides their rows as vanish (display:none), stub (a "N hidden
+  messages from nick" count line that keeps tally) or ghost (rows stay,
+  struck dim like deleted ones); the list and mode persist in the
+  options bundle and ride hw= / hwm= in settings urls
+- OBS overlay mode: ?overlay strips the page to live rows on a
+  transparent background - header, chat bar, video, panes and popups
+  all hide - ready to drop into a browser source
+- message permalinks: clicking a row's timestamp writes ?mid=<id> into
+  the url, and a link opened that way scrolls to and flashes the row
+- floating find-bar: ctrl+f, / or the ⌕ header button opens a search
+  over the rendered scrollback - bare words match text, user:login the
+  chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the
+  row type; enter/⇧enter step matches with a live counter, 'only'
+  collapses non-matching rows like a blocklist hit, and rows arriving
+  while the bar is open join the marks
+- chat archive: every rendered row indexes flat fields (mid, ts,
+  channel, login, kind, text) into a per-channel IndexedDB store held
+  30 days and capped near 50MB (oldest ~15% trimmed over-cap). the
+  find-bar's 'archive' button searches it newest-first past
+  scrollback's edge, and a hit that still renders jumps to its row
+- user inspector: a nick or @mention click pins a card - the chatter's
+  colour and display casing, pronouns (alejo.io, cached), first-seen,
+  session message count, their five most recent lines, and profile /
+  @mention / hide buttons. ⇧/⌃/⌘-click still opens the twitch profile;
+  the @mention button covers the @insert the plain click used to do
+- mod quick actions: where own USERSTATE flags moderator, broadcaster
+  or VIP, the inspector grows a timeout 10m / ban / delete msg row -
+  each button arms "sure?" for 3s before the second click sends the
+  /timeout /ban /delete through the relay on that row's channel
+- stats tab in the ? popup: session chatter and message counts, the
+  top 15 chatters in their nick colours, top 15 emotes by channel
+  usage, and the rate graph's three loudest bursts
+
 ## 2026-10-05
 
 ### Features

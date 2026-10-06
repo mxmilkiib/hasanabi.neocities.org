@@ -132,6 +132,12 @@ no dependencies beyond CDN-hosted fonts.
 - Gap notices — stretches the page wasn't watching (hidden tab,
   suspended timers, page closed, socket dropped) get a
   `· Nm gap · cause · start → end` row so lost context stays visible.
+- Whispers — `WHISPER` lines render in their own floating pane beside
+  the log (needs a login carrying whisper scopes); an unread count
+  badges a `✉` header chip that opens it, and `/w name text` replies
+  through `#jtv` like other clients.
+- Permalinks — clicking a row's timestamp copies a `?mid=` link;
+  opening it scrolls to and flashes the row.
 
 ### Emotes
 
@@ -285,6 +291,25 @@ no dependencies beyond CDN-hosted fonts.
   each link only once (session-only, not saved); `✂` clean urls
   rewrites link text without the `https://`, `www.` or a trailing
   `/index.htm` while leaving the target alone.
+- Find bar — `ctrl+f`, `/` or the `⌕` button floats a search over the
+  rendered scrollback: bare words match text, `user:login` the
+  chatter, `kind:notice|mod|gap|action|emote|mention|kw|deleted|sub`
+  the row type. `enter`/`⇧enter` step between matches with a counter,
+  `only` collapses non-matching rows, and `archive` searches the local
+  IndexedDB store — every rendered row indexes flat fields per channel
+  (30-day retention, ~50MB cap) so search reaches past scrollback's
+  edge; hits that still render jump to the row.
+- User hiding — a comma list of logins in config/help hides their
+  rows in one of three modes: `vanish` drops them, `stub` folds them
+  into a running count line, `ghost` strikes them dim like deleted
+  rows; persisted across visits.
+- User card — clicking a nick or @mention pins an inspector: colour,
+  pronouns, first-seen, session message count, recent lines, and
+  profile / @mention / hide buttons. Where one's own USERSTATE flags
+  mod, broadcaster or VIP privileges the card also offers
+  `timeout 10m`, `ban` and `delete msg`, each a click-twice confirm
+  sent through the relay as IRC commands. `⇧`/`⌃`/`⌘`-click still
+  opens the Twitch profile.
 - Hover previews — external links, nicks and @mentions pop a card:
   title and description, where a shortened link really lands, a
   playable video for instagram reels (resolved through kkclip), and
@@ -334,10 +359,12 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Help popup & resources
 
-- Three tabs — config/help, resources (re Hasan, clips, news, yt
+- Four tabs — config/help, stats (session top chatters, top emotes by
+  channel usage, the rate graph's loudest bursts), resources (re Hasan,
+  clips, news, yt
   channels, twitch streams, usa pol, dsa chapters, left parties,
   organising, conduct, dual power, mutual aid, free software, open
-  hardware, justice, extra links) and authors (era-grouped reading
+  hardware, justice, extra links), and authors (era-grouped reading
   lists) — laid out in link columns whose count is capped by the
   popup's own width via container queries.
 - The popup resizes from its edges and offers widths from 480 to
@@ -394,6 +421,10 @@ force off.
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
 | `epanim` | `anim`,`still` | picker animation filter |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
+| `overlay` | flag | OBS browser-source mode: transparent page, live rows only |
+| `mid` | a message id | scroll to and flash that row on load (set by timestamp clicks) |
+| `hw` | comma list | hide these logins' rows |
+| `hwm` | `vanish`/`stub`/`ghost` | how hidden users' rows render |
 
 `theme` names a preset bundle of all display options (`default`,
 `compact`, `print`, `cosy`, `cinema`, `phosphor`, `dyslexic`,
