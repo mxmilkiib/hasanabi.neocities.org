@@ -83,6 +83,14 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- the resources tab's channel list now links each stream's community
+  spaces too - verified discord invites (mikefrompa, majority report,
+  the serfs, kaceytron, frogan, yugopnik), subreddits, the tyt forum and
+  crooked's friends of the pod, lemmy for chapo and the deprogram,
+  patreon/community hubs (second thought, hbomberguy, thought slime,
+  lindsay ellis, some more news, left reckoning, hakim) and link hubs
+  (madeline pendleton, leaping larry, novara); streams with no findable
+  community space keep just their media links
 - the stats tab gains a channel scope picker on multi-channel joins:
   'scope all · #a · #b' narrows chatters, emotes, bursts, badges and
   the session row to one joined channel while 'all' keeps the combined
