@@ -83,6 +83,9 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- the ? popup's "follow" font size now tracks one ladder step below the
+  chat font rather than matching it - the option is labelled 'chat −1',
+  and explicit px picks still override
 - reply quotes can no longer leak anchor markup into the quoted body:
   replyCtx.body came from textContent, which glued the ▶ play glyph
   (and any chip/card text) onto the message tail - the linkifier then

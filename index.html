@@ -1112,7 +1112,7 @@
     border: 1px solid var(--popline);
     border-radius: 6px;
     padding: 0;
-    font-size: var(--chat-font, 15px); /* follow chat */
+    font-size: var(--help-font, var(--chat-font, 15px)); /* follow chat a step down */
     line-height: 1.5;
     z-index: 12; /* above the emote picker (11) */
     container-type: inline-size;
@@ -4403,9 +4403,11 @@
     const de = document.documentElement.style;
     de.setProperty('--chat-lhpx', Math.round(fs * Math.max(lh, 1.15)) + 'px');
     de.setProperty('--chat-lhm', Math.round(Math.max(-3, Math.min(0, (lh - 1.15) * 0.5 * fs))) + 'px');
-    // the preview card's body text runs two ladder steps below chat font
+    // the preview card's body text runs two ladder steps below chat font,
+    // and a following help panel one step below
     const pi = FONT_SIZES.indexOf(fs);
     de.setProperty('--peek-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 2)] : Math.max(7, fs - 2)) + 'px');
+    de.setProperty('--help-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 1)] : Math.max(7, fs - 1)) + 'px');
   }
   function cycle(btn, list, idx, prop, label, unit, helpCls) {
     const apply = () => {
@@ -8971,7 +8973,7 @@
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
-    helpFs: ['follow chat'].concat(HDR_SIZES),
+    helpFs: ['chat −1'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'on'],
     helpHide: HIDE_MODES,
