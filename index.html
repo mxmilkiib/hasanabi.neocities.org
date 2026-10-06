@@ -1265,6 +1265,9 @@
   #helpPanel .linkcols.stbl { display: grid; column-gap: .9em; }
   #helpPanel .linkcols.stbl > i { display: contents; }
   #helpPanel .linkcols.stbl > i.note { display: block; grid-column: 1 / -1; }
+  /* the legend's symbol marks are inline - the block rule above is for
+     author sub-heads */
+  #helpPanel .linkcols > i.note > b { display: inline; }
   /* kind + service cells take the dim .85em face nested descriptors get */
   #helpPanel .linkcols.stbl .cc, #helpPanel .linkcols.stbl .cl {
     font-size: .85em; color: var(--text-dim); }
