@@ -49,6 +49,12 @@ not versions — the page ships continuously to Neocities.
   usage, and the rate graph's three loudest bursts
 
 ### Fixes & polish
+- font previews in the ? popup now all render in their own font: the
+  stack's quoted family names sat inside a "-delimited style attribute,
+  so the attribute died at the first quote and every quoted-family
+  preview inherited the popup's sans - the names are single-quoted now.
+  also fixed Gohu's dead font url (the @master jsdelivr ref 403s; both
+  nerd-font faces are pinned to the v3.4.0 tag)
 - a closed emote picker no longer reopens on reload: the pin used to
   restore the picker open regardless of how the page was left - the
   pin now only remembers the float position, and open/closed persists

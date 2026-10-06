@@ -43,7 +43,7 @@
   }
   @font-face {
     font-family: 'Gohu';
-    src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@master/patched-fonts/Gohu/uni-11/GohuFontuni11NerdFont-Regular.ttf') format('truetype');
+    src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@v3.4.0/patched-fonts/Gohu/uni-11/GohuFontuni11NerdFont-Regular.ttf') format('truetype');
   }
   @font-face {
     font-family: 'Hack';
@@ -51,7 +51,7 @@
   }
   @font-face {
     font-family: 'Terminess';
-    src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@master/patched-fonts/Terminus/TerminessNerdFontMono-Regular.ttf') format('truetype');
+    src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@v3.4.0/patched-fonts/Terminus/TerminessNerdFontMono-Regular.ttf') format('truetype');
   }
   @font-face {
     font-family: 'Hack';
@@ -8643,7 +8643,9 @@
     `<a href="#" role="button" class="helpOpt helpPreset" data-preset="${n}">${n}</a>`).join(' / ');
   // each font name renders in its own face
   document.getElementById('helpFontFamList').innerHTML = [...fontSel.options].map((o, i) =>
-    `<a href="#" role="button" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value]}">${o.text}</a>`).join(' · ');
+    // single quotes inside - a " delimits the style attribute and every
+    // quoted family name would silently kill the preview's own font
+    `<a href="#" role="button" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value].replace(/"/g, "'")}">${o.text}</a>`).join(' · ');
   // the hide-mode default (stub) is set by no setter at boot - mark it
   markHelp('helpHide', hideMode);
   // bold each leading 'name:' in the description cells - whether it sits
