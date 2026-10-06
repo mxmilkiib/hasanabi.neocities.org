@@ -121,9 +121,10 @@ no dependencies beyond CDN-hosted fonts.
   chips and timestamps stay upright).
 - USERNOTICE subs/raids/gifts become dim italic notice rows;
   CLEARCHAT/NOTICE events show timeouts, bans and channel notices. A
-  room-wide `/clear` wipes rendered rows; a timeout or ban on the
-  logged-in user locks the chat input with a live countdown until it
-  expires.
+  room-wide `/clear` wipes rendered rows, while a timeout or ban
+  ghosts that user's rows in place (struck-through but readable,
+  including own echoes); a timeout or ban on the logged-in user locks
+  the chat input with a live countdown until it expires.
 - Name colours — the chatter's own Twitch colour when set, a
   hash-derived palette colour otherwise; either way the luminance is
   nudged so names stay legible on the active theme (the console theme
@@ -140,29 +141,39 @@ no dependencies beyond CDN-hosted fonts.
 - Zero-width 7TV emotes stack onto the previous one.
 - Emote-only rows render large (mode configurable: inline / pinned
   right / normal).
-- Tooltips name each emote's source set.
+- Hovering an emote — in a row or in the picker — pops a card with the
+  art at the provider's largest size plus the code and its source set
+  (emoji cells show the glyph with their search keywords).
 
 ### Emote picker
 
 - `☻` opens a Chatterino-style grid: 7TV / BTTV / FFZ / Twitch / emoji
   (~600 glyphs) sections with search, a `recent` row of the last 24
-  used, still/animated filters, and a `mix` toggle that merges every
-  enabled source into one flat grid.
+  used, per-source tab toggles, still/animated filters, and a `mix`
+  toggle that merges every enabled source into one flat grid.
 - Ordering is alphabetical or by usage — most recently used in chat
   first (StreamElements chatstats via the relay seed lifetime counts
   for tie-breaks; live session use updates both and persists across
-  reloads).
+  reloads). In mix mode anything used in the last minute pins to the
+  very top; sectioned mode keeps recents atop their own section.
 - In usage mode, dashed `2m`/`5m`/`10m`/`20m`/`30m`/`40m`/`50m`/`60m`
   cells mark where emotes were last used over that long ago — dim until
   recording has actually covered that span, then bold and
   accent-bordered — plus a solid accent square at the point recording
-  began (everything below it was never seen). All the squares' borders
-  breathe on a slow pulse so they catch the eye.
+  began (everything below it was never seen). The `▤` age-rows mode
+  gives each square its own row, and all the squares' borders breathe
+  on a slow pulse so they catch the eye.
 - Reshuffles animate emotes sliding to their new spots; a just-used
-  emote flashes behind its cell.
+  emote flashes behind its cell, each use stepping the flash ~24° round
+  the hue wheel so consecutive uses read as a spectral walk.
+- `Aa` overlays each emote's code, `½x`/`¾x`/`1x`/`2x` buttons size the
+  grid, and `hold` freezes usage reshuffles while the pointer is over
+  the picker.
 - The box resizes from its left and top edges and drags by a dotted
   grip strip (both persist); a `📌` pin keeps it open across chat-bar
-  hides and reloads.
+  hides and reloads. All display options — names, size, sort, age rows,
+  mix, hold, tabs, anim filter, geometry — ride the settings bundle,
+  theme slots and copied URLs.
 - Clicking inserts at the caret; `Esc` peels the topmost layer —
   picker first, then the help panel.
 
@@ -185,6 +196,11 @@ no dependencies beyond CDN-hosted fonts.
   racing backlog can't eat a just-sent line.
 - A plain click on a chatter's name types `@name ` at the input caret
   (modifier-clicks still open the profile).
+- `@` at a word boundary opens a narrowing pick of recently seen nicks
+  (freshest first, each in its chat colour) — tab/⇧tab walks it, enter
+  or a click fills the name. `:word`, or any bare word of 3+ letters
+  followed by tab, completes emote codes the same way, with a small
+  preview beside each candidate.
 - The box is a growing textarea — a wrapping draft gains a line at a
   time up to five before scrolling; ⇧`enter` writes a newline, plain
   `enter` sends.
@@ -194,7 +210,9 @@ no dependencies beyond CDN-hosted fonts.
 - Readline-style history: `↑`/`↓` in the input walk sent messages,
   stashing the draft on the first `↑` and restoring it once `↓` walks
   back past the newest entry; `↓` on a non-empty draft parks it as a
-  navigable slot under whatever is sent next.
+  navigable slot under whatever is sent next. The ring (100 deep,
+  per channel) persists in `localStorage`, so `↑` after a reload still
+  reaches older sends like an IRC client.
 - Channel rules apply server-side — slow mode counts down in the input
   after each send (mods/VIPs exempt), and rejections arrive as
   ordinary `[notice]` rows.
@@ -267,6 +285,13 @@ no dependencies beyond CDN-hosted fonts.
   each link only once (session-only, not saved); `✂` clean urls
   rewrites link text without the `https://`, `www.` or a trailing
   `/index.htm` while leaving the target alone.
+- Hover previews — external links, nicks and @mentions pop a card:
+  title and description, where a shortened link really lands, a
+  playable video for instagram reels (resolved through kkclip), and
+  for Twitch profiles the live state, followers, chat modes and
+  pronouns when the chatter set them on alejo.io. Lookups run through
+  the linkpeek Cloudflare worker; a config/help option scales the card
+  down to text or off, and it's skipped on touch screens.
 
 ### Keyboard & accessibility
 
@@ -303,9 +328,9 @@ no dependencies beyond CDN-hosted fonts.
   them.
 - PWA — installable (manifest + pass-through service worker); an
   installed standalone window survives backgrounding better than a
-  tab. On wake or reconnect the page asks the relay for missed lines
-  via recent-messages.robotty.de, so the log backfills rather than
-  staying truncated.
+  tab. On cold join, wake or reconnect the page asks the relay for
+  missed lines via recent-messages.robotty.de, so the log backfills
+  rather than opening empty or staying truncated.
 
 ### Help popup & resources
 
@@ -354,6 +379,21 @@ force off.
 | `ping` | flag | mention ping sound |
 | `clean` | flag | cleaned link text |
 | `self` | flag | accent edge on one's own messages |
+| `peek` | `0`–`3` | link-hover cards: off / text / +image / +icons |
+| `yt` | `0` | youtube link embeds off |
+| `lkico` | `0` | link favicons off |
+| `pn` | `0` | pronoun lookups on profile cards off |
+| `anim` | `0`–`3` | nick styles: off / super slow / slow / on |
+| `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
+| `epnames` | `1` | picker: emote names on cells |
+| `epzoom` | `sm`/`q`/`big` | picker cell size (½x / ¾x / 2x) |
+| `epsort` | `az` | picker sort (default usage) |
+| `epage` | `1` | picker age-rows mode |
+| `epmix` | `1` | picker merged provider grid |
+| `ephold` | `0` | picker reshuffle hold off |
+| `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
+| `epanim` | `anim`,`still` | picker animation filter |
+| `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
 
 `theme` names a preset bundle of all display options (`default`,
 `compact`, `print`, `cosy`, `cinema`, `phosphor`, `dyslexic`,
@@ -388,11 +428,11 @@ Where this sits relative to the usual suspects:
 | multi-channel | `?channel=` per tab | per page | per embed | tabs/splits | tabs | URL param | tabs | ✅ |
 | second-screen / PWA install | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | emote picker | ✅ usage stats + era marks | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
-| nick / emote completion | ❌ (names via click) | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| nick / emote completion | ✅ @nicks + :/tab codes | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
 | input draft history (↑/↓) | ✅ readline-style | ✅ | partial | ❌ | ❌ | n/a | ❌ | ❌ |
 | keyword / block-word filters | ✅ kw + bw | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
 | mention alerts | ✅ chip + opt. ping | partial | partial | ✅ sound/toast | ✅ | partial | ✅ | ✅ |
-| link / media cards | ✅ x-cards, gifs, imgs | partial | partial | ✅ hover previews | partial | ❌ | ❌ | ❌ |
+| link / media cards | ✅ x-cards, gifs, imgs, link/emote hovers | partial | partial | ✅ hover previews | partial | ❌ | ❌ | ❌ |
 | emote-only enlargement | ✅ 3 modes | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | gap notices (missed spans) | ✅ timed + cause | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | scrollback limit | ✅ 250–100k | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
