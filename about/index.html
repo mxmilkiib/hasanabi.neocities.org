@@ -61,8 +61,6 @@
     border-radius: 8px; padding: 1.1em 1.3em; color: var(--dim); font-size: .92em;
   }
   .how code { color: var(--text); background: rgba(255,255,255,.06); padding: .1em .35em; border-radius: 4px; font-size: .92em; }
-  .cols { columns: 2; column-gap: 2.4em; }
-  @media (max-width: 640px) { .cols { columns: 1; } }
   footer { margin-top: 3.5em; color: var(--dim); font-size: .85em; }
 </style>
 </head>
@@ -82,8 +80,8 @@
     <a href="https://github.com/mxmilkiib/hasanabi.neocities.org">github</a> ·
     mirrored at <a href="https://mxmilkiib.github.io/hasanabi.neocities.org/">github pages</a></p>
 
-  <h2>the chat</h2>
-  <ul class="cols">
+  <h2>chat</h2>
+  <ul>
     <li><b>every emote ecosystem</b> <i>7TV, BTTV, FFZ, animated &amp; zero-width</i></li>
     <li><b>real badges, replies, /me</b> <i>quoted reply blocks with jump-back</i></li>
     <li><b>send &amp; reply</b> <i>optional twitch login, readline history, drafts</i></li>
@@ -94,8 +92,8 @@
     <li><b>multi-channel</b> <i>?channel=a,b,c merges rooms</i></li>
   </ul>
 
-  <h2>the layer on top</h2>
-  <ul class="cols">
+  <h2>on top</h2>
+  <ul>
     <li><b>msgs/sec sparkline</b> <i>hover reads each second; glorp spikes glow</i></li>
     <li><b>stats tab</b> <i>top chatters, badges, emotes &amp; links over time windows</i></li>
     <li><b>link cards</b> <i>hover previews, titles, tweet cards, video embeds</i></li>
@@ -104,14 +102,14 @@
     <li><b>stream embed</b> <i>draggable, floats over the panels</i></li>
   </ul>
 
-  <h2>the hub</h2>
+  <h2>resources</h2>
   <ul>
     <li><b>resources</b> <i>re Hasan, news, live tv, usa pol, organising, mutual aid, free software, open social</i></li>
     <li><b>authors</b> <i>era-grouped reading lists with links to the source texts</i></li>
     <li><b>accessibility</b> <i>palettes × shade axis, dyslexia fonts, screen-reader live region, reduced motion</i></li>
   </ul>
 
-  <h2>how it works</h2>
+  <h2>the backend</h2>
   <div class="how">
     <div>Neocities ships a strict CSP — <code>connect-src 'self'</code> — so no WebSocket to Twitch
     IRC is possible. The page embeds a hidden iframe relay hosted on GitHub Pages (no CSP) and talks
