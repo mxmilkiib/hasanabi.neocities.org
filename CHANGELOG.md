@@ -43,6 +43,11 @@ not versions — the page ships continuously to Neocities.
   rides peek's autoscroll guard so the chat's own scrolling doesn't
   shake it loose
 ### Fixes & polish
+- backfill replays no longer duplicate rows after the dedup set
+  overflowed: the cap evicts the oldest ids instead of wiping the set
+  (a clear forgot ids still inside the replay window), and rendered
+  rows' own data-mid attrs back the check, so a replay of anything
+  still in scrollback is dropped even if its id aged out
 - usernames inside mod and event notices wear their nick formatting:
   "SomeChatter was timed out" and sub/raid "[notice] Name …" lines
   colour the name with the chatter's real twitch colour (falling back

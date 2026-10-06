@@ -2685,9 +2685,17 @@
         (kind !== 'PRIVMSG'
           ? `${kind}:${tags['tmi-sent-ts'] || ''}:${login || ''}:${rawMsg}` : '');
       if (dedupKey) {
-        if (seenIds.has(dedupKey)) continue;
+        // rowById mirrors rendered rows, so it still catches a replay whose
+        // id seenIds has already evicted (a trimmed row replaying is fine to
+        // render - it fell out of scrollback anyway)
+        if (seenIds.has(dedupKey) || rowById.has(dedupKey)) continue;
         seenIds.add(dedupKey);
-        if (seenIds.size > 20000) { seenIds.clear(); seenIds.add(dedupKey); }
+        // a wholesale clear forgets ids still inside the replay window - the
+        // next backfill then duplicates their rows; drop the oldest instead
+        if (seenIds.size > 20000) {
+          let n = 4000;
+          for (const id of seenIds) { seenIds.delete(id); if (!--n) break; }
+        }
       }
       if (live) {
         const now = Date.now();
