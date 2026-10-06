@@ -2392,10 +2392,11 @@
           let ico = '';
           if (lkIco) {
             try {
-              // nitter mirrors of twitter get the x icon, not the
-              // instance's own (usually absent) one
+              // twitter mirrors (nitter, the fx-family fixers) get the x
+              // icon, not the instance's own - fxtwitter's apex serves
+              // the github mark, which reads as a repo link
               const icoHost = new URL(u.replace(/&amp;/g, '&')).hostname;
-              ico = `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(/(?:^|\.)nitter/i.test(icoHost) ? 'x.com' : icoHost)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
+              ico = `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(/(?:^|\.)(?:nitter|fxtwitter|vxtwitter|fixupx|betterfox)/i.test(icoHost) ? 'x.com' : icoHost)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
             }
             catch { /* a malformed url keeps the bare text */ }
           }
