@@ -38,6 +38,10 @@ not versions — the page ships continuously to Neocities.
   utm_*/click-ids go globally; host rules catch ig's stkn/igsh, yt's
   si, x's s/t and tt's share_* set (yt's t stays - it is a timestamp).
   tracked and bare posts of one url now dedupe and count together
+- top chatters' sort pick becomes a time window - all-time, month,
+  week and today (default), folded out of new per-login day buckets
+  (nickDay, per-channel too, persisted as nd/ndp) like the badge
+  windows; the msgs/new/active orders are gone
 - resources gains an open social section (werdmuller's open social
   web essay, activitypub/atproto, fediverse app index + mastodon,
   pixelfed, lemmy; indieweb, bridgy fed, micro.blog) and the

@@ -3141,6 +3141,11 @@
         nickLast.set(login, Date.now());
         const nm = perMap(nickMsgsPer, ch);
         nm.set(login, (nm.get(login) || 0) + 1);
+        const nd0 = Math.floor(Date.now() / 864e5);
+        const nd = nickDay[login] || (nickDay[login] = {});
+        nd[nd0] = (nd[nd0] || 0) + 1;
+        const ndc = perObj(nickDayPer, ch), nde = ndc[login] || (ndc[login] = {});
+        nde[nd0] = (nde[nd0] || 0) + 1;
       }
       // real badge icons left of the name; text chips only as fallback
       const renderedSets = new Set();
@@ -4285,11 +4290,13 @@
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   let emoteStatSrc = 'alltime';
   try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
-  // top chatters' ordering: the count, or the name/first-seen/last-seen
-  // maps that tally alongside it
+  // top chatters rank message counts inside a trailing day window,
+  // folded out of the per-login day buckets like the badge windows
+  const CHAT_WINS = { 'all-time': 0, month: 31, week: 7, today: 1 };
   const CHAT_SORT_KEY = 'hasan-chatsort';
-  let chatSort = 'msgs';
-  try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'msgs'; } catch {}
+  let chatSort = 'today';
+  try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'today'; } catch {}
+  if (!(chatSort in CHAT_WINS)) chatSort = 'today';
   // badge counts also window like the emote ones: alltime is the plain
   // tally, the rest read trailing days out of the per-version buckets
   const BADGE_WINS = { alltime: 0, month: 31, week: 7, day: 1 };
@@ -4361,20 +4368,26 @@
     // bots chatter constantly but aren't people - count them in the
     // session totals, keep them out of the ranking
     const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
-    const csf = {
-      'new': (a, b) => (nickFirst.get(b[0]) || 0) - (nickFirst.get(a[0]) || 0) || b[1] - a[1],
-      'active': (a, b) => (nickLast.get(b[0]) || 0) - (nickLast.get(a[0]) || 0) || b[1] - a[1],
-    }[chatSort] || ((a, b) => b[1] - a[1]);
-    const cMet = chatSort === 'new' ? (lg) => (nickFirst.get(lg) ? fmtRowTime(new Date(nickFirst.get(lg))) : '·')
-      : chatSort === 'active' ? (lg) => (nickLast.get(lg) ? fmtRowTime(new Date(nickLast.get(lg))) : '·')
-      : (lg, n) => n.toLocaleString('en');
-    const chat = [...nMsgs.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
-      .sort(csf).slice(0, 40)
+    // windowed picks fold the per-login day buckets into a tally;
+    // all-time reads the plain session map
+    const cWinD = CHAT_WINS[chatSort] ?? 1;
+    let nView = nMsgs;
+    if (cWinD) {
+      nView = new Map();
+      const cD0 = Math.floor(Date.now() / 864e5) - (cWinD - 1);
+      for (const [lg, e] of Object.entries(sc ? (nickDayPer[sc] || {}) : nickDay)) {
+        let c = 0;
+        for (const [d, v] of Object.entries(e)) if (+d >= cD0) c += v;
+        if (c) nView.set(lg, c);
+      }
+    }
+    const chat = [...nView.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
+      .sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([lg, n], i) => {
         const nm = nmOf(lg);
         const col = (seenNicks.get(lg) || {}).c || colorForName(nm);
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
-          cMet(lg, n));
+          n.toLocaleString('en'));
       }).join('');
     // the loudest samples of the series that paints the rate graph's red
     // segments - the glorp/F spikes over the same >2/sec threshold, ranked
@@ -4586,8 +4599,9 @@
     const badgeWinBtns = Object.keys(BADGE_WINS)
       .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
-    const chatSortBtns = ['msgs', 'new', 'active']
-      .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="sort chatters">${s}</button>`)
+    const chatWinTips = { 'all-time': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', today: 'message count, today' };
+    const chatSortBtns = Object.keys(CHAT_WINS)
+      .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="${chatWinTips[s]}">${s}</button>`)
       .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
     const pvMax = sc ? (peakViewers[sc] || 0) : Math.max(0, ...Object.values(peakViewers));
@@ -7381,10 +7395,11 @@
   // month) honest, like the emote useDay ones; entries past 31 days
   // evict on save
   const badgeDay = {};           // 'set/ver' -> { dayIdx: count }
+  const nickDay = {};            // login -> { dayIdx: count } - feeds top chatters' windows
   // the same tallies again per channel, for the stats tab's scope picker:
   // channel -> Map/obj shaped like the global counters above
   const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {},
-    badgeDayPer = {}, urlUsePer = {};
+    badgeDayPer = {}, urlUsePer = {}, nickDayPer = {};
   const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
   const perObj = (o, ch) => o[ch] || (o[ch] = {});
   // the ranked counters restore like the history rows they tallied -
@@ -7408,10 +7423,12 @@
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
   Object.assign(badgeDay, savedStats.bd);
   for (const [ch, o] of Object.entries(savedStats.bdp || {})) Object.assign(perObj(badgeDayPer, ch), o);
+  Object.assign(nickDay, savedStats.nd);
+  for (const [ch, o] of Object.entries(savedStats.ndp || {})) Object.assign(perObj(nickDayPer, ch), o);
   const saveStats = () => {
     const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
     const bD0 = Math.floor(Date.now() / 864e5) - 31;
-    for (const bag of [badgeDay, ...Object.values(badgeDayPer)])
+    for (const bag of [badgeDay, nickDay, ...Object.values(badgeDayPer), ...Object.values(nickDayPer)])
       for (const e of Object.values(bag))
         for (const d of Object.keys(e)) if (+d < bD0) delete e[d];
     try {
@@ -7419,7 +7436,7 @@
         nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst], nl: [...nickLast],
         bu: [...badgeUse], bv: [...badgeVerUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
-        lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer,
+        lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer, nd: nickDay, ndp: nickDayPer,
         uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers,
       }));
     } catch {}
