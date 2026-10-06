@@ -4329,6 +4329,9 @@
       : '';
     const row = (i, inner, count) =>
       `<div class="st-row"><span class="n">${i}.</span><span class="nm">${inner}</span><i>${count}</i></div>`;
+    // supa partitions a channel's logs by utc day - as deep as its urls
+    // reach, so a burst time links the day that holds the spike
+    const logDay = (t) => new Date(t).toISOString().slice(0, 10);
     // bots chatter constantly but aren't people - count them in the
     // session totals, keep them out of the ranking
     const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
@@ -4421,7 +4424,8 @@
     const bursts = bSeries.map((r, i) => [r, rateTimes[bOff + i]])
       .filter(([r, t]) => Number.isFinite(r) && t)
       .sort((a, b) => b[0] - a[0]).slice(0, 3)
-      .map(([r, t]) => `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ${fmtRowTime(new Date(t))}</span></div>`).join('');
+      .map(([r, t]) => `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
+        `<a class="at" href="https://tv.supa.sh/logs?c=${encodeURIComponent(sc || CHANNEL)}&d=${logDay(t)}" target="_blank" rel="noopener" title="this day in the supa logs">${fmtRowTime(new Date(t))}</a></span></div>`).join('');
     // badge reference: the channel's own sets lead, then the badges that
     // actually turn up in chat, then every remaining global set a-z; each
     // set collapses so the hundreds of promo sets stay out of the way

@@ -27,6 +27,9 @@ not versions — the page ships continuously to Neocities.
   or scope pick folds it back
 - stats session cell lists the peak reported viewer count per channel
   (all-scope takes the max), persisted in the session-stats blob
+- stats burst rows link their timestamp to that utc day's supa chat
+  log (the deepest address its ?c/&d= urls reach; its search only
+  matches message text, not times)
 
 ### Fixes
 - link and emote hover previews dying on the stats tab: its ~3s live
