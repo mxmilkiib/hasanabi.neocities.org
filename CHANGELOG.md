@@ -9,10 +9,11 @@ not versions — the page ships continuously to Neocities.
 - stats gains a top links section: every url in a rendered PRIVMSG is
   normalised (scheme/www/case folded) and tallied, ranked by posts,
   scoped per channel and persisted in the session-stats blob
-- stats glorps lists the peak glorp/F moments - the loudest samples of
-  the same series that paints the rate graph's red segments (>2/sec),
-  ranked with their timestamps; a per-channel series keeps the scope
-  picker honest
+- stats glorps lists only the peak glorp/F moments - the loudest
+  samples of the same series that paints the rate graph's red
+  segments (>2/sec), ranked with their timestamps; a per-channel
+  series keeps the scope picker honest (the total and per-chatter
+  ranking are gone; so are their tallies)
 - stats badge and top-emote lists cap at the top 40 rows with a
   'N more - show all' row that expands the full ranking (and a
   'collapse to top 40' row to fold it again); a sort, window, source

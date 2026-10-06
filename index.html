@@ -3144,11 +3144,6 @@
         glorpCounts.set(sec, (glorpCounts.get(sec) || 0) + 1);
         const gcs = perMap(glorpCountsPer, ch);
         gcs.set(sec, (gcs.get(sec) || 0) + 1);
-        if (login) {
-          glorpUse.set(login, (glorpUse.get(login) || 0) + 1);
-          const gm = perMap(glorpPer, ch);
-          gm.set(login, (gm.get(login) || 0) + 1);
-        }
       }
       // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
@@ -4322,16 +4317,6 @@
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
           cMet(lg, n));
       }).join('');
-    const gUseM = sc ? (glorpPer[sc] || new Map()) : glorpUse;
-    const glorpTotal = [...gUseM.values()].reduce((a, b) => a + b, 0);
-    const glorps = [...gUseM.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10)
-      .map(([lg, n], i) => {
-        const rec = seenNicks.get(lg) || {};
-        const nm = rec.n || lg;
-        const col = rec.c || colorForName(nm);
-        return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
-          n.toLocaleString('en'));
-      }).join('');
     // the loudest samples of the series that paints the rate graph's red
     // segments - the glorp/F spikes over the same >2/sec threshold, ranked
     const gSeries = sc ? (glorpSamplesPer[sc] || []) : glorpSamples;
@@ -4540,9 +4525,7 @@
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
         `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div></div>` +
         `<div><div class="st-h">glorps</div>` +
-        `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
-        gPeaks +
-        `${glorps || (gPeaks ? '' : '<div class="st-row"><span class="nm">none yet</span></div>')}</div>` +
+        `${gPeaks || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `</div>` +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
       `<div class="st-h">top links</div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
@@ -7306,7 +7289,6 @@
   const nickMsgs = new Map();  // login -> rendered PRIVMSGs this session
   const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
   const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
-  const glorpUse = new Map();    // login -> rendered GLORP/F rows
   const urlUse = new Map();      // normalised url -> rendered PRIVMSGs carrying it
   // per-day badge buckets keep the stats tab's badge windows (day/week/
   // month) honest, like the emote useDay ones; entries past 31 days
@@ -7314,7 +7296,7 @@
   const badgeDay = {};           // 'set/ver' -> { dayIdx: count }
   // the same tallies again per channel, for the stats tab's scope picker:
   // channel -> Map/obj shaped like the global counters above
-  const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {}, glorpPer = {},
+  const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {},
     badgeDayPer = {}, urlUsePer = {};
   const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
   const perObj = (o, ch) => o[ch] || (o[ch] = {});
@@ -7329,12 +7311,10 @@
   intoMap(nickLast, savedStats.nl);
   intoMap(badgeUse, savedStats.bu);
   intoMap(badgeVerUse, savedStats.bv);
-  intoMap(glorpUse, savedStats.gl);
   intoMap(urlUse, savedStats.uu);
   for (const [ch, arr] of Object.entries(savedStats.nmp || {})) intoMap(perMap(nickMsgsPer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bup || {})) intoMap(perMap(badgeUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
-  for (const [ch, arr] of Object.entries(savedStats.glp || {})) intoMap(perMap(glorpPer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.uup || {})) intoMap(perMap(urlUsePer, ch), arr);
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
   Object.assign(badgeDay, savedStats.bd);
@@ -7348,9 +7328,9 @@
     try {
       localStorage.setItem(STATS_KEY, JSON.stringify({
         nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst], nl: [...nickLast],
-        bu: [...badgeUse], bv: [...badgeVerUse], gl: [...glorpUse],
+        bu: [...badgeUse], bv: [...badgeVerUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
-        glp: per(glorpPer), lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer,
+        lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer,
         uu: [...urlUse], uup: per(urlUsePer),
       }));
     } catch {}
