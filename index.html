@@ -4016,12 +4016,18 @@
   }
   // the stats tab builds fresh on each open: session chatters and message
   // counts, channel emote usage, and the rate graph's loudest samples
+  // logins the top-chatters ranking ignores - channel bots whose volume
+  // would otherwise crowd the list out
+  const STATS_EXCLUDE = new Set(['blammobot', 'fossabot']);
   function renderStats() {
     const el = document.getElementById('statsBody');
     if (!el) return;
     const row = (i, inner, count) =>
       `<div class="st-row"><span class="n">${i}.</span><span class="nm">${inner}</span><i>${count}</i></div>`;
-    const chat = [...nickMsgs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15)
+    // bots chatter constantly but aren't people - count them in the
+    // session totals, keep them out of the ranking
+    const chat = [...nickMsgs.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
+      .sort((a, b) => b[1] - a[1]).slice(0, 15)
       .map(([lg, n], i) => {
         const rec = seenNicks.get(lg) || {};
         const nm = rec.n || lg;
