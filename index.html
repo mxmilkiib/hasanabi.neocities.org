@@ -280,7 +280,7 @@
   .chat-modes { font-size: .93em; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
   /* @N chip: mentions that arrived while the page wasn't focused
      (scoped to the header chip - .eage.missed rungs are unrelated) */
-  #missed.missed {
+  #missed.missed, #whisChip {
     font-size: .78em;
     color: var(--accent);
     border: 1px solid var(--accent);
@@ -289,6 +289,8 @@
     cursor: pointer;
     white-space: nowrap;
   }
+  /* unread whispers badge violet like the row tint they open into */
+  #whisChip { color: var(--vip); border-color: var(--vip); }
   @keyframes missflash {
     0%, 40% { background-color: color-mix(in srgb, var(--accent) 30%, transparent); }
     100% { background-color: transparent; }
@@ -772,6 +774,40 @@
     padding-left: 8px;
   }
   .row.blk { display: none; }
+  /* per-user hide: vanish drops the rows, ghost keeps them struck like a
+     deleted message, stub collapses each into a running count line */
+  .row.uhide { display: none; }
+  .row.ughost { opacity: .55; text-decoration: line-through; }
+  .row.hidestub { color: var(--text-dim); font-style: italic; }
+  .row.hidestub .time { font-style: normal; }
+  /* find-bar: matched rows get an accent edge, 'only' hides the rest */
+  .row.hit { --rowbar: linear-gradient(var(--accent) 0 0); margin-left: -8px; padding-left: 8px;
+    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 9%, transparent) 0 0); }
+  .row.fhide { display: none; }
+  /* whispers live in their own pane - the row keeps chat styling but
+     wears the violet tint so the stream can't be mistaken for it */
+  #whis {
+    position: fixed; z-index: 9; left: 12px; bottom: 12px;
+    width: min(440px, 92vw); max-height: 55vh;
+    display: flex; flex-direction: column;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--popline); border-radius: 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .45);
+    font-size: var(--chat-font, 15px);
+  }
+  #whis[hidden] { display: none; }
+  .whis-head { display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    border-bottom: 1px solid var(--line); }
+  .whis-head b { color: var(--vip); }
+  .whis-head .whis-hint { flex: 1; color: var(--text-dim); font-size: .78em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .whis-log { overflow-y: auto; padding: 2px 6px 4px; min-height: 3em; }
+  .row.whisper {
+    --rowtint: linear-gradient(color-mix(in srgb, var(--vip) 12%, transparent) 0 0);
+    --rowbar: linear-gradient(var(--vip) 0 0);
+    margin-left: -8px; padding-left: 8px;
+  }
+  .row.whisper .warr { color: var(--vip); font-weight: 600; margin: 0 3px; }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -1412,7 +1448,7 @@
 </head>
 <body>
   <header>
-    <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
+    <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
     <canvas id="spark" role="img" title="msgs/sec over the last 2 minutes - ticks every 10s" aria-label="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.75)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button></div>
@@ -1532,6 +1568,7 @@
   <div id="offBar" role="status" hidden>you're offline - chat is paused and will catch up when the connection returns</div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
+  <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
@@ -1853,7 +1890,7 @@
       tags = parseTags(raw.slice(1, spaceIdx));
       rest = raw.slice(spaceIdx + 1);
     }
-    const cmd = rest.match(/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE)(?: |$)/);
+    const cmd = rest.match(/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE|WHISPER)(?: |$)/);
     if (!cmd) return null;
     let login = null;
     if (rest.startsWith(':')) {
@@ -2510,6 +2547,7 @@
              ? `${parsed.message.trim()} was ${+parsed.tags['ban-duration'] ? 'timed out' : 'banned'}`
              : 'chat was cleared by a moderator')
           : parsed.kind === 'CLEARMSG' ? 'a message was deleted'
+          : parsed.kind === 'WHISPER' ? `whisper: ${parsed.message}`
           : parsed.message;
       if (t) srLiveEl.textContent = (MULTI ? (parsed.channel || '') + ' ' : '') +
         (parsed.login ? parsed.login + ': ' : '') + t;
@@ -2672,6 +2710,7 @@
     }
     const nearBottom = stickBottom;
     let html = '';
+    let whisHtml = ''; // whisper rows collect beside the log's own batch
     // logins a clearchat struck this flush - marks their already-rendered
     // rows at the event and the batch's own rows after insertion
     const ghosted = new Set();
@@ -2690,7 +2729,9 @@
       // notice-type events carry no id, so key them on kind+ts+sender+body
       // system-msg in the notice key: two message-less subs in the same ms
       // would otherwise share kind:ts:login:body and drop each other
-      const dedupKey = tags.id ||
+      // whispers carry a message-id rather than a row id - fold it into the
+      // same key so a replay can't re-land one in the pane
+      const dedupKey = tags.id || tags['message-id'] ||
         (kind !== 'PRIVMSG'
           ? `${kind}:${tags['tmi-sent-ts'] || ''}:${login || ''}:${tags['system-msg'] || ''}:${rawMsg}` : '');
       if (dedupKey) {
@@ -2705,6 +2746,13 @@
           let n = 4000;
           for (const id of seenIds) { seenIds.delete(id); if (!--n) break; }
         }
+      }
+      // whispers render in their own pane, never the log - keep them out of
+      // the rate counters, the gap bookkeeping and the columns' history
+      if (kind === 'WHISPER') {
+        const wts = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
+        whisHtml += whisperRow(wts.getTime(), fmtRowTime(wts), tags, login, rawMsg, !!live);
+        continue;
       }
       if (live) {
         const now = Date.now();
@@ -2993,6 +3041,14 @@
       evictGhosts(activeEl);
     } else activeEl.append(tpl.content);
     dedupeLinks(newRows);
+    if (whisHtml) {
+      whisLog.insertAdjacentHTML('beforeend', whisHtml);
+      // the pane is a rolling dm history - bound it like the log but far
+      // tighter; whispers don't survive a reload
+      while (whisLog.children.length > 200) whisLog.firstElementChild.remove();
+      if (!whisEl.hidden) whisLog.scrollTop = whisLog.scrollHeight;
+      paintWhisChip();
+    }
     // mentions that land while the page isn't focused are queued on the
     // @N chip so they can be walked back through later
     const unfocused = document.hidden || !document.hasFocus();
@@ -3613,7 +3669,7 @@
   }
 
   function handleLine(line, replay) {
-    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE)(?: |$)/.test(line)) {
+    if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE|WHISPER)(?: |$)/.test(line)) {
       const parsed = parseTwitchMessage(line);
       if (!parsed) return;
       if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags, (parsed.channel || '').replace(/^#/, '').toLowerCase() || CHANNEL); return; }
@@ -4220,6 +4276,86 @@
     }
     updateMissedBadge();
   });
+
+  // ---- whispers: twitch dms arrive as WHISPER lines once the login has
+  // whisper scopes. They render in a floating pane beside the log - never
+  // in it - and the header's ✉ chip mirrors the @N one: a count of unread,
+  // click to open, ⇧click clears the count ----
+  const whisEl = document.getElementById('whis');
+  const whisLog = document.getElementById('whisLog');
+  const whisChip = document.getElementById('whisChip');
+  let whisUnread = 0, whisSeen = false;
+  function paintWhisChip() {
+    // the chip exists only once whispers have - it reads the unread count,
+    // or a bare ✉ while the pane it reopens stays open
+    whisChip.hidden = !(whisUnread > 0 || (whisSeen && !whisEl.hidden));
+    whisChip.textContent = whisUnread ? `✉${whisUnread}` : '✉';
+    whisChip.title = whisUnread
+      ? `${whisUnread} unread whisper${whisUnread === 1 ? '' : 's'} - click to open · ⇧click clears`
+      : 'whisper pane - click to close';
+  }
+  function setWhisOpen(on) {
+    whisEl.hidden = !on;
+    if (on) { whisUnread = 0; whisLog.scrollTop = whisLog.scrollHeight; }
+    paintWhisChip();
+  }
+  whisChip.addEventListener('click', (e) => {
+    if (e.shiftKey) { whisUnread = 0; paintWhisChip(); return; }
+    setWhisOpen(whisEl.hidden);
+  });
+  whisChip.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    whisChip.dispatchEvent(new MouseEvent('click', { shiftKey: e.shiftKey }));
+  });
+  document.getElementById('whisX').addEventListener('click', () => setWhisOpen(false));
+  // a name in the pane arms /w <login> at the input as the answer path;
+  // modifier clicks fall through to the profile like log nicks
+  whisLog.addEventListener('click', (e) => {
+    const nm = e.target.closest('a.name');
+    if (!nm || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || e.button) return;
+    e.preventDefault();
+    chatInput.value = `/w ${nm.dataset.u || nm.textContent} `;
+    chatbarEl.hidden = false;
+    growInput();
+    chatInput.focus();
+    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+  });
+  function whisperRow(ts, timeStr, tags, login, rawMsg, live) {
+    const name = tags['display-name'] || login || '(unknown)';
+    const color = monoNames ? colorForName(name) : (ensureLegible(tags.color) || colorForName(name));
+    if (login) { noteNick(login, name, color); pronSeen(login); }
+    const rendered = renderMessageHTML(rawMsg, tags.emotes, false, CHANNEL);
+    const twTail = pendingTw.splice(0).join('');
+    whisSeen = true;
+    if (live) {
+      if (whisEl.hidden) whisUnread++;
+      if (document.hidden || !document.hasFocus()) {
+        pingSnd();
+        notifyShow(`${name.trim()} whispered you`, rawMsg.slice(0, 140), 'whisper');
+      }
+    }
+    return `<div role="article" class="row whisper" data-ts="${ts}"${login ? ` data-u="${escapeHTML(login)}"` : ''}>` +
+      `<span class="time">${timeStr}</span>` +
+      `<a class="name" style="color:${color}" data-u="${escapeHTML(login || '')}" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(login || name.toLowerCase()))}" target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>` +
+      `<span class="warr">→ you:</span> ${rendered.html}${twTail}</div>`;
+  }
+  // /w's own echo: twitch doesn't mirror it back, so it lands in the pane
+  // directly, dressed in the sender's USERSTATE like a channel echo
+  function whisperEcho(name, msg) {
+    const me = selfTagsPer[CHANNEL] || {};
+    const wname = me['display-name'] || (auth && auth.login) || 'you';
+    const color = monoNames ? colorForName(wname) : (ensureLegible(me.color) || colorForName(wname));
+    const rendered = renderMessageHTML(msg, me.emotes, false, CHANNEL);
+    pendingTw.splice(0);
+    whisSeen = true;
+    whisLog.insertAdjacentHTML('beforeend',
+      `<div role="article" class="row whisper out"><span class="time">${fmtRowTime(new Date())}</span>` +
+      `<a class="name" style="color:${color}" data-u="${escapeHTML((auth && auth.login) || '')}">${escapeHTML(wname)}</a>` +
+      `<span class="warr">→ ${escapeHTML(name)}:</span> ${rendered.html}</div>`);
+    while (whisLog.children.length > 200) whisLog.firstElementChild.remove();
+    whisLog.scrollTop = whisLog.scrollHeight;
+  }
 
   // ---- option persistence ----
   const OPTS_KEY = 'hasan-opts';
@@ -6013,7 +6149,7 @@
           '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
           (CHANNEL !== DEFAULT_CHANNEL || MULTI ? '&state=' + encodeURIComponent(CHANNELS.join(',')) : '') +
           '&response_type=token&scope=' +
-          encodeURIComponent('chat:read chat:edit user:read:chat user:write:chat');
+          encodeURIComponent('chat:read chat:edit user:read:chat user:write:chat whispers:read user:read:whispers');
         // if the navigation never commits, unstick the button anyway
         setTimeout(() => sendBtn.classList.remove('busy'), 12000);
       };
@@ -6172,6 +6308,18 @@
     if (toUntils[target] || (slowUntils[target] || 0) > Date.now()) return;
     const text = chatInput.value.trim();
     if (!text || !relayFrame.contentWindow) return;
+    // /w goes out as a whisper through #jtv like other clients send it;
+    // twitch doesn't echo it back, so the echo lands in the whisper pane
+    // rather than the channel log
+    const wm = text.match(/^\/w(?:hisper)?\s+(\S+)\s+(.+)$/is);
+    if (wm) {
+      relayFrame.contentWindow.postMessage({ type: 'send', channel: 'jtv', text: `/w ${wm[1]} ${wm[2]}` }, RELAY_ORIGIN);
+      whisperEcho(wm[1], wm[2]);
+      chatInput.value = '';
+      compClose();
+      growInput();
+      return;
+    }
     // /me goes out as a CTCP ACTION like other clients send it. Twitch adds
     // a reply's @mention itself, so only the local echo spells it out
     const act = text.match(/^\/me\s+(.+)$/is);
