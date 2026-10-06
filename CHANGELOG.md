@@ -13,9 +13,10 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
-- stats badges get a count-window picker - alltime, month, week, day -
-  backed by new per-version day buckets in the session-stats blob, and
-  the sort list reorders to put name last
+- stats badges get a merged filter row - alltime, month, week and day
+  rank by use within that window (backed by new per-version day
+  buckets in the session-stats blob), then vers, kind and name run
+  the grouped views
 - stats top chatters gets a sort picker: msgs (the count), a-z, new
   (lately first-seen) and active (lately spoke) - the last two rank
   and label by time instead of count, using a new last-seen tally

@@ -4247,7 +4247,9 @@
     const bVUseM = sc ? (badgeVerUsePer[sc] || new Map()) : badgeVerUse;
     // windowed badge counts fold the per-version day buckets into set
     // and version tallies; alltime is the plain session tally
-    const bWinD = BADGE_WINS[badgeWin] ?? 0;
+    // the window only applies to the ranked 'use' view - grouped sorts
+    // always read the full tally
+    const bWinD = badgeSort === 'use' ? (BADGE_WINS[badgeWin] ?? 0) : 0;
     const bWSet = new Map(), bWVer = new Map();
     if (bWinD) {
       const wD0 = Math.floor(Date.now() / 864e5) - (bWinD - 1);
@@ -4441,11 +4443,14 @@
     const emoteSrcBtns = Object.keys(EMOTE_SRCS)
       .map((s) => `<button type="button" class="st-s${emoteStatSrc === s ? ' on' : ''}" data-esrc="${s}" title="count source">${s}</button>`)
       .join('');
-    const badgeSortBtns = Object.keys(BSORTS)
+    const badgeSortBtns = ['vers', 'kind', 'name']
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
+    // the window buttons take the sort row's lead slot: each one is
+    // 'use' ranked within that window, so they only light when the
+    // ranked view is showing
     const badgeWinBtns = Object.keys(BADGE_WINS)
-      .map((s) => `<button type="button" class="st-s${badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="count window">${s}</button>`)
+      .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="rank by use in window">${s}</button>`)
       .join('');
     const chatSortBtns = ['msgs', 'a-z', 'new', 'active']
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="sort chatters">${s}</button>`)
@@ -4507,7 +4512,9 @@
     const bw = e.target.closest('.st-s[data-bwin]');
     if (bw) {
       badgeWin = bw.dataset.bwin;
+      badgeSort = 'use';
       try { localStorage.setItem(BADGE_WIN_KEY, badgeWin); } catch {}
+      try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
       renderStats();
       return;
     }
