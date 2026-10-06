@@ -1260,6 +1260,9 @@
      tunable weight; the default keeps the usual .at bold */
   #htabRes .linkcols > i > a.at:first-of-type,
   #htabAuth .linkcols > i > a.at:first-of-type { font-weight: var(--linkw, 700); }
+  /* bracketed annotation links (work/theme sources) stay at text
+     weight - only the name carries the pick above */
+  #htabAuth .linkcols > i span a.at { font-weight: var(--chat-w, 400); }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run longest (name + work + dates + tagline), so
      the widest columns there */
