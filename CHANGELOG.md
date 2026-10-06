@@ -49,6 +49,11 @@ not versions — the page ships continuously to Neocities.
   usage, and the rate graph's three loudest bursts
 
 ### Fixes & polish
+- a closed emote picker no longer reopens on reload: the pin used to
+  restore the picker open regardless of how the page was left - the
+  pin now only remembers the float position, and open/closed persists
+  separately (a missing key reads as open so existing pinned setups
+  are unaffected). unpicking stays exactly what it was
 - the 12-hour timestamp options actually show 12-hour times now: a mode
   switch used to only toggle the seconds fragment, leaving every
   rendered stamp in the format it was created with - setTimes now

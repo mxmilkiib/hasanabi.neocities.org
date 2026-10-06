@@ -7918,6 +7918,9 @@
   // the pin state persists, so a pinned picker reopens on the next load
   const emotePin = document.getElementById('emotePin');
   const EPICK_PIN_KEY = 'hasan-epickpin';
+  // '0' only ever lands when the picker was closed - a missing key
+  // reads as open so existing pinned setups keep their behaviour
+  const EPICK_OPEN_KEY = 'hasan-epickopen';
   let epickPinned = false;
   function setPin(on) {
     epickPinned = on;
@@ -7946,7 +7949,10 @@
     emojiBtn.classList.remove('on');
     emojiBtn.setAttribute('aria-expanded', 'false');
     // closing isn't unpinning: a pinned picker keeps its pin and its
-    // stashed position, so the next ☻ press reopens it where it was
+    // stashed position, so the next ☻ press reopens it where it was.
+    // It stays closed across a reload though - the pin remembers where
+    // it floats, not that it was up
+    try { localStorage.setItem(EPICK_OPEN_KEY, '0'); } catch {}
   }
   emotePin.addEventListener('click', () => setPin(!epickPinned));
   document.getElementById('emoteX').addEventListener('click', closePicker);
@@ -7962,6 +7968,7 @@
   emojiBtn.addEventListener('click', () => {
     if (!emotePick.hidden) { closePicker(); return; }
     emotePick.hidden = false;
+    try { localStorage.setItem(EPICK_OPEN_KEY, '1'); } catch {}
     // a spot parked while the chat bar was hidden can sit under it now
     if (emotePick.style.top) {
       const r = emotePick.getBoundingClientRect();
@@ -8152,9 +8159,11 @@
     }
   };
   try { applyEpickBox(JSON.parse(localStorage.getItem(EPICK_SIZE_KEY))); } catch {}
-  // a pinned picker reopens where it was left - no focus steal
+  // a pinned picker reopens where it was left, but only if it was open
+  // when the page went away - a closed one stays closed, pin or not
   try {
-    if (localStorage.getItem(EPICK_PIN_KEY) === '1') {
+    if (localStorage.getItem(EPICK_PIN_KEY) === '1' &&
+        localStorage.getItem(EPICK_OPEN_KEY) !== '0') {
       setPin(true);
       emotePick.hidden = false;
       emojiBtn.classList.add('on');
