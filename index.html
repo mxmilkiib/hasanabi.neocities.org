@@ -3671,6 +3671,13 @@
     if (glorpSamples.length > sparkWin) glorpSamples.splice(0, glorpSamples.length - sparkWin);
     drawSpark();
     updateHeader();
+    // the stats tab re-renders on a ~3s cadence while it's open so its
+    // rankings, totals and burst rows track live traffic
+    const sb = document.getElementById('statsBody');
+    if (sb && sb.offsetParent && now - lastStatPaint > 2900) {
+      lastStatPaint = now;
+      renderStats();
+    }
   }, 1000);
 
   // ---- stream status (polled by the relay via decapi) ----
@@ -4166,6 +4173,7 @@
   const STAT_SCOPE_KEY = 'hasan-statscope';
   let statScope = '';
   try { statScope = localStorage.getItem(STAT_SCOPE_KEY) || ''; } catch {}
+  let lastStatPaint = 0;
   function renderStats() {
     const el = document.getElementById('statsBody');
     if (!el) return;
@@ -4302,7 +4310,7 @@
       // the sentence-length text goes on tooltips so an opened set
       // lists every version compactly: icon, title, count
       const tip = (t) => t ? ` title="${escapeHTML(t)}"` : '';
-      return `<details class="st-badge"><summary${tip(BADGE_BLURB[id])}><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
+      return `<details class="st-badge" data-set="${escapeHTML(id)}"><summary${tip(BADGE_BLURB[id])}><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
         `${escapeHTML(bOwner(id) ? bOwner(id) + ' ' + name : name)}<i>${metric}</i></summary>` +
         vs.map(([ver, v]) => {
           const n = bVUseM.get(id + '/' + ver) || 0;
@@ -4320,12 +4328,18 @@
     for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
       (bOwner(id) || CORE_BADGES.includes(id) || bUse(id) || Object.keys(bInfo[id]).length < 2 ? bShow : bMore).push(id);
     const badgeSets = bShow.map(badgeRow).join('') +
-      (bMore.length ? `<details class="st-badge st-more"><summary>${bMore.length.toLocaleString('en')} more sets` +
+      (bMore.length ? `<details class="st-badge st-more" data-more><summary>${bMore.length.toLocaleString('en')} more sets` +
         `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '');
     const badgeSortBtns = Object.keys(BSORTS)
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
+    // the tab re-renders live - keep opened sets, the folded group's
+    // state and the scroll spot across the innerHTML swap
+    const openSets = new Set(
+      [...el.querySelectorAll('details.st-badge[open]')].map((d) => d.dataset.set || '*'));
+    const scEl = el.closest('.hp-scroll');
+    const scTop = scEl ? scEl.scrollTop : 0;
     el.innerHTML =
       scopeBtns +
       `<div class="st-h">bursts</div>` +
@@ -4341,6 +4355,10 @@
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">badge data not loaded yet</span></div>`) +
       `</div>`;
+    if (openSets.size)
+      for (const d of el.querySelectorAll('details.st-badge'))
+        if (openSets.has(d.dataset.set || (d.hasAttribute('data-more') ? '*' : ''))) d.open = true;
+    if (scEl) scEl.scrollTop = scTop;
   }
   // delegated - the stats body rewrites its innerHTML on every render
   document.getElementById('statsBody').addEventListener('click', (e) => {

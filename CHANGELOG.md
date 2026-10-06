@@ -13,6 +13,10 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats tab re-renders live while it's open: the ~3s cadence rides the
+  rate-graph tick so rankings, totals and burst rows track chat; opened
+  badge sets, the folded group's state and the scroll spot survive
+  each repaint
 - stats: a glorps section under session - the running GLORP/F total
   plus a top-10 glorper ranking, scoped per channel and persisted in
   the stats blob like the other counters
