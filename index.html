@@ -808,6 +808,15 @@
     margin-left: -8px; padding-left: 8px;
   }
   .row.whisper .warr { color: var(--vip); font-weight: 600; margin: 0 3px; }
+  /* ?overlay - obs browser-source mode: transparent page, rows only, every
+     piece of chrome gone */
+  body.overlay, body.overlay main { background: transparent; }
+  body.overlay header, body.overlay #chatbar, body.overlay #vid,
+  body.overlay #helpPanel, body.overlay #whis, body.overlay #findbar,
+  body.overlay .jdown, body.overlay #offBar, body.overlay #hint,
+  body.overlay #emotePick, body.overlay #peek, body.overlay #epop,
+  body.overlay #tt { display: none !important; }
+  body.overlay main { height: 100vh; }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -5459,6 +5468,24 @@
   // original is still in the buffer. A row's hover ↩ sets it as the
   // pending reply target for the next sent message.
   mainEl.addEventListener('click', (e) => {
+    // a timestamp click copies a permalink for the row - ?mid=<id> scrolls
+    // to and flashes it on load; rows without a message id can't link
+    const tm = e.target.closest('.time');
+    if (tm) {
+      const row = tm.closest('.row[data-mid]');
+      if (row) {
+        const u = new URL(location.href);
+        u.search = '';
+        if (CHANNEL !== DEFAULT_CHANNEL || MULTI) u.searchParams.set('channel', CHANNELS.join(','));
+        u.searchParams.set('mid', row.dataset.mid);
+        navigator.clipboard.writeText(u.href).catch(() => {});
+        row.classList.remove('flash');
+        void row.offsetWidth;
+        row.classList.add('flash');
+      }
+      e.preventDefault();
+      return;
+    }
     // logged in, a plain click on a chatter's name types @name at the input
     // caret instead of opening the profile; modifier-clicks still open it
     const nm = e.target.closest('a.name');
@@ -8078,10 +8105,31 @@
       }
     }
     if (epUrlDirty) buildPicker();
+    // ?overlay strips every chrome for an obs browser source - rows only,
+    // transparent background; not a saved option, it lives in the url alone
+    if (flag('overlay')) document.body.classList.add('overlay');
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const i = HDR_SIZES.indexOf(+q.get('hpfs')); if (i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
+  }
+
+  // ?mid=<id> - a copied permalink: scroll to and flash the row once
+  // ingest or the restored history lands it; give up quietly if the row
+  // is older than scrollback/history reach
+  {
+    const mid = new URLSearchParams(location.search).get('mid');
+    if (mid && /^[a-z0-9:-]{4,80}$/i.test(mid)) {
+      let tries = 48;
+      const seek = setInterval(() => {
+        const r = document.querySelector(`.row[data-mid="${CSS.escape(mid)}"]`);
+        if (r && r.isConnected) {
+          clearInterval(seek);
+          r.scrollIntoView({ block: 'center' });
+          r.classList.add('jump');
+        } else if (!--tries) clearInterval(seek);
+      }, 250);
+    }
   }
 
   // clickable option lists in the help rows, matching the theme/size lists
