@@ -1283,6 +1283,7 @@
      tl = the small bracketed descriptor/source links - text weight
      with tighter tracking to match the annotation face */
   #helpPanel .linkcols > i > a.ml { font-weight: var(--linkw, 700); }
+  #helpPanel .st-row .nm a { font-weight: var(--linkw, 400); }
   #helpPanel .linkcols > i a.tl { font-weight: var(--chat-w, 400); letter-spacing: -0.05em; }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run longest (name + work + dates + tagline), so
@@ -1621,7 +1622,7 @@
     <div class="htabpage" role="tabpanel" id="htabCfg">
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
     <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
-    <div class="wide"><span>resources/authors link weight: <span id="helpLwList"></span> - each entry's own name link<sup>†</sup></span></div>
+    <div class="wide"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
@@ -5042,7 +5043,8 @@
   lhCtl.set(lhCtl.get());
   weightCtl.set(weightCtl.get());
   lsCtl.set(lsCtl.get());
-  // resources/authors name links: an absolute weight pick, default bold
+  // ? popup name links (resources/authors entries and stats rows):
+  // an absolute weight pick, default bold
   let linkW = WEIGHTS.length - 1;
   function setLinkW(i) {
     linkW = i;
