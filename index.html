@@ -895,8 +895,9 @@
   #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
     margin: 12px 0 2px; }
   #statsBody .st-h:first-child { margin-top: 0; }
-  /* session+bursts stack on the left, glorps flow over two columns */
-  #statsBody .st-trio { display: grid; grid-template-columns: 1fr 2fr; gap: 0 20px; }
+  /* session | bursts | glorps spread over the last two columns */
+  #statsBody .st-trio { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 20px; }
+  #statsBody .st-g2 { grid-column: span 2; }
   #statsBody .st-2col { columns: 2; column-gap: 20px; }
   /* ranked lists read down one column then on to the next */
   #statsBody .st-cols { columns: 14em; column-gap: 20px; }
@@ -4571,10 +4572,10 @@
         `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
         `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
-        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers</span></div>` : '') +
-        `<div class="st-h">bursts</div>` +
+        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers</span></div>` : '') + `</div>` +
+        `<div><div class="st-h">bursts</div>` +
         (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) + `</div>` +
-        `<div><div class="st-h">glorps</div>` +
+        `<div class="st-g2"><div class="st-h">glorps</div>` +
         `<div class="st-2col">${gPeaks || '<div class="st-row"><span class="nm">none yet</span></div>'}</div></div>` +
       `</div>` +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
