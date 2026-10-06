@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HasanAbi Chat Thing — about</title>
+<meta name="description" content="A compact, customisable Twitch chat client for the HasanAbi stream — an alt-UI, second-screen and accessibility tool that runs on a single static page.">
+<meta property="og:title" content="HasanAbi Chat Thing">
+<meta property="og:description" content="A compact, customisable Twitch chat client — chat, stats, resources and reading lists in one static page.">
+<meta property="og:image" content="https://mxmilkiib.github.io/hasanabi.neocities.org/og.png">
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root {
+    --bg: #151519;
+    --panel: #1d1d24;
+    --line: #34343e;
+    --text: #e8e6e3;
+    --dim: #9b97a3;
+    --accent: #f2a23a;
+    --accent-dim: #b87a2c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 16px/1.65 ui-monospace, 'JetBrains Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+    padding: 48px 20px 80px;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; overflow: hidden; margin-bottom: 42px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.45);
+  }
+  .card img { display: block; width: 100%; }
+  h1 {
+    font-size: 2rem; margin: 0 0 .35em; letter-spacing: -.02em;
+  }
+  h1 .sub { display: block; font-size: 1rem; color: var(--dim); font-weight: 400; letter-spacing: 0; }
+  h2 {
+    font-size: .82rem; text-transform: uppercase; letter-spacing: .18em;
+    color: var(--accent); margin: 2.4em 0 .7em; font-weight: 700;
+  }
+  p { margin: 0 0 1em; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent-dim); }
+  a:hover { border-bottom-style: solid; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { padding: .28em 0 .28em 1.3em; position: relative; color: var(--text); }
+  li::before { content: '·'; position: absolute; left: .3em; color: var(--accent); font-weight: 700; }
+  li b { color: var(--accent); font-weight: 700; }
+  li i { color: var(--dim); font-style: normal; }
+  .cta {
+    display: inline-block; margin-top: 1.2em; padding: .7em 1.6em;
+    background: var(--accent); color: #1a1206; border: 0; border-radius: 6px;
+    font-weight: 700; letter-spacing: .02em;
+  }
+  .cta:hover { background: #ffb84d; }
+  .how {
+    display: grid; grid-template-columns: 1fr; gap: 1em;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 1.1em 1.3em; color: var(--dim); font-size: .92em;
+  }
+  .how code { color: var(--text); background: rgba(255,255,255,.06); padding: .1em .35em; border-radius: 4px; font-size: .92em; }
+  .cols { columns: 2; column-gap: 2.4em; }
+  @media (max-width: 640px) { .cols { columns: 1; } }
+  footer { margin-top: 3.5em; color: var(--dim); font-size: .85em; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card"><img src="../og.png" alt="HasanAbi Chat Thing — a compact, customisable Twitch chat client"></div>
+
+  <h1>HasanAbi Chat Thing<span class="sub">the stream's chat, liberated from twitch.tv</span></h1>
+
+  <p>A single self-contained page that renders <a href="https://www.twitch.tv/hasanabi">HasanAbi's</a>
+  Twitch chat — and doubles as a second-screen, accessibility and organising hub. No install, no
+  build step, no accounts needed to watch: it runs on a static host and follows you through
+  suspends and reloads, backfilling whatever was missed.</p>
+
+  <a class="cta" href="https://hasanabi.neocities.org/">open the chat →</a>
+  <p style="margin-top:.6em;color:var(--dim);font-size:.85em">also on
+    <a href="https://github.com/mxmilkiib/hasanabi.neocities.org">github</a> ·
+    mirrored at <a href="https://mxmilkiib.github.io/hasanabi.neocities.org/">github pages</a></p>
+
+  <h2>the chat</h2>
+  <ul class="cols">
+    <li><b>every emote ecosystem</b> <i>7TV, BTTV, FFZ, animated &amp; zero-width</i></li>
+    <li><b>real badges, replies, /me</b> <i>quoted reply blocks with jump-back</i></li>
+    <li><b>send &amp; reply</b> <i>optional twitch login, readline history, drafts</i></li>
+    <li><b>whispers</b> <i>own pane, unread chip, /w replies</i></li>
+    <li><b>gap notices</b> <i>lost spans marked with cause and span</i></li>
+    <li><b>permalinks</b> <i>?mid= links jump to a row</i></li>
+    <li><b>find bar + archive search</b> <i>user:/kind: filters, 30-day IndexedDB store</i></li>
+    <li><b>multi-channel</b> <i>?channel=a,b,c merges rooms</i></li>
+  </ul>
+
+  <h2>the layer on top</h2>
+  <ul class="cols">
+    <li><b>msgs/sec sparkline</b> <i>hover reads each second; glorp spikes glow</i></li>
+    <li><b>stats tab</b> <i>top chatters, badges, emotes &amp; links over time windows</i></li>
+    <li><b>link cards</b> <i>hover previews, titles, tweet cards, video embeds</i></li>
+    <li><b>emote picker</b> <i>searchable grid, usage sort, age marks</i></li>
+    <li><b>user cards</b> <i>pronouns, history, mod quick-actions</i></li>
+    <li><b>stream embed</b> <i>draggable, floats over the panels</i></li>
+  </ul>
+
+  <h2>the hub</h2>
+  <ul>
+    <li><b>resources</b> <i>re Hasan, news, live tv, usa pol, organising, mutual aid, free software, open social</i></li>
+    <li><b>authors</b> <i>era-grouped reading lists with links to the source texts</i></li>
+    <li><b>accessibility</b> <i>palettes × shade axis, dyslexia fonts, screen-reader live region, reduced motion</i></li>
+  </ul>
+
+  <h2>how it works</h2>
+  <div class="how">
+    <div>Neocities ships a strict CSP — <code>connect-src 'self'</code> — so no WebSocket to Twitch
+    IRC is possible. The page embeds a hidden iframe relay hosted on GitHub Pages (no CSP) and talks
+    <code>postMessage</code> to it: the frontend owns all presentation, the relay owns every outbound
+    connection. A Cloudflare worker, <code>linkpeek</code>, scrapes og/twitter/JSON-LD/oEmbed metadata
+    for link cards and stats titles.</div>
+    <div>→ <a href="https://github.com/mxmilkiib/twitch-chat-relay">twitch-chat-relay</a> — the relay
+    &amp; worker source</div>
+  </div>
+
+  <footer>
+    AGPL-3.0 · <a href="https://github.com/mxmilkiib/hasanabi.neocities.org">source</a> ·
+    <a href="https://hasanabi.neocities.org/">hasanabi.neocities.org</a> ·
+    fan-made, not affiliated
+  </footer>
+</main>
+</body>
+</html>
