@@ -900,6 +900,7 @@
   /* ranked lists read down one column then on to the next */
   #statsBody .st-cols { columns: 14em; column-gap: 20px; }
   #statsBody .st-bcols { columns: 24em; }
+  #statsBody .st-ucols { columns: 24em; }
   #statsBody .st-badge { break-inside: avoid; }
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
@@ -4511,7 +4512,7 @@
         `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `</div>` +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
-      `<div class="st-h">top links</div><div class="st-cols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
+      `<div class="st-h">top links</div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
       `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
