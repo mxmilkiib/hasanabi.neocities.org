@@ -21,11 +21,10 @@ not versions — the page ships continuously to Neocities.
   channels' sets: tag-rendered ids (other channels' sub emotes typed
   here) get remembered and imaged from the twitch cdn, and scoped
   views fall back through the other joins' sets before giving up
-- channels/streams in ? > resources lays out as a three-column table:
-  streamer + switch/merge/drop controls, the kind dimmed, then the
-  community links - entries split at the first '·' of their
-  descriptor, so '(news · tw · discord)' becomes kind=news links=tw
-  discord
+- channels/streams in ? > resources lays out as a full table:
+  streamer + switch/merge/drop controls, the kind, then one column
+  per service so the same service name lines up across rows; kind
+  and service cells take the dim .85em descriptor face
 - stats top emotes gets a count-source picker: alltime ranks by the
   channel's StreamElements figures, local by this client's own tally,
   and today/week/month by per-day use buckets (evicted past 31 days) -

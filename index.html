@@ -1262,11 +1262,12 @@
   #htabRes a.at.livoff { opacity: .5; }
   /* channels/streams renders as a table: name+switch controls, then
      the kind, then the community links; the legend row spans all three */
-  #helpPanel .linkcols.stbl { display: grid; grid-template-columns: max-content max-content 1fr;
-    column-gap: 1.2em; }
+  #helpPanel .linkcols.stbl { display: grid; column-gap: .9em; }
   #helpPanel .linkcols.stbl > i { display: contents; }
   #helpPanel .linkcols.stbl > i.note { display: block; grid-column: 1 / -1; }
-  #helpPanel .linkcols.stbl .cc { color: var(--text-dim); }
+  /* kind + service cells take the dim .85em face nested descriptors get */
+  #helpPanel .linkcols.stbl .cc, #helpPanel .linkcols.stbl .cl {
+    font-size: .85em; color: var(--text-dim); }
   /* ml = an entry's own name link(s) - the weight pick, default bold;
      tl = the small bracketed descriptor/source links - text weight
      with tighter tracking to match the annotation face */
@@ -4586,17 +4587,22 @@
     }
   });
   // channels/streams lays out as a table: name+switch controls | kind |
-  // links. the tail '(kind · links)' splits at its first '·'; entries
-  // without one list just the kind
+  // one cell per service. the tail '(kind · links)' splits at its first
+  // '·'; entries without one list just the kind
   const stbl = document.querySelector('#htabRes .linkcols.stbl');
+  const svcCells = [], extraCells = [];
+  const svcCount = new Map(), svcOrder = [];
+  let stblRow = 0;
   if (stbl) for (const i of [...stbl.children]) {
     if (i.classList.contains('note')) continue;
+    stblRow++;
     // nested-<i> descriptors flatten to the same text/anchor tail as
     // the top-level form before splitting
     for (const inner of [...i.querySelectorAll(':scope > i')])
       inner.replaceWith(...inner.childNodes);
-    const cn = document.createElement('span'), cc = document.createElement('span'), cl = document.createElement('span');
-    cn.className = 'cn'; cc.className = 'cc'; cl.className = 'cl';
+    const cn = document.createElement('span'), cc = document.createElement('span');
+    const tail = document.createElement('span');
+    cn.className = 'cn'; cc.className = 'cc';
     while (i.firstChild && i.firstChild.nodeType === 1 && i.firstChild.tagName === 'A')
       cn.appendChild(i.firstChild);
     const w = document.createTreeWalker(i, NodeFilter.SHOW_TEXT);
@@ -4606,9 +4612,9 @@
       const cut = tn.data.indexOf('·');
       cc.textContent = tn.data.slice(0, cut).replace(/^[\s(]+/, '').trim();
       tn.data = tn.data.slice(cut + 1).replace(/^\s+/, '');
-      for (let n = tn; n; ) { const nx = n.nextSibling; cl.appendChild(n); n = nx; }
+      for (let n = tn; n; ) { const nx = n.nextSibling; tail.appendChild(n); n = nx; }
       // the first ')' in the links cell closed the descriptor paren
-      const w2 = document.createTreeWalker(cl, NodeFilter.SHOW_TEXT);
+      const w2 = document.createTreeWalker(tail, NodeFilter.SHOW_TEXT);
       let n2;
       while ((n2 = w2.nextNode())) {
         const j = n2.data.indexOf(')');
@@ -4618,8 +4624,40 @@
       cc.textContent = i.textContent.replace(/^\s*\(|\)\s*$/g, '').trim();
       i.textContent = '';
     }
-    i.append(cn, cc, cl);
+    // one .cl cell per service; * + − controls and stray text ride the
+    // cell they follow, separator runs fall away
+    const cells = [cn, cc];
+    let cell = null;
+    for (const n of [...tail.childNodes]) {
+      if (n.nodeType === 3 && !n.data.replace(/[\s·()]/g, '')) continue;
+      const svc = n.nodeType === 1 && n.tagName === 'A' &&
+        n.classList.contains('at') && !/^[*+−]$/.test(n.textContent.trim());
+      if (!cell || svc) {
+        cell = document.createElement('span');
+        cell.className = 'cl';
+        if (svc) {
+          cell.dataset.svc = n.textContent.trim();
+          if (!svcCount.has(cell.dataset.svc)) svcOrder.push(cell.dataset.svc);
+          svcCount.set(cell.dataset.svc, (svcCount.get(cell.dataset.svc) || 0) + 1);
+          svcCells.push(cell);
+        } else extraCells.push(cell);
+        cells.push(cell);
+      }
+      cell.appendChild(n);
+    }
+    // sparse service columns break auto-packing, so every cell pins its
+    // row; the column lands after all rows are read
+    for (const el of cells) el.style.gridRow = stblRow;
+    i.append(...cells);
   }
+  // each service gets its own column, most-used leftmost, so the same
+  // service name lines up across rows
+  const svcCols = svcOrder.sort((a, b) => svcCount.get(b) - svcCount.get(a));
+  const colOf = new Map(svcCols.map((nm, k) => [nm, k + 3]));
+  for (const el of svcCells) el.style.gridColumn = colOf.get(el.dataset.svc);
+  extraCells.forEach((el, k) => { el.style.gridColumn = 3 + svcCols.length + k; });
+  if (stbl) stbl.style.gridTemplateColumns =
+    `max-content max-content repeat(${svcCols.length + extraCells.length}, max-content)`;
   const authOrig = authSecs.innerHTML;
   helpPanel.addEventListener('click', (e) => {
     const a = e.target.closest('a[data-asort], a[data-ainfo]');
