@@ -2441,6 +2441,9 @@
   // names so callers can tell emote-only messages apart.
   function renderMessageHTML(message, emotesTag, hasBits, ch, shiny) {
     const names = new Set();
+    // tag-rendered ids let the stats tab image emotes that live outside the
+    // third-party sets (other channels' sub emotes usable here)
+    const nameId = new Map();
     if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch, shiny), names };
     const emotes = [];
     for (const part of emotesTag.split('/')) {
@@ -2459,6 +2462,7 @@
       if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch, shiny);
       const name = message.slice(e.start, e.end + 1);
       names.add(name);
+      nameId.set(name, e.id);
       const alt = escapeHTML(name);
       const eid = escapeHTML(e.id);
       const tone = lightMode ? 'light' : 'dark';
@@ -2468,7 +2472,7 @@
       cursor = e.end + 1;
     }
     if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch, shiny);
-    return { html, names };
+    return { html, names, nameId };
   }
 
   function roleTag(tags) {
@@ -3170,7 +3174,8 @@
       // rows would only pollute them
       for (const t of mtoks) {
         const en = ch === CHANNEL && emoteNameOf(ch, t);
-        if (en || rendered.names.has(t) || EMOJI_SET.has(t)) noteEmoteUse(en || t, ch);
+        if (en || rendered.names.has(t) || EMOJI_SET.has(t))
+          noteEmoteUse(en || t, ch, rendered.nameId?.get(t));
       }
       const eonly = mtoks.length > 0 &&
         mtoks.every((t) => rendered.names.has(t) || emoteNameOf(ch, t) || zwOf(ch).has(t));
@@ -4254,9 +4259,9 @@
       : win === -1 ? Object.keys(lUse) : Object.keys(dayBag));
     const emo = [...all].map((n) => [n, useS(n)]).sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([n, c], i) => {
-        // scoped views read that channel's sets; 'all' tries each join in
-        // turn so an emote living only in another channel still images
-        const chs = sc ? [sc] : CHANNELS;
+        // a scoped view reads its channel's sets first, then the other
+        // joins' - an emote living only in another channel still images
+        const chs = sc ? [sc, ...CHANNELS.filter((c) => c !== sc)] : CHANNELS;
         let en = null, url = null;
         for (const c of chs) {
           en = en || emoteNameOf(c, n);
@@ -4265,8 +4270,13 @@
         }
         en = en || n;
         const set = twSets.filter((s) => !sc || s.channelLogin === sc || s.setID === '0')
-          .flatMap((s) => s.emoteList).find((e) => e.code === n || e.code === en);
+          .flatMap((s) => s.emoteList).find((e) => e.code === n || e.code === en)
+          || (sc && twSets.flatMap((s) => s.emoteList).find((e) => e.code === n || e.code === en));
         url = url || (set && twEmoteUrl(set.id, set.assetType === 'ANIMATED'));
+        // ids captured from message tags cover emotes outside every set,
+        // like another channel's sub emotes typed here
+        url = url || ((useIds[n] || useIds[en]) &&
+          twEmoteUrl(useIds[n] || useIds[en], false));
         return row(i + 1, (url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}"> ` : '') + escapeHTML(n),
           c.toLocaleString('en'));
       }).join('');
@@ -8323,6 +8333,9 @@
   // month) honest; entries past 31 days evict on save
   const useDay = savedUse.d || {};
   const useDayPer = savedUse.pd || {};
+  // twitch emote ids captured at render - lets stats image sub emotes from
+  // outside the third-party sets (other channels' emotes typed here)
+  const useIds = savedUse.i || {};
   // when recording began: age markers stay dim until their era is covered
   const useT0 = savedUse.s || Date.now();
   let useSaveTimer = 0;
@@ -8335,7 +8348,7 @@
       if (ks.length > 6000) {
         ks.sort((a, b) => useTs[a] - useTs[b]);
         for (const k of ks.slice(0, ks.length - 6000)) {
-          delete useTs[k]; delete liveUse[k]; delete useDay[k];
+          delete useTs[k]; delete liveUse[k]; delete useDay[k]; delete useIds[k];
           for (const lp of Object.values(useDayPer)) delete lp[k];
         }
       }
@@ -8343,10 +8356,10 @@
       for (const bag of [useDay, ...Object.values(useDayPer)])
         for (const e of Object.values(bag))
           for (const d of Object.keys(e)) if (+d < d0) delete e[d];
-      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer })); } catch {}
+      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, i: useIds })); } catch {}
     }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer })); } catch {} });
+  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, i: useIds })); } catch {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
@@ -8419,7 +8432,8 @@
     clearTimeout(flashTimers.get(n));
     flashTimers.set(n, setTimeout(() => unflash(n), 3600));
   }
-  function noteEmoteUse(n, ch) {
+  function noteEmoteUse(n, ch, id) {
+    if (id && !useIds[n]) useIds[n] = id;
     liveUse[n] = (liveUse[n] || 0) + 1;
     const lp = perObj(liveUsePer, ch || CHANNEL);
     lp[n] = (lp[n] || 0) + 1;

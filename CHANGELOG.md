@@ -13,6 +13,10 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats top emotes images emotes that live outside the joined
+  channels' sets: tag-rendered ids (other channels' sub emotes typed
+  here) get remembered and imaged from the twitch cdn, and scoped
+  views fall back through the other joins' sets before giving up
 - channels/streams in ? > resources lays out as a three-column table:
   streamer + switch/merge/drop controls, the kind dimmed, then the
   community links - entries split at the first '·' of their
