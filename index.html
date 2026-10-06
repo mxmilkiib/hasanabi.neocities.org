@@ -3091,6 +3091,7 @@
       noteNick(login, name, color);
       if (login) {
         nickMsgs.set(login, (nickMsgs.get(login) || 0) + 1);
+        nickLast.set(login, Date.now());
         const nm = perMap(nickMsgsPer, ch);
         nm.set(login, (nm.get(login) || 0) + 1);
       }
@@ -4193,6 +4194,11 @@
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   let emoteStatSrc = 'alltime';
   try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
+  // top chatters' ordering: the count, or the name/first-seen/last-seen
+  // maps that tally alongside it
+  const CHAT_SORT_KEY = 'hasan-chatsort';
+  let chatSort = 'msgs';
+  try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'msgs'; } catch {}
   let lastStatPaint = 0;
   function renderStats() {
     const el = document.getElementById('statsBody');
@@ -4232,14 +4238,22 @@
       `<div class="st-row"><span class="n">${i}.</span><span class="nm">${inner}</span><i>${count}</i></div>`;
     // bots chatter constantly but aren't people - count them in the
     // session totals, keep them out of the ranking
+    const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
+    const csf = {
+      'a-z': (a, b) => nmOf(a[0]).localeCompare(nmOf(b[0])) || b[1] - a[1],
+      'new': (a, b) => (nickFirst.get(b[0]) || 0) - (nickFirst.get(a[0]) || 0) || b[1] - a[1],
+      'active': (a, b) => (nickLast.get(b[0]) || 0) - (nickLast.get(a[0]) || 0) || b[1] - a[1],
+    }[chatSort] || ((a, b) => b[1] - a[1]);
+    const cMet = chatSort === 'new' ? (lg) => (nickFirst.get(lg) ? fmtRowTime(new Date(nickFirst.get(lg))) : '·')
+      : chatSort === 'active' ? (lg) => (nickLast.get(lg) ? fmtRowTime(new Date(nickLast.get(lg))) : '·')
+      : (lg, n) => n.toLocaleString('en');
     const chat = [...nMsgs.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
-      .sort((a, b) => b[1] - a[1]).slice(0, 40)
+      .sort(csf).slice(0, 40)
       .map(([lg, n], i) => {
-        const rec = seenNicks.get(lg) || {};
-        const nm = rec.n || lg;
-        const col = rec.c || colorForName(nm);
+        const nm = nmOf(lg);
+        const col = (seenNicks.get(lg) || {}).c || colorForName(nm);
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
-          n.toLocaleString('en'));
+          cMet(lg, n));
       }).join('');
     const gUseM = sc ? (glorpPer[sc] || new Map()) : glorpUse;
     const glorpTotal = [...gUseM.values()].reduce((a, b) => a + b, 0);
@@ -4398,6 +4412,9 @@
     const badgeSortBtns = Object.keys(BSORTS)
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
+    const chatSortBtns = ['msgs', 'a-z', 'new', 'active']
+      .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="sort chatters">${s}</button>`)
+      .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
     // the tab re-renders live - keep opened sets, the folded group's
     // state and the scroll spot across the innerHTML swap
@@ -4418,7 +4435,7 @@
         `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
         `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `</div>` +
-      `<div class="st-h">top chatters</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
+      `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
       `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
       `<div class="st-cols st-bcols">` +
@@ -4446,9 +4463,16 @@
       return;
     }
     const b = e.target.closest('.st-s[data-bsort]');
-    if (!b) return;
-    badgeSort = b.dataset.bsort;
-    try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
+    if (b) {
+      badgeSort = b.dataset.bsort;
+      try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
+      renderStats();
+      return;
+    }
+    const cs = e.target.closest('.st-s[data-csort]');
+    if (!cs) return;
+    chatSort = cs.dataset.csort;
+    try { localStorage.setItem(CHAT_SORT_KEY, chatSort); } catch {}
     renderStats();
   });
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
@@ -7091,6 +7115,7 @@
   const chatComp = document.getElementById('chatComp');
   const seenNicks = new Map(); // login -> { n: display, c: colour }
   const nickFirst = new Map(); // login -> wall-ms first noted this session
+  const nickLast = new Map();  // login -> wall-ms of its last rendered PRIVMSG
   const nickMsgs = new Map();  // login -> rendered PRIVMSGs this session
   const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
   const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
@@ -7108,6 +7133,7 @@
   intoMap(nickMsgs, savedStats.nm);
   intoMap(seenNicks, savedStats.sn);
   intoMap(nickFirst, savedStats.nf);
+  intoMap(nickLast, savedStats.nl);
   intoMap(badgeUse, savedStats.bu);
   intoMap(badgeVerUse, savedStats.bv);
   intoMap(glorpUse, savedStats.gl);
@@ -7120,7 +7146,7 @@
     const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
     try {
       localStorage.setItem(STATS_KEY, JSON.stringify({
-        nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst],
+        nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst], nl: [...nickLast],
         bu: [...badgeUse], bv: [...badgeVerUse], gl: [...glorpUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
         glp: per(glorpPer), lup: liveUsePer,

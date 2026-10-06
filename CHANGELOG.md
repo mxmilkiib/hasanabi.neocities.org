@@ -13,6 +13,10 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats top chatters gets a sort picker: msgs (the count), a-z, new
+  (lately first-seen) and active (lately spoke) - the last two rank
+  and label by time instead of count, using a new last-seen tally
+  that rides the same session-stats blob
 - stats top emotes images emotes that live outside the joined
   channels' sets: tag-rendered ids (other channels' sub emotes typed
   here) get remembered and imaged from the twitch cdn, and scoped
