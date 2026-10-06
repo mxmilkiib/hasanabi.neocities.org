@@ -13,6 +13,11 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- channels/streams in ? > resources lays out as a three-column table:
+  streamer + switch/merge/drop controls, the kind dimmed, then the
+  community links - entries split at the first '·' of their
+  descriptor, so '(news · tw · discord)' becomes kind=news links=tw
+  discord
 - stats top emotes gets a count-source picker: alltime ranks by the
   channel's StreamElements figures, local by this client's own tally,
   and today/week/month by per-day use buckets (evicted past 31 days) -
