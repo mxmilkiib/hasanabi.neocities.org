@@ -4156,14 +4156,14 @@
       .join('');
     const total = [...nickMsgs.values()].reduce((a, b) => a + b, 0);
     el.innerHTML =
+      `<div class="st-h">bursts</div>` +
+      (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
       `<div class="st-h">session</div>` +
       `<div class="st-row"><span class="nm">${nickMsgs.size} chatter${nickMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
       `<div class="st-grid">` +
         `<div><div class="st-h">top chatters</div>${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
         `<div><div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
       `</div>` +
-      `<div class="st-h">bursts</div>` +
-      (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
       `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">badge data not loaded yet</span></div>`) +
