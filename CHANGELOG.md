@@ -11,7 +11,9 @@ not versions — the page ships continuously to Neocities.
   scoped per channel and persisted in the session-stats blob; rows lead
   with the site's favicon and label by the page's og title once the
   linkpeek cache has it (the url stays on the tooltip; unpeeked links
-  ask the worker and fall back to the url meanwhile)
+  ask the worker and fall back to the url meanwhile; youtube links ask
+  under the canonical watch key so they share chat's oembed-backed
+  cache whatever form was posted)
 - stats glorps lists only the peak glorp/F moments - the loudest
   samples of the same series that paints the rate graph's red
   segments (>2/sec), ranked with their timestamps; a per-channel

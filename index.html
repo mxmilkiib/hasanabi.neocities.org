@@ -4351,8 +4351,11 @@
       .map(([k, n], i) => {
         // a cached hover-peek's og title becomes the label; an unpeeked
         // link labels by url and asks the worker - the ~3s render tick
-        // swaps titles in as answers land (misses re-ask after a minute)
-        const pk = new URL('https://' + k).href;
+        // swaps titles in as answers land (misses re-ask after a minute).
+        // youtube links ask under the canonical watch key so they share
+        // chat's oembed-backed cache rather than the bare youtu.be form
+        const yt = ytIdOf(k);
+        const pk = yt ? ytKeyOf(yt.id) : new URL('https://' + k).href;
         const pe = peekCache.get(pk);
         let label = k;
         if (pe && Date.now() - pe.t < peekTtlOf(pe.p)) {
