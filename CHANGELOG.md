@@ -10,8 +10,8 @@ not versions — the page ships continuously to Neocities.
   normalised (scheme/www/case folded) and tallied, ranked by posts,
   scoped per channel and persisted in the session-stats blob
 - stats badge lists cap at the top 40 rows with a 'N more - show all'
-  row that expands the full ranking; a sort, window or scope pick
-  folds it back
+  row that expands the full ranking (and a 'collapse to top 40' row
+  to fold it again); a sort, window or scope pick folds it back
 
 ### Fixes
 - tweet video previews erroring with "no video with supported format

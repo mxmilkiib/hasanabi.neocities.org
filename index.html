@@ -4457,7 +4457,9 @@
       }).join('') +
         (flat.length > bVis.length
           ? `<div class="st-row st-all"><button type="button" class="st-s" data-ball>` +
-            `${(flat.length - bVis.length).toLocaleString('en')} more - show all</button></div>` : '');
+            `${(flat.length - bVis.length).toLocaleString('en')} more - show all</button></div>`
+          : statBadgeAll && flat.length > 40
+            ? `<div class="st-row st-all"><button type="button" class="st-s" data-bfold>collapse to top 40</button></div>` : '');
     } else {
       const bShow = [], bMore = [];
       for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
@@ -4468,7 +4470,9 @@
           `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '') +
         (bShow.length > bVis.length
           ? `<div class="st-row st-all"><button type="button" class="st-s" data-ball>` +
-            `${(bShow.length - bVis.length).toLocaleString('en')} more - show all</button></div>` : '');
+            `${(bShow.length - bVis.length).toLocaleString('en')} more - show all</button></div>`
+          : statBadgeAll && bShow.length > 40
+            ? `<div class="st-row st-all"><button type="button" class="st-s" data-bfold>collapse to top 40</button></div>` : '');
     }
     const emoteSrcBtns = Object.keys(EMOTE_SRCS)
       .map((s) => `<button type="button" class="st-s${emoteStatSrc === s ? ' on' : ''}" data-esrc="${s}" title="count source">${s}</button>`)
@@ -4523,6 +4527,12 @@
     const ball = e.target.closest('[data-ball]');
     if (ball) {
       statBadgeAll = true;
+      renderStats();
+      return;
+    }
+    const bfold = e.target.closest('[data-bfold]');
+    if (bfold) {
+      statBadgeAll = false;
       renderStats();
       return;
     }
