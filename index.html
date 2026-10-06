@@ -4258,9 +4258,18 @@
       'game-developer': 'develops a game integrated with Twitch',
       'watch-streak': 'on a consecutive-stream watch streak in this channel',
     };
-    const bInfo = setFor(sc || CHANNEL).badgeInfo || {};
-    const bChan = new Set(setFor(sc || CHANNEL).badgeChan || []);
-    const bRank = (id) => bChan.has(id) ? -1 : (CORE_BADGES.indexOf(id) + 1 || CORE_BADGES.length + 1);
+    // merged scope unions every joined channel's badge sets per version,
+    // so one channel's 'subscriber' doesn't clobber the other's
+    const bInfo = {};
+    for (const c of (sc ? [sc] : CHANNELS))
+      for (const [id, vs] of Object.entries(setFor(c).badgeInfo || {}))
+        bInfo[id] = { ...(bInfo[id] || {}), ...vs };
+    // a set owned by any joined channel counts as a channel set in every
+    // scope - hasanabi's badges don't demote just because another stream
+    // is primary; the owner channel prefixes the set name either way
+    const bOwner = (id) => (sc ? [sc] : CHANNELS).find((c) =>
+      (setFor(c).badgeChan || []).includes(id)) || '';
+    const bRank = (id) => bOwner(id) ? -1 : (CORE_BADGES.indexOf(id) + 1 || CORE_BADGES.length + 1);
     const bUse = (id) => bUseM.get(id) || 0;
     // the right-hand number tracks the sort: messages seen carrying the
     // set under use, version count otherwise
@@ -4279,7 +4288,7 @@
       // lists every version compactly: icon, title, count
       const tip = (t) => t ? ` title="${escapeHTML(t)}"` : '';
       return `<details class="st-badge"><summary${tip(BADGE_BLURB[id])}><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
-        `${escapeHTML(bChan.has(id) ? (sc || CHANNEL) + ' ' + name : name)}<i>${metric}</i></summary>` +
+        `${escapeHTML(bOwner(id) ? bOwner(id) + ' ' + name : name)}<i>${metric}</i></summary>` +
         vs.map(([ver, v]) => {
           const n = bVUseM.get(id + '/' + ver) || 0;
           return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
@@ -4288,11 +4297,13 @@
         }).join('') +
         `</details>`;
     };
-    // channel sets, everyday globals and sets actually seen stay listed;
-    // the promo tail folds into one group rather than papering the tab
+    // channel sets, everyday globals, sets actually seen and single-badge
+    // sets stay listed - a one-version set expands to a copy of its own
+    // summary, so folding it hides a row behind a click for nothing;
+    // only the multi-version promo tail folds into one group
     const bShow = [], bMore = [];
     for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
-      (bChan.has(id) || CORE_BADGES.includes(id) || bUse(id) ? bShow : bMore).push(id);
+      (bOwner(id) || CORE_BADGES.includes(id) || bUse(id) || Object.keys(bInfo[id]).length < 2 ? bShow : bMore).push(id);
     const badgeSets = bShow.map(badgeRow).join('') +
       (bMore.length ? `<details class="st-badge st-more"><summary>${bMore.length.toLocaleString('en')} more sets` +
         `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '');

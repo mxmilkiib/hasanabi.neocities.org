@@ -13,6 +13,12 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats badges: the fold now holds only multi-version unseen promo
+  sets - a one-badge set expanded to a copy of its own summary so it
+  stays listed flat; sets owned by any joined channel (not just the
+  primary) count as channel sets in every scope, and merged 'all'
+  unions each channel's badge versions instead of dropping the
+  non-primary channel's sets
 - stats counters survive reloads like the history rows they tallied:
   top chatters, chatter names/colours, badge tallies and per-channel
   scopes save alongside the scrollback on pagehide and restore on
