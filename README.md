@@ -395,7 +395,7 @@ force off.
 | `channel` | a twitch login | point the whole page at another channel |
 | `zebra` | flag | zebra-striped rows |
 | `lines` | `0`–`3` | row separator shades |
-| `times` | `nosec` / `12h` / `12hsec` / `0` | timestamp mode |
+| `times` | `nosec`/`24h` / `24hsec` / `12h` / `12hsec` / `0` | timestamp mode |
 | `shadow` | `0`–`2` | text shadow level |
 | `video` | flag | stream video overlay |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |

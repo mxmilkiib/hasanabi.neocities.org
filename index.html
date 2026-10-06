@@ -577,7 +577,7 @@
     padding-left: 8px;
   }
   main.notime .time { display: none; }
-  main.nosec .time .sec { display: none; }
+  main.nosec .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
   /* multi-channel mode: which room a row came from. Dim while that channel
      is offline, accent-tinted once its stream is live */
@@ -2862,9 +2862,9 @@
       if (pendingGap && !live && !pendingGap.emitted && ts > pendingGap.from && ts < pendingGap.to) {
         const pg = pendingGap;
         pg.emitted = true;
-        html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${pg.to}"><span class="time">${fmtRowTime(new Date(pg.to))}</span>` +
+        html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${pg.to}" data-gfrom="${pg.from}" data-gto="${pg.to}"><span class="time">${fmtRowTime(new Date(pg.to))}</span>` +
                 `· ${fmtDur(Math.max(1, Math.round((pg.to - pg.from) / 60000)))} gap · ${pg.why || 'lines missed - socket stayed open'} · ` +
-                `${fmtRowTime(new Date(pg.from))} → ${fmtRowTime(new Date(pg.to))}</div>`;
+                `<span class="grange">${fmtRowTime(new Date(pg.from))} → ${fmtRowTime(new Date(pg.to))}</span></div>`;
       }
       if (lastRowTs && ts - lastRowTs > GAP_MS) {
         const why = gapCause(lastRowTs, ts);
@@ -5552,8 +5552,8 @@
     setLinkview(!document.body.classList.contains('linkview'));
   }, { passive: false });
 
-  // ---- message timestamps: off / hh:mm / hh:mm:ss / 12-hour variants ----
-  const TIME_MODES = ['off', 'no seconds', 'seconds', '12-hour', '12-hour + seconds'];
+  // ---- message timestamps: off / 24h / 24h+sec / 12-hour variants ----
+  const TIME_MODES = ['off', '24-hour', '24-hour + seconds', '12-hour', '12-hour + seconds'];
   let timeIdx = 2;
   function setTimes(idx) {
     timeIdx = Math.max(0, Math.min(TIME_MODES.length - 1, idx));
@@ -5562,6 +5562,15 @@
     setOn(timeBtn, timeIdx > 0);
     timeBtn.title = `Timestamps: ${TIME_MODES[timeIdx]} - click/scroll · ⇧click back`;
     markHelp('helpTimes', timeIdx);
+    // the stamps are text stamped at row creation - a mode switch has to
+    // re-render them, not just hide the seconds fragment off the old one
+    for (const r of document.querySelectorAll('.row[data-ts]')) {
+      const t = r.querySelector('.time');
+      if (t) t.innerHTML = fmtRowTime(new Date(+r.dataset.ts));
+      const g = r.querySelector('.grange');
+      if (g && r.dataset.gfrom && r.dataset.gto)
+        g.innerHTML = `${fmtRowTime(new Date(+r.dataset.gfrom))} → ${fmtRowTime(new Date(+r.dataset.gto))}`;
+    }
     // hiding/narrowing the time column shifts every name left - the
     // reply quote indents measured against it need re-doing
     repin();
@@ -8521,7 +8530,7 @@
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
-    if (q.has('times')) setTimes({ nosec: 1, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
+    if (q.has('times')) setTimes({ nosec: 1, '24h': 1, '24hsec': 2, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }

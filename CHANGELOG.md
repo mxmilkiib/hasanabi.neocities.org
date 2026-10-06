@@ -48,6 +48,20 @@ not versions — the page ships continuously to Neocities.
   top 15 chatters in their nick colours, top 15 emotes by channel
   usage, and the rate graph's three loudest bursts
 
+### Fixes & polish
+- the 12-hour timestamp options actually show 12-hour times now: a mode
+  switch used to only toggle the seconds fragment, leaving every
+  rendered stamp in the format it was created with - setTimes now
+  re-stamps every row's .time from data-ts (gap ranges reflow too, with
+  seconds honouring the same hide rule). the modes are renamed so both
+  conventions read plainly - 24-hour / 24-hour + seconds / 12-hour /
+  12-hour + seconds - and ?times= accepts 24h and 24hsec aliases
+- the find-bar's word buttons (only / archive) sized to their labels
+  instead of overlapping inside hdr-btn's fixed 30px cell
+- the stats tab lays out properly: the help page's 9em label grid was
+  flowing its sections into one narrow column with counts wrapped onto
+  their own lines
+
 ## 2026-10-05
 
 ### Features
