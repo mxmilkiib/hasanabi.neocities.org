@@ -4336,7 +4336,6 @@
     // session totals, keep them out of the ranking
     const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
     const csf = {
-      'a-z': (a, b) => nmOf(a[0]).localeCompare(nmOf(b[0])) || b[1] - a[1],
       'new': (a, b) => (nickFirst.get(b[0]) || 0) - (nickFirst.get(a[0]) || 0) || b[1] - a[1],
       'active': (a, b) => (nickLast.get(b[0]) || 0) - (nickLast.get(a[0]) || 0) || b[1] - a[1],
     }[chatSort] || ((a, b) => b[1] - a[1]);
@@ -4561,7 +4560,7 @@
     const badgeWinBtns = Object.keys(BADGE_WINS)
       .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
-    const chatSortBtns = ['msgs', 'a-z', 'new', 'active']
+    const chatSortBtns = ['msgs', 'new', 'active']
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="sort chatters">${s}</button>`)
       .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
