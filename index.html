@@ -4371,7 +4371,9 @@
         `<div><div class="st-h">bursts</div>` +
         (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) + `</div>` +
         `<div><div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
-        `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} · ${bVUseM.size} badge${bVUseM.size === 1 ? '' : 's'}</span></div></div>` +
+        `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
+        `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
+        `<div class="st-row"><span class="nm">${bVUseM.size} badge${bVUseM.size === 1 ? '' : 's'} seen</span></div></div>` +
         `<div><div class="st-h">glorps</div>` +
         `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
         `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
