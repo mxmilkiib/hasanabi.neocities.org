@@ -919,7 +919,10 @@
     font-variant-numeric: tabular-nums; }
   #statsBody .st-row .nm { overflow: hidden; text-overflow: ellipsis;
     white-space: nowrap; min-width: 0; }
-  #statsBody .st-row .emote { max-height: 1.4em; vertical-align: -0.3em; }
+  #statsBody .st-row .emote { max-height: 1.4em; max-width: 2em; vertical-align: -0.3em; }
+  /* the fixed-width image slot lines up the names' left edges whether a
+     row carries an emote image or not */
+  #statsBody .st-row .ems { display: inline-block; width: 2em; text-align: center; }
   #statsBody .st-row i { margin-left: auto; font-style: normal;
     color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
   #statsBody .st-badge summary { cursor: pointer; display: flex; align-items: center;
@@ -4372,7 +4375,7 @@
         // like another channel's sub emotes typed here
         url = url || ((useIds[n] || useIds[en]) &&
           twEmoteUrl(useIds[n] || useIds[en], false));
-        return row(i + 1, (url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}"> ` : '') + escapeHTML(n),
+        return row(i + 1, `<span class="ems">${url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}">` : ''}</span>` + escapeHTML(n),
           c.toLocaleString('en'));
       }).join('') +
       (eRanked.length > eVis.length
