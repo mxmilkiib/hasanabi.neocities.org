@@ -559,6 +559,14 @@
   body:not(.chaton) .rplybtn { display: none; }
   /* pending-reply indicator across the top of the input */
   #chatbar { flex-wrap: wrap; }
+  /* chat box on top: the flex order lifts it under the header; the
+     completion list and the picker's default dock flip to open below */
+  body.bartop #chatbar { order: 1; }
+  body.bartop #hint { order: 2; }
+  body.bartop main { order: 3; }
+  body.bartop #chatComp { bottom: auto; top: calc(100% + 4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .4); }
+  body.bartop #emotePick { bottom: auto; top: 76px; }
   #replyBar { flex: 1 0 100%; display: flex; align-items: baseline; gap: 5px;
     font-size: .8em; color: var(--text-dim); white-space: nowrap; overflow: hidden; }
   #replyBar[hidden] { display: none; }
@@ -1559,7 +1567,7 @@
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
-    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span></div>
+    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
@@ -3917,6 +3925,7 @@
     else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpBar')) { setBarTop(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
@@ -4901,6 +4910,7 @@
       pause: pauseOnText,
       scrollback: MAX_MESSAGES,
       rev: revFlow,
+      bartop: barTop,
       times: timeIdx,
       shadow: shadLevel,
       eonly: emoteMode,
@@ -4979,6 +4989,7 @@
     if (typeof o.pause === 'boolean') setPause(o.pause);
     if (SCROLLBACK_SIZES.includes(o.scrollback)) setScrollback(o.scrollback);
     if (typeof o.rev === 'boolean') setRev(o.rev);
+    if (typeof o.bartop === 'boolean') setBarTop(o.bartop);
     if (typeof o.times === 'boolean') setTimes(o.times ? 2 : 0);
     else if (Number.isInteger(o.times)) setTimes(o.times);
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
@@ -5537,6 +5548,15 @@
     markHelp('helpFlow', on ? 1 : 0);
   }
 
+  // ---- chat box location: bottom default; top docks it under the ----
+  // header, with the completion list and picker flipping open below
+  let barTop = false;
+  function setBarTop(on) {
+    barTop = on;
+    document.body.classList.toggle('bartop', on);
+    markHelp('helpBar', on ? 1 : 0);
+  }
+
   // ---- links view: only rows carrying a url, first post of each link ----
   function setLinkview(on) {
     if (on) dedupeLinks();
@@ -5788,6 +5808,7 @@
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
+    if (barTop) q.set('bartop', '1');
     if (lineLevel !== 1) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
@@ -7967,12 +7988,19 @@
   document.getElementById('emoteX').addEventListener('click', closePicker);
   // the picker's lower bound is the chat bar's top edge when the bar is
   // up - same idea as the header clamp above it
-  const epickFloor = () => chatbarEl.hidden ? innerHeight : chatbarEl.getBoundingClientRect().top;
-  // the bar appearing under an open picker pushes the picker up
+  // the picker's lower bound is the chat bar's top edge when the bar is
+  // up - same idea as the header clamp above it. With the bar on top it
+  // bounds nothing below; the bar becomes the ceiling it clears instead
+  const epickFloor = () => barTop || chatbarEl.hidden ? innerHeight : chatbarEl.getBoundingClientRect().top;
+  const epickCeil = () => (barTop && !chatbarEl.hidden ? chatbarEl.getBoundingClientRect().bottom
+    : headerEl.getBoundingClientRect().bottom) + 4;
+  // the bar appearing under an open picker pushes the picker up (or
+  // down, when the bar is docked on top)
   new MutationObserver(() => {
     if (chatbarEl.hidden || emotePick.hidden || !emotePick.style.top) return;
     const r = emotePick.getBoundingClientRect();
-    if (r.bottom > epickFloor()) emotePick.style.top = (epickFloor() - r.height) + 'px';
+    if (barTop) { const c = epickCeil(); if (r.top < c) emotePick.style.top = c + 'px'; }
+    else if (r.bottom > epickFloor()) emotePick.style.top = (epickFloor() - r.height) + 'px';
   }).observe(chatbarEl, { attributes: true, attributeFilter: ['hidden'] });
   emojiBtn.addEventListener('click', () => {
     if (!emotePick.hidden) { closePicker(); return; }
@@ -7981,8 +8009,12 @@
     // a spot parked while the chat bar was hidden can sit under it now
     if (emotePick.style.top) {
       const r = emotePick.getBoundingClientRect();
-      if (r.bottom > epickFloor()) emotePick.style.top = (epickFloor() - r.height) + 'px';
+      if (barTop) { const c = epickCeil(); if (r.top < c) emotePick.style.top = c + 'px'; }
+      else if (r.bottom > epickFloor()) emotePick.style.top = (epickFloor() - r.height) + 'px';
     }
+    // no parked spot - dock just below the top bar rather than the
+    // default perch above a bottom one
+    if (barTop && !emotePick.style.top) emotePick.style.top = epickCeil() + 'px';
     emojiBtn.classList.add('on');
     emojiBtn.setAttribute('aria-expanded', 'true');
     emoteQ.value = ''; if (!twSetsKey) loadTwitchSets(''); buildPicker(); emoteQ.focus();
@@ -8050,7 +8082,7 @@
       emotePick.style.transform = 'none';
       const floor = epickFloor();
       emotePick.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
-      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(floor - r.height, ev.clientY - oy)) + 'px';
+      emotePick.style.top = Math.max(epickCeil(), Math.min(floor - r.height, ev.clientY - oy)) + 'px';
     };
     const drop = () => {
       emotePick.classList.remove('dragging');
@@ -8086,7 +8118,7 @@
       const botEdge = grip.classList.contains('bl') || grip.classList.contains('br') || grip.classList.contains('b');
       const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner/edge
       const ay = topEdge ? r.bottom : r.top;
-      const hdrBottom = headerEl.getBoundingClientRect().bottom;
+      const hdrBottom = epickCeil() - 4;
       const move = (ev) => {
         if (leftEdge || rightEdge) {
           const w = Math.round(Math.max(220, Math.min(leftEdge ? ax : innerWidth - 4 - ax, Math.abs(ev.clientX - ax))));
@@ -8168,7 +8200,7 @@
       emotePick.style.right = 'auto'; emotePick.style.bottom = 'auto';
       emotePick.style.transform = 'none';
       emotePick.style.left = Math.max(0, Math.min(innerWidth - (es.w || 480), es.left)) + 'px';
-      emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom,
+      emotePick.style.top = Math.max(epickCeil(),
         Math.min(epickFloor() - (es.h || 420), es.top)) + 'px';
     }
   };
@@ -8552,6 +8584,7 @@
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
+    if (q.has('bartop')) setBarTop(flag('bartop'));
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
     if (q.has('times')) setTimes({ nosec: 1, '24h': 1, '24hsec': 2, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
@@ -8637,7 +8670,7 @@
   }
   const HELP_LISTS = {
     helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
-    helpFlow: ['newest at bottom', 'newest at top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
@@ -8714,6 +8747,7 @@
   markHelp('helpClean', cleanUrls ? 1 : 0);
   markHelp('helpScrollback', SCROLLBACK_SIZES.indexOf(MAX_MESSAGES));
   markHelp('helpFlow', revFlow ? 1 : 0);
+  markHelp('helpBar', barTop ? 1 : 0);
   markHelp('helpTimes', timeIdx);
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);

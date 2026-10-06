@@ -47,6 +47,11 @@ not versions — the page ships continuously to Neocities.
 - stats tab in the ? popup: session chatter and message counts, the
   top 15 chatters in their nick colours, top 15 emotes by channel
   usage, and the rate graph's three loudest bursts
+- chat box location: a "chat box" option under ? > chat flow docks the
+  message input under the header as well as the usual bottom edge;
+  with it on top the nick completions drop down instead of up, and the
+  emote picker's dock, clamping and push-clearance all flip to keep it
+  below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
 - picking a non-panel help mode (labels or off) from inside the open ?

@@ -392,6 +392,7 @@ force off.
 | `pause` | flag | hold the scroll while hovering a row |
 | `scrollback` | `250`…`100000` | row cap |
 | `rev` | flag | reverse flow — new messages cascade down from the top |
+| `bartop` | flag | dock the chat input under the header instead of at the bottom |
 | `channel` | a twitch login | point the whole page at another channel |
 | `zebra` | flag | zebra-striped rows |
 | `lines` | `0`–`3` | row separator shades |
