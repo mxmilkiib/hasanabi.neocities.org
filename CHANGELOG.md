@@ -47,6 +47,10 @@ not versions — the page ships continuously to Neocities.
 - stats tab in the ? popup: session chatter and message counts, the
   top 15 chatters in their nick colours, top 15 emotes by channel
   usage, and the rate graph's three loudest bursts
+- presets pin the header help mode now: default keeps the button
+  labels showing, every other preset runs the bare header with labels
+  off - the current-preset underline counts the mode like every other
+  option it sets
 - chat box location: a "chat box" option under ? > chat flow docks the
   message input under the header as well as the usual bottom edge;
   with it on top the nick completions drop down instead of up, and the

@@ -432,7 +432,10 @@ force off.
 `midnight`, `solar`, `minimal`, `retro`, `irc`, `gohu`, `heather`); a
 style name like `theme=dark` still selects just the palette, which is
 also what the retired preset names `paper`, `mirc` and `console` now
-resolve to. Presets never share a name with a style.
+resolve to. Presets never share a name with a style. Each preset also
+pins the header help mode: `default` keeps the button labels on and
+every other preset runs the bare header (labels off, `?` still opens
+the panel).
 
 ### Performance
 
