@@ -43,6 +43,13 @@ not versions — the page ships continuously to Neocities.
   rides peek's autoscroll guard so the chat's own scrolling doesn't
   shake it loose
 ### Fixes & polish
+- hover cards (link previews and the emote card) survive row churn:
+  rows sliding under a parked cursor refire mouseover on whatever now
+  sits beneath it, and the non-link/non-emote target was closing the
+  card on every new message. a refire at the cursor's exact last
+  position is a layout shift, not a move, so the dismiss and the
+  card-open paths both ignore it - the card still dies the moment the
+  pointer actually moves
 - just-used emote flashes cycle colours: each use steps the flash's
   --fc ~24 degrees round the hue wheel (a bright hsl) instead of always
   washing accent, so simultaneous cells glow differently and the order

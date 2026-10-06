@@ -8278,7 +8278,13 @@
       peekShow(null, url, peekAsk(url));
     }, 350);
   }
+  let peekOverX = -1, peekOverY = -1;
   document.addEventListener('mouseover', (e) => {
+    // a mouseover refiring at the cursor's last position is a layout
+    // shift under a still pointer (rows churning past it), not a real
+    // move - a new message should neither open nor close a card
+    const still = e.clientX === peekOverX && e.clientY === peekOverY;
+    peekOverX = e.clientX; peekOverY = e.clientY;
     let a = e.target instanceof Element ? e.target.closest('a[href^="http"]') : null;
     if (a && !peekLink(a)) a = null;
     let url = a ? a.href : '';
@@ -8291,7 +8297,7 @@
       if (m) url = 'https://twitch.tv/' + m.textContent.replace(/^@/, '').toLowerCase();
     }
     // hops between child nodes of the same target don't restart the delay
-    if (url === peekUrl) return;
+    if (url === peekUrl || still) return;
     if (!url) peekHide(); else peekStart(url, e.clientX, e.clientY);
   });
   // keyboard focus gets the card too; :focus-visible skips click focus
@@ -8361,9 +8367,15 @@
     epop.style.left = Math.max(4, Math.min(innerWidth - epop.offsetWidth - 4, r.left + r.width / 2 - epop.offsetWidth / 2)) + 'px';
     epop.style.top = Math.max(4, r.top - epop.offsetHeight - 8) + 'px';
   }
+  let epopOverX = -1, epopOverY = -1;
   document.addEventListener('mouseover', (e) => {
+    // same layout-shift guard as peek: identical coords mean the content
+    // moved under a still cursor, not that the pointer did
+    const still = e.clientX === epopOverX && e.clientY === epopOverY;
+    epopOverX = e.clientX; epopOverY = e.clientY;
     const t = e.target instanceof Element ? e.target.closest('img.emote, button[data-ins]') : null;
     if (t === epopEl) return;
+    if (still) return;
     if (!t) { if (epopEl) epopHide(); return; }
     epopEl = t;
     clearTimeout(epopT);
