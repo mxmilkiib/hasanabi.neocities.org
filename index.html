@@ -4446,11 +4446,17 @@
         let label = orig;
         if (pe && Date.now() - pe.t < peekTtlOf(pe.p)) {
           if (pe.p && pe.p.title) label = pe.p.title;
-          // a title that is just the site's own name is boilerplate -
-          // a clip slug still carries the real title
-          const weak = !pe.p || !pe.p.title ||
-            (pe.p.site && pe.p.title.toLowerCase() === pe.p.site.toLowerCase());
-          if (weak) label = clipTitleOf(orig) || label;
+          // boilerplate titles ('Home', an echo of site_name) lose to the
+          // slug's embedded clip title, else the site name when it is a
+          // real name and not just the hostname back again
+          const t = (pe.p && pe.p.title) || '', site = (pe.p && pe.p.site) || '';
+          const weak = !t || /^(home|index|welcome|main|default|untitled)$/i.test(t) ||
+            (site && t.toLowerCase() === site.toLowerCase());
+          if (weak) {
+            const realSite = site && !/^(home|index|welcome|main|default|untitled)$/i.test(site) &&
+              !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(site) ? site : '';
+            label = clipTitleOf(orig) || realSite || label;
+          }
         } else peekAsk(pk);
         return row(i + 1,
           `<a class="at" href="https://${escapeHTML(orig)}" title="${escapeHTML(orig)}" target="_blank" rel="noopener noreferrer">${lkIco ? lkIcoImg('https://' + orig) : ''}${escapeHTML(label)}</a>`,
