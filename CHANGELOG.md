@@ -43,6 +43,13 @@ not versions — the page ships continuously to Neocities.
   rides peek's autoscroll guard so the chat's own scrolling doesn't
   shake it loose
 ### Fixes & polish
+- resources tab link audit: hasan's bluesky link removed; anna's archive
+  moved to the live .li mirror; safety first pdx (domain lapsed) now
+  points at its wayback capture; twelve stale domains updated to their
+  current homes - abcnews.com, batjc.org, cvilledsa.com, guifi's landing
+  host, home.memphisdsa.org, milwaukee.dsawi.org, mocodsa.net,
+  pluralpolicy.com/open (openstates' successor), nhdsa.org,
+  siliconvalleydsa.org, levernews.com and tulsadsa's canva site
 - message-drop audit: USERNOTICEs with no user text (message-less subs,
   raids, gifts) end at the channel arg so the parser now passes them
   through instead of returning null; a throwing row can no longer wedge
