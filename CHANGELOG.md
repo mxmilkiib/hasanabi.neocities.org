@@ -83,6 +83,12 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- the stats tab gains a channel scope picker on multi-channel joins:
+  'scope all · #a · #b' narrows chatters, emotes, bursts, badges and
+  the session row to one joined channel while 'all' keeps the combined
+  view - every tally now also runs per channel (message counts, badge
+  sets, live emote use, and a parallel rate series for bursts), and the
+  pick persists; top emote columns widen from 11em to 14em
 - the stats tab's badge list folds the promo tail away: channel sets,
   the everyday globals and sets actually seen in chat stay listed
   (~30), and the rest collapse into a 'more sets' group (~380) so the

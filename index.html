@@ -890,13 +890,14 @@
   #statsBody .st-h:first-child { margin-top: 0; }
   #statsBody .st-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 0 22px; }
   /* ranked lists read down one column then on to the next */
-  #statsBody .st-cols { columns: 11em; column-gap: 20px; }
+  #statsBody .st-cols { columns: 14em; column-gap: 20px; }
   #statsBody .st-bcols { columns: 13em; }
   #statsBody .st-badge { break-inside: avoid; }
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
   #statsBody .st-more > summary { color: var(--text-dim); }
   #statsBody .st-sort { float: right; font-weight: 400; }
+  #statsBody .st-scope .st-s { font-weight: 400; }
   #statsBody .st-s { border: 0; background: none; color: var(--text-dim);
     font: inherit; font-size: .9em; cursor: pointer; padding: 0 4px; }
   #statsBody .st-s:hover { color: var(--text); }
@@ -2454,6 +2455,7 @@
   // per-second rendered counts let a delayed sampler fill its missing
   // slots from observed traffic instead of painting the span dead
   const rateCounts = new Map();
+  const rateCountsPer = {}; // ch -> Map(sec -> count), for per-channel bursts
   const glorpCounts = new Map();
   // rolling one-hour window of distinct chatters seen talking - the only
   // audience figure available once the stream is offline
@@ -2932,6 +2934,8 @@
         recentTimestamps.push(now); // counted once rendered, not at queue time
         const sec = Math.floor(now / 1000);
         rateCounts.set(sec, (rateCounts.get(sec) || 0) + 1);
+        const rc = perMap(rateCountsPer, ch);
+        rc.set(sec, (rc.get(sec) || 0) + 1);
         const chatWho = (login || tags['display-name'] || '').toLowerCase();
         if (chatWho) chatterSeen.set(chatWho, now);
       }
@@ -3046,13 +3050,20 @@
       const name = tags['display-name'] || '(unknown)';
       const color = monoNames ? colorForName(name) : (ensureLegible(tags.color) || colorForName(name));
       noteNick(login, name, color);
-      if (login) nickMsgs.set(login, (nickMsgs.get(login) || 0) + 1);
+      if (login) {
+        nickMsgs.set(login, (nickMsgs.get(login) || 0) + 1);
+        const nm = perMap(nickMsgsPer, ch);
+        nm.set(login, (nm.get(login) || 0) + 1);
+      }
       // real badge icons left of the name; text chips only as fallback
       const renderedSets = new Set();
       const btags = (tags.badges || '').split(',').filter(Boolean);
       for (const b of btags) {
         badgeUse.set(b.split('/')[0], (badgeUse.get(b.split('/')[0]) || 0) + 1);
         badgeVerUse.set(b, (badgeVerUse.get(b) || 0) + 1);
+        const bs = perMap(badgeUsePer, ch), bv = perMap(badgeVerUsePer, ch);
+        bs.set(b.split('/')[0], (bs.get(b.split('/')[0]) || 0) + 1);
+        bv.set(b, (bv.get(b) || 0) + 1);
       }
       const badgeImgs = btags.map((b) => {
         const u = b && badgeUrl(b, ch);
@@ -3119,7 +3130,7 @@
       // rows would only pollute them
       for (const t of mtoks) {
         const en = ch === CHANNEL && emoteNameOf(ch, t);
-        if (en || rendered.names.has(t) || EMOJI_SET.has(t)) noteEmoteUse(en || t);
+        if (en || rendered.names.has(t) || EMOJI_SET.has(t)) noteEmoteUse(en || t, ch);
       }
       const eonly = mtoks.length > 0 &&
         mtoks.every((t) => rendered.names.has(t) || emoteNameOf(ch, t) || zwOf(ch).has(t));
@@ -3315,6 +3326,7 @@
   const devPx = (w) => Math.max(1, Math.round(w * DPR));
   const rateSamples = [];
   const rateTimes = []; // wall-clock end of each sample, parallel to rateSamples
+  const rateSamplesPer = {}; // ch -> same 5s-window series, for scoped bursts
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
   // outage cause per sample, parallel to rateSamples - '' for live ones;
@@ -3579,12 +3591,26 @@
       rateWhy.push(why);
       rateTimes.push(t);
       glorpSamples.push(glorpCounts.get(sec) || 0);
+      for (const c of CHANNELS) {
+        let cn = 0;
+        const rc = rateCountsPer[c];
+        if (rc) for (let j = 0; j < 5; j++) cn += rc.get(sec - j) || 0;
+        const arr = rateSamplesPer[c] = rateSamplesPer[c] || [];
+        arr.push(why ? NaN : cn / 5);
+        if (arr.length > sparkWin) arr.splice(0, arr.length - sparkWin);
+      }
     }
     lastTick = now;
     const oldSec = Math.floor(now / 1000) - sparkWin - 5;
     for (const sec of rateCounts.keys()) {
       if (sec >= oldSec) break;
       rateCounts.delete(sec);
+    }
+    for (const rc of Object.values(rateCountsPer)) {
+      for (const sec of rc.keys()) {
+        if (sec >= oldSec) break;
+        rc.delete(sec);
+      }
     }
     for (const sec of glorpCounts.keys()) {
       if (sec >= oldSec) break;
@@ -4100,14 +4126,35 @@
   const BADGE_SORT_KEY = 'hasan-badgesort';
   let badgeSort = 'use';
   try { badgeSort = localStorage.getItem(BADGE_SORT_KEY) || 'use'; } catch {}
+  const STAT_SCOPE_KEY = 'hasan-statscope';
+  let statScope = '';
+  try { statScope = localStorage.getItem(STAT_SCOPE_KEY) || ''; } catch {}
   function renderStats() {
     const el = document.getElementById('statsBody');
     if (!el) return;
+    // every counter also runs per channel; a scope pick narrows the tab
+    // to one joined channel, 'all' keeps the combined view
+    const sc = CHANNELS.includes(statScope) ? statScope : '';
+    const nMsgs = sc ? (nickMsgsPer[sc] || new Map()) : nickMsgs;
+    const lUse = sc ? (liveUsePer[sc] || {}) : liveUse;
+    const eUse = {};
+    if (sc) Object.assign(eUse, setFor(sc).emoteUse || {});
+    else for (const c of CHANNELS) {
+      const eu = setFor(c).emoteUse || {};
+      for (const k in eu) eUse[k] = (eUse[k] || 0) + eu[k];
+    }
+    const useS = (n) => (eUse[n] || 0) + (lUse[n] || 0);
+    const bUseM = sc ? (badgeUsePer[sc] || new Map()) : badgeUse;
+    const bVUseM = sc ? (badgeVerUsePer[sc] || new Map()) : badgeVerUse;
+    const scopeBtns = MULTI
+      ? `<div class="st-h st-scope">scope ` + ['', ...CHANNELS].map((c) =>
+          `<button type="button" class="st-s${sc === c ? ' on' : ''}" data-sscope="${c}">${c ? '#' + escapeHTML(c) : 'all'}</button>`).join(' ') + `</div>`
+      : '';
     const row = (i, inner, count) =>
       `<div class="st-row"><span class="n">${i}.</span><span class="nm">${inner}</span><i>${count}</i></div>`;
     // bots chatter constantly but aren't people - count them in the
     // session totals, keep them out of the ranking
-    const chat = [...nickMsgs.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
+    const chat = [...nMsgs.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
       .sort((a, b) => b[1] - a[1]).slice(0, 15)
       .map(([lg, n], i) => {
         const rec = seenNicks.get(lg) || {};
@@ -4120,16 +4167,28 @@
     // twitch codes resolve once any set is in hand - ask for the global set
     // whenever it is missing so a second render can image those too
     if (!twSets.some((s) => s.setID === '0')) loadTwitchSets('');
-    const all = new Set([...Object.keys(emoteUse), ...Object.keys(liveUse)]);
-    const emo = [...all].map((n) => [n, useOf(n)]).sort((a, b) => b[1] - a[1]).slice(0, 40)
+    const all = new Set([...Object.keys(eUse), ...Object.keys(lUse)]);
+    const emo = [...all].map((n) => [n, useS(n)]).sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([n, c], i) => {
-        const en = emoteNameOf(CHANNEL, n) || n;
-        const set = twSets.flatMap((s) => s.emoteList).find((e) => e.code === n || e.code === en);
-        const url = emotesOf(CHANNEL)[en] || (set && twEmoteUrl(set.id, set.assetType === 'ANIMATED'));
+        // scoped views read that channel's sets; 'all' tries each join in
+        // turn so an emote living only in another channel still images
+        const chs = sc ? [sc] : CHANNELS;
+        let en = null, url = null;
+        for (const c of chs) {
+          en = en || emoteNameOf(c, n);
+          url = url || emotesOf(c)[en || n];
+          if (en && url) break;
+        }
+        en = en || n;
+        const set = twSets.filter((s) => !sc || s.channelLogin === sc || s.setID === '0')
+          .flatMap((s) => s.emoteList).find((e) => e.code === n || e.code === en);
+        url = url || (set && twEmoteUrl(set.id, set.assetType === 'ANIMATED'));
         return row(i + 1, (url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}"> ` : '') + escapeHTML(n),
           c.toLocaleString('en'));
       }).join('');
-    const bursts = rateSamples.map((r, i) => [r, rateTimes[i]])
+    const bSeries = sc ? (rateSamplesPer[sc] || []) : rateSamples;
+    const bOff = rateTimes.length - bSeries.length;
+    const bursts = bSeries.map((r, i) => [r, rateTimes[bOff + i]])
       .filter(([r, t]) => Number.isFinite(r) && t)
       .sort((a, b) => b[0] - a[0]).slice(0, 3)
       .map(([r, t]) => `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ${fmtRowTime(new Date(t))}</span></div>`).join('');
@@ -4167,10 +4226,10 @@
       'game-developer': 'develops a game integrated with Twitch',
       'watch-streak': 'on a consecutive-stream watch streak in this channel',
     };
-    const bInfo = setFor(CHANNEL).badgeInfo || {};
-    const bChan = new Set(setFor(CHANNEL).badgeChan || []);
+    const bInfo = setFor(sc || CHANNEL).badgeInfo || {};
+    const bChan = new Set(setFor(sc || CHANNEL).badgeChan || []);
     const bRank = (id) => bChan.has(id) ? -1 : (CORE_BADGES.indexOf(id) + 1 || CORE_BADGES.length + 1);
-    const bUse = (id) => badgeUse.get(id) || 0;
+    const bUse = (id) => bUseM.get(id) || 0;
     // the right-hand number tracks the sort: messages seen carrying the
     // set under use, version count otherwise
     const BSORTS = {
@@ -4185,10 +4244,10 @@
       const name = id.replace(/[-_]/g, ' ');
       const metric = badgeSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
       return `<details class="st-badge"><summary><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
-        `${escapeHTML(bChan.has(id) ? CHANNEL + ' ' + name : name)}<i>${metric}</i></summary>` +
+        `${escapeHTML(bChan.has(id) ? (sc || CHANNEL) + ' ' + name : name)}<i>${metric}</i></summary>` +
         (BADGE_BLURB[id] ? `<div class="st-brow"><span class="bd">${escapeHTML(BADGE_BLURB[id])}</span></div>` : '') +
         vs.map(([ver, v]) => {
-          const n = badgeVerUse.get(id + '/' + ver) || 0;
+          const n = bVUseM.get(id + '/' + ver) || 0;
           return `<div class="st-brow"><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
             `<span class="bt">${escapeHTML(v.t || '')}</span>` +
             (v.d && v.d !== v.t ? `<span class="bd">${escapeHTML(v.d)}</span>` : '') +
@@ -4207,12 +4266,13 @@
     const badgeSortBtns = Object.keys(BSORTS)
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
-    const total = [...nickMsgs.values()].reduce((a, b) => a + b, 0);
+    const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
     el.innerHTML =
+      scopeBtns +
       `<div class="st-h">bursts</div>` +
       (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
-      `<div class="st-h">session</div>` +
-      `<div class="st-row"><span class="nm">${nickMsgs.size} chatter${nickMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
+      `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
+      `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
       `<div class="st-grid">` +
         `<div><div class="st-h">top chatters</div>${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
         `<div><div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
@@ -4224,6 +4284,13 @@
   }
   // delegated - the stats body rewrites its innerHTML on every render
   document.getElementById('statsBody').addEventListener('click', (e) => {
+    const scb = e.target.closest('.st-s[data-sscope]');
+    if (scb) {
+      statScope = scb.dataset.sscope;
+      try { localStorage.setItem(STAT_SCOPE_KEY, statScope); } catch {}
+      renderStats();
+      return;
+    }
     const b = e.target.closest('.st-s[data-bsort]');
     if (!b) return;
     badgeSort = b.dataset.bsort;
@@ -6773,6 +6840,11 @@
   const nickMsgs = new Map();  // login -> rendered PRIVMSGs this session
   const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
   const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
+  // the same tallies again per channel, for the stats tab's scope picker:
+  // channel -> Map/obj shaped like the global counters above
+  const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {};
+  const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
+  const perObj = (o, ch) => o[ch] || (o[ch] = {});
   const noteNick = (login, name, color) => {
     const k = (login || '').toLowerCase();
     if (!/^[a-z0-9_]{2,25}$/.test(k)) return;
@@ -8064,8 +8136,10 @@
     clearTimeout(flashTimers.get(n));
     flashTimers.set(n, setTimeout(() => unflash(n), 3600));
   }
-  function noteEmoteUse(n) {
+  function noteEmoteUse(n, ch) {
     liveUse[n] = (liveUse[n] || 0) + 1;
+    const lp = perObj(liveUsePer, ch || CHANNEL);
+    lp[n] = (lp[n] || 0) + 1;
     useTs[n] = Date.now();
     saveUse();
     if (emotePick.hidden) return;
