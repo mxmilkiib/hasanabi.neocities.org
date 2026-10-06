@@ -3497,6 +3497,7 @@
           complement(styles.getPropertyValue('--accent').trim() || '#e8a33d', parseFloat(styles.getPropertyValue('--sh-bg')) || -1),
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
         vip: styles.getPropertyValue('--vip') || '#a050c0',
+        text: styles.getPropertyValue('--text').trim() || '#fff',
       };
     }
     const step = SPARK_W / (SPARK_N - 1); // ~1px per sample
@@ -3575,23 +3576,33 @@
     sparkCtx.fillStyle = accent;
     sparkCtx.fill();
     sparkCtx.globalAlpha = 1;
-    // seconds with more than two glorp/F messages get a red segment
+    // seconds with more than two glorp/F messages get a hot segment. the
+    // wide text-coloured halo underneath keeps it readable where accent
+    // and danger sit close in hue (violet themes vs red) - shape and
+    // luminance carry the difference hue can't
     const danger = sparkCols.danger;
-    sparkCtx.strokeStyle = danger;
-    const gDev = devPx(2);
-    sparkCtx.lineWidth = gDev / DPR;
-    for (let i = 0; i < n; i++) {
-      if (!Number.isFinite(rateSamples[i]) || (glorpSamples[i] || 0) <= 2) continue;
-      const x = snapDev((i + SPARK_N - n) * step, gDev);
-      const y = snapDev(SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3), gDev);
+    const gDev = devPx(2), hDev = devPx(4.5);
+    const gSeg = (i) => {
+      const x = snapDev((i + SPARK_N - n) * step, hDev);
+      const y = snapDev(SPARK_H - 1 - (rateSamples[i] / max) * (SPARK_H - 3), hDev);
       sparkCtx.beginPath();
       if (i && Number.isFinite(rateSamples[i - 1])) {
-        sparkCtx.moveTo(snapDev((i - 1 + SPARK_N - n) * step, gDev),
-          snapDev(SPARK_H - 1 - (rateSamples[i - 1] / max) * (SPARK_H - 3), gDev));
+        sparkCtx.moveTo(snapDev((i - 1 + SPARK_N - n) * step, hDev),
+          snapDev(SPARK_H - 1 - (rateSamples[i - 1] / max) * (SPARK_H - 3), hDev));
       } else sparkCtx.moveTo(x, y);
       sparkCtx.lineTo(x, y);
       sparkCtx.stroke();
-    }
+    };
+    sparkCtx.strokeStyle = sparkCols.text;
+    sparkCtx.globalAlpha = .55;
+    sparkCtx.lineWidth = hDev / DPR;
+    for (let i = 0; i < n; i++)
+      if (Number.isFinite(rateSamples[i]) && (glorpSamples[i] || 0) > 2) gSeg(i);
+    sparkCtx.globalAlpha = 1;
+    sparkCtx.strokeStyle = danger;
+    sparkCtx.lineWidth = gDev / DPR;
+    for (let i = 0; i < n; i++)
+      if (Number.isFinite(rateSamples[i]) && (glorpSamples[i] || 0) > 2) gSeg(i);
   }
 
   // persisted so a reload keeps the recent rate history; the gap while the
