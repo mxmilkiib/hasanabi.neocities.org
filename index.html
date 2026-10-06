@@ -6725,6 +6725,7 @@
       })));
     } catch {}
     saveSpark();
+    saveStats();
   }
   function restoreHistory() {
     try {
@@ -6940,6 +6941,31 @@
   const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {};
   const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
   const perObj = (o, ch) => o[ch] || (o[ch] = {});
+  // the ranked counters restore like the history rows they tallied -
+  // saved alongside them on pagehide so a reload keeps the session going
+  const STATS_KEY = 'hasan-stats-' + CHANNELS.join(',');
+  const savedStats = (() => { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch { return {}; } })();
+  const intoMap = (m, arr) => { if (Array.isArray(arr)) for (const [k, v] of arr) m.set(k, v); };
+  intoMap(nickMsgs, savedStats.nm);
+  intoMap(seenNicks, savedStats.sn);
+  intoMap(nickFirst, savedStats.nf);
+  intoMap(badgeUse, savedStats.bu);
+  intoMap(badgeVerUse, savedStats.bv);
+  for (const [ch, arr] of Object.entries(savedStats.nmp || {})) intoMap(perMap(nickMsgsPer, ch), arr);
+  for (const [ch, arr] of Object.entries(savedStats.bup || {})) intoMap(perMap(badgeUsePer, ch), arr);
+  for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
+  for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
+  const saveStats = () => {
+    const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
+    try {
+      localStorage.setItem(STATS_KEY, JSON.stringify({
+        nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst],
+        bu: [...badgeUse], bv: [...badgeVerUse],
+        nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
+        lup: liveUsePer,
+      }));
+    } catch {}
+  };
   const noteNick = (login, name, color) => {
     const k = (login || '').toLowerCase();
     if (!/^[a-z0-9_]{2,25}$/.test(k)) return;

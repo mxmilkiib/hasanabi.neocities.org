@@ -13,6 +13,10 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats counters survive reloads like the history rows they tallied:
+  top chatters, chatter names/colours, badge tallies and per-channel
+  scopes save alongside the scrollback on pagehide and restore on
+  load, so a refresh continues the session instead of zeroing it
 - stats: top chatters lists 40 like top emotes, and both ranked
   sections now stack full-width so each flows across the 14em
   columns instead of squeezing chatters into a narrow grid cell
