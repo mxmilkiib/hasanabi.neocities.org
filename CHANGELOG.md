@@ -5,6 +5,14 @@ not versions — the page ships continuously to Neocities.
 
 ## 2026-10-06
 
+### Features
+- stats gains a top links section: every url in a rendered PRIVMSG is
+  normalised (scheme/www/case folded) and tallied, ranked by posts,
+  scoped per channel and persisted in the session-stats blob
+- stats badge lists cap at the top 40 rows with a 'N more - show all'
+  row that expands the full ranking; a sort, window or scope pick
+  folds it back
+
 ### Fixes
 - tweet video previews erroring with "no video with supported format
   and mime type found": video.twimg.com 403s any request carrying a

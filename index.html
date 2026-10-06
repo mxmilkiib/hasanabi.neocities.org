@@ -904,6 +904,8 @@
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
   #statsBody .st-more > summary { color: var(--text-dim); }
+  /* the badge list's show-all row bridges the column flow */
+  #statsBody .st-all { column-span: all; }
   #statsBody .st-sort { float: right; font-weight: 400; }
   #statsBody .st-scope .st-s { font-weight: 400; }
   #statsBody .st-s { border: 0; background: none; color: var(--text-dim);
@@ -3168,6 +3170,16 @@
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
       const lkey = linkKeyOf(message);
+      // the stats tab's links section tallies each distinct url once
+      // per message; the same normalised keys drive links-view dedup
+      if (lkey) {
+        for (const k of new Set(lkey.split(' '))) {
+          urlUse.set(k, (urlUse.get(k) || 0) + 1);
+          const um = perMap(urlUsePer, ch);
+          um.set(k, (um.get(k) || 0) + 1);
+        }
+        if (urlUse.size > 4000) urlUse.delete(urlUse.keys().next().value);
+      }
       // native twitch gif posts carry only the giphy title in brackets -
       // no id or url - so link the title to a giphy search for it
       const gifm = message.match(/^\[([^\]]*\bGIF\b[^\]]*)\]$/i);
@@ -4214,6 +4226,9 @@
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = 'alltime';
   try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
+  // the badge list caps at 40 rows; its 'show all' link flips this and a
+  // sort/window/scope pick folds it back
+  let statBadgeAll = false;
   let lastStatPaint = 0;
   function renderStats() {
     const el = document.getElementById('statsBody');
@@ -4299,6 +4314,13 @@
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
           n.toLocaleString('en'));
       }).join('');
+    // urls posted in chat, ranked by posts - keyed on the same normalised
+    // form links-view dedup uses, so scheme/www/case variants fold
+    const uUseM = sc ? (urlUsePer[sc] || new Map()) : urlUse;
+    const topLinks = [...uUseM.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40)
+      .map(([k, n], i) => row(i + 1,
+        `<a class="at" href="https://${escapeHTML(k)}" target="_blank" rel="noopener noreferrer">${escapeHTML(k)}</a>`,
+        n.toLocaleString('en'))).join('');
     // names in the counts outlive set loads: third-party lookups fold case,
     // twitch codes resolve once any set is in hand - ask for the global set
     // whenever it is missing so a second render can image those too
@@ -4425,20 +4447,28 @@
           if (n) flat.push({ id, v, n });
         }
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
-      badgeSets = flat.map(({ id, v, n }) => {
+      const bVis = statBadgeAll ? flat : flat.slice(0, 40);
+      badgeSets = bVis.map(({ id, v, n }) => {
         const name = id.replace(/[-_]/g, ' ');
         const label = v.t && v.t.toLowerCase() !== name ? `${name} · ${v.t}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">·</span>` +
           `<span class="nm"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""> ${escapeHTML(label)}</span>` +
           `<i>${n.toLocaleString('en')}</i></div>`;
-      }).join('');
+      }).join('') +
+        (flat.length > bVis.length
+          ? `<div class="st-row st-all"><button type="button" class="st-s" data-ball>` +
+            `${(flat.length - bVis.length).toLocaleString('en')} more - show all</button></div>` : '');
     } else {
       const bShow = [], bMore = [];
       for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
         (bKeep(id) ? bShow : bMore).push(id);
-      badgeSets = bShow.map(badgeRow).join('') +
+      const bVis = statBadgeAll ? bShow : bShow.slice(0, 40);
+      badgeSets = bVis.map(badgeRow).join('') +
         (bMore.length ? `<details class="st-badge st-more" data-more><summary>${bMore.length.toLocaleString('en')} more sets` +
-          `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '');
+          `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '') +
+        (bShow.length > bVis.length
+          ? `<div class="st-row st-all"><button type="button" class="st-s" data-ball>` +
+            `${(bShow.length - bVis.length).toLocaleString('en')} more - show all</button></div>` : '');
     }
     const emoteSrcBtns = Object.keys(EMOTE_SRCS)
       .map((s) => `<button type="button" class="st-s${emoteStatSrc === s ? ' on' : ''}" data-esrc="${s}" title="count source">${s}</button>`)
@@ -4477,6 +4507,7 @@
         `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `</div>` +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
+      `<div class="st-h">top links</div><div class="st-cols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
       `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
@@ -4489,9 +4520,16 @@
   }
   // delegated - the stats body rewrites its innerHTML on every render
   document.getElementById('statsBody').addEventListener('click', (e) => {
+    const ball = e.target.closest('[data-ball]');
+    if (ball) {
+      statBadgeAll = true;
+      renderStats();
+      return;
+    }
     const scb = e.target.closest('.st-s[data-sscope]');
     if (scb) {
       statScope = scb.dataset.sscope;
+      statBadgeAll = false;
       try { localStorage.setItem(STAT_SCOPE_KEY, statScope); } catch {}
       renderStats();
       return;
@@ -4506,6 +4544,7 @@
     const b = e.target.closest('.st-s[data-bsort]');
     if (b) {
       badgeSort = b.dataset.bsort;
+      statBadgeAll = false;
       try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
       renderStats();
       return;
@@ -4514,6 +4553,7 @@
     if (bw) {
       badgeWin = bw.dataset.bwin;
       badgeSort = 'use';
+      statBadgeAll = false;
       try { localStorage.setItem(BADGE_WIN_KEY, badgeWin); } catch {}
       try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
       renderStats();
@@ -7210,6 +7250,7 @@
   const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
   const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
   const glorpUse = new Map();    // login -> rendered GLORP/F rows
+  const urlUse = new Map();      // normalised url -> rendered PRIVMSGs carrying it
   // per-day badge buckets keep the stats tab's badge windows (day/week/
   // month) honest, like the emote useDay ones; entries past 31 days
   // evict on save
@@ -7217,7 +7258,7 @@
   // the same tallies again per channel, for the stats tab's scope picker:
   // channel -> Map/obj shaped like the global counters above
   const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {}, glorpPer = {},
-    badgeDayPer = {};
+    badgeDayPer = {}, urlUsePer = {};
   const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
   const perObj = (o, ch) => o[ch] || (o[ch] = {});
   // the ranked counters restore like the history rows they tallied -
@@ -7232,10 +7273,12 @@
   intoMap(badgeUse, savedStats.bu);
   intoMap(badgeVerUse, savedStats.bv);
   intoMap(glorpUse, savedStats.gl);
+  intoMap(urlUse, savedStats.uu);
   for (const [ch, arr] of Object.entries(savedStats.nmp || {})) intoMap(perMap(nickMsgsPer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bup || {})) intoMap(perMap(badgeUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.glp || {})) intoMap(perMap(glorpPer, ch), arr);
+  for (const [ch, arr] of Object.entries(savedStats.uup || {})) intoMap(perMap(urlUsePer, ch), arr);
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
   Object.assign(badgeDay, savedStats.bd);
   for (const [ch, o] of Object.entries(savedStats.bdp || {})) Object.assign(perObj(badgeDayPer, ch), o);
@@ -7251,6 +7294,7 @@
         bu: [...badgeUse], bv: [...badgeVerUse], gl: [...glorpUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
         glp: per(glorpPer), lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer,
+        uu: [...urlUse], uup: per(urlUsePer),
       }));
     } catch {}
   };
