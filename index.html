@@ -748,7 +748,8 @@
   .ytcard { display: block; margin: 2px 0; }
   iframe.ytplay { display: block; border: 0; border-radius: 4px; margin: 2px 0; width: min(30em, 100%); aspect-ratio: 16 / 9; }
   .twcard .twmedia a.twvid { position: relative; display: inline-block; }
-  .twcard .twmedia video.twvid { max-height: 12em; max-width: 18em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
+  .twcard .twmedia :is(video.twvid, iframe.twvid) { max-height: 12em; max-width: 18em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
+  .twcard .twmedia iframe.twvid { border: 0; width: 18em; aspect-ratio: 16 / 9; display: block; }
   .twcard .twmedia a.twvid i {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
@@ -6202,11 +6203,19 @@
     if (tv && tv.dataset.vsrc && !e.shiftKey) {
       e.preventDefault();
       const gif = tv.querySelector('i').textContent === 'GIF';
-      const v = document.createElement('video');
-      v.className = 'twvid'; v.src = tv.dataset.vsrc;
-      v.controls = true; v.autoplay = true; v.playsInline = true;
-      v.loop = gif; v.muted = gif;
-      tv.replaceWith(v);
+      // video.twimg.com 403s any request carrying a foreign Referer and
+      // <video> can't set referrerpolicy; a srcdoc document whose meta
+      // forces no-referrer loads the mp4 cleanly instead
+      const f = document.createElement('iframe');
+      f.className = 'twvid';
+      f.allow = 'autoplay; fullscreen';
+      f.setAttribute('allowfullscreen', '');
+      const wh = (tv.dataset.vwh || '').split('x');
+      if (+wh[0] && +wh[1]) f.style.aspectRatio = `${+wh[0]} / ${+wh[1]}`;
+      f.srcdoc = '<meta name="referrer" content="no-referrer">' +
+        '<style>html,body{margin:0;height:100%;background:#000}video{width:100%;height:100%;object-fit:contain}</style>' +
+        `<video src="${tv.dataset.vsrc.replace(/"/g, '&quot;')}" controls autoplay playsinline${gif ? ' loop muted' : ''}></video>`;
+      tv.replaceWith(f);
       return;
     }
     // the ▶ on a youtube link unfolds the embed under its row, and folds
@@ -8684,7 +8693,7 @@
           .map((p) => `<img src="${escapeHTML(p.url)}" alt="${escapeHTML(' ' + (p.alt || '[image]'))}">`)
           .concat((m.videos || []).slice(0, 4).filter((v) => v.thumb)
             .map((v) => {
-              const play = /\.(?:mp4|webm|mov|m4v)(?:\?|$)/i.test(v.url || '') ? ` data-vsrc="${escapeHTML(v.url)}"` : '';
+              const play = /\.(?:mp4|webm|mov|m4v)(?:\?|$)/i.test(v.url || '') ? ` data-vsrc="${escapeHTML(v.url)}"${v.w && v.h ? ` data-vwh="${v.w}x${v.h}"` : ''}` : '';
               return ` <a class="twvid" href="${escapeHTML(twurl)}"${play} target="_blank" rel="noopener noreferrer" title="play - ⇧click opens x.com"><img src="${escapeHTML(v.thumb)}" alt="[video]"><i>${v.type === 'gif' ? 'GIF' : '▶'}</i></a>`;
             }))
           .join('');
