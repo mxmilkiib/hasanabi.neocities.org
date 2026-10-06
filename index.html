@@ -2503,6 +2503,7 @@
   const rateCounts = new Map();
   const rateCountsPer = {}; // ch -> Map(sec -> count), for per-channel bursts
   const glorpCounts = new Map();
+  const glorpCountsPer = {}; // ch -> Map(sec -> count), for scoped glorp peaks
   // rolling one-hour window of distinct chatters seen talking - the only
   // audience figure available once the stream is offline
   const chatterSeen = new Map(); // login -> last-seen ts
@@ -3138,6 +3139,8 @@
         glorpTimestamps.push(now);
         const sec = Math.floor(now / 1000);
         glorpCounts.set(sec, (glorpCounts.get(sec) || 0) + 1);
+        const gcs = perMap(glorpCountsPer, ch);
+        gcs.set(sec, (gcs.get(sec) || 0) + 1);
         if (login) {
           glorpUse.set(login, (glorpUse.get(login) || 0) + 1);
           const gm = perMap(glorpPer, ch);
@@ -3397,6 +3400,7 @@
   const rateSamplesPer = {}; // ch -> same 5s-window series, for scoped bursts
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
+  const glorpSamplesPer = {}; // ch -> same series, for scoped glorp peaks
   // outage cause per sample, parallel to rateSamples - '' for live ones;
   // lets dead bands colour socket loss and a closed page differently
   const rateWhy = [];
@@ -3666,6 +3670,10 @@
         const arr = rateSamplesPer[c] = rateSamplesPer[c] || [];
         arr.push(why ? NaN : cn / 5);
         if (arr.length > sparkWin) arr.splice(0, arr.length - sparkWin);
+        const garr = glorpSamplesPer[c] = glorpSamplesPer[c] || [];
+        const gcm = glorpCountsPer[c];
+        garr.push(gcm ? (gcm.get(sec) || 0) : 0);
+        if (garr.length > sparkWin) garr.splice(0, garr.length - sparkWin);
       }
     }
     lastTick = now;
@@ -3683,6 +3691,12 @@
     for (const sec of glorpCounts.keys()) {
       if (sec >= oldSec) break;
       glorpCounts.delete(sec);
+    }
+    for (const gc of Object.values(glorpCountsPer)) {
+      for (const sec of gc.keys()) {
+        if (sec >= oldSec) break;
+        gc.delete(sec);
+      }
     }
     const cutoff = now - 5000;
     recentTimestamps = recentTimestamps.filter((t) => t > cutoff);
@@ -4315,6 +4329,15 @@
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
           n.toLocaleString('en'));
       }).join('');
+    // the loudest samples of the series that paints the rate graph's red
+    // segments - the glorp/F spikes over the same >2/sec threshold, ranked
+    const gSeries = sc ? (glorpSamplesPer[sc] || []) : glorpSamples;
+    const gOff = rateTimes.length - gSeries.length;
+    const gPeaks = gSeries.map((n, i) => [n, rateTimes[gOff + i]])
+      .filter(([n, t]) => n > 2 && t)
+      .sort((a, b) => b[0] - a[0]).slice(0, 3)
+      .map(([n, t]) => `<div class="st-row"><span class="n">·</span>` +
+        `<span class="nm">${n} at ${fmtRowTime(new Date(t))}</span></div>`).join('');
     // urls posted in chat, ranked by posts - keyed on the same normalised
     // form links-view dedup uses, so scheme/www/case variants fold
     const uUseM = sc ? (urlUsePer[sc] || new Map()) : urlUse;
@@ -4509,7 +4532,8 @@
         `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div></div>` +
         `<div><div class="st-h">glorps</div>` +
         `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
-        `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
+        gPeaks +
+        `${glorps || (gPeaks ? '' : '<div class="st-row"><span class="nm">none yet</span></div>')}</div>` +
       `</div>` +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
       `<div class="st-h">top links</div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
