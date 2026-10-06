@@ -13,6 +13,10 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats top emotes gets a count-source picker: alltime ranks by the
+  channel's StreamElements figures, local by this client's own tally,
+  and today/week/month by per-day use buckets (evicted past 31 days) -
+  the pick persists as hasan-emotesrc and honours the channel scope
 - stats: the session counts (chatters, messages, distinct badges seen)
   sit one per row, and the first three sections (bursts, session,
   glorps) sit side by side in a three-column row above the ranked

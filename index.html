@@ -4175,6 +4175,12 @@
   const STAT_SCOPE_KEY = 'hasan-statscope';
   let statScope = '';
   try { statScope = localStorage.getItem(STAT_SCOPE_KEY) || ''; } catch {}
+  // top emotes' count source: the channel's StreamElements figures, or
+  // this client's own tallies - all of them or a recent window
+  const EMOTE_SRCS = { alltime: 0, local: -1, today: 1, week: 7, month: 31 };
+  const EMOTE_SRC_KEY = 'hasan-emotesrc';
+  let emoteStatSrc = 'alltime';
+  try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
   let lastStatPaint = 0;
   function renderStats() {
     const el = document.getElementById('statsBody');
@@ -4190,7 +4196,20 @@
       const eu = setFor(c).emoteUse || {};
       for (const k in eu) eUse[k] = (eUse[k] || 0) + eu[k];
     }
-    const useS = (n) => (eUse[n] || 0) + (lUse[n] || 0);
+    const win = EMOTE_SRCS[emoteStatSrc] ?? 0;
+    const dayBag = sc ? (useDayPer[sc] || {}) : useDay;
+    // per-emote count under the picked source: stream-elements figures,
+    // all local tallies, or the day buckets inside a trailing window
+    const lCount = (n) => {
+      if (win === -1) return lUse[n] || 0;
+      const e = dayBag[n];
+      if (!e) return 0;
+      const d0 = Math.floor(Date.now() / 864e5) - win + 1;
+      let c = 0;
+      for (const [d, v] of Object.entries(e)) if (+d >= d0) c += v;
+      return c;
+    };
+    const useS = win === 0 ? (n) => (eUse[n] || 0) : lCount;
     const bUseM = sc ? (badgeUsePer[sc] || new Map()) : badgeUse;
     const bVUseM = sc ? (badgeVerUsePer[sc] || new Map()) : badgeVerUse;
     const scopeBtns = MULTI
@@ -4224,7 +4243,8 @@
     // twitch codes resolve once any set is in hand - ask for the global set
     // whenever it is missing so a second render can image those too
     if (!twSets.some((s) => s.setID === '0')) loadTwitchSets('');
-    const all = new Set([...Object.keys(eUse), ...Object.keys(lUse)]);
+    const all = new Set(win === 0 ? Object.keys(eUse)
+      : win === -1 ? Object.keys(lUse) : Object.keys(dayBag));
     const emo = [...all].map((n) => [n, useS(n)]).sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([n, c], i) => {
         // scoped views read that channel's sets; 'all' tries each join in
@@ -4355,6 +4375,9 @@
         (bMore.length ? `<details class="st-badge st-more" data-more><summary>${bMore.length.toLocaleString('en')} more sets` +
           `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '');
     }
+    const emoteSrcBtns = Object.keys(EMOTE_SRCS)
+      .map((s) => `<button type="button" class="st-s${emoteStatSrc === s ? ' on' : ''}" data-esrc="${s}" title="count source">${s}</button>`)
+      .join('');
     const badgeSortBtns = Object.keys(BSORTS)
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
@@ -4379,7 +4402,7 @@
         `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `</div>` +
       `<div class="st-h">top chatters</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
-      `<div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
+      `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
@@ -4395,6 +4418,13 @@
     if (scb) {
       statScope = scb.dataset.sscope;
       try { localStorage.setItem(STAT_SCOPE_KEY, statScope); } catch {}
+      renderStats();
+      return;
+    }
+    const esb = e.target.closest('.st-s[data-esrc]');
+    if (esb) {
+      emoteStatSrc = esb.dataset.esrc;
+      try { localStorage.setItem(EMOTE_SRC_KEY, emoteStatSrc); } catch {}
       renderStats();
       return;
     }
@@ -8247,6 +8277,10 @@
   const savedUse = (() => { try { return JSON.parse(localStorage.getItem(EMOTEUSE_KEY)) || {}; } catch { return {}; } })();
   const liveUse = savedUse.n || {};
   const useTs = savedUse.t || {};
+  // per-day buckets keep the stats tab's local windows (today/week/
+  // month) honest; entries past 31 days evict on save
+  const useDay = savedUse.d || {};
+  const useDayPer = savedUse.pd || {};
   // when recording began: age markers stay dim until their era is covered
   const useT0 = savedUse.s || Date.now();
   let useSaveTimer = 0;
@@ -8258,12 +8292,19 @@
       const ks = Object.keys(useTs);
       if (ks.length > 6000) {
         ks.sort((a, b) => useTs[a] - useTs[b]);
-        for (const k of ks.slice(0, ks.length - 6000)) { delete useTs[k]; delete liveUse[k]; }
+        for (const k of ks.slice(0, ks.length - 6000)) {
+          delete useTs[k]; delete liveUse[k]; delete useDay[k];
+          for (const lp of Object.values(useDayPer)) delete lp[k];
+        }
       }
-      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch {}
+      const d0 = Math.floor(Date.now() / 864e5) - 31;
+      for (const bag of [useDay, ...Object.values(useDayPer)])
+        for (const e of Object.values(bag))
+          for (const d of Object.keys(e)) if (+d < d0) delete e[d];
+      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer })); } catch {}
     }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0 })); } catch {} });
+  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer })); } catch {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
@@ -8340,6 +8381,12 @@
     liveUse[n] = (liveUse[n] || 0) + 1;
     const lp = perObj(liveUsePer, ch || CHANNEL);
     lp[n] = (lp[n] || 0) + 1;
+    const day = Math.floor(Date.now() / 864e5);
+    const ud = useDay[n] || (useDay[n] = {});
+    ud[day] = (ud[day] || 0) + 1;
+    const dpc = perObj(useDayPer, ch || CHANNEL);
+    const udp = dpc[n] || (dpc[n] = {});
+    udp[day] = (udp[day] || 0) + 1;
     useTs[n] = Date.now();
     saveUse();
     if (emotePick.hidden) return;
