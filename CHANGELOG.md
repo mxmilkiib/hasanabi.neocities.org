@@ -47,6 +47,9 @@ not versions — the page ships continuously to Neocities.
 - stats tab in the ? popup: session chatter and message counts, the
   top 15 chatters in their nick colours, top 15 emotes by channel
   usage, and the rate graph's three loudest bursts
+- the stats tab ends with a badge reference: every set collapsible,
+  channel badges first then everyday globals; common sets carry a
+  written meaning and versions show their titles
 - top emotes in the stats tab now lists 30 and resolves far more names
   to images: channel sub emotes arrive unasked (the relay fetches
   subscriptionProducts via gql, so anonymous viewers get them too), the

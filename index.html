@@ -891,6 +891,18 @@
   #statsBody .st-row .emote { max-height: 1.4em; vertical-align: -0.3em; }
   #statsBody .st-row i { margin-left: auto; font-style: normal;
     color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
+  #statsBody .st-badge summary { cursor: pointer; display: flex; align-items: center;
+    gap: 6px; padding: 1px 0; line-height: 1.7; list-style: none; }
+  #statsBody .st-badge summary::before { content: '▸'; color: var(--accent); }
+  #statsBody .st-badge[open] summary::before { content: '▾'; }
+  #statsBody .st-badge summary .emote { max-height: 1.4em; }
+  #statsBody .st-badge summary i { margin-left: auto; font-style: normal;
+    color: var(--text-dim); }
+  #statsBody .st-brow { display: flex; align-items: baseline; gap: 6px;
+    padding: 1px 0 1px 1.9em; line-height: 1.6; }
+  #statsBody .st-brow .emote { max-height: 1.3em; }
+  #statsBody .st-brow .bt { font-weight: 600; white-space: nowrap; }
+  #statsBody .st-brow .bd { color: var(--text-dim); font-size: .92em; }
   @media (max-width: 640px) { #statsBody .st-grid { grid-template-columns: 1fr; } }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
@@ -4052,6 +4064,56 @@
       .filter(([r, t]) => Number.isFinite(r) && t)
       .sort((a, b) => b[0] - a[0]).slice(0, 3)
       .map(([r, t]) => `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ${fmtRowTime(new Date(t))}</span></div>`).join('');
+    // badge reference: the channel's own sets lead, then the badges that
+    // actually turn up in chat, then every remaining global set a-z; each
+    // set collapses so the hundreds of promo sets stay out of the way
+    const CORE_BADGES = ['broadcaster', 'moderator', 'vip', 'partner', 'staff', 'admin',
+      'global_mod', 'verified', 'premium', 'turbo', 'subscriber', 'bits', 'bits-leader',
+      'sub-gifter', 'hype-train', 'predictions', 'moments', 'artist-badge', 'clip-champ', 'extension'];
+    // ivr's own descriptions echo the title on every core badge, so the
+    // everyday sets get a written meaning; event badges keep whatever
+    // real text ivr carries
+    const BADGE_BLURB = {
+      broadcaster: 'the channel owner',
+      moderator: 'appointed to keep chat in line - can time out, ban, and delete messages',
+      vip: 'a regular pinned as a valued community member by the broadcaster',
+      partner: 'a Twitch Partner - an established streamer under contract',
+      staff: 'a Twitch staff member',
+      admin: 'a Twitch administrator',
+      global_mod: 'a Twitch global moderator',
+      verified: 'a phone-verified Twitch account',
+      premium: 'a Prime Gaming subscriber',
+      turbo: 'a Twitch Turbo subscriber',
+      subscriber: 'a channel subscriber - each version marks tenure',
+      founder: 'subscribed within the channel\'s first ten ever subs',
+      bits: 'has cheered at least this many bits in the channel',
+      'bits-leader': 'one of the channel\'s top three bits cheerers',
+      'sub-gifter': 'has gifted at least this many subs in the channel',
+      'hype-train': 'rode this channel\'s hype train while it ran',
+      predictions: 'took part in the channel\'s predictions',
+      moments: 'part of Twitch\'s moments experiment',
+      'artist-badge': 'made emote art for this channel',
+      'clip-champ': 'clips this channel - one per channel, picked by the broadcaster',
+      extension: 'granted by a channel extension',
+      'game-developer': 'develops a game integrated with Twitch',
+      'watch-streak': 'on a consecutive-stream watch streak in this channel',
+    };
+    const bInfo = setFor(CHANNEL).badgeInfo || {};
+    const bChan = new Set(setFor(CHANNEL).badgeChan || []);
+    const bRank = (id) => bChan.has(id) ? -1 : (CORE_BADGES.indexOf(id) + 1 || CORE_BADGES.length + 1);
+    const badgeSets = Object.keys(bInfo).sort((a, b) => bRank(a) - bRank(b) || byName(a, b))
+      .map((id) => {
+        const vs = Object.entries(bInfo[id])
+          .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
+        const name = id.replace(/[-_]/g, ' ');
+        return `<details class="st-badge"><summary><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
+          `${escapeHTML(bChan.has(id) ? CHANNEL + ' ' + name : name)}<i>${vs.length}</i></summary>` +
+          (BADGE_BLURB[id] ? `<div class="st-brow"><span class="bd">${escapeHTML(BADGE_BLURB[id])}</span></div>` : '') +
+          vs.map(([, v]) => `<div class="st-brow"><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
+            `<span class="bt">${escapeHTML(v.t || '')}</span>` +
+            (v.d && v.d !== v.t ? `<span class="bd">${escapeHTML(v.d)}</span>` : '') + `</div>`).join('') +
+          `</details>`;
+      }).join('');
     const total = [...nickMsgs.values()].reduce((a, b) => a + b, 0);
     el.innerHTML =
       `<div class="st-h">session</div>` +
@@ -4061,7 +4123,9 @@
         `<div><div class="st-h">top emotes</div>${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `</div>` +
       `<div class="st-h">bursts</div>` +
-      (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`);
+      (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
+      `<div class="st-h">badges</div>` +
+      (badgeSets || `<div class="st-row"><span class="nm">badge data not loaded yet</span></div>`);
   }
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
@@ -8606,6 +8670,8 @@
       emoteAnim: new Set(d.emoteAnim || []),
       zeroWidth: new Set(d.zeroWidth || []),
       badges: d.badges || {},
+      badgeInfo: d.badgeInfo || {},
+      badgeChan: d.badgeChan || [],
       // folded-name index for emoteNameOf - first wins when two emotes
       // differ only by case
       emotesLc: {},
