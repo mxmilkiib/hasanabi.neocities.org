@@ -3453,6 +3453,7 @@
   const devPx = (w) => Math.max(1, Math.round(w * DPR));
   const rateSamples = [];
   const rateTimes = []; // wall-clock end of each sample, parallel to rateSamples
+  let sparkLegend = '';   // the graph's standing tooltip; hover appends a readout
   const rateSamplesPer = {}; // ch -> same 5s-window series, for scoped bursts
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
@@ -3484,7 +3485,7 @@
     const hCss = (sparkEl.height / DPR) + 'px';
     if (sparkEl.style.height !== hCss) sparkEl.style.height = hCss;
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    sparkEl.title = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page, or a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage`;
+    sparkEl.title = sparkLegend = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page, or a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage`;
     sparkEl.setAttribute('aria-label', sparkEl.title);
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (rateTimes.length > n) rateTimes.splice(0, rateTimes.length - n);
@@ -3714,6 +3715,22 @@
   sparkSize();
   restoreSpark();
   drawSpark();
+  // hovering the graph names the value under the cursor - the tooltip
+  // system mirrors title writes live, so the legend carries the readout
+  sparkEl.addEventListener('mousemove', (e) => {
+    const n = rateSamples.length;
+    if (!n) return;
+    const step = (sparkEl.width / DPR) / (sparkWin - 1);
+    const i = Math.round(e.offsetX / step) - (sparkWin - n);
+    if (i < 0) { sparkEl.title = sparkLegend + '\nno data yet'; return; }
+    const v = rateSamples[Math.min(i, n - 1)], t = rateTimes[Math.min(i, n - 1)];
+    const g = glorpSamples[Math.min(i, n - 1)] || 0;
+    sparkEl.title = sparkLegend + '\n' +
+      (Number.isFinite(v) ? `${v.toFixed(1)} msgs/s` : (rateWhy[i] || 'no data')) +
+      (g ? ` · ${g} glorp${g === 1 ? '' : 's'}` : '') +
+      (t ? ` · ${fmtRowTime(new Date(t)).replace(/<[^>]+>/g, '')}` : '');
+  });
+  sparkEl.addEventListener('mouseleave', () => { sparkEl.title = sparkLegend; });
   setInterval(() => {
     const now = Date.now();
     // a delayed tick fills each missed second from rendered-row counts;

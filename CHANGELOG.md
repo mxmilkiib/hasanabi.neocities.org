@@ -40,6 +40,9 @@ not versions — the page ships continuously to Neocities.
   tracked and bare posts of one url now dedupe and count together,
   and keys persisted before the strip re-fold on load so a link's
   old tracked tally merges into the clean one
+- hovering the msg rate graph reads the sample under the cursor in
+  the tooltip - msgs/s (or the band's cause on a gap), the glorp
+  count on hot seconds, and the wall-clock time
 - a top links row whose peeked title is just the site's own name
   labels from the link instead - a twitch clip slug embeds the
   clip's title in pascal case, so "Twitch" becomes the real name
