@@ -37,7 +37,9 @@ not versions — the page ships continuously to Neocities.
   href, the shown text and the stats key all carry the clean form.
   utm_*/click-ids go globally; host rules catch ig's stkn/igsh, yt's
   si, x's s/t and tt's share_* set (yt's t stays - it is a timestamp).
-  tracked and bare posts of one url now dedupe and count together
+  tracked and bare posts of one url now dedupe and count together,
+  and keys persisted before the strip re-fold on load so a link's
+  old tracked tally merges into the clean one
 - top chatters' sort pick becomes a time window - all-time, month,
   week and today (default), folded out of new per-login day buckets
   (nickDay, per-channel too, persisted as nd/ndp) like the badge

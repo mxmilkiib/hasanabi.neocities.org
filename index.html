@@ -7413,12 +7413,23 @@
   intoMap(nickLast, savedStats.nl);
   intoMap(badgeUse, savedStats.bu);
   intoMap(badgeVerUse, savedStats.bv);
-  intoMap(urlUse, savedStats.uu);
-  intoMap(urlOrig, savedStats.uo);
+  // url keys persisted before tracking params were stripped still carry
+  // ?utm_*/?si junk - re-fold them so old and new posts of one link count
+  // together, and the kept original form sheds the params for display
+  const foldUrls = (arr) => {
+    const m = new Map();
+    for (const [k, v] of arr || []) {
+      const nk = normUrl(k);
+      if (nk) m.set(nk, (m.get(nk) || 0) + v);
+    }
+    return [...m];
+  };
+  intoMap(urlUse, foldUrls(savedStats.uu));
+  for (const [k, orig] of savedStats.uo || []) urlOrig.set(normUrl(k), showUrl(orig));
   for (const [ch, arr] of Object.entries(savedStats.nmp || {})) intoMap(perMap(nickMsgsPer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bup || {})) intoMap(perMap(badgeUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
-  for (const [ch, arr] of Object.entries(savedStats.uup || {})) intoMap(perMap(urlUsePer, ch), arr);
+  for (const [ch, arr] of Object.entries(savedStats.uup || {})) intoMap(perMap(urlUsePer, ch), foldUrls(arr));
   Object.assign(peakViewers, savedStats.pv);
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
   Object.assign(badgeDay, savedStats.bd);
