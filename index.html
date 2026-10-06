@@ -4685,9 +4685,10 @@
         cell = document.createElement('span');
         cell.className = 'cl';
         if (svc) {
-          // lemmy rides the discord column - same community-chat role,
-          // saves a whole sparse column
-          cell.dataset.svc = n.textContent.trim() === 'lemmy' ? 'discord' : n.textContent.trim();
+          // lemmy rides the discord column and site the reddit one -
+          // near-roles share a slot, saving sparse columns
+          const svcAliases = { lemmy: 'discord', site: 'reddit' };
+          cell.dataset.svc = svcAliases[n.textContent.trim()] || n.textContent.trim();
           if (!svcCount.has(cell.dataset.svc)) svcOrder.push(cell.dataset.svc);
           svcCount.set(cell.dataset.svc, (svcCount.get(cell.dataset.svc) || 0) + 1);
           svcCells.push(cell);
