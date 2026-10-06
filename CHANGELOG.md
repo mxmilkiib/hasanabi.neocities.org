@@ -83,6 +83,11 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- the stats tab's badge list folds the promo tail away: channel sets,
+  the everyday globals and sets actually seen in chat stay listed
+  (~30), and the rest collapse into a 'more sets' group (~380) so the
+  tab fits on one screen again - the sort buttons still rank what's
+  visible
 - reddit links preview properly: reddit serves a bare js shell to
   non-browser fetches, so the worker's generic scrape found nothing -
   it now reads the atom feeds instead (post .rss for title, body,

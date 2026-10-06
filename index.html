@@ -893,6 +893,9 @@
   #statsBody .st-cols { columns: 11em; column-gap: 20px; }
   #statsBody .st-bcols { columns: 13em; }
   #statsBody .st-badge { break-inside: avoid; }
+  /* the folded 'more sets' group must let its rows flow across columns */
+  #statsBody .st-more { break-inside: auto; }
+  #statsBody .st-more > summary { color: var(--text-dim); }
   #statsBody .st-sort { float: right; font-weight: 400; }
   #statsBody .st-s { border: 0; background: none; color: var(--text-dim);
     font: inherit; font-size: .9em; cursor: pointer; padding: 0 4px; }
@@ -4176,24 +4179,31 @@
       vers: (a, b) => Object.keys(bInfo[b]).length - Object.keys(bInfo[a]).length || byName(a, b),
       kind: (a, b) => bRank(a) - bRank(b) || byName(a, b),
     };
-    const badgeSets = Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use)
-      .map((id) => {
-        const vs = Object.entries(bInfo[id])
-          .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
-        const name = id.replace(/[-_]/g, ' ');
-        const metric = badgeSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
-        return `<details class="st-badge"><summary><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
-          `${escapeHTML(bChan.has(id) ? CHANNEL + ' ' + name : name)}<i>${metric}</i></summary>` +
-          (BADGE_BLURB[id] ? `<div class="st-brow"><span class="bd">${escapeHTML(BADGE_BLURB[id])}</span></div>` : '') +
-          vs.map(([ver, v]) => {
-            const n = badgeVerUse.get(id + '/' + ver) || 0;
-            return `<div class="st-brow"><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
-              `<span class="bt">${escapeHTML(v.t || '')}</span>` +
-              (v.d && v.d !== v.t ? `<span class="bd">${escapeHTML(v.d)}</span>` : '') +
-              (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
-          }).join('') +
-          `</details>`;
-      }).join('');
+    const badgeRow = (id) => {
+      const vs = Object.entries(bInfo[id])
+        .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
+      const name = id.replace(/[-_]/g, ' ');
+      const metric = badgeSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
+      return `<details class="st-badge"><summary><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
+        `${escapeHTML(bChan.has(id) ? CHANNEL + ' ' + name : name)}<i>${metric}</i></summary>` +
+        (BADGE_BLURB[id] ? `<div class="st-brow"><span class="bd">${escapeHTML(BADGE_BLURB[id])}</span></div>` : '') +
+        vs.map(([ver, v]) => {
+          const n = badgeVerUse.get(id + '/' + ver) || 0;
+          return `<div class="st-brow"><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
+            `<span class="bt">${escapeHTML(v.t || '')}</span>` +
+            (v.d && v.d !== v.t ? `<span class="bd">${escapeHTML(v.d)}</span>` : '') +
+            (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
+        }).join('') +
+        `</details>`;
+    };
+    // channel sets, everyday globals and sets actually seen stay listed;
+    // the promo tail folds into one group rather than papering the tab
+    const bShow = [], bMore = [];
+    for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
+      (bChan.has(id) || CORE_BADGES.includes(id) || bUse(id) ? bShow : bMore).push(id);
+    const badgeSets = bShow.map(badgeRow).join('') +
+      (bMore.length ? `<details class="st-badge st-more"><summary>${bMore.length.toLocaleString('en')} more sets` +
+        `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '');
     const badgeSortBtns = Object.keys(BSORTS)
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
