@@ -47,6 +47,10 @@ not versions — the page ships continuously to Neocities.
 - stats tab in the ? popup: session chatter and message counts, the
   top 15 chatters in their nick colours, top 15 emotes by channel
   usage, and the rate graph's three loudest bursts
+- split columns: ghost rows that survived to the page turn no longer
+  vanish wholesale - the tail sweep used to delete every stale row in
+  the flipping column regardless of the fold; above-fold ghosts now
+  rejoin the previous page as ordinary rows
 - the stats tab ends with a badge reference: every set collapsible,
   channel badges first then everyday globals; common sets carry a
   written meaning and versions show their titles

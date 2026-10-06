@@ -6240,8 +6240,15 @@
     const staleTail = [], moveTail = [];
     let moved = false;
     for (let r = from.lastElementChild; r; r = r.previousElementSibling) {
-      // ghost tail already displaced below the fold: drop, don't carry over
-      if (r.classList.contains('stale')) { staleTail.push(r); continue; }
+      // ghosts below the fold drop with the page turn, but ghosts still on
+      // it are uneaten live history - the column they leave becomes the
+      // previous page, so they rejoin it as ordinary rows rather than
+      // vanishing wholesale mid-column
+      if (r.classList.contains('stale')) {
+        if (r.offsetTop - from.offsetTop + r.offsetHeight > from.clientHeight) staleTail.push(r);
+        else { r.classList.remove('stale'); r.style.opacity = ''; }
+        continue;
+      }
       // a display:none row reports offsetTop 0, which would read as inside
       // the fold - hidden tail rows ride along only once a visible row has
       // started moving
