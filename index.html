@@ -8941,8 +8941,8 @@
       const ymd = (s) => (Date.parse(s) ? new Date(s).toISOString().slice(0, 10) : '?');
       const rs = document.getElementById('repoStars');
       if (rs) rs.textContent = Number.isFinite(d.stars) ? d.stars.toLocaleString('en') : '';
-      document.getElementById('repoStats').textContent =
-        ` · started: ${ymd(d.created)}, updated: ${ymd(d.pushed)}`;
+      document.getElementById('repoStats').innerHTML =
+        ` · <b>started:</b> ${ymd(d.created)}, <b>updated:</b> ${ymd(d.pushed)}`;
     }
   });
 
