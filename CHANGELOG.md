@@ -13,6 +13,9 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats: a glorps section under session - the running GLORP/F total
+  plus a top-10 glorper ranking, scoped per channel and persisted in
+  the stats blob like the other counters
 - stats badges: the fold now holds only multi-version unseen promo
   sets - a one-badge set expanded to a copy of its own summary so it
   stays listed flat; sets owned by any joined channel (not just the

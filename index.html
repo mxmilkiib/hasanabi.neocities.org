@@ -1638,7 +1638,7 @@
     <div><b>⌕</b> find bar: ctrl+f, / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row</div>
-    <div><b>stats</b> the tab beside this one: session top chatters, top emotes by channel usage, the rate graph's loudest bursts</div>
+    <div><b>stats</b> the tab beside this one: session top chatters, glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts</div>
     <div><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles - hovering one (or an @mention in the text) previews the channel; a plain click pins a user card with pronouns, first-seen, session count, recent lines and profile / @mention / hide buttons (mods get timeout · ban · delete there too, each a click-twice confirm) - ⇧/⌃/⌘-click opens the profile · fossabot + blammobot names shimmer, as do urls they post · @ostonox mentions shimmer too and @hasanabi mentions get a rainbow sweep whose palette is hashed per author, and the #room tags in a merged view run the same sweep per channel - the ✦ row above switches these styles off · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
@@ -3112,6 +3112,11 @@
         glorpTimestamps.push(now);
         const sec = Math.floor(now / 1000);
         glorpCounts.set(sec, (glorpCounts.get(sec) || 0) + 1);
+        if (login) {
+          glorpUse.set(login, (glorpUse.get(login) || 0) + 1);
+          const gm = perMap(glorpPer, ch);
+          gm.set(login, (gm.get(login) || 0) + 1);
+        }
       }
       // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
       const aux = [];
@@ -4195,6 +4200,16 @@
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
           n.toLocaleString('en'));
       }).join('');
+    const gUseM = sc ? (glorpPer[sc] || new Map()) : glorpUse;
+    const glorpTotal = [...gUseM.values()].reduce((a, b) => a + b, 0);
+    const glorps = [...gUseM.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10)
+      .map(([lg, n], i) => {
+        const rec = seenNicks.get(lg) || {};
+        const nm = rec.n || lg;
+        const col = rec.c || colorForName(nm);
+        return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
+          n.toLocaleString('en'));
+      }).join('');
     // names in the counts outlive set loads: third-party lookups fold case,
     // twitch codes resolve once any set is in hand - ask for the global set
     // whenever it is missing so a second render can image those too
@@ -4317,6 +4332,9 @@
       (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
       `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
       `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
+      `<div class="st-h">glorps</div>` +
+      `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
+      `<div class="st-cols">${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `<div class="st-h">top chatters</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
       `<div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
@@ -6947,9 +6965,10 @@
   const nickMsgs = new Map();  // login -> rendered PRIVMSGs this session
   const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
   const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
+  const glorpUse = new Map();    // login -> rendered GLORP/F rows
   // the same tallies again per channel, for the stats tab's scope picker:
   // channel -> Map/obj shaped like the global counters above
-  const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {};
+  const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {}, glorpPer = {};
   const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
   const perObj = (o, ch) => o[ch] || (o[ch] = {});
   // the ranked counters restore like the history rows they tallied -
@@ -6962,18 +6981,20 @@
   intoMap(nickFirst, savedStats.nf);
   intoMap(badgeUse, savedStats.bu);
   intoMap(badgeVerUse, savedStats.bv);
+  intoMap(glorpUse, savedStats.gl);
   for (const [ch, arr] of Object.entries(savedStats.nmp || {})) intoMap(perMap(nickMsgsPer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bup || {})) intoMap(perMap(badgeUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
+  for (const [ch, arr] of Object.entries(savedStats.glp || {})) intoMap(perMap(glorpPer, ch), arr);
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
   const saveStats = () => {
     const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
     try {
       localStorage.setItem(STATS_KEY, JSON.stringify({
         nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst],
-        bu: [...badgeUse], bv: [...badgeVerUse],
+        bu: [...badgeUse], bv: [...badgeVerUse], gl: [...glorpUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
-        lup: liveUsePer,
+        glp: per(glorpPer), lup: liveUsePer,
       }));
     } catch {}
   };
