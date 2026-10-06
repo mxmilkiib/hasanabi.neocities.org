@@ -4035,11 +4035,16 @@
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
           n.toLocaleString('en'));
       }).join('');
+    // names in the counts outlive set loads: third-party lookups fold case,
+    // twitch codes resolve once any set is in hand - ask for the global set
+    // whenever it is missing so a second render can image those too
+    if (!twSets.some((s) => s.setID === '0')) loadTwitchSets('');
     const all = new Set([...Object.keys(emoteUse), ...Object.keys(liveUse)]);
-    const emo = [...all].map((n) => [n, useOf(n)]).sort((a, b) => b[1] - a[1]).slice(0, 15)
+    const emo = [...all].map((n) => [n, useOf(n)]).sort((a, b) => b[1] - a[1]).slice(0, 30)
       .map(([n, c], i) => {
-        const set = twSets.flatMap((s) => s.emoteList).find((e) => e.code === n);
-        const url = emotesOf(CHANNEL)[n] || (set && twEmoteUrl(set.id, set.assetType === 'ANIMATED'));
+        const en = emoteNameOf(CHANNEL, n) || n;
+        const set = twSets.flatMap((s) => s.emoteList).find((e) => e.code === n || e.code === en);
+        const url = emotesOf(CHANNEL)[en] || (set && twEmoteUrl(set.id, set.assetType === 'ANIMATED'));
         return row(i + 1, (url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}"> ` : '') + escapeHTML(n),
           c.toLocaleString('en'));
       }).join('');
@@ -8507,6 +8512,8 @@
       for (const s of sets) if (!have.has(s.setID)) twSets.push(s);
       if (d.key === twSetsPending) { if (sets.length) twSetsKey = d.key; twSetsPending = ''; }
       if (sets.length && !emotePick.hidden) buildPicker();
+      // names that were text-only at first paint gain urls once sets land
+      if (sets.length && document.getElementById('statsBody')?.offsetParent) renderStats();
     } else if (d.type === 'auth') {
       if (d.error) {
         auth = null;
