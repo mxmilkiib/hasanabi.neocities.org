@@ -10077,8 +10077,15 @@
       const m = e.target instanceof Element ? e.target.closest('.row .at') : null;
       if (m) url = 'https://twitch.tv/' + m.textContent.replace(/^@/, '').toLowerCase();
     }
-    // hops between child nodes of the same target don't restart the delay
-    if (url === peekUrl || still) return;
+    // hops between child nodes of the same target don't restart the delay.
+    // a node swap under a still cursor (the stats tab's live repaint)
+    // can pair a null-relatedTarget mouseout - which kills the card -
+    // with a still-guarded mouseover that would never re-arm it; when
+    // that refire lands on a link while the card is dead, arm it again
+    if (url === peekUrl || still) {
+      if (url && !peekUrl && !peekTimer) peekStart(url, e.clientX, e.clientY);
+      return;
+    }
     if (!url) peekHide(); else peekStart(url, e.clientX, e.clientY);
   });
   // keyboard focus gets the card too; :focus-visible skips click focus
@@ -10156,7 +10163,16 @@
     epopOverX = e.clientX; epopOverY = e.clientY;
     const t = e.target instanceof Element ? e.target.closest('img.emote, button[data-ins]') : null;
     if (t === epopEl) return;
-    if (still) return;
+    // the stats repaint can kill a live card the same way peek's does -
+    // a null-target mouseout on the swapped node, then this still-guarded
+    // refire - so a dead card on an emote re-arms too
+    if (still) {
+      if (t && !epopEl && !epopT) {
+        epopEl = t;
+        epopT = setTimeout(() => { epopT = 0; epopShow(t); }, epop.hidden ? 220 : 0);
+      }
+      return;
+    }
     if (!t) { if (epopEl) epopHide(); return; }
     epopEl = t;
     clearTimeout(epopT);

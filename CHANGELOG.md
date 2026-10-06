@@ -19,6 +19,11 @@ not versions — the page ships continuously to Neocities.
   or scope pick folds it back
 
 ### Fixes
+- link and emote hover previews dying on the stats tab: its ~3s live
+  repaint swaps the dom under a still cursor, and the refired hover
+  events could kill the card (null-target mouseout) then never re-arm
+  it (still-cursor guard) - a refire landing on a link or emote while
+  the card is dead now arms it again
 - tweet video previews erroring with "no video with supported format
   and mime type found": video.twimg.com 403s any request carrying a
   foreign Referer, and where a browser leaks one past the srcdoc's
