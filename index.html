@@ -4324,12 +4324,36 @@
     // sets stay listed - a one-version set expands to a copy of its own
     // summary, so folding it hides a row behind a click for nothing;
     // only the multi-version promo tail folds into one group
-    const bShow = [], bMore = [];
-    for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
-      (bOwner(id) || CORE_BADGES.includes(id) || bUse(id) || Object.keys(bInfo[id]).length < 2 ? bShow : bMore).push(id);
-    const badgeSets = bShow.map(badgeRow).join('') +
-      (bMore.length ? `<details class="st-badge st-more" data-more><summary>${bMore.length.toLocaleString('en')} more sets` +
-        `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '');
+    const bKeep = (id, verN) => bOwner(id) || CORE_BADGES.includes(id) || (verN ?? bUse(id)) ||
+      Object.keys(bInfo[id]).length < 2;
+    let badgeSets;
+    if (badgeSort === 'use') {
+      // use-sort flattens versions out of their sets: each badge ranks by
+      // its own seen count as a root row, no <details> to open
+      const flat = [];
+      for (const [id, vers] of Object.entries(bInfo))
+        for (const [ver, v] of Object.entries(vers))
+          flat.push({ id, v, n: bVUseM.get(id + '/' + ver) || 0 });
+      flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
+      const flatRow = ({ id, v, n }) => {
+        const name = id.replace(/[-_]/g, ' ');
+        const label = v.t && v.t.toLowerCase() !== name ? `${name} · ${v.t}` : name;
+        return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">·</span>` +
+          `<span class="nm"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""> ${escapeHTML(label)}</span>` +
+          `<i>${n ? n.toLocaleString('en') : ''}</i></div>`;
+      };
+      badgeSets = flat.filter((r) => bKeep(r.id, r.n)).map(flatRow).join('') +
+        (flat.some((r) => !bKeep(r.id, r.n))
+          ? `<details class="st-badge st-more" data-more><summary>${flat.filter((r) => !bKeep(r.id, r.n)).length.toLocaleString('en')} more badges` +
+            `<i>not seen here</i></summary>${flat.filter((r) => !bKeep(r.id, r.n)).map(flatRow).join('')}</details>` : '');
+    } else {
+      const bShow = [], bMore = [];
+      for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
+        (bKeep(id) ? bShow : bMore).push(id);
+      badgeSets = bShow.map(badgeRow).join('') +
+        (bMore.length ? `<details class="st-badge st-more" data-more><summary>${bMore.length.toLocaleString('en')} more sets` +
+          `<i>not seen here</i></summary>${bMore.map(badgeRow).join('')}</details>` : '');
+    }
     const badgeSortBtns = Object.keys(BSORTS)
       .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
       .join('');
