@@ -4190,7 +4190,7 @@
   try { statScope = localStorage.getItem(STAT_SCOPE_KEY) || ''; } catch {}
   // top emotes' count source: the channel's StreamElements figures, or
   // this client's own tallies - all of them or a recent window
-  const EMOTE_SRCS = { alltime: 0, local: -1, today: 1, week: 7, month: 31 };
+  const EMOTE_SRCS = { alltime: 0, local: -1, month: 31, week: 7, today: 1 };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   let emoteStatSrc = 'alltime';
   try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
