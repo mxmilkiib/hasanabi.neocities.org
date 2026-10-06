@@ -2792,14 +2792,18 @@
   // www. prefix, and a bare trailing / or /index.htm[l]
   const cleanUrlDisp = (u) => u.replace(/^https?:\/\//i, '').replace(/^www\./i, '')
     .replace(/\/$/, '').replace(/\/index\.html?(?:[?#]\S*)?$/i, '').replace(/\/$/, '');
-  function linkKeyOf(msg) {
+  // normUrl's case-folded twin - same stripping, keeping the path's
+  // original case: youtube/imgur/tiktok ids die when lowercased
+  const showUrl = (u) => u.replace(/^https?:\/\//i, '').replace(/^(?:www|mobile)\./i, '').replace(/[/?#]+$/, '');
+  function linkUrlsOf(msg) {
     const ks = [];
     for (const t of msg.split(/\s+/)) {
       const u = (t.match(/^([(["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s) || [])[2] || t;
-      if (/^https?:\/\/\S+$/i.test(u) || LINK_TLD_RE.test(u)) ks.push(normUrl(u));
+      if (/^https?:\/\/\S+$/i.test(u) || LINK_TLD_RE.test(u)) ks.push(showUrl(u));
     }
-    return ks.sort().join(' ');
+    return ks;
   }
+  const linkKeyOf = (msg) => linkUrlsOf(msg).map((u) => u.toLowerCase()).sort().join(' ');
   const seenLinks = new Set();
   function dedupeLinks(rows) {
     for (const r of rows || [logEl, sideEl, side2El].flatMap((col) => [...col.querySelectorAll('.row:not([data-lks])')])) {
@@ -3175,16 +3179,23 @@
                 `${chTag}<span class="rqt"><b>${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'))}</i><span class="rarr">↩</span></span></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
-      const lkey = linkKeyOf(message);
+      const lurls = linkUrlsOf(message);
+      const lkey = lurls.map((u) => u.toLowerCase()).sort().join(' ');
       // the stats tab's links section tallies each distinct url once
-      // per message; the same normalised keys drive links-view dedup
+      // per message; the same normalised keys drive links-view dedup.
+      // urlOrig keeps each key's original-case form for the peek ask
+      // and the link itself - a folded youtube id is a dead video
       if (lkey) {
+        for (const u of new Set(lurls)) urlOrig.set(u.toLowerCase(), u);
         for (const k of new Set(lkey.split(' '))) {
           urlUse.set(k, (urlUse.get(k) || 0) + 1);
           const um = perMap(urlUsePer, ch);
           um.set(k, (um.get(k) || 0) + 1);
         }
-        if (urlUse.size > 4000) urlUse.delete(urlUse.keys().next().value);
+        if (urlUse.size > 4000) {
+          const old = urlUse.keys().next().value;
+          urlUse.delete(old); urlOrig.delete(old);
+        }
       }
       // native twitch gif posts carry only the giphy title in brackets -
       // no id or url - so link the title to a giphy search for it
@@ -4353,16 +4364,19 @@
         // link labels by url and asks the worker - the ~3s render tick
         // swaps titles in as answers land (misses re-ask after a minute).
         // youtube links ask under the canonical watch key so they share
-        // chat's oembed-backed cache rather than the bare youtu.be form
-        const yt = ytIdOf(k);
-        const pk = yt ? ytKeyOf(yt.id) : new URL('https://' + k).href;
+        // chat's oembed-backed cache rather than the bare youtu.be form.
+        // urlOrig's original-case form feeds all of it - the folded key
+        // breaks case-sensitive ids
+        const orig = urlOrig.get(k) || k;
+        const yt = ytIdOf(orig);
+        const pk = yt ? ytKeyOf(yt.id) : new URL('https://' + orig).href;
         const pe = peekCache.get(pk);
-        let label = k;
+        let label = orig;
         if (pe && Date.now() - pe.t < peekTtlOf(pe.p)) {
           if (pe.p && pe.p.title) label = pe.p.title;
         } else peekAsk(pk);
         return row(i + 1,
-          `<a class="at" href="https://${escapeHTML(k)}" title="${escapeHTML(k)}" target="_blank" rel="noopener noreferrer">${lkIco ? lkIcoImg('https://' + k) : ''}${escapeHTML(label)}</a>`,
+          `<a class="at" href="https://${escapeHTML(orig)}" title="${escapeHTML(orig)}" target="_blank" rel="noopener noreferrer">${lkIco ? lkIcoImg('https://' + orig) : ''}${escapeHTML(label)}</a>`,
           n.toLocaleString('en'));
       }).join('');
     // names in the counts outlive set loads: third-party lookups fold case,
@@ -7325,6 +7339,7 @@
   const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
   const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
   const urlUse = new Map();      // normalised url -> rendered PRIVMSGs carrying it
+  const urlOrig = new Map();     // normalised url -> original-case form (case-folded ids are dead links)
   // per-day badge buckets keep the stats tab's badge windows (day/week/
   // month) honest, like the emote useDay ones; entries past 31 days
   // evict on save
@@ -7347,6 +7362,7 @@
   intoMap(badgeUse, savedStats.bu);
   intoMap(badgeVerUse, savedStats.bv);
   intoMap(urlUse, savedStats.uu);
+  intoMap(urlOrig, savedStats.uo);
   for (const [ch, arr] of Object.entries(savedStats.nmp || {})) intoMap(perMap(nickMsgsPer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bup || {})) intoMap(perMap(badgeUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
@@ -7367,7 +7383,7 @@
         bu: [...badgeUse], bv: [...badgeVerUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
         lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer,
-        uu: [...urlUse], uup: per(urlUsePer), pv: peakViewers,
+        uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers,
       }));
     } catch {}
   };

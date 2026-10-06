@@ -13,7 +13,9 @@ not versions — the page ships continuously to Neocities.
   linkpeek cache has it (the url stays on the tooltip; unpeeked links
   ask the worker and fall back to the url meanwhile; youtube links ask
   under the canonical watch key so they share chat's oembed-backed
-  cache whatever form was posted)
+  cache whatever form was posted; each key's original-case form is kept
+  (urlOrig) since folded youtube/imgur ids are dead links - it feeds
+  the peek ask, the href and the fallback label)
 - stats glorps lists only the peak glorp/F moments - the loudest
   samples of the same series that paints the rate graph's red
   segments (>2/sec), ranked with their timestamps; a per-channel
