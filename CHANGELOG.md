@@ -43,6 +43,12 @@ not versions — the page ships continuously to Neocities.
   rides peek's autoscroll guard so the chat's own scrolling doesn't
   shake it loose
 ### Fixes & polish
+- usernames inside mod and event notices wear their nick formatting:
+  "SomeChatter was timed out" and sub/raid "[notice] Name …" lines
+  colour the name with the chatter's real twitch colour (falling back
+  to the hash palette for users who never spoke), display-name casing
+  included. a colourless nick note (the clearchat target stamp) no
+  longer overwrites a stored colour in the completion map either
 - hover cards (link previews and the emote card) survive row churn:
   rows sliding under a parked cursor refire mouseover on whatever now
   sits beneath it, and the non-link/non-emote target was closing the

@@ -2741,13 +2741,15 @@
       if (kind === 'USERNOTICE') {
         const sys = unescapeTag(tags['system-msg'] || '');
         const who = tags['display-name'] || login || '';
-        if (who) noteNick(login || who, who);
+        // the notice's own tags carry the chatter's colour - wear it
+        const wcol = monoNames ? colorForName(who) : (ensureLegible(tags.color) || colorForName(who));
+        if (who) noteNick(login || who, who, wcol);
         const mid = /^[a-z-]+$/.test(tags['msg-id'] || '') ? ' ' + tags['msg-id'] : '';
         // system-msg re-states the nick ('Nick watched…') - drop the
         // echo and carry the name on a link to their channel instead
         const dup = who && sys.slice(0, who.length).toLowerCase() === who.toLowerCase() && !/\w/.test(sys[who.length] || '');
         const sysText = dup ? sys.slice(who.length).replace(/^\s*[-–—,:]?\s*/, '') : sys;
-        const whoLink = `<a class="at" href="https://www.twitch.tv/${escapeHTML(tags.login || login || who)}" target="_blank" rel="noopener noreferrer">${escapeHTML(who)}</a>`;
+        const whoLink = `<a class="at" style="color:${escapeHTML(wcol)}" href="https://www.twitch.tv/${escapeHTML(tags.login || login || who)}" target="_blank" rel="noopener noreferrer">${escapeHTML(who)}</a>`;
         html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> ${whoLink} ` +
                 `${linkifyEsc(escapeHTML(sysText))}${message ? (sysText ? ' - ' : '') + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
@@ -2794,8 +2796,13 @@
               r.classList.add('deleted');
           histDirty = true;
         }
+        // the target wears its own nick colour (display name when known) -
+        // seenNicks holds real twitch colours for chatters seen this session
+        const tn = target && seenNicks.get(target.toLowerCase());
+        const tname = tn ? tn.n : target;
+        const tcol = monoNames || !tn || !tn.c ? colorForName(tname) : tn.c;
         html += `<div role="article" class="row notice ${me ? 'selfmod' : 'mod'}${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
-          (target ? `${me ? 'you were' : `<a class="at" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(target))}" target="_blank" rel="noopener noreferrer">${escapeHTML(target)}</a> was`} ${dur ? `timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'banned'}`
+          (target ? `${me ? 'you were' : `<a class="at" style="color:${escapeHTML(tcol)}" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(target))}" target="_blank" rel="noopener noreferrer">${escapeHTML(tname)}</a> was`} ${dur ? `timed out for ${fmtDur(Math.max(1, Math.round(dur / 60)))}` : 'banned'}`
                   : 'chat was cleared by a moderator') + '</div>';
         continue;
       }
@@ -5724,8 +5731,14 @@
   const noteNick = (login, name, color) => {
     const k = (login || '').toLowerCase();
     if (!/^[a-z0-9_]{2,25}$/.test(k)) return;
+    // a note without a colour (a clearchat target, etc) keeps whatever a
+    // real message already stored - the lookup would otherwise erase it
+    const prev = seenNicks.get(k);
     seenNicks.delete(k); // reinsert keeps the tail end most-recent
-    seenNicks.set(k, { n: name || login, c: color || '' });
+    seenNicks.set(k, {
+      n: color ? name || login : (prev ? prev.n : name || login),
+      c: color || (prev ? prev.c : ''),
+    });
     if (seenNicks.size > 600) seenNicks.delete(seenNicks.keys().next().value);
   };
   let compList = [], compIdx = 0;
