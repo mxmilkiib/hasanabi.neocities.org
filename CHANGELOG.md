@@ -49,6 +49,10 @@ not versions — the page ships continuously to Neocities.
   usage, and the rate graph's three loudest bursts
 
 ### Fixes & polish
+- picking a non-panel help mode (labels or off) from inside the open ?
+  popup no longer ejects it - the mode is also the panel's visibility,
+  so the pick used to close the very panel being configured. the panel
+  now holds open past the pick until a real close (esc, ✕, the ? cycle)
 - font previews in the ? popup now all render in their own font: the
   stack's quoted family names sat inside a "-delimited style attribute,
   so the attribute died at the first quote and every quoted-family

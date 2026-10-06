@@ -3926,7 +3926,7 @@
     else if (a.classList.contains('helpVideo')) { setVideo(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpFontFam')) { fontSel.selectedIndex = +a.dataset.idx; applyFont(); saveOpts(); }
     else if (a.classList.contains('helpPreset')) { applyPreset(a.dataset.preset); saveOpts(); }
-    else if (a.classList.contains('helpHelp')) { helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
+    else if (a.classList.contains('helpHelp')) { helpForced = !helpPanel.hidden; helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
     else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px'; applyHelpW(); const s = readHsize(); delete s.w; delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a width pick also docks the panel top-right
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
     else if (a.classList.contains('helpFs')) { helpFs = +a.dataset.idx - 1; applyHelpFs(); }
@@ -5656,6 +5656,10 @@
   // ---- help: cycle off → popup panel → inline labels → both together ----
   const HELP_MODES = ['off', 'panel', 'labels', 'both'];
   let helpMode = 0;
+  // picking a non-panel mode from inside the open panel holds it open
+  // so the config being changed doesn't eject the user - every real
+  // close path (esc, ✕, the ? cycle) drops the hold
+  let helpForced = false;
   const HDR_LABELS = [
     [presetBtn, 'theme'], [themeBtn, 'style'], [shadeBtn, 'shade'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
     [fontSel, 'font'], [fontBtn, 'size'], [weightBtn, 'weight'], [lhBtn, 'height'],
@@ -5674,7 +5678,8 @@
 
   function applyHelp() {
     const showPanel = helpMode === 1 || helpMode === 3;
-    helpPanel.hidden = !showPanel;
+    if (showPanel) helpForced = false;
+    helpPanel.hidden = !showPanel && !helpForced;
     document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode < 2; });
     // labels mode widens the corner reserve so the pinned labels clear content
     document.body.classList.toggle('hdrlbl', helpMode >= 2);
@@ -5687,6 +5692,7 @@
   }
 
   function stepHelp(dir) {
+    helpForced = false;
     helpMode = (helpMode + dir + HELP_MODES.length) % HELP_MODES.length;
     applyHelp();
     saveOpts();
@@ -5695,7 +5701,10 @@
   // the panel's own close button peels exactly like esc does - panel-only
   // mode goes fully off, panel+labels keeps the labels
   document.getElementById('helpX').addEventListener('click', () => {
-    if (helpMode === 1 || helpMode === 3) { helpMode -= 1; applyHelp(); saveOpts(); }
+    if (helpPanel.hidden) return;
+    helpForced = false;
+    if (helpMode === 1 || helpMode === 3) helpMode -= 1;
+    applyHelp(); saveOpts();
   });
   helpBtn.addEventListener('click', (e) => stepHelp(e.shiftKey ? -1 : 1));
   helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY < 0 ? 1 : -1); }, { passive: false });
@@ -7987,6 +7996,11 @@
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!emotePick.hidden) { closePicker(); if (!chatbarEl.hidden) chatInput.focus(); return; }
+    if (!helpPanel.hidden) {
+      helpForced = false;
+      if (helpMode === 1 || helpMode === 3) helpMode -= 1;
+      applyHelp(); saveOpts(); return;
+    }
     if (helpMode === 1 || helpMode === 3) { helpMode -= 1; applyHelp(); saveOpts(); }
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
