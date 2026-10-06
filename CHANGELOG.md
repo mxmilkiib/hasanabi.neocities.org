@@ -7,7 +7,7 @@ not versions — the page ships continuously to Neocities.
 
 ### Features
 - link weight option for the ? popup's resources/authors tabs: a
-  light…bold pick on the same row as popup font size sets the weight
+  light…bold pick on its own row under popup font size sets the weight
   of each entry's own name link (first anchor per item) while the
   switch/merge/remove and descriptor links stay at the usual .at
   bold; saved as lwv, shareable as ?lw=500

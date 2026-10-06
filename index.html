@@ -1270,6 +1270,9 @@
   /* config's top width row is a filter-style row like the authors' sort/info
      pair - give the content below it the same air */
   #helpPanel #htabCfg > div.wide + div { margin-top: 9px; }
+  /* the top option rows read as one group - tighter than the rule
+     between a wide row and a regular one */
+  #helpPanel #htabCfg > div.wide + div.wide { margin-top: 0; }
   /* the info cycle: 0 all (work + dates + tagline), 1 themes (a tagline
      in place of the note), 2 works (no dates), 3 names + life dates;
      columns narrow as less text needs room */
@@ -1590,7 +1593,8 @@
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">resources</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
-    <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup> · resources/authors link weight: <span id="helpLwList"></span> - each entry's own name link<sup>†</sup></span></div>
+    <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
+    <div class="wide"><span>resources/authors link weight: <span id="helpLwList"></span> - each entry's own name link<sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
