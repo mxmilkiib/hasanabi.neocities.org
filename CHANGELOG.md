@@ -64,6 +64,14 @@ not versions — the page ships continuously to Neocities.
   probes every twitch link through the relay (a streamprobe message
   type, small worker pool against decapi): live channels get a green
   dot plus viewers/title on hover, offline ones grey out
+- youtube links now get an inline info card like tweets do: the
+  linkpeek worker's oembed/watch-page scrape (thumbnail, title,
+  channel, views, published date) paints under the message instead of
+  only showing on hover. lookups key on the canonical watch url so
+  youtu.be/shorts/watch forms share one fetch and the existing
+  day-long peek cache; the thumbnail doubles as a click-to-play
+  handle (same unfold as the ▶ glyph, start time honoured), and the
+  whole thing follows the youtube-embeds toggle
 - presets pin the header help mode now: default keeps the button
   labels showing, every other preset runs the bare header with labels
   off - the current-preset underline counts the mode like every other

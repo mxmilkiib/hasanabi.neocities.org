@@ -746,6 +746,11 @@
   a.ytemb { margin-left: .2em; text-decoration: none; color: var(--danger); font-size: .9em; }
   a.ytemb:hover { text-shadow: 0 0 4px currentColor; }
   .ytcard { display: block; margin: 2px 0; }
+  /* the linkpeek info card under a youtube link mirrors .twcard */
+  .ytinfo { display: block; margin: 2px 0; padding: 2px 8px; border-left: 2px solid var(--accent); font-size: .92em; white-space: normal; }
+  .ytinfo .ytth { max-height: 3.8em; border-radius: 4px; vertical-align: middle; margin-right: .45em; }
+  .ytinfo a.ytemb { margin-left: 0; font-size: 1em; }
+  .ytinfo i { font-style: italic; opacity: .75; }
   iframe.ytplay { display: block; border: 0; border-radius: 4px; margin: 2px 0; width: min(30em, 100%); aspect-ratio: 16 / 9; }
   .twcard .twmedia a.twvid { position: relative; display: inline-block; }
   .twcard .twmedia :is(video.twvid, iframe.twvid) { max-height: 12em; max-width: 18em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
@@ -1600,7 +1605,7 @@
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
-    <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph; clicking it unfolds the player under the row (a second click folds it) - nothing loads from google until then<sup>†</sup></span></div>
+    <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph and an info card under the message (thumbnail, title, channel, views and date via the linkpeek worker); clicking the glyph or the thumbnail unfolds the player under the row (a second click folds it) - nothing loads from google until then<sup>†</sup></span></div>
     <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service<sup>†</sup></span></div>
     <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a fact line on the twitch-profile hover card for chatters who set pronouns on alejo.io; looked up when a profile is previewed and cached for a month<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost struck-through</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
@@ -2094,6 +2099,20 @@
       .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'));
     return `<span class="twcard">${avi}<b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
   }
+  // a youtube link gets an info card under its row like a tweet does: the
+  // linkpeek worker already scrapes oembed+watch-page metadata, keyed by
+  // the canonical watch url so youtu.be/shorts forms share one lookup.
+  // the thumbnail doubles as a second click-to-play handle via a.ytemb
+  const ytKeyOf = (id) => 'https://www.youtube.com/watch?v=' + id;
+  function ytInfoCard(p, href, id, start) {
+    const views = /^\d+$/.test(p.views || '') ? `${Number(p.views).toLocaleString('en')} views` : '';
+    const meta = [p.description, views, p.published].filter(Boolean).join(' · ');
+    return `<span class="ytinfo">` +
+      `<a class="ytemb" data-ytid="${id}"${start ? ` data-ytt="${start}"` : ''} href="https://youtu.be/${id}" title="play the video here">` +
+      `${p.image ? `<img class="ytth" src="${escapeHTML(p.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}</a>` +
+      `<a class="yttl" href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${escapeHTML(p.title || href)}</a>` +
+      `${meta ? ` <i>${escapeHTML(meta)}</i>` : ''}</span>`;
+  }
   // native twitch gif posts name the gif only by its giphy title; the relay
   // searches giphy for it (best match) and the link swaps for the image.
   // gifCache: query -> { url, page } | null (no hit); unresolved rows keep
@@ -2336,6 +2355,17 @@
           // any other link
           const yt = ytEmbed ? ytIdOf(url) : null;
           const ytgl = yt ? `<a class="ytemb" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} href="https://youtu.be/${yt.id}" title="play the video here">▶</a>` : '';
+          if (yt) {
+            // title/channel card lands under the message - cached peeks
+            // paint at once, misses plant a placeholder filled on arrival
+            const ypk = ytKeyOf(yt.id);
+            const ce = peekCache.get(ypk);
+            if (ce && peekGood(ce.p)) pendingTw.push(ytInfoCard(ce.p, u, yt.id, yt.start));
+            else {
+              peekAsk(ypk);
+              pendingTw.push(`<span class="ytprev" data-ytu="${escapeHTML(ypk)}" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} data-href="${u}"></span>`);
+            }
+          }
           out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
         }
       }
@@ -2831,7 +2861,7 @@
     const qi = rq.querySelector('i');
     qi.textContent = '';
     for (let n = pnm.nextSibling; n; n = n.nextSibling)
-      if (n.nodeType !== 1 || !n.matches('.rplybtn, .colon, .aux, .auxr, .sub, .twprev, .twcard'))
+      if (n.nodeType !== 1 || !n.matches('.rplybtn, .colon, .aux, .auxr, .sub, .twprev, .twcard, .ytprev, .ytinfo, .ytcard'))
         qi.appendChild(n.cloneNode(true));
   }
   function flush() {
@@ -6919,7 +6949,7 @@
       for (let n = nameEl.nextSibling; n; n = n.nextSibling) {
         if (n.nodeType !== 1) { body += n.textContent; continue; }
         if (n.classList.contains('rplybtn')) break;
-        if (!n.matches('.aux, .auxr, .sub, .ytemb, .ytcard, .twprev, .twcard, .lkico'))
+        if (!n.matches('.aux, .auxr, .sub, .ytemb, .ytcard, .twprev, .twcard, .lkico, .ytprev, .ytinfo'))
           body += n.textContent;
       }
     }
@@ -9250,6 +9280,16 @@
     if (peekCache.size >= PEEK_MAX) peekCache.delete(peekCache.keys().next().value);
     peekCache.set(url, { p, t: Date.now() });
     if (peekGood(p)) peekSave();
+    // youtube links queued an info-card placeholder at render; a good peek
+    // swaps it in (placeholders that got cloned into reply bands just drop)
+    if (peekGood(p)) {
+      document.querySelectorAll(`.ytprev[data-ytu="${CSS.escape(url)}"]`)
+        .forEach((el) => {
+          if (el.closest('.rqt')) { el.remove(); return; }
+          el.outerHTML = ytInfoCard(p, el.dataset.href || url, el.dataset.ytid || '', +el.dataset.ytt || 0);
+        });
+      repin();
+    }
     // refresh the card only while its link is still hovered
     if (peekUrl === url && !peekEl.hidden) peekShow(p, url, false);
   }
