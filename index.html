@@ -895,7 +895,6 @@
   #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
     margin: 12px 0 2px; }
   #statsBody .st-h:first-child { margin-top: 0; }
-  #statsBody .st-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 0 22px; }
   /* ranked lists read down one column then on to the next */
   #statsBody .st-cols { columns: 14em; column-gap: 20px; }
   #statsBody .st-bcols { columns: 13em; }
@@ -4188,7 +4187,7 @@
     // bots chatter constantly but aren't people - count them in the
     // session totals, keep them out of the ranking
     const chat = [...nMsgs.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
-      .sort((a, b) => b[1] - a[1]).slice(0, 15)
+      .sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([lg, n], i) => {
         const rec = seenNicks.get(lg) || {};
         const nm = rec.n || lg;
@@ -4307,10 +4306,8 @@
       (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
       `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
       `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
-      `<div class="st-grid">` +
-        `<div><div class="st-h">top chatters</div>${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
-        `<div><div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `</div>` +
+      `<div class="st-h">top chatters</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
+      `<div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">badge data not loaded yet</span></div>`) +

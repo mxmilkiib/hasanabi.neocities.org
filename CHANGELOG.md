@@ -13,6 +13,9 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats: top chatters lists 40 like top emotes, and both ranked
+  sections now stack full-width so each flows across the 14em
+  columns instead of squeezing chatters into a narrow grid cell
 - stats badges read tighter: the sentence-length descriptions (set
   blurbs and per-version text) moved to tooltips on the set summary
   and version rows, so an opened set lists every version as icon +
