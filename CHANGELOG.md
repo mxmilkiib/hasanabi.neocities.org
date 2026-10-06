@@ -13,6 +13,9 @@ not versions — the page ships continuously to Neocities.
   fetch (the CDN answers CORS) and plays the blob
 
 ### Features
+- stats: the session row counts the distinct badge versions seen in
+  chat, and the first three sections (bursts, session, glorps) sit
+  side by side in a three-column row above the ranked lists
 - stats badges: the 'use' sort flattens versions out of their sets -
   every badge ranks by its own seen count as a flat row (icon + name ·
   version + count), no sets to open; other sorts keep the set groups

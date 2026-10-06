@@ -895,6 +895,8 @@
   #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
     margin: 12px 0 2px; }
   #statsBody .st-h:first-child { margin-top: 0; }
+  /* bursts/session/glorps ride side by side above the ranked lists */
+  #statsBody .st-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 20px; }
   /* ranked lists read down one column then on to the next */
   #statsBody .st-cols { columns: 14em; column-gap: 20px; }
   #statsBody .st-bcols { columns: 13em; }
@@ -4366,13 +4368,15 @@
     const scTop = scEl ? scEl.scrollTop : 0;
     el.innerHTML =
       scopeBtns +
-      `<div class="st-h">bursts</div>` +
-      (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
-      `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
-      `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
-      `<div class="st-h">glorps</div>` +
-      `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
-      `<div class="st-cols">${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
+      `<div class="st-trio">` +
+        `<div><div class="st-h">bursts</div>` +
+        (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) + `</div>` +
+        `<div><div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
+        `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} · ${bVUseM.size} badge${bVUseM.size === 1 ? '' : 's'}</span></div></div>` +
+        `<div><div class="st-h">glorps</div>` +
+        `<div class="st-row"><span class="nm">${glorpTotal.toLocaleString('en')} GLORP/F</span></div>` +
+        `${glorps || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
+      `</div>` +
       `<div class="st-h">top chatters</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
       `<div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
