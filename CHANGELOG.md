@@ -33,6 +33,15 @@ not versions — the page ships continuously to Neocities.
 - the bots' evergreen promo urls (prime sub, fear&'s linktree and
   twitter) are hidden from top links - they live in the re Hasan row
   now: prime sub beside ideologie shop, tw/links off fear& pod
+- share-tracking params are stripped from chat links at render - the
+  href, the shown text and the stats key all carry the clean form.
+  utm_*/click-ids go globally; host rules catch ig's stkn/igsh, yt's
+  si, x's s/t and tt's share_* set (yt's t stays - it is a timestamp).
+  tracked and bare posts of one url now dedupe and count together
+- resources gains an open social section (werdmuller's open social
+  web essay, activitypub/atproto, fediverse app index + mastodon,
+  pixelfed, lemmy; indieweb, bridgy fed, micro.blog) and the
+  kalahavivādasutta (snp 2.8) under extra links
 
 ### Fixes
 - link and emote hover previews dying on the stats tab: its ~3s live

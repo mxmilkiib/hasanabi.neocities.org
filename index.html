@@ -2044,8 +2044,10 @@
         const m = url.match(/^(.*?)((?:[)\]”’.,!?;:]|&quot;|&#0?39;)*)$/s);
         const url2 = m[1], post = m[2];
         if (!url2 || url2 === '.') return raw;
-        const u = /^https?:/i.test(url2) ? url2 : `https://${url2}`;
-        return `<a href="${u}" target="_blank" rel="noopener noreferrer" data-u="${url2}">${cleanUrls ? cleanUrlDisp(url2) : url2}</a>${post}`;
+        // esc is html-escaped - &amp; would read as a param named amp;x
+        const urlC = stripTrack(url2.replace(/&amp;/g, '&')), esc2 = escapeHTML(urlC);
+        const u = /^https?:/i.test(urlC) ? esc2 : `https://${esc2}`;
+        return `<a href="${u}" target="_blank" rel="noopener noreferrer" data-u="${esc2}">${cleanUrls ? cleanUrlDisp(esc2) : esc2}</a>${post}`;
       });
   }
 
@@ -2359,7 +2361,7 @@
       // get an inline preview card fetched by the relay
       const tw = tok.match(/^(?:https?:\/\/)?(?:www\.|mobile\.)?(?:x\.com|twitter\.com)(\/\S*)?$/i);
       if (tw) {
-        const path = tw[1] || '';
+        const path = (tw[1] || '').includes('?') ? stripTrack(`https://x.com${tw[1]}`).replace(/^https:\/\/x\.com/i, '') : tw[1] || '';
         const prof = path.match(/^\/([A-Za-z0-9_]{1,15})\/?$/);
         const st = path.match(/^\/[\w]+\/status\/(\d+)/);
         const href = prof ? (nitterHost ? `${nitterHost}${path}` : `https://bird.makeup/users/${prof[1]}`)
@@ -2377,7 +2379,8 @@
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
       // peel those off so `(example.com),` still links the bare domain
-      const [, pre, url, post] = tok.match(/^([(["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s);
+      const [, pre, url0, post] = tok.match(/^([(["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s);
+      const url = stripTrack(url0);
       if (/^https?:\/\/\S+$/i.test(url) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#]\S*)?$/i.test(url)) {
         const u = escapeHTML(/^https?:\/\//i.test(url) ? url : `https://${url}`);
@@ -2779,7 +2782,29 @@
   // links view: a row qualifies when its text carries a url; the key is the
   // sorted set of normalised urls so a reposted link counts as a dupe
   const LINK_TLD_RE = /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#]\S*)?$/i;
-  const normUrl = (u) => u.toLowerCase().replace(/^https?:\/\//, '').replace(/^(?:www|mobile)\./, '').replace(/[/?#]+$/, '');
+  // strips share-tracking params so href, display and stats keys all carry
+  // the clean form. utm_*/click-ids go globally; host rules catch tokens like
+  // ig's stkn or yt's si - yt's t stays, that one is the timestamp
+  const TRACK_G = /^(?:utm_\w+|fbclid|gclid|dclid|msclkid|wbraid|gbraid|yclid|mc_cid|mc_eid|_ga|_gl|spm|scm|igsh|igshid|ig_rid|stkn|mibextid|oly_anon_id|oly_enc_id|vero_id|wtsid|rcm)$/i;
+  const TRACK_H = [
+    [/(?:^|\.)(?:youtu\.be|youtube(?:-nocookie)?\.com)$/i, /^(?:si|feature|pp|kw)$/i],
+    [/(?:^|\.)(?:x|twitter)\.com$/i, /^(?:s|t|ref_src|ref_url)$/i],
+    [/(?:^|\.)(?:instagram|tiktok)\.com$/i, /^(?:_d|_r|_t|checksum|is_copy_url|is_from_webapp|preview_pb|sec_uid|share_app_id|share_item_id|share_link_id|share_region|share_token|tt_from|tt_medium|tt_content|u_code|img_index)$/i],
+    [/(?:^|\.)spotify\.com$/i, /^si$/i],
+  ];
+  function stripTrack(u) {
+    try {
+      const bare = !/^https?:/i.test(u), url = new URL(bare ? `https://${u}` : u);
+      const extra = TRACK_H.find(([h]) => h.test(url.hostname))?.[1];
+      let n = 0;
+      for (const k of [...url.searchParams.keys()])
+        if (TRACK_G.test(k) || (extra && extra.test(k))) { url.searchParams.delete(k); n++; }
+      if (!n) return u;
+      return bare ? url.href.slice(8) : url.href;
+    }
+    catch { return u; }
+  }
+  const normUrl = (u) => stripTrack(u).toLowerCase().replace(/^https?:\/\//, '').replace(/^(?:www|mobile)\./, '').replace(/[/?#]+$/, '');
   // twitter mirrors (nitter, the fx-family fixers) get the x icon, not the
   // instance's own - fxtwitter's apex serves the github mark, which reads
   // as a repo link
@@ -2797,7 +2822,7 @@
     .replace(/\/$/, '').replace(/\/index\.html?(?:[?#]\S*)?$/i, '').replace(/\/$/, '');
   // normUrl's case-folded twin - same stripping, keeping the path's
   // original case: youtube/imgur/tiktok ids die when lowercased
-  const showUrl = (u) => u.replace(/^https?:\/\//i, '').replace(/^(?:www|mobile)\./i, '').replace(/[/?#]+$/, '');
+  const showUrl = (u) => stripTrack(u).replace(/^https?:\/\//i, '').replace(/^(?:www|mobile)\./i, '').replace(/[/?#]+$/, '');
   function linkUrlsOf(msg) {
     const ks = [];
     for (const t of msg.split(/\s+/)) {
