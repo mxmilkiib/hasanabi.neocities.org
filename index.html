@@ -4685,7 +4685,9 @@
         cell = document.createElement('span');
         cell.className = 'cl';
         if (svc) {
-          cell.dataset.svc = n.textContent.trim();
+          // lemmy rides the discord column - same community-chat role,
+          // saves a whole sparse column
+          cell.dataset.svc = n.textContent.trim() === 'lemmy' ? 'discord' : n.textContent.trim();
           if (!svcCount.has(cell.dataset.svc)) svcOrder.push(cell.dataset.svc);
           svcCount.set(cell.dataset.svc, (svcCount.get(cell.dataset.svc) || 0) + 1);
           svcCells.push(cell);
