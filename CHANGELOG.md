@@ -18,7 +18,8 @@ not versions — the page ships continuously to Neocities.
   side by side in a three-column row above the ranked lists
 - stats badges: the 'use' sort flattens versions out of their sets -
   every badge ranks by its own seen count as a flat row (icon + name ·
-  version + count), no sets to open; other sorts keep the set groups
+  version + count), no sets to open and unseen badges hide outright;
+  other sorts keep the set groups
 - stats tab re-renders live while it's open: the ~3s cadence rides the
   rate-graph tick so rankings, totals and burst rows track chat; opened
   badge sets, the folded group's state and the scroll spot survive

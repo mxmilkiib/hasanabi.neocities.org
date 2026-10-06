@@ -4330,24 +4330,23 @@
       Object.keys(bInfo[id]).length < 2;
     let badgeSets;
     if (badgeSort === 'use') {
-      // use-sort flattens versions out of their sets: each badge ranks by
-      // its own seen count as a root row, no <details> to open
+      // use-sort flattens versions out of their sets and lists only the
+      // badges actually seen in chat, ranked by count - no sets to open,
+      // no unseen rows
       const flat = [];
       for (const [id, vers] of Object.entries(bInfo))
-        for (const [ver, v] of Object.entries(vers))
-          flat.push({ id, v, n: bVUseM.get(id + '/' + ver) || 0 });
+        for (const [ver, v] of Object.entries(vers)) {
+          const n = bVUseM.get(id + '/' + ver) || 0;
+          if (n) flat.push({ id, v, n });
+        }
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
-      const flatRow = ({ id, v, n }) => {
+      badgeSets = flat.map(({ id, v, n }) => {
         const name = id.replace(/[-_]/g, ' ');
         const label = v.t && v.t.toLowerCase() !== name ? `${name} · ${v.t}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">·</span>` +
           `<span class="nm"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""> ${escapeHTML(label)}</span>` +
-          `<i>${n ? n.toLocaleString('en') : ''}</i></div>`;
-      };
-      badgeSets = flat.filter((r) => bKeep(r.id, r.n)).map(flatRow).join('') +
-        (flat.some((r) => !bKeep(r.id, r.n))
-          ? `<details class="st-badge st-more" data-more><summary>${flat.filter((r) => !bKeep(r.id, r.n)).length.toLocaleString('en')} more badges` +
-            `<i>not seen here</i></summary>${flat.filter((r) => !bKeep(r.id, r.n)).map(flatRow).join('')}</details>` : '');
+          `<i>${n.toLocaleString('en')}</i></div>`;
+      }).join('');
     } else {
       const bShow = [], bMore = [];
       for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
@@ -4381,7 +4380,7 @@
       `<div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
       `<div class="st-cols st-bcols">` +
-      (badgeSets || `<div class="st-row"><span class="nm">badge data not loaded yet</span></div>`) +
+      (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div>`;
     if (openSets.size)
       for (const d of el.querySelectorAll('details.st-badge'))
