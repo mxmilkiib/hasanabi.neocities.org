@@ -4687,7 +4687,7 @@
         if (svc) {
           // lemmy rides the discord column and site the reddit one -
           // near-roles share a slot, saving sparse columns
-          const svcAliases = { lemmy: 'discord', site: 'reddit' };
+          const svcAliases = { lemmy: 'discord', site: 'reddit', forum: 'reddit' };
           cell.dataset.svc = svcAliases[n.textContent.trim()] || n.textContent.trim();
           if (!svcCount.has(cell.dataset.svc)) svcOrder.push(cell.dataset.svc);
           svcCount.set(cell.dataset.svc, (svcCount.get(cell.dataset.svc) || 0) + 1);
