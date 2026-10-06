@@ -28,6 +28,11 @@ not versions — the page ships continuously to Neocities.
   dismisses it. failsafes: kkclip down or a non-reel url just loses the
   video field, the card keeps instagram's own metadata, and a 6h ttl
   means cached signed urls are dropped long before they rot
+- pronoun chips on nicks: chatters who set pronouns on pronouns.alejo.io
+  get a small dim tag after their name - one lookup per login, drained
+  ~4/sec, cached a month (a week when unset so new sign-ups surface),
+  applied retroactively to that chatter's existing rows when a result
+  lands. toggleable under ? > config/help, rides pn= in settings urls
 - bttv-style emote hover card: hovering an emote in chat or a picker
   cell pops a card with the art at the provider's largest size (7tv
   4x, bttv 3x, ffz 4, twitch 3.0), the code, and which set it came
