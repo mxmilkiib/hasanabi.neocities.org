@@ -6299,13 +6299,12 @@
     const staleTail = [], moveTail = [];
     let moved = false;
     for (let r = from.lastElementChild; r; r = r.previousElementSibling) {
-      // ghosts below the fold drop with the page turn, but ghosts still on
-      // it are uneaten live history - the column they leave becomes the
-      // previous page, so they rejoin it as ordinary rows rather than
-      // vanishing wholesale mid-column
+      // ghosts below the fold drop with the page turn; ghosts still on it
+      // just stay ghosts - they're the outgoing page's fading remnant, not
+      // live rows. Rejoining them as live would instantly refill the column
+      // and flip the live edge straight back on the next insert
       if (r.classList.contains('stale')) {
         if (r.offsetTop - from.offsetTop + r.offsetHeight > from.clientHeight) staleTail.push(r);
-        else { r.classList.remove('stale'); r.style.opacity = ''; }
         continue;
       }
       // a display:none row reports offsetTop 0, which would read as inside
@@ -6328,10 +6327,18 @@
     // over); read them before the first dom move so the batch below
     // costs one layout instead of one per row
     const heights = moveTail.map((r) => r.offsetHeight);
+    // `to` receives at most one page of live rows: the older part of an
+    // oversized spill stays in `from` as ghosts. Handing `to` a multi-page
+    // live block leaves its tail below the fold already, so the next flush
+    // flips it straight back - the same run shuttling between columns
+    let keep = 0, hSum = 0;
+    while (keep < moveTail.length && hSum < to.clientHeight) hSum += heights[keep++];
+    const spill = moveTail.splice(keep);
     for (const r of to.children) r.classList.add('stale');
     let need = 0;
     const frag = document.createDocumentFragment();
     for (let i = moveTail.length - 1; i >= 0; i--) { frag.appendChild(moveTail[i]); need += heights[i]; }
+    for (const r of spill) r.classList.add('stale');
     to.prepend(frag);
     const firstGhost = to.querySelector('.row.stale');
     if (firstGhost) consumeGhosts(firstGhost, need);

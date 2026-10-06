@@ -111,6 +111,12 @@ not versions — the page ships continuously to Neocities.
 - the stats tab lays out properly: the help page's 9em label grid was
   flowing its sections into one narrow column with counts wrapped onto
   their own lines
+- split columns no longer pingpong the live edge every message: a
+  burst landed a multi-page live block in the receiving column, whose
+  below-fold tail flipped straight back next flush - the same run
+  shuttling between the two columns per message. pushOverflow now caps
+  a page turn at one page of live rows; the older excess stays behind
+  as ghosts of the page just turned
 - tweet video thumbs actually play on click now: video.twimg.com 403s
   any request carrying a foreign Referer and <video> can't set
   referrerpolicy, so the click swap produced a dead element - the thumb
