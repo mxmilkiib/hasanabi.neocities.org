@@ -115,6 +115,11 @@ not versions — the page ships continuously to Neocities.
   fxtwitter's author.avatar_url and the card renders it round beside
   the @handle - including the media-only variant, which used to drop
   the author entirely when a bot had already pasted the tweet text
+- stats tab: badge sets now count their use in chat (messages carrying
+  each set, and each version inside an open set), lay out in columns,
+  and sort four ways via header buttons - use (default), name, vers,
+  kind - with the choice persisted. top emotes flow into columns too,
+  so the 40-strong list no longer stretches past the chatter list
 
 ## 2026-10-05
 

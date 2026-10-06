@@ -882,7 +882,16 @@
   #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
     margin: 12px 0 2px; }
   #statsBody .st-h:first-child { margin-top: 0; }
-  #statsBody .st-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+  #statsBody .st-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 0 22px; }
+  /* ranked lists read down one column then on to the next */
+  #statsBody .st-cols { columns: 11em; column-gap: 20px; }
+  #statsBody .st-bcols { columns: 13em; }
+  #statsBody .st-badge { break-inside: avoid; }
+  #statsBody .st-sort { float: right; font-weight: 400; }
+  #statsBody .st-s { border: 0; background: none; color: var(--text-dim);
+    font: inherit; font-size: .9em; cursor: pointer; padding: 0 4px; }
+  #statsBody .st-s:hover { color: var(--text); }
+  #statsBody .st-s.on { color: var(--accent); text-decoration: underline; }
   #statsBody .st-row { display: flex; align-items: baseline; gap: 6px;
     min-width: 0; padding: 1px 0; line-height: 1.7; }
   #statsBody .st-row .n { color: var(--accent); font-weight: 600; min-width: 1.5em;
@@ -904,6 +913,8 @@
   #statsBody .st-brow .emote { max-height: 1.3em; }
   #statsBody .st-brow .bt { font-weight: 600; white-space: nowrap; }
   #statsBody .st-brow .bd { color: var(--text-dim); font-size: .92em; }
+  #statsBody .st-brow i { margin-left: auto; font-style: normal;
+    color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
   @media (max-width: 640px) { #statsBody .st-grid { grid-template-columns: 1fr; } }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
@@ -2997,7 +3008,12 @@
       if (login) nickMsgs.set(login, (nickMsgs.get(login) || 0) + 1);
       // real badge icons left of the name; text chips only as fallback
       const renderedSets = new Set();
-      const badgeImgs = (tags.badges || '').split(',').map((b) => {
+      const btags = (tags.badges || '').split(',').filter(Boolean);
+      for (const b of btags) {
+        badgeUse.set(b.split('/')[0], (badgeUse.get(b.split('/')[0]) || 0) + 1);
+        badgeVerUse.set(b, (badgeVerUse.get(b) || 0) + 1);
+      }
+      const badgeImgs = btags.map((b) => {
         const u = b && badgeUrl(b, ch);
         if (u) renderedSets.add(b.split('/')[0]);
         return u ? `<img class="badge" src="${escapeHTML(u)}"` +
@@ -4033,6 +4049,11 @@
   // logins the top-chatters ranking ignores - channel bots whose volume
   // would otherwise crowd the list out
   const STATS_EXCLUDE = new Set(['blammobot', 'fossabot']);
+  // badge sort order: use = most-seen in chat, name = a-z, vers = most
+  // versions, kind = channel sets then everyday globals then a-z
+  const BADGE_SORT_KEY = 'hasan-badgesort';
+  let badgeSort = 'use';
+  try { badgeSort = localStorage.getItem(BADGE_SORT_KEY) || 'use'; } catch {}
   function renderStats() {
     const el = document.getElementById('statsBody');
     if (!el) return;
@@ -4103,32 +4124,59 @@
     const bInfo = setFor(CHANNEL).badgeInfo || {};
     const bChan = new Set(setFor(CHANNEL).badgeChan || []);
     const bRank = (id) => bChan.has(id) ? -1 : (CORE_BADGES.indexOf(id) + 1 || CORE_BADGES.length + 1);
-    const badgeSets = Object.keys(bInfo).sort((a, b) => bRank(a) - bRank(b) || byName(a, b))
+    const bUse = (id) => badgeUse.get(id) || 0;
+    // the right-hand number tracks the sort: messages seen carrying the
+    // set under use, version count otherwise
+    const BSORTS = {
+      use: (a, b) => bUse(b) - bUse(a) || bRank(a) - bRank(b) || byName(a, b),
+      name: (a, b) => byName(a, b),
+      vers: (a, b) => Object.keys(bInfo[b]).length - Object.keys(bInfo[a]).length || byName(a, b),
+      kind: (a, b) => bRank(a) - bRank(b) || byName(a, b),
+    };
+    const badgeSets = Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use)
       .map((id) => {
         const vs = Object.entries(bInfo[id])
           .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
         const name = id.replace(/[-_]/g, ' ');
+        const metric = badgeSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
         return `<details class="st-badge"><summary><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
-          `${escapeHTML(bChan.has(id) ? CHANNEL + ' ' + name : name)}<i>${vs.length}</i></summary>` +
+          `${escapeHTML(bChan.has(id) ? CHANNEL + ' ' + name : name)}<i>${metric}</i></summary>` +
           (BADGE_BLURB[id] ? `<div class="st-brow"><span class="bd">${escapeHTML(BADGE_BLURB[id])}</span></div>` : '') +
-          vs.map(([, v]) => `<div class="st-brow"><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
-            `<span class="bt">${escapeHTML(v.t || '')}</span>` +
-            (v.d && v.d !== v.t ? `<span class="bd">${escapeHTML(v.d)}</span>` : '') + `</div>`).join('') +
+          vs.map(([ver, v]) => {
+            const n = badgeVerUse.get(id + '/' + ver) || 0;
+            return `<div class="st-brow"><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
+              `<span class="bt">${escapeHTML(v.t || '')}</span>` +
+              (v.d && v.d !== v.t ? `<span class="bd">${escapeHTML(v.d)}</span>` : '') +
+              (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
+          }).join('') +
           `</details>`;
       }).join('');
+    const badgeSortBtns = Object.keys(BSORTS)
+      .map((s) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="sort badges">${s}</button>`)
+      .join('');
     const total = [...nickMsgs.values()].reduce((a, b) => a + b, 0);
     el.innerHTML =
       `<div class="st-h">session</div>` +
       `<div class="st-row"><span class="nm">${nickMsgs.size} chatter${nickMsgs.size === 1 ? '' : 's'} · ${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
       `<div class="st-grid">` +
         `<div><div class="st-h">top chatters</div>${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
-        `<div><div class="st-h">top emotes</div>${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
+        `<div><div class="st-h">top emotes</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
       `</div>` +
       `<div class="st-h">bursts</div>` +
       (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) +
-      `<div class="st-h">badges</div>` +
-      (badgeSets || `<div class="st-row"><span class="nm">badge data not loaded yet</span></div>`);
+      `<div class="st-h">badges <span class="st-sort">${badgeSortBtns}</span></div>` +
+      `<div class="st-cols st-bcols">` +
+      (badgeSets || `<div class="st-row"><span class="nm">badge data not loaded yet</span></div>`) +
+      `</div>`;
   }
+  // delegated - the stats body rewrites its innerHTML on every render
+  document.getElementById('statsBody').addEventListener('click', (e) => {
+    const b = e.target.closest('.st-s[data-bsort]');
+    if (!b) return;
+    badgeSort = b.dataset.bsort;
+    try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
+    renderStats();
+  });
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
     if (!a) return;
@@ -6653,6 +6701,8 @@
   const seenNicks = new Map(); // login -> { n: display, c: colour }
   const nickFirst = new Map(); // login -> wall-ms first noted this session
   const nickMsgs = new Map();  // login -> rendered PRIVMSGs this session
+  const badgeUse = new Map();    // badge set -> rendered PRIVMSGs carrying it
+  const badgeVerUse = new Map(); // 'set/ver' -> rendered PRIVMSGs carrying it
   const noteNick = (login, name, color) => {
     const k = (login || '').toLowerCase();
     if (!/^[a-z0-9_]{2,25}$/.test(k)) return;
