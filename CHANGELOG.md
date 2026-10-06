@@ -83,6 +83,10 @@ not versions — the page ships continuously to Neocities.
   below the bar. persists in saved options and as ?bartop
 
 ### Fixes & polish
+- merged channels can be dropped from the resources tab: a stream
+  already in the ?channel= list shows a blue '-' where the merge '+'
+  sits, linking to the list minus that channel - removing the last one
+  lands on a bare reset to the default
 - the resources tab's channel list now links each stream's community
   spaces too - verified discord invites (mikefrompa, majority report,
   the serfs, kaceytron, frogan, yugopnik), subreddits, the tyt forum and
