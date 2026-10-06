@@ -18,6 +18,8 @@ not versions — the page ships continuously to Neocities.
   'N more - show all' row that expands the full ranking (and a
   'collapse to top 40' row to fold it again); a sort, window, source
   or scope pick folds it back
+- stats session cell lists the peak reported viewer count per channel
+  (all-scope takes the max), persisted in the session-stats blob
 
 ### Fixes
 - link and emote hover previews dying on the stats tab: its ~3s live

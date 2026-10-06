@@ -3796,6 +3796,7 @@
   // per-channel live state; the header narrates the focused one (stream),
   // secondary channels' state only tints their row chips
   const streamStates = {};
+  const peakViewers = {}; // ch -> highest reported viewer count this session
   function onStream(d) {
     streamHeard = true;
     const sch = (d.channel || CHANNEL).toLowerCase();
@@ -3815,6 +3816,8 @@
     }
     const prevSt = streamStates[sch];
     streamStates[sch] = st;
+    if (st.live && st.viewers != null)
+      peakViewers[sch] = Math.max(peakViewers[sch] || 0, st.viewers);
     if (prevSt && !prevSt.live && st.live) notifyLive(sch, st.title);
     paintChTags(sch);
     paintProbe();
@@ -4521,6 +4524,7 @@
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="sort chatters">${s}</button>`)
       .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
+    const pvMax = sc ? (peakViewers[sc] || 0) : Math.max(0, ...Object.values(peakViewers));
     // the tab re-renders live - keep opened sets, the folded group's
     // state and the scroll spot across the innerHTML swap
     const openSets = new Set(
@@ -4535,7 +4539,8 @@
         `<div><div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
         `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
-        `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div></div>` +
+        `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
+        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers</span></div>` : '') + `</div>` +
         `<div><div class="st-h">glorps</div>` +
         `${gPeaks || '<div class="st-row"><span class="nm">none yet</span></div>'}</div>` +
       `</div>` +
@@ -7328,6 +7333,7 @@
   for (const [ch, arr] of Object.entries(savedStats.bup || {})) intoMap(perMap(badgeUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.uup || {})) intoMap(perMap(urlUsePer, ch), arr);
+  Object.assign(peakViewers, savedStats.pv);
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
   Object.assign(badgeDay, savedStats.bd);
   for (const [ch, o] of Object.entries(savedStats.bdp || {})) Object.assign(perObj(badgeDayPer, ch), o);
@@ -7343,7 +7349,7 @@
         bu: [...badgeUse], bv: [...badgeVerUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
         lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer,
-        uu: [...urlUse], uup: per(urlUsePer),
+        uu: [...urlUse], uup: per(urlUsePer), pv: peakViewers,
       }));
     } catch {}
   };
