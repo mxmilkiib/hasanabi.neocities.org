@@ -43,6 +43,11 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- the news column grew a serious-mainstream tail: reuters, ap, bbc,
+  the guardian, financial times, the economist, new statesman, le monde
+  diplomatique, haaretz, politico, nyt, wapo, the atlantic, the new
+  yorker, foreign affairs, foreign policy, npr, pbs newshour,
+  propublica and rest of world - every linked yt handle verified
 - patreon links added for secular talk, the serfs, chapo, coffeezilla,
   kat blaque, luna oi, kaceytron and comrade virgo - every other
   patreon-less entry checked resolves 404 or a dead placeholder
