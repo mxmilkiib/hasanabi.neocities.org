@@ -16,6 +16,10 @@ not versions — the page ships continuously to Neocities.
   its ✕ dismisses until the title changes or the stream restarts;
   config's `stream title bar` option toggles it (default on,
   `?stitle=0` hides), and overlay mode drops it with the chrome
+- `network organisation for the 21st century` moves from extra
+  links into organising next to turbulence - correctly credited
+  to halpin & summer with the "be a hub" tagline (the wordpress
+  byline was for a different turbulence event)
 - `open social` and `open gov` move up to sit directly after
   `free software`
 - `open culture` grows into `open social`, grouped like the news
