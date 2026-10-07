@@ -421,6 +421,7 @@ force off.
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel`/`labels`/`both` | help display mode |
+| `nolbl` | flag | `?` button cycles only off/panel — the header-label modes are skipped |
 | `htab` | `config`/`resources`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel |
 | `kw` | comma list | keyword highlights (green edge) |
 | `bw` | comma list | block words — matching lines hidden |

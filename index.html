@@ -1627,6 +1627,7 @@
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
     <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
+    <div class="wide"><span>disable ? button toggling header button labels: <span id="helpNoLblList"></span><sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
@@ -4277,6 +4278,7 @@
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpHide')) { setHideMode(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpNoLbl')) { setNoLbl(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx === 1);
   });
   // anchors only fire on enter natively, and only when href'd - the
@@ -5817,6 +5819,7 @@
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
+      nolbl: helpNoLbl ? 1 : 0,
       split: 1 + !sideEl.hidden + !side2El.hidden,
     };
   }
@@ -5944,6 +5947,8 @@
       if (helpFs < -3) helpFs = -1; // a px no longer offered falls back to follow
       applyHelpFs();
     }
+    // late on purpose - it folds a restored labels mode back to the pair
+    if (o.nolbl !== undefined) setNoLbl(!!o.nolbl);
   }
 
   // ---- theme presets: a named combo of every display option. The active
@@ -6611,9 +6616,22 @@
     markHelp('helpHelp', helpMode);
   }
 
+  // 'nolbl' keeps the ? button's cycle to just off ↔ panel - the inline
+  // header-button labels never enter the rotation (the panel's own mode
+  // list can still pick them)
+  let helpNoLbl = false;
+  function setNoLbl(on) {
+    helpNoLbl = !!on;
+    // an already-showing labels mode folds back into the plain pair
+    if (helpNoLbl && helpMode >= 2) { helpMode -= 2; applyHelp(); }
+    markHelp('helpNoLbl', helpNoLbl ? 1 : 0);
+  }
+
   function stepHelp(dir) {
     helpForced = false;
-    helpMode = (helpMode + dir + HELP_MODES.length) % HELP_MODES.length;
+    helpMode = helpNoLbl
+      ? (helpMode + dir + 2) % 2
+      : (helpMode + dir + HELP_MODES.length) % HELP_MODES.length;
     applyHelp();
     saveOpts();
   }
@@ -6764,6 +6782,7 @@
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs !== -1) q.set('hpfs', helpFs < 0 ? helpFs : HDR_SIZES[helpFs]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
+    if (helpNoLbl) q.set('nolbl', '1');
     if (copyHelp) {
       // emit the mode that reproduces what's visible now - the panel can
       // be held open (helpForced) under a non-panel mode
@@ -9760,6 +9779,8 @@
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const v = +q.get('hpfs'), i = v < 0 ? Math.max(Math.round(v), -3) : HDR_SIZES.indexOf(v); if (v < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
+    // read after ?help= so a labels-mode param still folds back to the pair
+    if (q.has('nolbl')) setNoLbl(flag('nolbl'));
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
 
@@ -9798,6 +9819,7 @@
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'on'],
     helpHide: HIDE_MODES,
+    helpNoLbl: ['off', 'on'],
     helpRbw: ['sweep', 'wave', 'hue cycle', 'pulse', 'flicker'],
     helpCopyHelp: ['off', 'on'],
   };

@@ -19,6 +19,15 @@ not versions — the page ships continuously to Neocities.
   closes it and lets the keypress through
 - the stats tab's window pickers (top chatters, top emotes, badges)
   run newest-first - today leads each row, alltime trails it
+- a 'disable ? button toggling header button labels' pick pins the
+  ? cycle to off ↔ panel, skipping the inline-labels modes; folds a
+  showing labels mode back down, saved and exposed as ?nolbl=1
+- the stats tab's session cell now notes what the tally counts -
+  everything rendered since the page first ran, kept across reloads
+
+### Changed
+- the ? popup's link-weight row is hidden for now; entry links
+  default to regular (the ?lw= param still applies)
 
 ### Fixes
 - the find bar could cover its own matches: a hit at a column's scroll
