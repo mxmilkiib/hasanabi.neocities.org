@@ -4940,9 +4940,11 @@
     for (const el of cells) el.style.gridRow = stblRow;
     i.append(...cells);
   }
-  // each service gets its own column, most-used leftmost, so the same
-  // service name lines up across rows
-  const svcCols = svcOrder.sort((a, b) => svcCount.get(b) - svcCount.get(a));
+  // each Service gets its own Column so the same name lines up across
+  // rows - tw and yt pin leftmost, the rest most-used first
+  const svcPin = { tw: -2, yt: -1 };
+  const svcCols = svcOrder.sort((a, b) =>
+    (svcPin[a] || 0) - (svcPin[b] || 0) || svcCount.get(b) - svcCount.get(a));
   const colOf = new Map(svcCols.map((nm, k) => [nm, k + 3]));
   for (const el of svcCells) el.style.gridColumn = colOf.get(el.dataset.svc);
   extraCells.forEach((el, k) => { el.style.gridColumn = 3 + svcCols.length + k; });

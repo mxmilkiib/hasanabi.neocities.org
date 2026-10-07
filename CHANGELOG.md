@@ -33,6 +33,8 @@ not versions — the page ships continuously to Neocities.
   kill james bond under philosophy tube, even more news under some
   more news, krystal kyle & friends under both secular talk and
   breaking points
+- the channels/streams service columns now pin tw and yt leftmost
+  (ahead of reddit/site) instead of ordering purely by frequency
 
 ### Changed
 - the ? popup's link-weight row is hidden for now; entry links
