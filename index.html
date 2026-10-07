@@ -10404,6 +10404,13 @@
     if (helpPanel.style.left) { s.x = Math.round(rr.left); s.y = Math.round(rr.top); }
     writeHsize(s);
   };
+  // raise-on-press between the two floating panels: whichever takes a
+  // press pops above the other, and a press on the other wins it back
+  for (const [top, low] of [[emotePick, helpPanel], [helpPanel, emotePick]])
+    top.addEventListener('pointerdown', () => {
+      top.style.zIndex = 13;
+      low.style.zIndex = '';
+    });
   helpPanel.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || helpPanel.hidden) return;
     const edge = edgeAt(e);

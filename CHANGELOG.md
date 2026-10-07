@@ -15,6 +15,9 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- overlapping popups trade z-order on press: dragging or pressing
+  the emote picker over the `?` panel (or vice versa) raises it to
+  the front, and a press on the other takes the top back
 - the `copy settings url` button flashes a full theme-accent fill on
   a successful copy, then eases back to chrome
 - the scroll-off counter pill now gets two plain-arrow circle buttons
