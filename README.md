@@ -383,7 +383,7 @@ no dependencies beyond CDN-hosted fonts.
   previews; the rate graph's loudest bursts and glorp peaks linked to
   that day's supa chat log; and a storage cell sizing the app's own
   footprint — localStorage keys, archive row count, origin estimate),
-  media (Hasan & co. links, clips, news, yt channels, twitch streams,
+  media (re Hasan, clips, news, yt channels, twitch streams,
   community), left/libre (usa pol, dsa chapters, left parties,
   organising, conduct, dual power, mutual aid, free software, free
   culture, open hardware, open social, open gov, justice, extra
