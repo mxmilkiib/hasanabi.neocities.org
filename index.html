@@ -4931,6 +4931,12 @@
     // one .cl cell per service; * + − controls and stray text ride the
     // cell they follow, separator runs fall away
     const cells = [cn, cc];
+    const rowSvc = new Set();
+    // a row's own service names claim their columns first - an alias
+    // can't park on a column a genuine link in the row will need
+    const rowLbl = new Set([...tail.childNodes]
+      .filter((n) => n.nodeType === 1 && n.tagName === 'A')
+      .map((n) => n.textContent.trim()));
     let cell = null;
     for (const n of [...tail.childNodes]) {
       if (n.nodeType === 3 && !n.data.replace(/[\s·()]/g, '')) continue;
@@ -4940,12 +4946,20 @@
         cell = document.createElement('span');
         cell.className = 'cl';
         if (svc) {
-          // lemmy rides the discord column and site the reddit one, and
-          // every Podcast name rides deprogram's - near-roles share a
-          // slot, saving sparse columns
-          const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: 'reddit',
+          // lemmy and site ride the reddit column, locals the discord
+          // one, and every podcast name rides deprogram's - near-roles
+          // share a slot, saving sparse columns. a row that already has
+          // that service keeps the link under its own name instead, so
+          // two links never layer on the one cell
+          const svcAliases = { lemmy: 'reddit', locals: 'discord', site: 'reddit', forum: 'reddit',
             'even more news': 'deprogram', 'kill james bond': 'deprogram', 'krystal kyle & friends': 'deprogram' };
-          cell.dataset.svc = svcAliases[n.textContent.trim()] || n.textContent.trim();
+          const lbl = n.textContent.trim();
+          const aliased = svcAliases[lbl];
+          let s = aliased && !rowSvc.has(aliased) && !rowLbl.has(aliased) ? aliased : lbl;
+          let dup = 2;
+          while (rowSvc.has(s)) s = `${lbl}·${dup++}`;
+          cell.dataset.svc = s;
+          rowSvc.add(s);
           if (!svcCount.has(cell.dataset.svc)) svcOrder.push(cell.dataset.svc);
           svcCount.set(cell.dataset.svc, (svcCount.get(cell.dataset.svc) || 0) + 1);
           svcCells.push(cell);

@@ -43,6 +43,10 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- lemmy links now ride the reddit column (forum-adjacent) instead of
+  discord's; a row that genuinely has the target service keeps the
+  aliased link under its own column, so nothing layers - this also
+  unlayers tyt's forum/reddit pair
 - channels/streams link audit: every twitch, youtube, discord and site
   url verified live - kat blaque's yt moved to /c/KatBlaque (the
   @handle is dead) and chapo's lemmy link retargeted to
