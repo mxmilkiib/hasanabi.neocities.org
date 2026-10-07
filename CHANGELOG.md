@@ -29,6 +29,10 @@ not versions — the page ships continuously to Neocities.
   the message - the inline ▶ unfold glyph stays for on-demand play
 - the stats tab's session cell now notes what the tally counts -
   everything rendered since the page first ran, kept across reloads
+- resources gains podcast side-links mirroring the deprogram trio:
+  kill james bond under philosophy tube, even more news under some
+  more news, krystal kyle & friends under both secular talk and
+  breaking points
 
 ### Changed
 - the ? popup's link-weight row is hidden for now; entry links
