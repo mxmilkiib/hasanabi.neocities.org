@@ -380,7 +380,7 @@ no dependencies beyond CDN-hosted fonts.
   bursts and glorp peaks, timestamps linked to that day's supa chat
   log), resources (re Hasan, clips, news, yt channels, twitch
   streams, usa pol, dsa chapters, left parties, organising, conduct,
-  dual power, mutual aid, free software, open hardware, open social,
+  dual power, mutual aid, free software, open hardware, open culture,
   justice, extra links), and authors (era-grouped reading lists) —
   laid out in link columns whose count is capped by the popup's own
   width via container queries.
