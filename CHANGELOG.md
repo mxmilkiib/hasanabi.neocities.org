@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- a `community` row ends the media tab (lemmygrad, riseup);
+  opendemocracy joins news' independent & left, cryptpad joins
+  organising
 - the resources tab splits in two: `media` keeps everything through
   channels/streams, `liberatory` takes usa pol down to extra links;
   `?htab=resources` still resolves to media
