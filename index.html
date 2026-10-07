@@ -7820,6 +7820,16 @@
     clearTimeout(histSaveT);
     if (now) writeHist(); else histSaveT = setTimeout(writeHist, 300);
   };
+  // one push path for local sends and cross-tab echoes: dedup against the
+  // tail, cap at 100, shift parked indexes down when the oldest drops
+  const histPush = (s) => {
+    if (!s || hist[hist.length - 1] === s) return;
+    hist.push(s);
+    if (hist.length > 100) {
+      hist.shift();
+      for (const i of [...parked]) { parked.delete(i); if (i > 0) parked.add(i - 1); }
+    }
+  };
   addEventListener('pagehide', () => saveHist(true));
   let histIdx = null, histDraft = '';
   const histGo = (dir) => {
@@ -7944,6 +7954,8 @@
     const wm = text.match(/^\/w(?:hisper)?\s+(\S+)\s+(.+)$/is);
     if (wm) {
       relayFrame.contentWindow.postMessage({ type: 'send', channel: 'jtv', text: `/w ${wm[1]} ${wm[2]}` }, RELAY_ORIGIN);
+      histPush(text);
+      saveHist();
       whisperEcho(wm[1], wm[2]);
       chatInput.value = '';
       compClose();
@@ -7960,6 +7972,16 @@
     const body = act ? `\x01ACTION ${inner}\x01` : inner;
     const shown = !ctx ? body : act ? `\x01ACTION @${ctx.name} ${inner}\x01` : `@${ctx.name} ${inner}`;
     relayFrame.contentWindow.postMessage({ type: 'send', channel: target, text: body, replyTo: ctx }, RELAY_ORIGIN);
+    // the line is away now, so the walk records it before any dressing -
+    // a failure building the local echo can't orphan it from history.
+    // sending a parked draft closes its slot and lands it at the end
+    // like any send; other slots' indexes shift down with the splice
+    if (histIdx !== null && parked.delete(histIdx)) {
+      hist.splice(histIdx, 1);
+      for (const i of [...parked]) if (i > histIdx) { parked.delete(i); parked.add(i - 1); }
+    }
+    histPush(text);
+    saveHist();
     // twitch doesn't echo own messages back over IRC - render locally,
     // dressed with the badges/colour the target channel's USERSTATE reported
     const me = selfTagsPer[target] || {};
@@ -7976,23 +7998,9 @@
     let bumped = false;
     for (const t of inner.split(/\s+/)) if (t && noteRecentName(t, target)) bumped = true;
     if (bumped && !emotePick.hidden) rebuildPicker();
-    if (chan) chan.postMessage({ type: 'echo', msg: echoMsg });
+    if (chan) chan.postMessage({ type: 'echo', msg: echoMsg, raw: text });
     pendingEcho.push(target + '\x00' + echoKey(auth.login, echoMsg.tags, shown));
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
-    // sending a parked draft closes its slot and lands it at the end
-    // like any send; other slots' indexes shift down with the splice
-    if (histIdx !== null && parked.delete(histIdx)) {
-      hist.splice(histIdx, 1);
-      for (const i of [...parked]) if (i > histIdx) { parked.delete(i); parked.add(i - 1); }
-    }
-    if (hist[hist.length - 1] !== text) {
-      hist.push(text);
-      if (hist.length > 100) {
-        hist.shift();
-        for (const i of [...parked]) { parked.delete(i); if (i > 0) parked.add(i - 1); }
-      }
-    }
-    saveHist();
     // a send from inside a walk hands the stashed draft back to the box -
     // the entry was sent but the half-written text was never its own
     const shelved = histIdx !== null && histDraft;
@@ -9322,6 +9330,12 @@
     queueMessage(m.msg, false);
     pendingEcho.push(ech + '\x00' + echoKey(m.msg.login, m.msg.tags || {}, m.msg.message));
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
+    // a send from a sibling tab echoes here as a row - keep this copy's
+    // input walk in step so ↑ finds it everywhere the message landed.
+    // raw is the typed text; the row's own message carries the reply's
+    // @mention, which wouldn't resend as one
+    histPush(m.raw || m.msg.message);
+    saveHist();
   });
 
   // optional installability: standalone PWA windows survive backgrounding

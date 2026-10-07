@@ -3,6 +3,16 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-07
+
+### Fixes
+- a sent line could end up missing from the input history's ↑ walk:
+  sends that echoed into a sibling tab via the BroadcastChannel never
+  entered that copy's history (the raw typed text now rides the echo so
+  every open page keeps the same walk), /w sends skipped the push
+  entirely, and the entry now lands right after the relay post so a
+  failure dressing the local echo can't orphan it
+
 ## 2026-10-06
 
 ### Features
