@@ -4932,9 +4932,11 @@
         cell = document.createElement('span');
         cell.className = 'cl';
         if (svc) {
-          // lemmy rides the discord column and site the reddit one -
-          // near-roles share a slot, saving sparse columns
-          const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: 'reddit' };
+          // lemmy rides the discord column and site the reddit one, and
+          // every Podcast name rides deprogram's - near-roles share a
+          // slot, saving sparse columns
+          const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: 'reddit',
+            'even more news': 'deprogram', 'kill james bond': 'deprogram', 'krystal kyle & friends': 'deprogram' };
           cell.dataset.svc = svcAliases[n.textContent.trim()] || n.textContent.trim();
           if (!svcCount.has(cell.dataset.svc)) svcOrder.push(cell.dataset.svc);
           svcCount.set(cell.dataset.svc, (svcCount.get(cell.dataset.svc) || 0) + 1);
