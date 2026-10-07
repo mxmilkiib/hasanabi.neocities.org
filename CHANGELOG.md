@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- a stream title strip under the header shows the live title -
+  its ✕ dismisses until the title changes or the stream restarts;
+  config's `stream title bar` option toggles it (default on,
+  `?stitle=0` hides), and overlay mode drops it with the chrome
 - `open culture` grows into `open social`, grouped like the news
   subs: fediverse (activitypub.rocks, fediverse.party, mastodon,
   pixelfed, lemmy, peertube), indieweb (microformats, webmention,

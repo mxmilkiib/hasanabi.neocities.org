@@ -836,7 +836,7 @@
   body.overlay, body.overlay main { background: transparent; }
   body.overlay header, body.overlay #chatbar, body.overlay #vid,
   body.overlay #helpPanel, body.overlay #whis, body.overlay #findbar,
-  body.overlay .jdown, body.overlay #offBar, body.overlay #hint,
+  body.overlay .jdown, body.overlay #offBar, body.overlay #titleBar, body.overlay #hint,
   body.overlay #emotePick, body.overlay #peek, body.overlay #epop,
   body.overlay #tt { display: none !important; }
   body.overlay main { height: 100vh; }
@@ -1109,6 +1109,11 @@
   .gifimg { max-height: 9em; max-width: 100%; vertical-align: middle; border-radius: 3px; }
   #offBar { flex: none; text-align: center; padding: 3px 8px; font-size: .9em; background: var(--danger); color: #fff; }
   #offBar[hidden] { display: none; }
+  /* stream title strip - same seat in the flow as the offline banner */
+  #titleBar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; background: var(--panel); border-bottom: 1px solid var(--line); }
+  #titleBar[hidden] { display: none; }
+  #titleTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #titleBar .hdr-btn { height: 22px; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   #errBox {
     position: fixed; left: 10px; bottom: 10px; z-index: 30; max-width: min(560px, calc(100vw - 20px));
@@ -1631,6 +1636,7 @@
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll"><option value="mono">JetBrains Mono</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="roobert">Roobert (local)</option><option value="sourcesans">Source Sans 3</option><option value="atkinson">Atkinson Hyperlegible</option><option value="lexend">Lexend</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="sourcecodepro">Source Code Pro</option><option value="plexmono">IBM Plex Mono</option><option value="vt323">VT323</option><option value="fixedsys">Fixedsys</option><option value="gohu">GohuFont</option><option value="terminus">Terminus</option></select><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.75)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
   </header>
+  <div id="titleBar" role="status" hidden><span id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">resources</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
@@ -1639,6 +1645,7 @@
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide"><span>disable ? button toggling header button labels: <span id="helpNoLblList"></span><sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
+    <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
@@ -3945,6 +3952,8 @@
       stream = { live: false };
     } else {
       stream = st;
+      // a real offline->live flip revives a dismissed title strip
+      if (prevSt && !prevSt.live) titleDismissed = '';
       // an open embed idling on the offline slate doesn't pick the
       // stream up on its own - nudge the player on a real offline->live
       // flip; already-playing embeds treat play() as a no-op
@@ -4021,7 +4030,26 @@
     faviconEl.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="${encodeURIComponent(c)}" d="${FAVICON_PATH}"/></svg>`;
   }
 
+  // stream title strip under the header - reads the same relay stream
+  // state the header dot does; ✕ dismisses until the title changes or
+  // a fresh live flip resets it, the config toggle persists off/on
+  const titleBar = document.getElementById('titleBar');
+  const titleTxt = document.getElementById('titleTxt');
+  let titleBarOn = true;   // config toggle, default on
+  let titleDismissed = ''; // the title string the ✕ silenced this session
+  function paintTitleBar() {
+    const t = (stream && stream.live && stream.title) || '';
+    titleBar.hidden = !(titleBarOn && t && t !== titleDismissed);
+    if (!titleBar.hidden) titleTxt.textContent = t;
+  }
+  function setTitleBar(on) { titleBarOn = on; markHelp('helpTitle', on ? 1 : 0); paintTitleBar(); }
+  document.getElementById('titleX').addEventListener('click', () => {
+    titleDismissed = (stream && stream.title) || '';
+    paintTitleBar();
+  });
+
   function updateHeader() {
+    paintTitleBar();
     const chatTxt = chatState === 'connected' ? 'chat connected'
                   : chatState === 'reconnecting' ? `chat reconnecting${wsCause ? ` (${wsCause})` : ''}`
                   : 'connecting to chat';
@@ -4286,6 +4314,7 @@
     else if (a.classList.contains('helpNotify')) { setNotify(+a.dataset.idx === 1, true); saveOpts(); }
     else if (a.classList.contains('helpGif')) { setGifSafe(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpYtem')) { setYtEmb(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpTitle')) { setTitleBar(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpFav')) { setLkIco(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPn')) { setPronouns(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
@@ -5878,7 +5907,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, anim: nickAnim, rbw: rbwStyle,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0,
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSort,
       epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
@@ -5972,6 +6001,7 @@
     if (o.gifsafe !== undefined) setGifSafe(!!o.gifsafe);
     if (Number.isInteger(o.peek) && o.peek >= 0 && o.peek < PEEK_MODES.length) setPeek(o.peek);
     if (o.yt !== undefined) setYtEmb(!!o.yt);
+    if (o.stitle !== undefined) setTitleBar(!!o.stitle);
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.pn !== undefined) setPronouns(!!o.pn);
     if (o.anim !== undefined) setNickAnim(+o.anim);
@@ -6839,6 +6869,7 @@
     if (cleanUrls) q.set('clean', '1');
     if (peekMode !== 2) q.set('peek', peekMode);
     if (!ytEmbed) q.set('yt', '0');
+    if (!titleBarOn) q.set('stitle', '0');
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (nickAnim !== 1) q.set('anim', nickAnim);
@@ -9845,6 +9876,7 @@
     if (q.has('clean')) setCleanUrls(flag('clean'));
     if (q.has('peek') && +q.get('peek') >= 0 && +q.get('peek') < PEEK_MODES.length) setPeek(+q.get('peek'));
     if (q.has('yt')) setYtEmb(flag('yt'));
+    if (q.has('stitle')) setTitleBar(flag('stitle'));
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 1 : +q.get('anim'));
@@ -9911,7 +9943,7 @@
     helpZebra: ['off', 'on'], helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpFs: ['chat −3', 'chat −2', 'chat −1', 'chat'].concat(HDR_SIZES),
@@ -9966,6 +9998,7 @@
   markHelp('helpNotify', notifyOn ? 1 : 0);
   markHelp('helpPeek', peekMode);
   markHelp('helpYtem', ytEmbed ? 1 : 0);
+  markHelp('helpTitle', titleBarOn ? 1 : 0);
   markHelp('helpFav', lkIco ? 1 : 0);
   markHelp('helpPn', pronounsOn ? 1 : 0);
   markHelp('helpCopyHelp', copyHelp ? 1 : 0);
