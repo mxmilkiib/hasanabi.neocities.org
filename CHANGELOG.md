@@ -23,7 +23,7 @@ not versions — the page ships continuously to Neocities.
 - in the picker's age-rows mode, era squares only open a row when
   emotes actually follow them - an empty stretch of time-ago
   squares rides the tail of the newer cells' line instead of a
-  row each
+  row each; the ladder also gains a 30-second rung
 - overlapping popups trade z-order on press: dragging or pressing
   the emote picker over the `?` panel (or vice versa) raises it to
   the front, and a press on the other takes the top back

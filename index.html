@@ -9355,7 +9355,7 @@
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // in use mode, the cells mark where last-seen chat use ages past each
     // threshold; emotes never seen this session count as stale
-    const AGES = [[6e4, 'a minute'], [12e4, '2 minutes'], [3e5, '5 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, '30 minutes'], [24e5, '40 minutes'], [3e6, '50 minutes'], [36e5, 'an hour'],
+    const AGES = [[3e4, '30 seconds'], [6e4, 'a minute'], [12e4, '2 minutes'], [3e5, '5 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, '30 minutes'], [24e5, '40 minutes'], [3e6, '50 minutes'], [36e5, 'an hour'],
       ...[...Array(11)].map((_, i) => [(i + 2) * 36e5, `${i + 2} hours`])]; // 2h through 12h
     const aged = (items, codeOf, render) => {
       if (epickSort !== 'use') return items.map(render).join('');
@@ -9389,7 +9389,7 @@
             m += `<div role="separator" class="eage t0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${ANTS}${lbl}</div>`;
           } else {
             const lit = t0age >= mk.t;
-            const lbl = mk.t >= 36e5 ? `${mk.t / 36e5}h` : `${mk.t / 6e4}m`;
+            const lbl = mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 6e4 ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
             m += `<div role="separator" class="eage${lit ? ' lit' : ''}${mk.missed ? ' missed' : ''}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lbl}</div>`;
           }
         }
