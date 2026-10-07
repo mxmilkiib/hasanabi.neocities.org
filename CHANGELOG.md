@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- recovered gap bands on the rate graph are green now - violet was
+  close enough to the socket-loss red to confuse, and a re-marked
+  away span no longer clobbers a sample's `filled` tag
 - the about paragraph's "no install" notes it is a PWA anyway,
   linked to web.dev's what-are-pwas explainer
 - the about page's opening line drops its redundant "self-contained

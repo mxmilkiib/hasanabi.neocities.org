@@ -1681,7 +1681,7 @@
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
-    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns violet once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
+    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>log in with twitch to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -2795,7 +2795,10 @@
     for (let i = 0; i < rateSamples.length; i++)
       if (rateTimes[i] && s < rateTimes[i] && e > rateTimes[i] - 1000) {
         rateSamples[i] = NaN;
-        rateWhy[i] = why;
+        // a recovered span keeps its filled tag through re-marks -
+        // once the lines came back the band must not read as lost
+        rateWhy[i] = (rateWhy[i] || '').includes('filled')
+          ? (why ? why + ' · filled' : 'filled') : why;
       }
   }
   // a replayed line inside an outage window proves the stretch was
@@ -3588,7 +3591,7 @@
     const hCss = (sparkEl.height / DPR) + 'px';
     if (sparkEl.style.height !== hCss) sparkEl.style.height = hCss;
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    sparkEl.title = sparkLegend = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page, or a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage`;
+    sparkEl.title = sparkLegend = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page\ngreen bands mark a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage`;
     sparkEl.setAttribute('aria-label', sparkEl.title);
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (rateTimes.length > n) rateTimes.splice(0, rateTimes.length - n);
@@ -3659,6 +3662,7 @@
           complement(styles.getPropertyValue('--accent').trim() || '#e8a33d', parseFloat(styles.getPropertyValue('--sh-bg')) || -1),
         danger: styles.getPropertyValue('--danger') || '#e85d5d',
         vip: styles.getPropertyValue('--vip') || '#a050c0',
+        good: styles.getPropertyValue('--good') || '#5fd98a',
         text: styles.getPropertyValue('--text').trim() || '#fff',
       };
     }
@@ -3694,8 +3698,9 @@
     sparkCtx.globalAlpha = .25;
     for (let i = 0; i < n; i++) {
       if (Number.isFinite(rateSamples[i])) continue;
-      sparkCtx.fillStyle = /closed|discarded|filled/.test(rateWhy[i] || '')
-        ? sparkCols.vip : sparkCols.danger;
+      sparkCtx.fillStyle = /filled/.test(rateWhy[i] || '') ? sparkCols.good
+        : /closed|discarded/.test(rateWhy[i] || '') ? sparkCols.vip
+        : sparkCols.danger;
       sparkCtx.fillRect(snapFill((i + SPARK_N - n) * step), 0,
         Math.max(snapFill(step), 1 / DPR), SPARK_H);
     }
