@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- marxist/critical's subsections flow as one continuous column run
+  (wider 30em columns, `marxism` picks up right where `pre-marxist`
+  ends) instead of three unbreakable column blocks
 - text selection highlights lavender (#b9a5f0, the about page's
   heading colour) with dark ink instead of the browser default blue -
   same rule on the about page
