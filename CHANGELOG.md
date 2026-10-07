@@ -15,6 +15,9 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- atkinson hyperlegible mono joins the font menu (`?font=
+  atkinsonmono`), loaded from google fonts at 400/600 like the
+  other monospace entries
 - in the picker's age-rows mode, empty stretches of eras now pack
   their time-ago squares onto one row instead of a row each - only
   the first square of a run, or one that actually has emotes after
