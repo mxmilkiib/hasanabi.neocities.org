@@ -90,10 +90,10 @@ not versions — the page ships continuously to Neocities.
   table audited, no real sub for the remainder
 - fear& (and fear& podcast) text in chat runs the pastel rainbow
   sweep - the same hashed-per-author scheme the @hasanabi mention wears
-- fossabot youtube cards return except for the fear& channel: the
-  placeholder plants as usual but wears a mark, and drops at fill
-  time when the video resolves to Fear& (a cached answer drops at
-  render); the inline ▶ play glyph stays either way
+- fossabot youtube cards return except for the fear& and hasanabi
+  gaming channels: the placeholder plants as usual but wears a mark,
+  and drops at fill time when the video resolves to either (a cached
+  answer drops at render); the inline ▶ play glyph stays either way
 - youtube channel pages (@handle, /channel/, /c/, /user/) peeked as
   'no preview': the consent wall eats the plain scrape in some
   regions, so the worker resolves them through youtube's own public

@@ -2191,8 +2191,9 @@
   // the thumbnail doubles as a second click-to-play handle via a.ytemb
   const ytKeyOf = (id) => 'https://www.youtube.com/watch?v=' + id;
   // the resolved peek's Description is 'by <channel>' - a Fossabot row
-  // drops the card only when that's Fear&, other Videos keep it
-  const ytFearVid = (p) => !!p && /fear&/i.test(`${p.description || ''} ${p.title || ''}`);
+  // drops the card for Fear& and for the Gaming channel's videos, other
+  // Videos keep it
+  const ytFossaHide = (p) => !!p && /fear&|by hasanabi gaming/i.test(`${p.description || ''} ${p.title || ''}`);
   function ytInfoCard(p, href, id, start) {
     const views = /^\d+$/.test(p.views || '') ? `${Number(p.views).toLocaleString('en')} views` : '';
     const meta = [p.description, views, p.published].filter(Boolean).join(' · ');
@@ -2455,7 +2456,7 @@
             const ypk = ytKeyOf(yt.id);
             const ce = peekCache.get(ypk);
             if (ce && peekGood(ce.p)) {
-              if (!(fossa && ytFearVid(ce.p))) pendingTw.push(ytInfoCard(ce.p, u, yt.id, yt.start));
+              if (!(fossa && ytFossaHide(ce.p))) pendingTw.push(ytInfoCard(ce.p, u, yt.id, yt.start));
             }
             else {
               peekAsk(ypk);
@@ -10220,7 +10221,7 @@
           if (el.closest('.rqt')) { el.remove(); return; }
           // a fossabot-marked slot drops when the Channel turns out to be
           // Fear& - the pod's videos stay cardless while the rest paint
-          if (el.classList.contains('foss') && ytFearVid(p)) { el.remove(); return; }
+          if (el.classList.contains('foss') && ytFossaHide(p)) { el.remove(); return; }
           el.outerHTML = ytInfoCard(p, el.dataset.href || url, el.dataset.ytid || '', +el.dataset.ytt || 0);
         });
       repin();
