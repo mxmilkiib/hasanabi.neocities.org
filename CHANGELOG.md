@@ -43,6 +43,10 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- more yt links: hasanabi's own row finally gets @HasanAbi, chapo gets
+  its channel, the news-row novara gets @novaramedia, and three tiktok
+  clip channels (pikerbroadcasting, daily dose, afterdark) point at
+  their youtube twins - every handle resolved through linkpeek first
 - lemmy links now ride the reddit column (forum-adjacent) instead of
   discord's; a row that genuinely has the target service keeps the
   aliased link under its own column, so nothing layers - this also
