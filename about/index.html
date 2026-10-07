@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HasanAbi Chat Thing — about</title>
-<meta name="description" content="A compact, customisable Twitch chat client for the HasanAbi stream — an alt-UI, second-screen and accessibility tool that runs on a single static page.">
+<title>HasanAbi Chat Thing - about</title>
+<meta name="description" content="A compact, customisable Twitch chat client for the HasanAbi stream - an alt-UI, second-screen and accessibility tool that runs on a single static page.">
 <meta property="og:title" content="HasanAbi Chat Thing">
-<meta property="og:description" content="A compact, customisable Twitch chat client — chat, stats, resources and reading lists in one static page.">
+<meta property="og:description" content="A compact, customisable Twitch chat client - chat, stats, resources and reading lists in one static page.">
 <meta property="og:image" content="https://mxmilkiib.github.io/hasanabi.neocities.org/og.png">
 <link rel="icon" href="../favicon.ico">
 <style>
@@ -75,7 +75,7 @@
 </head>
 <body>
 <main>
-  <div class="card"><img src="../og.png" alt="HasanAbi Chat Thing — a compact, customisable Twitch chat client"></div>
+  <div class="card"><img src="../og.png" alt="HasanAbi Chat Thing - a compact, customisable Twitch chat client"></div>
 
   <p>the stream's chat, liberated from twitch.tv. a self-contained page that renders
   <a href="https://www.twitch.tv/hasanabi">HasanAbi's</a> Twitch chat for use as a
@@ -117,12 +117,12 @@
 
   <h2>backend</h2>
   <div class="how">
-    <div>Neocities ships a strict CSP — <code>connect-src 'self'</code> — so no WebSocket to Twitch
+    <div>Neocities ships a strict CSP (<code>connect-src 'self'</code>), so no WebSocket to Twitch
     IRC is possible. the page embeds a hidden iframe relay hosted on GitHub Pages (no CSP) and talks
     <code>postMessage</code> to it: the frontend owns all presentation, the relay owns every outbound
     connection. a Cloudflare worker, <code>linkpeek</code>, scrapes og/twitter/JSON-LD/oEmbed metadata
     for link cards and stats titles.</div>
-    <div>→ <a href="https://github.com/mxmilkiib/twitch-chat-relay">twitch-chat-relay</a> — the relay
+    <div>→ <a href="https://github.com/mxmilkiib/twitch-chat-relay">twitch-chat-relay</a>: the relay
     &amp; worker source</div>
   </div>
 
