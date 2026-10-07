@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- resources/authors rows breathe more (12px section gaps, was 7)
+  and the link columns start a .4em step below the section name
 - a marxist/critical section above organising - wikipedia links to
   the key concepts grouped pre-marxist (dialectic, political
   economy, utopian socialism), marxism (historical + dialectical

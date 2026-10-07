@@ -1216,6 +1216,10 @@
   /* 9em of popup font keeps the glyph column aligned at any popup font
      size while fitting the longest labels ("radicals & labour" etc) */
   #helpPanel .htabpage > div, #helpPanel #authSections > div { margin: 7px 0; display: grid; grid-template-columns: 9em 1fr; gap: 0 8px; }
+  /* the resource/author sections breathe more than the config rows */
+  #helpPanel #htabRes > div, #helpPanel #authSections > div { margin: 12px 0; }
+  /* column tops sit a touch below the section name, not level with it */
+  #helpPanel span.linkcols { padding-top: .4em; }
   #helpPanel div.sep { display: block; grid-column: 1 / -1; text-align: center; color: var(--text-dim); opacity: .55; margin: 9px 0 7px; }
   #helpPanel #htabRes div.sep { margin: 5px 0 3px; line-height: 1.1; }
   #helpPanel #htabCfg div.sep { opacity: .4; }
