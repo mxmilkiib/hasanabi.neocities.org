@@ -2149,16 +2149,18 @@
   const twNorm = (s) => s.toLowerCase().replace(/https?:\/\/\S+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
   // the card is built per row: a bot that already pasted the tweet's text
   // (fossabot) makes the text redundant, so only the media is kept
-  function twCard(c, rowText) {
+  function twCard(c, rowText, id) {
     if (!c) return '';
+    // the id stays on the card so a reload can re-resolve stale markup
+    const twid = id ? ` data-twid="${id}"` : '';
     const head = twNorm(c.text).slice(0, 40);
     const media = c.imgs ? `<span class="twmedia">${c.imgs}</span>` : '';
     const avi = c.avatar ? `<img class="twavi" src="${escapeHTML(c.avatar)}" alt="" referrerpolicy="no-referrer">` : '';
-    if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard">${avi}<b>@${escapeHTML(c.author)}</b> ${media}</span>` : '';
+    if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard"${twid}>${avi}<b>@${escapeHTML(c.author)}</b> ${media}</span>` : '';
     // unicode runs stay upright: italic faces lack their glyph coverage
     const text = linkifyEsc(escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& '))
       .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'));
-    return `<span class="twcard">${avi}<b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
+    return `<span class="twcard"${twid}>${avi}<b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
   }
   // a youtube link gets an info card under its row like a tweet does: the
   // linkpeek worker already scrapes oembed+watch-page metadata, keyed by
@@ -2382,7 +2384,7 @@
         const href = prof ? (nitterHost ? `${nitterHost}${path}` : `https://bird.makeup/users/${prof[1]}`)
                           : `https://x.com${path}`;
         if (st) {
-          if (tweetCache.has(st[1])) pendingTw.push(twCard(tweetCache.get(st[1]), text));
+          if (tweetCache.has(st[1])) pendingTw.push(twCard(tweetCache.get(st[1]), text, st[1]));
           else { reqTweet(st[1]); pendingTw.push(`<span class="twprev" data-twid="${st[1]}"></span>`); }
         }
         const twDisp = `twitter.com${path}`;
@@ -7301,6 +7303,20 @@
         const k = decodeURIComponent(el.dataset.ek);
         (echoRows.get(k) || echoRows.set(k, []).get(k)).push(el);
       }
+      // tweet placeholders and pre-avatar cards in saved rows never
+      // resolved: re-ask the relay (the asks queue until the socket
+      // joins). Legacy cards carry no data-twid - the status link in
+      // the row's own body supplies the id
+      for (const el of logEl.querySelectorAll('.twprev, .twcard')) {
+        if (el.closest('.rqt') || el.querySelector('.twavi')) continue;
+        let id = el.dataset.twid;
+        if (!id) {
+          const a = el.closest('.row')?.querySelector('a[href*="/status/"]');
+          id = a && ((a.href.match(/\/status\/(\d+)/) || [])[1]);
+          if (id) el.dataset.twid = id;
+        }
+        if (id) reqTweet(id);
+      }
       dedupeLinks();
       // continue the stripe alternation from the restored tail
       zFlip = !!(logEl.lastElementChild && logEl.lastElementChild.classList.contains('z'));
@@ -9589,13 +9605,21 @@
       tweetCache.set(d.id, entry);
       // bound the cache - a long session can link thousands of unique tweets
       if (tweetCache.size > 2000) tweetCache.delete(tweetCache.keys().next().value);
-      document.querySelectorAll(`.twprev[data-twid="${d.id}"]`)
+      // placeholders and restored cards (a stale card carries no avatar
+      // yet) both resolve through the same swap
+      document.querySelectorAll(`[data-twid="${d.id}"]`)
         .forEach((el) => {
           // a placeholder that reached a reply quote gets dropped - a
           // card swap there would shove a full tweet into the band
-          if (el.closest('.rqt')) { el.remove(); return; }
-          const row = el.closest('.row');
-          el.outerHTML = twCard(entry, row ? row.textContent : '');
+          if (el.closest('.rqt')) { if (el.classList.contains('twprev')) el.remove(); return; }
+          // an old card stays up when the refetch comes back empty
+          if (!entry && el.classList.contains('twcard')) return;
+          // the old card's own body would fake the 'a bot already pasted
+          // it' match - park a stand-in so the row's text reads clean
+          const holder = document.createElement('span');
+          el.replaceWith(holder);
+          const row = holder.closest('.row');
+          holder.outerHTML = twCard(entry, row ? row.textContent : '', d.id);
         });
       repin();
     } else if (d.type === 'linkpeek' && typeof d.url === 'string') {

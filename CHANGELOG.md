@@ -30,6 +30,12 @@ not versions — the page ships continuously to Neocities.
   default to regular (the ?lw= param still applies)
 
 ### Fixes
+- tweet cards saved in scrollback never gained their author avatar and
+  placeholders that missed their fetch stayed empty forever - restored
+  rows now re-ask the relay for their status id (queued until the
+  socket joins; a card keeps its old body if the refetch comes back
+  empty), and fresh cards carry data-twid so the next reload can tell
+  them apart
 - the find bar could cover its own matches: a hit at a column's scroll
   edge couldn't centre and sat behind the fixed bar - while find is
   open the columns now inset their scrollport past the bar (and an
