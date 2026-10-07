@@ -136,6 +136,9 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- the `?` popup keeps its mode across reloads - saved panel and
+  panel+labels states restore whole instead of demoting a notch,
+  so phones recycling the page no longer drop the open popup
 - the `?` popup stops forcing horizontal scroll on phones: the tab
   bar wraps to a second row below its min-width, and the stats
   session/bursts/glorps trio stacks two-up via a container query
