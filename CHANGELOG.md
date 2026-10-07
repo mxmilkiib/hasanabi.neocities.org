@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- a marxist/critical section above organising - wikipedia links to
+  the key concepts grouped pre-marxist (dialectic, political
+  economy, utopian socialism), marxism (historical + dialectical
+  materialism, surplus value, alienation, base & superstructure…),
+  and post-marxism & critical (frankfurt school, gramsci's
+  hegemony, debord's spectacle, hardt & negri's empire…)
 - a stream title strip under the header shows the live title -
   its ✕ dismisses until the title changes or the stream restarts;
   config's `stream title bar` option toggles it (default on,
