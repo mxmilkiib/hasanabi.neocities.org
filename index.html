@@ -4458,25 +4458,25 @@
   // top emotes' count source: the channel's StreamElements figures, or
   // this client's own tallies - all of them or a recent window. window
   // specs fold hour buckets for sub-day spans and day buckets past that
-  const EMOTE_SRCS = { '1h': { h: 1 }, '12h': { h: 12 }, today: { d: 1 }, week: { d: 7 }, month: { d: 31 }, local: -1, alltime: 0 };
+  const EMOTE_SRCS = { alltime: 0, local: -1, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   let emoteStatSrc = 'alltime';
   try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
-  const CHAT_WINS = { '1h': { h: 1 }, '12h': { h: 12 }, today: { d: 1 }, week: { d: 7 }, month: { d: 31 }, 'all-time': 0 };
+  const CHAT_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const CHAT_SORT_KEY = 'hasan-chatsort';
   let chatSort = 'today';
   try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'today'; } catch {}
   if (!(chatSort in CHAT_WINS)) chatSort = 'today';
   // badge counts also window like the emote ones: alltime is the plain
   // tally, the rest read trailing days out of the per-version buckets
-  const BADGE_WINS = { '1h': { h: 1 }, '12h': { h: 12 }, day: { d: 1 }, week: { d: 7 }, month: { d: 31 }, alltime: 0 };
+  const BADGE_WINS = { alltime: 0, month: { d: 31 }, week: { d: 7 }, day: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = 'alltime';
   try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
   // top links window the same way; all-time is the plain tally
-  const LINK_WINS = { '1h': { h: 1 }, '12h': { h: 12 }, today: { d: 1 }, week: { d: 7 }, month: { d: 31 }, 'all-time': 0 };
+  const LINK_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const LINK_WIN_KEY = 'hasan-linkwin';
   let linkWin = 'all-time';
   try { linkWin = localStorage.getItem(LINK_WIN_KEY) || 'all-time'; } catch {}

@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the stats age filters now read longest → shortest
+  (all-time → 1h) across chatters, links, emotes and badges
 - top links gets the same age windows as the other rankings
   (`1h`/`12h`/today/week/month, all-time still the default), folded
   from new per-day/per-hour url buckets in the saved stats
