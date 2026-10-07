@@ -127,6 +127,14 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- burst and glorp stats no longer spike on reload/backfill: rate and
+  glorp counters stamp the line's own `tmi-sent-ts` second instead of
+  render time, replays skip the glorp counters, and a backlog flushing
+  late lands in its true slots rather than the wake second
+- scoped (per-channel) burst and glorp series now tick in lockstep
+  with the globals - they previously only grew on missed-second
+  fills, leaving sparse samples with borrowed timestamps - and both
+  restore across reloads with the rest of the graph window
 - the about page's cta button trades fills with its marching dash -
   amber button, lavender dashes; and the card's underline runs a
   red-to-gray gradient (was solid amber)

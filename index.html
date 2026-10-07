@@ -3091,21 +3091,23 @@
         whisHtml += whisperRow(wts.getTime(), fmtRowTime(wts), tags, login, rawMsg, !!live);
         continue;
       }
+      const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
+      const timeStr = fmtRowTime(when);
+      const ts = when.getTime();
       if (live) {
-        const now = Date.now();
-        recentTimestamps.push(now); // counted once rendered, not at queue time
-        const sec = Math.floor(now / 1000);
+        // rate bookkeeping stamps the line's own second, not the render
+        // pass - a live backlog flushing late (suspended or throttled
+        // tab) lands in its true slots instead of spiking the wake tick
+        const sec = Math.floor(ts / 1000);
         rateCounts.set(sec, (rateCounts.get(sec) || 0) + 1);
         const rc = perMap(rateCountsPer, ch);
         rc.set(sec, (rc.get(sec) || 0) + 1);
+        if (ts > Date.now() - 5000) recentTimestamps.push(ts); // counted once rendered, not at queue time
         const chatWho = (login || tags['display-name'] || '').toLowerCase();
-        if (chatWho) chatterSeen.set(chatWho, now);
+        if (chatWho) chatterSeen.set(chatWho, ts);
       }
-      const when = tags['tmi-sent-ts'] ? new Date(Number(tags['tmi-sent-ts'])) : new Date();
-      const timeStr = fmtRowTime(when);
       // a long silence means the page missed a stretch - mark the gap with
       // its span and, when an away window overlaps, the cause
-      const ts = when.getTime();
       // a backfilled row landing inside an outage window resolves it
       if (!live) fillAway(ts);
       // a deferred gap resolves here: the first recovered line inside its
@@ -3254,10 +3256,11 @@
       const points = tags['msg-id'] === 'highlighted-message';
       const glorp = GLORP_RE.test(message) || F_RE.test(message.trim()) ||
                     (fossa && /trigger is pulled.*bullet fired/i.test(message));
-      if (glorp) {
-        const now = Date.now();
-        glorpTimestamps.push(now);
-        const sec = Math.floor(now / 1000);
+      // replays skip the glorp counters - a backfill batch would stamp a
+      // spike of glorps into the second it landed in
+      if (glorp && live) {
+        if (ts > Date.now() - 1000) glorpTimestamps.push(ts);
+        const sec = Math.floor(ts / 1000);
         glorpCounts.set(sec, (glorpCounts.get(sec) || 0) + 1);
         const gcs = perMap(glorpCountsPer, ch);
         gcs.set(sec, (gcs.get(sec) || 0) + 1);
@@ -3736,7 +3739,7 @@
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
   function saveSpark() {
     try {
-      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, chat: [...chatterSeen], quiet: quietGaps }));
+      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps }));
     } catch {}
   }
   function restoreSpark() {
@@ -3764,6 +3767,16 @@
         if (quietGaps.length > 50) quietGaps.splice(0, quietGaps.length - 50);
       }
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
+      // scoped series restore beside the globals - each channel's tail
+      // gets the same closed-gap padding so bursts keep real times
+      for (const c of CHANNELS) {
+        const rr = d.ratePer && Array.isArray(d.ratePer[c]) ? d.ratePer[c].slice(-win) : [];
+        rateSamplesPer[c] = [...rr.map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN)];
+        if (rateSamplesPer[c].length > win) rateSamplesPer[c].splice(0, rateSamplesPer[c].length - win);
+        const gg = d.glorpPer && Array.isArray(d.glorpPer[c]) ? d.glorpPer[c].slice(-win) : [];
+        glorpSamplesPer[c] = [...gg, ...Array(gap).fill(0)];
+        if (glorpSamplesPer[c].length > win) glorpSamplesPer[c].splice(0, glorpSamplesPer[c].length - win);
+      }
       // keep the rolling chatter tally going across a reload - entries
       // already older than the hour window come back to expire at once
       if (Array.isArray(d.chat)) {
@@ -3827,24 +3840,26 @@
       }
     }
     lastTick = now;
+    // ts-keyed inserts can land out of order (a late flush stamping its
+    // own second), so scan rather than break on the first live key
     const oldSec = Math.floor(now / 1000) - sparkWin - 5;
     for (const sec of rateCounts.keys()) {
-      if (sec >= oldSec) break;
+      if (sec >= oldSec) continue;
       rateCounts.delete(sec);
     }
     for (const rc of Object.values(rateCountsPer)) {
       for (const sec of rc.keys()) {
-        if (sec >= oldSec) break;
+        if (sec >= oldSec) continue;
         rc.delete(sec);
       }
     }
     for (const sec of glorpCounts.keys()) {
-      if (sec >= oldSec) break;
+      if (sec >= oldSec) continue;
       glorpCounts.delete(sec);
     }
     for (const gc of Object.values(glorpCountsPer)) {
       for (const sec of gc.keys()) {
-        if (sec >= oldSec) break;
+        if (sec >= oldSec) continue;
         gc.delete(sec);
       }
     }
@@ -3870,6 +3885,22 @@
     while (glorpTimestamps.length && glorpTimestamps[0] < gcut) glorpTimestamps.shift();
     glorpSamples.push(glorpTimestamps.length);
     if (glorpSamples.length > sparkWin) glorpSamples.splice(0, glorpSamples.length - sparkWin);
+    // the per-channel series tick in lockstep with the globals so the
+    // stats bursts' tail alignment holds - they only grew on missed
+    // fills before, leaving sparse samples with borrowed timestamps
+    const sNow = Math.floor(now / 1000);
+    for (const c of CHANNELS) {
+      let cn = 0;
+      const rcp = rateCountsPer[c];
+      if (rcp) for (let j = 0; j < 5; j++) cn += rcp.get(sNow - j) || 0;
+      const arr = rateSamplesPer[c] = rateSamplesPer[c] || [];
+      arr.push(downAt ? NaN : cn / 5);
+      if (arr.length > sparkWin) arr.splice(0, arr.length - sparkWin);
+      const garr = glorpSamplesPer[c] = glorpSamplesPer[c] || [];
+      const gcm = glorpCountsPer[c];
+      garr.push(gcm ? (gcm.get(sNow) || 0) : 0);
+      if (garr.length > sparkWin) garr.splice(0, garr.length - sparkWin);
+    }
     drawSpark();
     updateHeader();
     // the stats tab re-renders on a ~3s cadence while it's open so its
