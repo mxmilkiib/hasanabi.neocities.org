@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- hascord + r/Hasan_Piker join the first line of hasan & co. links,
+  after tiktok - the second line starts at media tracker
 - imgur links resolve the post's real title in previews - the
   linkpeek worker scrapes through google's translate proxy (imgur's
   own html/api are region-blocked and never emit og:title), with the
