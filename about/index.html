@@ -71,6 +71,17 @@
     border-radius: 8px; padding: 1.1em 1.3em; color: var(--dim); font-size: .92em;
   }
   .how code { color: var(--text); background: rgba(255,255,255,.06); padding: .1em .35em; border-radius: 4px; font-size: .92em; }
+  .shots {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+  }
+  .shots a {
+    display: block; border: 1px solid var(--line); border-radius: 8px;
+    overflow: hidden; background: var(--panel);
+  }
+  .shots a:hover { border-color: var(--accent-dim); }
+  .shots img { display: block; width: 100%; }
+  .shots span { display: block; padding: .35em .7em; font-size: .8em; color: var(--dim); }
   footer { margin-top: 3.5em; color: var(--dim); font-size: .85em; text-align: center; }
 </style>
 </head>
@@ -108,6 +119,18 @@
     <li><b>link cards</b> <i>hover previews, titles, tweet cards, video embeds</i></li>
     <li><b>user cards</b> <i>pronouns, history, mod quick-actions</i></li>
   </ul>
+
+  <h2>themes</h2>
+  <div class="shots">
+    <a href="https://hasanabi.neocities.org/?theme=default"><img src="shots/default.png" alt="the default theme" loading="lazy"><span>default</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=phosphor"><img src="shots/phosphor.png" alt="the phosphor theme" loading="lazy"><span>phosphor</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=midnight"><img src="shots/midnight.png" alt="the midnight theme" loading="lazy"><span>midnight</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=solar"><img src="shots/solar.png" alt="the solar theme" loading="lazy"><span>solar</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=cosy"><img src="shots/cosy.png" alt="the cosy theme" loading="lazy"><span>cosy</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=print"><img src="shots/print.png" alt="the print theme" loading="lazy"><span>print</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=retro"><img src="shots/retro.png" alt="the retro theme" loading="lazy"><span>retro</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=irc"><img src="shots/irc.png" alt="the irc theme" loading="lazy"><span>irc</span></a>
+  </div>
 
   <h2>resources</h2>
   <ul>
