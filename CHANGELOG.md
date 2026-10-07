@@ -28,6 +28,8 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the picker's age ladder gains 45s, 3m and 4m rungs, so the early
+  seconds and pre-5m stretch resolve finer
 - rainbow @hasanabi mentions gain a thin dark drop-shadow halo so the
   pale gradient stops stay legible; it rides a custom property the
   filter-animating variants (hue/pulse) re-apply in their keyframes
