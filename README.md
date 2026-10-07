@@ -263,14 +263,15 @@ no dependencies beyond CDN-hosted fonts.
 - Page-flip columns — two, or three in landscape; a full column hands
   its overflow to the next, whose old page lingers as faded ghost rows
   that incoming messages overwrite in a dimming wave from the fold.
-- `live?` in the resources tab pings every linked Twitch channel
+- `live?` in the media tab pings every linked Twitch channel
   through the relay; live links gain a green dot and an
   uptime/viewers/title tooltip, offline ones grey out.
 - Stream video overlay — draggable, resizable, loads only when
   enabled; its glyph goes green while the stream is live, red when a
   stopped player exists and the stream is not.
-- Tabbed help panel (config/help · resources · authors) with its own
-  width and font-size controls; resizes from its edges.
+- Tabbed help panel (config/help · media · liberatory · authors ·
+  stats) with its own width and font-size controls; resizes from its
+  edges.
 - Everything persists in `localStorage`; every option answers to
   click, shift+click (reverse) and the scroll wheel. In the popup the
   style and preset links render as live swatches — background, text
@@ -325,11 +326,12 @@ no dependencies beyond CDN-hosted fonts.
   opens the Twitch profile.
 - Hover previews — external links, nicks and @mentions pop a card:
   title and description, where a shortened link really lands, a
-  playable video for instagram reels (resolved through kkclip), and
-  for Twitch profiles the live state, followers, chat modes and
-  pronouns when the chatter set them on alejo.io. Lookups run through
-  the linkpeek Cloudflare worker; a config/help option scales the card
-  down to text or off, and it's skipped on touch screens.
+  playable video for instagram reels (resolved through kkclip),
+  x/twitter status cards through fxtwitter anywhere outside chat
+  rows, and for Twitch profiles the live state, followers, chat modes
+  and pronouns when the chatter set them on alejo.io. Lookups run
+  through the linkpeek Cloudflare worker; a config/help option scales
+  the card down to text or off, and it's skipped on touch screens.
 
 ### Keyboard & accessibility
 
@@ -353,15 +355,15 @@ no dependencies beyond CDN-hosted fonts.
   rows (1,000 by default). Larger limits use more browser memory and
   may slow long-running tabs; at most the newest 1,000 rows (including
   gap notices) survive reloads via `localStorage`.
-- Stream run history, graph samples, emote-use stats, option bundles
-  and picker geometry persist too.
+- Stream run history, graph samples, emote-use stats, per-day/hour
+  stats buckets, option bundles and picker geometry persist too.
 - Multi-tab — option changes and login/logout propagate to other open
   copies through `storage` events; sent-message echoes broadcast over
   a `BroadcastChannel` so every copy renders them at once.
 - `?channel=login` points chat, stream embed and status at another
   streamer for the visit; history, graph and tab-sync keys get a
   per-channel suffix so streams don't bleed into each other, and the
-  OAuth round-trip carries the channel in `state`. The resources tab's
+  OAuth round-trip carries the channel in `state`. The media tab's
   twitch streams row links each streamer with a `*` that switches to
   them.
 - PWA — installable (manifest + pass-through service worker); an
@@ -372,18 +374,22 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Help popup & resources
 
-- Four tabs — config/help, stats (a session cell with chatter/message/
-  badge counts and peak viewers; top chatters and badges over
-  all-time/month/week/today windows; top emotes by channel usage,
-  day buckets or StreamElements lifetime counts; top links with
-  favicons and fetched page titles; and the rate graph's loudest
-  bursts and glorp peaks, timestamps linked to that day's supa chat
-  log), resources (Hasan & co. links, clips, news, yt channels, twitch
-  streams, usa pol, dsa chapters, left parties, organising, conduct,
-  dual power, mutual aid, free software, open hardware, open culture,
-  justice, extra links), and authors (era-grouped reading lists) —
-  laid out in link columns whose count is capped by the popup's own
-  width via container queries.
+- Five tabs — config/help, stats (a session cell with chatter/message/
+  badge counts and peak viewers; a channel scope picker when several
+  are joined; top chatters and badges over all-time/month/week/today/
+  12h/1h windows folded from per-day and per-hour buckets; top emotes
+  by channel usage, the same buckets, or StreamElements lifetime
+  counts; top links with favicons, fetched page titles and tweet
+  previews; the rate graph's loudest bursts and glorp peaks linked to
+  that day's supa chat log; and a storage cell sizing the app's own
+  footprint — localStorage keys, archive row count, origin estimate),
+  media (Hasan & co. links, clips, news, yt channels, twitch streams,
+  community), liberatory (usa pol, dsa chapters, left parties,
+  organising, conduct, dual power, mutual aid, free software, free
+  culture, open hardware, open social, open gov, justice, extra
+  links), and authors (era-grouped reading lists) — laid out in link
+  columns whose count is capped by the popup's own width via
+  container queries.
 - The popup resizes from its edges and offers widths from 480 to
   1600px.
 
@@ -404,7 +410,7 @@ force off.
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
-| `lw` | `300`–`700` | weight of entry links across the `?` popup — resources, authors, stats |
+| `lw` | `300`–`700` | weight of entry links across the `?` popup — media, liberatory, authors, stats |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
 | `hpfs` | px / `-1`…`-3` | help popup font size (negatives follow the chat font that many steps down) |
 | `hpw` | `480`–`1600` | help popup width |
@@ -422,7 +428,7 @@ force off.
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel`/`labels`/`both` | help display mode |
 | `nolbl` | flag | `?` button cycles only off/panel — the header-label modes are skipped |
-| `htab` | `config`/`resources`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel |
+| `htab` | `config`/`media`/`liberatory`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`resources` still resolves to `media`) |
 | `kw` | comma list | keyword highlights (green edge) |
 | `bw` | comma list | block words — matching lines hidden |
 | `ping` | flag | mention ping sound |
