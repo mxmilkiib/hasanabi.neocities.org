@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- text selection highlights lavender (#b9a5f0, the about page's
+  heading colour) with dark ink instead of the browser default blue -
+  same rule on the about page
 - hascord + r/Hasan_Piker join the first line of hasan & co. links,
   after tiktok - the second line starts at media tracker
 - imgur links resolve the post's real title in previews - the
