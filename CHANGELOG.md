@@ -15,6 +15,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- emote-picker cells now hold their use colour while a chat row
+  carrying the emote is still on screen: rows are watched for
+  viewport intersection, the wash only fades once every copy has
+  scrolled away or left the log
 - the `news` row's independent & left organs now run biggest-to-
   smallest with the more radical ranked up: democracy now, zeteo,
   jacobin, intercept, novara ahead of the investigative and
