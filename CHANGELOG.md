@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- x/twitter status links outside chat (stats' top links, the help
+  panel) get hover previews resolved through the relay's fxtwitter
+  ask - author, text, date, photo/playable video - sharing chat's
+  tweet cache; links inside rows still use the inline card
 - a `community` row ends the media tab (lemmygrad, riseup);
   opendemocracy joins news' independent & left, cryptpad joins
   organising

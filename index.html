@@ -2312,6 +2312,9 @@
     return /^[A-Za-z]/.test(s) && s.length > 3 ? s : '';
   };
   const tweetWait = new Set();
+  // hover peeks on status links outside chat queue their url by status id
+  // until the tweet answer lands - reqTweet dedupes the ask itself
+  const tweetPeekWait = new Map();
   function reqTweet(id) {
     if (tweetWait.has(id) || tweetCache.has(id)) return;
     tweetWait.add(id);
@@ -9725,9 +9728,18 @@
             }))
           .join('');
         entry = { text: t.text, author: t.author && t.author.screen_name || '',
-          avatar: t.author && t.author.avatar_url || '', imgs, ts: +t.ts || 0 };
+          avatar: t.author && t.author.avatar_url || '', imgs, ts: +t.ts || 0,
+          photo: ((m.photos || []).find((p) => /^https:/.test(p.url || '')) || {}).url || '',
+          video: ((m.videos || []).find((v) => /^https:.*\.(?:mp4|m4v|webm|mov)(?:\?|$)/i.test(v.url || '')) || {}).url || '' };
       }
       tweetCache.set(d.id, entry);
+      // status links hovering outside chat (stats, help) resolve their
+      // peek card off the same fill
+      const pw = tweetPeekWait.get(d.id);
+      if (pw) {
+        tweetPeekWait.delete(d.id);
+        for (const u of pw) peekGot(u, twPeek(entry, d.id));
+      }
       // bound the cache - a long session can link thousands of unique tweets
       if (tweetCache.size > 2000) tweetCache.delete(tweetCache.keys().next().value);
       // placeholders and restored cards (a stale card carries no avatar
@@ -10240,6 +10252,10 @@
     }, 2000);
   }
   // links that already carry their own embed, or that never hold a page
+  // a status id off an x/twitter url, else '' - the peek gate and the
+  // tweet ask both key on it
+  const twStatusOf = (u) => /^(?:x|twitter|mobile\.twitter)\.com$/.test(u.hostname.replace(/^www\./, ''))
+    ? ((/\/status\/(\d+)/.exec(u.pathname) || [])[1] || '') : '';
   function peekLink(a) {
     // lkico favicons live inside the anchor - the img check is for links
     // that ARE an embed, so it has to look past the icon
@@ -10248,7 +10264,9 @@
     try { u = new URL(a.href); } catch { return false; }
     const h = u.hostname.replace(/^www\./, '');
     if (h === 'hasanabi.neocities.org' || h === location.hostname) return false;
-    if (/^(?:x|twitter|mobile\.twitter)\.com$/.test(h) && /\/status\//.test(u.pathname)) return false;
+    // statuses inside the log already carry the inline tweet card; links
+    // elsewhere (stats, help panel) get the hover card instead
+    if (twStatusOf(u) && a.closest('#log')) return false;
     return !/\.(?:gif|gifv|webp|png|jpe?g|avif|mp4|webm)$/i.test(u.pathname);
   }
   // one decode pass - the worker decodes its output already, but entries
@@ -10294,10 +10312,32 @@
     // refresh the card only while its link is still hovered
     if (peekUrl === url && !peekEl.hidden) peekShow(p, url, false);
   }
+  // a tweetCache entry re-shaped as a worker peek for the hover card:
+  // the author titles and bylines it, the text bodies it, a photo (else
+  // the avatar) images it and an mp4 plays in the card
+  const twPeek = (c, id) => c ? {
+    title: c.author ? '@' + c.author : '', description: (c.text || '').slice(0, 300),
+    author: c.author || '', published: c.ts ? new Date(c.ts).toISOString().slice(0, 10) : '',
+    image: c.photo || c.avatar || '', video: c.video || '',
+    url: 'https://x.com/i/status/' + id,
+  } : null;
   function peekAsk(url) {
     if (peekInflight.has(url)) return true;
     if (!joined || !relayFrame.contentWindow) return false;
     peekInflight.set(url, setTimeout(() => peekGot(url, null), PEEK_WAIT));
+    // x serves no scrapeable meta for statuses - those ask the relay's
+    // fxtwitter path instead, sharing chat's tweet cache and dedupe
+    let tw = '';
+    try { tw = twStatusOf(new URL(url)); } catch {}
+    if (tw) {
+      if (tweetCache.has(tw)) queueMicrotask(() => peekGot(url, twPeek(tweetCache.get(tw), tw)));
+      else {
+        let s = tweetPeekWait.get(tw);
+        if (!s) tweetPeekWait.set(tw, s = new Set());
+        s.add(url); reqTweet(tw);
+      }
+      return true;
+    }
     relayFrame.contentWindow.postMessage({ type: 'linkpeek', id: ++peekSeq, url }, RELAY_ORIGIN);
     return true;
   }
