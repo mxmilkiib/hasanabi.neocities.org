@@ -21,6 +21,9 @@ not versions — the page ships continuously to Neocities.
   run newest-first - today leads each row, alltime trails it
 
 ### Fixes
+- the @ completer never offered the broadcaster: candidates came only
+  from nicks seen chatting, and the channel itself rarely chats - the
+  joined channels now lead the pick before the recent-nick walk
 - a sent line could end up missing from the input history's ↑ walk:
   sends that echoed into a sibling tab via the BroadcastChannel never
   entered that copy's history (the raw typed text now rides the echo so

@@ -204,8 +204,8 @@ no dependencies beyond CDN-hosted fonts.
   racing backlog can't eat a just-sent line.
 - A plain click on a chatter's name types `@name ` at the input caret
   (modifier-clicks still open the profile).
-- `@` at a word boundary opens a narrowing pick of recently seen nicks
-  (freshest first, each in its chat colour) — tab/⇧tab walks it, enter
+- `@` at a word boundary opens a narrowing pick of the joined channels
+  plus recently seen nicks (freshest first, each in its chat colour) — tab/⇧tab walks it, enter
   or a click fills the name. `:word`, or any bare word of 3+ letters
   followed by tab, completes emote codes the same way, with a small
   preview beside each candidate.
