@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- foreign fridays joins channels/streams (yt name link, tw live
+  stream + chat switch, ig, tiktok, patreon, site) - socials lifted
+  from the channel's own video descriptions; tiktok becomes a new
+  service column at the tail
 - an about page at /about/ - a project landing page with the
   screenshot card, a one-line pitch, chat / extras / resources
   feature lists and the backend story (iframe relay + linkpeek
