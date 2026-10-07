@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the about/social card tagline gains "one-page" -
+  `a compact, customisable, one-page Twitch chat client`
 - chat-link favicons fall back to icon.horse when duckduckgo's icon
   service errors - a transient 404 used to remove the chip for good
 - `unwall` (reader view, strips walls) joins the unblock row
