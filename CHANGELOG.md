@@ -43,6 +43,8 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- the ? button's border is 2px now - it reads as the odd one out
+  anyway, may as well dress the part
 - an ig column joins channels/streams: sixteen instagram links taken
   straight from each channel's own youtube about-tab socials (hasan's
   is hasandpiker, coffeezilla's is coffeebreak_yt, lindsay's is
