@@ -45,6 +45,9 @@ not versions — the page ships continuously to Neocities.
 ### Fixes
 - the ? button's border is 2px now - it reads as the odd one out
   anyway, may as well dress the part
+- tyt's forum link joins the lemmy spillover column instead of
+  spawning its own - service aliases now fall through a preference
+  list, so forum denied the reddit slot lands beside lemmy
 - hasanabi's row gains discord.gg/hasan (the invite is "hasan", not
   "hasanabi") - verified against the discord api, guild name matches
 - discord and patreon columns trade places; lemmy rides discord again,

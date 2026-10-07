@@ -4948,14 +4948,17 @@
         if (svc) {
           // lemmy and locals ride the discord column, site and forum
           // the reddit one, and every podcast name rides deprogram's -
-          // near-roles share a slot, saving sparse columns. a row that
-          // already has that service keeps the link under its own name
-          // instead, so two links never layer on the one cell
-          const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: 'reddit',
+          // near-roles share a slot, saving sparse columns. an alias
+          // falls through its list when earlier picks are taken (forum
+          // denied reddit lands in lemmy's spillover); if none are free
+          // the link keeps its own name, so two links never layer
+          const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: ['reddit', 'lemmy'],
             'even more news': 'deprogram', 'kill james bond': 'deprogram', 'krystal kyle & friends': 'deprogram' };
           const lbl = n.textContent.trim();
-          const aliased = svcAliases[lbl];
-          let s = aliased && !rowSvc.has(aliased) && !rowLbl.has(aliased) ? aliased : lbl;
+          let s = lbl;
+          for (const cand of [].concat(svcAliases[lbl] || [])) {
+            if (!rowSvc.has(cand) && !rowLbl.has(cand)) { s = cand; break; }
+          }
           let dup = 2;
           while (rowSvc.has(s)) s = `${lbl}·${dup++}`;
           cell.dataset.svc = s;
