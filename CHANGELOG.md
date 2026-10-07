@@ -43,6 +43,10 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- an ig column joins channels/streams: sixteen instagram links taken
+  straight from each channel's own youtube about-tab socials (hasan's
+  is hasandpiker, coffeezilla's is coffeebreak_yt, lindsay's is
+  namebrandlindsay) - no guesses, ig sits behind reddit
 - more yt links: hasanabi's own row finally gets @HasanAbi, chapo gets
   its channel, the news-row novara gets @novaramedia, and three tiktok
   clip channels (pikerbroadcasting, daily dose, afterdark) point at
