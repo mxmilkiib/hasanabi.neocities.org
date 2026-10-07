@@ -3453,8 +3453,9 @@
     histDirty = true;
     // rev never marks stales (its overflow cascades instead of flipping),
     // and any stragglers sit at the bottom edge where a tail append still
-    // lands correctly - so the seam path is normal-mode only
-    const firstGhost = revFlow ? null : activeEl.querySelector('.row.stale');
+    // lands correctly - so the seam path is split normal-mode only; a
+    // merged .stale leftover must not divert appends mid-log
+    const firstGhost = revFlow || !isSplit() ? null : activeEl.querySelector('.row.stale');
     const tpl = document.createElement('template');
     tpl.innerHTML = html;
     const newRows = tpl.content.querySelectorAll('.row[data-new]');
@@ -7360,11 +7361,13 @@
     let keep = 0, hSum = 0;
     while (keep < moveTail.length && hSum < to.clientHeight) hSum += heights[keep++];
     const spill = moveTail.splice(keep);
-    for (const r of to.children) r.classList.add('stale');
+    // a .local echo awaiting its real copy stays a live row - ghosting it
+    // strands the echo key and the real message lands as a duplicate
+    for (const r of to.children) if (!r.classList.contains('local')) r.classList.add('stale');
     let need = 0;
     const frag = document.createDocumentFragment();
     for (let i = moveTail.length - 1; i >= 0; i--) { frag.appendChild(moveTail[i]); need += heights[i]; }
-    for (const r of spill) r.classList.add('stale');
+    for (const r of spill) if (!r.classList.contains('local')) r.classList.add('stale');
     to.prepend(frag);
     const firstGhost = to.querySelector('.row.stale');
     if (firstGhost) consumeGhosts(firstGhost, need);
@@ -7449,6 +7452,12 @@
       for (const r of [...col.children]) frag.appendChild(r);
       logEl.appendChild(frag);
     }
+    // ghost markers are page-flip bookkeeping - rejoined or re-dealt rows
+    // must read as ordinary messages (like setRev does), or pushOverflow's
+    // ghost handling would drop them. ghostgap spacers are pure column
+    // scaffolding and die with the layout they padded
+    for (const g of logEl.querySelectorAll('.row.ghostgap')) g.remove();
+    for (const r of logEl.querySelectorAll('.row.stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
     sideEl.hidden = level < 2;
     side2El.hidden = level < 3;
     mainEl.classList.toggle('split', level >= 2);
@@ -7461,8 +7470,6 @@
     splitBtn.title = (level > 1 ? 'Rejoin the columns' : 'Split into page-flip columns') + ' - click/scroll · ⇧click back';
     if (level === 1) {
       activeEl = logEl;
-      // drop inline ghost-gradient values left over from column mode
-      for (const r of logEl.querySelectorAll('.row.stale')) r.style.opacity = '';
       // columns widen on rejoin - re-pin the live column if it was following
       requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); });
     } else if (revFlow) {
@@ -7493,6 +7500,7 @@
     const max = window.innerWidth > window.innerHeight ? 3 : 2;
     const n = cols().length + dir;
     setSplit(((n - 1) % max + max) % max + 1);
+    saveOpts();
   }
 
   splitBtn.addEventListener('click', (e) => cycleSplit(e.shiftKey ? -1 : 1));

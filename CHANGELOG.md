@@ -5,6 +5,15 @@ not versions — the page ships continuously to Neocities.
 
 ## 2026-10-07
 
+### Fixes
+- sent-message echoes no longer duplicate across columns: the .local
+  row stays live instead of being ghosted and evicted, so the real
+  copy adopts it in place rather than landing again on the other side
+- turning page-flip columns off no longer stalls the log - merged
+  rows kept their ghost marks, which sent new appends mid-log and ate
+  real rows; the marks now strip on every column re-deal, and the
+  split toggle saves so a reload can't resurrect the columns
+
 ### Features
 - lemmy links ride the reddit column in the channels/streams
   table (yugopnik, chapo, hakim); rows with a real reddit link
