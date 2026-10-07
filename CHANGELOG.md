@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- stats gains `1h` and `12h` windows on chatters, emotes and badges,
+  folded from new per-hour buckets kept beside the day ones; the
+  scope picker moves down to sit directly over top chatters; a
+  `storage` section ends the tab - localstorage key count + size,
+  archive db row count, and the browser's origin estimate
 - x/twitter status links outside chat (stats' top links, the help
   panel) get hover previews resolved through the relay's fxtwitter
   ask - author, text, date, photo/playable video - sharing chat's

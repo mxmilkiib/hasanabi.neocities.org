@@ -3224,6 +3224,11 @@
         nd[nd0] = (nd[nd0] || 0) + 1;
         const ndc = perObj(nickDayPer, ch), nde = ndc[login] || (ndc[login] = {});
         nde[nd0] = (nde[nd0] || 0) + 1;
+        const nh0 = Math.floor(Date.now() / 36e5);
+        const nh = nickHour[login] || (nickHour[login] = {});
+        nh[nh0] = (nh[nh0] || 0) + 1;
+        const nhc = perObj(nickHourPer, ch), nhe = nhc[login] || (nhc[login] = {});
+        nhe[nh0] = (nhe[nh0] || 0) + 1;
       }
       // real badge icons left of the name; text chips only as fallback
       const renderedSets = new Set();
@@ -3239,6 +3244,11 @@
         bd[bd0] = (bd[bd0] || 0) + 1;
         const bdc = perObj(badgeDayPer, ch), bde = bdc[b] || (bdc[b] = {});
         bde[bd0] = (bde[bd0] || 0) + 1;
+        const bh0 = Math.floor(Date.now() / 36e5);
+        const bh = badgeHour[b] || (badgeHour[b] = {});
+        bh[bh0] = (bh[bh0] || 0) + 1;
+        const bhc = perObj(badgeHourPer, ch), bhe = bhc[b] || (bhc[b] = {});
+        bhe[bh0] = (bhe[bh0] || 0) + 1;
       }
       const badgeImgs = btags.map((b) => {
         const u = b && badgeUrl(b, ch);
@@ -4432,24 +4442,46 @@
   let statScope = '';
   try { statScope = localStorage.getItem(STAT_SCOPE_KEY) || ''; } catch {}
   // top emotes' count source: the channel's StreamElements figures, or
-  // this client's own tallies - all of them or a recent window
-  const EMOTE_SRCS = { today: 1, week: 7, month: 31, local: -1, alltime: 0 };
+  // this client's own tallies - all of them or a recent window. window
+  // specs fold hour buckets for sub-day spans and day buckets past that
+  const EMOTE_SRCS = { '1h': { h: 1 }, '12h': { h: 12 }, today: { d: 1 }, week: { d: 7 }, month: { d: 31 }, local: -1, alltime: 0 };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   let emoteStatSrc = 'alltime';
   try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
-  const CHAT_WINS = { today: 1, week: 7, month: 31, 'all-time': 0 };
+  const CHAT_WINS = { '1h': { h: 1 }, '12h': { h: 12 }, today: { d: 1 }, week: { d: 7 }, month: { d: 31 }, 'all-time': 0 };
   const CHAT_SORT_KEY = 'hasan-chatsort';
   let chatSort = 'today';
   try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'today'; } catch {}
   if (!(chatSort in CHAT_WINS)) chatSort = 'today';
   // badge counts also window like the emote ones: alltime is the plain
   // tally, the rest read trailing days out of the per-version buckets
-  const BADGE_WINS = { day: 1, week: 7, month: 31, alltime: 0 };
+  const BADGE_WINS = { '1h': { h: 1 }, '12h': { h: 12 }, day: { d: 1 }, week: { d: 7 }, month: { d: 31 }, alltime: 0 };
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = 'alltime';
   try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
+  // a window spec folds its bucket family into a key -> count map:
+  // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
+  const foldWin = (spec, dayBag, hourBag) => {
+    const out = new Map();
+    if (spec.h) {
+      const h0 = Math.floor(Date.now() / 36e5) - spec.h + 1;
+      for (const [k, e] of Object.entries(hourBag)) {
+        let c = 0;
+        for (const [h, v] of Object.entries(e)) if (+h >= h0) c += v;
+        if (c) out.set(k, c);
+      }
+    } else {
+      const d0 = Math.floor(Date.now() / 864e5) - spec.d + 1;
+      for (const [k, e] of Object.entries(dayBag)) {
+        let c = 0;
+        for (const [d, v] of Object.entries(e)) if (+d >= d0) c += v;
+        if (c) out.set(k, c);
+      }
+    }
+    return out;
+  };
   // the badge and emote lists cap at 40 rows; their 'show all' links
   // flip these and a sort/window/source/scope pick folds them back
   let statBadgeAll = false, statEmoteAll = false;
@@ -4469,18 +4501,12 @@
       for (const k in eu) eUse[k] = (eUse[k] || 0) + eu[k];
     }
     const win = EMOTE_SRCS[emoteStatSrc] ?? 0;
-    const dayBag = sc ? (useDayPer[sc] || {}) : useDay;
     // per-emote count under the picked source: stream-elements figures,
-    // all local tallies, or the day buckets inside a trailing window
-    const lCount = (n) => {
-      if (win === -1) return lUse[n] || 0;
-      const e = dayBag[n];
-      if (!e) return 0;
-      const d0 = Math.floor(Date.now() / 864e5) - win + 1;
-      let c = 0;
-      for (const [d, v] of Object.entries(e)) if (+d >= d0) c += v;
-      return c;
-    };
+    // all local tallies, or the buckets inside a trailing window
+    const wMap = (win !== -1 && win !== 0)
+      ? foldWin(win, sc ? (useDayPer[sc] || {}) : useDay, sc ? (useHourPer[sc] || {}) : useHour)
+      : null;
+    const lCount = (n) => win === -1 ? (lUse[n] || 0) : wMap.get(n) || 0;
     const useS = win === 0 ? (n) => (eUse[n] || 0) : lCount;
     const bUseM = sc ? (badgeUsePer[sc] || new Map()) : badgeUse;
     const bVUseM = sc ? (badgeVerUsePer[sc] || new Map()) : badgeVerUse;
@@ -4488,20 +4514,17 @@
     // and version tallies; alltime is the plain session tally
     // the window only applies to the ranked 'use' view - grouped sorts
     // always read the full tally
-    const bWinD = badgeSort === 'use' ? (BADGE_WINS[badgeWin] ?? 0) : 0;
+    const bWinSpec = badgeSort === 'use' ? (BADGE_WINS[badgeWin] ?? 0) : 0;
     const bWSet = new Map(), bWVer = new Map();
-    if (bWinD) {
-      const wD0 = Math.floor(Date.now() / 864e5) - (bWinD - 1);
-      for (const [kv, e] of Object.entries(sc ? (badgeDayPer[sc] || {}) : badgeDay)) {
-        let c = 0;
-        for (const [d, v] of Object.entries(e)) if (+d >= wD0) c += v;
-        if (!c) continue;
+    if (bWinSpec) {
+      const bWFold = foldWin(bWinSpec, sc ? (badgeDayPer[sc] || {}) : badgeDay, sc ? (badgeHourPer[sc] || {}) : badgeHour);
+      for (const [kv, c] of bWFold) {
         bWVer.set(kv, c);
         const s = kv.split('/')[0];
         bWSet.set(s, (bWSet.get(s) || 0) + c);
       }
     }
-    const bVerUseM = bWinD ? bWVer : bVUseM;
+    const bVerUseM = bWinSpec ? bWVer : bVUseM;
     const bSeenN = bVerUseM.size;
     const scopeBtns = MULTI
       ? `<div class="st-h st-scope">scope ` + ['', ...CHANNELS].map((c) =>
@@ -4517,17 +4540,10 @@
     const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
     // windowed picks fold the per-login day buckets into a tally;
     // all-time reads the plain session map
-    const cWinD = CHAT_WINS[chatSort] ?? 1;
-    let nView = nMsgs;
-    if (cWinD) {
-      nView = new Map();
-      const cD0 = Math.floor(Date.now() / 864e5) - (cWinD - 1);
-      for (const [lg, e] of Object.entries(sc ? (nickDayPer[sc] || {}) : nickDay)) {
-        let c = 0;
-        for (const [d, v] of Object.entries(e)) if (+d >= cD0) c += v;
-        if (c) nView.set(lg, c);
-      }
-    }
+    const cWinSpec = CHAT_WINS[chatSort] ?? CHAT_WINS.today;
+    const nView = cWinSpec
+      ? foldWin(cWinSpec, sc ? (nickDayPer[sc] || {}) : nickDay, sc ? (nickHourPer[sc] || {}) : nickHour)
+      : nMsgs;
     const chat = [...nView.entries()].filter(([lg]) => !STATS_EXCLUDE.has(lg))
       .sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([lg, n], i) => {
@@ -4587,7 +4603,7 @@
     // whenever it is missing so a second render can image those too
     if (!twSets.some((s) => s.setID === '0')) loadTwitchSets('');
     const all = new Set(win === 0 ? Object.keys(eUse)
-      : win === -1 ? Object.keys(lUse) : Object.keys(dayBag));
+      : win === -1 ? Object.keys(lUse) : wMap.keys());
     const eRanked = [...all].map((n) => [n, useS(n)]).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
     const eVis = statEmoteAll ? eRanked : eRanked.slice(0, 40);
     const emo = eVis.map(([n, c], i) => {
@@ -4670,7 +4686,7 @@
     const bOwner = (id) => (sc ? [sc] : CHANNELS).find((c) =>
       (setFor(c).badgeChan || []).includes(id)) || '';
     const bRank = (id) => bOwner(id) ? -1 : (CORE_BADGES.indexOf(id) + 1 || CORE_BADGES.length + 1);
-    const bUse = (id) => (bWinD ? bWSet : bUseM).get(id) || 0;
+    const bUse = (id) => (bWinSpec ? bWSet : bUseM).get(id) || 0;
     // the right-hand number tracks the sort: messages seen carrying the
     // set under use, version count otherwise
     const BSORTS = {
@@ -4753,11 +4769,11 @@
     // the window buttons take the sort row's lead slot: each one is
     // 'use' ranked within that window, so they only light when the
     // ranked view is showing
-    const badgeWinTips = { alltime: 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', day: 'flat ranking by use, today' };
+    const badgeWinTips = { alltime: 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', day: 'flat ranking by use, today', '12h': 'flat ranking by use, last 12 hours', '1h': 'flat ranking by use, last hour' };
     const badgeWinBtns = Object.keys(BADGE_WINS)
       .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
-    const chatWinTips = { 'all-time': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', today: 'message count, today' };
+    const chatWinTips = { 'all-time': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', today: 'message count, today', '12h': 'message count, last 12 hours', '1h': 'message count, last hour' };
     const chatSortBtns = Object.keys(CHAT_WINS)
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="${chatWinTips[s]}">${s}</button>`)
       .join('');
@@ -4770,7 +4786,6 @@
     const scEl = el.closest('.hp-scroll');
     const scTop = scEl ? scEl.scrollTop : 0;
     el.innerHTML =
-      scopeBtns +
       `<div class="st-trio">` +
         `<div>` +
         `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
@@ -4784,17 +4799,62 @@
         `<div class="st-g2"><div class="st-h">glorps</div>` +
         `<div class="st-2col">${gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>'}</div></div>` +
       `</div>` +
+      scopeBtns +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
       `<div class="st-h">top links</div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
       `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
-      `</div>`;
+      `</div>` +
+      `<div class="st-h">storage</div><div class="st-2col" id="stStore"></div>`;
+    updateStorageStats(el);
     if (openSets.size)
       for (const d of el.querySelectorAll('details.st-badge'))
         if (openSets.has(d.dataset.set || (d.hasAttribute('data-more') ? '*' : ''))) d.open = true;
     if (scEl) scEl.scrollTop = scTop;
+  }
+  // the storage section sizes the app's own footprint: hasan-* keys in
+  // localStorage count utf-16 units (x2 ~ bytes on disk), the archive db
+  // reports its row count, and the origin estimate covers both. the db
+  // count and estimate answer asynchronously, so they fill in on a slow
+  // cadence while the localStorage row measures fresh on every render
+  let stIdbHtml = '', stEstHtml = '', stStoreAt = 0;
+  function updateStorageStats(el) {
+    const box = el.querySelector('#stStore');
+    if (!box) return;
+    const fmtB = (n) => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB'
+      : n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : Math.round(n) + ' B';
+    const srow = (nm, v) => `<div class="st-row"><span class="nm">${nm}</span><i>${v}</i></div>`;
+    let keys = 0, bytes = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k.startsWith('hasan-')) continue;
+        keys++;
+        bytes += k.length + (localStorage.getItem(k) || '').length;
+      }
+    } catch {}
+    box.innerHTML = srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)}`) +
+      (stIdbHtml || srow('chat archive', archDb ? 'counting…' : 'not open')) +
+      (stEstHtml || ((navigator.storage && navigator.storage.estimate) ? srow('origin estimate', 'measuring…') : ''));
+    if (Date.now() - stStoreAt < 15000) return;
+    stStoreAt = Date.now();
+    if (archDb) {
+      try {
+        const rq = archDb.transaction('msgs').objectStore('msgs').count();
+        rq.onsuccess = () => {
+          stIdbHtml = srow('chat archive', rq.result.toLocaleString('en') + ' msgs');
+          updateStorageStats(el);
+        };
+        rq.onerror = () => { stIdbHtml = srow('chat archive', 'unavailable'); };
+      } catch {}
+    } else stIdbHtml = srow('chat archive', 'not open');
+    if (navigator.storage && navigator.storage.estimate)
+      navigator.storage.estimate().then((e) => {
+        stEstHtml = srow('origin estimate', `${fmtB(e.usage || 0)} of ${fmtB(e.quota || 0)}`);
+        updateStorageStats(el);
+      }).catch(() => { stEstHtml = ''; });
   }
   // delegated - the stats body rewrites its innerHTML on every render
   document.getElementById('statsBody').addEventListener('click', (e) => {
@@ -7657,6 +7717,9 @@
   // channel -> Map/obj shaped like the global counters above
   const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {},
     badgeDayPer = {}, urlUsePer = {}, nickDayPer = {};
+  // hour-grain twins for the sub-day windows (1h/12h); entries past a
+  // week evict on save - no filter reaches further back than that
+  const nickHour = {}, badgeHour = {}, nickHourPer = {}, badgeHourPer = {};
   const perMap = (o, ch) => o[ch] || (o[ch] = new Map());
   const perObj = (o, ch) => o[ch] || (o[ch] = {});
   // the ranked counters restore like the history rows they tallied -
@@ -7693,18 +7756,27 @@
   for (const [ch, o] of Object.entries(savedStats.bdp || {})) Object.assign(perObj(badgeDayPer, ch), o);
   Object.assign(nickDay, savedStats.nd);
   for (const [ch, o] of Object.entries(savedStats.ndp || {})) Object.assign(perObj(nickDayPer, ch), o);
+  Object.assign(nickHour, savedStats.nh);
+  for (const [ch, o] of Object.entries(savedStats.nhp || {})) Object.assign(perObj(nickHourPer, ch), o);
+  Object.assign(badgeHour, savedStats.bh);
+  for (const [ch, o] of Object.entries(savedStats.bhp || {})) Object.assign(perObj(badgeHourPer, ch), o);
   const saveStats = () => {
     const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
     const bD0 = Math.floor(Date.now() / 864e5) - 31;
     for (const bag of [badgeDay, nickDay, ...Object.values(badgeDayPer), ...Object.values(nickDayPer)])
       for (const e of Object.values(bag))
         for (const d of Object.keys(e)) if (+d < bD0) delete e[d];
+    const bH0 = Math.floor(Date.now() / 36e5) - 7 * 24;
+    for (const bag of [badgeHour, nickHour, ...Object.values(badgeHourPer), ...Object.values(nickHourPer)])
+      for (const e of Object.values(bag))
+        for (const h of Object.keys(e)) if (+h < bH0) delete e[h];
     try {
       localStorage.setItem(STATS_KEY, JSON.stringify({
         nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst], nl: [...nickLast],
         bu: [...badgeUse], bv: [...badgeVerUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
         lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer, nd: nickDay, ndp: nickDayPer,
+        nh: nickHour, nhp: nickHourPer, bh: badgeHour, bhp: badgeHourPer,
         uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers,
       }));
     } catch {}
@@ -8932,6 +9004,8 @@
   // month) honest; entries past 31 days evict on save
   const useDay = savedUse.d || {};
   const useDayPer = savedUse.pd || {};
+  const useHour = savedUse.h || {};
+  const useHourPer = savedUse.hp || {};
   // twitch emote ids captured at render - lets stats image sub emotes from
   // outside the third-party sets (other channels' emotes typed here)
   const useIds = savedUse.i || {};
@@ -8947,18 +9021,23 @@
       if (ks.length > 6000) {
         ks.sort((a, b) => useTs[a] - useTs[b]);
         for (const k of ks.slice(0, ks.length - 6000)) {
-          delete useTs[k]; delete liveUse[k]; delete useDay[k]; delete useIds[k];
+          delete useTs[k]; delete liveUse[k]; delete useDay[k]; delete useHour[k]; delete useIds[k];
           for (const lp of Object.values(useDayPer)) delete lp[k];
+          for (const hp of Object.values(useHourPer)) delete hp[k];
         }
       }
       const d0 = Math.floor(Date.now() / 864e5) - 31;
       for (const bag of [useDay, ...Object.values(useDayPer)])
         for (const e of Object.values(bag))
           for (const d of Object.keys(e)) if (+d < d0) delete e[d];
-      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, i: useIds })); } catch {}
+      const h0 = Math.floor(Date.now() / 36e5) - 7 * 24;
+      for (const bag of [useHour, ...Object.values(useHourPer)])
+        for (const e of Object.values(bag))
+          for (const h of Object.keys(e)) if (+h < h0) delete e[h];
+      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds })); } catch {}
     }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, i: useIds })); } catch {} });
+  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds })); } catch {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
@@ -9042,6 +9121,12 @@
     const dpc = perObj(useDayPer, ch || CHANNEL);
     const udp = dpc[n] || (dpc[n] = {});
     udp[day] = (udp[day] || 0) + 1;
+    const hour = Math.floor(Date.now() / 36e5);
+    const uh = useHour[n] || (useHour[n] = {});
+    uh[hour] = (uh[hour] || 0) + 1;
+    const hpc = perObj(useHourPer, ch || CHANNEL);
+    const uhp = hpc[n] || (hpc[n] = {});
+    uhp[hour] = (uhp[hour] || 0) + 1;
     useTs[n] = Date.now();
     saveUse();
     if (emotePick.hidden) return;
