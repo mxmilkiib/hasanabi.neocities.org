@@ -1644,14 +1644,16 @@
     stroke-dasharray: 4 3; animation: eage-ants .9s linear infinite; animation-delay: inherit; }
   #emoteGrid .eage.lit { opacity: 1; color: var(--text); font-weight: 700; }
   #emoteGrid .eage.lit .ants rect { stroke: var(--accent); }
+  #emoteGrid .eage.t0 { opacity: .9; color: var(--text); font-weight: 700; }
+  #emoteGrid .eage.t0 .ants rect { stroke: var(--accent); stroke-width: 1.4; }
   /* a lit era whose window spans a stretch chat wasn't logging - the
      count could be understated, so the border turns purple and its
-     ants thin to dots, clearly broken against the standard rungs */
+     ants thin to dots, clearly broken against the standard rungs.
+     ordered after .t0 so a missed recording-start boundary still
+     reads violet (keeping its heavier stroke) */
   #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
   @keyframes eage-ants-missed { to { stroke-dashoffset: -5; } }
-  #emoteGrid .eage.t0 { opacity: .9; color: var(--text); font-weight: 700; }
-  #emoteGrid .eage.t0 .ants rect { stroke: var(--accent); stroke-width: 1.4; }
   @keyframes eage-ants { to { stroke-dashoffset: -7; } }
   @media (prefers-reduced-motion: reduce) { #emoteGrid .eage .ants rect { animation: none; } }
   /* narrow screens and touch devices: the header wraps onto a second row,
@@ -3833,7 +3835,7 @@
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
   function saveSpark() {
     try {
-      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps }));
+      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30) }));
     } catch {}
   }
   function restoreSpark() {
@@ -3854,6 +3856,12 @@
       const oldWhy = (Array.isArray(d.why) ? d.why.slice(-win) : []);
       while (oldWhy.length < oldRate.length) oldWhy.unshift('');
       rateWhy.push(...oldWhy, ...Array(gap).fill(''));
+      // windows carried over from the last session, so rungs covering an
+      // in-session socket drop still read missed after a reload
+      if (Array.isArray(d.away))
+        for (const w of d.away)
+          if (Array.isArray(w) && w.length >= 2 && w[1] > w[0]
+              && !away.some(([s, e]) => s === w[0] && e === w[1])) away.push(w);
       if (d.t) markAway(savedAt, now,
         document.wasDiscarded ? 'tab discarded by browser' : 'page closed');
       if (Array.isArray(d.quiet)) {
@@ -9170,6 +9178,10 @@
   const useIds = savedUse.i || {};
   // when recording began: age markers stay dim until their era is covered
   const useT0 = savedUse.s || Date.now();
+  // if the spark save is gone (reset, first visit) but emote-use data
+  // survived, its last-write stamp still proves the page ran - seed the
+  // closed gap from it so rungs covering it keep the missed mark
+  if (savedUse.w && !away.length) markAway(savedUse.w, Date.now(), 'page closed');
   let useSaveTimer = 0;
   const saveUse = () => {
     if (useSaveTimer) return;
@@ -9193,10 +9205,10 @@
       for (const bag of [useHour, ...Object.values(useHourPer)])
         for (const e of Object.values(bag))
           for (const h of Object.keys(e)) if (+h < h0) delete e[h];
-      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds })); } catch {}
+      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds, w: Date.now() })); } catch {}
     }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds })); } catch {} });
+  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds, w: Date.now() })); } catch {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
@@ -9395,9 +9407,10 @@
       marks.push({ t: t0age, t0: true });
       marks.sort((a, b) => a.t - b.t);
       // a rung whose era reaches back into an 'away' window (socket
-      // dropped or page closed) covers time chat wasn't logging
+      // dropped or page closed) covers time chat wasn't logging; the t0
+      // boundary earns the same mark - its 'seen since' claim has holes
       for (const mk of marks)
-        if (!mk.t0) mk.missed = away.some(([s, e]) => s < now && e > now - mk.t);
+        mk.missed = away.some(([s, e]) => s < now && e > now - mk.t);
       let next = 0; // thresholds fire once each, in order
       // the marching-ants border - an svg rect whose dashoffset animates;
       // the rung's inline animation-delay reaches it via inherit
@@ -9414,7 +9427,7 @@
           const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
           if (mk.t0) {
             const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
-            m += `<div role="separator" class="eage t0" data-age="0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${ANTS}${lbl}</div>`;
+            m += `<div role="separator" class="eage t0${mk.missed ? ' missed' : ''}" data-age="0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded${mk.missed ? ' - part of that span had no logging' : ''}">${ANTS}${lbl}</div>`;
           } else {
             const lit = t0age >= mk.t;
             const lbl = mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 6e4 ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;

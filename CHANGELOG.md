@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- age squares covering unlogged time keep their violet 'missed' mark
+  across reloads: away windows persist through the spark save, the
+  emote-use blob stamps a last-write time as a fallback seed when the
+  spark is gone, and the t0 boundary square can read missed too (its
+  'seen since' claim has holes) - the rule was skipped and its accent
+  style sat later in the sheet than the missed violet
 - animated twitch sub emotes (hasSlam, hasRant et al) now respect the
   anim filter and freeze as stills under the frozen state - the relay's
   channel-emote payload was dropping their assetType, so they read as
