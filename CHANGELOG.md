@@ -45,7 +45,9 @@ not versions — the page ships continuously to Neocities.
 ### Fixes
 - the ? button's border is 2px now - it reads as the odd one out
   anyway, may as well dress the part
-- scroll anywhere (the drag-to-scroll extension) joins extra links
+- scroll anywhere (the drag-to-scroll extension) joins extra links,
+  as does rodrigo nunes' network organisation for the 21st century
+  (turbulence 4)
 - an unblock row sits under news: archive.today, wayback, removepaywall,
   smry, txtify, archive button and bypass paywalls clean, closing on
   ublock origin - paywallbuster/12ft/freedium checked, all dead
