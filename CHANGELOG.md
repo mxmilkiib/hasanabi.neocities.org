@@ -6,6 +6,7 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- `unwall` (reader view, strips walls) joins the unblock row
 - the config/help tab's left heading column joins the light purple -
   the legend's rowstyle swatches keep their colours
 - the `disable ? button` row reads just `header button labels`
