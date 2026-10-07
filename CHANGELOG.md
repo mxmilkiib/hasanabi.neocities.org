@@ -43,6 +43,10 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- channels/streams link audit: every twitch, youtube, discord and site
+  url verified live - kat blaque's yt moved to /c/KatBlaque (the
+  @handle is dead) and chapo's lemmy link retargeted to
+  hexbear.net/c/chapotraphouse (chapo.chat folded into hexbear)
 - the news column grew a serious-mainstream tail: reuters, ap, bbc,
   the guardian, financial times, the economist, new statesman, le monde
   diplomatique, haaretz, politico, nyt, wapo, the atlantic, the new
