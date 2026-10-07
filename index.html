@@ -1116,10 +1116,11 @@
   #offBar { flex: none; text-align: center; padding: 3px 8px; font-size: .9em; background: var(--danger); color: #fff; }
   #offBar[hidden] { display: none; }
   /* stream title strip - same seat in the flow as the offline banner */
-  #titleBar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; background: var(--panel); border-bottom: 1px solid var(--line); }
+  #titleBar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; background: var(--panel); border-bottom: 1px solid var(--line); position: relative; }
   #titleBar[hidden] { display: none; }
-  #titleTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #titleTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; padding: 0 30px; }
   #titleBar .hdr-btn { height: 22px; }
+  #titleX { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   #errBox {
     position: fixed; left: 10px; bottom: 10px; z-index: 30; max-width: min(560px, calc(100vw - 20px));
