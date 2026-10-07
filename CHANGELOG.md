@@ -48,7 +48,8 @@ not versions — the page ships continuously to Neocities.
 
 ### Fixes
 - the about page's cta button trades fills with its marching dash -
-  amber button, lavender dashes
+  amber button, lavender dashes; and the card's underline runs a
+  red-to-gray gradient (was solid amber)
 - tyt's discord link swapped for the real invite - tyt.com/discord
   soft-404s through the spa shell; the invite resolves to TYT Official
 - the ? button's border is 2px now - it reads as the odd one out
