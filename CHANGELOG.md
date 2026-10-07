@@ -15,6 +15,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- in the picker's age-rows mode, empty stretches of eras now pack
+  their time-ago squares onto one row instead of a row each - only
+  the first square of a run, or one that actually has emotes after
+  it, opens a fresh line
 - overlapping popups trade z-order on press: dragging or pressing
   the emote picker over the `?` panel (or vice versa) raises it to
   the front, and a press on the other takes the top back
