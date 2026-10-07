@@ -5141,13 +5141,13 @@
         cell = document.createElement('span');
         cell.className = 'cl';
         if (svc) {
-          // lemmy and locals ride the discord column, site and forum
-          // the reddit one, and every podcast name rides deprogram's -
+          // locals rides the discord column; lemmy, site and forum the
+          // reddit one; and every podcast name rides deprogram's -
           // near-roles share a slot, saving sparse columns. an alias
           // falls through its list when earlier picks are taken (forum
           // denied reddit lands in lemmy's spillover); if none are free
           // the link keeps its own name, so two links never layer
-          const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: ['reddit', 'lemmy'],
+          const svcAliases = { lemmy: 'reddit', locals: 'discord', site: 'reddit', forum: ['reddit', 'lemmy'],
             links: 'deprogram', 'even more news': 'deprogram', 'kill james bond': 'deprogram', 'krystal kyle & friends': 'deprogram' };
           const lbl = n.textContent.trim();
           let s = lbl;
@@ -5177,11 +5177,11 @@
   const svcCols = svcOrder.sort((a, b) =>
     (svcPin[a] || 0) - (svcPin[b] || 0) || svcCount.get(b) - svcCount.get(a));
   // patreon and discord swap seats, and the lemmy spillover column
-  // (rows carrying a real discord link too) tucks right after discord
+  // (rows carrying a real reddit link too) tucks right after reddit
   const pi = svcCols.indexOf('patreon'), di = svcCols.indexOf('discord');
   if (pi >= 0 && di >= 0) [svcCols[pi], svcCols[di]] = [svcCols[di], svcCols[pi]];
   const li = svcCols.indexOf('lemmy');
-  if (li >= 0) { svcCols.splice(li, 1); svcCols.splice(svcCols.indexOf('discord') + 1, 0, 'lemmy'); }
+  if (li >= 0) { svcCols.splice(li, 1); svcCols.splice(svcCols.indexOf('reddit') + 1, 0, 'lemmy'); }
   // links is the aggregator column - it pins last, the rightmost
   // service column before the descriptor cells
   const ki = svcCols.indexOf('links');

@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- lemmy links ride the reddit column in the channels/streams
+  table (yugopnik, chapo, hakim); rows with a real reddit link
+  keep the lemmy spillover, now seated right after reddit
 - the `?` popup's tab names take the light purple the section
   headings use (was accent inactive / text active; the active tab
   keeps its accent border)
