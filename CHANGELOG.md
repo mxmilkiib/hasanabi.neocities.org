@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- top links gets the same age windows as the other rankings
+  (`1h`/`12h`/today/week/month, all-time still the default), folded
+  from new per-day/per-hour url buckets in the saved stats
 - `opengov partnership` (strategy 2023-28) joins open gov
 - stats gains `1h` and `12h` windows on chatters, emotes and badges,
   folded from new per-hour buckets kept beside the day ones; the

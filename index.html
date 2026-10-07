@@ -3317,6 +3317,16 @@
           urlUse.set(k, (urlUse.get(k) || 0) + 1);
           const um = perMap(urlUsePer, ch);
           um.set(k, (um.get(k) || 0) + 1);
+          const ud0 = Math.floor(Date.now() / 864e5);
+          const ud = urlDay[k] || (urlDay[k] = {});
+          ud[ud0] = (ud[ud0] || 0) + 1;
+          const udc = perObj(urlDayPer, ch), ude = udc[k] || (udc[k] = {});
+          ude[ud0] = (ude[ud0] || 0) + 1;
+          const uh0 = Math.floor(Date.now() / 36e5);
+          const uh = urlHour[k] || (urlHour[k] = {});
+          uh[uh0] = (uh[uh0] || 0) + 1;
+          const uhc = perObj(urlHourPer, ch), uhe = uhc[k] || (uhc[k] = {});
+          uhe[uh0] = (uhe[uh0] || 0) + 1;
         }
         if (urlUse.size > 4000) {
           const old = urlUse.keys().next().value;
@@ -4465,6 +4475,12 @@
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = 'alltime';
   try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
+  // top links window the same way; all-time is the plain tally
+  const LINK_WINS = { '1h': { h: 1 }, '12h': { h: 12 }, today: { d: 1 }, week: { d: 7 }, month: { d: 31 }, 'all-time': 0 };
+  const LINK_WIN_KEY = 'hasan-linkwin';
+  let linkWin = 'all-time';
+  try { linkWin = localStorage.getItem(LINK_WIN_KEY) || 'all-time'; } catch {}
+  if (!(linkWin in LINK_WINS)) linkWin = 'all-time';
   // a window spec folds its bucket family into a key -> count map:
   // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
   const foldWin = (spec, dayBag, hourBag) => {
@@ -4569,7 +4585,10 @@
     // form links-view dedup uses, so scheme/www/case variants fold. the
     // bots' evergreen promos crowd the ranking without news value - they
     // already live in the Hasan & co. links row, so they're hidden from the list
-    const uUseM = sc ? (urlUsePer[sc] || new Map()) : urlUse;
+    const lWinSpec = LINK_WINS[linkWin] ?? 0;
+    const uUseM = lWinSpec
+      ? foldWin(lWinSpec, sc ? (urlDayPer[sc] || {}) : urlDay, sc ? (urlHourPer[sc] || {}) : urlHour)
+      : (sc ? (urlUsePer[sc] || new Map()) : urlUse);
     const topLinks = [...uUseM.entries()].filter(([k]) => !URL_HIDE.has(k)).sort((a, b) => b[1] - a[1]).slice(0, 40)
       .map(([k, n], i) => {
         // a cached hover-peek's og title becomes the label; an unpeeked
@@ -4781,6 +4800,10 @@
     const chatSortBtns = Object.keys(CHAT_WINS)
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="${chatWinTips[s]}">${s}</button>`)
       .join('');
+    const linkWinTips = { 'all-time': 'post count, all time', month: 'post count, last 31 days', week: 'post count, last 7 days', today: 'post count, today', '12h': 'post count, last 12 hours', '1h': 'post count, last hour' };
+    const linkWinBtns = Object.keys(LINK_WINS)
+      .map((s) => `<button type="button" class="st-s${linkWin === s ? ' on' : ''}" data-lwin="${s}" title="${linkWinTips[s]}">${s}</button>`)
+      .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
     const pvMax = sc ? (peakViewers[sc] || 0) : Math.max(0, ...Object.values(peakViewers));
     // the tab re-renders live - keep opened sets, the folded group's
@@ -4805,7 +4828,7 @@
       `</div>` +
       scopeBtns +
       `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
-      `<div class="st-h">top links</div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
+      `<div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
       `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
       `<div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
@@ -4917,6 +4940,13 @@
       statBadgeAll = false;
       try { localStorage.setItem(BADGE_WIN_KEY, badgeWin); } catch {}
       try { localStorage.setItem(BADGE_SORT_KEY, badgeSort); } catch {}
+      renderStats();
+      return;
+    }
+    const lw = e.target.closest('.st-s[data-lwin]');
+    if (lw) {
+      linkWin = lw.dataset.lwin;
+      try { localStorage.setItem(LINK_WIN_KEY, linkWin); } catch {}
       renderStats();
       return;
     }
@@ -7717,10 +7747,11 @@
   // evict on save
   const badgeDay = {};           // 'set/ver' -> { dayIdx: count }
   const nickDay = {};            // login -> { dayIdx: count } - feeds top chatters' windows
+  const urlDay = {}, urlHour = {}; // normalised url -> {dayIdx|hourIdx: count} - top links' windows
   // the same tallies again per channel, for the stats tab's scope picker:
   // channel -> Map/obj shaped like the global counters above
   const nickMsgsPer = {}, badgeUsePer = {}, badgeVerUsePer = {}, liveUsePer = {},
-    badgeDayPer = {}, urlUsePer = {}, nickDayPer = {};
+    badgeDayPer = {}, urlUsePer = {}, nickDayPer = {}, urlDayPer = {}, urlHourPer = {};
   // hour-grain twins for the sub-day windows (1h/12h); entries past a
   // week evict on save - no filter reaches further back than that
   const nickHour = {}, badgeHour = {}, nickHourPer = {}, badgeHourPer = {};
@@ -7764,14 +7795,18 @@
   for (const [ch, o] of Object.entries(savedStats.nhp || {})) Object.assign(perObj(nickHourPer, ch), o);
   Object.assign(badgeHour, savedStats.bh);
   for (const [ch, o] of Object.entries(savedStats.bhp || {})) Object.assign(perObj(badgeHourPer, ch), o);
+  Object.assign(urlDay, savedStats.ud);
+  for (const [ch, o] of Object.entries(savedStats.udp || {})) Object.assign(perObj(urlDayPer, ch), o);
+  Object.assign(urlHour, savedStats.uh);
+  for (const [ch, o] of Object.entries(savedStats.uhp || {})) Object.assign(perObj(urlHourPer, ch), o);
   const saveStats = () => {
     const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
     const bD0 = Math.floor(Date.now() / 864e5) - 31;
-    for (const bag of [badgeDay, nickDay, ...Object.values(badgeDayPer), ...Object.values(nickDayPer)])
+    for (const bag of [badgeDay, nickDay, urlDay, ...Object.values(badgeDayPer), ...Object.values(nickDayPer), ...Object.values(urlDayPer)])
       for (const e of Object.values(bag))
         for (const d of Object.keys(e)) if (+d < bD0) delete e[d];
     const bH0 = Math.floor(Date.now() / 36e5) - 7 * 24;
-    for (const bag of [badgeHour, nickHour, ...Object.values(badgeHourPer), ...Object.values(nickHourPer)])
+    for (const bag of [badgeHour, nickHour, urlHour, ...Object.values(badgeHourPer), ...Object.values(nickHourPer), ...Object.values(urlHourPer)])
       for (const e of Object.values(bag))
         for (const h of Object.keys(e)) if (+h < bH0) delete e[h];
     try {
@@ -7781,6 +7816,7 @@
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
         lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer, nd: nickDay, ndp: nickDayPer,
         nh: nickHour, nhp: nickHourPer, bh: badgeHour, bhp: badgeHourPer,
+        ud: urlDay, udp: urlDayPer, uh: urlHour, uhp: urlHourPer,
         uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers,
       }));
     } catch {}
