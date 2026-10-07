@@ -948,6 +948,10 @@
   #statsBody .st-brow i { margin-left: auto; font-style: normal;
     color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
   @media (max-width: 640px) { #statsBody .st-grid { grid-template-columns: 1fr; } }
+  /* narrow popups (phones): the summary trio stacks two-up and glorps
+     takes the full second row - the panel is the container, not the
+     viewport, so a thin desktop column folds the same way */
+  @container (max-width: 560px) { #statsBody .st-trio { grid-template-columns: 1fr 1fr; } }
   body.selfhl .row.self {
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -1195,7 +1199,7 @@
   /* tabs stay pinned at the top while the panel scrolls: the negative
      margins and matching padding bleed the row's background over the
      panel padding so scrolling content doesn't peek through */
-  #helpPanel .htabs { display: flex; gap: 4px; margin: -10px -14px 19px;
+  #helpPanel .htabs { display: flex; flex-wrap: wrap; gap: 4px; margin: -10px -14px 19px;
     padding: 0 10px; position: sticky; top: 0; z-index: 1;
     background: var(--panel); border-radius: 6px 6px 0 0; }
   /* panel-coloured tails on both sides of the sticky row so content

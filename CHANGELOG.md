@@ -133,6 +133,10 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- the `?` popup stops forcing horizontal scroll on phones: the tab
+  bar wraps to a second row below its min-width, and the stats
+  session/bursts/glorps trio stacks two-up via a container query
+  on the panel itself
 - burst and glorp stats no longer spike on reload/backfill: rate and
   glorp counters stamp the line's own `tmi-sent-ts` second instead of
   render time, replays skip the glorp counters, and a backlog flushing
