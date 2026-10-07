@@ -4946,12 +4946,12 @@
         cell = document.createElement('span');
         cell.className = 'cl';
         if (svc) {
-          // lemmy and site ride the reddit column, locals the discord
-          // one, and every podcast name rides deprogram's - near-roles
-          // share a slot, saving sparse columns. a row that already has
-          // that service keeps the link under its own name instead, so
-          // two links never layer on the one cell
-          const svcAliases = { lemmy: 'reddit', locals: 'discord', site: 'reddit', forum: 'reddit',
+          // lemmy and locals ride the discord column, site and forum
+          // the reddit one, and every podcast name rides deprogram's -
+          // near-roles share a slot, saving sparse columns. a row that
+          // already has that service keeps the link under its own name
+          // instead, so two links never layer on the one cell
+          const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: 'reddit',
             'even more news': 'deprogram', 'kill james bond': 'deprogram', 'krystal kyle & friends': 'deprogram' };
           const lbl = n.textContent.trim();
           const aliased = svcAliases[lbl];
@@ -4978,6 +4978,12 @@
   const svcPin = { tw: -2, yt: -1 };
   const svcCols = svcOrder.sort((a, b) =>
     (svcPin[a] || 0) - (svcPin[b] || 0) || svcCount.get(b) - svcCount.get(a));
+  // patreon and discord swap seats, and the lemmy spillover column
+  // (rows carrying a real discord link too) tucks right after discord
+  const pi = svcCols.indexOf('patreon'), di = svcCols.indexOf('discord');
+  if (pi >= 0 && di >= 0) [svcCols[pi], svcCols[di]] = [svcCols[di], svcCols[pi]];
+  const li = svcCols.indexOf('lemmy');
+  if (li >= 0) { svcCols.splice(li, 1); svcCols.splice(svcCols.indexOf('discord') + 1, 0, 'lemmy'); }
   const colOf = new Map(svcCols.map((nm, k) => [nm, k + 3]));
   for (const el of svcCells) el.style.gridColumn = colOf.get(el.dataset.svc);
   extraCells.forEach((el, k) => { el.style.gridColumn = 3 + svcCols.length + k; });
