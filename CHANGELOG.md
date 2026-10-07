@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- imgur links resolve the post's real title in previews - the
+  linkpeek worker scrapes through google's translate proxy (imgur's
+  own html/api are region-blocked and never emit og:title), with the
+  v3 api, jina's reader and a plain image-thumbnail card as fallbacks
 - resources/authors rows breathe more (12px section gaps, was 7)
   and the link columns start a .4em step below the section name
 - a marxist/critical section above organising - wikipedia links to
