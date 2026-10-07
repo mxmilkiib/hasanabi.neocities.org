@@ -45,6 +45,8 @@ not versions — the page ships continuously to Neocities.
 ### Fixes
 - the ? button's border is 2px now - it reads as the odd one out
   anyway, may as well dress the part
+- hasanabi's row gains discord.gg/hasan (the invite is "hasan", not
+  "hasanabi") - verified against the discord api, guild name matches
 - discord and patreon columns trade places; lemmy rides discord again,
   its spillover column (yugopnik, the one row with both) tucked
   straight after
