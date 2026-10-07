@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the resource/author section headings shift from azure to light
+  purple
 - the `links` service cells in the channels/streams table merge
   into the column to their left (the deprogram/podcast spillover),
   dropping the sparse rightmost column
