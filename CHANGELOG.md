@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- multi-pane ghost pages fade gentler: the overwrite boundary dips
+  to .35 (was .03), the ramp narrows to 260px linear (was 340px with
+  a front-hugging curve), and the resting shade rises to .7 - old
+  text stays readable until new rows actually reach it
 - the resource/author section headings shift from azure to light
   purple
 - the `links` service cells in the channels/streams table merge

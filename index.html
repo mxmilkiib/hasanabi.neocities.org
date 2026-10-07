@@ -724,7 +724,7 @@
   .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); }
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
-  .row.stale { opacity: .62; }
+  .row.stale { opacity: .7; }
   /* ghost rows near the fresh/ghost boundary fade hardest and ease off with
      depth as a pixel-distance gradient - applied inline by ghostFade() */
   /* invisible spacer repaying ghost-height overage so the faded page keeps
@@ -7387,12 +7387,12 @@
   // Ghost rows fade as a smooth gradient by pixel distance below the
   // fresh/ghost boundary: the next row to be overwritten is faintest, and
   // the dimming creeps well ahead of the incoming text rather than stepping.
-  const GHOST_LO = 0.03;  // boundary ghost, about to be overwritten
-  const GHOST_HI = 0.62;  // resting ghost opacity (matches .row.stale)
-  const GHOST_RAMP = 340; // px below the boundary the fade eases over
-  // >1: the fade hugs the wave front - ghosts stay near-invisible well past
-  // the boundary, then rise quickly to the resting shade
-  const GHOST_CURVE = 1.7;
+  const GHOST_LO = 0.35;  // boundary ghost, about to be overwritten
+  const GHOST_HI = 0.7;   // resting ghost opacity (matches .row.stale)
+  const GHOST_RAMP = 260; // px below the boundary the fade eases over
+  // linear: the fade neither hugs the front nor leaps ahead - ghosts
+  // stay readable through the column and only dip near the boundary
+  const GHOST_CURVE = 1.0;
   function ghostFade(col) {
     const first = col.querySelector('.row.stale');
     if (!first) return;
