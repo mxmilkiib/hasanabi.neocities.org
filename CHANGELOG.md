@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- chat-link favicons fall back to icon.horse when duckduckgo's icon
+  service errors - a transient 404 used to remove the chip for good
 - `unwall` (reader view, strips walls) joins the unblock row
 - the config/help tab's left heading column joins the light purple -
   the legend's rowstyle swatches keep their colours

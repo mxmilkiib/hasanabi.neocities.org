@@ -1692,7 +1692,7 @@
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
     <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph and an info card under the message (thumbnail, title, channel, views and date via the linkpeek worker); clicking the glyph or the thumbnail unfolds the player under the row (a second click folds it) - nothing loads from google until then<sup>†</sup></span></div>
-    <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service<sup>†</sup></span></div>
+    <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service with an icon.horse fallback<sup>†</sup></span></div>
     <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a fact line on the twitch-profile hover card for chatters who set pronouns on alejo.io; looked up when a profile is previewed and cached for a month<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost struck-through</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
@@ -2450,7 +2450,7 @@
         const twDisp = `twitter.com${path}`;
         // the icon always asks for x.com: profile hrefs reroute to nitter
         // (whose own favicon means nothing), and ddg 404s twitter.com
-        const twIco = lkIco ? '<img class="lkico" src="https://icons.duckduckgo.com/ip3/x.com.ico" alt="" loading="lazy" referrerpolicy="no-referrer">' : '';
+        const twIco = lkIco ? '<img class="lkico" data-h="x.com" src="https://icons.duckduckgo.com/ip3/x.com.ico" alt="" loading="lazy" referrerpolicy="no-referrer">' : '';
         out.push(`<a${shiny ? ' class="shimmer"' : ''} href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${twIco}${escapeHTML(cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
       }
       else {
@@ -2732,10 +2732,17 @@
     });
   }
   logEl.addEventListener('load', resnap, true);
-  // a favicon that never resolves (duckduckgo 404s unknown hosts) leaves no
-  // broken-image chip behind
+  // a favicon that never resolves (duckduckgo 404s unknown hosts) retries
+  // once against icon.horse's wider index, then leaves no broken chip behind
   mainEl.addEventListener('error', (e) => {
-    if (e.target instanceof HTMLImageElement && e.target.classList.contains('lkico')) e.target.remove();
+    const t = e.target;
+    if (!(t instanceof HTMLImageElement) || !t.classList.contains('lkico')) return;
+    if (!t.dataset.fbk && t.dataset.h) {
+      t.dataset.fbk = '1';
+      t.src = `https://icon.horse/icon/${encodeURIComponent(t.dataset.h)}`;
+      return;
+    }
+    t.remove();
   }, true);
   sideEl.addEventListener('load', resnap, true);
   side2El.addEventListener('load', resnap, true);
@@ -2894,7 +2901,8 @@
   const lkIcoImg = (u) => {
     try {
       const h = new URL(u).hostname;
-      return `<img class="lkico" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(LINK_TWMIRROR.test(h) ? 'x.com' : h)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
+      const f = LINK_TWMIRROR.test(h) ? 'x.com' : h;
+      return `<img class="lkico" data-h="${escapeHTML(f)}" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(f)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
     }
     catch { return ''; }
   };
