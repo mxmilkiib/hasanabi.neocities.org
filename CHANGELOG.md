@@ -15,6 +15,8 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the `copy settings url` button flashes a full theme-accent fill on
+  a successful copy, then eases back to chrome
 - the scroll-off counter pill now gets two plain-arrow circle buttons
   flanking it at the quarter-width marks of its column - same theme,
   same jump-to-bottom, three landing spots in one, two and three

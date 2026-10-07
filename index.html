@@ -1089,6 +1089,10 @@
   #rate { flex: 1; min-width: 0; white-space: nowrap; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  /* copy-settings flashes a full accent inversion on success, then
+     eases back to chrome over the transition on the base state */
+  #copyUrl { transition: background .4s ease, color .4s ease, border-color .4s ease; }
+  #copyUrl.copied { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; transition: none; }
   #sendBtn.on { border-color: #9146ff; } /* twitch purple while logged in */
   #hdrMin .dash { display: inline-block; transform: translateY(-1px); } /* the en dash sits low in its glyph box */
   /* login preflight: busy pulses while id.twitch.tv is probed, err flashes
@@ -7110,7 +7114,10 @@
     }
     const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
     navigator.clipboard.writeText(url)
-      .then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy settings url', 1200); })
+      .then(() => {
+        b.textContent = 'copied'; b.classList.add('copied');
+        setTimeout(() => { b.textContent = 'copy settings url'; b.classList.remove('copied'); }, 1200);
+      })
       .catch(() => { b.textContent = url; });
   });
 
