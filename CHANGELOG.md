@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- animated twitch sub emotes (hasSlam, hasRant et al) now respect the
+  anim filter and freeze as stills under the frozen state - the relay's
+  channel-emote payload was dropping their assetType, so they read as
+  static (relay 1f6f696)
 - picker cells no longer sit stranded above the time-ago squares they
   already crossed: the last-minute order-pin was leapfrogging them back
   over the sub-minute rungs, and the use sort makes it redundant anyway
