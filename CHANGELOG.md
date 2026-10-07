@@ -37,6 +37,12 @@ not versions — the page ships continuously to Neocities.
   (ahead of reddit/site) instead of ordering purely by frequency
 - yt links fill in for the twitch-first entries that had none -
   maple takes, kneecoleslaw and comrade virgo
+- the small-screen media query now also covers landscape phones
+  (coarse pointer, up to 1080px); within it the default chat font
+  rises to 16px (a picked size still wins, and the Aa ladder seeds
+  its rung from the live size), header buttons grow to 32/38px, row
+  taps can't arm double-tap zoom, and the help panel scrolls sideways
+  when its service grid outruns the viewport
 
 ### Changed
 - the ? popup's link-weight row is hidden for now; entry links

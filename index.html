@@ -1593,20 +1593,29 @@
   #emoteGrid .eage.t0 .ants rect { stroke: var(--accent); stroke-width: 1.4; }
   @keyframes eage-ants { to { stroke-dashoffset: -7; } }
   @media (prefers-reduced-motion: reduce) { #emoteGrid .eage .ants rect { animation: none; } }
-  /* narrow screens: the header wraps onto a second row, controls get a
-     larger touch target, and the spark canvas clamps so it can't hog the row */
-  @media (max-width: 720px) {
+  /* narrow screens and touch devices: the header wraps onto a second row,
+     controls get a larger touch target, and the spark canvas clamps so it
+     can't hog the row */
+  @media (max-width: 720px), (pointer: coarse) and (max-width: 1080px) {
+    /* a 15px chat font reads tiny on a phone - the raised floor only
+       holds while nothing is picked: an inline --chat-font always wins */
+    :root { --chat-font: 16px; }
+    /* tapping rows shouldn't arm the browser's double-tap zoom */
+    body { touch-action: manipulation; }
     header { padding: 3px 8px 2px; padding-right: 92px; column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
     #helpBtn { right: 6px; }
     #hdrMin { right: 48px; }
     body.hdrmin #hdrMin { right: 48px; }
     .hdr-side { gap: 4px; }
-    .hdr-btn { height: 28px; }
-    button.hdr-btn { width: 34px; }
+    .hdr-btn { height: 32px; }
+    button.hdr-btn { width: 38px; }
     #fontSel { max-width: 92px; }
     #spark { max-width: 70px; }
-    body.hdrgraph header { padding-right: 130px; min-height: 32px; } /* fits the 28px buttons */
+    body.hdrgraph header { padding-right: 130px; min-height: 36px; } /* fits the 32px buttons */
     #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; max-height: 70dvh; }
+    /* the channels/streams service grid can run wider than a phone
+       panel - let it slide sideways instead of clipping */
+    #helpPanel .hp-scroll { overflow-x: auto; }
     .col { padding: 6px 10px 6px 6px; }
   }
   /* phones: cap the header type so a large header size can't eat a third of the screen */
@@ -5070,7 +5079,10 @@
     return { set: (i) => { idx = i; apply(); }, get: () => idx };
   }
 
-  const fontCtl = cycle(fontBtn, FONT_SIZES, DEF.size, '--chat-font', 'Font size', 'px', 'helpFont');
+  // the Ladder starts on the live Font size so a raised mobile floor
+  // steps up from there instead of from an unrelated rung
+  const fsNow = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font'));
+  const fontCtl = cycle(fontBtn, FONT_SIZES, FONT_SIZES.indexOf(fsNow) >= 0 ? FONT_SIZES.indexOf(fsNow) : DEF.size, '--chat-font', 'Font size', 'px', 'helpFont');
   const lhCtl = cycle(lhBtn, LINE_HEIGHTS, DEF.lh, '--chat-lh', 'Line height', '', 'helpLh');
   const WEIGHTS = [300, 400, 500, 600, 700];
   const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
