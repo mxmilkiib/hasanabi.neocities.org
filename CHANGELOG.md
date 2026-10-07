@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the about paragraph's "no install" notes it is a PWA anyway,
+  linked to web.dev's what-are-pwas explainer
 - the about page's opening line drops its redundant "self-contained
   page" phrasing - the card tagline says it now - and "resource hub
   tool" becomes "info hub tool"
