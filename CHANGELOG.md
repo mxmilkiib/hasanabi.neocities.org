@@ -43,6 +43,8 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- tyt's discord link swapped for the real invite - tyt.com/discord
+  soft-404s through the spa shell; the invite resolves to TYT Official
 - the ? button's border is 2px now - it reads as the odd one out
   anyway, may as well dress the part
 - scroll anywhere (the drag-to-scroll extension) joins extra links,
