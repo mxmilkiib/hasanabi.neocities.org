@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the `?` popup's tab names take the light purple the section
+  headings use (was accent inactive / text active; the active tab
+  keeps its accent border)
 - the `?` button now only toggles the popup - header button labels
   are their own flag driven by the popup's `header button labels`
   row, kept across reloads as `lbls` and carried in copied urls;
