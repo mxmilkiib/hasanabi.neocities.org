@@ -4291,20 +4291,20 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 6,    font: 'sourcecodepro', px: 17, lhv: 1.3, wv: 400, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 2 },
-    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0 },
-    print:    { theme: 'light',   shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0 },
-    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0 },
-    cinema:   { theme: 'black',   shade: 8,    font: 'lexend',     px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0 },
-    phosphor: { theme: 'amber',   shade: 8,    font: 'vt323',      px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0 },
-    dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   px: 20, lhv: 2, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0 },
-    midnight: { theme: 'nord',    shade: 5,    font: 'inter',      px: 14, lhv: 1.65, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0, help: 0 },
-    solar:    { theme: 'solarized',shade: 6,    font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0 },
-    minimal:  { theme: 'mirc',    shade: 2,    font: 'lexend',     px: 16, lhv: 1, wv: 300, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: true, hfspx: -1, help: 0 },
-    retro:    { theme: 'console', shade: 7,    font: 'terminus',   px: 28, lhv: 1, lines: 1, zebra: false, times: 1,  shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0 },
-    irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0 },
-    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15, help: 0 },
-    heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0 },
+    default:  { theme: 'dark',    shade: 6,    font: 'sourcecodepro', px: 17, lhv: 1.3, wv: 400, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 1 },
+    compact:  { theme: 'dark',    shade: 6,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
+    print:    { theme: 'light',   shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
+    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
+    cinema:   { theme: 'black',   shade: 8,    font: 'lexend',     px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0, lbls: 0 },
+    phosphor: { theme: 'amber',   shade: 8,    font: 'vt323',      px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
+    dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   px: 20, lhv: 2, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    midnight: { theme: 'nord',    shade: 5,    font: 'inter',      px: 14, lhv: 1.65, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    solar:    { theme: 'solarized',shade: 6,    font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    minimal:  { theme: 'mirc',    shade: 2,    font: 'lexend',     px: 16, lhv: 1, wv: 300, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: true, hfspx: -1, help: 0, lbls: 0 },
+    retro:    { theme: 'console', shade: 7,    font: 'terminus',   px: 28, lhv: 1, lines: 1, zebra: false, times: 1,  shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0, lbls: 0 },
+    irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
+    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15, help: 0, lbls: 0 },
+    heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
   const THEMES = ['console', 'amber', 'black', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'steel', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
@@ -4431,7 +4431,7 @@
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpHide')) { setHideMode(+a.dataset.idx); saveOpts(); }
-    else if (a.classList.contains('helpNoLbl')) { setNoLbl(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpNoLbl')) { setLbls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx === 1);
   });
   // anchors only fire on enter natively, and only when href'd - the
@@ -6080,7 +6080,7 @@
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
-      nolbl: helpNoLbl ? 1 : 0,
+      lbls: lblsOn ? 1 : 0,
       split: 1 + !sideEl.hidden + !side2El.hidden,
     };
   }
@@ -6156,7 +6156,13 @@
     // the saved mode comes back whole, so a reload reopens the popup
     // where it was - phones recycle the page often enough that demoting
     // panel modes silently lost it
-    if (Number.isInteger(o.help) && o.help >= 0 && o.help < HELP_MODES.length) { helpMode = o.help; applyHelp(); }
+    if (Number.isInteger(o.help) && o.help >= 0 && o.help <= 3) {
+      // legacy labels/both modes fold the label half out to its own flag
+      if (o.help >= 2) setLbls(true);
+      else if (o.lbls === undefined) setLbls(false);
+      helpMode = o.help >= 2 ? o.help - 2 : o.help;
+      applyHelp();
+    }
     if (typeof o.video === 'boolean') setVideo(o.video);
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
@@ -6210,8 +6216,8 @@
       if (helpFs < -4) helpFs = -1; // a px no longer offered falls back to follow
       applyHelpFs();
     }
-    // late on purpose - it folds a restored labels mode back to the pair
-    if (o.nolbl !== undefined) setNoLbl(!!o.nolbl);
+    // late on purpose - after o.help's legacy modes feed it
+    if (o.lbls !== undefined) setLbls(!!o.lbls);
   }
 
   // ---- theme presets: a named combo of every display option. The active
@@ -6227,7 +6233,7 @@
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: mainEl.classList.contains('zebra'), times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
-      split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode,
+      split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
     };
     return Object.keys(p).every((k) => !(k in cmp) || p[k] === cmp[k]);
@@ -6841,8 +6847,9 @@
   }, { passive: false });
   setShadow(0);
 
-  // ---- help: cycle off → popup panel → inline labels → both together ----
-  const HELP_MODES = ['off', 'panel', 'labels', 'both'];
+  // ---- help: the ? button cycles off ↔ popup panel; header button ----
+  // labels are their own toggle, no longer in the rotation
+  const HELP_MODES = ['off', 'panel'];
   let helpMode = 0;
   // picking a non-panel mode from inside the open panel holds it open
   // so the config being changed doesn't eject the user - every real
@@ -6865,12 +6872,12 @@
   }
 
   function applyHelp() {
-    const showPanel = helpMode === 1 || helpMode === 3;
+    const showPanel = helpMode === 1;
     if (showPanel) helpForced = false;
     helpPanel.hidden = !showPanel && !helpForced;
-    document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = helpMode < 2; });
-    // labels mode widens the corner reserve so the pinned labels clear content
-    document.body.classList.toggle('hdrlbl', helpMode >= 2);
+    document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = !lblsOn; });
+    // labels widen the corner reserve so the pinned labels clear content
+    document.body.classList.toggle('hdrlbl', lblsOn);
     // anchor below whatever height the header wraps to once labels are in
     if (showPanel) clampHelpPanel();
     helpBtn.classList.toggle('on', helpMode !== 0);
@@ -6879,32 +6886,28 @@
     markHelp('helpHelp', helpMode);
   }
 
-  // 'nolbl' keeps the ? button's cycle to just off ↔ panel - the inline
-  // header-button labels never enter the rotation (the panel's own mode
-  // list can still pick them)
-  let helpNoLbl = false;
-  function setNoLbl(on) {
-    helpNoLbl = !!on;
-    // an already-showing labels mode folds back into the plain pair
-    if (helpNoLbl && helpMode >= 2) { helpMode -= 2; applyHelp(); }
-    markHelp('helpNoLbl', helpNoLbl ? 1 : 0);
+  // header-button labels are standalone now - the popup's 'header
+  // button labels' row switches them, the ? cycle never touches them
+  let lblsOn = false;
+  function setLbls(on) {
+    lblsOn = !!on;
+    applyHelp();
+    markHelp('helpNoLbl', lblsOn ? 1 : 0);
   }
 
   function stepHelp(dir) {
     helpForced = false;
-    helpMode = helpNoLbl
-      ? (helpMode + dir + 2) % 2
-      : (helpMode + dir + HELP_MODES.length) % HELP_MODES.length;
+    helpMode = (helpMode + dir + HELP_MODES.length) % HELP_MODES.length;
     applyHelp();
     saveOpts();
   }
 
-  // the panel's own close button peels exactly like esc does - panel-only
-  // mode goes fully off, panel+labels keeps the labels
+  // the panel's own close button peels exactly like esc does - the panel
+  // goes fully off and the labels are unaffected either way
   document.getElementById('helpX').addEventListener('click', () => {
     if (helpPanel.hidden) return;
     helpForced = false;
-    if (helpMode === 1 || helpMode === 3) helpMode -= 1;
+    helpMode = 0;
     applyHelp(); saveOpts();
   });
   helpBtn.addEventListener('click', (e) => stepHelp(e.shiftKey ? -1 : 1));
@@ -7057,12 +7060,12 @@
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs !== -1) q.set('hpfs', helpFs < 0 ? helpFs : HDR_SIZES[helpFs]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
-    if (helpNoLbl) q.set('nolbl', '1');
+    if (lblsOn) q.set('lbls', '1');
     if (copyHelp) {
       // emit the mode that reproduces what's visible now - the panel can
       // be held open (helpForced) under a non-panel mode
       const pOpen = !helpPanel.hidden;
-      q.set('help', HELP_MODES[pOpen ? (helpMode >= 2 ? 3 : 1) : (helpMode >= 2 ? 2 : 0)]);
+      q.set('help', HELP_MODES[pOpen ? 1 : 0]);
       const t = helpPanel.querySelector('.htabs a.on');
       if (t && HTAB_URL_INV[t.dataset.htab]) q.set('htab', HTAB_URL_INV[t.dataset.htab]);
     }
@@ -9448,16 +9451,16 @@
     if (e.key === 'Enter') emoteGrid.querySelector('button[data-ins]')?.click();
   });
   // esc peels the topmost layer wherever focus sits: picker first, then
-  // the help panel (both-mode drops back to labels, panel-mode to off)
+  // the help panel - the labels flag is its own setting and stays put
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!emotePick.hidden) { closePicker(); if (!chatbarEl.hidden) chatInput.focus(); return; }
     if (!helpPanel.hidden) {
       helpForced = false;
-      if (helpMode === 1 || helpMode === 3) helpMode -= 1;
+      helpMode = 0;
       applyHelp(); saveOpts(); return;
     }
-    if (helpMode === 1 || helpMode === 3) { helpMode -= 1; applyHelp(); saveOpts(); }
+    if (helpMode === 1) { helpMode = 0; applyHelp(); saveOpts(); }
   });
   // inserts at the caret, spaced from neighbours; the panel stays open so
   // several emotes can stack, like chatterino's picker - the recents band
@@ -10055,7 +10058,13 @@
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
-    if (q.has('help')) { const i = HELP_MODES.indexOf(q.get('help')); if (i >= 0) { helpMode = i; applyHelp(); } }
+    if (q.has('help')) {
+      const v = q.get('help'), i = HELP_MODES.indexOf(v);
+      // legacy labels/both values split out to the standalone labels flag
+      if (i >= 0) helpMode = i;
+      else if (v === 'labels' || v === 'both') { helpMode = v === 'both' ? 1 : 0; setLbls(true); }
+      if (i >= 0 || v === 'labels' || v === 'both') applyHelp();
+    }
     // ?htab=config|resources|authors|stats picks the panel's tab; on its
     // own (no ?help=) it opens the panel too
     if (q.has('htab')) {
@@ -10063,7 +10072,7 @@
       const id = HTAB_URL[v] || (helpPanel.querySelector(`[data-htab="${v}"]`) ? v : '');
       if (id) {
         switchTab(id);
-        if (!q.has('help') && helpMode !== 1 && helpMode !== 3) { helpMode |= 1; applyHelp(); }
+        if (!q.has('help') && helpMode !== 1) { helpMode = 1; applyHelp(); }
       }
     }
     if (q.has('split')) {
@@ -10117,8 +10126,7 @@
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const v = +q.get('hpfs'), i = v < 0 ? Math.max(Math.round(v), -4) : HDR_SIZES.indexOf(v); if (v < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
-    // read after ?help= so a labels-mode param still folds back to the pair
-    if (q.has('nolbl')) setNoLbl(flag('nolbl'));
+    if (q.has('lbls')) setLbls(flag('lbls'));
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
 

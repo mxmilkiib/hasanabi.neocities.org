@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the `?` button now only toggles the popup - header button labels
+  are their own flag driven by the popup's `header button labels`
+  row, kept across reloads as `lbls` and carried in copied urls;
+  old `help=labels`/`both` urls and saved mode bundles still land
+  right (labels on, panel state preserved)
 - stats filters normalise the labels: `alltime`/`day` read
   `all-time`/`today` everywhere, and every ranking now defaults to
   `today` (old saved prefs resolve to the new names)

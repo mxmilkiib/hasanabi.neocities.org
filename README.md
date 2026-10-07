@@ -426,8 +426,8 @@ force off.
 | `video` | flag | stream video overlay |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
-| `help` | `off`/`panel`/`labels`/`both` | help display mode |
-| `nolbl` | flag | `?` button cycles only off/panel — the header-label modes are skipped |
+| `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
+| `lbls` | flag | header button labels shown beside each header control — independent of the `?` cycle |
 | `htab` | `config`/`media`/`left`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`resources` and `liberatory` still resolve to `media`/`left`) |
 | `kw` | comma list | keyword highlights (green edge) |
 | `bw` | comma list | block words — matching lines hidden |
@@ -460,9 +460,8 @@ force off.
 style name like `theme=dark` still selects just the palette, which is
 also what the retired preset names `paper`, `mirc` and `console` now
 resolve to. Presets never share a name with a style. Each preset also
-pins the header help mode: `default` keeps the button labels on and
-every other preset runs the bare header (labels off, `?` still opens
-the panel).
+pins the header button labels: `default` keeps them on and every other
+preset runs the bare header (the `?` popup is unaffected either way).
 
 ### Performance
 
