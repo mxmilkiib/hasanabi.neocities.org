@@ -378,7 +378,7 @@ no dependencies beyond CDN-hosted fonts.
   day buckets or StreamElements lifetime counts; top links with
   favicons and fetched page titles; and the rate graph's loudest
   bursts and glorp peaks, timestamps linked to that day's supa chat
-  log), resources (re Hasan, clips, news, yt channels, twitch
+  log), resources (Hasan & co. links, clips, news, yt channels, twitch
   streams, usa pol, dsa chapters, left parties, organising, conduct,
   dual power, mutual aid, free software, open hardware, open culture,
   justice, extra links), and authors (era-grouped reading lists) —
