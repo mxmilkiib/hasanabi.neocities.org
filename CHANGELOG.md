@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- picker cells no longer sit stranded above the time-ago squares they
+  already crossed: the last-minute order-pin was leapfrogging them back
+  over the sub-minute rungs, and the use sort makes it redundant anyway
 - sent-message echoes no longer duplicate across columns: the .local
   row stays live instead of being ghosted and evicted, so the real
   copy adopts it in place rather than landing again on the other side

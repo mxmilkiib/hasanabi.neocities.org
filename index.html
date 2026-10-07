@@ -1709,7 +1709,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. @hasanabi rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking where emotes last saw 2m–60m ago ('▤' starts each populated era on its own row and packs empty stretches together), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid and lifts anything used in the last minute to the very top, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking where emotes last saw 2m–60m ago ('▤' starts each populated era on its own row and packs empty stretches together), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -9200,10 +9200,8 @@
   let flashHueNext = Math.floor(Math.random() * 360);
   let resortTimer = 0;
   // a use within the last minute pins its button to the very top of the
-  // scroll grid (grid order beats every section header; the recents band
-  // above keeps its own MRU order)
-  const FRESH_MS = 6e4;
-  let freshTimer = 0;
+  // scroll grid via the useTs sort; the recents band above keeps its own
+  // MRU order
   let ageTimer = 0;
   const poke = (name, delay) => {
     // a delay phases the fresh animation to mid-fade - rebuilt buttons
@@ -9362,29 +9360,16 @@
     const q = emoteQ.value.trim().toLowerCase();
     const hit = (n) => !q || n.toLowerCase().includes(q);
     const ehit = (c) => !q || (EMOJI_KW[c] || '').toLowerCase().includes(q);
-    // used in the last minute and not searching? the button floats to
-    // the top of the whole grid, freshest first - and a timer rebuilds
-    // the grid when the oldest pin lapses so it drops back home. only in
-    // mix mode: sectioned mode already lifts fresh uses to the top of
-    // their own section, and a cross-grid pin just leaks emotes above
-    // unrelated headers
-    const now = Date.now();
-    let freshEdge = 0;
+    // useTs order already floats fresh uses to the top - the old order-pin
+    // would leapfrog cells back over the age squares they crossed
     // nearest upcoming rung crossing, fed by aged() - arms a rebuild so
     // cells drift down past the squares as they age, not just on new uses
     let nextAgeDelta = Infinity;
-    const pin = (n) => {
-      if (q || epickSort !== 'use' || !epickMerge) return '';
-      const age = now - (useTs[n] || 0);
-      if (age >= FRESH_MS) return '';
-      if (age > freshEdge) freshEdge = age;
-      return ` style="order:${Math.round((age - FRESH_MS) / 1e3)}"`;
-    };
-    const ejiBtn = (c, strip) => `<button type="button" class="eji" data-ins="${c}"${strip ? '' : pin(c)} title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
-    const btn = (n, src, img, a, strip) => {
+    const ejiBtn = (c) => `<button type="button" class="eji" data-ins="${c}" title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
+    const btn = (n, src, img, a) => {
       const e = escapeHTML(n);
       const im = a && animFrozen() ? freezeUrl(img) : img;
-      return `<button type="button" data-ins="${e}"${strip ? '' : pin(n)}${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
+      return `<button type="button" data-ins="${e}"${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
         `<img src="${escapeHTML(im)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
@@ -9447,7 +9432,7 @@
       : r.img ? emoteAnim.has(r.n) || twAnim(r.n) : false)) : [];
     emoteRecent.hidden = !recs.length;
     emoteRecent.innerHTML = recs.length ? '<span class="rlabel">recent</span>' + recs.map((r) =>
-      r.img ? btn(r.n, r.src, r.img, r.a, 1) : ejiBtn(r.n, 1)).join('') : '';
+      r.img ? btn(r.n, r.src, r.img, r.a) : ejiBtn(r.n)).join('') : '';
     const srcTab = { '7TV': '7tv', 'BTTV': 'bttv', 'FFZ': 'ffz', 'FFZ animated': 'ffz' };
     // sections collect as (usage total, html) so the use sort can order
     // the groups by what chat actually runs, not just their members
@@ -9530,11 +9515,6 @@
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
     // rebuilt cells drop their classes - relight whatever is still on screen
     for (const n of litEms) litApply(n, true);
-    clearTimeout(freshTimer);
-    freshTimer = freshEdge ? setTimeout(() => {
-      freshTimer = 0;
-      if (!emotePick.hidden) heldOr();
-    }, FRESH_MS - freshEdge + 250) : 0;
     // cells keep ageing between uses - rebuild when the next one crosses
     // a rung so squares drift down with them instead of waiting for a use
     clearTimeout(ageTimer);
