@@ -16,6 +16,8 @@ not versions — the page ships continuously to Neocities.
   its ✕ dismisses until the title changes or the stream restarts;
   config's `stream title bar` option toggles it (default on,
   `?stitle=0` hides), and overlay mode drops it with the chrome
+- `open social` and `open gov` move up to sit directly after
+  `free software`
 - `open culture` grows into `open social`, grouped like the news
   subs: fediverse (activitypub.rocks, fediverse.party, mastodon,
   pixelfed, lemmy, peertube), indieweb (microformats, webmention,
