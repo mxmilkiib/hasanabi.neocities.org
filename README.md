@@ -403,7 +403,7 @@ force off.
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
 | `lw` | `300`–`700` | weight of entry links across the `?` popup — resources, authors, stats |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
-| `hpfs` | px | help popup font size |
+| `hpfs` | px / `-1`…`-3` | help popup font size (negatives follow the chat font that many steps down) |
 | `hpw` | `480`–`1600` | help popup width |
 | `pause` | flag | hold the scroll while hovering a row |
 | `scrollback` | `250`…`100000` | row cap |
