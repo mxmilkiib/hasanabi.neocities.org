@@ -646,15 +646,22 @@
     background-clip: text;
     animation: notice-rainbow var(--rbw-t, 6s) linear infinite;
   }
+  /* a thin dark halo keeps the pale gradient stops legible. it rides a
+     custom property so the variants that animate filter (hue/pulse)
+     can re-apply it inside their keyframes instead of dropping it */
+  .row .rbw {
+    --rbwshadow: drop-shadow(0 0 .6px rgba(0,0,0,.7)) drop-shadow(0 0 1.8px rgba(0,0,0,.3));
+    filter: var(--rbwshadow);
+  }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
   @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .row .rbw { animation: none; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
   body.rbw-wave .row .rbw { animation-name: rbw-wave; animation-timing-function: ease-in-out; }
-  @keyframes rbw-hue { to { filter: hue-rotate(360deg); } }
+  @keyframes rbw-hue { to { filter: hue-rotate(360deg) var(--rbwshadow); } }
   body.rbw-hue .row .rbw { animation-name: rbw-hue; }
-  @keyframes rbw-pulse { 50% { filter: brightness(1.45) saturate(1.25); } }
+  @keyframes rbw-pulse { 50% { filter: brightness(1.45) saturate(1.25) var(--rbwshadow); } }
   body.rbw-pulse .row .rbw { animation-name: rbw-pulse; animation-timing-function: ease-in-out; }
   @keyframes rbw-flick {
     8% { opacity: .5; } 9%, 40% { opacity: 1; } 41% { opacity: .7; }

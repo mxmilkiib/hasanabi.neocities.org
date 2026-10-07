@@ -22,6 +22,9 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- rainbow @hasanabi mentions gain a thin dark drop-shadow halo so the
+  pale gradient stops stay legible; it rides a custom property the
+  filter-animating variants (hue/pulse) re-apply in their keyframes
 - the picker's `anim` chip is now tri-state: click cycles playing →
   frozen stills → hidden. frozen cells render the static frame - 7tv
   `*_static` variants and twitch `default` paths directly, first-frame
