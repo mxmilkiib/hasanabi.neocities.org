@@ -1558,7 +1558,7 @@
     45% { background: color-mix(in srgb, var(--fc, var(--accent)) 55%, transparent); }
   }
   /* resort moves animate; set inline by the FLIP step in rebuildPicker */
-  #emoteGrid button.emove { transition: transform .35s ease; }
+  #emoteGrid .emove { transition: transform .35s ease; }
   #emoteGrid {
     flex: 1; overflow-y: auto;
     display: grid; grid-template-columns: repeat(auto-fill, 40px);
@@ -9180,6 +9180,7 @@
   // above keeps its own MRU order)
   const FRESH_MS = 6e4;
   let freshTimer = 0;
+  let ageTimer = 0;
   const poke = (name, delay) => {
     // a delay phases the fresh animation to mid-fade - rebuilt buttons
     // resume their dimming instead of renewing to full brightness
@@ -9199,18 +9200,22 @@
   const rebuildPicker = () => {
     const st = emoteGrid.scrollTop;
     // a name shows twice when it's both recent and in its home section -
-    // queue rects per name so each button animates from its own spot
+    // queue rects per name so each button animates from its own spot.
+    // age squares ride the FLIP too - except in own-row mode, where they
+    // head rows rather than flowing with the cells
+    const flipSel = emotePick.classList.contains('agerows') ? 'button[data-ins]' : 'button[data-ins], .eage[data-age]';
+    const flipKey = (b) => b.dataset.ins !== undefined ? 'i' + b.dataset.ins : 'a' + b.dataset.age;
     const before = new Map();
-    for (const b of emotePick.querySelectorAll('button[data-ins]'))
-      (before.get(b.dataset.ins) || before.set(b.dataset.ins, []).get(b.dataset.ins))
+    for (const b of emotePick.querySelectorAll(flipSel))
+      (before.get(flipKey(b)) || before.set(flipKey(b), []).get(flipKey(b)))
         .push(b.getBoundingClientRect());
     buildPicker();
     emoteGrid.scrollTop = st;
     // write all offsets first, reflow once, then release to 0 together -
     // a reflow per button would thrash layout on a full-grid resort
     const movers = [];
-    for (const b of emotePick.querySelectorAll('button[data-ins]')) {
-      const r0 = before.get(b.dataset.ins)?.shift();
+    for (const b of emotePick.querySelectorAll(flipSel)) {
+      const r0 = before.get(flipKey(b))?.shift();
       if (!r0) continue;
       const r1 = b.getBoundingClientRect();
       const dx = r0.left - r1.left, dy = r0.top - r1.top;
@@ -9341,6 +9346,9 @@
     // unrelated headers
     const now = Date.now();
     let freshEdge = 0;
+    // nearest upcoming rung crossing, fed by aged() - arms a rebuild so
+    // cells drift down past the squares as they age, not just on new uses
+    let nextAgeDelta = Infinity;
     const pin = (n) => {
       if (q || epickSort !== 'use' || !epickMerge) return '';
       const age = now - (useTs[n] || 0);
@@ -9379,7 +9387,8 @@
       const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
         '<rect x="1" y="1" width="98" height="98" rx="5" vector-effect="non-scaling-stroke"/></svg>';
       return items.map((x) => {
-        const age = now - (useTs[codeOf(x)] || 0);
+        const ts = useTs[codeOf(x)] || 0;
+        const age = now - ts;
         let m = '';
         while (next < marks.length && age >= marks[next].t) {
           const mk = marks[next++];
@@ -9388,13 +9397,17 @@
           const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
           if (mk.t0) {
             const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
-            m += `<div role="separator" class="eage t0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${ANTS}${lbl}</div>`;
+            m += `<div role="separator" class="eage t0" data-age="0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded">${ANTS}${lbl}</div>`;
           } else {
             const lit = t0age >= mk.t;
             const lbl = mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 6e4 ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
-            m += `<div role="separator" class="eage${lit ? ' lit' : ''}${mk.missed ? ' missed' : ''}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lbl}</div>`;
+            m += `<div role="separator" class="eage${lit ? ' lit' : ''}${mk.missed ? ' missed' : ''}" data-age="${mk.t}"${dl} title="${lit ? `emotes below were last used over ${mk.words} ago` : `only ${t0mins}m recorded so far`}${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lbl}</div>`;
           }
         }
+        // the first rung beyond this cell's age is where it next crosses;
+        // never-seen cells sit past every rung and never cross again
+        if (ts) for (const mk of marks)
+          if (!mk.t0 && mk.t > age) { if (mk.t - age < nextAgeDelta) nextAgeDelta = mk.t - age; break; }
         return m + render(x);
       }).join('');
     };
@@ -9446,7 +9459,9 @@
       if (groupOn('emoji') && animOk(false))
         for (const c of EMOJIS) if (ehit(c)) ejs.push({ c, r: ejiBtn(c) });
       all.sort((a, b) => epickSort === 'az' ? byFam(a.c, b.c) : byUse(a.c, b.c));
-      h += aged(all.concat(ejs), (x) => x.c, (x) => x.r);
+      // emoji keep the tail unsorted, so the age walk skips them - its
+      // squares would land at list-order spots that say nothing
+      h += aged(all, (x) => x.c, (x) => x.r) + ejs.map((x) => x.r).join('');
     } else {
       // codes dedupe across sources too - 7tv/bttv both ship <3 and the
       // classics - first section scanned wins, later copies drop out
@@ -9495,6 +9510,13 @@
       freshTimer = 0;
       if (!emotePick.hidden) heldOr();
     }, FRESH_MS - freshEdge + 250) : 0;
+    // cells keep ageing between uses - rebuild when the next one crosses
+    // a rung so squares drift down with them instead of waiting for a use
+    clearTimeout(ageTimer);
+    ageTimer = isFinite(nextAgeDelta) ? setTimeout(() => {
+      ageTimer = 0;
+      if (!emotePick.hidden) heldOr();
+    }, Math.max(1600, nextAgeDelta + 80)) : 0;
   }
   // a pinned picker floats free of the chat bar and ignores its closes;
   // the pin state persists, so a pinned picker reopens on the next load

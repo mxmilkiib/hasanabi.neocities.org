@@ -15,6 +15,11 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- picker's time-ago squares now drift with the cells: a timed rebuild
+  lands whenever the next emote's age crosses a rung, and the squares
+  ride the same slide animation as the buttons (own-row mode keeps
+  them heading their rows). unsorted emoji no longer weave squares
+  through the tail of the grid; 10s and 20s rungs join the ladder
 - chat-link favicons that miss both icon services now fall back to
   a generic link glyph instead of vanishing from the row
 - the font menu previews each option in its own typeface, the closed
