@@ -43,6 +43,9 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- patreon links added for secular talk, the serfs, chapo, coffeezilla,
+  kat blaque, luna oi, kaceytron and comrade virgo - every other
+  patreon-less entry checked resolves 404 or a dead placeholder
 - reddit links joined novara (both rows), hasanabi (r/Hasan_Piker),
   the young turks and kaceytron in channels/streams, plus democracy
   now, the intercept and jacobin in the news column - the rest of the
