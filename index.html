@@ -1657,7 +1657,7 @@
     <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a fact line on the twitch-profile hover card for chatters who set pronouns on alejo.io; looked up when a profile is previewed and cached for a month<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost struck-through</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
-    <div><b>⌕</b> find bar: ctrl+f, / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
+    <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row</div>
     <div><b>stats</b> the tab beside this one: session top chatters, glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts</div>
@@ -5460,7 +5460,7 @@
   const findCnt = document.getElementById('findCnt');
   const findOnlyBtn = document.getElementById('findOnly');
   const findRes = document.getElementById('findres');
-  let findOnlyOn = false, findT = 0;
+  let findOnlyOn = false, findT = 0, findKeyT = 0;
   let findHits = [], findIdx = -1, findToks = [];
   const KIND_TESTS = {
     msg: (r) => !r.classList.contains('notice'),
@@ -5558,6 +5558,11 @@
   });
   addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'f') {
+      // a second tap inside half a second skips preventDefault so the
+      // browser's own find opens over a closed bar
+      const now = Date.now();
+      if (!e.repeat && now - findKeyT < 500) { findKeyT = 0; setFindOpen(false); return; }
+      if (!e.repeat) findKeyT = now;
       e.preventDefault();
       setFindOpen(true);
     } else if (e.key === '/' && findEl.hidden && !e.ctrlKey && !e.metaKey && !e.altKey &&

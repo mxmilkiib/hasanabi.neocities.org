@@ -301,7 +301,8 @@ no dependencies beyond CDN-hosted fonts.
   yt's `si`, x's `s`/`t` and friends) are stripped from the target
   itself on render, so the clean form is also what stats tallies and
   dedupe folds on.
-- Find bar — `ctrl+f`, `/` or the `⌕` button floats a search over the
+- Find bar — `ctrl+f` (a second tap hands off to the browser's own find),
+  `/` or the `⌕` button floats a search over the
   rendered scrollback: bare words match text, `user:login` the
   chatter, `kind:notice|mod|gap|action|emote|mention|kw|deleted|sub`
   the row type. `enter`/`⇧enter` step between matches with a counter,
