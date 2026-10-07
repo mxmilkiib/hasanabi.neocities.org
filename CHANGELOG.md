@@ -62,8 +62,9 @@ not versions — the page ships continuously to Neocities.
   anyway, may as well dress the part
 - scroll anywhere (the drag-to-scroll extension) joins extra links,
   as does rodrigo nunes' network organisation for the 21st century
-  (turbulence 4) and bo burnham's how the world works (yt); hootie
-  frutti leads the middle row of the six
+  (turbulence 4) and bo burnham's how the world works (yt); order is
+  nazi, burnham, hootie, kala, scroll anywhere, turbulence down the
+  left column
 - an unblock row sits under news: archive.today, wayback, removepaywall,
   smry, txtify, archive button and bypass paywalls clean, closing on
   ublock origin - paywallbuster/12ft/freedium checked, all dead
