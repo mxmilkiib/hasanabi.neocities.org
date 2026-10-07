@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the about page's opening line drops its redundant "self-contained
+  page" phrasing - the card tagline says it now - and "resource hub
+  tool" becomes "info hub tool"
 - the about/social card tagline gains "one-page" -
   `a compact, customisable, one-page Twitch chat client`
 - chat-link favicons fall back to icon.horse when duckduckgo's icon
