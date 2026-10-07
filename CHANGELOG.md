@@ -5,6 +5,21 @@ not versions — the page ships continuously to Neocities.
 
 ## 2026-10-07
 
+### Features
+- an about page at /about/ - a project landing page with the
+  screenshot card, a one-line pitch, chat / extras / resources
+  feature lists and the backend story (iframe relay + linkpeek
+  worker), a cta back to the app; the ? popup's source row leads
+  with a link to it
+- the ? popup's font-size pick gains 'chat −2' and 'chat −3' beside
+  'chat −1', each following the chat font that many ladder steps
+  down; the values ride saved options and ?hpfs=
+- a second ctrl+f tap hands off to the browser's own find - the
+  first opens the in-page find bar, a repeat within half a second
+  closes it and lets the keypress through
+- the stats tab's window pickers (top chatters, top emotes, badges)
+  run newest-first - today leads each row, alltime trails it
+
 ### Fixes
 - a sent line could end up missing from the input history's ↑ walk:
   sends that echoed into a sibling tab via the BroadcastChannel never
