@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the channels/streams `live?` ping link drops to the smaller .85em
+  annotation size
 - the letter-spacing options self-demonstrate - each label renders
   with the tracking it applies (they used to inherit the live chat
   spacing instead)
