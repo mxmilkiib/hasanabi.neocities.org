@@ -15,6 +15,8 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the font menu previews each option in its own typeface, the closed
+  select follows the current pick, and inter tops the list
 - atkinson hyperlegible mono joins the font menu (`?font=
   atkinsonmono`), loaded from google fonts at 400/600 like the
   other monospace entries
