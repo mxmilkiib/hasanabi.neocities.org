@@ -45,6 +45,9 @@ not versions — the page ships continuously to Neocities.
 ### Fixes
 - the ? button's border is 2px now - it reads as the odd one out
   anyway, may as well dress the part
+- an unblock row sits under news: archive.today, wayback, removepaywall,
+  smry, txtify, archive button and bypass paywalls clean, closing on
+  ublock origin - paywallbuster/12ft/freedium checked, all dead
 - yt links for monthly review, mondoweiss and le monde diplomatique in
   english (found by channel-id search, not handles) plus indymedia's
   @IMCnetwork - waiting room and lpe project searched, nothing real
