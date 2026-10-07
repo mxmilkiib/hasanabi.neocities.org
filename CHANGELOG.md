@@ -35,6 +35,8 @@ not versions — the page ships continuously to Neocities.
   breaking points
 - the channels/streams service columns now pin tw and yt leftmost
   (ahead of reddit/site) instead of ordering purely by frequency
+- yt links fill in for the twitch-first entries that had none -
+  maple takes, kneecoleslaw and comrade virgo
 
 ### Changed
 - the ? popup's link-weight row is hidden for now; entry links
