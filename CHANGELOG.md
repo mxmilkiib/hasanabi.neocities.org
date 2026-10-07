@@ -21,6 +21,10 @@ not versions — the page ships continuously to Neocities.
   run newest-first - today leads each row, alltime trails it
 
 ### Fixes
+- the find bar could cover its own matches: a hit at a column's scroll
+  edge couldn't centre and sat behind the fixed bar - while find is
+  open the columns now inset their scrollport past the bar (and an
+  open archive list), so jumped-to rows always land clear
 - the @ completer never offered the broadcaster: candidates came only
   from nicks seen chatting, and the channel itself rarely chats - the
   joined channels now lead the pick before the recent-nick walk

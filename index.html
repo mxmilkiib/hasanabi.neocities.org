@@ -848,6 +848,9 @@
     padding: 5px 7px; box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
   }
   #findbar[hidden] { display: none; }
+  /* while the bar is open the columns inset their scrollport past it
+     (and an open archive list), so a jumped-to row can't hide behind */
+  body.findopen .col { scroll-padding-top: var(--findclear, 0px); }
   /* the word buttons can't live in hdr-btn's fixed 30px cell */
   #findbar #findOnly, #findbar #findArch { width: auto; padding: 0 7px; white-space: nowrap; }
   #findIn { width: min(300px, 44vw); text-align: left; }
@@ -5526,11 +5529,21 @@
     r.classList.add('jump');
     findCnt.textContent = `${findIdx + 1}/${findHits.length}`;
   }
+  function findClear() {
+    // how far the open bar (and its archive list) reach into the
+    // columns' scrollport - jumped-to rows land clear of them
+    let bot = findEl.getBoundingClientRect().bottom;
+    if (!findRes.hidden) bot = Math.max(bot, findRes.getBoundingClientRect().bottom);
+    document.body.style.setProperty('--findclear',
+      Math.max(0, bot + 4 - logEl.getBoundingClientRect().top) + 'px');
+  }
   function setFindOpen(on) {
     findEl.hidden = !on;
+    document.body.classList.toggle('findopen', on);
     if (on) {
       findEl.style.top = (headerEl.getBoundingClientRect().bottom + 6) + 'px';
       findEl.style.left = Math.max(8, (innerWidth - findEl.offsetWidth) / 2) + 'px';
+      findClear();
       findIn.focus();
       findIn.select();
       if (findIn.value) runFind();
@@ -5658,10 +5671,12 @@
     const toks = findTokens();
     findRes.hidden = false;
     findRes.textContent = 'searching archive…';
+    findClear();
     archSearch(toks, (hits) => {
       if (!hits.length) { findRes.textContent = 'no archived matches'; return; }
       findRes.innerHTML = hits.map((r) =>
         `<div class="fr" data-mid="${escapeHTML(r.mid)}" data-ts="${r.ts}"><b>${escapeHTML(r.name || r.login || '?')}</b>: ${escapeHTML((r.text || '').slice(0, 160))}</div>`).join('');
+      findClear();
     });
   });
   // an archived hit whose row still renders jumps to it; gone rows just
