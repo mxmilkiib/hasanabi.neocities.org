@@ -22,6 +22,9 @@ not versions — the page ships continuously to Neocities.
 - a 'disable ? button toggling header button labels' pick pins the
   ? cycle to off ↔ panel, skipping the inline-labels modes; folds a
   showing labels mode back down, saved and exposed as ?nolbl=1
+- tweet preview cards stamp the post's age after the author (a dim
+  '· Nm/h/d/mo/y ago' with the full date on hover) - the relay
+  forwards fxtwitter's created_timestamp
 - the stats tab's session cell now notes what the tally counts -
   everything rendered since the page first ran, kept across reloads
 

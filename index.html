@@ -744,6 +744,7 @@
   }
   .twcard b { color: #1d9bf0; }
   .twcard .twavi { height: 1.5em; border-radius: 50%; vertical-align: -0.4em; margin-right: .25em; }
+  .twcard .twt { color: var(--text-dim); font-size: .82em; font-style: normal; white-space: nowrap; }
   .twcard .up { font-style: normal; }
   .twcard .twmedia img { max-height: 5em; max-width: 12em; border-radius: 4px; margin: 2px 4px 0 0; vertical-align: top; }
   /* inline site icons lead chat links; a 404 hides the chip rather than
@@ -2147,6 +2148,17 @@
   // cards collect while a row's tokens render, then land under the message
   const pendingTw = [];
   const twNorm = (s) => s.toLowerCase().replace(/https?:\/\/\S+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  // compact age for a card stamp: 45m / 3h / 12d / 7mo / 4y ago
+  const fmtAgo = (ts) => {
+    const m = Math.max(0, Math.round((Date.now() - ts) / 60000));
+    if (m < 60) return m ? m + 'm ago' : 'just now';
+    const h = Math.round(m / 60);
+    if (h < 24) return h + 'h ago';
+    const d = Math.round(h / 24);
+    if (d < 30) return d + 'd ago';
+    const mo = Math.round(d / 30.44);
+    return mo < 12 ? mo + 'mo ago' : Math.round(d / 365.25) + 'y ago';
+  };
   // the card is built per row: a bot that already pasted the tweet's text
   // (fossabot) makes the text redundant, so only the media is kept
   function twCard(c, rowText, id) {
@@ -2156,11 +2168,12 @@
     const head = twNorm(c.text).slice(0, 40);
     const media = c.imgs ? `<span class="twmedia">${c.imgs}</span>` : '';
     const avi = c.avatar ? `<img class="twavi" src="${escapeHTML(c.avatar)}" alt="" referrerpolicy="no-referrer">` : '';
-    if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard"${twid}>${avi}<b>@${escapeHTML(c.author)}</b> ${media}</span>` : '';
+    const age = c.ts ? ` <i class="twt" title="${escapeHTML(new Date(c.ts).toLocaleString())}">· ${fmtAgo(c.ts)}</i>` : '';
+    if (head.length >= 12 && twNorm(rowText).includes(head)) return media ? `<span class="twcard"${twid}>${avi}<b>@${escapeHTML(c.author)}</b>${age} ${media}</span>` : '';
     // unicode runs stay upright: italic faces lack their glyph coverage
     const text = linkifyEsc(escapeHTML(c.text.slice(0, 280).replace(/\S(?=\[video\])/gi, '$& '))
       .replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'));
-    return `<span class="twcard"${twid}>${avi}<b>@${escapeHTML(c.author)}</b> ${text}${media}</span>`;
+    return `<span class="twcard"${twid}>${avi}<b>@${escapeHTML(c.author)}</b>${age} ${text}${media}</span>`;
   }
   // a youtube link gets an info card under its row like a tweet does: the
   // linkpeek worker already scrapes oembed+watch-page metadata, keyed by
@@ -9600,7 +9613,7 @@
             }))
           .join('');
         entry = { text: t.text, author: t.author && t.author.screen_name || '',
-          avatar: t.author && t.author.avatar_url || '', imgs };
+          avatar: t.author && t.author.avatar_url || '', imgs, ts: +t.ts || 0 };
       }
       tweetCache.set(d.id, entry);
       // bound the cache - a long session can link thousands of unique tweets
