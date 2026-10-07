@@ -433,6 +433,8 @@ force off.
 | `bw` | comma list | block words — matching lines hidden |
 | `ping` | flag | mention ping sound |
 | `clean` | flag | cleaned link text |
+| `gifsafe` | flag | giphy pg-13 safe-search |
+| `notify` | flag | background notifications (asks permission on first load) |
 | `self` | flag | accent edge on one's own messages |
 | `peek` | `0`–`3` | link-hover cards: off / text / +image / +icons |
 | `yt` | `0` | youtube link embeds off |

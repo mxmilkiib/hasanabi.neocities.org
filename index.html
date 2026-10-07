@@ -7038,6 +7038,8 @@
     }
     if (pingOn) q.set('ping', '1');
     if (cleanUrls) q.set('clean', '1');
+    if (gifSafe) q.set('gifsafe', '1');
+    if (notifyOn) q.set('notify', '1');
     if (peekMode !== 2) q.set('peek', peekMode);
     if (!ytEmbed) q.set('yt', '0');
     if (!titleBarOn) q.set('stitle', '0');
@@ -10098,6 +10100,8 @@
     if (q.has('hwm')) { const i = HIDE_MODES.indexOf(q.get('hwm')); if (i >= 0) setHideMode(i); }
     if (q.has('ping')) setPing(flag('ping'));
     if (q.has('clean')) setCleanUrls(flag('clean'));
+    if (q.has('gifsafe')) setGifSafe(flag('gifsafe'));
+    if (q.has('notify')) setNotify(flag('notify'), true);
     if (q.has('peek') && +q.get('peek') >= 0 && +q.get('peek') < PEEK_MODES.length) setPeek(+q.get('peek'));
     if (q.has('yt')) setYtEmb(flag('yt'));
     if (q.has('stitle')) setTitleBar(flag('stitle'));
