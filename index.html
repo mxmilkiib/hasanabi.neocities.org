@@ -5136,7 +5136,7 @@
   document.getElementById('helpLhList').innerHTML = LINE_HEIGHTS.map((lh, i) =>
     `<a href="#" role="button" class="helpLh" data-idx="${i}">${lh}</a>`).join(' ');
   document.getElementById('helpLsList').innerHTML = LS_STEPS.map((v, i) =>
-    `<a href="#" role="button" class="helpLs" data-idx="${i}">${v}</a>`).join(' ');
+    `<a href="#" role="button" class="helpLs" data-idx="${i}" style="letter-spacing:${v}em">${v}</a>`).join(' ');
   fontCtl.set(fontCtl.get());
   lhCtl.set(lhCtl.get());
   weightCtl.set(weightCtl.get());

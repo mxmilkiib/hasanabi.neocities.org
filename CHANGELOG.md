@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the letter-spacing options self-demonstrate - each label renders
+  with the tracking it applies (they used to inherit the live chat
+  spacing instead)
 - the popup font-size picker gains a `chat` option (match the chat
   font exactly, no step down); chat-relative picks now also light up
   the px stop they currently resolve to
