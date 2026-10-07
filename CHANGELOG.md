@@ -15,6 +15,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the scroll-off counter pill now gets two plain-arrow circle buttons
+  flanking it at the quarter-width marks of its column - same theme,
+  same jump-to-bottom, three landing spots in one, two and three
+  column layouts alike
 - emote-picker cells now hold their use colour while a chat row
   carrying the emote is still on screen: rows are watched for
   viewport intersection, the wash only fades once every copy has

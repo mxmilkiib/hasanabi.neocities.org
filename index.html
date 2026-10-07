@@ -476,6 +476,21 @@
   main.split3 .jdown { left: 16.666%; }
   main.split3 .jdown.side { left: 50%; }
   main.split3 .jdown.side2 { left: 83.333%; }
+  /* plain-arrow circles flank each counter pill, parked halfway between
+     the pill and its column's edges - same jump, wider landing strip */
+  .jdown.jdc { min-width: 0; width: 30px; padding: 0; border-radius: 50%; font-size: 15px; }
+  .jdown.jdc.l { left: 25%; }
+  .jdown.jdc.r { left: 75%; }
+  main.split .jdc[data-for="jdownLog"].l { left: 12.5%; }
+  main.split .jdc[data-for="jdownLog"].r { left: 37.5%; }
+  main.split .jdc[data-for="jdownSide"].l { left: 62.5%; }
+  main.split .jdc[data-for="jdownSide"].r { left: 87.5%; }
+  main.split3 .jdc[data-for="jdownLog"].l { left: 8.333%; }
+  main.split3 .jdc[data-for="jdownLog"].r { left: 25%; }
+  main.split3 .jdc[data-for="jdownSide"].l { left: 41.666%; }
+  main.split3 .jdc[data-for="jdownSide"].r { left: 58.333%; }
+  main.split3 .jdc[data-for="jdownSide2"].l { left: 75%; }
+  main.split3 .jdc[data-for="jdownSide2"].r { left: 91.666%; }
   /* rev flow: the column axis flips so newest rows land at the top. The
      scroll origin anchors to the bottom, so the live edge sits at
      scrollTop = clientHeight - scrollHeight (negative) and sparse
@@ -1804,7 +1819,7 @@
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
-  <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
+  <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each age square gets its own row - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
@@ -2679,6 +2694,11 @@
   function jdownSet(btn, col, forceHidden) {
     const at = forceHidden || liveDist(col) < 60;
     btn.hidden = at;
+    // the flanking arrow circles ride the pill's visibility
+    for (const c of document.querySelectorAll(`.jdc[data-for="${btn.id}"]`)) {
+      c.hidden = at;
+      if (!at) c.textContent = revFlow ? '↑' : '↓';
+    }
     if (!at) {
       const { n, sec } = belowFold(col);
       btn.innerHTML = `<span class="arr">${revFlow ? '↑' : '↓'}</span>${n ? `<span class="cnt">${n}</span>` : ''}${sec ? `<span class="cnt secs">${fmtBack(sec)}</span>` : ''}`;
@@ -2702,9 +2722,17 @@
   });
   function jumpDown(col, btn) {
     btn.hidden = true;
+    for (const c of document.querySelectorAll(`.jdc[data-for="${btn.id}"]`)) c.hidden = true;
     col.scrollTo({ top: revFlow ? -col.scrollHeight : col.scrollHeight, behavior: 'smooth' });
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
+  // the plain circles make the same jump as their column's counter pill
+  for (const c of document.querySelectorAll('.jdc')) c.addEventListener('click', () => {
+    const btn = document.getElementById(c.dataset.for);
+    const col = btn === jdownSide ? sideEl : btn === jdownSide2 ? side2El : logEl;
+    if (col === logEl) stickBottom = true;
+    jumpDown(col, btn);
+  });
   // scroll pause: hovering an actual message row holds that column; empty
   // column space doesn't count. Leaving the row re-pins if it was following
   let pauseOnText = false;
@@ -7472,7 +7500,8 @@
     side2El.hidden = level < 3;
     mainEl.classList.toggle('split', level >= 2);
     mainEl.classList.toggle('split3', level === 3);
-    jdownSide.hidden = jdownSide2.hidden = true;
+    jdownSet(jdownSide, sideEl, true);
+    jdownSet(jdownSide2, side2El, true);
     setOn(splitBtn, level > 1);
     splitBtn.textContent = level === 3 ? '▮▮▮' : '▮▮';
     splitBtn.classList.toggle('tri', level === 3);
