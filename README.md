@@ -449,7 +449,7 @@ force off.
 | `epmix` | `1` | picker merged provider grid |
 | `ephold` | `0` | picker reshuffle hold off |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
-| `epanim` | `anim`,`still` | picker animation filter |
+| `epanim` | `anim`,`animf`,`still` | picker animation filter (`animf` = animated shown as stills) |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
 | `overlay` | flag | OBS browser-source mode: transparent page, live rows only |
 | `mid` | a message id | scroll to and flash that row on load (set by timestamp clicks) |

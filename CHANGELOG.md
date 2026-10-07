@@ -15,6 +15,11 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the picker's `anim` chip is now tri-state: click cycles playing →
+  frozen stills → hidden. frozen cells render the static frame - 7tv
+  `*_static` variants and twitch `default` paths directly, first-frame
+  renders via weserv for bttv/ffz-animated which ship none; dashed
+  border marks the frozen leg and `epanim=animf` carries it in urls
 - picker's time-ago squares now drift with the cells: a timed rebuild
   lands whenever the next emote's age crosses a rung, and the squares
   ride the same slide animation as the buttons (own-row mode keeps

@@ -1089,6 +1089,8 @@
   #rate { flex: 1; min-width: 0; white-space: nowrap; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  /* the anim chip's frozen state: on, but dashed to read 'stilled' */
+  .hdr-btn.on.frz { border-style: dashed; }
   /* copy-settings flashes a full accent inversion on success, then
      eases back to chrome over the transition on the base state */
   #copyUrl { transition: background .4s ease, color .4s ease, border-color .4s ease; }
@@ -1707,7 +1709,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. @hasanabi rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking where emotes last saw 2m–60m ago ('▤' starts each populated era on its own row and packs empty stretches together), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid and lifts anything used in the last minute to the very top, 'anim'/'still' filter, 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking where emotes last saw 2m–60m ago ('▤' starts each populated era on its own row and packs empty stretches together), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid and lifts anything used in the last minute to the very top, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -8857,6 +8859,14 @@
     '♥️':'heart suit card emotion game hearts', '♦️':'diamond suit card game', '🃏':'joker card game wildcard',
   };
   const twEmoteUrl = (id, anim) => `https://static-cdn.jtvnw.net/emoticons/v2/${id}/${anim ? 'animated' : 'default'}/${lightMode ? 'light' : 'dark'}/2.0`;
+  // the anim chip's frozen state renders the still frame: 7tv ships a
+  // *_static variant and twitch a 'default' path; bttv/ffz-animated have
+  // none, so weserv serves their first frame (img-src is open)
+  const freezeUrl = (u) => {
+    const v = u.replace(/(cdn\.7tv\.app\/emote\/[^/]+\/\dx)\.webp$/, '$1_static.webp')
+               .replace(/(\/emoticons\/v2\/[^/]+\/)animated\//, '$1default/');
+    return v !== u ? v : `https://images.weserv.nl/?url=${u.replace(/^https?:\/\//, '')}&n=1`;
+  };
   const twAnim = (code) => twSets.some((s) =>
     s.emoteList.some((e) => e.code === code && e.assetType === 'ANIMATED'));
   // twitch sets: [{ setID, channelLogin, tier, emoteList: [{ code, id, type }] }]
@@ -9021,23 +9031,37 @@
   const EPICK_ANIM_KEY = 'hasan-epickanim';
   let epickAnimOn = new Set();
   try { epickAnimOn = new Set(JSON.parse(localStorage.getItem(EPICK_ANIM_KEY)) || []); } catch {}
-  const animOk = (a) => !epickAnimOn.size || epickAnimOn.has(a ? 'anim' : 'still');
+  // the anim chip is tri-state: playing -> frozen (shown as stills) ->
+  // hidden; 'animf' marks the frozen leg in the saved/url list
+  const animOk = (a) => !epickAnimOn.size || epickAnimOn.has(a ? 'anim' : 'still') || (a && epickAnimOn.has('animf'));
+  const animFrozen = () => epickAnimOn.has('animf') && !epickAnimOn.has('anim');
+  const animState = () => animFrozen() ? 'frozen' : !epickAnimOn.size || epickAnimOn.has('anim') ? 'play' : 'off';
   const animBtns = { anim: document.getElementById('emoteAnim'), still: document.getElementById('emoteStill') };
   function paintAnim() {
     setOn(animBtns.anim, animOk(true));
+    animBtns.anim.classList.toggle('frz', animFrozen());
+    animBtns.anim.title = `animated emotes: ${{ play: 'playing', frozen: 'shown as stills', off: 'hidden' }[animState()]} - click cycles, shift-click solos`;
     setOn(animBtns.still, animOk(false));
   }
   paintAnim();
   const setAnimFilter = (list) => {
-    epickAnimOn = new Set((list || []).filter((k) => k === 'anim' || k === 'still'));
-    if (epickAnimOn.size === 2) epickAnimOn.clear();
+    epickAnimOn = new Set((list || []).filter((k) => k === 'anim' || k === 'animf' || k === 'still'));
+    // anim-playing + still is the unrestricted default - stored as empty
+    if (epickAnimOn.has('anim') && epickAnimOn.has('still')) epickAnimOn.clear();
     try { localStorage.setItem(EPICK_ANIM_KEY, JSON.stringify([...epickAnimOn])); } catch {}
     paintAnim();
   };
   for (const [k, b] of Object.entries(animBtns)) b.addEventListener('click', (e) => {
     let next;
     if (e.shiftKey) next = [k];
-    else if (!epickAnimOn.size) next = k === 'anim' ? ['still'] : ['anim'];
+    else if (k === 'anim') {
+      next = [...epickAnimOn].filter((x) => x !== 'anim' && x !== 'animf');
+      const st = animState();
+      if (st === 'play') next.push('animf');
+      else if (st === 'off') next.push('anim');
+      if (!epickAnimOn.size) next.push('still'); // default was all-on; keep stills lit
+    }
+    else if (!epickAnimOn.size) next = ['anim'];
     else { next = [...epickAnimOn]; epickAnimOn.has(k) ? next.splice(next.indexOf(k), 1) : next.push(k); }
     setAnimFilter(next);
     buildPicker();
@@ -9359,8 +9383,9 @@
     const ejiBtn = (c, strip) => `<button type="button" class="eji" data-ins="${c}"${strip ? '' : pin(c)} title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
     const btn = (n, src, img, a, strip) => {
       const e = escapeHTML(n);
+      const im = a && animFrozen() ? freezeUrl(img) : img;
       return `<button type="button" data-ins="${e}"${strip ? '' : pin(n)}${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
-        `<img src="${escapeHTML(img)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
+        `<img src="${escapeHTML(im)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // in use mode, the cells mark where last-seen chat use ages past each
@@ -10247,7 +10272,7 @@
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 1 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     // emote-picker options: ?epnames=1&epzoom=sm|q|big&epsort=az&epage=1&
-    // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|still&epgeo=WxH[,L,T]
+    // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(flag('epnames')); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
