@@ -5032,6 +5032,10 @@
   if (pi >= 0 && di >= 0) [svcCols[pi], svcCols[di]] = [svcCols[di], svcCols[pi]];
   const li = svcCols.indexOf('lemmy');
   if (li >= 0) { svcCols.splice(li, 1); svcCols.splice(svcCols.indexOf('discord') + 1, 0, 'lemmy'); }
+  // links is the aggregator column - it pins last, the rightmost
+  // service column before the descriptor cells
+  const ki = svcCols.indexOf('links');
+  if (ki >= 0 && ki !== svcCols.length - 1) { svcCols.splice(ki, 1); svcCols.push('links'); }
   const colOf = new Map(svcCols.map((nm, k) => [nm, k + 3]));
   for (const el of svcCells) el.style.gridColumn = colOf.get(el.dataset.svc);
   extraCells.forEach((el, k) => { el.style.gridColumn = 3 + svcCols.length + k; });
