@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the config/help tab's left heading column joins the light purple -
+  the legend's rowstyle swatches keep their colours
+- the `disable ? button` row reads just `header button labels`
 - `how the world works` tops the third column of extra links via a
   forced column break
 - the stream title centers in its bar; the hide ✕ pins to the right

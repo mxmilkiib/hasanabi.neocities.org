@@ -1235,7 +1235,8 @@
      accent-coloured label <b>s elsewhere in the panel */
   #helpPanel #htabRes > div > b,
   #helpPanel #htabLib > div > b,
-  #helpPanel #authSections > div > b { color: #c39bff; }
+  #helpPanel #authSections > div > b,
+  #helpPanel #htabCfg > div > b:not([class]) { color: #c39bff; }
   /* the ghbtns.com star-button look at small size, self-hosted - an
      iframe embed would be eaten by social-widget blocklists. The count
      fills from the relay's repo stats instead of their jsonp. Dark
@@ -1659,7 +1660,7 @@
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
     <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
-    <div class="wide"><span>disable ? button toggling header button labels: <span id="helpNoLblList"></span><sup>†</sup></span></div>
+    <div class="wide"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
