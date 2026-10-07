@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- stats filters normalise the labels: `alltime`/`day` read
+  `all-time`/`today` everywhere, and every ranking now defaults to
+  `today` (old saved prefs resolve to the new names)
 - recovered gap bands on the rate graph are green now - violet was
   close enough to the socket-loss red to confuse, and a re-marked
   away span no longer clobbers a sample's `filled` tag

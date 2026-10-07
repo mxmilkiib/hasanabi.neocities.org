@@ -4473,10 +4473,13 @@
   // top emotes' count source: the channel's StreamElements figures, or
   // this client's own tallies - all of them or a recent window. window
   // specs fold hour buckets for sub-day spans and day buckets past that
-  const EMOTE_SRCS = { alltime: 0, local: -1, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const EMOTE_SRCS = { 'all-time': 0, local: -1, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
-  let emoteStatSrc = 'alltime';
-  try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
+  // saved prefs from before the labels were normalised still resolve
+  const normWin = (v) => (v === 'alltime' ? 'all-time' : v === 'day' ? 'today' : v);
+  let emoteStatSrc = 'today';
+  try { emoteStatSrc = normWin(localStorage.getItem(EMOTE_SRC_KEY)) || 'today'; } catch {}
+  if (!(emoteStatSrc in EMOTE_SRCS)) emoteStatSrc = 'today';
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
   const CHAT_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
@@ -4484,18 +4487,19 @@
   let chatSort = 'today';
   try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'today'; } catch {}
   if (!(chatSort in CHAT_WINS)) chatSort = 'today';
-  // badge counts also window like the emote ones: alltime is the plain
+  // badge counts also window like the emote ones: all-time is the plain
   // tally, the rest read trailing days out of the per-version buckets
-  const BADGE_WINS = { alltime: 0, month: { d: 31 }, week: { d: 7 }, day: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const BADGE_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const BADGE_WIN_KEY = 'hasan-badgewin';
-  let badgeWin = 'alltime';
-  try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
+  let badgeWin = 'today';
+  try { badgeWin = normWin(localStorage.getItem(BADGE_WIN_KEY)) || 'today'; } catch {}
+  if (!(badgeWin in BADGE_WINS)) badgeWin = 'today';
   // top links window the same way; all-time is the plain tally
   const LINK_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const LINK_WIN_KEY = 'hasan-linkwin';
-  let linkWin = 'all-time';
-  try { linkWin = localStorage.getItem(LINK_WIN_KEY) || 'all-time'; } catch {}
-  if (!(linkWin in LINK_WINS)) linkWin = 'all-time';
+  let linkWin = 'today';
+  try { linkWin = localStorage.getItem(LINK_WIN_KEY) || 'today'; } catch {}
+  if (!(linkWin in LINK_WINS)) linkWin = 'today';
   // a window spec folds its bucket family into a key -> count map:
   // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
   const foldWin = (spec, dayBag, hourBag) => {
@@ -4807,7 +4811,7 @@
     // the window buttons take the sort row's lead slot: each one is
     // 'use' ranked within that window, so they only light when the
     // ranked view is showing
-    const badgeWinTips = { alltime: 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', day: 'flat ranking by use, today', '12h': 'flat ranking by use, last 12 hours', '1h': 'flat ranking by use, last hour' };
+    const badgeWinTips = { 'all-time': 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', today: 'flat ranking by use, today', '12h': 'flat ranking by use, last 12 hours', '1h': 'flat ranking by use, last hour' };
     const badgeWinBtns = Object.keys(BADGE_WINS)
       .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
