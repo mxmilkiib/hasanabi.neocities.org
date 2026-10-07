@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- kopimistsamfundet (sweden's file-sharing church) joins sharing;
+  its `—` divider moves above the row so sharing + free culture sit
+  inside the free/open block
 - the channels/streams `links` column pins to the rightmost service
   slot instead of sorting in by frequency
 - a `free culture` row below sharing - the movement, creative
