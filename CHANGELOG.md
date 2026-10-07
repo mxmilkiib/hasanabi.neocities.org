@@ -108,7 +108,8 @@ not versions — the page ships continuously to Neocities.
   @handle is dead) and chapo's lemmy link retargeted to
   hexbear.net/c/chapotraphouse (chapo.chat folded into hexbear)
 - the news column grew a serious-mainstream tail: reuters, ap, bbc,
-  the guardian, financial times, the economist, new statesman, le monde
+  channel 4 news, the guardian, financial times, the economist, new
+  statesman, le monde
   diplomatique, haaretz, politico, nyt, wapo, the atlantic, the new
   yorker, foreign affairs, foreign policy, npr, pbs newshour,
   propublica and rest of world - every linked yt handle verified
