@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the news column splits into subsections, left-parties style:
+  independent & left, palestine & middle east (haaretz moved in),
+  wires, uk, us, and journals & intl (le monde diplo heads it)
 - the tiktok column fills out: 22 creator tiktoks verified by bio,
   nickname or channel-linked socials (hasanabi, mpu, breaking points,
   tyt, secular talk, smn, novara, the serfs, maple takes, pod save via
