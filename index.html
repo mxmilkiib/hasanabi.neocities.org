@@ -2339,7 +2339,7 @@
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
   // and bolding @username mentions like real chat. Zero-width emotes stack
   // onto the previous emote; cheermotes resolve when the message has bits.
-  function renderTextHTML(text, hasBits, ch, shiny) {
+  function renderTextHTML(text, hasBits, ch, shiny, noYt) {
     const em = emotesOf(ch || CHANNEL), eml = emotesLcOf(ch || CHANNEL),
           es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL);
     const out = [];
@@ -2433,7 +2433,7 @@
           // any other link
           const yt = ytEmbed ? ytIdOf(url) : null;
           const ytgl = yt ? `<a class="ytemb" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} href="https://youtu.be/${yt.id}" title="play the video here">▶</a>` : '';
-          if (yt) {
+          if (yt && !noYt) {
             // title/channel card lands under the message - cached peeks
             // paint at once, misses plant a placeholder filled on arrival
             const ypk = ytKeyOf(yt.id);
@@ -2478,12 +2478,12 @@
   // Turns message text + the "emotes" tag into HTML, swapping emote spans for
   // <img> tags and escaping everything else. Also returns the native emote
   // names so callers can tell emote-only messages apart.
-  function renderMessageHTML(message, emotesTag, hasBits, ch, shiny) {
+  function renderMessageHTML(message, emotesTag, hasBits, ch, shiny, noYt) {
     const names = new Set();
     // tag-rendered ids let the stats tab image emotes that live outside the
     // third-party sets (other channels' sub emotes usable here)
     const nameId = new Map();
-    if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch, shiny), names };
+    if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch, shiny, noYt), names };
     const emotes = [];
     for (const part of emotesTag.split('/')) {
       const [id, ranges] = part.split(':');
@@ -2493,12 +2493,12 @@
         emotes.push({ id, start, end });
       }
     }
-    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits, ch, shiny), names };
+    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits, ch, shiny, noYt), names };
     emotes.sort((a, b) => a.start - b.start);
     let html = '', cursor = 0;
     for (const e of emotes) {
       if (e.start < cursor) continue; // ignore malformed/overlapping ranges
-      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch, shiny);
+      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch, shiny, noYt);
       const name = message.slice(e.start, e.end + 1);
       names.add(name);
       nameId.set(name, e.id);
@@ -2510,7 +2510,7 @@
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
     }
-    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch, shiny);
+    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch, shiny, noYt);
     return { html, names, nameId };
   }
 
@@ -3267,7 +3267,7 @@
         ? { html: gifHtml(gifm[1], message), names: new Set() }
         : fossa && /[⠀-⣿]/.test(message)
           ? { html: '<br>' + message.split(' ').map((w) => linkifyEsc(escapeHTML(w))).join('<br>'), names: new Set() }
-          : renderMessageHTML(message, tags.emotes, !!tags.bits, ch, shimmer);
+          : renderMessageHTML(message, tags.emotes, !!tags.bits, ch, shimmer, fossa);
       let msgHtml = rendered.html;
       const twTail = pendingTw.splice(0).join('');
       // chatterino-style: messages made of only emotes render them bigger

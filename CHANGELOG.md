@@ -25,6 +25,8 @@ not versions — the page ships continuously to Neocities.
 - tweet preview cards stamp the post's age after the author (a dim
   '· Nm/h/d/mo/y ago' with the full date on hover) - the relay
   forwards fxtwitter's created_timestamp
+- fossabot posts no longer sprout the youtube thumbnail card under
+  the message - the inline ▶ unfold glyph stays for on-demand play
 - the stats tab's session cell now notes what the tally counts -
   everything rendered since the page first ran, kept across reloads
 
