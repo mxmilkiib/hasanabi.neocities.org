@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the liberatory tab is now `left/libre` - `?htab=left` is the
+  canonical token, old `liberatory` links still resolve
 - the stats age filters now read longest → shortest
   (all-time → 1h) across chatters, links, emotes and badges
 - top links gets the same age windows as the other rankings

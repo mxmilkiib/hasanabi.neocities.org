@@ -1653,7 +1653,7 @@
   </header>
   <div id="titleBar" role="status" hidden><span id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
-    <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">liberatory</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
+    <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left/libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">config/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
     <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
@@ -4440,7 +4440,7 @@
     try { localStorage.setItem('hasan-htab', id); } catch {}
   }
   // short names for the ?htab= settings param, both directions
-  const HTAB_URL = { config: 'htabCfg', resources: 'htabRes', media: 'htabRes', liberatory: 'htabLib', authors: 'htabAuth', stats: 'htabStats' };
+  const HTAB_URL = { config: 'htabCfg', resources: 'htabRes', media: 'htabRes', liberatory: 'htabLib', left: 'htabLib', authors: 'htabAuth', stats: 'htabStats' };
   const HTAB_URL_INV = Object.fromEntries(Object.entries(HTAB_URL).map(([k, v]) => [v, k]));
   // the stats tab builds fresh on each open: session chatters and message
   // counts, channel emote usage, and the rate graph's loudest samples

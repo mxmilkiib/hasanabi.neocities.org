@@ -384,7 +384,7 @@ no dependencies beyond CDN-hosted fonts.
   that day's supa chat log; and a storage cell sizing the app's own
   footprint — localStorage keys, archive row count, origin estimate),
   media (Hasan & co. links, clips, news, yt channels, twitch streams,
-  community), liberatory (usa pol, dsa chapters, left parties,
+  community), left/libre (usa pol, dsa chapters, left parties,
   organising, conduct, dual power, mutual aid, free software, free
   culture, open hardware, open social, open gov, justice, extra
   links), and authors (era-grouped reading lists) — laid out in link
@@ -410,7 +410,7 @@ force off.
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
-| `lw` | `300`–`700` | weight of entry links across the `?` popup — media, liberatory, authors, stats |
+| `lw` | `300`–`700` | weight of entry links across the `?` popup — media, left/libre, authors, stats |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
 | `hpfs` | px / `-1`…`-3` | help popup font size (negatives follow the chat font that many steps down) |
 | `hpw` | `480`–`1600` | help popup width |
@@ -428,7 +428,7 @@ force off.
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel`/`labels`/`both` | help display mode |
 | `nolbl` | flag | `?` button cycles only off/panel — the header-label modes are skipped |
-| `htab` | `config`/`media`/`liberatory`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`resources` still resolves to `media`) |
+| `htab` | `config`/`media`/`left`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`resources` and `liberatory` still resolve to `media`/`left`) |
 | `kw` | comma list | keyword highlights (green edge) |
 | `bw` | comma list | block words — matching lines hidden |
 | `ping` | flag | mention ping sound |
