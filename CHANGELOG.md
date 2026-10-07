@@ -15,6 +15,8 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the media tab's `news` row columns widen from 20em to 26em, so the
+  outlet entries with yt/reddit sub-links stop wrapping as much
 - copied settings urls now carry `gifsafe` (giphy safe-search) and
   `notify` (background notifications - opens a permission prompt on
   first load); the last two saved options the url format skipped
