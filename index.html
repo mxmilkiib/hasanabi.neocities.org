@@ -4309,7 +4309,7 @@
     else if (a.classList.contains('helpHelp')) { helpForced = !helpPanel.hidden; helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
     else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px'; applyHelpW(); const s = readHsize(); delete s.w; delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a width pick also docks the panel top-right
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
-    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i - 3; applyHelpFs(); }
+    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i <= 2 ? i - 3 : i === 3 ? -4 : i - 4; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
@@ -6010,7 +6010,7 @@
     }
     if (Number.isInteger(o.hpfs)) {
       helpFs = o.hpfs < 0 ? o.hpfs : HDR_SIZES.indexOf(o.hpfs);
-      if (helpFs < -3) helpFs = -1; // a px no longer offered falls back to follow
+      if (helpFs < -4) helpFs = -1; // a px no longer offered falls back to follow
       applyHelpFs();
     }
     // late on purpose - it folds a restored labels mode back to the pair
@@ -6754,14 +6754,25 @@
   }
   // a dragged width isn't one of the stops - note it in brackets
   const markHelpW = (w) => { helpWCur.textContent = w ? ` (${w}px)` : ''; };
-  // popup font size: -1/-2/-3 follow the chat font that many ladder steps
-  // down, else a px pick from the same stops the header size uses
+  // popup font size: -4/-1/-2/-3 follow the chat font that many ladder steps
+  // down (-4 = no step, chat itself), else a px pick from the same stops
+  // the header size uses
   let helpFs = -1;
   function applyHelpFs() {
-    if (helpFs < 0) helpPanel.style.fontSize = helpFs === -1 ? '' : `var(--help-font${-helpFs})`;
+    if (helpFs === -4) helpPanel.style.fontSize = 'var(--chat-font)';
+    else if (helpFs < 0) helpPanel.style.fontSize = helpFs === -1 ? '' : `var(--help-font${-helpFs})`;
     else helpPanel.style.fontSize = HDR_SIZES[helpFs] + 'px';
-    markHelp('helpFs', helpFs + 3);
+    markHelpFs();
     saveOpts();
+  }
+  // a chat-relative pick resolves to a px stop too - light that up as well
+  // so the row shows what 'chat −N' currently means
+  function markHelpFs() {
+    markHelp('helpFs', helpFs === -4 ? 3 : helpFs < 0 ? helpFs + 3 : helpFs + 4);
+    if (helpFs >= 0) return;
+    const i = HDR_SIZES.indexOf(Math.round(parseFloat(getComputedStyle(helpPanel).fontSize)));
+    const eq = i >= 0 && helpPanel.querySelector(`a.helpFs[data-idx="${i + 4}"]`);
+    if (eq) setOn(eq, true);
   }
   // header height changes with width when the controls wrap - re-anchor
   window.addEventListener('resize', () => {
@@ -9865,7 +9876,7 @@
     // transparent background; not a saved option, it lives in the url alone
     if (flag('overlay')) document.body.classList.add('overlay');
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
-    if (q.has('hpfs')) { const v = +q.get('hpfs'), i = v < 0 ? Math.max(Math.round(v), -3) : HDR_SIZES.indexOf(v); if (v < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
+    if (q.has('hpfs')) { const v = +q.get('hpfs'), i = v < 0 ? Math.max(Math.round(v), -4) : HDR_SIZES.indexOf(v); if (v < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
     // read after ?help= so a labels-mode param still folds back to the pair
     if (q.has('nolbl')) setNoLbl(flag('nolbl'));
@@ -9903,7 +9914,7 @@
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
-    helpFs: ['chat −3', 'chat −2', 'chat −1'].concat(HDR_SIZES),
+    helpFs: ['chat −3', 'chat −2', 'chat −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'on'],
     helpHide: HIDE_MODES,
@@ -9989,7 +10000,7 @@
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
   markHelp('helpHfs', hdrFs + 1);
-  markHelp('helpFs', helpFs + 3);
+  markHelpFs();
   markHelp('helpSelf', selfHl ? 1 : 0);
   markHelp('helpAnim', ANIM_LVLS.indexOf(nickAnim));
   markHelp('helpRbw', rbwStyle);

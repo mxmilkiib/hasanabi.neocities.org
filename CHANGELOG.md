@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the popup font-size picker gains a `chat` option (match the chat
+  font exactly, no step down); chat-relative picks now also light up
+  the px stop they currently resolve to
 - the news column splits into subsections, left-parties style:
   independent & left, palestine & middle east (haaretz moved in),
   wires, uk, us, and journals & intl (le monde diplo heads it)
