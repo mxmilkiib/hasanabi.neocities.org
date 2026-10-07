@@ -925,6 +925,7 @@
   #statsBody .st-row .nm { overflow: hidden; text-overflow: ellipsis;
     white-space: nowrap; min-width: 0; }
   #statsBody .st-row .emote { max-height: 1.4em; max-width: 2em; vertical-align: -0.3em; }
+  #statsBody .st-note .nm { color: var(--text-dim); font-size: .8em; white-space: normal; }
   /* the fixed-width image slot lines up the names' left edges whether a
      row carries an emote image or not */
   #statsBody .st-row .ems { display: inline-block; width: 2em; text-align: center; }
@@ -4660,7 +4661,8 @@
         `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
         `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
-        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers</span></div>` : '') + `</div>` +
+        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers</span></div>` : '') +
+        `<div class="st-row st-note"><span class="nm">rows rendered since this page first ran - reloads keep the tally going</span></div>` + `</div>` +
         `<div><div class="st-h">bursts</div>` +
         (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) + `</div>` +
         `<div class="st-g2"><div class="st-h">glorps</div>` +
