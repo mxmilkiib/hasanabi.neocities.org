@@ -1529,12 +1529,10 @@
   #emotePick .esort:disabled { opacity: .25; cursor: default; }
   /* agerows: each age square starts a new grid row, keeping its 40px
      cell on the left while the older emotes flow on to its right */
-  #emotePick.agerows #emoteGrid .eage { grid-column-start: 1; }
-  /* an empty stretch of eras packs onto one row: a square strictly
-     inside a run (an .eage on both sides, so no cells before or
-     after it) stays on the current line; only run edges - the first
-     square or one that actually has emotes after it - open a row */
-  #emotePick.agerows #emoteGrid .eage + .eage:has(+ .eage) { grid-column-start: auto; }
+  /* an era square opens a fresh row only when emotes actually follow
+     it - an empty stretch of squares rides the tail of the newer
+     cells' line instead of a row each */
+  #emotePick.agerows #emoteGrid .eage:has(+ button) { grid-column-start: 1; }
   /* the source tabs sit left, the option buttons right; a thin popup
      wraps .eopts onto its own line, still hugging the right edge */
   #emotePick .etabsrow { flex: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }

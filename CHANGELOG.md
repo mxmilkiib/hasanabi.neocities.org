@@ -20,10 +20,10 @@ not versions — the page ships continuously to Neocities.
 - atkinson hyperlegible mono joins the font menu (`?font=
   atkinsonmono`), loaded from google fonts at 400/600 like the
   other monospace entries
-- in the picker's age-rows mode, empty stretches of eras now pack
-  their time-ago squares onto one row instead of a row each - only
-  the first square of a run, or one that actually has emotes after
-  it, opens a fresh line
+- in the picker's age-rows mode, era squares only open a row when
+  emotes actually follow them - an empty stretch of time-ago
+  squares rides the tail of the newer cells' line instead of a
+  row each
 - overlapping popups trade z-order on press: dragging or pressing
   the emote picker over the `?` panel (or vice versa) raises it to
   the front, and a press on the other takes the top back
