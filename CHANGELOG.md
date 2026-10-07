@@ -15,7 +15,7 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
-- the default preset is now atkinson 12px, link weight 400, no row
+- the default preset is now atkinson 14px, link weight 400, no row
   separators, clean urls, mixed emote picker with hold off and a
   pinned 876x625 geometry - dark shade 6, zebra and labels on stay
 - lemmy links ride the reddit column in the channels/streams
