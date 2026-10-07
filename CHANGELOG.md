@@ -37,6 +37,7 @@ not versions — the page ships continuously to Neocities.
   (ahead of reddit/site) instead of ordering purely by frequency
 - yt links fill in for the twitch-first entries that had none -
   maple takes, kneecoleslaw and comrade virgo
+- extra links gains katseye's hootie frutti mv
 - the small-screen media query now also covers landscape phones
   (coarse pointer, up to 1080px); within it the default chat font
   rises to 16px (a picked size still wins, and the Aa ladder seeds
