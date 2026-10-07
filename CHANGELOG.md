@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- workers unions and tenants unions sections under left parties -
+  intl/us/canada/uk groupings (iww, ue, ewoc, afl-cio, seiu, teamsters,
+  uaw, unite here, cupe, unifor, tuc, unite, unison, rmt, iwgb, uvw;
+  iut, tuf, latu, kc tenants, vancouver, acorn, lru, living rent,
+  catu, mieterbund, rahu); atun-rsia and the wikipedia us-union list
+  move across from organising
 - foreign fridays joins channels/streams (yt name link, tw live
   stream + chat switch, ig, tiktok, patreon, site) - socials lifted
   from the channel's own video descriptions; tiktok becomes a new
