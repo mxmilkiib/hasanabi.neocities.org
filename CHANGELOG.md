@@ -6,6 +6,14 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the tiktok column fills out: 22 creator tiktoks verified by bio,
+  nickname or channel-linked socials (hasanabi, mpu, breaking points,
+  tyt, secular talk, smn, novara, the serfs, maple takes, pod save via
+  crookedmedia, chapo, left reckoning, hbm, thought slime, lindsay,
+  kat blaque, boy boy, madeline pendleton, kaceytron, kneecoleslaw,
+  frogan, yugopnik); duds skipped - coffeezilla's handle is an aussie
+  coffee brand, leaping larry's a nick, mikefrompa's a placeholder,
+  majorityreportfm died
 - workers unions and tenants unions sections under left parties -
   intl/us/canada/uk groupings (iww, ue, ewoc, afl-cio, seiu, teamsters,
   uaw, unite here, cupe, unifor, tuc, unite, unison, rmt, iwgb, uvw;
