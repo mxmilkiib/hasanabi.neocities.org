@@ -2189,6 +2189,9 @@
   // the canonical watch url so youtu.be/shorts forms share one lookup.
   // the thumbnail doubles as a second click-to-play handle via a.ytemb
   const ytKeyOf = (id) => 'https://www.youtube.com/watch?v=' + id;
+  // the resolved peek's Description is 'by <channel>' - a Fossabot row
+  // drops the card only when that's Fear&, other Videos keep it
+  const ytFearVid = (p) => !!p && /fear&/i.test(`${p.description || ''} ${p.title || ''}`);
   function ytInfoCard(p, href, id, start) {
     const views = /^\d+$/.test(p.views || '') ? `${Number(p.views).toLocaleString('en')} views` : '';
     const meta = [p.description, views, p.published].filter(Boolean).join(' · ');
@@ -2348,7 +2351,7 @@
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
   // and bolding @username mentions like real chat. Zero-width emotes stack
   // onto the previous emote; cheermotes resolve when the message has bits.
-  function renderTextHTML(text, hasBits, ch, shiny, noYt) {
+  function renderTextHTML(text, hasBits, ch, shiny, fossa) {
     const em = emotesOf(ch || CHANNEL), eml = emotesLcOf(ch || CHANNEL),
           es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL);
     const out = [];
@@ -2442,15 +2445,20 @@
           // any other link
           const yt = ytEmbed ? ytIdOf(url) : null;
           const ytgl = yt ? `<a class="ytemb" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} href="https://youtu.be/${yt.id}" title="play the video here">▶</a>` : '';
-          if (yt && !noYt) {
+          if (yt) {
             // title/channel card lands under the message - cached peeks
-            // paint at once, misses plant a placeholder filled on arrival
+            // paint at once, misses plant a placeholder filled on arrival.
+            // A fossabot row still asks, but its placeholder wears a foss
+            // mark so a video resolving to the Fear& channel drops at
+            // fill time (and a cached peek drops right here)
             const ypk = ytKeyOf(yt.id);
             const ce = peekCache.get(ypk);
-            if (ce && peekGood(ce.p)) pendingTw.push(ytInfoCard(ce.p, u, yt.id, yt.start));
+            if (ce && peekGood(ce.p)) {
+              if (!(fossa && ytFearVid(ce.p))) pendingTw.push(ytInfoCard(ce.p, u, yt.id, yt.start));
+            }
             else {
               peekAsk(ypk);
-              pendingTw.push(`<span class="ytprev" data-ytu="${escapeHTML(ypk)}" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} data-href="${u}"></span>`);
+              pendingTw.push(`<span class="ytprev${fossa ? ' foss' : ''}" data-ytu="${escapeHTML(ypk)}" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} data-href="${u}"></span>`);
             }
           }
           out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
@@ -2487,12 +2495,12 @@
   // Turns message text + the "emotes" tag into HTML, swapping emote spans for
   // <img> tags and escaping everything else. Also returns the native emote
   // names so callers can tell emote-only messages apart.
-  function renderMessageHTML(message, emotesTag, hasBits, ch, shiny, noYt) {
+  function renderMessageHTML(message, emotesTag, hasBits, ch, shiny, fossa) {
     const names = new Set();
     // tag-rendered ids let the stats tab image emotes that live outside the
     // third-party sets (other channels' sub emotes usable here)
     const nameId = new Map();
-    if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch, shiny, noYt), names };
+    if (!emotesTag) return { html: renderTextHTML(message, hasBits, ch, shiny, fossa), names };
     const emotes = [];
     for (const part of emotesTag.split('/')) {
       const [id, ranges] = part.split(':');
@@ -2502,12 +2510,12 @@
         emotes.push({ id, start, end });
       }
     }
-    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits, ch, shiny, noYt), names };
+    if (emotes.length === 0) return { html: renderTextHTML(message, hasBits, ch, shiny, fossa), names };
     emotes.sort((a, b) => a.start - b.start);
     let html = '', cursor = 0;
     for (const e of emotes) {
       if (e.start < cursor) continue; // ignore malformed/overlapping ranges
-      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch, shiny, noYt);
+      if (e.start > cursor) html += renderTextHTML(message.slice(cursor, e.start), hasBits, ch, shiny, fossa);
       const name = message.slice(e.start, e.end + 1);
       names.add(name);
       nameId.set(name, e.id);
@@ -2519,7 +2527,7 @@
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
     }
-    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch, shiny, noYt);
+    if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch, shiny, fossa);
     return { html, names, nameId };
   }
 
@@ -10186,6 +10194,9 @@
       document.querySelectorAll(`.ytprev[data-ytu="${CSS.escape(url)}"]`)
         .forEach((el) => {
           if (el.closest('.rqt')) { el.remove(); return; }
+          // a fossabot-marked slot drops when the Channel turns out to be
+          // Fear& - the pod's videos stay cardless while the rest paint
+          if (el.classList.contains('foss') && ytFearVid(p)) { el.remove(); return; }
           el.outerHTML = ytInfoCard(p, el.dataset.href || url, el.dataset.ytid || '', +el.dataset.ytt || 0);
         });
       repin();
