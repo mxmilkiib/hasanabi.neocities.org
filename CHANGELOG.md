@@ -45,6 +45,9 @@ not versions — the page ships continuously to Neocities.
 ### Fixes
 - the ? button's border is 2px now - it reads as the odd one out
   anyway, may as well dress the part
+- yt links for monthly review, mondoweiss and le monde diplomatique in
+  english (found by channel-id search, not handles) plus indymedia's
+  @IMCnetwork - waiting room and lpe project searched, nothing real
 - tyt's forum link joins the lemmy spillover column instead of
   spawning its own - service aliases now fall through a preference
   list, so forum denied the reddit slot lands beside lemmy
