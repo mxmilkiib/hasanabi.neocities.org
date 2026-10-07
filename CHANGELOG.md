@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- the `links` service cells in the channels/streams table merge
+  into the column to their left (the deprogram/podcast spillover),
+  dropping the sparse rightmost column
 - the liberatory tab is now `left/libre` - `?htab=left` is the
   canonical token, old `liberatory` links still resolve
 - the stats age filters now read longest → shortest

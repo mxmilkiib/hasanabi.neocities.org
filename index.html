@@ -5129,7 +5129,7 @@
           // denied reddit lands in lemmy's spillover); if none are free
           // the link keeps its own name, so two links never layer
           const svcAliases = { lemmy: 'discord', locals: 'discord', site: 'reddit', forum: ['reddit', 'lemmy'],
-            'even more news': 'deprogram', 'kill james bond': 'deprogram', 'krystal kyle & friends': 'deprogram' };
+            links: 'deprogram', 'even more news': 'deprogram', 'kill james bond': 'deprogram', 'krystal kyle & friends': 'deprogram' };
           const lbl = n.textContent.trim();
           let s = lbl;
           for (const cand of [].concat(svcAliases[lbl] || [])) {
