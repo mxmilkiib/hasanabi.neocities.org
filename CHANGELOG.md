@@ -67,7 +67,11 @@ not versions — the page ships continuously to Neocities.
 - an ig column joins channels/streams: sixteen instagram links taken
   straight from each channel's own youtube about-tab socials (hasan's
   is hasandpiker, coffeezilla's is coffeebreak_yt, lindsay's is
-  namebrandlindsay) - no guesses, ig sits behind reddit
+  namebrandlindsay) - no guesses, ig sits behind reddit; philosophy
+  tube's ig (theabigailthorn) joins later - her channel never linked
+  it, so the about-tab sweep missed it; the re-audit found no other
+  misses (hasanabi gaming's linked ig is an editor's, left reckoning's
+  is an invite url)
 - more yt links: hasanabi's own row finally gets @HasanAbi, chapo gets
   its channel, the news-row novara gets @novaramedia, and three tiktok
   clip channels (pikerbroadcasting, daily dose, afterdark) point at
