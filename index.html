@@ -4313,20 +4313,20 @@
   try { statScope = localStorage.getItem(STAT_SCOPE_KEY) || ''; } catch {}
   // top emotes' count source: the channel's StreamElements figures, or
   // this client's own tallies - all of them or a recent window
-  const EMOTE_SRCS = { alltime: 0, local: -1, month: 31, week: 7, today: 1 };
+  const EMOTE_SRCS = { today: 1, week: 7, month: 31, local: -1, alltime: 0 };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   let emoteStatSrc = 'alltime';
   try { emoteStatSrc = localStorage.getItem(EMOTE_SRC_KEY) || 'alltime'; } catch {}
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
-  const CHAT_WINS = { 'all-time': 0, month: 31, week: 7, today: 1 };
+  const CHAT_WINS = { today: 1, week: 7, month: 31, 'all-time': 0 };
   const CHAT_SORT_KEY = 'hasan-chatsort';
   let chatSort = 'today';
   try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'today'; } catch {}
   if (!(chatSort in CHAT_WINS)) chatSort = 'today';
   // badge counts also window like the emote ones: alltime is the plain
   // tally, the rest read trailing days out of the per-version buckets
-  const BADGE_WINS = { alltime: 0, month: 31, week: 7, day: 1 };
+  const BADGE_WINS = { day: 1, week: 7, month: 31, alltime: 0 };
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = 'alltime';
   try { badgeWin = localStorage.getItem(BADGE_WIN_KEY) || 'alltime'; } catch {}
