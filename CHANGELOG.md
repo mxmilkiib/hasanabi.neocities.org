@@ -43,6 +43,10 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- reddit links joined novara (both rows), hasanabi (r/Hasan_Piker),
+  the young turks and kaceytron in channels/streams, plus democracy
+  now, the intercept and jacobin in the news column - the rest of the
+  table audited, no real sub for the remainder
 - fear& (and fear& podcast) text in chat runs the pastel rainbow
   sweep - the same hashed-per-author scheme the @hasanabi mention wears
 - fossabot youtube cards return except for the fear& channel: the
