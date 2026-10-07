@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- a `free culture` row below sharing - the movement, creative
+  commons, cc's open-culture history piece, and lessig's permission
+  culture; `gnu categories` (free vs non-free taxonomy) joins free
+  software
 - marxist/critical's subsections flow as one continuous column run
   (wider 30em columns, `marxism` picks up right where `pre-marxist`
   ends) instead of three unbreakable column blocks
