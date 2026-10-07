@@ -47,9 +47,8 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
-- the about page's cta button wears the section-heading lavender
-  (#b9a5f0) instead of amber - fill and hover only, the marching
-  dash keeps the amber accent
+- the about page's cta button trades fills with its marching dash -
+  amber button, lavender dashes
 - tyt's discord link swapped for the real invite - tyt.com/discord
   soft-404s through the spa shell; the invite resolves to TYT Official
 - the ? button's border is 2px now - it reads as the odd one out
