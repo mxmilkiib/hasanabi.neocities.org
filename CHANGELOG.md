@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- `open culture` grows into `open social`, grouped like the news
+  subs: fediverse (activitypub.rocks, fediverse.party, mastodon,
+  pixelfed, lemmy, peertube), indieweb (microformats, webmention,
+  micro.blog), atmosphere (atproto, bluesky, blacksky), web
+  standards (w3c, whatwg, solid), open chat (matrix, element,
+  xmpp/jabber); bridgy fed and the werdmuller essay stay
 - the channels/streams `live?` ping link drops to the smaller .85em
   annotation size
 - the letter-spacing options self-demonstrate - each label renders
