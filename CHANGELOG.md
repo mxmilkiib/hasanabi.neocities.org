@@ -38,6 +38,16 @@ not versions — the page ships continuously to Neocities.
 - yt links fill in for the twitch-first entries that had none -
   maple takes, kneecoleslaw and comrade virgo
 - extra links gains katseye's hootie frutti mv
+- the podcast side-links share one column in the channels/streams
+  grid - even more news, kill james bond and krystal kyle & friends
+  ride deprogram's slot
+
+### Fixes
+- youtube channel pages (@handle, /channel/, /c/, /user/) peeked as
+  'no preview': the consent wall eats the plain scrape in some
+  regions, so the worker resolves them through youtube's own public
+  innertube client (resolve_url → browse) for title, about text and
+  avatar; watch-page fetches also carry a socs cookie now
 - the small-screen media query now also covers landscape phones
   (coarse pointer, up to 1080px); within it the default chat font
   rises to 16px (a picked size still wins, and the Aa ladder seeds
