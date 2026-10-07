@@ -6,6 +6,7 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Features
+- `opengov partnership` (strategy 2023-28) joins open gov
 - stats gains `1h` and `12h` windows on chatters, emotes and badges,
   folded from new per-hour buckets kept beside the day ones; the
   scope picker moves down to sit directly over top chatters; a
