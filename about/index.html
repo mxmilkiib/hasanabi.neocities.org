@@ -110,9 +110,9 @@
   <h2>the backend</h2>
   <div class="how">
     <div>Neocities ships a strict CSP — <code>connect-src 'self'</code> — so no WebSocket to Twitch
-    IRC is possible. The page embeds a hidden iframe relay hosted on GitHub Pages (no CSP) and talks
+    IRC is possible. the page embeds a hidden iframe relay hosted on GitHub Pages (no CSP) and talks
     <code>postMessage</code> to it: the frontend owns all presentation, the relay owns every outbound
-    connection. A Cloudflare worker, <code>linkpeek</code>, scrapes og/twitter/JSON-LD/oEmbed metadata
+    connection. a Cloudflare worker, <code>linkpeek</code>, scrapes og/twitter/JSON-LD/oEmbed metadata
     for link cards and stats titles.</div>
     <div>→ <a href="https://github.com/mxmilkiib/twitch-chat-relay">twitch-chat-relay</a> — the relay
     &amp; worker source</div>
