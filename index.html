@@ -4272,7 +4272,7 @@
     else if (a.classList.contains('helpHelp')) { helpForced = !helpPanel.hidden; helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
     else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px'; applyHelpW(); const s = readHsize(); delete s.w; delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a width pick also docks the panel top-right
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
-    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i < 3 ? -(i + 1) : i - 3; applyHelpFs(); }
+    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i - 3; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
@@ -6676,7 +6676,7 @@
   function applyHelpFs() {
     if (helpFs < 0) helpPanel.style.fontSize = helpFs === -1 ? '' : `var(--help-font${-helpFs})`;
     else helpPanel.style.fontSize = HDR_SIZES[helpFs] + 'px';
-    markHelp('helpFs', helpFs < 0 ? -helpFs - 1 : helpFs + 3);
+    markHelp('helpFs', helpFs + 3);
     saveOpts();
   }
   // header height changes with width when the controls wrap - re-anchor
@@ -9794,7 +9794,7 @@
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
-    helpFs: ['chat −1', 'chat −2', 'chat −3'].concat(HDR_SIZES),
+    helpFs: ['chat −3', 'chat −2', 'chat −1'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'on'],
     helpHide: HIDE_MODES,
@@ -9879,7 +9879,7 @@
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
   markHelp('helpHfs', hdrFs + 1);
-  markHelp('helpFs', helpFs < 0 ? -helpFs - 1 : helpFs + 3);
+  markHelp('helpFs', helpFs + 3);
   markHelp('helpSelf', selfHl ? 1 : 0);
   markHelp('helpAnim', ANIM_LVLS.indexOf(nickAnim));
   markHelp('helpRbw', rbwStyle);
