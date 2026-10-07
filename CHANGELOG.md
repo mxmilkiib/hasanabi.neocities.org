@@ -43,6 +43,8 @@ not versions — the page ships continuously to Neocities.
   ride deprogram's slot
 
 ### Fixes
+- fear& (and fear& podcast) text in chat runs the pastel rainbow
+  sweep - the same hashed-per-author scheme the @hasanabi mention wears
 - fossabot youtube cards return except for the fear& channel: the
   placeholder plants as usual but wears a mark, and drops at fill
   time when the video resolves to Fear& (a cached answer drops at

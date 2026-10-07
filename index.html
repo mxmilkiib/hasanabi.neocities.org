@@ -2473,13 +2473,13 @@
         const shiny = has || /^ostonox$/i.test(at[1].slice(1));
         out.push(`<b class="at${has ? ' rbw' : shiny ? ' shimmer' : ''}">${escapeHTML(at[1])}</b>` + escapeHTML(at[2]));
       }
-      // Fear& / Fear& PODCAST shout-outs get bolded; the bold wraps the
-      // PODCAST token too when it directly follows.
+      // Fear& / Fear& PODCAST shout-outs run the pastel rainbow sweep;
+      // the wrap takes in the PODCAST token too when it directly follows.
       else {
       const fear = tok.match(/^Fear&([\s\S]*)$/i);
       if (fear) {
-        if (!fear[1] && /^podcast\b/i.test(tok2(arr, i + 2))) out.push('<b>Fear&amp;');
-        else out.push(`<b>Fear&amp;</b>${escapeHTML(fear[1])}`);
+        if (!fear[1] && /^podcast\b/i.test(tok2(arr, i + 2))) out.push('<b class="rbw">Fear&amp;');
+        else out.push(`<b class="rbw">Fear&amp;</b>${escapeHTML(fear[1])}`);
       }
       else if (/^podcast\b/i.test(tok) && /^Fear&$/i.test(tok2(arr, i - 2))) out.push(`${escapeHTML(tok)}</b>`);
       else out.push(escapeHTML(tok));
