@@ -3,6 +3,30 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-08
+
+### Resources
+- left/libre regrouped: workers' self-management leads co-ops;
+  organising gains facilitation / infra / reading rows; wellbeing gains
+  a dhamma row; a digital rights section (sovereignty, eff, org, edri,
+  privacy guides) sits after free software; open hardware follows it;
+  open net (chat, community nets, mesh, web standards) splits out of
+  open social; open knowledge moves after osint so the academic chain
+  (knowledge → access → science → learning) runs unbroken; open science
+  gains an open pharma row
+- media: scotland row in news (the national, bella caledonia), pod save
+  america closes the channels list
+- two dangling separators in marxist/critical removed; spoon theory
+  link follows its www redirect
+
+### Fixes
+- `findBtn` is now declared like the other header buttons rather than
+  resolving through the implicit window.id global; unused `linkKeyOf`
+  helper dropped
+- lint config knows indexedDB / IDBKeyRange; the lint flow is documented
+  in the README
+- deploy skips `og.png.bak` and the unused Inter Mono woff2 files
+
 ## 2026-10-07
 
 ### Fixes
