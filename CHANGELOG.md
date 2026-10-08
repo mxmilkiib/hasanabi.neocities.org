@@ -55,6 +55,7 @@ not versions — the page ships continuously to Neocities.
   uk gdpr right); open data folds into open knowledge as labelled
   data / maps / live rows, which now sits below open gov so the run
   reads osint → gov → knowledge → access
+- open access leads with open-access.network (the oa info portal)
 - open social: 'leftist corners' is now 'leftist fediverse'; the app
   rows merge into one - the 'more apps' head is gone and piefed sits
   directly after lemmy as its fork
