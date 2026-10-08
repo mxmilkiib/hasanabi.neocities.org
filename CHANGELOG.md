@@ -69,6 +69,11 @@ not versions — the page ships continuously to Neocities.
   section, where they parked ahead of later sections' used cells
 
 ### Features
+- a lit emote cell's wash now fades with its height in the picker grid -
+  a scroll-driven view() timeline runs the glow from 40% at the bottom
+  edge to 10% as it nears the scrollport's top; the justused flash still
+  plays at full pop, and browsers without scroll timelines keep the
+  flat wash
 - an mIRC-style read marker: when the page loses focus or gets hidden,
   a red line is armed at the last-seen boundary and draws itself before
   the first row that lands while away; coming back to the page clears it

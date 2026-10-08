@@ -1603,6 +1603,21 @@
     background: color-mix(in srgb, var(--fc, var(--accent)) 40%, transparent);
     transition: background 1s ease;
   }
+  /* the wash thins with height in the grid - a cell near the scrollport's
+     top glows fainter than one just risen from the bottom edge. view()
+     gives each cell its own 0->1 progress up the grid; skipped under
+     .justused so the flash keeps full pop, and wrapped in @supports so a
+     browser without scroll timelines keeps the flat 40% wash */
+  @supports (animation-timeline: view()) {
+    #emoteGrid button.lit:not(.justused) {
+      animation: litdepth linear both;
+      animation-timeline: view();
+    }
+  }
+  @keyframes litdepth {
+    from { background: color-mix(in srgb, var(--fc, var(--accent)) 40%, transparent); }
+    to { background: color-mix(in srgb, var(--fc, var(--accent)) 10%, transparent); }
+  }
   /* each flash takes the next hue in a slow spectral walk via --fc -
      sequential uses read as a colour progression, ~15 steps round the
      wheel */
