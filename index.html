@@ -1633,9 +1633,6 @@
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
     position: relative; color: var(--text-dim); font-size: .7em; opacity: .4; }
-  /* merged empty-run chips carry a 10s-45s style range label - one
-     cell can't hold it, so they take two */
-  #emoteGrid .eage.rng { grid-column: auto / span 2; white-space: nowrap; }
   /* the border is a dashed svg rect whose dashoffset marches - the
      classic processing-ants border; the rung's inline animation-delay
      is inherited so the marches stay staggered per rung */
@@ -1721,7 +1718,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. @hasanabi rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches merge into one ranged square and eras before tracking began are skipped ('▤' starts each populated era on its own row), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together and eras before tracking began are skipped ('▤' starts each populated era on its own row; middle-click 'use' forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -1842,7 +1839,7 @@
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓</button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each populated era starts its own row; empty stretches pack together - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each populated era starts its own row; empty stretches pack together - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
 // global safety net: an uncaught error or rejected promise raises a small
@@ -9001,6 +8998,19 @@
     buildPicker();
     emoteQ.focus();
   });
+  // middle-click 'use' forgets the session's ordering memory - recency
+  // and counted uses clear, tracking restarts, and the grid falls back
+  // to the channel's own usage ranking; day/hour stats buckets keep
+  // their history since they feed the stats tab, not the order
+  sortBtns.use.addEventListener('auxclick', (e) => {
+    if (e.button !== 1) return;
+    e.preventDefault();
+    for (const k of Object.keys(useTs)) delete useTs[k];
+    for (const k of Object.keys(liveUse)) delete liveUse[k];
+    useT0 = Date.now();
+    saveUse();
+    buildPicker();
+  });
   // mix merges every lit source into a single sectionless grid
   const EPICK_MIX_KEY = 'hasan-epickmix';
   let epickMerge = false;
@@ -9186,7 +9196,7 @@
   // outside the third-party sets (other channels' emotes typed here)
   const useIds = savedUse.i || {};
   // when recording began: age markers stay dim until their era is covered
-  const useT0 = savedUse.s || Date.now();
+  let useT0 = savedUse.s || Date.now();
   // if the spark save is gone (reset, first visit) but emote-use data
   // survived, its last-write stamp still proves the page ran - seed the
   // closed gap from it so rungs covering it keep the missed mark
@@ -9444,34 +9454,20 @@
       return items.map((x) => {
         const ts = useTs[codeOf(x)] || 0;
         const age = now - ts;
-        const pend = [];
+        let m = '';
         while (next < marks.length && age >= marks[next].t) {
           const mk = marks[next++];
           // eras wholly before tracking began can never hold a cell - the
           // t0 boundary covers them, so their rungs go unprinted
           if (!mk.t0 && mk.t > t0age) continue;
-          pend.push(mk);
-        }
-        let m = '';
-        if (pend.length) {
           // a per-rung negative delay starts each square mid-cycle, so
           // the marches stagger instead of beating in lockstep
           const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
-          const ti = pend.findIndex((mk) => mk.t0);
-          const rungs = ti < 0 ? pend : pend.slice(0, ti);
-          if (rungs.length === 1) {
-            const mk = rungs[0];
-            m += `<div role="separator" class="eage lit${mk.missed ? ' missed' : ''}" data-age="${mk.t}"${dl} title="emotes below were last used over ${mk.words} ago${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lblOf(mk)}</div>`;
-          } else if (rungs.length > 1) {
-            // a run of empty rungs merges into one ranged chip - a dead
-            // era reads as a single 5m-1h square, not a wall of blocks
-            const a = rungs[0], b = rungs[rungs.length - 1];
-            const miss = rungs.some((mk) => mk.missed);
-            m += `<div role="separator" class="eage lit rng${miss ? ' missed' : ''}" data-age="r${b.t}"${dl} title="nothing used between ${a.words} and ${b.words} ago${miss ? ' - chat was not being logged for part of that span, so the count may miss some' : ''}">${ANTS}${lblOf(a)}–${lblOf(b)}</div>`;
-          }
-          if (ti >= 0) {
+          if (mk.t0) {
             const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
-            m += `<div role="separator" class="eage t0${pend[ti].missed ? ' missed' : ''}" data-age="0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded${pend[ti].missed ? ' - part of that span had no logging' : ''}">${ANTS}${lbl}</div>`;
+            m += `<div role="separator" class="eage t0${mk.missed ? ' missed' : ''}" data-age="0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded${mk.missed ? ' - part of that span had no logging' : ''}">${ANTS}${lbl}</div>`;
+          } else {
+            m += `<div role="separator" class="eage lit${mk.missed ? ' missed' : ''}" data-age="${mk.t}"${dl} title="emotes below were last used over ${mk.words} ago${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lblOf(mk)}</div>`;
           }
         }
         // the first rung beyond this cell's age is where it next crosses;

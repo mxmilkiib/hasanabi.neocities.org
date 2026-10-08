@@ -11,11 +11,9 @@ not versions — the page ships continuously to Neocities.
   the wheel under it, the hue survives the flash's end and grid
   rebuilds (the .lit path stamps --fc itself), and only releases when
   the cell is both unflashed and fully off-screen
-- sparse use-sorted pickers no longer sprout a wall of empty age
-  squares: consecutive untouched rungs merge into one ranged chip
-  ('10s–45s'), and rungs wholly older than the tracking start - which
-  can never hold an emote - go unprinted, so the pre-history tail
-  collapses to the t0 square alone
+- age rungs wholly older than the tracking start go unprinted - they
+  can never hold an emote, so the pre-history tail collapses to the
+  t0 square alone instead of stacking 3h-12h markers
 - age squares covering unlogged time keep their violet 'missed' mark
   across reloads: away windows persist through the spark save, the
   emote-use blob stamps a last-write time as a fallback seed when the
@@ -38,6 +36,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- middle-clicking the picker's 'use' button resets the recorded order:
+  recency stamps and session counts clear, tracking restarts, and the
+  grid falls back to the channel's own usage ranking (the stats tab's
+  day/hour buckets keep their history)
 - the ▦ zebra button is now a contrast dial instead of a toggle:
   off → faint → mild → strong → heavy, cycling on click and stepping
   on scroll; the config row lists all five, presets keep working
