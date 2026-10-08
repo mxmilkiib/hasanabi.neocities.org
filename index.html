@@ -4896,7 +4896,9 @@
   });
   // tabs split the panel into config/help / resources / authors pages
   function switchTab(id) {
-    if (id === 'htabStats' && !railEl.hidden) id = 'htabCfg'; // docked in the rail
+    // stats docks out of the panel in rail mode - its tab is hidden and
+    // anything still asking for it lands on config instead
+    if (id === 'htabStats' && !helpPanel.contains(document.getElementById('htabStats'))) id = 'htabCfg';
     helpPanel.querySelectorAll('.htabs a').forEach((a) => {
       const on = a.dataset.htab === id;
       a.classList.toggle('on', on);
