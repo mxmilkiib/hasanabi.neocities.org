@@ -9720,14 +9720,13 @@
         }
         if (!twSets.length && !q) h += head('twitch - loading…');
       }
-      // emoji sit out of the sort: they keep the list order (hands
-      // first, then the traditional groups) at the tail of the grid
+      // a-z parks emoji at the tail in list order (hands first, then the
+      // traditional groups); under use they join the ladder - a stamped
+      // emoji floats up by recency like any other cell
       const ejs = [];
       if (groupOn('emoji') && animOk(false))
-        for (const c of EMOJIS) if (ehit(c)) ejs.push({ c, r: ejiBtn(c) });
+        for (const c of EMOJIS) if (ehit(c)) (epickSort === 'use' ? all : ejs).push({ c, r: ejiBtn(c) });
       all.sort((a, b) => epickSort === 'az' ? byFam(a.c, b.c) : byUse(a.c, b.c));
-      // emoji keep the tail unsorted, so the age walk skips them - its
-      // squares would land at list-order spots that say nothing
       h += aged(all, (x) => x.c, (x) => x.r) + ejs.map((x) => x.r).join('');
     } else {
       // codes dedupe across sources too - 7tv/bttv both ship <3 and the
@@ -9763,7 +9762,11 @@
       }
       if (groupOn('emoji') && animOk(false)) {
         const hits = EMOJIS.filter(ehit);
-        if (hits.length) pushSec(0, 'emoji', hits.map(ejiBtn).join(''));
+        // use sort walks the stamps within the section too, so a fresh
+        // emoji heads it and trips the same age squares as the emotes
+        if (hits.length) pushSec(0, 'emoji', epickSort === 'use'
+          ? aged(hits.sort((a, b) => (useTs[b] || 0) - (useTs[a] || 0)), (c) => c, ejiBtn)
+          : hits.map(ejiBtn).join(''));
       }
       // a-z keeps the fixed provider order; use sorts sections busiest-first
       if (epickSort === 'use') secs.sort((a, b) => b[0] - a[0]);

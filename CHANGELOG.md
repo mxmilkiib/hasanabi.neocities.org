@@ -69,9 +69,10 @@ not versions — the page ships continuously to Neocities.
   cell's last use falls, a timed rebuild slides a square in exactly
   when the next emote crosses it, and the squares ride the same slide
   animation as the cells (rx 6 corners). '▤' starts each populated era
-  on its own row, empty stretches pack inline, unsorted emoji stay out
-  of the walk, and the old last-minute order-pin that could strand a
-  cell above its square is gone
+  on its own row, empty stretches pack inline, and the old last-minute
+  order-pin that could strand a cell above its square is gone. emoji
+  join the walk too - a used one floats up by recency like any cell;
+  under a-z they still tail the grid in list order
 - the ladder's unpopulated eras read two ways: violet 'soon' rungs
   mark times no used emote has reached yet - tripped by the never-used
   tail or flushed at the list's end in seen-only mode, so after a
