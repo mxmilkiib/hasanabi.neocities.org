@@ -1497,7 +1497,7 @@
      daggers stayed pinned while the text beneath them scrolled away */
   #helpPanel sup { position: relative; top: -3px; font-size: .7em; margin-left: 1px; }
   #helpPanel b.fn { color: var(--text); }
-  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 3px 6px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
+  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { position: relative; padding: 0 5px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
   /* the bar after a chip's name carries its accent · good · vip - the
      personality colours a bg/text pair alone doesn't show */
   #helpPanel a.helpTheme::after, #helpPanel a.helpPreset::after, #helpPanel a.helpShade::after { content: ''; display: inline-block; width: 1.5em; height: .55em; margin-left: 5px; border-radius: 1px; background: linear-gradient(90deg, var(--pv-a, transparent) 0 34%, var(--pv-g, transparent) 34% 66%, var(--pv-v, transparent) 66%); }
@@ -1520,21 +1520,20 @@
   #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
   /* the selected chip reads in its own text colour under a page-accent
      ring and tick - legible on every palette, unlike a bare underline */
-  /* the selected chip's border turns into a slow marching-ants crawl -
-     four 2px dashed strips (one per edge) sliding via background-position.
-     the fill is a bottom layer clipped to the content box, so the padding
-     strip reads as a gap between the ants and the swatch; border goes
-     transparent so the strips show without resizing the box */
-  #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); border-color: transparent; cursor: default;
+  /* the ring rides ::before stretched 3px past the swatch: four 2px
+     dashed strips (one per edge) sliding via background-position, so the
+     gap between the ants and the chip edge reads as padding around it */
+  #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); cursor: default; }
+  #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { content: ''; position: absolute; inset: -3px; border-radius: 6px;
     background: linear-gradient(90deg, var(--accent) 50%, transparent 50%) 0 0 / 8px 2px repeat-x,
       linear-gradient(90deg, var(--accent) 50%, transparent 50%) 0 100% / 8px 2px repeat-x,
       linear-gradient(0deg, var(--accent) 50%, transparent 50%) 0 0 / 2px 8px repeat-y,
-      linear-gradient(0deg, var(--accent) 50%, transparent 50%) 100% 0 / 2px 8px repeat-y,
-      linear-gradient(var(--pv-bg, transparent), var(--pv-bg, transparent)) content-box var(--pv-bg, transparent);
+      linear-gradient(0deg, var(--accent) 50%, transparent 50%) 100% 0 / 2px 8px repeat-y;
     animation: antscrawl 2.4s linear infinite; }
   @keyframes antscrawl { to { background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px; } }
-  @media (prefers-reduced-motion: reduce) { #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { animation: none; } }
-  #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { content: '✓'; color: var(--accent); margin-right: 2px; }
+  @media (prefers-reduced-motion: reduce) { #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { animation: none; } }
+  /* the ✓ moves onto the name span - ::before carries the ring now */
+  #helpPanel a.helpTheme.on .chipName::before, #helpPanel a.helpPreset.on .chipName::before, #helpPanel a.helpShade.on .chipName::before { content: '✓'; color: var(--accent); margin-right: 2px; }
   #chatbar {
     flex: none;
     display: flex;
@@ -4694,7 +4693,7 @@
   lightMQ.addEventListener('change', () => { updateTone(); previewSwatches(); });
   // theme names in the help description are clickable quick-switches
   document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
-    `<a href="#" role="button" class="helpTheme" data-theme="${t}">${t}</a>`).join(' / ');
+    `<a href="#" role="button" class="helpTheme" data-theme="${t}"><span class="chipName">${t}</span></a>`).join(' / ');
   helpPanel.addEventListener('click', (e) => {
     const a = e.target.closest('a.helpTheme, a.helpShade, a.helpFont, a.helpLh, a.helpLs, a.helpLines, a.helpOpt');
     if (!a) return;
@@ -11020,11 +11019,11 @@
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
-      `<a href="#" role="button" class="helpOpt ${cls}" data-idx="${i}">${n}</a>`)
+      `<a href="#" role="button" class="helpOpt ${cls}" data-idx="${i}"><span class="chipName">${n}</span></a>`)
       // bare numbers space-join like the chat size row; wordy options keep ' / '
       .join(cls === 'helpHfs' || cls === 'helpFs' ? ' ' : ' / ');
   document.getElementById('helpPresetList').innerHTML = Object.keys(THEME_PRESETS).map((n) =>
-    `<a href="#" role="button" class="helpOpt helpPreset" data-preset="${n}">${n}</a>`).join(' / ');
+    `<a href="#" role="button" class="helpOpt helpPreset" data-preset="${n}"><span class="chipName">${n}</span></a>`).join(' / ');
   // each shadow chip wears its own level
   helpPanel.querySelectorAll('a.helpShadow')
     .forEach((a) => { a.style.textShadow = SHADOW_LVLS[+a.dataset.idx]; });
