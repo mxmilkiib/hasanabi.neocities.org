@@ -28,6 +28,10 @@ not versions — the page ships continuously to Neocities.
   jo freeman, mariame kaba); authors gains dean spade and kimberlé
   crenshaw, bookchin's work link (the ecology of freedom), and loses
   its duplicate mark fisher (kept under critical/social theory)
+- wellbeing puts the meditation pair and darebee below existential
+  therapy and leads the dhamma block with them; sharing folds into
+  mutual aid as a labelled row set; both unions sections run wider
+  columns
 - two dangling separators in marxist/critical removed; spoon theory
   link follows its www redirect
 
