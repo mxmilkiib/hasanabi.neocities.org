@@ -1695,8 +1695,9 @@
   #emoteGrid .eage.lit { opacity: 1; color: var(--text); font-weight: 700; }
   #emoteGrid .eage.lit .ants rect { stroke: var(--accent); }
   /* a lit era whose window spans a stretch chat wasn't logging - the
-     count could be understated, so the border turns purple and its
-     ants thin to dots, clearly broken against the standard rungs */
+     count could be understated, so the border turns purple, the text
+     follows it, and the ants thin to dots against the standard rungs */
+  #emoteGrid .eage.missed { color: #a06be0; }
   #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
   /* eras no emote has reached yet - tripped by the never-used tail or

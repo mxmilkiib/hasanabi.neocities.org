@@ -6,6 +6,8 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- 'missed' age squares now colour the label violet too, not just the
+  border - a purple-bordered rung no longer keeps the lit text colour
 - sent-message echoes render native channel emotes now - twitch sends no
   emotes tag for own messages, so codes like Squid1 stayed text even when
   the sets knew them; the echo synthesizes positions for codes the
