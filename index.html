@@ -563,7 +563,9 @@
     border-bottom: 1px solid var(--line); box-shadow: none; }
   #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
   #rail #htabStats { flex: 1; min-height: 0; overflow-y: auto; padding: 0 10px; }
-  #rail #statsBody { flex-wrap: wrap; }
+  /* a rail-width stats page stacks its sections vertically */
+  #rail #statsBody .st-trio, #rail #statsBody .st-panel { flex: 1 1 100%; }
+  #rail #statsBody .st-trio { flex-wrap: wrap; }
   .empty {
     color: var(--text-dim);
     padding: 24px 4px;
@@ -1002,16 +1004,26 @@
      columns with tabular counts pinned right */
   /* display:flex - #helpPanel .htabpage > div's label grid must not
      flow the sections into its 9em column (it outranks a bare #id) */
-  #helpPanel #statsBody, #rail #statsBody { display: flex; align-items: flex-start; gap: 0 22px; padding: 2px 2px 8px; margin: 7px 0; }
+  #helpPanel #statsBody, #rail #statsBody { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 22px; padding: 2px 2px 8px; margin: 7px 0; }
   #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
     margin: 12px 0 2px; }
   #statsBody .st-h:first-child { margin-top: 0; }
   /* each chart owns a fixed column so every section's top sits on one
      line - a panel narrower than the set scrolls the row sideways. the
      trio drops to contents so session/bursts/glorps get a column each */
-  #statsBody .st-trio { display: contents; }
-  #statsBody .st-panel { flex: 0 0 17em; min-width: 0; }
-  #statsBody .st-panel.st-wide { flex-basis: 26em; }
+  /* three rows: the session/burst/glorp trio across the top, the
+     scrollback chart full-width under it, then the ranked charts
+     sharing the last row */
+  #statsBody .st-trio { display: flex; flex: 0 0 100%; gap: 0 22px; align-items: flex-start; }
+  #statsBody .st-trio .st-panel { flex: 1 1 0; }
+  #statsBody .st-rate { flex: 0 0 100%; }
+  #statsBody .st-panel { flex: 1 1 12em; min-width: 0; }
+  #statsBody .st-panel.st-wide { flex: 2 1 20em; }
+  /* a narrow panel keeps its filters beside the title by letting the
+     anchors wrap into right-aligned lines instead of widening the box */
+  #statsBody .st-panel.st-narrow { flex: 0.7 1 9em; }
+  #statsBody .st-panel.st-narrow .st-sort { display: inline-flex; flex-wrap: wrap;
+    justify-content: flex-end; max-width: 66%; }
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
   #statsBody #stRate { display: block; width: 100%; height: 64px; }
@@ -5347,11 +5359,11 @@
         `<div class="st-panel"><div class="st-h">glorps</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
-      `<div class="st-panel"><div class="st-h">scrollback rate</div>` +
+      `<div class="st-panel st-rate"><div class="st-h">scrollback rate</div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
-      `<div class="st-panel"><div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `<div class="st-panel st-wide"><div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
+      `<div class="st-panel st-narrow"><div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
+      `<div class="st-panel st-narrow"><div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
