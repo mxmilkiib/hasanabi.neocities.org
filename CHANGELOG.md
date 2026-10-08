@@ -89,6 +89,8 @@ not versions — the page ships continuously to Neocities.
   so saved levels don't remap
 - stats tab reorders: emotes and badges lead, chatters sits just
   above storage
+- the panel's label column gains 5px of gap before its links (13px
+  total)
 - link-column subsection heads (fediverse, leftist fediverse, data /
   maps / live, the regional tags, the authors' era labels) outdent
   10px and drop 4px with a faint --line underline and 3px of air
