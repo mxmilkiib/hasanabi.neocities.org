@@ -128,6 +128,9 @@
   :root[data-theme="ember"]     { --ph: 65;  --pc: .032; --ptc: .045; --accent: #f0b04a; --good: #b8d88a; --danger: #e07850; --vip: #d8a0b8; }
   :root[data-theme="amber"]     { --ph: 70;  --pc: .02;  --ptc: .09;  --text-c: #ffb000; --accent: #ffd040; --good: #ffcc33; --danger: #cc5533; --vip: #ffcc88; --spark: #ffd040; }
   :root[data-theme="console"]   { --ph: 145; --pc: .006; --ptc: .10;  --text-c: #33dd55; --accent: #5fff8a; --good: #33ff66; --danger: #cc4444; --vip: #aaffcc; --spark: #5fff8a; }
+  /* twitch/chatterino: near-neutral surfaces a hair violet, brand purple
+     accent, hype-train green, vip badge pink */
+  :root[data-theme="twitch"]    { --ph: 285; --pc: .018; --ptc: .015; --accent: #a970ff; --good: #00f593; --danger: #ff4f4d; --vip: #e005b9; }
   * { box-sizing: border-box; }
   /* selection highlight: the about page's lavender over dark ink */
   ::selection { background: #b9a5f0; color: #1a1206; }
@@ -4521,13 +4524,14 @@
     irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
     gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15, help: 0, lbls: 0 },
     heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
+    twitch:   { theme: 'twitch',  shade: 7,    font: 'inter',      px: 14, lhv: 1.5, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
   };
   // ordered by each style's designed shade stop, darkest → lightest
-  const THEMES = ['console', 'amber', 'black', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'steel', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
+  const THEMES = ['console', 'amber', 'black', 'twitch', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'steel', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
   // each style's designed shade: swatch previews and popup clicks use it,
   // while the ◐ cycle keeps whatever shade is currently active
-  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, steel: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, black: 8, amber: 8, console: 8 };
-  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', steel: '▣', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞' };
+  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, steel: 4, nord: 5, solarized: 6, dark: 6, ember: 6, forest: 6, wine: 6, twitch: 7, black: 8, amber: 8, console: 8 };
+  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', steel: '▣', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞', twitch: '◘' };
   let themeMode = 'dark';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
 

@@ -43,6 +43,12 @@ not versions — the page ships continuously to Neocities.
 - two dangling separators in marxist/critical removed; spoon theory
   link follows its www redirect
 
+### Themes
+- `twitch` style: near-neutral violet-tinted surfaces, brand purple
+  accent, hype-train green, vip badge pink; designed at shade 7. a
+  matching `twitch` preset pairs it with inter, airy line height, and
+  no timestamps or zebra - the chatterino look
+
 ### Fixes
 - the picker's 'anim' frozen-stills state now reaches chat rows too:
   tag-rendered twitch emotes (hasSlam, hasRant) were hardcoded to the
