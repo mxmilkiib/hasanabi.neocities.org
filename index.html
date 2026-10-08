@@ -9221,11 +9221,17 @@
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
-  // each use steps the flash hue ~24 degrees round the wheel so the
-  // order of uses reads as a slow spectral walk; the map keeps a cell's
-  // colour stable across rebuilds
+  // each use steps the flash hue ~24 degrees round the wheel (~15 steps
+  // per lap) so the order of uses reads as a slow spectral walk; a hue
+  // sticks to its emote while the cell is lit or still flashing, and is
+  // released once both lapse so a later visit can take a fresh one
   const flashHues = new Map();
   let flashHueNext = Math.floor(Math.random() * 360);
+  const hueFor = (n) => {
+    if (!flashHues.has(n)) flashHues.set(n, flashHueNext = (flashHueNext + 24) % 360);
+    return flashHues.get(n);
+  };
+  const fcOf = (n) => `hsl(${hueFor(n)} 90% 62%)`;
   let resortTimer = 0;
   // a use within the last minute pins its button to the very top of the
   // scroll grid via the useTs sort; the recents band above keeps its own
@@ -9235,7 +9241,7 @@
     // a delay phases the fresh animation to mid-fade - rebuilt buttons
     // resume their dimming instead of renewing to full brightness
     const d = delay ? `-${Math.max(0, delay).toFixed(2)}s` : '';
-    const fc = `hsl(${flashHues.get(name) ?? 220} 90% 62%)`;
+    const fc = fcOf(name);
     for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`)) {
       b.style.animationDelay = d;
       b.style.setProperty('--fc', fc);
@@ -9285,7 +9291,8 @@
     flashTimers.delete(n);
     flashSet.delete(n);
     flashT0.delete(n);
-    flashHues.delete(n);
+    // the hue outlives the flash while a visible row keeps the cell lit
+    if (!litEms.has(n)) flashHues.delete(n);
     for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
       b.classList.remove('justused');
   }
@@ -9315,7 +9322,7 @@
     if (emotePick.hidden) return;
     flashSet.add(n);
     flashT0.set(n, Date.now());
-    flashHues.set(n, flashHueNext = (flashHueNext + 24) % 360);
+    hueFor(n); // a use while lit keeps the hue it already holds
     poke(n);
     flashLater(n);
     if (epickSort === 'use' && !resortTimer)
@@ -9338,8 +9345,12 @@
     return s;
   };
   const litApply = (n, on) => {
-    for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
+    for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`)) {
       b.classList.toggle('lit', on);
+      // stamp --fc too so a grid rebuild restores the wash's hue rather
+      // than falling back to accent; unlit cells are re-stamped on next use
+      if (on) b.style.setProperty('--fc', fcOf(n));
+    }
   };
   const emVisBump = (row, dir) => {
     for (const n of rowEmotes(row)) {
@@ -9349,7 +9360,11 @@
         if (!litEms.has(n)) { litEms.add(n); litApply(n, true); }
       } else {
         emVisCount.delete(n);
-        if (litEms.delete(n)) litApply(n, false);
+        if (litEms.delete(n)) {
+          litApply(n, false);
+          // off screen and not mid-flash - release the hue for the wheel
+          if (!flashSet.has(n)) flashHues.delete(n);
+        }
       }
     }
   };

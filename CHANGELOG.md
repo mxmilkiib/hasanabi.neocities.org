@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- a lit emote cell now keeps its assigned spectral hue for as long as a
+  chat row carrying it stays on screen: repeat uses no longer re-step
+  the wheel under it, the hue survives the flash's end and grid
+  rebuilds (the .lit path stamps --fc itself), and only releases when
+  the cell is both unflashed and fully off-screen
 - sparse use-sorted pickers no longer sprout a wall of empty age
   squares: consecutive untouched rungs merge into one ranged chip
   ('10s–45s'), and rungs wholly older than the tracking start - which
