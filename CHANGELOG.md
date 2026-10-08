@@ -63,6 +63,10 @@ not versions — the page ships continuously to Neocities.
 - the picker's search box gains a faint in-field x that clears the query
   (it only surfaces once there is text, via placeholder-shown) and its
   focus ring drops to 1px instead of the global 2px
+- the stats storage row 'origin estimate' splits into its per-api parts
+  when the browser reports usageDetails (chromium: indexeddb, caches,
+  service workers…), with anything unnamed riding as 'unattributed' -
+  browsers without the api keep the single total
 - era rungs no used emote has reached yet now print as violet 'soon'
   squares: in plain 'use' mode the never-used tail trips them, and in
   seen-only mode they flush at the list's end as the set of times

@@ -962,6 +962,9 @@
      the same line the emote images hang at */
   #statsBody .st-row .eme { font-size: 1.3em; vertical-align: -0.18em; }
   #statsBody .st-note .nm { color: var(--text-dim); font-size: .8em; white-space: normal; }
+  /* usageDetails' per-api split indents under the origin estimate */
+  #statsBody .st-sub { padding-left: 1.4em; }
+  #statsBody .st-sub .nm { color: var(--text-dim); font-size: .88em; }
   /* the fixed-width image slot lines up the names' left edges whether a
      row carries an emote image or not */
   #statsBody .st-row .ems { display: inline-block; width: 2em; text-align: center; }
@@ -4977,7 +4980,8 @@
   }
   // the storage section sizes the app's own footprint: hasan-* keys in
   // localStorage count utf-16 units (x2 ~ bytes on disk), the archive db
-  // reports its row count, and the origin estimate covers both. the db
+  // reports its row count, and the origin estimate covers both - split
+  // per api underneath when the browser reports usageDetails. the db
   // count and estimate answer asynchronously, so they fill in on a slow
   // cadence while the localStorage row measures fresh on every render
   let stIdbHtml = '', stEstHtml = '', stStoreAt = 0;
@@ -4987,6 +4991,7 @@
     const fmtB = (n) => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB'
       : n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : Math.round(n) + ' B';
     const srow = (nm, v) => `<div class="st-row"><span class="nm">${nm}</span><i>${v}</i></div>`;
+    const ssub = (nm, v) => `<div class="st-row st-sub"><span class="nm">${nm}</span><i>${v}</i></div>`;
     let keys = 0, bytes = 0;
     try {
       for (let i = 0; i < localStorage.length; i++) {
@@ -5014,6 +5019,20 @@
     if (navigator.storage && navigator.storage.estimate)
       navigator.storage.estimate().then((e) => {
         stEstHtml = srow('origin estimate', `${fmtB(e.usage || 0)} of ${fmtB(e.quota || 0)}`);
+        // usageDetails (chromium) splits the lump per api - indexeddb,
+        // caches, service workers. whatever the split doesn't name rides
+        // as 'unattributed'; localstorage sits in it, having no key
+        const d = e.usageDetails;
+        if (d) {
+          let known = 0;
+          for (const [k, v] of Object.entries(d)) {
+            if (!v) continue;
+            known += v;
+            stEstHtml += ssub(k.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase(), fmtB(v));
+          }
+          const rest = (e.usage || 0) - known;
+          if (rest > 999) stEstHtml += ssub('unattributed', fmtB(rest));
+        }
         updateStorageStats(el);
       }).catch(() => { stEstHtml = ''; });
   }
