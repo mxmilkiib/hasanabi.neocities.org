@@ -64,8 +64,8 @@ not versions — the page ships continuously to Neocities.
   seen-only pass that hides emotes with no recorded use, and a third
   click cycles back - it persists as 'useseen' (saved bundle, ?epsort=)
   and marks itself with a dotted accent underline
-- the emote-use flash hue step drops to 9°, so the spectral walk runs
-  40 distinct colours per lap instead of 15
+- the emote-use flash hue step drops to 5°, so the spectral walk runs
+  72 distinct colours per lap instead of 15
 - middle-clicking the picker's 'use' button resets the recorded order:
   recency stamps and session counts clear, tracking restarts, and the
   grid falls back to the channel's own usage ranking (the stats tab's

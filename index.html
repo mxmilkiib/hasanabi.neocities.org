@@ -9289,7 +9289,7 @@
   const flashHues = new Map();
   let flashHueNext = Math.floor(Math.random() * 360);
   const hueFor = (n) => {
-    if (!flashHues.has(n)) flashHues.set(n, flashHueNext = (flashHueNext + 9) % 360);
+    if (!flashHues.has(n)) flashHues.set(n, flashHueNext = (flashHueNext + 5) % 360);
     return flashHues.get(n);
   };
   const fcOf = (n) => `hsl(${hueFor(n)} 90% 62%)`;
@@ -9386,7 +9386,7 @@
     // every use steps the wheel - a re-use while still lit trades the
     // held hue for the next one; the hue releases only when the cell
     // drops fully off screen
-    flashHues.set(n, flashHueNext = (flashHueNext + 9) % 360);
+    flashHues.set(n, flashHueNext = (flashHueNext + 5) % 360);
     poke(n);
     flashLater(n);
     if (epickSort === 'use' && !resortTimer)
