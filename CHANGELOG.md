@@ -60,6 +60,9 @@ not versions — the page ships continuously to Neocities.
   level, the default preset (which now pins the numeric level so preset
   matching still recognises it), and a bare ?zebra flag all land on it;
   other presets keep their boolean 'on' = mild mapping
+- the picker's search box gains a faint in-field x that clears the query
+  (it only surfaces once there is text, via placeholder-shown) and its
+  focus ring drops to 1px instead of the global 2px
 - era rungs no used emote has reached yet now print as violet 'soon'
   squares: in plain 'use' mode the never-used tail trips them, and in
   seen-only mode they flush at the list's end as the set of times
