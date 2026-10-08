@@ -6964,6 +6964,14 @@
       applyHelp();
     }
     if (typeof o.video === 'boolean') setVideo(o.video);
+    // a floating geometry only means something while pinned - same as
+    // what dragging free does. applies before the split so a rail dock
+    // still clears the parked geometry off the reparented picker
+    if (o.epgeo && o.epgeo.w) {
+      applyEpickBox(o.epgeo);
+      try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
+      if (o.epgeo.left != null) setPin(true);
+    }
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 4) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
@@ -6991,13 +6999,6 @@
     if (o.ephold !== undefined) setHold(!!o.ephold);
     if (Array.isArray(o.eptabs)) { setTabs(o.eptabs); epDirty = true; }
     if (Array.isArray(o.epanim)) { setAnimFilter(o.epanim); epDirty = true; }
-    // a floating geometry only means something while pinned - same as
-    // what dragging free does
-    if (o.epgeo && o.epgeo.w) {
-      applyEpickBox(o.epgeo);
-      try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
-      if (o.epgeo.left != null) setPin(true);
-    }
     if (epDirty) buildPicker();
     if (o.notify !== undefined) setNotify(!!o.notify, false);
     const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
