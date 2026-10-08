@@ -97,8 +97,10 @@ not versions — the page ships continuously to Neocities.
   filter-animating variants (hue/pulse) re-apply in their keyframes
 - chat-link favicons that miss both icon services now fall back to
   a generic link glyph instead of vanishing from the row
-- the font menu previews each option in its own typeface, the closed
-  select follows the current pick, and inter tops the list
+- the font control is a real popup menu now: the button wears the
+  current pick and each item previews in its own typeface (the hidden
+  select stays the model, so urls/presets/wheel-cycling are unchanged);
+  inter tops the list
 - atkinson hyperlegible mono joins the font menu (`?font=
   atkinsonmono`), loaded from google fonts at 400/600 like the
   other monospace entries
