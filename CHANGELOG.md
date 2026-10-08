@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- emoji cells in the picker now pick up the lit wash like image emotes:
+  the row scan that feeds it only collected img.emote alts, but emoji
+  ride the message as bare text - the scan now also checks the row's
+  text tokens against the emoji set, so a visible chat emoji keeps its
+  cell coloured (and the new height fade applies to it too)
 - the header font picker now works outside the mobile media query: its
   styles were scoped to the narrow/touch block, so on desktop the menu
   rendered unpositioned as a row of buttons inside the header and the

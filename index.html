@@ -9591,6 +9591,10 @@
     if (!s) {
       s = new Set();
       for (const im of row.querySelectorAll('img.emote')) if (im.alt) s.add(im.alt);
+      // emoji ride as bare text, not imgs - pick them out of the message
+      // tokens the same way noteEmoteUse does
+      for (const t of (row.querySelector('.msg') || row).textContent.split(/\s+/))
+        if (EMOJI_SET.has(t)) s.add(t);
       rowEmoteNames.set(row, s);
     }
     return s;
