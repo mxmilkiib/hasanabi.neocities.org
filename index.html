@@ -1440,6 +1440,11 @@
   /* command-group titles head their block in the bot command lists; a
      slight outdent-and-drop lets a head hang off the column's text edge */
   #helpPanel .linkcols > i > b { display: block; position: relative; left: -10px; top: 4px; margin-bottom: 3px; font-size: .88em; color: var(--text-dim); font-style: italic; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+  /* a column-topping row that leads with a subsection head leaves its
+     first line empty - JS marks it .coltop since css can't see column
+     breaks; the pad sits on the b, which survives the break where a
+     margin truncates and works under .flow's inline i too */
+  #helpPanel .linkcols > i.coltop > b:first-child { padding-top: 1.7em; }
   /* author sub-heads (classical / founders / …) get a breath above them
      so a group's first entry doesn't crowd the item overhead */
   #htabAuth .linkcols > i > b { margin-top: .45em; }
@@ -4740,6 +4745,24 @@
     if (id === 'htabStats') setTimeout(renderStats); // the maps it reads init below; defer past the first pass
     try { localStorage.setItem('hasan-htab', id); } catch {}
   }
+  // multicol offers no 'first in column' hook, so the link-columns are
+  // measured after layout: a row that opens its column leading with a
+  // subsection <b> is marked, and css gives it an empty first line.
+  // the RO covers tab switches, panel opens, width stops and font
+  // swaps - anything that reflows the columns resizes the span
+  let colTopQ = 0;
+  function markColTops() {
+    colTopQ = 0;
+    helpPanel.querySelectorAll('.htabpage:not([hidden]) .linkcols:not(.stbl)').forEach((span) => {
+      let top = Infinity;
+      for (const i of span.children) if (i.offsetParent) top = Math.min(top, i.offsetTop);
+      for (const i of span.children)
+        i.classList.toggle('coltop', i.firstElementChild?.tagName === 'B' && i.offsetTop - top < 2);
+    });
+  }
+  const queueColTops = () => { if (!colTopQ) colTopQ = requestAnimationFrame(markColTops); };
+  helpPanel.querySelectorAll('.linkcols').forEach((s) => new ResizeObserver(queueColTops).observe(s));
+  document.fonts?.ready.then(queueColTops);
   // short names for the ?htab= settings param, both directions
   const HTAB_URL = { config: 'htabCfg', resources: 'htabRes', media: 'htabRes', liberatory: 'htabLib', left: 'htabLib', authors: 'htabAuth', stats: 'htabStats' };
   const HTAB_URL_INV = Object.fromEntries(Object.entries(HTAB_URL).map(([k, v]) => [v, k]));
