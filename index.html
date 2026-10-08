@@ -4390,7 +4390,7 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 6,    font: 'atkinson',     px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 1, clean: true, epmix: 1, ephold: 0, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
+    default:  { theme: 'dark',    shade: 6,    font: 'atkinson',     px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 0, zebra: 1,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 1, clean: true, epmix: 1, ephold: 0, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
     compact:  { theme: 'dark',    shade: 6,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
     print:    { theme: 'light',   shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
     cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
@@ -6346,7 +6346,12 @@
       split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
     };
-    return Object.keys(p).every((k) => !(k in cmp) || p[k] === cmp[k]);
+    return Object.keys(p).every((k) => {
+      if (!(k in cmp)) return true;
+      // a preset can pin a level (zebra: 1); the boolean just pins on/off
+      if (k === 'zebra' && typeof p[k] === 'number') return p[k] === zebraLevel;
+      return p[k] === cmp[k];
+    });
   }
   function markPresets() {
     try { // called during init before some options exist - retry later
@@ -6807,7 +6812,7 @@
   const ZEBRA_SHADES = [
     ['off', 0], ['faint', .035], ['mild', .07], ['strong', .14], ['heavy', .24],
   ];
-  let zebraLevel = 2;
+  let zebraLevel = 1;
   function setZebra(level) {
     zebraLevel = ((level % ZEBRA_SHADES.length) + ZEBRA_SHADES.length) % ZEBRA_SHADES.length;
     mainEl.classList.toggle('zebra', zebraLevel > 0);
@@ -7127,7 +7132,7 @@
     if (weightCtl.get() !== DEF.weight) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (lsCtl.get() !== DEF.ls) q.set('ls', LS_STEPS[lsCtl.get()]);
     if (linkW !== WEIGHTS.length - 1) q.set('lw', WEIGHTS[linkW]);
-    if (zebraLevel !== 2) q.set('zebra', String(zebraLevel));
+    if (zebraLevel !== 1) q.set('zebra', String(zebraLevel));
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
@@ -10328,7 +10333,7 @@
     if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('ls')) { const i = LS_STEPS.indexOf(+q.get('ls')); if (i >= 0) lsCtl.set(i); }
     if (q.has('lw')) { const i = WEIGHTS.indexOf(+q.get('lw')); if (i >= 0) setLinkW(i); }
-    if (q.has('zebra')) { const v = q.get('zebra'); setZebra(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 2)); }
+    if (q.has('zebra')) { const v = q.get('zebra'); setZebra(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 1)); }
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));

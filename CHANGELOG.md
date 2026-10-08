@@ -56,6 +56,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the default theme's zebra striping softens to 'faint' - the out-of-box
+  level, the default preset (which now pins the numeric level so preset
+  matching still recognises it), and a bare ?zebra flag all land on it;
+  other presets keep their boolean 'on' = mild mapping
 - era rungs no used emote has reached yet now print as violet 'soon'
   squares: in plain 'use' mode the never-used tail trips them, and in
   seen-only mode they flush at the list's end as the set of times
