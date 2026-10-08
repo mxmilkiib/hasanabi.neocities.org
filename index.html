@@ -1430,13 +1430,23 @@
      daggers stayed pinned while the text beneath them scrolled away */
   #helpPanel sup { position: relative; top: -3px; font-size: .7em; margin-left: 1px; }
   #helpPanel b.fn { color: var(--text); }
-  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 0 5px; border-radius: 3px; border: 1px solid var(--line); }
+  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 0 5px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
+  /* the bar after a chip's name carries its accent · good · vip - the
+     personality colours a bg/text pair alone doesn't show */
+  #helpPanel a.helpTheme::after, #helpPanel a.helpPreset::after, #helpPanel a.helpShade::after { content: ''; display: inline-block; width: 1.5em; height: .55em; margin-left: 5px; border-radius: 1px; background: linear-gradient(90deg, var(--pv-a, transparent) 0 34%, var(--pv-g, transparent) 34% 66%, var(--pv-v, transparent) 66%); }
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLines { color: var(--accent); cursor: pointer; text-decoration: none; }
   #helpPanel a.helpTheme:hover, #helpPanel a.helpFont:hover, #helpPanel a.helpLh:hover, #helpPanel a.helpLines:hover { text-decoration: underline; }
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLines.on { color: var(--text); text-decoration: underline; cursor: default; }
   #helpPanel a.helpOpt { color: var(--accent); cursor: pointer; text-decoration: none; }
   #helpPanel a.helpOpt:hover { text-decoration: underline; }
   #helpPanel a.helpOpt.on { color: var(--text); text-decoration: underline; cursor: default; }
+  /* the painted text colour sits after the generic link rules so it wins
+     on helpShade chips (which also carry helpOpt) */
+  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
+  /* the selected chip reads in its own text colour under a page-accent
+     ring and tick - legible on every palette, unlike a bare underline */
+  #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); text-decoration: none; outline: 2px solid var(--accent); outline-offset: 1px; cursor: default; }
+  #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { content: '✓'; color: var(--accent); margin-right: 2px; }
   #chatbar {
     flex: none;
     display: flex;
@@ -6538,11 +6548,16 @@
     if (theme) root.setAttribute('data-theme', theme); else root.removeAttribute('data-theme');
     if (shade == null) root.removeAttribute('data-shade'); else root.setAttribute('data-shade', shade);
     const cs = getComputedStyle(root);
-    const out = { bg: cs.getPropertyValue('--bg').trim(), text: cs.getPropertyValue('--text').trim() };
+    const out = {};
+    for (const [k, v] of [['bg', '--bg'], ['tx', '--text'], ['a', '--accent'], ['g', '--good'], ['v', '--vip'], ['ln', '--line']])
+      out[k] = cs.getPropertyValue(v).trim();
     if (keepT == null) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', keepT);
     if (keepS == null) root.removeAttribute('data-shade'); else root.setAttribute('data-shade', keepS);
     return out;
   }
+  // a chip wears its palette as --pv-* vars; css draws bg/text plus the
+  // accent·good·vip bar from them
+  const paintPal = (a, pal) => { for (const [k, v] of Object.entries(pal)) a.style.setProperty('--pv-' + k, v); };
   function previewSwatches() {
     try { // lists may not be built yet during early init
       // each paletteOf read restyles the whole document; containment on
@@ -6551,16 +6566,12 @@
       mainEl.style.contentVisibility = 'hidden';
       try {
       helpPanel.querySelectorAll('a.helpTheme').forEach((a) => {
-        const { bg, text } = paletteOf(a.dataset.theme === 'auto' ? null : a.dataset.theme, THEME_SHADE[a.dataset.theme] ?? shadeIdx);
-        a.style.background = bg;
-        a.style.color = text;
+        paintPal(a, paletteOf(a.dataset.theme === 'auto' ? null : a.dataset.theme, THEME_SHADE[a.dataset.theme] ?? shadeIdx));
       });
       helpPanel.querySelectorAll('a.helpPreset').forEach((a) => {
         const p = THEME_PRESETS[a.dataset.preset];
         if (!p) return;
-        const { bg, text } = paletteOf(p.theme === 'auto' ? null : p.theme, p.shade);
-        a.style.background = bg;
-        a.style.color = text;
+        paintPal(a, paletteOf(p.theme === 'auto' ? null : p.theme, p.shade));
         const ff = FONT_STACKS[p.font];
         if (ff) a.style.fontFamily = ff;
       });
@@ -6568,9 +6579,7 @@
       // previews whatever the media query resolves to
       helpPanel.querySelectorAll('a.helpShade').forEach((a) => {
         const idx = a.dataset.idx === 'auto' ? null : +a.dataset.idx;
-        const { bg, text } = paletteOf(themeMode === 'auto' ? null : themeMode, idx);
-        a.style.background = bg;
-        a.style.color = text;
+        paintPal(a, paletteOf(themeMode === 'auto' ? null : themeMode, idx));
       });
       } finally { mainEl.style.contentVisibility = keepCv; }
     } catch {}
