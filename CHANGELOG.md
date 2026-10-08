@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- sent-message echoes render native channel emotes now - twitch sends no
+  emotes tag for own messages, so codes like Squid1 stayed text even when
+  the sets knew them; the echo synthesizes positions for codes the
+  login's emote-sets can actually use in the channel (global, own-channel
+  and account-wide sets), and the backfilled copy still adopts the row
 - the jump-down flank circles trade the pill's masked conic ring for an
   svg rect stroke - the mask shaved a sliver off the right rim wherever
   a quarter-percent position landed on a fractional pixel - and the

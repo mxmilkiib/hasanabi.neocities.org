@@ -8523,7 +8523,29 @@
     // twitch doesn't echo own messages back over IRC - render locally,
     // dressed with the badges/colour the target channel's USERSTATE reported
     const me = selfTagsPer[target] || {};
+    // and there is no emotes tag for an echo, so native codes like Squid1
+    // would stay text even though the sets know them - synthesize the tag
+    // here, positions run against the rendered text (CTCP wrapper already
+    // stripped, reply name present). usable sets: global, this channel's,
+    // and account-wide ones with no owning channel - but only sets the
+    // login's emote-sets reported, so an unsubbed Squid1 stays text too
+    const emsg = act ? `${ctx ? `@${ctx.name} ` : ''}${inner}` : shown;
+    const usable = new Set([...(me['emote-sets'] || '').split(','), '0']);
+    const codeIds = new Map();
+    for (const s of twSets)
+      if (usable.has(s.setID) && (!s.channelLogin || s.channelLogin === target))
+        for (const e of s.emoteList) if (!codeIds.has(e.code)) codeIds.set(e.code, e.id);
+    const spans = new Map();
+    if (codeIds.size) {
+      let off = 0;
+      for (const tok of emsg.split(/(\s+)/)) {
+        const id = !/\s/.test(tok) && codeIds.get(tok);
+        if (id) spans.set(id, (spans.get(id) ? spans.get(id) + ',' : '') + `${off}-${off + tok.length - 1}`);
+        off += tok.length;
+      }
+    }
     const echoMsg = { tags: { ...me, id: 'local-' + Date.now(),
+      ...(spans.size ? { emotes: [...spans].map(([id, r]) => `${id}:${r}`).join('/') } : {}),
       'display-name': me['display-name'] || auth.login,
       'tmi-sent-ts': String(Date.now()),
       ...(ctx ? { 'reply-parent-msg-id': ctx.id,
