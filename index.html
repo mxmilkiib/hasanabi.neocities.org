@@ -1452,6 +1452,9 @@
   /* a head's drop (and authors' breath) separates it from the row above;
      topping a column there is no row above, so the head sits flush */
   #helpPanel .linkcols > i.colhead > b { top: 0; margin-top: 0; }
+  /* a .flow column can top mid-i on a text fragment - no element edge
+     to carry ::before, so JS drops a real fill block at the fragment */
+  #helpPanel .linkcols .coltop-fill { display: block; height: 1.5em; }
   /* author sub-heads (classical / founders / …) get a breath above them
      so a group's first entry doesn't crowd the item overhead */
   #htabAuth .linkcols > i > b { margin-top: .45em; }
@@ -4759,6 +4762,12 @@
   // column nothing drops - the alignment has no referent.
   // the RO covers tab switches, panel opens, width stops and font
   // swaps - anything that reflows the columns resizes the span
+  // the text node (or element+offset) sitting at a viewport point -
+  // how a column's top fragment is found when it is not an i start
+  const caretAt = (x, y) => {
+    if (document.caretRangeFromPoint) { const c = document.caretRangeFromPoint(x, y); return c && { n: c.startContainer, o: c.startOffset }; }
+    if (document.caretPositionFromPoint) { const c = document.caretPositionFromPoint(x, y); return c && { n: c.offsetNode, o: c.offset }; }
+  };
   let colTopQ = 0;
   function markColTops() {
     colTopQ = 0;
@@ -4769,11 +4778,14 @@
       // into anonymous boxes and i.offsetTop reports a phantom box, not
       // the head's own - measure the b's block box for head-led rows
       const boxTop = (i) => (headLed(i) ? i.firstElementChild : i).offsetTop;
+      const flow = span.classList.contains('flow');
       // marking shifts the marked rows, which can shift who tops a
       // column; run to a fixed point within this frame so intermediate
       // states never paint - single-shot marking let the RO refire
       // and the classes buzzed between layouts every frame
       for (let pass = 0; pass < 4; pass++) {
+        span.querySelectorAll('.coltop-fill').forEach((f) => f.remove());
+        span.normalize();  // re-merge the text nodes fills split
         let top = Infinity;
         for (const i of rows) if (i.offsetParent) top = Math.min(top, boxTop(i));
         const colTop = (i) => boxTop(i) - top < 2;
@@ -4783,6 +4795,32 @@
         for (const i of rows) {
           set(i, 'coltop', anyHead && colTop(i) && !headLed(i));
           set(i, 'colhead', colTop(i) && headLed(i));  // kill the head's drop when it tops a column
+        }
+        // in .flow a column can top mid-i on a text fragment, no element
+        // to mark - probe each column's top-left and drop a fill block at
+        // the fragment itself. column one stays flush with the label
+        if (flow && anyHead) {
+          const r = span.getBoundingClientRect();
+          const cs = getComputedStyle(span);
+          const pitch = parseFloat(cs.columnWidth) + parseFloat(cs.columnGap);
+          const y = r.top + parseFloat(cs.paddingTop) + 2;
+          for (let c = 1, n = Math.floor((r.width + parseFloat(cs.columnGap)) / pitch); c < n; c++) {
+            const p = caretAt(r.left + c * pitch + 4, y);
+            if (!p || !span.contains(p.n)) continue;
+            const el = p.n.nodeType === 1 ? p.n : p.n.parentElement;
+            if (el.closest('b')) continue;                          // a head tops this column - colhead covers it
+            const host = el.closest('i');
+            if (host && (host.classList.contains('coltop') || host.classList.contains('colhead'))) continue;
+            const cr = document.createRange();                      // confirm the fragment really is the column's top line
+            cr.setStart(p.n, p.o); cr.setEnd(p.n, p.o);
+            const ct = cr.getClientRects()[0];
+            if (!ct || Math.abs(ct.top - (r.top + parseFloat(cs.paddingTop))) > 10) continue;
+            const fill = document.createElement('span');
+            fill.className = 'coltop-fill';
+            if (p.n.nodeType === 3) { const rest = p.n.splitText(p.o); rest.parentNode.insertBefore(fill, rest); }
+            else p.n.insertBefore(fill, p.n.childNodes[p.o] || null);
+            moved = true;
+          }
         }
         if (!moved) break;
       }
