@@ -2739,24 +2739,38 @@
     }
   }
 
+  // a catch-up glide holds its column pinned until it lands: mid-flight
+  // scroll events would otherwise read 'far from live edge' and drop the
+  // follow flag, so rows appended during the glide left it stranded
+  // above the bottom it was heading for. The flag clears on arrival, on
+  // a wheel/touch gesture, or after a beat in case no scroll fires
+  const jumpingCols = new Set();
   logEl.addEventListener('scroll', () => {
-    stickBottom = liveDist(logEl) < 60;
+    const d = liveDist(logEl);
+    if (d < 60) jumpingCols.delete(logEl);
+    stickBottom = jumpingCols.has(logEl) || d < 60;
     jdownSet(jdownLog, logEl, stickBottom);
   });
   const jdownSide2 = document.getElementById('jdownSide2');
   let sideBottom = true;
   let side2Bottom = true;
   sideEl.addEventListener('scroll', () => {
-    sideBottom = liveDist(sideEl) < 60;
+    const d = liveDist(sideEl);
+    if (d < 60) jumpingCols.delete(sideEl);
+    sideBottom = jumpingCols.has(sideEl) || d < 60;
     jdownSet(jdownSide, sideEl, sideBottom);
   });
   side2El.addEventListener('scroll', () => {
-    side2Bottom = liveDist(side2El) < 60;
+    const d = liveDist(sideEl);
+    if (d < 60) jumpingCols.delete(side2El);
+    side2Bottom = jumpingCols.has(side2El) || d < 60;
     jdownSet(jdownSide2, side2El, side2Bottom);
   });
   function jumpDown(col, btn) {
     btn.hidden = true;
     for (const c of document.querySelectorAll(`.jdc[data-for="${btn.id}"]`)) c.hidden = true;
+    jumpingCols.add(col);
+    setTimeout(() => jumpingCols.delete(col), 1500);
     col.scrollTo({ top: revFlow ? -col.scrollHeight : col.scrollHeight, behavior: 'smooth' });
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
@@ -2782,6 +2796,9 @@
       if (on) pausedCols.add(col); else { pausedCols.delete(col); repinCol(col); }
     });
     col.addEventListener('mouseleave', () => pausedCols.delete(col));
+    // a deliberate scroll gesture aborts a catch-up glide in progress
+    col.addEventListener('wheel', () => jumpingCols.delete(col), { passive: true });
+    col.addEventListener('touchstart', () => jumpingCols.delete(col), { passive: true });
   }
   jdownSide.addEventListener('click', () => jumpDown(sideEl, jdownSide));
   jdownSide2.addEventListener('click', () => jumpDown(side2El, jdownSide2));

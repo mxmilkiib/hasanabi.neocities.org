@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- catch-up jumps no longer strand above the live edge: the glide held a
+  scrollHeight target captured at click time while the mid-flight scroll
+  events dropped the follow flag, so rows arriving during the animation
+  left it scrolled up - the column now stays pinned through the glide
+  (cleared on arrival, a wheel/touch, or a beat) and appended rows snap
+  it to the real bottom
 - the picker's frozen anim state caught stragglers: recents entries
   saved before the animated flag existed rendered unfrozen, and any
   animated url slips the flag check - the freeze now also triggers on
