@@ -11290,7 +11290,14 @@
   try {
     const hs = readHsize();
     const q2 = new URLSearchParams(location.search);
-    if (hs.w >= 280 && !q2.has('hpw')) { helpPanel.style.width = helpPanel.style.maxWidth = hs.w + 'px'; markHelpW(hs.w); }
+    if (hs.w >= 280 && !q2.has('hpw')) {
+      helpPanel.style.width = helpPanel.style.maxWidth = hs.w + 'px';
+      // a stored px that happens to land on a preset marks the preset
+      // link again; anything else clears the row and brackets the px
+      const i = HELP_WIDTHS.indexOf(hs.w);
+      if (i >= 0) { helpWIdx = i; markHelp('helpW', i); markHelpW(0); }
+      else { markHelp('helpW', -1); markHelpW(hs.w); }
+    }
     if (hs.h >= 120) { helpPanel.style.height = hs.h + 'px'; helpPanel.style.maxHeight = 'none'; }
     if (hs.x != null) {
       helpPanel.style.left = hs.x + 'px'; helpPanel.style.top = hs.y + 'px';
