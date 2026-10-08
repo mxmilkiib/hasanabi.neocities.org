@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- backfilled copies of locally-echoed sends no longer carry the
+  'recovered from the recent-messages backlog' tooltip when the echo
+  row itself is already gone - every minted echo key is remembered
+  (echoed, cross-tab and restored alike), so the copy still reads as
+  local rather than as recovered history
 - 'missed' age squares now colour the label violet too, not just the
   border - a purple-bordered rung no longer keeps the lit text colour
 - sent-message echoes render native channel emotes now - twitch sends no

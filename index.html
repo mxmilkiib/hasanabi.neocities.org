@@ -2720,6 +2720,11 @@
   // the echo row rather than render a duplicate
   const echoRows = new Map(); // 'login\x00text' -> [echo rows] - identical sends share a key
   const pendingEcho = [];     // keys, bound to rows in render order
+  // every minted echo key, live row or not - a backfilled copy that finds
+  // its echo row gone (evicted, trimmed) still knows the send was local,
+  // so it drops the 'recovered' tooltip rather than claim lost history
+  const echoKeys = new Set();
+  const noteEchoKey = (k) => { echoKeys.add(k); if (echoKeys.size > 300) echoKeys.delete(echoKeys.keys().next().value); };
   // twitch prepends "@parent " to threaded replies for irc clients, so an
   // echo and its real line differ by that mention - key both with it stripped
   function echoKey(login, tags, text) {
@@ -3540,9 +3545,13 @@
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
       // a real copy of a locally-echoed message adopts the echo row:
-      // it drops .local (so it persists in history) and takes the real id
+      // it drops .local (so it persists in history) and takes the real id.
+      // selfEcho marks the send as already-local even when no live row is
+      // left to adopt - the copy confirms the line, it didn't recover it
+      let selfEcho = false;
       if (kind === 'PRIVMSG' && !local && auth && login === auth.login) {
         const ek = ch + '\x00' + echoKey(login, tags, rawMsg);
+        selfEcho = echoKeys.has(ek);
         const arr = echoRows.get(ek);
         // evicted echoes go stale in the bucket - skip to a live row; the
         // oldest matching echo adopts first when the key is shared
@@ -3567,7 +3576,7 @@
       // matches what strict per-line alternation would give
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
-      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
+      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay'}"${live || selfEcho ? '' : ' title="recovered from the recent-messages backlog"'}` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -7803,6 +7812,7 @@
       for (const el of logEl.querySelectorAll('.row.local[data-ek]')) {
         const k = decodeURIComponent(el.dataset.ek);
         (echoRows.get(k) || echoRows.set(k, []).get(k)).push(el);
+        noteEchoKey(k);
       }
       // tweet placeholders and pre-avatar cards in saved rows never
       // resolved: re-ask the relay (the asks queue until the socket
@@ -8602,6 +8612,7 @@
     if (bumped && !emotePick.hidden) rebuildPicker();
     if (chan) chan.postMessage({ type: 'echo', msg: echoMsg, raw: text });
     pendingEcho.push(target + '\x00' + echoKey(auth.login, echoMsg.tags, shown));
+    noteEchoKey(pendingEcho[pendingEcho.length - 1]);
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     // a send from inside a walk hands the stashed draft back to the box -
     // the entry was sent but the half-written text was never its own
@@ -10085,6 +10096,7 @@
     if (!CHANNELS.includes(ech)) return;
     queueMessage(m.msg, false);
     pendingEcho.push(ech + '\x00' + echoKey(m.msg.login, m.msg.tags || {}, m.msg.message));
+    noteEchoKey(pendingEcho[pendingEcho.length - 1]);
     if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
     // a send from a sibling tab echoes here as a row - keep this copy's
     // input walk in step so ↑ finds it everywhere the message landed.
