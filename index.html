@@ -8328,7 +8328,7 @@
     splitBtn.textContent = level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
     splitBtn.classList.toggle('tri', level >= 3);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = `${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)'][level - 1]} - click/scroll · ⇧click back`;
+    splitBtn.title = `${level}/4 ${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)'][level - 1]} - click/scroll · ⇧click back`;
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     // flipping between 2 and 4 keeps the deal - only the rail toggles
     if ((level === 4 ? 2 : level) === cur) {
