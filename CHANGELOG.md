@@ -21,6 +21,13 @@ not versions — the page ships continuously to Neocities.
   satellite) takes the data links out of open knowledge and osint
 - google fonts (sheet and woff2) now cache-first in the service worker,
   so the offline copy keeps its fonts
+- left/libre vs authors overlap managed by rule: texts cited in a topic
+  sit under a reading row (dual power, mutual aid) and the author's name
+  is a dotted-underline cite that hops to the authors tab and flashes
+  the entry (lenin, luxemburg, bookchin, öcalan, kropotkin, dean spade,
+  jo freeman, mariame kaba); authors gains dean spade and kimberlé
+  crenshaw, bookchin's work link (the ecology of freedom), and loses
+  its duplicate mark fisher (kept under critical/social theory)
 - two dangling separators in marxist/critical removed; spoon theory
   link follows its www redirect
 

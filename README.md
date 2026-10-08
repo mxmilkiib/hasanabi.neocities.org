@@ -390,6 +390,13 @@ no dependencies beyond CDN-hosted fonts.
   links), and authors (era-grouped reading lists) — laid out in link
   columns whose count is capped by the popup's own width via
   container queries.
+- Split rule between left/libre and authors: people and their texts
+  live in authors (`data-w` the work, `data-g` the tagline's source);
+  left/libre links concepts, organisations and tools. Where a topic
+  wants its texts in context they sit under a **reading** row, and the
+  author's name is an `a.au[data-au]` cite that hops to the authors tab
+  and flashes the entry — so a text only appears in left/libre when its
+  author has an entry.
 - The popup resizes from its edges and offers widths from 480 to
   1600px.
 
