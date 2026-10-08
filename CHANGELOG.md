@@ -74,6 +74,8 @@ not versions — the page ships continuously to Neocities.
   section, where they parked ahead of later sections' used cells
 
 ### Features
+- the emote picker's size row gains a 1½x step between 1x and 2x - 60px
+  cells, saved and reachable via ?epzoom=hf like the other sizes
 - a lit emote cell's wash now fades with its height in the picker grid -
   a scroll-driven view() timeline runs the glow from 40% at the bottom
   edge to 10% as it nears the scrollport's top; the justused flash still
