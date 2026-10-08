@@ -1060,16 +1060,18 @@
      (zeroed bases keep them there at any width - grow ratios, not
      ems, split the space), then storage on its own last row */
   #statsBody .st-trio { display: flex; flex: 0 0 100%; gap: 0 22px; align-items: flex-start; }
-  #statsBody .st-trio .st-panel { flex: 1 1 0; }
+  #statsBody .st-trio .st-panel { flex: 1 1 0; min-width: 0; }
   /* st-panel.st-rate, not bare .st-rate - the generic panel rule sits
      later at equal specificity and would collapse it into the row */
   #statsBody .st-panel.st-rate { flex: 0 0 100%; }
-  #statsBody .st-panel { flex: 1 1 0; min-width: 0; }
-  #statsBody .st-panel.st-wide { flex: 2 1 0; }
+  /* min-widths keep the narrow panels from crushing to slivers - the
+     row wraps rather than vanishing when the container can't fit it */
+  #statsBody .st-panel { flex: 1 1 0; min-width: 10em; }
+  #statsBody .st-panel.st-wide { flex: 2 1 0; min-width: 14em; }
   #statsBody .st-panel.st-foot { flex: 0 0 100%; }
   /* a narrow panel keeps its filters beside the title by letting the
      anchors wrap into right-aligned lines instead of widening the box */
-  #statsBody .st-panel.st-narrow { flex: 0.7 1 0; }
+  #statsBody .st-panel.st-narrow { flex: 0.7 1 0; min-width: 8em; }
   #statsBody .st-panel.st-narrow .st-sort { display: inline-flex; flex-wrap: wrap;
     justify-content: flex-end; max-width: 66%; }
   /* inside a fixed column the ranked lists run single-file */
@@ -5486,7 +5488,7 @@
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
       `<div class="st-panel st-narrow"><div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `<div class="st-panel st-narrow"><div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
+      `<div class="st-panel st-narrow"><div class="st-h">top badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
