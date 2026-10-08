@@ -3121,14 +3121,21 @@
     away.push([s, e, why]);
     if (away.length > 50) away.shift();
     // rateTimes is parallel to rateSamples; a reconnect can shade the
-    // socket-down span even when its samples were already drawn as 0
-    for (let i = 0; i < rateSamples.length; i++)
+    // socket-down span even when its samples were already drawn as 0.
+    // the long series is the same tail with an offset, so marks mirror
+    for (let i = 0, hOff = rateHistT.length - rateTimes.length; i < rateSamples.length; i++)
       if (rateTimes[i] && s < rateTimes[i] && e > rateTimes[i] - 1000) {
         rateSamples[i] = NaN;
         // a recovered span keeps its filled tag through re-marks -
         // once the lines came back the band must not read as lost
         rateWhy[i] = (rateWhy[i] || '').includes('filled')
           ? (why ? why + ' · filled' : 'filled') : why;
+        const h = i + hOff;
+        if (h >= 0) {
+          rateHist[h] = NaN;
+          rateHistWhy[h] = (rateHistWhy[h] || '').includes('filled')
+            ? (why ? why + ' · filled' : 'filled') : why;
+        }
       }
   }
   // a replayed line inside an outage window proves the stretch was
@@ -3145,10 +3152,13 @@
       const covered = Math.min(e, ts);  // hole shrinks to [s, covered]
       if (ts <= s) away.splice(i--, 1);
       else w[1] = covered;
-      for (let j = 0; j < rateSamples.length; j++)
+      for (let j = 0, hOff = rateHistT.length - rateTimes.length; j < rateSamples.length; j++)
         if (!Number.isFinite(rateSamples[j]) && rateTimes[j] > covered &&
-            rateTimes[j] - 1000 < e && !(rateWhy[j] || '').includes('filled'))
+            rateTimes[j] - 1000 < e && !(rateWhy[j] || '').includes('filled')) {
           rateWhy[j] = rateWhy[j] ? rateWhy[j] + ' · filled' : 'filled';
+          const h = j + hOff;
+          if (h >= 0) rateHistWhy[h] = rateHistWhy[h] ? rateHistWhy[h] + ' · filled' : 'filled';
+        }
       if (ts > s) return;
     }
   }
@@ -3915,6 +3925,14 @@
   // outage cause per sample, parallel to rateSamples - '' for live ones;
   // lets dead bands colour socket loss and a closed page differently
   const rateWhy = [];
+  // the session-long copy of the same series: pushed in lockstep with
+  // rateSamples but kept to RATE_KEEP seconds instead of the spark's
+  // window, so the stats rate chart covers the whole recorded session
+  const RATE_KEEP = 43200;
+  const rateHist = [];
+  const rateHistT = [];
+  const rateHistWhy = [];
+  const rateHistPer = {}; // ch -> long series; session-scoped, not saved
   let sparkCols = null; // theme colours, resolved once instead of per draw
 
   function sparkSize() {
@@ -4126,7 +4144,7 @@
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
   function saveSpark() {
     try {
-      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30) }));
+      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hist: rateHist, histT: rateHistT, histWhy: rateHistWhy }));
     } catch {}
   }
   function restoreSpark() {
@@ -4147,6 +4165,20 @@
       const oldWhy = (Array.isArray(d.why) ? d.why.slice(-win) : []);
       while (oldWhy.length < oldRate.length) oldWhy.unshift('');
       rateWhy.push(...oldWhy, ...Array(gap).fill(''));
+      // the session-long series: current saves carry it beside the
+      // windowed arrays; older saves fall back to the windowed tail
+      const oldHist = (Array.isArray(d.hist) ? d.hist : d.rate).slice(-RATE_KEEP)
+        .map((v) => (v === null ? NaN : v));
+      const hGap = Math.min(RATE_KEEP, Math.max(0, Math.round((now - savedAt) / 1000)));
+      rateHist.push(...oldHist, ...Array(hGap).fill(NaN));
+      rateHistT.push(
+        ...(Array.isArray(d.histT) && d.histT.length >= oldHist.length
+          ? d.histT.slice(-oldHist.length)
+          : oldHist.map((_, i) => savedAt - (oldHist.length - i) * 1000)),
+        ...Array.from({ length: hGap }, (_, i) => savedAt + (i + 1) * 1000));
+      const oldHWhy = (Array.isArray(d.histWhy) ? d.histWhy : []).slice(-oldHist.length);
+      while (oldHWhy.length < oldHist.length) oldHWhy.unshift('');
+      rateHistWhy.push(...oldHWhy, ...Array(hGap).fill(''));
       // windows carried over from the last session, so rungs covering an
       // in-session socket drop still read missed after a reload
       if (Array.isArray(d.away))
@@ -4165,6 +4197,9 @@
       for (const c of CHANNELS) {
         const rr = d.ratePer && Array.isArray(d.ratePer[c]) ? d.ratePer[c].slice(-win) : [];
         rateSamplesPer[c] = [...rr.map((v) => (v === null ? NaN : v)), ...Array(gap).fill(NaN)];
+        // the long per-channel series is session-only: pad the restored
+        // span as no-data so its tail still aligns with rateHistT
+        rateHistPer[c] = Array(rateHist.length).fill(NaN);
         if (rateSamplesPer[c].length > win) rateSamplesPer[c].splice(0, rateSamplesPer[c].length - win);
         const gg = d.glorpPer && Array.isArray(d.glorpPer[c]) ? d.glorpPer[c].slice(-win) : [];
         glorpSamplesPer[c] = [...gg, ...Array(gap).fill(0)];
@@ -4180,6 +4215,11 @@
       if (rateTimes.length > win) rateTimes.splice(0, rateTimes.length - win);
       if (rateWhy.length > win) rateWhy.splice(0, rateWhy.length - win);
       if (glorpSamples.length > win) glorpSamples.splice(0, glorpSamples.length - win);
+      if (rateHist.length > RATE_KEEP) {
+        rateHist.splice(0, rateHist.length - RATE_KEEP);
+        rateHistT.splice(0, rateHistT.length - RATE_KEEP);
+        rateHistWhy.splice(0, rateHistWhy.length - RATE_KEEP);
+      }
     } catch {}
   }
 
@@ -4207,7 +4247,7 @@
     const now = Date.now();
     // a delayed tick fills each missed second from rendered-row counts;
     // only a confirmed away window still gets a dead NaN sample
-    const missed = Math.min(sparkWin,
+    const missed = Math.min(RATE_KEEP,
       Math.max(0, Math.round((now - lastTick) / 1000) - 1));
     for (let i = 0; i < missed; i++) {
       const t = lastTick + (i + 1) * 1000;
@@ -4218,6 +4258,9 @@
       rateSamples.push(why ? NaN : n / 5);
       rateWhy.push(why);
       rateTimes.push(t);
+      rateHist.push(why ? NaN : n / 5);
+      rateHistWhy.push(why);
+      rateHistT.push(t);
       glorpSamples.push(glorpCounts.get(sec) || 0);
       for (const c of CHANNELS) {
         let cn = 0;
@@ -4226,6 +4269,9 @@
         const arr = rateSamplesPer[c] = rateSamplesPer[c] || [];
         arr.push(why ? NaN : cn / 5);
         if (arr.length > sparkWin) arr.splice(0, arr.length - sparkWin);
+        const harr = rateHistPer[c] = rateHistPer[c] || [];
+        harr.push(why ? NaN : cn / 5);
+        if (harr.length > RATE_KEEP) harr.splice(0, harr.length - RATE_KEEP);
         const garr = glorpSamplesPer[c] = glorpSamplesPer[c] || [];
         const gcm = glorpCountsPer[c];
         garr.push(gcm ? (gcm.get(sec) || 0) : 0);
@@ -4271,9 +4317,17 @@
     rateSamples.push(downAt ? NaN : rate);
     rateWhy.push(downAt ? 'socket dropped' : '');
     rateTimes.push(now);
+    rateHist.push(downAt ? NaN : rate);
+    rateHistWhy.push(downAt ? 'socket dropped' : '');
+    rateHistT.push(now);
     if (rateSamples.length > sparkWin) rateSamples.splice(0, rateSamples.length - sparkWin);
     if (rateTimes.length > sparkWin) rateTimes.splice(0, rateTimes.length - sparkWin);
     if (rateWhy.length > sparkWin) rateWhy.splice(0, rateWhy.length - sparkWin);
+    if (rateHist.length > RATE_KEEP) {
+      rateHist.splice(0, rateHist.length - RATE_KEEP);
+      rateHistT.splice(0, rateHistT.length - RATE_KEEP);
+      rateHistWhy.splice(0, rateHistWhy.length - RATE_KEEP);
+    }
     const gcut = Date.now() - 1000;
     while (glorpTimestamps.length && glorpTimestamps[0] < gcut) glorpTimestamps.shift();
     glorpSamples.push(glorpTimestamps.length);
@@ -4289,6 +4343,9 @@
       const arr = rateSamplesPer[c] = rateSamplesPer[c] || [];
       arr.push(downAt ? NaN : cn / 5);
       if (arr.length > sparkWin) arr.splice(0, arr.length - sparkWin);
+      const harr = rateHistPer[c] = rateHistPer[c] || [];
+      harr.push(downAt ? NaN : cn / 5);
+      if (harr.length > RATE_KEEP) harr.splice(0, harr.length - RATE_KEEP);
       const garr = glorpSamplesPer[c] = glorpSamplesPer[c] || [];
       const gcm = glorpCountsPer[c];
       garr.push(gcm ? (gcm.get(sNow) || 0) : 0);
@@ -5359,7 +5416,7 @@
         `<div class="st-panel"><div class="st-h">glorps</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
-      `<div class="st-panel st-rate"><div class="st-h">scrollback rate</div>` +
+      `<div class="st-panel st-rate"><div class="st-h">session rate</div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
       `<div class="st-panel st-narrow"><div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
@@ -5438,10 +5495,18 @@
   // canvas's pixel width decides, drawn as per-bucket columns so the whole
   // buffer's flow shows at once - silent stretches read as flat floor.
   // gap marker rows aren't messages and don't count
+  // the session-long rate series - the same samples the header spark
+  // draws, kept past its window; scoped views take the per-channel tail
   function drawScrollGraph(el, sc) {
     const cv = el.querySelector('#stRate');
     const cap = el.querySelector('#stRateCap');
     if (!cv || !cap) return;
+    const series = sc ? (rateHistPer[sc] || []) : rateHist;
+    const off = rateHistT.length - series.length;
+    if (!series.length) {
+      cap.innerHTML = '<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>';
+      return;
+    }
     const dpr = window.devicePixelRatio || 1;
     const H = 64;
     const wCss = Math.max(80, cv.clientWidth || 220);
@@ -5449,37 +5514,47 @@
     cv.height = Math.round(H * dpr);
     const g = cv.getContext('2d');
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const times = [];
-    for (const r of document.querySelectorAll('.row[data-ts]')) {
-      if (r.classList.contains('gap') || (sc && r.dataset.ch !== sc)) continue;
-      const t = +r.dataset.ts || 0;
-      if (t) times.push(t);
-    }
-    if (times.length < 2) {
-      cap.innerHTML = `<div class="st-row"><span class="nm">${times.length ? 'one row' : 'no rows'} stored</span></div>`;
-      return;
-    }
-    let t0 = times[0], t1 = times[0];
-    for (const t of times) { if (t < t0) t0 = t; if (t > t1) t1 = t; }
+    const t0 = rateHistT[Math.max(0, off)] || Date.now();
+    const t1 = rateHistT[rateHistT.length - 1] || Date.now();
     const span = Math.max(30000, t1 - t0);
-    const N = Math.min(320, Math.max(60, Math.round(wCss)));
-    const bw = span / N;
-    const bins = new Float64Array(N);
-    for (const t of times) bins[Math.min(N - 1, Math.floor((t - t0) / bw))]++;
-    const bs = bw / 1000;
-    let peak = 0;
-    for (const b of bins) if (b / bs > peak) peak = b / bs;
-    g.fillStyle = (sparkCols && sparkCols.accent) ||
-      getComputedStyle(document.documentElement).getPropertyValue('--spark').trim() || '#888';
-    g.globalAlpha = .8;
-    const bwPx = wCss / N;
-    for (let i = 0; i < N; i++) {
-      const rh = (bins[i] / bs) / peak * (H - 2);
-      if (rh > .3) g.fillRect(Math.floor(i * bwPx), H - rh, Math.max(1, Math.ceil(bwPx) - 1), rh);
+    const N = Math.min(480, Math.max(60, Math.round(wCss)));
+    const bw = span / N, bwPx = wCss / N;
+    // per-second samples pool into pixel bins: rate bars average, and a
+    // bin with any dead sample flags the cause for the underlay band
+    const bins = new Float64Array(N), bn = new Float64Array(N), bwhy = new Array(N).fill('');
+    for (let i = 0; i < series.length; i++) {
+      const t = rateHistT[off + i];
+      if (!t) continue;
+      const b = Math.min(N - 1, Math.floor((t - t0) / bw));
+      const v = series[i];
+      if (Number.isFinite(v)) { bins[b] += v; bn[b]++; }
+      else {
+        const w = rateHistWhy[off + i] || '';
+        if (w && !bwhy[b].includes(w)) bwhy[b] = bwhy[b] ? bwhy[b] + ' · ' + w : w;
+      }
     }
+    let peak = 0;
+    for (let i = 0; i < N; i++) if (bn[i] && bins[i] / bn[i] > peak) peak = bins[i] / bn[i];
+    if (sparkCols) {
+      g.globalAlpha = .22;
+      for (let i = 0; i < N; i++) if (bwhy[i]) {
+        g.fillStyle = /filled/.test(bwhy[i]) ? sparkCols.good : sparkCols.vip;
+        g.fillRect(Math.floor(i * bwPx), 0, Math.max(1, Math.ceil(bwPx)), H);
+      }
+    }
+    if (peak) {
+      g.globalAlpha = .8;
+      g.fillStyle = (sparkCols && sparkCols.accent) ||
+        getComputedStyle(document.documentElement).getPropertyValue('--spark').trim() || '#888';
+      for (let i = 0; i < N; i++) {
+        const rh = bn[i] ? (bins[i] / bn[i]) / peak * (H - 2) : 0;
+        if (rh > .3) g.fillRect(Math.floor(i * bwPx), H - rh, Math.max(1, Math.ceil(bwPx) - 1), rh);
+      }
+    }
+    g.globalAlpha = 1;
     const mins = Math.round((t1 - t0) / 60000);
     const dur = mins >= 60 ? `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}m` : `${mins}m`;
-    cv.title = `msgs/sec across the ${times.length.toLocaleString('en')} stored rows - ${dur} span`;
+    cv.title = `msgs/sec across the recorded session - ${dur} span`;
     cv.setAttribute('aria-label', cv.title);
     cap.innerHTML = `<div class="st-row"><span class="nm">${fmtRowTime(new Date(t0))} – ${fmtRowTime(new Date(t1))} (${dur})</span><i>peak ${peak.toFixed(1)}/s</i></div>`;
   }
