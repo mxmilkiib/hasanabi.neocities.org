@@ -1446,6 +1446,9 @@
      see column breaks; a block ::before spacer holds the line and also
      works under .flow's inline i */
   #helpPanel .linkcols > i.coltop::before { content: ""; display: block; height: 1.5em; }
+  /* column one always opens flush with the section label - the drop
+     line is only for sibling columns falling in under a head */
+  #helpPanel .linkcols > i.coltop:first-child::before { display: none; }
   /* a head's drop (and authors' breath) separates it from the row above;
      topping a column there is no row above, so the head sits flush */
   #helpPanel .linkcols > i.colhead > b { top: 0; margin-top: 0; }

@@ -118,7 +118,8 @@ not versions — the page ships continuously to Neocities.
   that tops its column drops a line only when another column opens
   with a head, so a subsection head shares row one with the section
   label and link text aligns under it (marked by a layout scan, since
-  css can't see column breaks)
+  css can't see column breaks); column one itself always opens flush
+  with the label - it is the anchor the siblings align to
 
 ### Fixes
 - the picker's 'anim' frozen-stills state now reaches chat rows too:
