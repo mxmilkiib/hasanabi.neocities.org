@@ -65,9 +65,7 @@ not versions — the page ships continuously to Neocities.
   use-record reset the whole ladder is pending - and violet-dashed
   'missed' rungs cover windows chat wasn't logging, persisted across
   reloads through the spark save plus a last-write stamp on the
-  emote-use blob; the t0 tracking-start square bounds the recorded
-  span - labelled 't0' rather than a rounded duration, so it never
-  doubles a real rung - and can read missed too
+  emote-use blob
 - the picker's 'use' button gains two extras: a second click cycles a
   seen-only pass hiding emotes with no recorded use (persisted as
   'useseen' / ?epsort=useseen, marked with a dotted accent underline),
