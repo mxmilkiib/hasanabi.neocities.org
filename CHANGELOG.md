@@ -89,9 +89,9 @@ not versions — the page ships continuously to Neocities.
   so saved levels don't remap
 - stats tab reorders: emotes and badges lead, chatters sits just
   above storage
-- link-column subsection heads (fediverse, leftist fediverse, stats /
-  maps / live, the regional tags, the authors' era labels) outdent 4px
-  so a head hangs off its column's text edge
+- link-column subsection heads (fediverse, leftist fediverse, data /
+  maps / live, the regional tags, the authors' era labels) outdent 7px
+  and drop 2px, so a head hangs off its column's text edge
 
 ### Fixes
 - the picker's 'anim' frozen-stills state now reaches chat rows too:
