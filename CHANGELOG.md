@@ -44,6 +44,12 @@ not versions — the page ships continuously to Neocities.
   link follows its www redirect
 
 ### Fixes
+- the picker's 'anim' frozen-stills state now reaches chat rows too:
+  tag-rendered twitch emotes (hasSlam, hasRant) were hardcoded to the
+  /animated/ frame and third-party imgs used raw urls, so both played
+  on regardless. new renders emit the default frame or the provider's
+  still, and toggling the chip rewrites emote srcs in place - including
+  rows restored from history, which arrive pre-rendered
 - `findBtn` is now declared like the other header buttons rather than
   resolving through the implicit window.id global; unused `linkKeyOf`
   helper dropped

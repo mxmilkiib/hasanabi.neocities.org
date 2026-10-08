@@ -2529,7 +2529,7 @@
         if (url) {
           const img = document.createElement('img');
           img.className = 'emote';
-          img.src = url;
+          img.src = stillUrl(url, setFor(rowCh.ch || CHANNEL).emoteAnim?.has(name));
           img.alt = name;
         img.title = name + (es[name] ? ' - ' + es[name] : '');
           frag.appendChild(img);
@@ -2544,7 +2544,8 @@
   // onto the previous emote; cheermotes resolve when the message has bits.
   function renderTextHTML(text, hasBits, ch, shiny, fossa) {
     const em = emotesOf(ch || CHANNEL), eml = emotesLcOf(ch || CHANNEL),
-          es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL);
+          es = emoteSrcOf(ch || CHANNEL), zw = zwOf(ch || CHANNEL),
+          ea = setFor(ch || CHANNEL).emoteAnim || ZERO;
     const out = [];
     let lastEmote = -1; // index in out of the last emote img, for zw stacking
     text.split(/(\s+)/).forEach((tok, i, arr) => {
@@ -2552,7 +2553,7 @@
       const url = name && em[name];
       if (url) {
         const alt = escapeHTML(name);
-        const img = `<img class="emote" src="${escapeHTML(url)}" alt="${alt}"` +
+        const img = `<img class="emote" src="${escapeHTML(stillUrl(url, ea.has(name)))}" alt="${alt}"` +
                     ` title="${alt}${es[name] ? ' - ' + es[name] : ''}">`;
         if (zw.has(name) && lastEmote >= 0) {
           if (out[lastEmote].endsWith('</span>'))
@@ -2713,7 +2714,9 @@
       const alt = escapeHTML(name);
       const eid = escapeHTML(e.id);
       const tone = lightMode ? 'light' : 'dark';
-      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/animated/${tone}/2.0"` +
+      // frozen stills take the default frame outright - static emotes
+      // have one anyway, so the fallback below simply never fires
+      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${animFrozen() ? 'default' : 'animated'}/${tone}/2.0"` +
               ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${eid}/default/${tone}/2.0'"` +
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
@@ -9349,6 +9352,35 @@
     setOn(animBtns.still, animOk(false));
   }
   paintAnim();
+  // the freeze test picker cells and chat rows share: a provider-flagged
+  // emote, or an url that outs itself - /animated/ or a bare .gif
+  const stillUrl = (u, a) => animFrozen() && (a || /\/animated\/|\.gif(?:$|\?)/i.test(u || '')) ? freezeUrl(u) : u;
+  // chat rows follow the chip as well - twitch frames swap dirs,
+  // third-party rewrites through the same frozen urls as picker cells.
+  // rows restored from history arrive pre-rendered, so the set runs
+  // once at open too, not only on toggles
+  const restillEmotes = () => {
+    const fz = animFrozen();
+    for (const im of mainEl.querySelectorAll('.row img.emote')) {
+      const u = im.getAttribute('src') || '';
+      const tw = u.match(/(\/emoticons\/v2\/[^/]+\/)(animated|default)\//);
+      if (tw) {
+        const v = u.replace(`/${tw[2]}/`, `/${fz ? 'default' : 'animated'}/`);
+        if (v === u) continue;
+        // heading back to playing hits animated/ first, which static
+        // emotes 404 - re-arm the fallback a fresh render carries
+        im.onerror = fz ? null : () => { im.onerror = null; im.src = u; };
+        im.src = v;
+        continue;
+      }
+      const ch = im.closest('.row').dataset.ch || CHANNEL;
+      const name = emoteNameOf(ch, im.alt);
+      const base = name && emotesOf(ch)[name];
+      if (!base) continue;
+      im.src = fz ? stillUrl(base, setFor(ch).emoteAnim?.has(name)) : base;
+    }
+  };
+  if (animFrozen()) restillEmotes();
   const setAnimFilter = (list) => {
     epickAnimOn = new Set((list || []).filter((k) => k === 'anim' || k === 'animf' || k === 'still'));
     // anim-playing + still is the unrestricted default - stored as empty
@@ -9370,6 +9402,7 @@
     else { next = [...epickAnimOn]; epickAnimOn.has(k) ? next.splice(next.indexOf(k), 1) : next.push(k); }
     setAnimFilter(next);
     buildPicker();
+    restillEmotes();
     emoteQ.focus();
   });
   // source tabs: any mix of groups may be lit; none lit means everything
@@ -9722,7 +9755,7 @@
       // the flag can miss - older recents stored no 'a', and a twitch url
       // still says /animated/ or a .gif says it for itself - so freeze on
       // either signal
-      const im = animFrozen() && (a || /\/animated\/|\.gif(?:$|\?)/i.test(img || '')) ? freezeUrl(img) : img;
+      const im = stillUrl(img, a);
       return `<button type="button" data-ins="${e}"${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
         `<img src="${escapeHTML(im)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
     };
