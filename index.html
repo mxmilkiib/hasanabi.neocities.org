@@ -578,6 +578,18 @@
     word-wrap: break-word;
     position: relative;
   }
+  /* 'faint dots' swaps the seam layer for a run of 1px dots */
+  main.linedots .row {
+    background-image:
+      var(--rowbar),
+      var(--rowtint),
+      radial-gradient(circle .55px at .8px .5px, var(--rowline, var(--line)) 98%, transparent);
+    background-repeat: no-repeat, no-repeat, repeat-x;
+    background-size:
+      4px calc(100% - var(--rowin) * 2),
+      100% calc(100% - var(--rowin) * 2),
+      3px 1px;
+  }
   /* hover reply affordance - hidden unless logged in (body.chaton). The
      box spans the last line's full height so the glyph lands centred on
      the bottom row of a wrapped message (and centred in a single-line
@@ -1058,6 +1070,10 @@
   .reply.rq::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
     height: 1px; background: var(--rowline);
+  }
+  main.linedots .reply.rq::after {
+    background: radial-gradient(circle .55px at .8px .5px, var(--rowline) 98%, transparent);
+    background-size: 3px 1px; background-repeat: repeat-x;
   }
   /* quoted emotes render at three-quarter size - the eonly override
      keeps an emote-only reply row from blowing them back up; other
@@ -6877,6 +6893,9 @@
     ['faint', 'color-mix(in srgb, var(--line) 35%, transparent)'],
     ['medium', 'color-mix(in srgb, var(--line) 65%, transparent)'],
     ['solid', 'var(--line)'],
+    // last on purpose: saved levels are the index, so appends don't remap.
+    // a third field marks the render mode - 'dots' redraws the seam layer
+    ['faint dots', 'color-mix(in srgb, var(--line) 35%, transparent)', 'dots'],
   ];
   let lineLevel = 1;
   document.getElementById('helpLinesList').innerHTML = LINE_SHADES.map((s, i) =>
@@ -6884,6 +6903,7 @@
   function setLines(level) {
     lineLevel = ((level % LINE_SHADES.length) + LINE_SHADES.length) % LINE_SHADES.length;
     mainEl.style.setProperty('--rowline', LINE_SHADES[lineLevel][1]);
+    mainEl.classList.toggle('linedots', LINE_SHADES[lineLevel][2] === 'dots');
     setOn(linesBtn, lineLevel > 0);
     linesBtn.title = `Row separators: ${LINE_SHADES[lineLevel][0]} - click/scroll · ⇧click back`;
     helpPanel.querySelectorAll('a.helpLines')
