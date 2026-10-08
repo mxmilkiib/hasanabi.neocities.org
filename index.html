@@ -1443,7 +1443,18 @@
   #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
   /* the selected chip reads in its own text colour under a page-accent
      ring and tick - legible on every palette, unlike a bare underline */
-  #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); outline: 2px solid var(--accent); outline-offset: 1px; cursor: default; }
+  /* the selected chip's border turns into a slow marching-ants crawl -
+     four 1px dashed strips (one per edge) sliding via background-position.
+     border goes transparent so the strip shows without resizing the box */
+  #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); border-color: transparent; cursor: default;
+    background-color: var(--pv-bg);
+    background-image: linear-gradient(90deg, var(--accent) 50%, transparent 50%), linear-gradient(90deg, var(--accent) 50%, transparent 50%), linear-gradient(0deg, var(--accent) 50%, transparent 50%), linear-gradient(0deg, var(--accent) 50%, transparent 50%);
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+    background-size: 8px 1px, 8px 1px, 1px 8px, 1px 8px;
+    background-position: 0 0, 0 100%, 0 0, 100% 0;
+    animation: antscrawl 2.4s linear infinite; }
+  @keyframes antscrawl { to { background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px; } }
+  @media (prefers-reduced-motion: reduce) { #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { animation: none; } }
   #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { content: '✓'; color: var(--accent); margin-right: 2px; }
   #chatbar {
     flex: none;
