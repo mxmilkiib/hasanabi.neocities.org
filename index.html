@@ -1452,6 +1452,9 @@
   /* a head's drop (and authors' breath) separates it from the row above;
      topping a column there is no row above, so the head sits flush */
   #helpPanel .linkcols > i.colhead > b { top: 0; margin-top: 0; }
+  /* JS tags a head stranded at a column foot in a .flow section (where
+     break-after: avoid is ignored) so it starts the next column */
+  #helpPanel .linkcols > i > b.colbreak { break-before: column; }
   /* a .flow column can top mid-i on a text fragment - no element edge
      to carry ::before, so JS drops a real fill block at the fragment */
   #helpPanel .linkcols .coltop-fill { display: block; height: 1.5em; }
@@ -4787,6 +4790,24 @@
       for (let pass = 0; pass < 4; pass++) {
         span.querySelectorAll('.coltop-fill').forEach((f) => f.remove());
         span.normalize();  // re-merge the text nodes fills split
+        // a head inside an inline flow i ignores break-after: avoid, so
+        // find heads stranded at a column foot - their following text
+        // sits a column to the right - and force them to the next column
+        span.querySelectorAll('b.colbreak').forEach((b) => b.classList.remove('colbreak'));
+        if (flow) {
+          const orphans = [];
+          for (const b of span.querySelectorAll('i > b')) {
+            let nx = b.nextSibling;
+            while (nx && nx.nodeType === 3 && !nx.data.trim()) nx = nx.nextSibling;
+            if (!nx) continue;
+            const nr = document.createRange();
+            if (nx.nodeType === 3) { const k = nx.data.search(/\S/); nr.setStart(nx, k); nr.setEnd(nx, k + 1); }
+            else nr.selectNode(nx);
+            const nrc = nr.getClientRects()[0];
+            if (nrc && nrc.left >= b.getBoundingClientRect().right) orphans.push(b);  // head is column-wide, so next-column text starts past its right edge
+          }
+          orphans.forEach((b) => b.classList.add('colbreak'));
+        }
         let top = Infinity;
         for (const i of rows) if (i.offsetParent) top = Math.min(top, boxTop(i));
         const colTop = (i) => boxTop(i) - top < 2;
