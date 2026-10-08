@@ -16,6 +16,11 @@ not versions — the page ships continuously to Neocities.
   gains an open pharma row
 - media: scotland row in news (the national, bella caledonia), pod save
   america closes the channels list
+- open social rows labelled: more apps, wayfinding; bridgy fed joins
+  atmosphere; an open data section (stats, maps, live flights/vessels/
+  satellite) takes the data links out of open knowledge and osint
+- google fonts (sheet and woff2) now cache-first in the service worker,
+  so the offline copy keeps its fonts
 - two dangling separators in marxist/critical removed; spoon theory
   link follows its www redirect
 
