@@ -1855,7 +1855,9 @@
   /* a lit era whose window spans a stretch chat wasn't logging - the
      count could be understated, so the border turns purple, the text
      follows it, and the ants thin to dots against the standard rungs */
-  #emoteGrid .eage.missed { color: #a06be0; }
+  /* a lit rung keeps its weight and text when missed - only the dotted
+     violet ring flags the unlogged stretch, so crossed stays crossed */
+  #emoteGrid .eage.missed:not(.lit) { color: #a06be0; }
   #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
   /* eras no emote has reached yet - tripped by the never-used tail or
@@ -10299,9 +10301,12 @@
     const marks = AGES.map(([t, words]) => ({ t, words }));
     marks.sort((a, b) => a.t - b.t);
     // a rung whose era reaches back into an 'away' window (socket
-    // dropped or page closed) covers time chat wasn't logging
+    // dropped or page closed) covers time chat wasn't logging - but a
+    // sliver left over a quick reload shouldn't dim the ladder, so the
+    // unlogged overlap must clear a floor: 30s or an eighth of the era
     for (const mk of marks)
-      mk.missed = away.some(([s, e]) => s < now && e > now - mk.t);
+      mk.missed = away.some(([s, e]) =>
+        Math.min(e, now) - Math.max(s, now - mk.t) > Math.max(3e4, mk.t / 8));
     // rungs beyond the oldest stamp are times still to happen; grouped
     // mode emits them once at the grid's end rather than per section
     const oldestAge = now - Math.min(Infinity, ...Object.values(useTs));
