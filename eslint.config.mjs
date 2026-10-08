@@ -32,6 +32,7 @@ export default [
         requestIdleCallback: 'readonly', queueMicrotask: 'readonly',
         structuredClone: 'readonly', AbortController: 'readonly',
         AbortSignal: 'readonly',
+        indexedDB: 'readonly', IDBKeyRange: 'readonly',
         SpeechSynthesisUtterance: 'readonly', speechSynthesis: 'readonly',
       },
     },

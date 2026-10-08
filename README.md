@@ -516,6 +516,14 @@ DankChat/Chatsen cover the phone. The niche here is zero
 install, a host that forbids sockets outright, and a page that treats
 the stream's context (resources, history, rate graph) as part of chat.
 
+## Lint
+
+The page script lives inline in `index.html`; `eslint.config.mjs` lints
+an extracted copy at `page-scan.js` (gitignored, never deployed):
+
+    s=$(rg -n '^<script>' index.html | cut -d: -f1); e=$(rg -n '^</script>' index.html | cut -d: -f1)
+    sed -n "$((s+1)),$((e-1))p" index.html > page-scan.js && eslint page-scan.js
+
 ## Deploy
 
     neocities-deploy deploy -s hasanabi.neocities.org

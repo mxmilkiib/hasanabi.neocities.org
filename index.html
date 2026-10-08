@@ -2064,6 +2064,7 @@
   const srLiveEl = document.getElementById('srLive');
   const chatInput = document.getElementById('chatInput');
   const vidBtn = document.getElementById('vidBtn');
+  const findBtn = document.getElementById('findBtn');
   const vidBox = document.getElementById('vid');
   const helpPanel = document.getElementById('helpPanel');
   const mainEl = document.querySelector('main');
@@ -3098,7 +3099,6 @@
     }
     return ks;
   }
-  const linkKeyOf = (msg) => linkUrlsOf(msg).map((u) => u.toLowerCase()).sort().join(' ');
   const seenLinks = new Set();
   function dedupeLinks(rows) {
     for (const r of rows || [logEl, sideEl, side2El].flatMap((col) => [...col.querySelectorAll('.row:not([data-lks])')])) {
@@ -6071,7 +6071,7 @@
     for (const c of cols()) for (const r of c.querySelectorAll('.row.hit, .row.fhide'))
       r.classList.remove('hit', 'fhide');
   }
-  document.getElementById('findBtn').addEventListener('click', () => setFindOpen(findEl.hidden));
+  findBtn.addEventListener('click', () => setFindOpen(findEl.hidden));
   document.getElementById('findX').addEventListener('click', () => setFindOpen(false));
   document.getElementById('findPrev').addEventListener('click', () => findJump(-1));
   document.getElementById('findNext').addEventListener('click', () => findJump(1));
