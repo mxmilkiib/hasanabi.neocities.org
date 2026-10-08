@@ -983,20 +983,21 @@
   #ucardX { float: right; padding: 0 5px; }
   /* the stats tab: headed sections, chatters and emotes in paired
      columns with tabular counts pinned right */
-  /* display:block - #helpPanel .htabpage > div's label grid must not
+  /* display:flex - #helpPanel .htabpage > div's label grid must not
      flow the sections into its 9em column (it outranks a bare #id) */
-  #helpPanel #statsBody { display: block; padding: 2px 2px 8px; margin: 7px 0; }
+  #helpPanel #statsBody { display: flex; align-items: flex-start; gap: 0 22px; padding: 2px 2px 8px; margin: 7px 0; }
   #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
     margin: 12px 0 2px; }
   #statsBody .st-h:first-child { margin-top: 0; }
-  /* session | bursts | glorps spread over the last two columns */
-  #statsBody .st-trio { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 20px; }
-  #statsBody .st-g2 { grid-column: span 2; }
-  #statsBody .st-2col { columns: 2; column-gap: 20px; }
-  /* ranked lists read down one column then on to the next */
-  #statsBody .st-cols { columns: 14em; column-gap: 20px; }
-  #statsBody .st-bcols { columns: 24em; }
-  #statsBody .st-ucols { columns: 32em; }
+  /* each chart owns a fixed column so every section's top sits on one
+     line - a panel narrower than the set scrolls the row sideways. the
+     trio drops to contents so session/bursts/glorps get a column each */
+  #statsBody .st-trio { display: contents; }
+  #statsBody .st-panel { flex: 0 0 17em; min-width: 0; }
+  #statsBody .st-panel.st-wide { flex-basis: 26em; }
+  /* inside a fixed column the ranked lists run single-file */
+  #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
+  #statsBody #stRate { display: block; width: 100%; height: 64px; }
   #statsBody .st-badge { break-inside: avoid; }
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
@@ -5142,11 +5143,27 @@
           ? `<div class="st-row st-all"><button type="button" class="st-s" data-efold>collapse to top 40</button></div>` : '');
     const bSeries = sc ? (rateSamplesPer[sc] || []) : rateSamples;
     const bOff = rateTimes.length - bSeries.length;
-    const bursts = bSeries.map((r, i) => [r, rateTimes[bOff + i]])
+    const bSamps = bSeries.map((r, i) => [r, rateTimes[bOff + i]])
       .filter(([r, t]) => Number.isFinite(r) && t)
-      .sort((a, b) => b[0] - a[0]).slice(0, 3)
-      .map(([r, t]) => `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
-        `<a class="at" href="https://tv.supa.sh/logs?c=${encodeURIComponent(sc || CHANNEL)}&d=${logDay(t)}" target="_blank" rel="noopener" title="this day in the supa logs">${fmtRowTime(new Date(t))}</a></span></div>`).join('');
+      .sort((a, b) => b[0] - a[0]);
+    // distinct bursts only: each pick suppresses every sample within 10s
+    // of it, and the walk goes down by rate so a taller spike inside the
+    // window 'overwrites' its neighbours rather than listing beside them.
+    // a strong similar-rate flow stretches the window to 30s
+    const bPicks = [];
+    for (const s of bSamps) {
+      if (bPicks.every((p) => Math.abs(p[1] - s[1]) > 10000 &&
+          !(Math.abs(p[1] - s[1]) <= 30000 && s[0] >= p[0] - .05))) bPicks.push(s);
+      if (bPicks.length === 3) break;
+    }
+    // a sustained flow notes its earliest highest: the listed time rolls
+    // back to the first sample inside 30s that reached the pick's rate
+    const bursts = bPicks.map(([r, t]) => {
+      const t0 = bSamps.reduce((m, [r2, t2]) =>
+        Math.abs(t2 - t) <= 30000 && r2 >= r - .05 ? Math.min(m, t2) : m, t);
+      return `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
+        `<a class="at" href="https://tv.supa.sh/logs?c=${encodeURIComponent(sc || CHANNEL)}&d=${logDay(t0)}" target="_blank" rel="noopener" title="this day in the supa logs">${fmtRowTime(new Date(t0))}</a></span></div>`;
+    }).join('');
     // badge reference: the channel's own sets lead, then the badges that
     // actually turn up in chat, then every remaining global set a-z; each
     // set collapses so the hundreds of promo sets stay out of the way
@@ -5298,28 +5315,31 @@
     const scTop = scEl ? scEl.scrollTop : 0;
     el.innerHTML =
       `<div class="st-trio">` +
-        `<div>` +
+        `<div class="st-panel">` +
         `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
         `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
         `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
         (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers</span></div>` : '') +
-        `<div class="st-row st-note"><span class="nm">rows rendered since this page first ran - reloads keep the tally going</span></div>` + `</div>` +
-        `<div><div class="st-h">bursts</div>` +
+        `<div class="st-row st-note"><span class="nm">rows rendered since this page first ran - reloads keep the tally going</span></div>` +
+        scopeBtns + `</div>` +
+        `<div class="st-panel"><div class="st-h">bursts</div>` +
         (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) + `</div>` +
-        `<div class="st-g2"><div class="st-h">glorps</div>` +
-        `<div class="st-2col">${gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>'}</div></div>` +
+        `<div class="st-panel"><div class="st-h">glorps</div>` +
+        (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
-      scopeBtns +
-      `<div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div>` +
-      `<div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div>` +
-      `<div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
+      `<div class="st-panel"><div class="st-h">scrollback rate</div>` +
+        `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
+      `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
+      `<div class="st-panel"><div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
+      `<div class="st-panel st-wide"><div class="st-h">badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
-      `</div>` +
-      `<div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div>` +
-      `<div class="st-h">storage</div><div class="st-2col" id="stStore"></div>`;
+      `</div></div>` +
+      `<div class="st-panel"><div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
+      `<div class="st-panel"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
+    drawScrollGraph(el, sc);
     if (openSets.size)
       for (const d of el.querySelectorAll('details.st-badge'))
         if (openSets.has(d.dataset.set || (d.hasAttribute('data-more') ? '*' : ''))) d.open = true;
@@ -5382,6 +5402,55 @@
         }
         updateStorageStats(el);
       }).catch(() => { stEstHtml = ''; });
+  }
+  // scrollback rate: every stored row's timestamp binned into buckets the
+  // canvas's pixel width decides, drawn as per-bucket columns so the whole
+  // buffer's flow shows at once - silent stretches read as flat floor.
+  // gap marker rows aren't messages and don't count
+  function drawScrollGraph(el, sc) {
+    const cv = el.querySelector('#stRate');
+    const cap = el.querySelector('#stRateCap');
+    if (!cv || !cap) return;
+    const dpr = window.devicePixelRatio || 1;
+    const H = 64;
+    const wCss = Math.max(80, cv.clientWidth || 220);
+    cv.width = Math.round(wCss * dpr);
+    cv.height = Math.round(H * dpr);
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const times = [];
+    for (const r of document.querySelectorAll('.row[data-ts]')) {
+      if (r.classList.contains('gap') || (sc && r.dataset.ch !== sc)) continue;
+      const t = +r.dataset.ts || 0;
+      if (t) times.push(t);
+    }
+    if (times.length < 2) {
+      cap.innerHTML = `<div class="st-row"><span class="nm">${times.length ? 'one row' : 'no rows'} stored</span></div>`;
+      return;
+    }
+    let t0 = times[0], t1 = times[0];
+    for (const t of times) { if (t < t0) t0 = t; if (t > t1) t1 = t; }
+    const span = Math.max(30000, t1 - t0);
+    const N = Math.min(320, Math.max(60, Math.round(wCss)));
+    const bw = span / N;
+    const bins = new Float64Array(N);
+    for (const t of times) bins[Math.min(N - 1, Math.floor((t - t0) / bw))]++;
+    const bs = bw / 1000;
+    let peak = 0;
+    for (const b of bins) if (b / bs > peak) peak = b / bs;
+    g.fillStyle = (sparkCols && sparkCols.accent) ||
+      getComputedStyle(document.documentElement).getPropertyValue('--spark').trim() || '#888';
+    g.globalAlpha = .8;
+    const bwPx = wCss / N;
+    for (let i = 0; i < N; i++) {
+      const rh = (bins[i] / bs) / peak * (H - 2);
+      if (rh > .3) g.fillRect(Math.floor(i * bwPx), H - rh, Math.max(1, Math.ceil(bwPx) - 1), rh);
+    }
+    const mins = Math.round((t1 - t0) / 60000);
+    const dur = mins >= 60 ? `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}m` : `${mins}m`;
+    cv.title = `msgs/sec across the ${times.length.toLocaleString('en')} stored rows - ${dur} span`;
+    cv.setAttribute('aria-label', cv.title);
+    cap.innerHTML = `<div class="st-row"><span class="nm">${fmtRowTime(new Date(t0))} – ${fmtRowTime(new Date(t1))} (${dur})</span><i>peak ${peak.toFixed(1)}/s</i></div>`;
   }
   // delegated - the stats body rewrites its innerHTML on every render
   document.getElementById('statsBody').addEventListener('click', (e) => {
