@@ -8306,7 +8306,11 @@
       statsLink.hidden = true;
       if (statsLink.classList.contains('on')) switchTab('htabCfg');
       if (vidBox.hidden) setVideo(true);
-      if (emotePick.hidden) {
+      // '0' means the picker was deliberately closed - the rail honours
+      // that instead of reopening it on every entry
+      let epClosed = false;
+      try { epClosed = localStorage.getItem(EPICK_OPEN_KEY) === '0'; } catch {}
+      if (emotePick.hidden && !epClosed) {
         emotePick.hidden = false;
         emojiBtn.classList.add('on');
         emojiBtn.setAttribute('aria-expanded', 'true');
