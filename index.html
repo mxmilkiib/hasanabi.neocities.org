@@ -691,7 +691,7 @@
   .row.notice .nwho { font-weight: max(800, calc(var(--chat-w, 400) + 400)); }
   /* the rainbow sweep: notice labels, merged-channel tags and
      @hasanabi mentions share it */
-  .row.notice .notice-label, .row .rbw {
+  .row.notice .notice-label, .rbw {
     color: transparent;
     background: linear-gradient(90deg, #ff6868, #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868,
       #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868);
@@ -703,25 +703,25 @@
   /* a thin dark halo keeps the pale gradient stops legible. it rides a
      custom property so the variants that animate filter (hue/pulse)
      can re-apply it inside their keyframes instead of dropping it */
-  .row .rbw {
+  .rbw {
     --rbwshadow: drop-shadow(0 0 .4px rgba(0,0,0,.9)) drop-shadow(0 0 1px rgba(0,0,0,.55));
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .row .rbw { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw { animation: none; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
-  body.rbw-wave .row .rbw { animation-name: rbw-wave; animation-timing-function: ease-in-out; }
+  body.rbw-wave .rbw { animation-name: rbw-wave; animation-timing-function: ease-in-out; }
   @keyframes rbw-hue { to { filter: hue-rotate(360deg) var(--rbwshadow); } }
-  body.rbw-hue .row .rbw { animation-name: rbw-hue; }
+  body.rbw-hue .rbw { animation-name: rbw-hue; }
   @keyframes rbw-pulse { 50% { filter: brightness(1.45) saturate(1.25) var(--rbwshadow); } }
-  body.rbw-pulse .row .rbw { animation-name: rbw-pulse; animation-timing-function: ease-in-out; }
+  body.rbw-pulse .rbw { animation-name: rbw-pulse; animation-timing-function: ease-in-out; }
   @keyframes rbw-flick {
     8% { opacity: .5; } 9%, 40% { opacity: 1; } 41% { opacity: .7; }
     42%, 72% { opacity: 1; } 73% { opacity: .55; } 74% { opacity: 1; }
   }
-  body.rbw-flick .row .rbw { animation-name: rbw-flick; animation-timing-function: steps(1, end); }
+  body.rbw-flick .rbw { animation-name: rbw-flick; animation-timing-function: steps(1, end); }
   /* links view: rows without a url, and repeat posts of a url, hide */
   body.linkview .row:not([data-lk]), body.linkview .row.linkdup { display: none; }
   body.nobots .row[data-u="blammobot"], body.nobots .row[data-u="fossabot"] { display: none; }
@@ -766,7 +766,7 @@
   /* the nick styles option kills the same set the reduced-motion rules
      do; the slow modes just stretch the sweep's period via the vars */
   body.noanim .name.shimmer, body.noanim .row a.shimmer, body.noanim .row .at.shimmer,
-  body.noanim .row .rbw, body.noanim .row.notice .notice-label { animation: none; }
+  body.noanim .rbw, body.noanim .row.notice .notice-label { animation: none; }
   body.animslow { --shim-t: 6s; --rbw-t: 12s; }
   body.animsslow { --shim-t: 12s; --rbw-t: 24s; }
   /* Negative vertical margins keep the line box at the fixed line-height
@@ -1914,7 +1914,7 @@
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
-    <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. @hasanabi rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
+    <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
     <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/1½x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
@@ -2317,6 +2317,13 @@
       for (let i = 0; i < who.length; i++) w = (w * 31 + who.toLowerCase().charCodeAt(i)) >>> 0;
       seq = who ? w : rbwSeq++;
       e.target.style.backgroundImage = rbwPalette(seq);
+      e.target.dataset.rseq = seq;
+      // 'random' mode: each mention draws its motion off its palette index
+      if (RBW_STYLES[rbwStyle] === 'rbw-rand') {
+        const m = RBW_RAND[seq % RBW_RAND.length];
+        e.target.style.animationName = m[0];
+        e.target.style.animationTimingFunction = m[1];
+      }
     }
     e.target.style.animationDelay = -(((h + seq * 53) % 160) / 40).toFixed(2) + 's';
   }, true);
@@ -7366,12 +7373,26 @@
   // ---- @hasanabi rainbow motion: sweep is the base; the alternates swap
   // the keyframes on the same clipped gradient while the rate option
   // above still stretches the period. Index into body classes ----
-  const RBW_STYLES = ['', 'rbw-wave', 'rbw-hue', 'rbw-pulse', 'rbw-flick'];
+  const RBW_STYLES = ['', 'rbw-wave', 'rbw-hue', 'rbw-pulse', 'rbw-flick', 'rbw-rand'];
+  // 'random' deals each mention a motion off its palette index - a given
+  // chatter's @hasanabi keeps the same trick like it keeps its scheme
+  const RBW_RAND = [
+    ['notice-rainbow', 'linear'], ['rbw-wave', 'ease-in-out'], ['rbw-hue', 'linear'],
+    ['rbw-pulse', 'ease-in-out'], ['rbw-flick', 'steps(1, end)'],
+  ];
   let rbwStyle = 0;
   function setRbwStyle(idx) {
     rbwStyle = Math.min(RBW_STYLES.length - 1, Math.max(0, idx | 0));
     document.body.classList.remove(...RBW_STYLES.slice(1));
     if (RBW_STYLES[rbwStyle]) document.body.classList.add(RBW_STYLES[rbwStyle]);
+    const rand = RBW_STYLES[rbwStyle] === 'rbw-rand';
+    // the dealt motion rides inline name+easing - cleared on fixed styles
+    // so the body-class rules take back over
+    document.querySelectorAll('.rbw').forEach((el) => {
+      const m = rand ? RBW_RAND[(+el.dataset.rseq || 0) % RBW_RAND.length] : ['', ''];
+      el.style.animationName = m[0];
+      el.style.animationTimingFunction = m[1];
+    });
     markHelp('helpRbw', rbwStyle);
   }
   setRbwStyle(0);
@@ -11014,7 +11035,7 @@
     helpHide: HIDE_MODES,
     helpBots: ['off', 'on'],
     helpNoLbl: ['off', 'on'],
-    helpRbw: ['sweep', 'wave', 'hue cycle', 'pulse', 'flicker'],
+    helpRbw: ['sweep', 'wave', 'hue cycle', 'pulse', 'flicker', 'random'],
     helpCopyHelp: ['off', 'on'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
