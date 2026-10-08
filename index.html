@@ -7128,8 +7128,12 @@
     '0 1px 2px color-mix(in srgb, var(--text) 35%, transparent)',
     '0 1px 3px color-mix(in srgb, var(--text) 55%, transparent)',
     '0 2px 5px color-mix(in srgb, var(--text) 75%, transparent)',
+    // the last pair drop the text tint - fixed black shadows that read
+    // the same on every theme
+    '0 1px 3px rgba(0, 0, 0, .85)',
+    '0 0 3px rgba(0, 0, 0, .9), 0 2px 7px rgba(0, 0, 0, .95)',
   ];
-  const SHADOW_NAMES = ['off', 'subtle', 'medium', 'strong'];
+  const SHADOW_NAMES = ['off', 'subtle', 'medium', 'strong', 'black', 'pitch'];
   let shadLevel = 0;
   function setShadow(lv) {
     shadLevel = Math.max(0, Math.min(SHADOW_LVLS.length - 1, lv));
@@ -10751,6 +10755,9 @@
       .join(cls === 'helpHfs' || cls === 'helpFs' ? ' ' : ' / ');
   document.getElementById('helpPresetList').innerHTML = Object.keys(THEME_PRESETS).map((n) =>
     `<a href="#" role="button" class="helpOpt helpPreset" data-preset="${n}">${n}</a>`).join(' / ');
+  // each shadow chip wears its own level
+  helpPanel.querySelectorAll('a.helpShadow')
+    .forEach((a) => { a.style.textShadow = SHADOW_LVLS[+a.dataset.idx]; });
   // each font name renders in its own face
   document.getElementById('helpFontFamList').innerHTML = [...fontSel.options].map((o, i) =>
     // single quotes inside - a " delimits the style attribute and every
