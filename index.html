@@ -1339,12 +1339,12 @@
      doubles up with the literal space between the two; strip it so the
      space alone separates * from + */
   #helpPanel a.chadd { margin-left: 0; color: var(--accent); }
-  /* a merged channel's + slot becomes a drop -, in the same azure the
+  /* a merged channel's + slot becomes a drop -, in the same green the
      joined entries already read in */
-  #helpPanel a.chdel { color: #5f9dff; }
-  /* a joined stream's entry reads in azure - a hue apart from the
-     accent/red/green/amber/violet colours already in use */
-  #helpPanel i.chon a.at { color: #5f9dff; }
+  #helpPanel a.chdel { color: var(--good); }
+  /* a joined stream's entry reads in --good green, matching the live
+     dot's "this one's ours" signal */
+  #helpPanel i.chon a.at { color: var(--good); }
   #livePing { color: var(--accent); font-weight: 400; font-size: .85em; }
   #htabRes a.at.livon::before { content: '●'; color: #43b581;
     font-size: .7em; margin-right: 2px; }
