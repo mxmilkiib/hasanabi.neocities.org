@@ -4765,14 +4765,18 @@
     helpPanel.querySelectorAll('.htabpage:not([hidden]) .linkcols:not(.stbl)').forEach((span) => {
       const rows = [...span.children];
       const headLed = (i) => i.firstElementChild?.tagName === 'B';
+      // a .flow i is inline, so a block head inside it fragments the i
+      // into anonymous boxes and i.offsetTop reports a phantom box, not
+      // the head's own - measure the b's block box for head-led rows
+      const boxTop = (i) => (headLed(i) ? i.firstElementChild : i).offsetTop;
       // marking shifts the marked rows, which can shift who tops a
       // column; run to a fixed point within this frame so intermediate
       // states never paint - single-shot marking let the RO refire
       // and the classes buzzed between layouts every frame
       for (let pass = 0; pass < 4; pass++) {
         let top = Infinity;
-        for (const i of rows) if (i.offsetParent) top = Math.min(top, i.offsetTop);
-        const colTop = (i) => i.offsetTop - top < 2;
+        for (const i of rows) if (i.offsetParent) top = Math.min(top, boxTop(i));
+        const colTop = (i) => boxTop(i) - top < 2;
         const anyHead = rows.some((i) => colTop(i) && headLed(i));
         let moved = false;
         const set = (i, cls, on) => { if (i.classList.contains(cls) !== on) { i.classList.toggle(cls, on); moved = true; } };
