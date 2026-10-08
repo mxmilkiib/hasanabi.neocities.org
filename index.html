@@ -1439,7 +1439,7 @@
   #helpPanel .linkcols.wider { columns: 30em; }
   /* command-group titles head their block in the bot command lists; a
      slight outdent-and-drop lets a head hang off the column's text edge */
-  #helpPanel .linkcols > i > b { display: block; position: relative; left: -7px; top: 4px; margin-bottom: 3px; font-size: .88em; color: var(--text-dim); font-style: italic; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+  #helpPanel .linkcols > i > b { display: block; position: relative; left: -7px; top: 4px; margin-bottom: 3px; break-after: avoid; font-size: .88em; color: var(--text-dim); font-style: italic; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
   /* a column-topping row that does not lead with a subsection head
      drops a line, so a head shares row one with the section label and
      link text aligns a row under it - JS marks .coltop since css can't
@@ -4798,24 +4798,33 @@
           set(i, 'colhead', colTop(i) && headLed(i));  // kill the head's drop when it tops a column
         }
         // in .flow a column can top mid-i on a text fragment, no element
-        // to mark - probe each column's top-left and drop a fill block at
-        // the fragment itself. column one stays flush with the label
+        // to mark - find each column's topmost line fragment by its
+        // rects, probe that line's left edge for an insertion point, and
+        // drop a fill block there. column one stays flush with the label
         if (flow && anyHead) {
           const r = span.getBoundingClientRect();
           const cs = getComputedStyle(span);
-          const pitch = parseFloat(cs.columnWidth) + parseFloat(cs.columnGap);
-          const y = r.top + parseFloat(cs.paddingTop) + 2;
-          for (let c = 1, n = Math.floor((r.width + parseFloat(cs.columnGap)) / pitch); c < n; c++) {
-            const p = caretAt(r.left + c * pitch + 4, y);
+          const gap = parseFloat(cs.columnGap);
+          const pitch = parseFloat(cs.columnWidth) + gap;
+          const all = document.createRange();
+          all.selectNodeContents(span);
+          const rects = [...all.getClientRects()];
+          const n = Math.floor((r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) + gap) / pitch);
+          for (let c = 1; c < n; c++) {
+            const colL = r.left + parseFloat(cs.paddingLeft) + c * pitch;
+            const line = rects.filter((rc) => rc.width && Math.abs(rc.left - colL) < 12)  // heads outdent -7px, still count
+                              .sort((a, b) => a.top - b.top)[0];
+            if (!line) continue;
+            const p = caretAt(line.left + 2, line.top + 2);
             if (!p || !span.contains(p.n)) continue;
             const el = p.n.nodeType === 1 ? p.n : p.n.parentElement;
             if (el.closest('b')) continue;                          // a head tops this column - colhead covers it
             const host = el.closest('i');
             if (host && (host.classList.contains('coltop') || host.classList.contains('colhead'))) continue;
-            const cr = document.createRange();                      // confirm the fragment really is the column's top line
+            const cr = document.createRange();                      // the caret must resolve into that top line, not the line below
             cr.setStart(p.n, p.o); cr.setEnd(p.n, p.o);
             const ct = cr.getClientRects()[0];
-            if (!ct || Math.abs(ct.top - (r.top + parseFloat(cs.paddingTop))) > 10) continue;
+            if (!ct || Math.abs(ct.top - line.top) > line.height / 2) continue;
             const fill = document.createElement('span');
             fill.className = 'coltop-fill';
             if (p.n.nodeType === 3) { const rest = p.n.splitText(p.o); rest.parentNode.insertBefore(fill, rest); }
