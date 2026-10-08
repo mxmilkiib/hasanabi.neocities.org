@@ -609,11 +609,7 @@
     border-bottom: 1px solid var(--line); box-shadow: none; }
   #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
   #rail #htabStats { flex: 2 1 0; min-height: 0; overflow-y: auto; padding: 0 10px; }
-  /* rail stats keep the three-row arrangement; zeroing the basis puts the
-     ranked charts astride on one line at rail width. .st-rate's row stays
-     full-width - the base rule loses on specificity */
-  #rail #statsBody > .st-panel { flex-basis: 0; }
-  #rail #statsBody > .st-rate { flex: 0 0 100%; }
+
   .empty {
     color: var(--text-dim);
     padding: 24px 4px;
@@ -1059,17 +1055,21 @@
   /* each chart owns a fixed column so every section's top sits on one
      line - a panel narrower than the set scrolls the row sideways. the
      trio drops to contents so session/bursts/glorps get a column each */
-  /* three rows: the session/burst/glorp trio across the top, the
-     scrollback chart full-width under it, then the ranked charts
-     sharing the last row */
+  /* four rows: the session/burst/glorp trio across the top, the rate
+     chart full-width under it, the ranked charts astride on one row
+     (zeroed bases keep them there at any width - grow ratios, not
+     ems, split the space), then storage on its own last row */
   #statsBody .st-trio { display: flex; flex: 0 0 100%; gap: 0 22px; align-items: flex-start; }
   #statsBody .st-trio .st-panel { flex: 1 1 0; }
-  #statsBody .st-rate { flex: 0 0 100%; }
-  #statsBody .st-panel { flex: 1 1 12em; min-width: 0; }
-  #statsBody .st-panel.st-wide { flex: 2 1 20em; }
+  /* st-panel.st-rate, not bare .st-rate - the generic panel rule sits
+     later at equal specificity and would collapse it into the row */
+  #statsBody .st-panel.st-rate { flex: 0 0 100%; }
+  #statsBody .st-panel { flex: 1 1 0; min-width: 0; }
+  #statsBody .st-panel.st-wide { flex: 2 1 0; }
+  #statsBody .st-panel.st-foot { flex: 0 0 100%; }
   /* a narrow panel keeps its filters beside the title by letting the
      anchors wrap into right-aligned lines instead of widening the box */
-  #statsBody .st-panel.st-narrow { flex: 0.7 1 9em; }
+  #statsBody .st-panel.st-narrow { flex: 0.7 1 0; }
   #statsBody .st-panel.st-narrow .st-sort { display: inline-flex; flex-wrap: wrap;
     justify-content: flex-end; max-width: 66%; }
   /* inside a fixed column the ranked lists run single-file */
@@ -5491,7 +5491,7 @@
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
       `<div class="st-panel"><div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
-      `<div class="st-panel"><div class="st-h">storage</div><div id="stStore"></div></div>`;
+      `<div class="st-panel st-foot"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
     drawScrollGraph(el, sc);
     if (openSets.size)
