@@ -4764,14 +4764,23 @@
     colTopQ = 0;
     helpPanel.querySelectorAll('.htabpage:not([hidden]) .linkcols:not(.stbl)').forEach((span) => {
       const rows = [...span.children];
-      let top = Infinity;
-      for (const i of rows) if (i.offsetParent) top = Math.min(top, i.offsetTop);
-      const colTop = (i) => i.offsetTop - top < 2;
       const headLed = (i) => i.firstElementChild?.tagName === 'B';
-      const anyHead = rows.some((i) => colTop(i) && headLed(i));
-      for (const i of rows) {
-        i.classList.toggle('coltop', anyHead && colTop(i) && !headLed(i));
-        i.classList.toggle('colhead', colTop(i) && headLed(i));  // kill the head's drop when it tops a column
+      // marking shifts the marked rows, which can shift who tops a
+      // column; run to a fixed point within this frame so intermediate
+      // states never paint - single-shot marking let the RO refire
+      // and the classes buzzed between layouts every frame
+      for (let pass = 0; pass < 4; pass++) {
+        let top = Infinity;
+        for (const i of rows) if (i.offsetParent) top = Math.min(top, i.offsetTop);
+        const colTop = (i) => i.offsetTop - top < 2;
+        const anyHead = rows.some((i) => colTop(i) && headLed(i));
+        let moved = false;
+        const set = (i, cls, on) => { if (i.classList.contains(cls) !== on) { i.classList.toggle(cls, on); moved = true; } };
+        for (const i of rows) {
+          set(i, 'coltop', anyHead && colTop(i) && !headLed(i));
+          set(i, 'colhead', colTop(i) && headLed(i));  // kill the head's drop when it tops a column
+        }
+        if (!moved) break;
       }
     });
   }
