@@ -547,6 +547,23 @@
     padding: 8px 18px 2px 6px;
   }
   #side, #side2 { border-left: 1px solid var(--line); }
+  /* split level 4's rail: a third column holding the floating panels
+     re-parented by dockRail - video up top (full width, aspect kept),
+     the picker at a third of the height, stats filling the rest. The
+     floating chrome (handles, grips, shadows, fixed geometry) is
+     suppressed while they live here */
+  #rail { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+    border-left: 1px solid var(--line); }
+  #rail[hidden] { display: none; }
+  #rail #vid { position: static; width: 100%; box-sizing: border-box; flex: none;
+    border: 0; border-bottom: 1px solid var(--line); box-shadow: none; }
+  #rail #vid .vid-handle, #rail #vid .vid-size { display: none; }
+  #rail #emotePick { position: static; transform: none; width: auto; max-width: none;
+    flex: 0 0 34%; height: auto; max-height: none; border: 0; border-radius: 0;
+    border-bottom: 1px solid var(--line); box-shadow: none; }
+  #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
+  #rail #htabStats { flex: 1; min-height: 0; overflow-y: auto; padding: 0 10px; }
+  #rail #statsBody { flex-wrap: wrap; }
   .empty {
     color: var(--text-dim);
     padding: 24px 4px;
@@ -985,7 +1002,7 @@
      columns with tabular counts pinned right */
   /* display:flex - #helpPanel .htabpage > div's label grid must not
      flow the sections into its 9em column (it outranks a bare #id) */
-  #helpPanel #statsBody { display: flex; align-items: flex-start; gap: 0 22px; padding: 2px 2px 8px; margin: 7px 0; }
+  #helpPanel #statsBody, #rail #statsBody { display: flex; align-items: flex-start; gap: 0 22px; padding: 2px 2px 8px; margin: 7px 0; }
   #statsBody .st-h { color: var(--accent); font-weight: 700; font-size: .9em;
     margin: 12px 0 2px; }
   #statsBody .st-h:first-child { margin-top: 0; }
@@ -1918,7 +1935,7 @@
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
     <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/1½x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>?</b> <span>help mode: <span id="helpHelpList"></span><sup>†</sup></span></div>
@@ -2044,7 +2061,7 @@
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
-  <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
+  <main><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" maxlength="500" placeholder="chat" aria-label="message" rows="1"></textarea><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each populated era starts its own row; empty stretches pack together - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
@@ -2153,6 +2170,7 @@
   const infoEl = document.getElementById('streamInfo');
   const sideEl = document.getElementById('side');
   const side2El = document.getElementById('side2');
+  const railEl = document.getElementById('rail');
   let activeEl = logEl; // column currently receiving new rows
   // the visible columns in page-flip order; a row page-flips to the column
   // after the active one, so the column after it holds the oldest rows
@@ -4798,6 +4816,7 @@
   });
   // tabs split the panel into config/help / resources / authors pages
   function switchTab(id) {
+    if (id === 'htabStats' && !railEl.hidden) id = 'htabCfg'; // docked in the rail
     helpPanel.querySelectorAll('.htabs a').forEach((a) => {
       const on = a.dataset.htab === id;
       a.classList.toggle('on', on);
@@ -6681,7 +6700,7 @@
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
       lbls: lblsOn ? 1 : 0,
-      split: 1 + !sideEl.hidden + !side2El.hidden,
+      split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4,
     };
   }
   function saveOpts() {
@@ -6765,7 +6784,7 @@
       applyHelp();
     }
     if (typeof o.video === 'boolean') setVideo(o.video);
-    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 3) setSplit(o.split);
+    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 4) setSplit(o.split);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
     if (typeof o.hw === 'string') { hwInput.value = o.hw; setHideList(o.hw); }
@@ -6835,7 +6854,7 @@
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
-      split: 1 + !sideEl.hidden + !side2El.hidden, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode, lbls: lblsOn ? 1 : 0,
+      split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
     };
     return Object.keys(p).every((k) => {
@@ -7001,18 +7020,23 @@
   // when the pointer crosses over the iframe, which would eat them otherwise
   const VIDPOS_KEY = 'hasan-vidpos';
   const vidHandle = vidBox.querySelector('.vid-handle');
-  try {
-    const p = JSON.parse(localStorage.getItem(VIDPOS_KEY));
-    if (p && p.w) vidBox.style.width = Math.min(p.w, innerWidth - 24) + 'px';
-    if (p && p.left != null) {
-      // clamp to the viewport: the box is hidden here so it can't be
-      // measured, and an off-screen saved position renders it invisible
-      const w = Math.min(p.w || 460, innerWidth - 24), h = w / vidRatio;
-      vidBox.style.left = Math.max(0, Math.min(innerWidth - w, parseFloat(p.left) || 0)) + 'px';
-      vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - h, parseFloat(p.top) || 0)) + 'px';
-      vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
-    }
-  } catch {}
+  // floating geometry rides inline; rail docking clears it, so the save
+  // replays on the way back out
+  const applyVidPos = () => {
+    try {
+      const p = JSON.parse(localStorage.getItem(VIDPOS_KEY));
+      if (p && p.w) vidBox.style.width = Math.min(p.w, innerWidth - 24) + 'px';
+      if (p && p.left != null) {
+        // clamp to the viewport: the box is hidden here so it can't be
+        // measured, and an off-screen saved position renders it invisible
+        const w = Math.min(p.w || 460, innerWidth - 24), h = w / vidRatio;
+        vidBox.style.left = Math.max(0, Math.min(innerWidth - w, parseFloat(p.left) || 0)) + 'px';
+        vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - h, parseFloat(p.top) || 0)) + 'px';
+        vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
+      }
+    } catch {}
+  };
+  applyVidPos();
   vidHandle.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
     e.preventDefault();
@@ -7637,7 +7661,7 @@
   window.addEventListener('resize', () => {
     clampHelpPanel();
     // the third pane only exists in landscape; dropping to portrait folds it
-    if (!side2El.hidden && window.innerWidth <= window.innerHeight) setSplit(2);
+    if ((!side2El.hidden || !railEl.hidden) && window.innerWidth <= window.innerHeight) setSplit(2);
     if (document.body.classList.contains('hdrgraph')) sparkSize();
     // rotating or shrinking the window mustn't strand a dragged panel off-screen
     [vidBox, emotePick].forEach((el) => {
@@ -8100,14 +8124,65 @@
     }
   }
 
-  // Sets the pane count (1..3); a third column only exists in landscape,
+  // level 4's rail deals no rows - it re-parents the floating panels:
+  // video on top, the emote picker at a third of the column height, and
+  // the help panel's stats page filling the rest. Their parked float
+  // geometry is inline style, cleared on the way in and re-applied from
+  // the position saves on the way out
+  let statsHome = null;
+  function dockRail(on) {
+    const statsTab = document.getElementById('htabStats');
+    const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
+    if (on) {
+      if (!statsHome) statsHome = { parent: statsTab.parentNode, next: statsTab.nextSibling };
+      railEl.append(vidBox, emotePick, statsTab);
+      vidBox.style.left = vidBox.style.top = vidBox.style.right = vidBox.style.bottom = vidBox.style.width = '';
+      emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
+      statsTab.hidden = false;
+      statsLink.hidden = true;
+      if (statsLink.classList.contains('on')) switchTab('htabCfg');
+      if (vidBox.hidden) setVideo(true);
+      if (emotePick.hidden) {
+        emotePick.hidden = false;
+        emojiBtn.classList.add('on');
+        emojiBtn.setAttribute('aria-expanded', 'true');
+        if (!twSetsKey) loadTwitchSets('');
+        buildPicker();
+      }
+      renderStats();
+    } else {
+      statsHome.parent.insertBefore(statsTab, statsHome.next);
+      statsTab.hidden = true;
+      statsLink.hidden = false;
+      mainEl.before(vidBox);
+      mainEl.after(emotePick);
+      applyVidPos();
+      try { applyEpickBox(JSON.parse(localStorage.getItem(EPICK_SIZE_KEY))); } catch {}
+    }
+  }
+  // the rail's stats keep ticking while they're docked
+  setInterval(() => { if (!railEl.hidden) renderStats(); }, 8000);
+
+  // Sets the pane count (1..4); a third column only exists in landscape,
   // where it's actually wider than it is tall enough to be readable.
+  // Level 4 is the docked rail rather than a third chat column
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
-    level = Math.max(1, Math.min(3, level));
+    level = Math.max(1, Math.min(4, level));
     markHelp('helpSplit', level - 1);
+    setOn(splitBtn, level > 1);
+    splitBtn.textContent = level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
+    splitBtn.classList.toggle('tri', level >= 3);
+    document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
+    splitBtn.title = (level > 1 ? 'Rejoin the columns' : 'Split into page-flip columns') + ' - click/scroll · ⇧click back';
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
-    if (level === cur) return;
+    // flipping between 2 and 4 keeps the deal - only the rail toggles
+    if ((level === 4 ? 2 : level) === cur) {
+      if (railEl.hidden === (level !== 4)) return;
+      railEl.hidden = level !== 4;
+      dockRail(level === 4);
+      return;
+    }
     // merge every column back into logEl chronologically - the column after
     // the active one in flip order holds the oldest page (the last column
     // in rev's drain order) - then re-deal
@@ -8130,16 +8205,13 @@
     for (const g of logEl.querySelectorAll('.row.ghostgap')) g.remove();
     for (const r of logEl.querySelectorAll('.row.stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
     sideEl.hidden = level < 2;
-    side2El.hidden = level < 3;
+    side2El.hidden = level !== 3;
+    railEl.hidden = level !== 4;
     mainEl.classList.toggle('split', level >= 2);
-    mainEl.classList.toggle('split3', level === 3);
+    mainEl.classList.toggle('split3', level >= 3);
     jdownSet(jdownSide, sideEl, true);
     jdownSet(jdownSide2, side2El, true);
-    setOn(splitBtn, level > 1);
-    splitBtn.textContent = level === 3 ? '▮▮▮' : '▮▮';
-    splitBtn.classList.toggle('tri', level === 3);
-    document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = (level > 1 ? 'Rejoin the columns' : 'Split into page-flip columns') + ' - click/scroll · ⇧click back';
+    dockRail(level === 4);
     if (level === 1) {
       activeEl = logEl;
       // columns widen on rejoin - re-pin the live column if it was following
@@ -8149,7 +8221,7 @@
       // lands in the next
       activeEl = logEl;
       flipCols();
-    } else if (level === 2) {
+    } else if (level === 2 || level === 4) {
       if (cur === 3) { // three -> two: move logEl's below-fold page to #side
         activeEl = logEl;
         if (pushOverflow(logEl, sideEl)) activeEl = sideEl;
@@ -8169,8 +8241,8 @@
   }
 
   function cycleSplit(dir) {
-    const max = window.innerWidth > window.innerHeight ? 3 : 2;
-    const n = cols().length + dir;
+    const max = window.innerWidth > window.innerHeight ? 4 : 2;
+    const n = (railEl.hidden ? cols().length : 4) + dir;
     setSplit(((n - 1) % max + max) % max + 1);
     saveOpts();
   }
@@ -10506,6 +10578,7 @@
 
   const EPICK_CURS = { l: 'ew-resize', t: 'ns-resize', tl: 'nwse-resize' };
   const epickEdge = (e) => {
+    if (emotePick.parentElement === railEl) return ''; // docked in the rail - no edges
     const r = emotePick.getBoundingClientRect();
     const l = e.clientX - r.left < EPICK_EDGE, t = e.clientY - r.top < EPICK_EDGE;
     return l && t ? 'tl' : l ? 'l' : t ? 't' : '';
@@ -11013,7 +11086,7 @@
     if (q.has('split')) {
       const n = q.get('split');
       const v = parseInt(n, 10);
-      if (n !== '0') setSplit(v >= 1 && v <= 3 ? v : 2);
+      if (n !== '0') setSplit(v >= 1 && v <= 4 ? v : 2);
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
@@ -11095,7 +11168,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'on'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3'],
+    helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
@@ -11187,7 +11260,7 @@
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
   markHelp('helpEonly', emoteMode);
-  markHelp('helpSplit', !sideEl.hidden + !side2El.hidden);
+  markHelp('helpSplit', !sideEl.hidden + !side2El.hidden + !railEl.hidden);
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);
   markHelp('helpLinks', document.body.classList.contains('linkview') ? 1 : 0);
   markHelp('helpBots', hideBots ? 1 : 0);
