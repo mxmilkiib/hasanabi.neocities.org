@@ -1497,7 +1497,7 @@
      daggers stayed pinned while the text beneath them scrolled away */
   #helpPanel sup { position: relative; top: -3px; font-size: .7em; margin-left: 1px; }
   #helpPanel b.fn { color: var(--text); }
-  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 0 5px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
+  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { padding: 3px 6px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
   /* the bar after a chip's name carries its accent · good · vip - the
      personality colours a bg/text pair alone doesn't show */
   #helpPanel a.helpTheme::after, #helpPanel a.helpPreset::after, #helpPanel a.helpShade::after { content: ''; display: inline-block; width: 1.5em; height: .55em; margin-left: 5px; border-radius: 1px; background: linear-gradient(90deg, var(--pv-a, transparent) 0 34%, var(--pv-g, transparent) 34% 66%, var(--pv-v, transparent) 66%); }
@@ -1521,14 +1521,16 @@
   /* the selected chip reads in its own text colour under a page-accent
      ring and tick - legible on every palette, unlike a bare underline */
   /* the selected chip's border turns into a slow marching-ants crawl -
-     four 1px dashed strips (one per edge) sliding via background-position.
-     border goes transparent so the strip shows without resizing the box */
+     four 2px dashed strips (one per edge) sliding via background-position.
+     the fill is a bottom layer clipped to the content box, so the padding
+     strip reads as a gap between the ants and the swatch; border goes
+     transparent so the strips show without resizing the box */
   #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); border-color: transparent; cursor: default;
-    background-color: var(--pv-bg);
-    background-image: linear-gradient(90deg, var(--accent) 50%, transparent 50%), linear-gradient(90deg, var(--accent) 50%, transparent 50%), linear-gradient(0deg, var(--accent) 50%, transparent 50%), linear-gradient(0deg, var(--accent) 50%, transparent 50%);
-    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-    background-size: 8px 1px, 8px 1px, 1px 8px, 1px 8px;
-    background-position: 0 0, 0 100%, 0 0, 100% 0;
+    background: linear-gradient(90deg, var(--accent) 50%, transparent 50%) 0 0 / 8px 2px repeat-x,
+      linear-gradient(90deg, var(--accent) 50%, transparent 50%) 0 100% / 8px 2px repeat-x,
+      linear-gradient(0deg, var(--accent) 50%, transparent 50%) 0 0 / 2px 8px repeat-y,
+      linear-gradient(0deg, var(--accent) 50%, transparent 50%) 100% 0 / 2px 8px repeat-y,
+      linear-gradient(var(--pv-bg, transparent), var(--pv-bg, transparent)) content-box var(--pv-bg, transparent);
     animation: antscrawl 2.4s linear infinite; }
   @keyframes antscrawl { to { background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px; } }
   @media (prefers-reduced-motion: reduce) { #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { animation: none; } }
