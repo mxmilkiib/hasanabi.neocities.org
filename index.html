@@ -6877,6 +6877,22 @@
   function loadOpts() {
     let o;
     try { o = JSON.parse(localStorage.getItem(OPTS_KEY)); } catch {}
+    // the standalone picker keys are written on every change, while the
+    // bundle only catches up through saveOpts - where both exist the
+    // standalone record is the fresher one and wins
+    if (o) try {
+      const g = (k) => localStorage.getItem(k);
+      let v;
+      if ((v = g(EPICK_NAMES_KEY)) !== null) o.epnames = v === '1' ? 1 : 0;
+      if ((v = g(EPICK_ZOOM_KEY)) !== null) o.epzoom = v;
+      if ((v = g(EPICK_SORT_KEY)) !== null) o.epsort = v;
+      if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = v === '1' ? 1 : 0;
+      if ((v = g(EPICK_MIX_KEY)) !== null) o.epmix = v === '1' ? 1 : 0;
+      if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '1' ? 1 : 0;
+      if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
+      if ((v = g(EPICK_ANIM_KEY)) !== null) o.epanim = JSON.parse(v);
+      if ((v = g(EPICK_SIZE_KEY)) !== null) o.epgeo = JSON.parse(v);
+    } catch {}
     try { suppressSave = true; applyOpts(o); }
     finally { suppressSave = false; }
   }
