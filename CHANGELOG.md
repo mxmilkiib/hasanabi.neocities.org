@@ -42,12 +42,42 @@ not versions — the page ships continuously to Neocities.
   mutual aid's sharing rows
 - two dangling separators in marxist/critical removed; spoon theory
   link follows its www redirect
+- news grows asia and south america groups at the tail of the regional
+  run: the diplomat, hong kong free press, new bloom, prachatai,
+  rappler, new naratif, the wire, the caravan, himal, japan times and
+  korea herald on one side; nacla, latin america bureau,
+  venezuelanalysis, telesur english, brasil wire, brazilian report,
+  buenos aires times, bogotá post and el país's english edition on the
+  other
 
 ### Themes
 - `twitch` style: near-neutral violet-tinted surfaces, brand purple
   accent, hype-train green, vip badge pink; designed at shade 7. a
   matching `twitch` preset pairs it with inter, airy line height, and
   no timestamps or zebra - the chatterino look
+- auto-dark's rate spark gets a fixed green rather than the accent's
+  computed complement
+
+### Controls & display
+- the wheel over a help-panel option set cycles its pick, like the
+  header buttons' wheels (up advances, down steps back); weight chips
+  render at the weight they pick, zebra chips wear their level's gray
+  wash, and shadow chips wear their own level
+- the text shadow scale gains two fixed-black levels (black, pitch)
+  that read the same on every theme; lit option chips get a tight
+  black shadow under the white text
+- style and shade get their own airy rows in config; the links view
+  row marks its off chip at boot; the findbar's search border takes
+  the theme accent; the emote-picker smiley sits at a 17° tilt
+- hdr font row: 'follow chat' names the resolved chat px and the
+  footnote dagger is gone
+- new options: hide bots drops fossabot + blammobot rows entirely,
+  commands and all (`?nbots`); chat bar autohide fades the input out,
+  back on hover, focus or an open emote picker (`?bauto`)
+- row separators gain a faint dots mode, appended to the shade cycle
+  so saved levels don't remap
+- stats tab reorders: emotes and badges lead, chatters sits just
+  above storage
 
 ### Fixes
 - the picker's 'anim' frozen-stills state now reaches chat rows too:
