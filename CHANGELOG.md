@@ -83,7 +83,7 @@ not versions — the page ships continuously to Neocities.
   (their on/off maps to mild/off), and ?zebra= takes a level number
 - the picker's age ladder gains 45s, 3m and 4m rungs, so the early
   seconds and pre-5m stretch resolve finer
-- rainbow @hasanabi mentions gain a near-black drop-shadow outline so
+- rainbow @hasanabi mentions gain a black drop-shadow outline so
   the pale gradient stops stay legible; it rides a custom property the
   filter-animating variants (hue/pulse) re-apply in their keyframes
 - the picker's `anim` chip is now tri-state: click cycles playing →
