@@ -1442,6 +1442,8 @@
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLs.on, #helpPanel a.helpLines.on, #helpPanel a.helpOpt.on { color: var(--text); cursor: default; }
   /* 'follow chat' names the resolved size while it leads the hdr row */
   #helpPanel.hfs-follow a.helpHfs[data-idx="0"]::after { content: " (" var(--chat-font, 15px) ")"; }
+  /* zebra chips wear a gray wash - a little inset keeps the shade readable */
+  #helpPanel a.helpZebra { padding: 0 3px; border-radius: 3px; }
   /* the painted text colour sits after the generic link rules so it wins
      on helpShade chips (which also carry helpOpt) */
   #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
@@ -4656,6 +4658,17 @@
     else if (a.classList.contains('helpNoLbl')) { setLbls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx === 1);
   });
+  // the wheel over an option set cycles its pick, like the header
+  // buttons' wheels: scroll up advances, scroll down steps back
+  helpPanel.addEventListener('wheel', (e) => {
+    const list = e.target.closest('span[id$="List"]');
+    if (!list || !helpPanel.contains(list)) return;
+    const chips = [...list.querySelectorAll('a[data-idx], a[data-theme], a[data-preset]')];
+    if (chips.length < 2) return;
+    e.preventDefault();
+    const i = chips.findIndex((a) => a.classList.contains('on'));
+    chips[(i < 0 ? 0 : i + (e.deltaY < 0 ? 1 : -1) + chips.length) % chips.length].click();
+  }, { passive: false });
   // anchors only fire on enter natively, and only when href'd - the
   // role=button and tab picks answer space, plus enter on the bare ones
   helpPanel.addEventListener('keydown', (e) => {
@@ -5583,7 +5596,8 @@
   const lsCtl = cycle(kernBtn, LS_STEPS, DEF.ls, '--chat-lse', 'Letter spacing', 'em', 'helpLs');
   kernBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); lsCtl.set(DEF.ls); });
   document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
-    `<a href="#" role="button" class="helpOpt helpWg" data-idx="${i}">${n}</a>`).join(' ');
+    // each weight chip renders at the weight it picks
+    `<a href="#" role="button" class="helpOpt helpWg" data-idx="${i}" style="font-weight:${WEIGHTS[i]}">${n}</a>`).join(' ');
   // the help descriptions embed the same option lists as clickable links
   document.getElementById('helpFontList').innerHTML = FONT_SIZES.map((px, i) =>
     `<a href="#" role="button" class="helpFont" data-idx="${i}">${px}</a>`).join(' ');
@@ -10758,6 +10772,9 @@
   // each shadow chip wears its own level
   helpPanel.querySelectorAll('a.helpShadow')
     .forEach((a) => { a.style.textShadow = SHADOW_LVLS[+a.dataset.idx]; });
+  // each zebra chip wears its level's gray wash
+  helpPanel.querySelectorAll('a.helpZebra')
+    .forEach((a) => { a.style.background = `rgba(128, 128, 128, ${ZEBRA_SHADES[+a.dataset.idx][1]})`; });
   // each font name renders in its own face
   document.getElementById('helpFontFamList').innerHTML = [...fontSel.options].map((o, i) =>
     // single quotes inside - a " delimits the style attribute and every
