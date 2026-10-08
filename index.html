@@ -10826,6 +10826,7 @@
   markHelp('helpEonly', emoteMode);
   markHelp('helpSplit', !sideEl.hidden + !side2El.hidden);
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);
+  markHelp('helpLinks', document.body.classList.contains('linkview') ? 1 : 0);
   markHelp('helpHelp', helpMode);
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
