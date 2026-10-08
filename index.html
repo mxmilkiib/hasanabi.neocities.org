@@ -1284,6 +1284,8 @@
   /* 9em of popup font keeps the glyph column aligned at any popup font
      size while fitting the longest labels ("radicals & labour" etc) */
   #helpPanel .htabpage > div, #helpPanel #authSections > div { margin: 7px 0; display: grid; grid-template-columns: 9em 1fr; gap: 0 8px; }
+  /* theme/style/shade rows breathe - the swatch chips want the air */
+  #helpPanel .htabpage > div.thm { margin: 13px 0; }
   /* the resource/author sections breathe more than the config rows */
   #helpPanel #htabRes > div, #helpPanel #htabLib > div, #helpPanel #authSections > div { margin: 12px 0; }
   /* column tops sit a touch below the section name, not level with it */
@@ -1826,8 +1828,9 @@
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
-    <div><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
-    <div><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span> - chips preview and apply each style's designed shade (the ◐ cycle leaves shade alone); right-click resets to <a href="#" role="button" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" role="button" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
+    <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
+    <div class="thm"><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span> - chips preview and apply each style's designed shade (the ◐ cycle leaves shade alone); right-click resets to <a href="#" role="button" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
+    <div class="thm"><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" role="button" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
     <div><b>font menu</b> <span><span id="helpFontFamList"></span><sup>†</sup></span></div>
     <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span><b>⇄</b><span>letter spacing: <span id="helpLsList"></span> - em steps, so they scale with the font size; right-click resets to 0<sup>†</sup></span></div>
     <div><b>hdr</b><span>header font size: <span id="helpHfsList"></span></span></div>
