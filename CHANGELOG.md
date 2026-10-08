@@ -46,6 +46,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- an mIRC-style read marker: when the page loses focus or gets hidden,
+  a red line is armed at the last-seen boundary and draws itself before
+  the first row that lands while away; it stays put through the return
+  and relocates to the new boundary on the next inactive spell
 - inter mono (lujstn's iosevka build styled after inter) joins the font
   menu right after inter (`?font=intermono`) - self-hosted regular +
   semibold woff2s since no cdn package exists
