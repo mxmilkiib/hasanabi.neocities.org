@@ -101,6 +101,10 @@ not versions — the page ships continuously to Neocities.
   above storage
 - the panel's label column gains 5px of gap before its links (13px
   total)
+- workers unions reads like english now: every bare acronym carries
+  its expansion in brackets (iww -> industrial workers of the world,
+  ewoc -> emergency workplace organizing cttee, rmt -> rail,
+  maritime & transport, and so on down the rows)
 - link peek cards get a consistent rim: the border (and the og:image's
   own edge) takes an hsl hue hashed from the url, so a repeated link
   carries the same tint; the site's theme-color still edges the left
