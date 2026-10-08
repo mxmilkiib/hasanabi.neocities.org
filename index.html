@@ -3065,13 +3065,21 @@
   // recovered - flip those dead samples from the danger wash to violet,
   // the 'page away' shade (the cause text stays in the tooltip)
   function fillAway(ts) {
-    for (const [s, e] of away) {
-      if (ts <= s || ts >= e) continue;
-      for (let i = 0; i < rateSamples.length; i++)
-        if (!Number.isFinite(rateSamples[i]) && rateTimes[i] > s &&
-            rateTimes[i] - 1000 < e && !(rateWhy[i] || '').includes('filled'))
-          rateWhy[i] = rateWhy[i] ? rateWhy[i] + ' · filled' : 'filled';
-      return;
+    for (let i = 0; i < away.length; i++) {
+      const w = away[i], s = w[0], e = w[1];
+      // the backlog lands contiguously: a replay at or before the gap's
+      // start proves the whole stretch came back, a later one leaves the
+      // unlogged remnant ahead of it - so rungs stop wearing 'missed'
+      // once the window they cover has actually been recovered
+      if (ts >= e) continue;
+      const covered = Math.min(e, ts);  // hole shrinks to [s, covered]
+      if (ts <= s) away.splice(i--, 1);
+      else w[1] = covered;
+      for (let j = 0; j < rateSamples.length; j++)
+        if (!Number.isFinite(rateSamples[j]) && rateTimes[j] > covered &&
+            rateTimes[j] - 1000 < e && !(rateWhy[j] || '').includes('filled'))
+          rateWhy[j] = rateWhy[j] ? rateWhy[j] + ' · filled' : 'filled';
+      if (ts > s) return;
     }
   }
   // '19:27[:43] PM' back to wall-clock ms for restored rows saved before
@@ -3628,7 +3636,7 @@
       for (const t of mtoks) {
         const en = emoteNameOf(ch, t);
         if (en || rendered.names.has(t) || EMOJI_SET.has(t))
-          noteEmoteUse(en || t, ch, rendered.nameId?.get(t));
+          noteEmoteUse(en || t, ch, rendered.nameId?.get(t), ts);
       }
       const eonly = mtoks.length > 0 &&
         mtoks.every((t) => rendered.names.has(t) || emoteNameOf(ch, t) || zwOf(ch).has(t));
@@ -9847,24 +9855,29 @@
     clearTimeout(flashTimers.get(n));
     flashTimers.set(n, setTimeout(() => unflash(n), 3600));
   }
-  function noteEmoteUse(n, ch, id) {
+  function noteEmoteUse(n, ch, id, when) {
+    // replayed backfill keeps the message's own send time - a recovered use
+    // holds its real age instead of landing at 'now' over fresher cells
+    const at = when || Date.now();
     if (id && !useIds[n]) useIds[n] = id;
     liveUse[n] = (liveUse[n] || 0) + 1;
     const lp = perObj(liveUsePer, ch || CHANNEL);
     lp[n] = (lp[n] || 0) + 1;
-    const day = Math.floor(Date.now() / 864e5);
+    const day = Math.floor(at / 864e5);
     const ud = useDay[n] || (useDay[n] = {});
     ud[day] = (ud[day] || 0) + 1;
     const dpc = perObj(useDayPer, ch || CHANNEL);
     const udp = dpc[n] || (dpc[n] = {});
     udp[day] = (udp[day] || 0) + 1;
-    const hour = Math.floor(Date.now() / 36e5);
+    const hour = Math.floor(at / 36e5);
     const uh = useHour[n] || (useHour[n] = {});
     uh[hour] = (uh[hour] || 0) + 1;
     const hpc = perObj(useHourPer, ch || CHANNEL);
     const uhp = hpc[n] || (hpc[n] = {});
     uhp[hour] = (uhp[hour] || 0) + 1;
-    useTs[n] = Date.now();
+    // a stamp only moves forward - a late replay can't drag a re-used
+    // cell back down the ladder
+    useTs[n] = Math.max(useTs[n] || 0, at);
     saveUse();
     if (emotePick.hidden) return;
     flashSet.add(n);
