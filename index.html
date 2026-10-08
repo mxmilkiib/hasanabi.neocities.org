@@ -5812,15 +5812,18 @@
     repin();
   }
 
-  const setFontMenu = (open) => {
-    fontMenu.hidden = !open;
-    fontPick.setAttribute('aria-expanded', String(open));
-    if (!open) return;
+  const markFontMenu = () => {
     const i = fontSel.selectedIndex;
     fontMenu.querySelectorAll('button').forEach((b, j) => {
       b.classList.toggle('on', j === i);
       b.setAttribute('aria-selected', String(j === i));
     });
+  };
+  const setFontMenu = (open) => {
+    fontMenu.hidden = !open;
+    fontPick.setAttribute('aria-expanded', String(open));
+    if (!open) return;
+    markFontMenu();
     const r = fontPick.getBoundingClientRect();
     fontMenu.style.left = Math.min(r.left, innerWidth - fontMenu.offsetWidth - 8) + 'px';
     fontMenu.style.top = r.bottom + 3 + 'px';
@@ -5842,9 +5845,15 @@
   fontPick.addEventListener('wheel', (e) => {
     e.preventDefault();
     const n = fontSel.options.length;
-    fontSel.selectedIndex = (fontSel.selectedIndex + (e.deltaY < 0 ? 1 : -1) + n) % n;
+    fontSel.selectedIndex = (fontSel.selectedIndex + (e.deltaY < 0 ? -1 : 1) + n) % n;
     applyFont();
     saveOpts();
+    // with the menu open the wheel also walks its highlight down/up the
+    // list so the cycle reads against the visible options
+    if (!fontMenu.hidden) {
+      markFontMenu();
+      fontMenu.querySelector('.on')?.scrollIntoView({ block: 'nearest' });
+    }
   }, { passive: false });
   fontSel.value = 'inter'; // boot default; saved opts / url override below
   applyFont();
