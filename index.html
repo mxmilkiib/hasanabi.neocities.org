@@ -10395,7 +10395,7 @@
     // the rung's inline animation-delay reaches it via inherit
     const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
       '<rect x="1" y="1" width="98" height="98" rx="6" vector-effect="non-scaling-stroke"/></svg>';
-    const lblOf = (mk) => mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 6e4 ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
+    const lblOf = (mk) => mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 12e4 && (mk.t < 6e4 || mk.t % 6e4) ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
     // a per-square negative delay starts each one mid-cycle, so the
     // marches stagger instead of beating in lockstep
     let sqN = 0;
