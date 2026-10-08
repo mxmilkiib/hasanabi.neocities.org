@@ -4747,19 +4747,23 @@
     try { localStorage.setItem('hasan-htab', id); } catch {}
   }
   // multicol offers no 'first in column' hook, so the link-columns are
-  // measured after layout: a row that opens its column WITHOUT a
-  // subsection <b> head is marked, and css drops it a line so heads
-  // own row one and link text aligns under them.
+  // measured after layout: when some column opens with a subsection
+  // <b> head, the OTHER column-topping rows drop a line so heads own
+  // row one and link text aligns under them; with no head topping a
+  // column nothing drops - the alignment has no referent.
   // the RO covers tab switches, panel opens, width stops and font
   // swaps - anything that reflows the columns resizes the span
   let colTopQ = 0;
   function markColTops() {
     colTopQ = 0;
     helpPanel.querySelectorAll('.htabpage:not([hidden]) .linkcols:not(.stbl)').forEach((span) => {
+      const rows = [...span.children];
       let top = Infinity;
-      for (const i of span.children) if (i.offsetParent) top = Math.min(top, i.offsetTop);
-      for (const i of span.children)
-        i.classList.toggle('coltop', i.firstElementChild?.tagName !== 'B' && i.offsetTop - top < 2);
+      for (const i of rows) if (i.offsetParent) top = Math.min(top, i.offsetTop);
+      const colTop = (i) => i.offsetTop - top < 2;
+      const headLed = (i) => i.firstElementChild?.tagName === 'B';
+      const anyHead = rows.some((i) => colTop(i) && headLed(i));
+      for (const i of rows) i.classList.toggle('coltop', anyHead && colTop(i) && !headLed(i));
     });
   }
   const queueColTops = () => { if (!colTopQ) colTopQ = requestAnimationFrame(markColTops); };
