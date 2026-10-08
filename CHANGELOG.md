@@ -44,6 +44,12 @@ not versions — the page ships continuously to Neocities.
   rows kept their ghost marks, which sent new appends mid-log and ate
   real rows; the marks now strip on every column re-deal, and the
   split toggle saves so a reload can't resurrect the columns
+- a used emote can no longer land below a violet time-ago square:
+  the use record is now shared across channels (legacy per-channel
+  blobs merge in once - counts sum, stamps keep the newest), so a
+  shared emote keeps its stamp after a stream switch, and grouped
+  mode's pending rungs flush once at the grid's end instead of per
+  section, where they parked ahead of later sections' used cells
 
 ### Features
 - an mIRC-style read marker: when the page loses focus or gets hidden,

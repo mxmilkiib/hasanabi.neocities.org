@@ -3498,10 +3498,10 @@
       const twTail = pendingTw.splice(0).join('');
       // chatterino-style: messages made of only emotes render them bigger
       const mtoks = message.trim().split(/\s+/).filter(Boolean);
-      // usage-age stats belong to the focused channel's store; other rooms'
-      // rows would only pollute them
+      // usage-age stats share one record across channels - the *Per bags
+      // still attribute each use to the row's own room
       for (const t of mtoks) {
-        const en = ch === CHANNEL && emoteNameOf(ch, t);
+        const en = emoteNameOf(ch, t);
         if (en || rendered.names.has(t) || EMOJI_SET.has(t))
           noteEmoteUse(en || t, ch, rendered.nameId?.get(t));
       }
@@ -9375,9 +9375,27 @@
   // use-sort, flash their picker button, and lazily resort the open grid
   // session-use counts and last-seen times, persisted so the use sort and
   // its age markers keep working across a reload instead of going cold -
-  // per-channel, since the emote sets being counted differ per stream
-  const EMOTEUSE_KEY = 'hasan-emoteuse' + CHAN_SFX;
+  // one shared record across channels: a shared emote used on one stream
+  // is still used on another, and the *Per bags keep per-channel tallies
+  const EMOTEUSE_KEY = 'hasan-emoteuse';
   const savedUse = (() => { try { return JSON.parse(localStorage.getItem(EMOTEUSE_KEY)) || {}; } catch { return {}; } })();
+  // a legacy channel-scoped blob folds into the shared record once - counts
+  // sum, stamps keep the newest, the start keeps the earliest - then drops
+  const legacyUse = CHAN_SFX && (() => { try { return JSON.parse(localStorage.getItem(EMOTEUSE_KEY + CHAN_SFX)) || null; } catch { return null; } })();
+  if (legacyUse) {
+    const addInto = (a, b) => { for (const [k, v] of Object.entries(b || {})) a[k] = (a[k] || 0) + v; };
+    const nestInto = (a, b) => { for (const [k, m] of Object.entries(b || {})) addInto(a[k] || (a[k] = {}), m); };
+    addInto(savedUse.n ||= {}, legacyUse.n);
+    nestInto(savedUse.d ||= {}, legacyUse.d);
+    nestInto(savedUse.h ||= {}, legacyUse.h);
+    for (const [c, m] of Object.entries(legacyUse.pd || {})) nestInto((savedUse.pd ||= {})[c] ||= {}, m);
+    for (const [c, m] of Object.entries(legacyUse.hp || {})) nestInto((savedUse.hp ||= {})[c] ||= {}, m);
+    for (const [k, v] of Object.entries(legacyUse.t || {})) (savedUse.t ||= {})[k] = Math.max(savedUse.t[k] || 0, v);
+    for (const [k, v] of Object.entries(legacyUse.i || {})) (savedUse.i ||= {})[k] ||= v;
+    if (legacyUse.s) savedUse.s = Math.min(savedUse.s || Infinity, legacyUse.s);
+    if (legacyUse.w) savedUse.w = Math.max(savedUse.w || 0, legacyUse.w);
+    localStorage.removeItem(EMOTEUSE_KEY + CHAN_SFX);
+  }
   const liveUse = savedUse.n || {};
   const useTs = savedUse.t || {};
   // per-day buckets keep the stats tab's local windows (today/week/
@@ -9632,40 +9650,49 @@
     // threshold; emotes never seen this session count as stale
     const AGES = [[1e4, '10 seconds'], [2e4, '20 seconds'], [3e4, '30 seconds'], [45e3, '45 seconds'], [6e4, 'a minute'], [12e4, '2 minutes'], [18e4, '3 minutes'], [24e4, '4 minutes'], [3e5, '5 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, '30 minutes'], [24e5, '40 minutes'], [3e6, '50 minutes'], [36e5, 'an hour'],
       ...[...Array(11)].map((_, i) => [(i + 2) * 36e5, `${i + 2} hours`])]; // 2h through 12h
-    const aged = (items, codeOf, render) => {
+    // the ladder is shared across sections - one timeline, one pending set
+    const now = Date.now();
+    const marks = AGES.map(([t, words]) => ({ t, words }));
+    marks.sort((a, b) => a.t - b.t);
+    // a rung whose era reaches back into an 'away' window (socket
+    // dropped or page closed) covers time chat wasn't logging
+    for (const mk of marks)
+      mk.missed = away.some(([s, e]) => s < now && e > now - mk.t);
+    // rungs beyond the oldest stamp are times still to happen; grouped
+    // mode emits them once at the grid's end rather than per section
+    const oldestAge = now - Math.min(Infinity, ...Object.values(useTs));
+    // the marching-ants border - an svg rect whose dashoffset animates;
+    // the rung's inline animation-delay reaches it via inherit
+    const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
+      '<rect x="1" y="1" width="98" height="98" rx="6" vector-effect="non-scaling-stroke"/></svg>';
+    const lblOf = (mk) => mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 6e4 ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
+    // a per-square negative delay starts each one mid-cycle, so the
+    // marches stagger instead of beating in lockstep
+    let sqN = 0;
+    const sqOf = (mk, soon) => {
+      const dl = ` style="animation-delay:${(-(sqN++ % 7) * 0.34).toFixed(2)}s"`;
+      // 'soon' = a rung no used emote has reached yet (tripped by the
+      // never-used tail or flushed at the list's end) - the violet
+      // marks a time still to happen rather than a crossed boundary
+      return `<div role="separator" class="eage ${soon ? 'soon' : 'lit'}${mk.missed ? ' missed' : ''}" data-age="${mk.t}"${dl} title="${soon ? `no emote has aged past ${mk.words} yet` : `emotes below were last used over ${mk.words} ago`}${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lblOf(mk)}</div>`;
+    };
+    const aged = (items, codeOf, render, deferPend) => {
       if (epickSort !== 'use') return items.map(render).join('');
-      const now = Date.now();
-      const marks = AGES.map(([t, words]) => ({ t, words }));
-      marks.sort((a, b) => a.t - b.t);
-      // a rung whose era reaches back into an 'away' window (socket
-      // dropped or page closed) covers time chat wasn't logging
-      for (const mk of marks)
-        mk.missed = away.some(([s, e]) => s < now && e > now - mk.t);
       let next = 0; // thresholds fire once each, in order
-      // the marching-ants border - an svg rect whose dashoffset animates;
-      // the rung's inline animation-delay reaches it via inherit
-      const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
-        '<rect x="1" y="1" width="98" height="98" rx="6" vector-effect="non-scaling-stroke"/></svg>';
-      const lblOf = (mk) => mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 6e4 ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
-      // a per-rung negative delay starts each square mid-cycle, so the
-      // marches stagger instead of beating in lockstep
-      const sqOf = (mk, soon) => {
-        const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
-        // 'soon' = a rung no used emote has reached yet (tripped by the
-        // never-used tail or flushed at the list's end) - the violet
-        // marks a time still to happen rather than a crossed boundary
-        return `<div role="separator" class="eage ${soon ? 'soon' : 'lit'}${mk.missed ? ' missed' : ''}" data-age="${mk.t}"${dl} title="${soon ? `no emote has aged past ${mk.words} yet` : `emotes below were last used over ${mk.words} ago`}${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lblOf(mk)}</div>`;
-      };
       let out = items.map((x) => {
         const ts = useTs[codeOf(x)] || 0;
         const age = now - ts;
         let m = '';
         while (next < marks.length && age >= marks[next].t) {
           const mk = marks[next++];
-          // a rung older than tracking start can only ever be tripped by
-          // the never-used tail - it reads as a pending violet square, a
-          // time still to happen, not a crossed boundary
-          m += sqOf(mk, !ts);
+          // deferPend keeps pending rungs for the shared tail flush so no
+          // section parks violet squares ahead of later sections' used
+          // cells; a never-cell tripping a rung some cell crossed
+          // elsewhere still reads lit - it is a real boundary
+          if (deferPend) {
+            if (!ts && mk.t > oldestAge) continue;
+            m += sqOf(mk, false);
+          } else m += sqOf(mk, !ts);
         }
         // the first rung beyond this cell's age is where it next crosses;
         // never-seen cells sit past every rung and never cross again
@@ -9674,8 +9701,9 @@
         return m + render(x);
       }).join('');
       // rungs past the last cell print at the end as 'still to happen' -
-      // seen-only mode hides the never-tail that would have tripped them
-      while (next < marks.length) out += sqOf(marks[next++], true);
+      // seen-only mode hides the never-tail that would have tripped them.
+      // deferPend leaves them for the caller's single shared flush
+      if (!deferPend) while (next < marks.length) out += sqOf(marks[next++], true);
       return out;
     };
     // third-party emotes grouped by provider
@@ -9740,7 +9768,7 @@
         const g = g0.filter((n) => !seenAll.has(n) && (seenAll.add(n), true));
         if (!g.length) continue;
         pushSec(g.reduce((t, n) => t + useOf(n), 0), src === 'other' ? 'emotes' : src.toLowerCase(),
-          aged(g, (n) => n, (n) => btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n))));
+          aged(g, (n) => n, (n) => btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n)), true));
       }
       if (groupOn('twitch')) {
         // this channel's sets first, then other channels by name, globals last
@@ -9756,7 +9784,7 @@
           const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                       : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
           pushSec(g.reduce((t, e) => t + useOf(e.code), 0), label,
-            aged(g, (e) => e.code, (e) => btn(e.code, label.slice(9), twEmoteUrl(e.id, e.assetType === 'ANIMATED'), e.assetType === 'ANIMATED')));
+            aged(g, (e) => e.code, (e) => btn(e.code, label.slice(9), twEmoteUrl(e.id, e.assetType === 'ANIMATED'), e.assetType === 'ANIMATED'), true));
         }
         if (!twSets.length && !q) h += head('twitch - loading…');
       }
@@ -9765,12 +9793,16 @@
         // use sort walks the stamps within the section too, so a fresh
         // emoji heads it and trips the same age squares as the emotes
         if (hits.length) pushSec(0, 'emoji', epickSort === 'use'
-          ? aged(hits.sort((a, b) => (useTs[b] || 0) - (useTs[a] || 0)), (c) => c, ejiBtn)
+          ? aged(hits.sort((a, b) => (useTs[b] || 0) - (useTs[a] || 0)), (c) => c, ejiBtn, true)
           : hits.map(ejiBtn).join(''));
       }
       // a-z keeps the fixed provider order; use sorts sections busiest-first
       if (epickSort === 'use') secs.sort((a, b) => b[0] - a[0]);
       for (const s of secs) h += s[1];
+      // pending rungs trail the whole grid once - a per-section flush
+      // would park violet squares ahead of later sections' used cells
+      if (epickSort === 'use')
+        for (const mk of marks) if (mk.t > oldestAge) h += sqOf(mk, true);
     }
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
     // rebuilt cells drop their classes - relight whatever is still on screen
