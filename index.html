@@ -1439,13 +1439,16 @@
   #helpPanel .linkcols.wider { columns: 30em; }
   /* command-group titles head their block in the bot command lists; a
      slight outdent-and-drop lets a head hang off the column's text edge */
-  #helpPanel .linkcols > i > b { display: block; position: relative; left: -10px; top: 4px; margin-bottom: 3px; font-size: .88em; color: var(--text-dim); font-style: italic; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+  #helpPanel .linkcols > i > b { display: block; position: relative; left: -7px; top: 4px; margin-bottom: 3px; font-size: .88em; color: var(--text-dim); font-style: italic; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
   /* a column-topping row that does not lead with a subsection head
      drops a line, so a head shares row one with the section label and
      link text aligns a row under it - JS marks .coltop since css can't
      see column breaks; a block ::before spacer holds the line and also
      works under .flow's inline i */
   #helpPanel .linkcols > i.coltop::before { content: ""; display: block; height: 1.5em; }
+  /* a head's drop (and authors' breath) separates it from the row above;
+     topping a column there is no row above, so the head sits flush */
+  #helpPanel .linkcols > i.colhead > b { top: 0; margin-top: 0; }
   /* author sub-heads (classical / founders / …) get a breath above them
      so a group's first entry doesn't crowd the item overhead */
   #htabAuth .linkcols > i > b { margin-top: .45em; }
@@ -4763,7 +4766,10 @@
       const colTop = (i) => i.offsetTop - top < 2;
       const headLed = (i) => i.firstElementChild?.tagName === 'B';
       const anyHead = rows.some((i) => colTop(i) && headLed(i));
-      for (const i of rows) i.classList.toggle('coltop', anyHead && colTop(i) && !headLed(i));
+      for (const i of rows) {
+        i.classList.toggle('coltop', anyHead && colTop(i) && !headLed(i));
+        i.classList.toggle('colhead', colTop(i) && headLed(i));  // kill the head's drop when it tops a column
+      }
     });
   }
   const queueColTops = () => { if (!colTopQ) colTopQ = requestAnimationFrame(markColTops); };

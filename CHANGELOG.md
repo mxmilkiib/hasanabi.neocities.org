@@ -107,8 +107,10 @@ not versions — the page ships continuously to Neocities.
   when the worker found one
 - link-column subsection heads (fediverse, leftist fediverse, data /
   maps / live, the regional tags, the authors' era labels) outdent
-  10px and drop 4px with a faint --line underline and 3px of air
-  under it, so a head hangs off its column's text edge; a text row
+  7px and drop 4px with a faint --line underline and 3px of air
+  under it, so a head hangs off its column's text edge; a head that
+  tops a column keeps row one flush - the drop only exists to stand
+  off a row above, and up there there is none; a text row
   that tops its column drops a line only when another column opens
   with a head, so a subsection head shares row one with the section
   label and link text aligns under it (marked by a layout scan, since
