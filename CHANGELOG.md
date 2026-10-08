@@ -6,6 +6,9 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- unicode emoji in the stats emote list now ride the fixed image slot
+  like emote pictures - optically sized and nudged onto the same line -
+  instead of sitting at text baseline in the name column
 - catch-up jumps no longer strand above the live edge: the glide held a
   scrollHeight target captured at click time while the mid-flight scroll
   events dropped the follow flag, so rows arriving during the animation

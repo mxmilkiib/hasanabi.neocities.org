@@ -958,6 +958,9 @@
   #statsBody .st-row .nm { overflow: hidden; text-overflow: ellipsis;
     white-space: nowrap; min-width: 0; }
   #statsBody .st-row .emote { max-height: 1.4em; max-width: 2em; vertical-align: -0.3em; }
+  /* a unicode emoji in the slot: optically sized and nudged to sit on
+     the same line the emote images hang at */
+  #statsBody .st-row .eme { font-size: 1.3em; vertical-align: -0.18em; }
   #statsBody .st-note .nm { color: var(--text-dim); font-size: .8em; white-space: normal; }
   /* the fixed-width image slot lines up the names' left edges whether a
      row carries an emote image or not */
@@ -4763,7 +4766,12 @@
         // like another channel's sub emotes typed here
         url = url || ((useIds[n] || useIds[en]) &&
           twEmoteUrl(useIds[n] || useIds[en], false));
-        return row(i + 1, `<span class="ems">${url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}">` : ''}</span>` + escapeHTML(n),
+        // a unicode emoji rides the fixed slot like an emote image, so it
+        // sits on the same optical line and the names' left edges still
+        // align - the char itself is the code, so the name stays
+        const ic = url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}">`
+          : EMOJI_SET.has(en) ? `<span class="eme">${escapeHTML(en)}</span>` : '';
+        return row(i + 1, `<span class="ems">${ic}</span>` + escapeHTML(n),
           c.toLocaleString('en'));
       }).join('') +
       (eRanked.length > eVis.length
