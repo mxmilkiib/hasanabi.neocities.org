@@ -7361,6 +7361,7 @@
       localStorage.removeItem(SLOTS_KEY);
       localStorage.removeItem(EMOTEUSE_KEY);
       localStorage.removeItem('hasan-htab');
+      localStorage.removeItem('hasan-hsize');
     } catch {}
     location.reload();
   });
@@ -10735,10 +10736,14 @@
     if (edges.includes('l') || edges.includes('r')) {
       s.w = Math.round(rr.width);
       const i = HELP_WIDTHS.indexOf(s.w);
-      if (i >= 0) { helpWIdx = i; markHelp('helpW', i); markHelpW(0); delete s.w; }
+      if (s.w < 280) delete s.w; // a collapsed save must not come back
+      else if (i >= 0) { helpWIdx = i; markHelp('helpW', i); markHelpW(0); delete s.w; }
       else { markHelp('helpW', -1); markHelpW(s.w); }
     }
-    if (edges.includes('b') || edges.includes('t')) s.h = Math.round(rr.height);
+    if (edges.includes('b') || edges.includes('t')) {
+      s.h = Math.round(rr.height);
+      if (s.h < 120) delete s.h;
+    }
     if (helpPanel.style.left) { s.x = Math.round(rr.left); s.y = Math.round(rr.top); }
     writeHsize(s);
   };
@@ -10830,13 +10835,14 @@
       const htop = headerEl.getBoundingClientRect().bottom + 4;
       const move = (ev) => {
         if (leftEdge || rightEdge) {
-          // cap the grown edge at the screen it faces, so it can't push past
-          const w = Math.round(Math.min(leftEdge ? ax - 8 : innerWidth - ax - 8, Math.max(280, Math.abs(ev.clientX - ax))));
+          // cap the grown edge at the screen it faces, but never below the
+          // minimum - a cap under 280 on a narrow screen must not collapse it
+          const w = Math.round(Math.max(280, Math.min(leftEdge ? ax - 8 : innerWidth - ax - 8, Math.abs(ev.clientX - ax))));
           helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
           helpPanel.style.left = (leftEdge ? ax - w : ax) + 'px';
         }
         if (topEdge || botEdge) {
-          const h = Math.round(Math.min(topEdge ? ay - htop : innerHeight - ay - 8, Math.max(120, Math.abs(ev.clientY - ay))));
+          const h = Math.round(Math.max(120, Math.min(topEdge ? ay - htop : innerHeight - ay - 8, Math.abs(ev.clientY - ay))));
           helpPanel.style.height = h + 'px';
           helpPanel.style.maxHeight = 'none';
           helpPanel.style.top = (topEdge ? ay - h : ay) + 'px';
@@ -10859,8 +10865,8 @@
   try {
     const hs = readHsize();
     const q2 = new URLSearchParams(location.search);
-    if (hs.w && !q2.has('hpw')) { helpPanel.style.width = helpPanel.style.maxWidth = hs.w + 'px'; markHelpW(hs.w); }
-    if (hs.h) { helpPanel.style.height = hs.h + 'px'; helpPanel.style.maxHeight = 'none'; }
+    if (hs.w >= 280 && !q2.has('hpw')) { helpPanel.style.width = helpPanel.style.maxWidth = hs.w + 'px'; markHelpW(hs.w); }
+    if (hs.h >= 120) { helpPanel.style.height = hs.h + 'px'; helpPanel.style.maxHeight = 'none'; }
     if (hs.x != null) {
       helpPanel.style.left = hs.x + 'px'; helpPanel.style.top = hs.y + 'px';
       helpPanel.style.right = 'auto';
