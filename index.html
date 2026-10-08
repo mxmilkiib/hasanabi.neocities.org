@@ -8416,7 +8416,7 @@
   splitBtn.addEventListener('click', (e) => cycleSplit(e.shiftKey ? -1 : 1));
   splitBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    cycleSplit(e.deltaY < 0 ? 1 : -1);
+    cycleSplit(e.deltaY < 0 ? -1 : 1);
   }, { passive: false });
 
   // ---- local history: keep recent rows across reloads ----
