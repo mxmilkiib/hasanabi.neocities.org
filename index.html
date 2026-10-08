@@ -1604,9 +1604,12 @@
   #emotePick[hidden] { display: none; }
   /* the hold chip breathes while the pointer is actually holding the
      grid - the class only rides while cursor and option agree */
-  #emoteHold.held { animation: ehold-pulse 1.2s ease-in-out infinite; }
-  @keyframes ehold-pulse { 50% { filter: brightness(1.55) saturate(1.3);
-    background-color: color-mix(in srgb, var(--line) 55%, #d33); } }
+  #emoteHold.held { animation: ehold-pulse 2.4s ease-in-out infinite; }
+  @keyframes ehold-pulse {
+    0%, 100% { background-color: color-mix(in srgb, var(--line) 55%, #d33); }
+    33% { background-color: color-mix(in srgb, var(--line) 55%, #4c5); }
+    66% { background-color: color-mix(in srgb, var(--line) 55%, #46d); }
+  }
   @media (prefers-reduced-motion: reduce) { #emoteHold.held { animation: none; } }
   /* the dotted grip mirrors the stream overlay's handle - absolutely
      overlaid on the top edge (drag anywhere) so it costs no layout
