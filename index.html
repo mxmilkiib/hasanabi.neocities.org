@@ -1546,8 +1546,8 @@
   #emotePick .erow .qwrap { position: relative; flex: 1; min-width: 0; display: flex; }
   #emotePick #emoteQ { flex: 1; min-width: 0; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 22px 4px 8px; }
   /* a 1px focus ring reads enough on the field - the global 2px is for
-     buttons and chips */
-  #emotePick #emoteQ:focus-visible { outline-width: 1px; }
+     buttons and chips - and it wears the picker squares' light violet */
+  #emotePick #emoteQ:focus-visible { outline: 1px solid #a06be0; }
   /* the clear × rides the box's right end and only surfaces once there
      is text to clear */
   #emotePick #emoteQx { position: absolute; right: 2px; top: 50%; transform: translateY(-50%);
