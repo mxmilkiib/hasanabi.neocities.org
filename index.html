@@ -685,6 +685,7 @@
   body.rbw-flick .row .rbw { animation-name: rbw-flick; animation-timing-function: steps(1, end); }
   /* links view: rows without a url, and repeat posts of a url, hide */
   body.linkview .row:not([data-lk]), body.linkview .row.linkdup { display: none; }
+  body.nobots .row[data-u="blammobot"], body.nobots .row[data-u="fossabot"] { display: none; }
   .row.notice.selfmod {
     color: var(--danger); font-style: normal; font-weight: 600;
     --rowtint: linear-gradient(color-mix(in srgb, var(--danger) 13%, transparent) 0 0);
@@ -1850,6 +1851,7 @@
     <div><b>▶</b> <span>youtube embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph and an info card under the message (thumbnail, title, channel, views and date via the linkpeek worker); clicking the glyph or the thumbnail unfolds the player under the row (a second click folds it) - nothing loads from google until then<sup>†</sup></span></div>
     <div><b>◍</b> <span>link favicons: <span id="helpFavList"></span> - each chat link leads with the site's icon, fetched from duckduckgo's icon service with an icon.horse fallback, then a generic link glyph<sup>†</sup></span></div>
     <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a fact line on the twitch-profile hover card for chatters who set pronouns on alejo.io; looked up when a profile is previewed and cached for a month<sup>†</sup></span></div>
+    <div><b>bots</b><span>hide blammobot + fossabot: <span id="helpBotsList"></span> - their chat rows vanish entirely, commands and all<sup>†</sup></span></div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
@@ -4634,6 +4636,7 @@
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpBar')) { setBarTop(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
+    else if (a.classList.contains('helpBots')) { setBotsHide(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
@@ -6383,7 +6386,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0,
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
@@ -6487,6 +6490,7 @@
     if (o.stitle !== undefined) setTitleBar(!!o.stitle);
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.pn !== undefined) setPronouns(!!o.pn);
+    if (o.nbots !== undefined) setBotsHide(!!o.nbots);
     if (o.anim !== undefined) setNickAnim(+o.anim);
     if (o.rbw !== undefined) setRbwStyle(+o.rbw);
     // emote-picker display options ride the bundle too; one rebuild
@@ -7066,6 +7070,14 @@
     setLinkview(!document.body.classList.contains('linkview'));
   }, { passive: false });
 
+  // ---- hide bots: drop the fossabot + blammobot rows entirely ----
+  let hideBots = false;
+  function setBotsHide(on) {
+    hideBots = on;
+    document.body.classList.toggle('nobots', on);
+    markHelp('helpBots', on ? 1 : 0);
+  }
+
   // ---- message timestamps: off / 24h / 24h+sec / 12-hour variants ----
   const TIME_MODES = ['off', '24-hour', '24-hour + seconds', '12-hour', '12-hour + seconds'];
   let timeIdx = 2;
@@ -7372,6 +7384,7 @@
     if (!titleBarOn) q.set('stitle', '0');
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
+    if (hideBots) q.set('nbots', '1');
     if (nickAnim !== 1) q.set('anim', nickAnim);
     if (rbwStyle) q.set('rbw', rbwStyle);
     // emote-picker options only enter the url off their defaults
@@ -10688,6 +10701,7 @@
     if (q.has('stitle')) setTitleBar(flag('stitle'));
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
+    if (q.has('nbots')) setBotsHide(flag('nbots'));
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 1 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     // emote-picker options: ?epnames=1&epzoom=sm|q|hf|big&epsort=az|useseen&epage=1&
@@ -10758,6 +10772,7 @@
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'on'],
     helpHide: HIDE_MODES,
+    helpBots: ['off', 'on'],
     helpNoLbl: ['off', 'on'],
     helpRbw: ['sweep', 'wave', 'hue cycle', 'pulse', 'flicker'],
     helpCopyHelp: ['off', 'on'],
@@ -10844,6 +10859,7 @@
   markHelp('helpSplit', !sideEl.hidden + !side2El.hidden);
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);
   markHelp('helpLinks', document.body.classList.contains('linkview') ? 1 : 0);
+  markHelp('helpBots', hideBots ? 1 : 0);
   markHelp('helpHelp', helpMode);
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
