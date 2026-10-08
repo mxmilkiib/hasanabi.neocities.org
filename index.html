@@ -601,14 +601,19 @@
     flex: none; z-index: auto;
     border: 0; border-bottom: 1px solid var(--line); box-shadow: none; }
   #rail #vid .vid-handle, #rail #vid .vid-size { display: none; }
+  /* grow proportions rather than a % basis - a percentage basis on a
+     column item can fall back to content height, and the grid's content
+     is the whole emote set */
   #rail #emotePick { position: static; transform: none; width: auto; max-width: none;
-    flex: 0 0 34%; height: auto; max-height: none; border: 0; border-radius: 0;
+    flex: 1 1 0; min-height: 0; height: auto; max-height: none; border: 0; border-radius: 0;
     border-bottom: 1px solid var(--line); box-shadow: none; }
   #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
-  #rail #htabStats { flex: 1; min-height: 0; overflow-y: auto; padding: 0 10px; }
-  /* a rail-width stats page stacks its sections vertically */
-  #rail #statsBody .st-trio, #rail #statsBody .st-panel { flex: 1 1 100%; }
-  #rail #statsBody .st-trio { flex-wrap: wrap; }
+  #rail #htabStats { flex: 2 1 0; min-height: 0; overflow-y: auto; padding: 0 10px; }
+  /* rail stats keep the three-row arrangement; zeroing the basis puts the
+     ranked charts astride on one line at rail width. .st-rate's row stays
+     full-width - the base rule loses on specificity */
+  #rail #statsBody > .st-panel { flex-basis: 0; }
+  #rail #statsBody > .st-rate { flex: 0 0 100%; }
   .empty {
     color: var(--text-dim);
     padding: 24px 4px;
