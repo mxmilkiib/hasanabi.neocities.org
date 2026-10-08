@@ -9444,7 +9444,10 @@
     const ejiBtn = (c) => `<button type="button" class="eji" data-ins="${c}" title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
     const btn = (n, src, img, a) => {
       const e = escapeHTML(n);
-      const im = a && animFrozen() ? freezeUrl(img) : img;
+      // the flag can miss - older recents stored no 'a', and a twitch url
+      // still says /animated/ or a .gif says it for itself - so freeze on
+      // either signal
+      const im = animFrozen() && (a || /\/animated\/|\.gif(?:$|\?)/i.test(img || '')) ? freezeUrl(img) : img;
       return `<button type="button" data-ins="${e}"${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
         `<img src="${escapeHTML(im)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
     };
@@ -9511,7 +9514,7 @@
       : r.img ? emoteAnim.has(r.n) || twAnim(r.n) : false)) : [];
     emoteRecent.hidden = !recs.length;
     emoteRecent.innerHTML = recs.length ? '<span class="rlabel">recent</span>' + recs.map((r) =>
-      r.img ? btn(r.n, r.src, r.img, r.a) : ejiBtn(r.n)).join('') : '';
+      r.img ? btn(r.n, r.src, r.img, r.a !== undefined ? r.a : (emoteAnim.has(r.n) || twAnim(r.n))) : ejiBtn(r.n)).join('') : '';
     const srcTab = { '7TV': '7tv', 'BTTV': 'bttv', 'FFZ': 'ffz', 'FFZ animated': 'ffz' };
     // sections collect as (usage total, html) so the use sort can order
     // the groups by what chat actually runs, not just their members

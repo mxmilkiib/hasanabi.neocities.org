@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- the picker's frozen anim state caught stragglers: recents entries
+  saved before the animated flag existed rendered unfrozen, and any
+  animated url slips the flag check - the freeze now also triggers on
+  urls that declare it themselves (/animated/ paths, .gif), and the
+  recents band resolves a missing flag against the current sets
 - the timeout/delete strike now lands on the message only - the
   timestamp, badges, sub chip and nick keep their look, and the line
   renders in muted gray rather than the font colour. The message body
