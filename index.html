@@ -9801,6 +9801,7 @@
   setNames(localStorage.getItem(EPICK_NAMES_KEY) === '1');
   emoteNamesBtn.addEventListener('click', () => {
     setNames(!emotePick.classList.contains('names'));
+    saveOpts();
     emoteQ.focus();
   });
   // cell-size chips: 2x for a closer look at the art, ½x for a denser
@@ -9818,7 +9819,7 @@
     }
     setOn(zoomOneBtn, !epickZoom); // normal is lit when nothing else is
   }
-  zoomOneBtn.addEventListener('click', () => { setZoom(''); emoteQ.focus(); });
+  zoomOneBtn.addEventListener('click', () => { setZoom(''); saveOpts(); emoteQ.focus(); });
   const setZoom = (v) => {
     epickZoom = zoomBtns[v] ? v : '';
     try { localStorage.setItem(EPICK_ZOOM_KEY, epickZoom); } catch {}
@@ -9826,6 +9827,7 @@
   };
   for (const [k, b] of Object.entries(zoomBtns)) b.addEventListener('click', () => {
     setZoom(epickZoom === k ? '' : k);
+    saveOpts();
     emoteQ.focus();
   });
   paintZoom();
@@ -9859,6 +9861,7 @@
   };
   ageBtn.addEventListener('click', () => {
     setAge(!epickAge);
+    saveOpts();
     emoteQ.focus();
   });
   function paintSort() {
@@ -9878,6 +9881,7 @@
   for (const [m, b] of Object.entries(sortBtns)) b.addEventListener('click', () => {
     setSort(m === 'use' && epickSort === 'use' ? (epickSeen ? 'use' : 'useseen') : m);
     buildPicker();
+    saveOpts();
     emoteQ.focus();
   });
   // middle-click 'use' forgets the session's ordering memory - recency
@@ -9907,6 +9911,7 @@
   mixBtn.addEventListener('click', () => {
     setMix(!epickMerge);
     buildPicker();
+    saveOpts();
     emoteQ.focus();
   });
   // hold: while the pointer is over the picker, automatic reshuffles
@@ -9930,6 +9935,7 @@
   setOn(holdBtn, epickHold);
   holdBtn.addEventListener('click', () => {
     setHold(!epickHold);
+    saveOpts();
     emoteQ.focus();
   });
   // the chip breathes while the pointer is actually holding the grid
@@ -10011,6 +10017,7 @@
     setAnimFilter(next);
     buildPicker();
     restillEmotes();
+    saveOpts();
     emoteQ.focus();
   });
   // source tabs: any mix of groups may be lit; none lit means everything
@@ -10041,6 +10048,7 @@
     else { next = [...epickOn]; epickOn.has(g) ? next.splice(next.indexOf(g), 1) : next.push(g); }
     setTabs(next);
     buildPicker();
+    saveOpts();
     emoteQ.focus();
   });
   // last-used row: [{ n, src, img }] newest first, emoji carry just n
@@ -10585,7 +10593,7 @@
     // it floats, not that it was up
     try { localStorage.setItem(EPICK_OPEN_KEY, '0'); } catch {}
   }
-  emotePin.addEventListener('click', () => setPin(!epickPinned));
+  emotePin.addEventListener('click', () => { setPin(!epickPinned); saveOpts(); });
   document.getElementById('emoteX').addEventListener('click', closePicker);
   // the picker's lower bound is the chat bar's top edge when the bar is
   // up - same idea as the header clamp above it
@@ -10671,6 +10679,7 @@
         { w: Math.round(rr.width), h: Math.round(rr.height),
           ...(emotePick.style.left ? { left: Math.round(rr.left), top: Math.round(rr.top) } : {}) }));
     } catch {}
+    saveOpts(); // the bundle carries a copy - keep it in step
   };
   const epickHandle = emotePick.querySelector('.epick-handle');
   epickHandle.addEventListener('pointerdown', (e) => {
