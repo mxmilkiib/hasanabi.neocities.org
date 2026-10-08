@@ -4316,6 +4316,12 @@
     const nc = chatterSeen.size;
     chattersEl.hidden = !nc;
     chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
+    // .local immunity exists so a send's real copy can adopt the row - an
+    // echo still unmatched a minute on isn't awaiting anything, so it
+    // stops dodging the column ghosting and pages out like any row. A
+    // late copy can still adopt it (the echoRows entry survives)
+    for (const r of document.querySelectorAll('.row.local'))
+      if ((+r.dataset.ts || 0) < now - 6e4) r.classList.remove('local');
     rateSamples.push(downAt ? NaN : rate);
     rateWhy.push(downAt ? 'socket dropped' : '');
     rateTimes.push(now);
