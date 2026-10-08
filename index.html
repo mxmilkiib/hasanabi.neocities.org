@@ -1664,6 +1664,11 @@
      reads violet (keeping its heavier stroke) */
   #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
+  /* eras no emote has reached yet - tripped by the never-used tail or
+     flushed at the list's end - wear violet like the missed mark, but
+     keep the standard dash: a future boundary, not a logged gap */
+  #emoteGrid .eage.soon { opacity: .85; color: #a06be0; }
+  #emoteGrid .eage.soon .ants rect { stroke: #a06be0; }
   @keyframes eage-ants-missed { to { stroke-dashoffset: -5; } }
   @keyframes eage-ants { to { stroke-dashoffset: -7; } }
   @media (prefers-reduced-motion: reduce) { #emoteGrid .eage .ants rect { animation: none; } }
@@ -1729,7 +1734,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact 12</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. @hasanabi rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together and eras before tracking began are skipped ('▤' starts each populated era on its own row; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, eras before tracking began are skipped, and violet squares tail the list as eras no emote has reached yet ('▤' starts each populated era on its own row; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -9353,7 +9358,10 @@
     if (emotePick.hidden) return;
     flashSet.add(n);
     flashT0.set(n, Date.now());
-    hueFor(n); // a use while lit keeps the hue it already holds
+    // every use steps the wheel - a re-use while still lit trades the
+    // held hue for the next one; the hue releases only when the cell
+    // drops fully off screen
+    flashHues.set(n, flashHueNext = (flashHueNext + 9) % 360);
     poke(n);
     flashLater(n);
     if (epickSort === 'use' && !resortTimer)
@@ -9475,9 +9483,22 @@
       // the marching-ants border - an svg rect whose dashoffset animates;
       // the rung's inline animation-delay reaches it via inherit
       const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
-        '<rect x="1" y="1" width="98" height="98" rx="5" vector-effect="non-scaling-stroke"/></svg>';
+        '<rect x="1" y="1" width="98" height="98" rx="6" vector-effect="non-scaling-stroke"/></svg>';
       const lblOf = (mk) => mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 6e4 ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
-      return items.map((x) => {
+      // a per-rung negative delay starts each square mid-cycle, so the
+      // marches stagger instead of beating in lockstep
+      const sqOf = (mk, soon) => {
+        const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
+        if (mk.t0) {
+          const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
+          return `<div role="separator" class="eage t0${mk.missed ? ' missed' : ''}" data-age="0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded${mk.missed ? ' - part of that span had no logging' : ''}">${ANTS}${lbl}</div>`;
+        }
+        // 'soon' = a rung no used emote has reached yet (tripped by the
+        // never-used tail or flushed at the list's end) - the violet
+        // marks a time still to happen rather than a crossed boundary
+        return `<div role="separator" class="eage ${soon ? 'soon' : 'lit'}${mk.missed ? ' missed' : ''}" data-age="${mk.t}"${dl} title="${soon ? `no emote has aged past ${mk.words} yet` : `emotes below were last used over ${mk.words} ago`}${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lblOf(mk)}</div>`;
+      };
+      let out = items.map((x) => {
         const ts = useTs[codeOf(x)] || 0;
         const age = now - ts;
         let m = '';
@@ -9486,15 +9507,7 @@
           // eras wholly before tracking began can never hold a cell - the
           // t0 boundary covers them, so their rungs go unprinted
           if (!mk.t0 && mk.t > t0age) continue;
-          // a per-rung negative delay starts each square mid-cycle, so
-          // the marches stagger instead of beating in lockstep
-          const dl = ` style="animation-delay:${(-(next % 7) * 0.34).toFixed(2)}s"`;
-          if (mk.t0) {
-            const lbl = t0mins >= 1440 ? `${Math.round(t0mins / 1440)}d` : t0mins >= 60 ? `${Math.round(t0mins / 60)}h` : `${t0mins}m`;
-            m += `<div role="separator" class="eage t0${mk.missed ? ' missed' : ''}" data-age="0"${dl} title="emote use tracking began ${fmtDur(t0mins)} ago - everything above was seen since; below was never recorded${mk.missed ? ' - part of that span had no logging' : ''}">${ANTS}${lbl}</div>`;
-          } else {
-            m += `<div role="separator" class="eage lit${mk.missed ? ' missed' : ''}" data-age="${mk.t}"${dl} title="emotes below were last used over ${mk.words} ago${mk.missed ? ' - chat was not being logged for part of that window, so the count may miss some' : ''}">${ANTS}${lblOf(mk)}</div>`;
-          }
+          m += sqOf(mk, !ts);
         }
         // the first rung beyond this cell's age is where it next crosses;
         // never-seen cells sit past every rung and never cross again
@@ -9502,6 +9515,14 @@
           if (!mk.t0 && mk.t > age) { if (mk.t - age < nextAgeDelta) nextAgeDelta = mk.t - age; break; }
         return m + render(x);
       }).join('');
+      // rungs past the last cell print at the end as 'still to happen' -
+      // seen-only mode hides the never-tail that would have tripped them
+      while (next < marks.length) {
+        const mk = marks[next++];
+        if (!mk.t0 && mk.t > t0age) continue;
+        out += sqOf(mk, true);
+      }
+      return out;
     };
     // third-party emotes grouped by provider
     const groups = {};

@@ -18,10 +18,10 @@ not versions — the page ships continuously to Neocities.
   selectors follow suit); rows restored from pre-change history dim
   but don't strike
 - a lit emote cell now keeps its assigned spectral hue for as long as a
-  chat row carrying it stays on screen: repeat uses no longer re-step
-  the wheel under it, the hue survives the flash's end and grid
-  rebuilds (the .lit path stamps --fc itself), and only releases when
-  the cell is both unflashed and fully off-screen
+  chat row carrying it stays on screen: the hue survives the flash's end
+  and grid rebuilds (the .lit path stamps --fc itself), and only
+  releases when the cell is both unflashed and fully off-screen - a
+  fresh use while still lit re-steps the wheel for a new colour
 - age rungs wholly older than the tracking start go unprinted - they
   can never hold an emote, so the pre-history tail collapses to the
   t0 square alone instead of stacking 3h-12h markers
@@ -47,6 +47,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- era rungs no used emote has reached yet now print as violet 'soon'
+  squares: in plain 'use' mode the never-used tail trips them, and in
+  seen-only mode they flush at the list's end as the set of times
+  still to happen - and all age squares round a touch more (rx 5 → 6)
 - the picker's 'use' button is now two-mode: a second click cycles in a
   seen-only pass that hides emotes with no recorded use, and a third
   click cycles back - it persists as 'useseen' (saved bundle, ?epsort=)
