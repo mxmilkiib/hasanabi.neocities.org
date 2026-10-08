@@ -419,7 +419,7 @@ force off.
 | `rev` | flag | reverse flow — new messages cascade down from the top |
 | `bartop` | flag | dock the chat input under the header instead of at the bottom |
 | `channel` | a twitch login | point the whole page at another channel |
-| `zebra` | flag | zebra-striped rows |
+| `zebra` | `0`–`4` / flag | zebra stripe contrast (0=off, 1=faint, 2=mild, 3=strong, 4=heavy; a bare flag = mild) |
 | `lines` | `0`–`3` | row separator shades |
 | `times` | `nosec`/`24h` / `24hsec` / `12h` / `12hsec` / `0` | timestamp mode |
 | `shadow` | `0`–`2` | text shadow level |

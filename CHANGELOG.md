@@ -28,6 +28,10 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the ▦ zebra button is now a contrast dial instead of a toggle:
+  off → faint → mild → strong → heavy, cycling on click and stepping
+  on scroll; the config row lists all five, presets keep working
+  (their on/off maps to mild/off), and ?zebra= takes a level number
 - the picker's age ladder gains 45s, 3m and 4m rungs, so the early
   seconds and pre-5m stretch resolve finer
 - rainbow @hasanabi mentions gain a thin dark drop-shadow halo so the
