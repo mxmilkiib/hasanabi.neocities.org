@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- a timed-out or banned user's ghosted rows now strike through the nick
+  as well as the message, in a lighter gray than before; the strike
+  survives the name's hover underline. single deleted messages keep the
+  dim message-only strike
 - backfilled copies of locally-echoed sends no longer carry the
   'recovered from the recent-messages backlog' tooltip when the echo
   row itself is already gone - every minted echo key is remembered
