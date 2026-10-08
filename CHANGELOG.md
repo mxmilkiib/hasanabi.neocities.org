@@ -56,6 +56,15 @@ not versions — the page ships continuously to Neocities.
   uk gdpr right); open data folds into open knowledge as labelled
   data / maps / live rows, which now sits below open gov so the run
   reads osint → gov → knowledge → access
+- full link audit (~1000 urls fetched and titled): two domains were
+  squatted - pc de méxico now serves a betting page (→ enwiki) and
+  mid-missouri dsa's an ad rotator (→ its bluesky). pacbi moved to
+  bdsmovement.net/pacbi, spoon theory to the wikipedia article (site
+  down), pts to its eswiki article (502), mysociety to its enwiki
+  article (outage), fox news live to its video hub, and teamsters /
+  icl-cit / nnu / mlk online follow their canonical redirects. the
+  403/400 wall (cloudflare, facebook, github /stargazers) is
+  bot-blocking, not link rot
 - open access leads with open-access.network (the oa info portal)
   and doaj moves up under it, gaining its about page as a sublink
 - open social: 'leftist corners' is now 'leftist fediverse'; the app
