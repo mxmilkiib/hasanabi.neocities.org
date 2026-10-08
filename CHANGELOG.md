@@ -6,6 +6,10 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- the jump-down flank circles trade the pill's masked conic ring for an
+  svg rect stroke - the mask shaved a sliver off the right rim wherever
+  a quarter-percent position landed on a fractional pixel - and the
+  circles' dash march now runs counterclockwise, opposite the pill's
 - unicode emoji in the stats emote list now ride the fixed image slot
   like emote pictures - optically sized and nudged onto the same line -
   instead of sitting at text baseline in the name column
