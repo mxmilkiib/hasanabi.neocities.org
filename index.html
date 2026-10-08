@@ -1440,6 +1440,8 @@
      for plain text colour so it reads as the settled one */
   #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLs, #helpPanel a.helpLines, #helpPanel a.helpOpt { color: var(--accent); cursor: pointer; text-decoration: underline; }
   #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLs.on, #helpPanel a.helpLines.on, #helpPanel a.helpOpt.on { color: var(--text); cursor: default; }
+  /* 'follow chat' names the resolved size while it leads the hdr row */
+  #helpPanel.hfs-follow a.helpHfs[data-idx="0"]::after { content: " (" var(--chat-font, 15px) ")"; }
   /* the painted text colour sits after the generic link rules so it wins
      on helpShade chips (which also carry helpOpt) */
   #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
@@ -7226,8 +7228,12 @@
     const s = document.documentElement.style;
     if (hdrFs < 0) s.removeProperty('--hdr-fs');
     else s.setProperty('--hdr-fs', HDR_SIZES[hdrFs] + 'px');
-    markHelp('helpHfs', hdrFs + 1);
+    markHfs();
     saveOpts();
+  }
+  function markHfs() {
+    markHelp('helpHfs', hdrFs + 1);
+    helpPanel.classList.toggle('hfs-follow', hdrFs < 0);
   }
   let helpWIdx = DEF.hpw;
   const helpWCur = document.getElementById('helpWCur');
@@ -10816,7 +10822,7 @@
   markHelp('helpHelp', helpMode);
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
-  markHelp('helpHfs', hdrFs + 1);
+  markHfs();
   markHelpFs();
   markHelp('helpSelf', selfHl ? 1 : 0);
   markHelp('helpAnim', ANIM_LVLS.indexOf(nickAnim));
