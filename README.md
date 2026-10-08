@@ -444,7 +444,7 @@ force off.
 | `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
 | `epnames` | `1` | picker: emote names on cells |
 | `epzoom` | `sm`/`q`/`big` | picker cell size (½x / ¾x / 2x) |
-| `epsort` | `az` | picker sort (default usage) |
+| `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
 | `epage` | `1` | picker age-rows mode |
 | `epmix` | `1` | picker merged provider grid |
 | `ephold` | `0` | picker reshuffle hold off |

@@ -36,6 +36,12 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- the picker's 'use' button is now two-mode: a second click cycles in a
+  seen-only pass that hides emotes with no recorded use, and a third
+  click cycles back - it persists as 'useseen' (saved bundle, ?epsort=)
+  and marks itself with a dotted accent underline
+- the emote-use flash hue step halves to 12°, so the spectral walk runs
+  ~30 distinct colours per lap instead of 15
 - middle-clicking the picker's 'use' button resets the recorded order:
   recency stamps and session counts clear, tracking restarts, and the
   grid falls back to the channel's own usage ranking (the stats tab's
