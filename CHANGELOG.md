@@ -90,8 +90,8 @@ not versions — the page ships continuously to Neocities.
 - stats tab reorders: emotes and badges lead, chatters sits just
   above storage
 - link-column subsection heads (fediverse, leftist fediverse, data /
-  maps / live, the regional tags, the authors' era labels) outdent 7px
-  and drop 2px, so a head hangs off its column's text edge
+  maps / live, the regional tags, the authors' era labels) outdent
+  14px and drop 4px, so a head hangs off its column's text edge
 
 ### Fixes
 - the picker's 'anim' frozen-stills state now reaches chat rows too:
