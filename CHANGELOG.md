@@ -34,6 +34,9 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
+- inter mono (lujstn's iosevka build styled after inter) joins the font
+  menu right after inter (`?font=intermono`) - self-hosted regular +
+  semibold woff2s since no cdn package exists
 - the ▦ zebra button is now a contrast dial instead of a toggle:
   off → faint → mild → strong → heavy, cycling on click and stepping
   on scroll; the config row lists all five and ?zebra= takes a level
