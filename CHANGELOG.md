@@ -55,6 +55,9 @@ not versions — the page ships continuously to Neocities.
   uk gdpr right); open data now sits above open gov with open
   knowledge below it, so the run reads osint → data → gov →
   knowledge → access
+- open social: 'leftist corners' is now 'leftist fediverse'; the app
+  rows merge into one - the 'more apps' head is gone and piefed sits
+  directly after lemmy as its fork
 
 ### Themes
 - `twitch` style: near-neutral violet-tinted surfaces, brand purple
