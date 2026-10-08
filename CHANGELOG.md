@@ -53,7 +53,7 @@ not versions — the page ships continuously to Neocities.
   design section (the open-design movement) leads open hardware;
   digital rights gains data portability (the concept plus the ico's
   uk gdpr right); open data folds into open knowledge as labelled
-  stats / maps / live rows, which now sits below open gov so the run
+  data / maps / live rows, which now sits below open gov so the run
   reads osint → gov → knowledge → access
 - open social: 'leftist corners' is now 'leftist fediverse'; the app
   rows merge into one - the 'more apps' head is gone and piefed sits
