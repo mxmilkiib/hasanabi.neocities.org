@@ -49,7 +49,8 @@ not versions — the page ships continuously to Neocities.
   venezuelanalysis, telesur english, brasil wire, brazilian report,
   buenos aires times, bogotá post and el país's english edition on the
   other
-- hackerspaces splits out of dual power into its own section; an open
+- dual power gains prefigurative politics beside the concept links;
+  hackerspaces splits out of dual power into its own section; an open
   design section (the open-design movement) leads open hardware;
   digital rights gains data portability (the concept plus the ico's
   uk gdpr right); open data folds into open knowledge as labelled
