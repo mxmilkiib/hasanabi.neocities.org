@@ -1596,17 +1596,17 @@
   /* the painted text colour sits after the generic link rules so it wins
      on helpShade chips (which also carry helpOpt) */
   #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
-  /* the selected chip reads in its own text colour under a page-accent
-     ring and tick - legible on every palette, unlike a bare underline */
+  /* the selected chip reads in its own text colour under a green
+     marching-ants ring and an accent tick */
   /* the ring rides ::before stretched 3px past the swatch: four 2px
      dashed strips (one per edge) sliding via background-position, so the
      gap between the ants and the chip edge reads as padding around it */
   #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); cursor: default; }
   #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { content: ''; position: absolute; inset: -3px; border-radius: 6px;
-    background: linear-gradient(90deg, var(--accent) 50%, transparent 50%) 0 0 / 8px 2px repeat-x,
-      linear-gradient(90deg, var(--accent) 50%, transparent 50%) 0 100% / 8px 2px repeat-x,
-      linear-gradient(0deg, var(--accent) 50%, transparent 50%) 0 0 / 2px 8px repeat-y,
-      linear-gradient(0deg, var(--accent) 50%, transparent 50%) 100% 0 / 2px 8px repeat-y;
+    background: linear-gradient(90deg, #4c5 50%, transparent 50%) 0 0 / 8px 2px repeat-x,
+      linear-gradient(90deg, #4c5 50%, transparent 50%) 0 100% / 8px 2px repeat-x,
+      linear-gradient(0deg, #4c5 50%, transparent 50%) 0 0 / 2px 8px repeat-y,
+      linear-gradient(0deg, #4c5 50%, transparent 50%) 100% 0 / 2px 8px repeat-y;
     animation: antscrawl 2.4s linear infinite; }
   @keyframes antscrawl { to { background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px; } }
   @media (prefers-reduced-motion: reduce) { #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { animation: none; } }
