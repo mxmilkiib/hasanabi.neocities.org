@@ -15,39 +15,12 @@ not versions — the page ships continuously to Neocities.
   left it scrolled up - the column now stays pinned through the glide
   (cleared on arrival, a wheel/touch, or a beat) and appended rows snap
   it to the real bottom
-- the picker's frozen anim state caught stragglers: recents entries
-  saved before the animated flag existed rendered unfrozen, and any
-  animated url slips the flag check - the freeze now also triggers on
-  urls that declare it themselves (/animated/ paths, .gif), and the
-  recents band resolves a missing flag against the current sets
 - the timeout/delete strike now lands on the message only - the
   timestamp, badges, sub chip and nick keep their look, and the line
   renders in muted gray rather than the font colour. The message body
   now wraps in a .msg span (gif embeds and right-pinned emote rows'
   selectors follow suit); rows restored from pre-change history dim
   but don't strike
-- a lit emote cell now keeps its assigned spectral hue for as long as a
-  chat row carrying it stays on screen: the hue survives the flash's end
-  and grid rebuilds (the .lit path stamps --fc itself), and only
-  releases when the cell is both unflashed and fully off-screen - a
-  fresh use while still lit re-steps the wheel for a new colour
-- age rungs wholly older than the tracking start read as violet
-  'soon' squares - a used cell can never have crossed them, so they
-  tail the list as times still to happen rather than lit boundaries;
-  after a use-record reset the pending ladder is the whole set
-- age squares covering unlogged time keep their violet 'missed' mark
-  across reloads: away windows persist through the spark save, the
-  emote-use blob stamps a last-write time as a fallback seed when the
-  spark is gone, and the t0 boundary square can read missed too (its
-  'seen since' claim has holes) - the rule was skipped and its accent
-  style sat later in the sheet than the missed violet
-- animated twitch sub emotes (hasSlam, hasRant et al) now respect the
-  anim filter and freeze as stills under the frozen state - the relay's
-  channel-emote payload was dropping their assetType, so they read as
-  static (relay 1f6f696)
-- picker cells no longer sit stranded above the time-ago squares they
-  already crossed: the last-minute order-pin was leapfrogging them back
-  over the sub-minute rungs, and the use sort makes it redundant anyway
 - sent-message echoes no longer duplicate across columns: the .local
   row stays live instead of being ghosted and evicted, so the real
   copy adopts it in place rather than landing again on the other side
@@ -57,50 +30,58 @@ not versions — the page ships continuously to Neocities.
   split toggle saves so a reload can't resurrect the columns
 
 ### Features
-- the default theme's zebra striping softens to 'faint' - the out-of-box
-  level, the default preset (which now pins the numeric level so preset
-  matching still recognises it), and a bare ?zebra flag all land on it;
-  other presets keep their boolean 'on' = mild mapping
-- the picker's search box gains a faint in-field x that clears the query
-  (it only surfaces once there is text, via placeholder-shown) and its
-  focus ring drops to 1px instead of the global 2px
-- the stats storage row 'origin estimate' splits into its per-api parts
-  when the browser reports usageDetails (chromium: indexeddb, caches,
-  service workers…), with anything unnamed riding as 'unattributed' -
-  browsers without the api keep the single total
-- era rungs no used emote has reached yet now print as violet 'soon'
-  squares: in plain 'use' mode the never-used tail trips them, and in
-  seen-only mode they flush at the list's end as the set of times
-  still to happen - and all age squares round a touch more (rx 5 → 6)
-- the picker's 'use' button is now two-mode: a second click cycles in a
-  seen-only pass that hides emotes with no recorded use, and a third
-  click cycles back - it persists as 'useseen' (saved bundle, ?epsort=)
-  and marks itself with a dotted accent underline
-- the emote-use flash hue step drops to 5°, so the spectral walk runs
-  72 distinct colours per lap instead of 15
-- middle-clicking the picker's 'use' button resets the recorded order:
-  recency stamps and session counts clear, tracking restarts, and the
-  grid falls back to the channel's own usage ranking (the stats tab's
-  day/hour buckets keep their history)
 - the ▦ zebra button is now a contrast dial instead of a toggle:
   off → faint → mild → strong → heavy, cycling on click and stepping
-  on scroll; the config row lists all five, presets keep working
-  (their on/off maps to mild/off), and ?zebra= takes a level number
-- the picker's age ladder gains 45s, 3m and 4m rungs, so the early
-  seconds and pre-5m stretch resolve finer
-- rainbow @hasanabi mentions gain a black drop-shadow outline so
-  the pale gradient stops stay legible; it rides a custom property the
-  filter-animating variants (hue/pulse) re-apply in their keyframes
+  on scroll; the config row lists all five and ?zebra= takes a level
+  number. the default theme lands on faint (out-of-box, its preset's
+  numeric pin, a bare ?zebra flag) while the other presets' boolean
+  'on' still maps to mild, and old boolean saves restore accordingly
+- the picker's search box gains a faint in-field x that clears the
+  query (it only surfaces once there is text, via placeholder-shown),
+  and its focus ring is a 1px light violet instead of the global 2px
+  accent
+- the stats storage row 'origin estimate' splits into its per-api
+  parts when the browser reports usageDetails (chromium: indexeddb,
+  caches, service workers…), with anything unnamed riding as
+  'unattributed' - browsers without the api keep the single total
+- the picker's 'use' sort gains a marching-ants time-ago ladder: era
+  squares (10s, 20s, 30s, 45s, 1m-5m, 10m-50m, 1h-12h) mark where each
+  cell's last use falls, a timed rebuild slides a square in exactly
+  when the next emote crosses it, and the squares ride the same slide
+  animation as the cells (rx 6 corners). '▤' starts each populated era
+  on its own row, empty stretches pack inline, unsorted emoji stay out
+  of the walk, and the old last-minute order-pin that could strand a
+  cell above its square is gone
+- the ladder's unpopulated eras read two ways: violet 'soon' rungs
+  mark times no used emote has reached yet - tripped by the never-used
+  tail or flushed at the list's end in seen-only mode, so after a
+  use-record reset the whole ladder is pending - and violet-dashed
+  'missed' rungs cover windows chat wasn't logging, persisted across
+  reloads through the spark save plus a last-write stamp on the
+  emote-use blob; the t0 tracking-start square bounds the recorded
+  span and can read missed too
+- the picker's 'use' button gains two extras: a second click cycles a
+  seen-only pass hiding emotes with no recorded use (persisted as
+  'useseen' / ?epsort=useseen, marked with a dotted accent underline),
+  and a middle-click resets the recorded order - recency stamps and
+  session counts clear and the grid falls back to the channel's own
+  usage ranking (the stats tab's day/hour buckets keep their history)
+- emote-picker cells wear a spectral use colour: each use steps a hue
+  wheel 5° (72 colours per lap), a re-use while still on screen trades
+  to the next hue, and rows are watched for viewport intersection so
+  the wash holds until every chat row carrying the emote has scrolled
+  away or left the log - then the hue releases for its next visit
 - the picker's `anim` chip is now tri-state: click cycles playing →
   frozen stills → hidden. frozen cells render the static frame - 7tv
   `*_static` variants and twitch `default` paths directly, first-frame
-  renders via weserv for bttv/ffz-animated which ship none; dashed
-  border marks the frozen leg and `epanim=animf` carries it in urls
-- picker's time-ago squares now drift with the cells: a timed rebuild
-  lands whenever the next emote's age crosses a rung, and the squares
-  ride the same slide animation as the buttons (own-row mode keeps
-  them heading their rows). unsorted emoji no longer weave squares
-  through the tail of the grid; 10s and 20s rungs join the ladder
+  renders via weserv for bttv/ffz-animated which ship none; animation
+  declared by the url itself (/animated/, .gif) counts too so flagless
+  recents still freeze, and animated twitch sub emotes arrive properly
+  flagged (relay 1f6f696). a dashed border marks the frozen leg and
+  `epanim=animf` carries it in urls
+- rainbow @hasanabi mentions gain a black drop-shadow outline so
+  the pale gradient stops stay legible; it rides a custom property the
+  filter-animating variants (hue/pulse) re-apply in their keyframes
 - chat-link favicons that miss both icon services now fall back to
   a generic link glyph instead of vanishing from the row
 - the font menu previews each option in its own typeface, the closed
@@ -108,10 +89,6 @@ not versions — the page ships continuously to Neocities.
 - atkinson hyperlegible mono joins the font menu (`?font=
   atkinsonmono`), loaded from google fonts at 400/600 like the
   other monospace entries
-- in the picker's age-rows mode, era squares only open a row when
-  emotes actually follow them - an empty stretch of time-ago
-  squares rides the tail of the newer cells' line instead of a
-  row each; the ladder also gains a 30-second rung
 - overlapping popups trade z-order on press: dragging or pressing
   the emote picker over the `?` panel (or vice versa) raises it to
   the front, and a press on the other takes the top back
@@ -121,10 +98,6 @@ not versions — the page ships continuously to Neocities.
   flanking it at the quarter-width marks of its column - same theme,
   same jump-to-bottom, three landing spots in one, two and three
   column layouts alike
-- emote-picker cells now hold their use colour while a chat row
-  carrying the emote is still on screen: rows are watched for
-  viewport intersection, the wash only fades once every copy has
-  scrolled away or left the log
 - the `news` row's independent & left organs now run biggest-to-
   smallest with the more radical ranked up: democracy now, zeteo,
   jacobin, intercept, novara ahead of the investigative and
