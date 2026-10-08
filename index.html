@@ -7097,10 +7097,11 @@
   // solid; LINE_SHADES order stays put so saved indices don't remap
   const LINE_ORDER = [0, 4, 1, 2, 3];
   let lineLevel = 1;
-  // each option's underline wears the line it selects: shade colour for
-  // the strength, dotted for the dots mode, transparent when it's off
+  // each option's underbar wears the line it selects: the shade colour
+  // for the strength, dotted for the dots mode, invisible when off - a
+  // real 1px border reads closer to the row seam than a hairline underline
   document.getElementById('helpLinesList').innerHTML = LINE_ORDER.map((i) =>
-    `<a href="#" role="button" class="helpLines" data-idx="${i}" style="text-decoration-color: ${LINE_SHADES[i][1]}${LINE_SHADES[i][2] === 'dots' ? '; text-decoration-style: dotted' : ''}">${LINE_SHADES[i][0]}</a>`).join(' / ');
+    `<a href="#" role="button" class="helpLines" data-idx="${i}" style="text-decoration: none; border-bottom: 1px ${LINE_SHADES[i][2] === 'dots' ? 'dotted' : 'solid'} ${LINE_SHADES[i][1]}">${LINE_SHADES[i][0]}</a>`).join(' / ');
   function setLines(level) {
     lineLevel = ((level % LINE_SHADES.length) + LINE_SHADES.length) % LINE_SHADES.length;
     mainEl.style.setProperty('--rowline', LINE_SHADES[lineLevel][1]);
