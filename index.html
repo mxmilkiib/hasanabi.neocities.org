@@ -1642,6 +1642,14 @@
   body.barauto #chatbar:not([hidden]):hover,
   body.barauto #chatbar:not([hidden]):focus-within,
   body.barauto #chatbar:not([hidden]):has(#emojiBtn[aria-expanded="true"]) { opacity: 1; }
+  /* slim: the bar collapses to a hairline strip; the same wake triggers
+     as fade mode bring it back. max-height animates the unfold */
+  body.barslim #chatbar:not([hidden]) { max-height: 7px; overflow: hidden;
+    padding-top: 0; padding-bottom: 0; border-top: 1px solid var(--line);
+    box-sizing: border-box; transition: max-height .18s ease; }
+  body.barslim #chatbar:not([hidden]):hover,
+  body.barslim #chatbar:not([hidden]):focus-within,
+  body.barslim #chatbar:not([hidden]):has(#emojiBtn[aria-expanded="true"]) { max-height: 40vh; }
   /* multi-channel send picker: sits over the empty textarea like a
      placeholder, each channel chip its own colour, click to pick */
   #chatPick { position: absolute; z-index: 1; pointer-events: none;
@@ -2005,7 +2013,7 @@
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
-    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - the bar fades out of the way; hovering its strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
+    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - fade ghosts the bar out, slim collapses it to a hairline; hovering the strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
@@ -4877,7 +4885,7 @@
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpBar')) { setBarTop(+a.dataset.idx === 1); saveOpts(); }
-    else if (a.classList.contains('helpAuto')) { setBarAuto(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpAuto')) { setBarAuto(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpLinks')) setLinkview(+a.dataset.idx === 1);
     else if (a.classList.contains('helpBots')) { setBotsHide(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
@@ -6838,7 +6846,7 @@
       scrollback: MAX_MESSAGES,
       rev: revFlow,
       bartop: barTop,
-      bauto: barAuto ? 1 : 0,
+      bauto: barAuto,
       times: timeIdx,
       shadow: shadLevel,
       eonly: emoteMode,
@@ -6919,7 +6927,7 @@
     if (SCROLLBACK_SIZES.includes(o.scrollback)) setScrollback(o.scrollback);
     if (typeof o.rev === 'boolean') setRev(o.rev);
     if (typeof o.bartop === 'boolean') setBarTop(o.bartop);
-    if (o.bauto !== undefined) setBarAuto(!!o.bauto);
+    if (o.bauto !== undefined) setBarAuto(o.bauto);
     if (typeof o.times === 'boolean') setTimes(o.times ? 2 : 0);
     else if (Number.isInteger(o.times)) setTimes(o.times);
     if (Number.isInteger(o.shadow)) setShadow(o.shadow);
@@ -7528,12 +7536,14 @@
     document.body.classList.toggle('bartop', on);
     markHelp('helpBar', on ? 1 : 0);
   }
-  // autohide: the bar fades out until the pointer comes back for it
-  let barAuto = false;
-  function setBarAuto(on) {
-    barAuto = on;
-    document.body.classList.toggle('barauto', on);
-    markHelp('helpAuto', on ? 1 : 0);
+  // autohide: fade ghosts the bar out, slim collapses it to a hairline -
+  // hovering its strip, typing or an open emote picker bring it back
+  let barAuto = 0;
+  function setBarAuto(mode) {
+    barAuto = Math.min(2, Math.max(0, +mode || 0));
+    document.body.classList.toggle('barauto', barAuto === 1);
+    document.body.classList.toggle('barslim', barAuto === 2);
+    markHelp('helpAuto', barAuto);
   }
 
   // ---- links view: only rows carrying a url, first post of each link ----
@@ -7851,7 +7861,7 @@
     if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
     if (barTop) q.set('bartop', '1');
-    if (barAuto) q.set('bauto', '1');
+    if (barAuto) q.set('bauto', String(barAuto));
     if (lineLevel !== 1) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
@@ -11217,7 +11227,7 @@
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
     if (q.has('bartop')) setBarTop(flag('bartop'));
-    if (q.has('bauto')) setBarAuto(flag('bauto'));
+    if (q.has('bauto')) setBarAuto(flag('bauto') ? (+q.get('bauto') || 1) : 0);
     if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
     if (q.has('times')) setTimes({ nosec: 1, '24h': 1, '24hsec': 2, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
@@ -11324,7 +11334,7 @@
   }
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
-    helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'on'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
@@ -11421,7 +11431,7 @@
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);
   markHelp('helpLinks', document.body.classList.contains('linkview') ? 1 : 0);
   markHelp('helpBots', hideBots ? 1 : 0);
-  markHelp('helpAuto', barAuto ? 1 : 0);
+  markHelp('helpAuto', barAuto);
   markHelp('helpHelp', helpMode);
   markHelp('helpNoLbl', lblsOn ? 1 : 0);
   markHelp('helpFontFam', fontSel.selectedIndex);
