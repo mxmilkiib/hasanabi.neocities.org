@@ -7913,17 +7913,17 @@
   window.addEventListener('pageshow', backfill);
 
   // ---- read marker: a red line between the last-seen row and whatever
-  // arrived while the page was inactive. Each blur/hide moves the
-  // boundary: the old line goes, the next queued row draws a fresh one.
-  // Returning just disarms - the line stays put until the next spell ----
-  const armRedbar = () => {
+  // arrived while the page was inactive. Each blur/hide arms a fresh
+  // boundary; returning to the page clears the line ----
+  const clearRedbar = () => {
+    redbarArm = false;
     for (const el of document.querySelectorAll('.redbar')) el.remove();
-    redbarArm = true;
   };
+  const armRedbar = () => { clearRedbar(); redbarArm = true; };
   addEventListener('blur', armRedbar);
-  addEventListener('focus', () => { redbarArm = false; });
+  addEventListener('focus', clearRedbar);
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) armRedbar(); else redbarArm = false;
+    if (document.hidden) armRedbar(); else clearRedbar();
   });
 
   // ---- twitch login + sending ----

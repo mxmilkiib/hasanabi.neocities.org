@@ -54,8 +54,7 @@ not versions — the page ships continuously to Neocities.
 ### Features
 - an mIRC-style read marker: when the page loses focus or gets hidden,
   a red line is armed at the last-seen boundary and draws itself before
-  the first row that lands while away; it stays put through the return
-  and relocates to the new boundary on the next inactive spell
+  the first row that lands while away; coming back to the page clears it
 - the ▦ zebra button is now a contrast dial instead of a toggle:
   off → faint → mild → strong → heavy, cycling on click and stepping
   on scroll; the config row lists all five and ?zebra= takes a level
