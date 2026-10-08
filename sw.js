@@ -3,9 +3,12 @@
 //   picked up on the next load and the cached copy only serves when offline
 // - images (emotes, badges, gifs from any origin) go cache-first with a cap,
 //   so they stop re-downloading and still paint offline
+// - google fonts (the css2 sheet and its woff2 payloads) go cache-first in a
+//   small uncapped bucket, so offline keeps the same faces
 // - everything else (twitch embed, relay iframe, apis) passes straight through
 const SHELL = 'hasan-shell-v1';
 const IMAGES = 'hasan-img-v1';
+const FONTS = 'hasan-fonts-v1';
 const IMG_CAP = 600;
 const PRECACHE = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
@@ -15,7 +18,7 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
-      .then((ks) => Promise.all(ks.filter((k) => k !== SHELL && k !== IMAGES).map((k) => caches.delete(k))))
+      .then((ks) => Promise.all(ks.filter((k) => k !== SHELL && k !== IMAGES && k !== FONTS).map((k) => caches.delete(k))))
       .then(() => clients.claim()));
 });
 
@@ -49,6 +52,15 @@ async function cacheFirst(req) {
   return res;
 }
 
+async function fontFirst(req) {
+  const cache = await caches.open(FONTS);
+  const hit = await cache.match(req);
+  if (hit) return hit;
+  const res = await fetch(req);
+  if (res.ok || res.type === 'opaque') cache.put(req, res.clone());
+  return res;
+}
+
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   e.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cs) => {
@@ -62,5 +74,6 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   if (req.destination === 'image') return e.respondWith(cacheFirst(req));
   const url = new URL(req.url);
+  if (url.host === 'fonts.googleapis.com' || url.host === 'fonts.gstatic.com') return e.respondWith(fontFirst(req));
   if (url.origin === location.origin) e.respondWith(networkFirst(req));
 });
