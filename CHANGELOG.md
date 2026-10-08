@@ -32,6 +32,14 @@ not versions — the page ships continuously to Neocities.
   therapy and leads the dhamma block with them; sharing folds into
   mutual aid as a labelled row set; both unions sections run wider
   columns
+- tenants unions reshaped: iut described, us heads its own column,
+  ireland/germany/australia split into labelled rows, the directory
+  links fold into the us row
+- workers unions rounds out (itf, psi, nnu, clc, cupw, neu, bectu,
+  utaw) and gains a worker centres section below (labor notes,
+  organizing for power, tech workers coalition, code-cwa, ndwa, nelp,
+  payday report); christiania joins dual power; gift economy leads
+  mutual aid's sharing rows
 - two dangling separators in marxist/critical removed; spoon theory
   link follows its www redirect
 
