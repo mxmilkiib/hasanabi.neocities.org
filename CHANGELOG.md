@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- sparse use-sorted pickers no longer sprout a wall of empty age
+  squares: consecutive untouched rungs merge into one ranged chip
+  ('10s–45s'), and rungs wholly older than the tracking start - which
+  can never hold an emote - go unprinted, so the pre-history tail
+  collapses to the t0 square alone
 - age squares covering unlogged time keep their violet 'missed' mark
   across reloads: away windows persist through the spark save, the
   emote-use blob stamps a last-write time as a fallback seed when the
