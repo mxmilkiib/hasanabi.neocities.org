@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- the header font picker now works outside the mobile media query: its
+  styles were scoped to the narrow/touch block, so on desktop the menu
+  rendered unpositioned as a row of buttons inside the header and the
+  label overflowed its 30px button. the rules are global now, and the
+  button's width follows the font name (capped with an ellipsis) instead
+  of staying pinned to the icon width on phones
 - the ? popup can no longer be stranded thin or off-screen by a saved
   drag geometry: the corner-grip resizer clamped width to the viewport
   cap before the 280px minimum, so a grip drag on a narrow screen could

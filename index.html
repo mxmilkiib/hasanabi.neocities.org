@@ -1702,6 +1702,23 @@
   @keyframes eage-ants-missed { to { stroke-dashoffset: -5; } }
   @keyframes eage-ants { to { stroke-dashoffset: -7; } }
   @media (prefers-reduced-motion: reduce) { #emoteGrid .eage .ants rect { animation: none; } }
+
+  /* the font button shows the current face's name rendered in it - the
+     width follows the label, capped so a long name can't stretch the row */
+  #fontPick { width: auto; padding: 0 8px; max-width: 118px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; }
+  /* the menu pops fixed below the button on every viewport - living
+     inside .hdr-side means unpositioned it would join the button row */
+  #fontMenu { position: fixed; z-index: 70; min-width: 180px; max-height: 65vh; overflow-y: auto;
+    padding: 4px; background: var(--panel); border: 1px solid var(--popline); border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+  #fontMenu button { display: block; width: 100%; text-align: left; background: none; border: 0;
+    border-radius: 4px; padding: 3px 9px; color: var(--text); font-size: 14px; line-height: 1.5;
+    cursor: pointer; }
+  #fontMenu button:hover, #fontMenu button:focus-visible { background: var(--line); }
+  #fontMenu button.on { color: var(--accent); font-weight: 700; }
+  body.hdrgraph #fontMenu { display: none; }
+
   /* narrow screens and touch devices: the header wraps onto a second row,
      controls get a larger touch target, and the spark canvas clamps so it
      can't hog the row */
@@ -1718,16 +1735,6 @@
     .hdr-side { gap: 4px; }
     .hdr-btn { height: 32px; }
     button.hdr-btn { width: 38px; }
-    #fontPick { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #fontMenu { position: fixed; z-index: 70; min-width: 180px; max-height: 65vh; overflow-y: auto;
-      padding: 4px; background: var(--panel); border: 1px solid var(--popline); border-radius: 6px;
-      box-shadow: 0 4px 16px rgba(0,0,0,.4); }
-    #fontMenu button { display: block; width: 100%; text-align: left; background: none; border: 0;
-      border-radius: 4px; padding: 3px 9px; color: var(--text); font-size: 14px; line-height: 1.5;
-      cursor: pointer; }
-    #fontMenu button:hover, #fontMenu button:focus-visible { background: var(--line); }
-    #fontMenu button.on { color: var(--accent); font-weight: 700; }
-    body.hdrgraph #fontMenu { display: none; }
     #spark { max-width: 70px; }
     body.hdrgraph header { padding-right: 130px; min-height: 36px; } /* fits the 32px buttons */
     #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; max-height: 70dvh; }
