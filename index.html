@@ -7087,9 +7087,12 @@
     // a third field marks the render mode - 'dots' redraws the seam layer
     ['faint dots', 'color-mix(in srgb, var(--line) 35%, transparent)', 'dots'],
   ];
+  // help list and the ≡ cycle run off → faint dots → faint → medium →
+  // solid; LINE_SHADES order stays put so saved indices don't remap
+  const LINE_ORDER = [0, 4, 1, 2, 3];
   let lineLevel = 1;
-  document.getElementById('helpLinesList').innerHTML = LINE_SHADES.map((s, i) =>
-    `<a href="#" role="button" class="helpLines" data-idx="${i}">${s[0]}</a>`).join(' / ');
+  document.getElementById('helpLinesList').innerHTML = LINE_ORDER.map((i) =>
+    `<a href="#" role="button" class="helpLines" data-idx="${i}">${LINE_SHADES[i][0]}</a>`).join(' / ');
   function setLines(level) {
     lineLevel = ((level % LINE_SHADES.length) + LINE_SHADES.length) % LINE_SHADES.length;
     mainEl.style.setProperty('--rowline', LINE_SHADES[lineLevel][1]);
@@ -7723,10 +7726,15 @@
     });
   });
 
-  linesBtn.addEventListener('click', (e) => { setLines(lineLevel + (e.shiftKey ? -1 : 1)); saveOpts(); });
+  // click/scroll walk the display order rather than raw indices
+  const stepLines = (dir) => {
+    const i = LINE_ORDER.indexOf(lineLevel);
+    setLines(LINE_ORDER[(i + dir + LINE_ORDER.length) % LINE_ORDER.length]);
+  };
+  linesBtn.addEventListener('click', (e) => { stepLines(e.shiftKey ? -1 : 1); saveOpts(); });
   linesBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setLines(lineLevel + (e.deltaY < 0 ? 1 : -1));
+    stepLines(e.deltaY < 0 ? 1 : -1);
     saveOpts();
   }, { passive: false });
   setLines(lineLevel);
