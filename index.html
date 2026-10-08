@@ -8247,7 +8247,9 @@
         if (!twSetsKey) loadTwitchSets('');
         buildPicker();
       }
-      renderStats();
+      // dockRail can run inside loadOpts, before the maps renderStats
+      // reads have initialized - defer past the first eval pass
+      setTimeout(renderStats);
     } else {
       statsHome.parent.insertBefore(statsTab, statsHome.next);
       statsTab.hidden = true;
