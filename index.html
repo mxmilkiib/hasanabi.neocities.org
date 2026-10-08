@@ -405,13 +405,13 @@
   #peek {
     position: fixed; z-index: 50; width: 533px; max-width: 90vw;
     background: var(--panel); color: var(--text);
-    border: 1px solid var(--popline); border-radius: 6px;
+    border: 1px solid var(--peekline, var(--popline)); border-radius: 6px;
     padding: 8px 10px; font-size: var(--chat-font, 15px); line-height: 1.4;
     pointer-events: none; box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
   }
   #peek[hidden] { display: none; }
   /* the preview image floats right and the card text wraps its left */
-  #peek > img { float: right; max-width: 40%; max-height: 9em; border-radius: 4px; margin: 0 0 .3em .6em; border: 1px solid #c39bff; box-sizing: border-box; }
+  #peek > img { float: right; max-width: 40%; max-height: 9em; border-radius: 4px; margin: 0 0 .3em .6em; border: 1px solid var(--peekline, #c39bff); box-sizing: border-box; }
   /* a card carrying a playable file takes the pointer so its controls
      work - text cards stay click-through */
   #peek.pint { pointer-events: auto; }
@@ -11242,7 +11242,12 @@
   }
   function peekShow(p, url, loading) {
     peekEl.textContent = '';
-    // the site's own theme-color edges the card
+    // the card's rim is a per-url hash hue, so repeat links carry the
+    // same tint; the site's own theme-color still edges the left when
+    // the worker found one
+    let uh = 0;
+    for (const c of url) uh = (uh * 31 + c.charCodeAt(0)) >>> 0;
+    peekEl.style.setProperty('--peekline', `hsl(${uh % 360} 60% 55%)`);
     peekEl.style.borderLeft = p && p.color ? `3px solid ${p.color}` : '';
     // a playable file (eg an instagram reel via kkclip) leads over the
     // poster image and makes the card interactive - pointer events stay

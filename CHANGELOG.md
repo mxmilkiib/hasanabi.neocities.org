@@ -92,6 +92,10 @@ not versions — the page ships continuously to Neocities.
   above storage
 - the panel's label column gains 5px of gap before its links (13px
   total)
+- link peek cards get a consistent rim: the border (and the og:image's
+  own edge) takes an hsl hue hashed from the url, so a repeated link
+  carries the same tint; the site's theme-color still edges the left
+  when the worker found one
 - link-column subsection heads (fediverse, leftist fediverse, data /
   maps / live, the regional tags, the authors' era labels) outdent
   10px and drop 4px with a faint --line underline and 3px of air
