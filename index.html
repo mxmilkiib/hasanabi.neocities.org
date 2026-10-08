@@ -10865,6 +10865,10 @@
       helpPanel.style.left = hs.x + 'px'; helpPanel.style.top = hs.y + 'px';
       helpPanel.style.right = 'auto';
     }
+    // a geometry saved on a different screen (folded vs unfolded, desktop
+    // vs phone) can restore off-viewport - the open-time clamp ran before
+    // this block, so pull it back inside now that the styles are applied
+    clampHelpPanel();
   } catch {}
 
   // ---- link previews: hovering an external url asks the linkpeek worker

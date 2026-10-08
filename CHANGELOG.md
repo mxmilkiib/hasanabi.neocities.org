@@ -6,6 +6,11 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- the ? popup no longer restores a saved drag geometry off-screen when
+  the saved position doesn't fit the current viewport (a panel placed
+  on a desktop or an unfolded foldable display could land outside a
+  phone's cover screen, showing only a sliver of its left border) - the
+  restore now re-runs the viewport clamp after applying the styles
 - a timed-out or banned user's ghosted rows now strike through the nick
   as well as the message, in a lighter gray than before; the strike
   survives the name's hover underline. single deleted messages keep the
