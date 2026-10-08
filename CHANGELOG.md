@@ -95,9 +95,10 @@ not versions — the page ships continuously to Neocities.
 - link-column subsection heads (fediverse, leftist fediverse, data /
   maps / live, the regional tags, the authors' era labels) outdent
   10px and drop 4px with a faint --line underline and 3px of air
-  under it, so a head hangs off its column's text edge; a head that
-  tops its column leaves the first line empty (marked by a layout
-  scan, since css can't see column breaks)
+  under it, so a head hangs off its column's text edge; a text row
+  that tops its column drops a line, so a subsection head shares row
+  one with the section label and link text aligns under it (marked by
+  a layout scan, since css can't see column breaks)
 
 ### Fixes
 - the picker's 'anim' frozen-stills state now reaches chat rows too:

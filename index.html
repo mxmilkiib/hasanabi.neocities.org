@@ -1440,11 +1440,12 @@
   /* command-group titles head their block in the bot command lists; a
      slight outdent-and-drop lets a head hang off the column's text edge */
   #helpPanel .linkcols > i > b { display: block; position: relative; left: -10px; top: 4px; margin-bottom: 3px; font-size: .88em; color: var(--text-dim); font-style: italic; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
-  /* a column-topping row that leads with a subsection head leaves its
-     first line empty - JS marks it .coltop since css can't see column
-     breaks; the pad sits on the b, which survives the break where a
-     margin truncates and works under .flow's inline i too */
-  #helpPanel .linkcols > i.coltop > b:first-child { padding-top: 1.7em; }
+  /* a column-topping row that does not lead with a subsection head
+     drops a line, so a head shares row one with the section label and
+     link text aligns a row under it - JS marks .coltop since css can't
+     see column breaks; a block ::before spacer holds the line and also
+     works under .flow's inline i */
+  #helpPanel .linkcols > i.coltop::before { content: ""; display: block; height: 1.5em; }
   /* author sub-heads (classical / founders / …) get a breath above them
      so a group's first entry doesn't crowd the item overhead */
   #htabAuth .linkcols > i > b { margin-top: .45em; }
@@ -4746,8 +4747,9 @@
     try { localStorage.setItem('hasan-htab', id); } catch {}
   }
   // multicol offers no 'first in column' hook, so the link-columns are
-  // measured after layout: a row that opens its column leading with a
-  // subsection <b> is marked, and css gives it an empty first line.
+  // measured after layout: a row that opens its column WITHOUT a
+  // subsection <b> head is marked, and css drops it a line so heads
+  // own row one and link text aligns under them.
   // the RO covers tab switches, panel opens, width stops and font
   // swaps - anything that reflows the columns resizes the span
   let colTopQ = 0;
@@ -4757,7 +4759,7 @@
       let top = Infinity;
       for (const i of span.children) if (i.offsetParent) top = Math.min(top, i.offsetTop);
       for (const i of span.children)
-        i.classList.toggle('coltop', i.firstElementChild?.tagName === 'B' && i.offsetTop - top < 2);
+        i.classList.toggle('coltop', i.firstElementChild?.tagName !== 'B' && i.offsetTop - top < 2);
     });
   }
   const queueColTops = () => { if (!colTopQ) colTopQ = requestAnimationFrame(markColTops); };
