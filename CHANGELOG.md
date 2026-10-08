@@ -31,9 +31,10 @@ not versions — the page ships continuously to Neocities.
   and grid rebuilds (the .lit path stamps --fc itself), and only
   releases when the cell is both unflashed and fully off-screen - a
   fresh use while still lit re-steps the wheel for a new colour
-- age rungs wholly older than the tracking start go unprinted - they
-  can never hold an emote, so the pre-history tail collapses to the
-  t0 square alone instead of stacking 3h-12h markers
+- age rungs wholly older than the tracking start read as violet
+  'soon' squares - a used cell can never have crossed them, so they
+  tail the list as times still to happen rather than lit boundaries;
+  after a use-record reset the pending ladder is the whole set
 - age squares covering unlogged time keep their violet 'missed' mark
   across reloads: away windows persist through the spark save, the
   emote-use blob stamps a last-write time as a fallback seed when the
