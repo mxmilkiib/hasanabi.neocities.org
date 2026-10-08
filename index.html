@@ -4766,12 +4766,35 @@
   // column nothing drops - the alignment has no referent.
   // the RO covers tab switches, panel opens, width stops and font
   // swaps - anything that reflows the columns resizes the span
-  // the text node (or element+offset) sitting at a viewport point -
-  // how a column's top fragment is found when it is not an i start
-  const caretAt = (x, y) => {
-    if (document.caretRangeFromPoint) { const c = document.caretRangeFromPoint(x, y); return c && { n: c.startContainer, o: c.startOffset }; }
-    if (document.caretPositionFromPoint) { const c = document.caretPositionFromPoint(x, y); return c && { n: c.offsetNode, o: c.offset }; }
-  };
+  // first word of each column after the first, found by walking the
+  // words in document order and reading their rects - hit-testing a
+  // point (caretRangeFromPoint) returns nothing off-screen, and the
+  // computed column-width is the specified one, not the used one
+  function flowColTops(span) {
+    const r = span.getBoundingClientRect();
+    const cs = getComputedStyle(span);
+    const gap = parseFloat(cs.columnGap) || 0;
+    const w = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const cw = parseFloat(cs.columnWidth), cc = parseInt(cs.columnCount);
+    let n = cw > 0 ? Math.max(1, Math.floor((w + gap) / (cw + gap))) : Infinity;
+    if (cc > 0) n = Math.min(n, cc);
+    if (!isFinite(n) || n < 2) return [];
+    const pitch = (w - (n - 1) * gap) / n + gap;
+    const left0 = r.left + parseFloat(cs.paddingLeft);
+    const tops = [];
+    const tw = document.createTreeWalker(span, NodeFilter.SHOW_TEXT);
+    const wr = document.createRange();
+    for (let t; (t = tw.nextNode()) && tops.length < n - 1;) {
+      for (const m of t.data.matchAll(/\S+/g)) {
+        wr.setStart(t, m.index); wr.setEnd(t, m.index + m[0].length);
+        const rc = wr.getClientRects()[0];
+        if (!rc) continue;
+        const c = Math.floor((rc.left + 8 - left0) / pitch);  // +7: heads outdent, +1 slack
+        if (c > tops.length) tops.push({ node: t, offset: m.index });
+      }
+    }
+    return tops;
+  }
   let colTopQ = 0;
   function markColTops() {
     colTopQ = 0;
@@ -4819,37 +4842,21 @@
           set(i, 'colhead', colTop(i) && headLed(i));  // kill the head's drop when it tops a column
         }
         // in .flow a column can top mid-i on a text fragment, no element
-        // to mark - find each column's topmost line fragment by its
-        // rects, probe that line's left edge for an insertion point, and
-        // drop a fill block there. column one stays flush with the label
+        // to mark - drop a fill block ahead of each column's first word.
+        // column one stays flush with the label
         if (flow && anyHead) {
-          const r = span.getBoundingClientRect();
-          const cs = getComputedStyle(span);
-          const gap = parseFloat(cs.columnGap);
-          const pitch = parseFloat(cs.columnWidth) + gap;
-          const all = document.createRange();
-          all.selectNodeContents(span);
-          const rects = [...all.getClientRects()];
-          const n = Math.floor((r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) + gap) / pitch);
-          for (let c = 1; c < n; c++) {
-            const colL = r.left + parseFloat(cs.paddingLeft) + c * pitch;
-            const line = rects.filter((rc) => rc.width && Math.abs(rc.left - colL) < 12)  // heads outdent -7px, still count
-                              .sort((a, b) => a.top - b.top)[0];
-            if (!line) continue;
-            const p = caretAt(line.left + 2, line.top + 2);
-            if (!p || !span.contains(p.n)) continue;
-            const el = p.n.nodeType === 1 ? p.n : p.n.parentElement;
+          for (const { node, offset } of flowColTops(span)) {
+            const el = node.parentElement;
             if (el.closest('b')) continue;                          // a head tops this column - colhead covers it
             const host = el.closest('i');
             if (host && (host.classList.contains('coltop') || host.classList.contains('colhead'))) continue;
-            const cr = document.createRange();                      // the caret must resolve into that top line, not the line below
-            cr.setStart(p.n, p.o); cr.setEnd(p.n, p.o);
-            const ct = cr.getClientRects()[0];
-            if (!ct || Math.abs(ct.top - line.top) > line.height / 2) continue;
             const fill = document.createElement('span');
             fill.className = 'coltop-fill';
-            if (p.n.nodeType === 3) { const rest = p.n.splitText(p.o); rest.parentNode.insertBefore(fill, rest); }
-            else p.n.insertBefore(fill, p.n.childNodes[p.o] || null);
+            // climb out of any link the word opens, so the block lands
+            // between inlines rather than splitting an anchor
+            let at = offset ? node.splitText(offset) : node;
+            while (at.parentNode !== host && at.parentNode !== span && !at.previousSibling) at = at.parentNode;
+            at.parentNode.insertBefore(fill, at);
             moved = true;
           }
         }
