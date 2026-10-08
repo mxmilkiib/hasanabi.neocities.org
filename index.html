@@ -9244,14 +9244,14 @@
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
-  // each use steps the flash hue ~12 degrees round the wheel (~30 steps
+  // each use steps the flash hue ~9 degrees round the wheel (40 steps
   // per lap) so the order of uses reads as a slow spectral walk; a hue
   // sticks to its emote while the cell is lit or still flashing, and is
   // released once both lapse so a later visit can take a fresh one
   const flashHues = new Map();
   let flashHueNext = Math.floor(Math.random() * 360);
   const hueFor = (n) => {
-    if (!flashHues.has(n)) flashHues.set(n, flashHueNext = (flashHueNext + 12) % 360);
+    if (!flashHues.has(n)) flashHues.set(n, flashHueNext = (flashHueNext + 9) % 360);
     return flashHues.get(n);
   };
   const fcOf = (n) => `hsl(${hueFor(n)} 90% 62%)`;
