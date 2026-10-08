@@ -1,7 +1,7 @@
 {
   "name": "HasanAbi Chat Thing",
   "short_name": "Hasan Chat",
-  "description": "HasanAbi Twitch chat with emotes, badges, and stream status.",
+  "description": "A compact, customisable HasanAbi Twitch chat client — real emotes, badges, replies, stream video, themes and resources — orientated around the Hasan Piker stream.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
