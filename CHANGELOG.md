@@ -6,6 +6,12 @@ not versions — the page ships continuously to Neocities.
 ## 2026-10-07
 
 ### Fixes
+- the timeout/delete strike now lands on the message only - the
+  timestamp, badges, sub chip and nick keep their look, and the line
+  renders in muted gray rather than the font colour. The message body
+  now wraps in a .msg span (gif embeds and right-pinned emote rows'
+  selectors follow suit); rows restored from pre-change history dim
+  but don't strike
 - a lit emote cell now keeps its assigned spectral hue for as long as a
   chat row carrying it stays on screen: repeat uses no longer re-step
   the wheel under it, the hue survives the flash's end and grid
