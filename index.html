@@ -1076,7 +1076,10 @@
      leanest, badge names+images want room, chatters sit between */
   #statsBody .st-panel.st-emotes { flex: 0.5 1 0; min-width: 6.5em; }
   #statsBody .st-panel.st-badges { flex: 1.3 1 0; }
-  #statsBody .st-panel.st-chatters { flex: 0.8 1 0; min-width: 9em; }
+  /* chatters take their own row below the ranked trio; the list columns
+     flow to fill it rather than stretching one tall strip */
+  #statsBody .st-panel.st-chatters { flex: 0 0 100%; }
+  #statsBody .st-panel.st-chatters .st-cols { columns: 13em; }
   /* ranked-panel filters live in their own row under the title - a
      vertical stack beside it squeezed the rows narrow, and beside the
      title there wasn't the width */
