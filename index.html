@@ -1094,6 +1094,9 @@
      headers carry a · 24h suffix since every ranked list is windowed */
   #rail .st-frow, #rail .st-sort, #rail .st-scope { display: none; }
   #rail .st-row i { font-size: .8em; }
+  /* the narrow rail's gutters run tighter than the wide form's 22px */
+  #rail #statsBody { gap: 10px 14px; }
+  #rail #statsBody .st-trio { gap: 0 14px; }
   #statsBody .st-key .st-sw { display: inline-block; width: .7em; height: .7em;
     border-radius: 2px; margin: 0 3px -1px 4px; }
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
@@ -5620,6 +5623,10 @@
       `<div class="st-panel st-foot"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
     drawScrollGraph(el, sc);
+    // the narrow column ellipsises names - hovering a clipped one shows
+    // the full string (an inner title, like a link's url, still wins)
+    if (inRail) for (const nm of el.querySelectorAll('.st-row .nm'))
+      if (nm.scrollWidth > nm.clientWidth) nm.title = nm.textContent;
     if (openSets.size)
       for (const d of el.querySelectorAll('details.st-badge'))
         if (openSets.has(d.dataset.set || (d.hasAttribute('data-more') ? '*' : ''))) d.open = true;
