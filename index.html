@@ -5224,6 +5224,8 @@
   // flip these and a sort/window/source/scope pick folds them back
   let statBadgeAll = false, statEmoteAll = false;
   let lastStatPaint = 0;
+  const fmtSpan = (ms) => ms >= 864e5 ? (ms / 864e5).toFixed(1) + 'd'
+    : ms >= 36e5 ? (ms / 36e5).toFixed(1) + 'h' : Math.max(1, Math.round(ms / 6e4)) + 'm';
   function renderStats() {
     const el = document.getElementById('statsBody');
     if (!el) return;
@@ -5545,6 +5547,9 @@
     const pvCh = sc || Object.keys(peakViewers).reduce((a, b) => (peakViewers[b] > (peakViewers[a] || 0) ? b : a), null);
     const pvMax = pvCh ? peakViewers[pvCh] || 0 : 0;
     const pvAt = pvCh ? peakViewersAt[pvCh] : 0;
+    const sinceD = new Date(statsSince);
+    const sinceTxt = sinceD.toLocaleDateString([], { day: 'numeric', month: 'short' }) +
+      ' ' + fmtRowTime(sinceD).replace(/<[^>]+>/g, '');
     // the tab re-renders live - keep opened sets, the folded group's
     // state and the scroll spot across the innerHTML swap
     const openSets = new Set(
@@ -5555,9 +5560,10 @@
       `<div class="st-trio">` +
         `<div class="st-panel">` +
         `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
-        `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
+        `<div class="st-row"><span class="nm">${nMsgs.size} unique chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
         `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
+        `<div class="st-row"><span class="nm">tracking since ${sinceTxt} · ${fmtSpan(Date.now() - statsSince)}</span></div>` +
         (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span></div>` : '') +
         `<div class="st-row st-note"><span class="nm">rows rendered since this page first ran - reloads keep the tally going</span></div>` +
         scopeBtns + `</div>` +
@@ -5595,8 +5601,6 @@
     if (!box) return;
     const fmtB = (n) => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB'
       : n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : Math.round(n) + ' B';
-    const fmtSpan = (ms) => ms >= 864e5 ? (ms / 864e5).toFixed(1) + 'd'
-      : ms >= 36e5 ? (ms / 36e5).toFixed(1) + 'h' : Math.max(1, Math.round(ms / 6e4)) + 'm';
     const srow = (nm, v) => `<div class="st-row"><span class="nm">${nm}</span><i>${v}</i></div>`;
     const ssub = (nm, v) => `<div class="st-row st-sub"><span class="nm">${nm}</span><i>${v}</i></div>`;
     let keys = 0, bytes = 0;
@@ -8935,6 +8939,14 @@
   for (const [ch, o] of Object.entries(savedStats.udp || {})) Object.assign(perObj(urlDayPer, ch), o);
   Object.assign(urlHour, savedStats.uh);
   for (const [ch, o] of Object.entries(savedStats.uhp || {})) Object.assign(perObj(urlHourPer, ch), o);
+  // when the stats began - old saves backfill it from the earliest
+  // first-seen nick they hold (a scan, not a spread: nick maps get big),
+  // fresh ones from now
+  const statsSince = savedStats.since || (() => {
+    let m = Date.now();
+    for (const t of nickFirst.values()) if (t < m) m = t;
+    return m;
+  })();
   const saveStats = () => {
     const per = (o) => Object.fromEntries(Object.entries(o).map(([k, m]) => [k, [...m]]));
     const bD0 = Math.floor(Date.now() / 864e5) - 31;
@@ -8953,7 +8965,7 @@
         lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer, nd: nickDay, ndp: nickDayPer,
         nh: nickHour, nhp: nickHourPer, bh: badgeHour, bhp: badgeHourPer,
         ud: urlDay, udp: urlDayPer, uh: urlHour, uhp: urlHourPer,
-        uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers, pvt: peakViewersAt,
+        uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers, pvt: peakViewersAt, since: statsSince,
       }));
     } catch {}
   };
