@@ -1329,6 +1329,8 @@
   select.hdr-btn { padding-right: 4px; }
   select.hdr-btn option { background: var(--panel); color: var(--text); }
   .hdr-lbl { color: var(--text-dim); font-size: .87em; align-self: center; white-space: nowrap; }
+  /* a label and its button wrap as a unit down the .hdr-side rows */
+  .hdr-pair { display: inline-flex; align-items: center; gap: 4px; }
   .aux { margin-right: 5px; }
   .aux .role:last-child { margin-right: 0; }
   .auxr { float: right; margin: 0 0 0 5px; }
@@ -7973,7 +7975,15 @@
       s.classList.add('corner', el === helpBtn ? 'c-help' : 'c-hdr');
     s.textContent = txt;
     s.hidden = true;
-    el.parentNode.insertBefore(s, el);
+    // inside .hdr-side a label binds to its button in a pair that wraps
+    // whole - loose siblings let a line break split label from control,
+    // and at narrow widths the stray tail drops off the header's line
+    if (el.parentNode === hdrSideEl) {
+      const pair = document.createElement('span');
+      pair.className = 'hdr-pair';
+      el.parentNode.insertBefore(pair, el);
+      pair.append(s, el);
+    } else el.parentNode.insertBefore(s, el);
   }
 
   function applyHelp() {
