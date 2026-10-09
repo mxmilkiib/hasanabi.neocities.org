@@ -125,10 +125,12 @@
     font-family: 'Web437 VGA';
     src: url('fonts/web437-ibm-vga-8x16.woff') format('woff');
   }
-  /* two axes: style = hue + chroma + accent set (data-theme), shade =
-     lightness stop 0..9 (data-shade, unset = follow system). --ptc tints
-     text toward the surface hue; --text-c overrides it entirely for the
-     phosphor styles whose text is the accent colour */
+  /* three axes: colour = hue + chroma + accent set (data-colour), variant =
+     a finish applied over any colour (data-variant: phosphor tints text and
+     accents toward the hue, grain adds the noise tile, contrast widens the
+     bg/text gap), shade = lightness stop 0..9 (data-shade, unset = follow
+     system). --ptc tints text toward the surface hue; --text-c overrides
+     it entirely under the phosphor finish */
   :root {
     color-scheme: light dark;
     --ph: 80; --pc: .012; --ptc: .02;
@@ -162,47 +164,56 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-shade]) { --sh-bg: .13; --sh-tx: .95; }
-    :root:not([data-theme]) {
+    :root:not([data-colour]) {
       --accent: #e8a33d; --good: #5fd98a; --danger: #e85d5d; --vip: #f783ac;
       --spark: #35d07f;
     }
   }
-  :root[data-theme="light"]     { --ph: 80;  --pc: .012; --ptc: .02;  --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; }
-  :root[data-theme="lavender"]  { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; }
-  :root[data-theme="mirc"]      { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
-  :root[data-theme="sepia"]     { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
-  /* warm cream stock: hue toward yellow-orange with more chroma than the
-     other light styles, text tinted the same way so it reads as ink */
-  :root[data-theme="paper"]     { --ph: 85;  --pc: .045; --ptc: .04;  --accent: #8a5a12; --good: #2e7d46; --danger: #a84040; --vip: #a03060;
+  /* colours: each is a hue + chroma + accent set; the lightness comes from
+     the shade axis, so every one spans light and dark stops */
+  :root[data-colour="cream"]    { --ph: 80;  --pc: .012; --ptc: .02;  --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; }
+  :root[data-colour="lavender"] { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; }
+  :root[data-colour="mirc"]     { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
+  :root[data-colour="sepia"]    { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
+  :root[data-colour="ice"]      { --ph: 215; --pc: .02;  --ptc: .03;  --accent: #2a5fa8; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
+  :root[data-colour="solarized"]{ --ph: 200; --pc: .038; --ptc: .03;  --accent: #b58900; --good: #859900; --danger: #dc322f; --vip: #d33682; }
+  :root[data-colour="nord"]     { --ph: 245; --pc: .028; --ptc: .02;  --accent: #88c0d0; --good: #a3be8c; --danger: #bf616a; --vip: #b48ead; }
+  :root[data-colour="gray"]     { --ph: 255; --pc: .016; --ptc: .015; --accent: #e8a33d; --good: #5fd98a; --danger: #e85d5d; --vip: #f783ac; }
+  /* red on near-gray surfaces: the hue only warms the surface a trace,
+     the accent set carries the colour */
+  :root[data-colour="red"]      { --ph: 5;   --pc: .014; --ptc: .018; --accent: #f05050; --good: #6fd08f; --danger: #e84848; --vip: #ff6d9d; }
+  :root[data-colour="wine"]     { --ph: 335; --pc: .028; --ptc: .025; --accent: #f0a868; --good: #a0d080; --danger: #ff7d7d; --vip: #ff9dc8; }
+  :root[data-colour="ember"]    { --ph: 65;  --pc: .032; --ptc: .045; --accent: #f0b04a; --good: #b8d88a; --danger: #e07850; --vip: #d8a0b8; }
+  :root[data-colour="green"]    { --ph: 150; --pc: .025; --ptc: .02;  --accent: #e0b45a; --good: #7fd08a; --danger: #e87858; --vip: #f0a0b8; }
+  /* twitch/chatterino: near-neutral surfaces a hair violet, brand purple
+     accent, hype-train green, vip badge pink */
+  :root[data-colour="violet"]   { --ph: 285; --pc: .018; --ptc: .015; --accent: #a970ff; --good: #00f593; --danger: #ff4f4d; --vip: #e005b9; }
+  /* variants: finishes layered over any colour. phosphor runs the old
+     amber/console look generically - text and accents tint toward the
+     colour's hue, designed for the darkest stops. contrast is steel's
+     trick: it scales the shade's text lightness away from the .5 midpoint
+     (a bigger bg/text gap at every stop, light or dark) and mixes
+     line/dim harder toward text so borders and glyphs read stronger */
+  :root[data-variant="phosphor"] {
+    --text-c: oklch(.8 .17 var(--ph));
+    --accent: oklch(.84 .16 var(--ph));
+    --good: oklch(.8 .17 var(--ph));
+    --danger: #cc4a3d;
+    --vip: oklch(.86 .1 var(--ph));
+    --spark: oklch(.84 .16 var(--ph));
+  }
+  :root[data-variant="grain"] {
     /* fractal-noise grain tile, faint alpha - a subtle paper texture. two
        layers: fine grain plus a softer, larger fibre mottle */
     --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.09'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.07'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
   }
-  :root[data-theme="ice"]       { --ph: 215; --pc: .02;  --ptc: .03;  --accent: #2a5fa8; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
-  :root[data-theme="mid"]       { --ph: 255; --pc: .022; --ptc: .02;  --accent: #f0b04a; --good: #6fe08f; --danger: #ff7d7d; --vip: #ffa4c8; }
-  /* mid's weakness is contrast - steel scales the shade's text lightness
-     away from the .5 midpoint (a bigger bg/text gap at every stop, light
-     or dark) and mixes line/dim harder toward text so borders and glyphs
-     read stronger */
-  :root[data-theme="steel"]     { --ph: 250; --pc: .028; --ptc: .014; --accent: #8ab8f5; --good: #6fe08f; --danger: #ff8585; --vip: #f0a4c8;
+  :root[data-variant="contrast"] {
     --text: oklch(clamp(.03, calc(.5 + (var(--sh-tx) - .5) * 1.2), .99) var(--ptc) var(--ph));
     --text-dim: color-mix(in oklch, var(--bg), var(--text) 68%);
     --line: color-mix(in oklch, var(--bg), var(--text) 40%);
     --panel: color-mix(in oklch, var(--bg), var(--text) 12%);
   }
-  :root[data-theme="solarized"] { --ph: 200; --pc: .038; --ptc: .03;  --accent: #b58900; --good: #859900; --danger: #dc322f; --vip: #d33682; }
-  :root[data-theme="nord"]      { --ph: 245; --pc: .028; --ptc: .02;  --accent: #88c0d0; --good: #a3be8c; --danger: #bf616a; --vip: #b48ead; }
-  :root[data-theme="dark"]      { --ph: 255; --pc: .016; --ptc: .015; --accent: #e8a33d; --good: #5fd98a; --danger: #e85d5d; --vip: #f783ac; }
-  :root[data-theme="black"]     { --ph: 255; --pc: .006; --ptc: .008; --accent: #e8a33d; --good: #5fd98a; --danger: #e85d5d; --vip: #f783ac; }
-  :root[data-theme="forest"]    { --ph: 150; --pc: .025; --ptc: .02;  --accent: #e0b45a; --good: #7fd08a; --danger: #e87858; --vip: #f0a0b8; }
-  :root[data-theme="wine"]      { --ph: 335; --pc: .028; --ptc: .025; --accent: #f0a868; --good: #a0d080; --danger: #ff7d7d; --vip: #ff9dc8; }
-  :root[data-theme="ember"]     { --ph: 65;  --pc: .032; --ptc: .045; --accent: #f0b04a; --good: #b8d88a; --danger: #e07850; --vip: #d8a0b8; }
-  :root[data-theme="amber"]     { --ph: 70;  --pc: .02;  --ptc: .09;  --text-c: #ffb000; --accent: #ffd040; --good: #ffcc33; --danger: #cc5533; --vip: #ffcc88; --spark: #ffd040; }
-  :root[data-theme="console"]   { --ph: 145; --pc: .006; --ptc: .10;  --text-c: #33dd55; --accent: #5fff8a; --good: #33ff66; --danger: #cc4444; --vip: #aaffcc; --spark: #5fff8a; }
-  /* twitch/chatterino: near-neutral surfaces a hair violet, brand purple
-     accent, hype-train green, vip badge pink */
-  :root[data-theme="twitch"]    { --ph: 285; --pc: .018; --ptc: .015; --accent: #a970ff; --good: #00f593; --danger: #ff4f4d; --vip: #e005b9; }
   * { box-sizing: border-box; }
   /* selection highlight: the about page's lavender over dark ink */
   ::selection { background: #b9a5f0; color: #1a1206; }
@@ -349,8 +360,8 @@
   .dot.reconnecting { background: var(--danger); }
   /* console is all-green, so the non-live states step down in brightness
      instead of sharing accent/dim greens that read as live */
-  [data-theme="console"] .dot.idle { background: var(--text-dim); }
-  [data-theme="console"] .dot.offline { background: #1a4a24; }
+  [data-variant="phosphor"] .dot.idle { background: var(--text-dim); }
+  [data-variant="phosphor"] .dot.offline { background: oklch(.3 .08 var(--ph)); }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
   @media (prefers-reduced-motion: reduce) {
     .dot.connecting, .dot.reconnecting, .hdr-btn.busy, #sendBtn.wait { animation: none; }
@@ -1281,7 +1292,7 @@
   #splitBtn.tri { font-size: .66em; letter-spacing: -.5px; }
   /* ◍ renders tall in the symbol fallback font and spills over the
      button's top edge - shrinking it a touch keeps it inside */
-  #themeBtn.tall { font-size: .88em; }
+  #colourBtn.tall { font-size: .88em; }
   /* sparkSize() pins the box to the device grid (see its comment); the rate
      span takes over as the header's flexible space absorber so the icon
      strip still hugs the right edge */
@@ -1446,7 +1457,7 @@
   /* 9em of popup font keeps the glyph column aligned at any popup font
      size while fitting the longest labels ("radicals & labour" etc) */
   #helpPanel .htabpage > div, #helpPanel #authSections > div { margin: 7px 0; display: grid; grid-template-columns: 9em 1fr; gap: 0 13px; }
-  /* theme/style/shade rows breathe - the swatch chips want the air */
+  /* theme/colour/variant/shade rows breathe - the swatch chips want the air */
   #helpPanel .htabpage > div.thm { margin: 17px 0; }
   /* the resource/author sections breathe more than the config rows */
   #helpPanel #htabRes > div, #helpPanel #htabLib > div, #helpPanel #authSections > div { margin: 12px 0; }
@@ -1616,14 +1627,14 @@
      daggers stayed pinned while the text beneath them scrolled away */
   #helpPanel sup { position: relative; top: -3px; font-size: .7em; margin-left: 1px; }
   #helpPanel b.fn { color: var(--text); }
-  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { position: relative; padding: 0 5px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
+  #helpPanel a.helpColour, #helpPanel a.helpVariant, #helpPanel a.helpPreset, #helpPanel a.helpShade { position: relative; padding: 0 5px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
   /* the bar after a chip's name carries its accent · good · vip - the
      personality colours a bg/text pair alone doesn't show */
-  #helpPanel a.helpTheme::after, #helpPanel a.helpPreset::after, #helpPanel a.helpShade::after { content: ''; display: inline-block; width: 1.5em; height: .55em; margin-left: 5px; border-radius: 1px; background: linear-gradient(90deg, var(--pv-a, transparent) 0 34%, var(--pv-g, transparent) 34% 66%, var(--pv-v, transparent) 66%); }
+  #helpPanel a.helpColour::after, #helpPanel a.helpVariant::after, #helpPanel a.helpPreset::after, #helpPanel a.helpShade::after { content: ''; display: inline-block; width: 1.5em; height: .55em; margin-left: 5px; border-radius: 1px; background: linear-gradient(90deg, var(--pv-a, transparent) 0 34%, var(--pv-g, transparent) 34% 66%, var(--pv-v, transparent) 66%); }
   /* every settings anchor is underlined; the active pick drops accent
      for plain text colour so it reads as the settled one */
-  #helpPanel a.helpTheme, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLs, #helpPanel a.helpLines, #helpPanel a.helpOpt { color: var(--accent); cursor: pointer; text-decoration: underline; }
-  #helpPanel a.helpTheme.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLs.on, #helpPanel a.helpLines.on, #helpPanel a.helpOpt.on { color: var(--text); cursor: default; }
+  #helpPanel a.helpColour, #helpPanel a.helpVariant, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLs, #helpPanel a.helpLines, #helpPanel a.helpOpt { color: var(--accent); cursor: pointer; text-decoration: underline; }
+  #helpPanel a.helpColour.on, #helpPanel a.helpVariant.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLs.on, #helpPanel a.helpLines.on, #helpPanel a.helpOpt.on { color: var(--text); cursor: default; }
   /* the labels row's lit pick reads white rather than theme text */
   #helpPanel a.helpNoLbl.on { color: #fff; }
   /* the lit pick: a tight black shadow under the white text; chips
@@ -1636,23 +1647,23 @@
   #helpPanel a.helpZebra { padding: 0 3px; border-radius: 3px; }
   /* the painted text colour sits after the generic link rules so it wins
      on helpShade chips (which also carry helpOpt) */
-  #helpPanel a.helpTheme, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
+  #helpPanel a.helpColour, #helpPanel a.helpVariant, #helpPanel a.helpPreset, #helpPanel a.helpShade { color: var(--pv-tx, var(--accent)); }
   /* the selected chip reads in its own text colour under a green
      marching-ants ring and an accent tick */
   /* the ring rides ::before stretched 3px past the swatch: four 2px
      dashed strips (one per edge) sliding via background-position, so the
      gap between the ants and the chip edge reads as padding around it */
-  #helpPanel a.helpTheme.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); cursor: default; }
-  #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { content: ''; position: absolute; inset: -3px; border-radius: 6px;
+  #helpPanel a.helpColour.on, #helpPanel a.helpVariant.on, #helpPanel a.helpPreset.on, #helpPanel a.helpShade.on { color: var(--pv-tx, var(--accent)); cursor: default; }
+  #helpPanel a.helpColour.on::before, #helpPanel a.helpVariant.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { content: ''; position: absolute; inset: -3px; border-radius: 6px;
     background: linear-gradient(90deg, #4c5 50%, transparent 50%) 0 0 / 8px 2px repeat-x,
       linear-gradient(90deg, #4c5 50%, transparent 50%) 0 100% / 8px 2px repeat-x,
       linear-gradient(0deg, #4c5 50%, transparent 50%) 0 0 / 2px 8px repeat-y,
       linear-gradient(0deg, #4c5 50%, transparent 50%) 100% 0 / 2px 8px repeat-y;
     animation: antscrawl 2.4s linear infinite; }
   @keyframes antscrawl { to { background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px; } }
-  @media (prefers-reduced-motion: reduce) { #helpPanel a.helpTheme.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { #helpPanel a.helpColour.on::before, #helpPanel a.helpVariant.on::before, #helpPanel a.helpPreset.on::before, #helpPanel a.helpShade.on::before { animation: none; } }
   /* the ✓ moves onto the name span - ::before carries the ring now */
-  #helpPanel a.helpTheme.on .chipName::before, #helpPanel a.helpPreset.on .chipName::before, #helpPanel a.helpShade.on .chipName::before { content: '✓'; color: var(--accent); margin-right: 2px; }
+  #helpPanel a.helpColour.on .chipName::before, #helpPanel a.helpVariant.on .chipName::before, #helpPanel a.helpPreset.on .chipName::before, #helpPanel a.helpShade.on .chipName::before { content: '✓'; color: var(--accent); margin-right: 2px; }
   #chatbar {
     flex: none;
     display: flex;
@@ -2037,7 +2048,7 @@
     <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
     <canvas id="spark" role="img" title="msgs/sec over the last 2 minutes - ticks every 10s" aria-label="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
-    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="themeBtn" title="Style">◐</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="inter">Inter</option><option value="sans">System Sans</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><div id="fontMenu" role="listbox" aria-label="Chat font" hidden></div><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="colourBtn" title="Colour">◐</button><button class="hdr-btn" id="variantBtn" title="Variant">▢</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="inter">Inter</option><option value="sans">System Sans</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><div id="fontMenu" role="listbox" aria-label="Chat font" hidden></div><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
   </header>
   <div id="titleBar" role="status" hidden><span id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
@@ -2052,7 +2063,8 @@
     <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
-    <div class="thm"><b id="helpThemeIcon">◐</b><span>style: <span id="helpThemeList"></span> - chips preview and apply each style's designed shade (the ◐ cycle leaves shade alone); right-click resets to <a href="#" role="button" class="helpTheme" data-theme="auto">system</a><sup>†</sup></span></div>
+    <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
+    <div class="thm"><b id="helpVariantIcon">▢</b><span>variant: <span id="helpVariantList"></span> - a finish layered over any colour: phosphor tints text and accents toward the hue, grain adds texture, contrast widens the bg/text gap</span></div>
     <div class="thm"><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" role="button" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
     <div><b>font menu</b> <span><span id="helpFontFamList"></span><sup>†</sup></span></div>
     <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span><b>⇄</b><span>letter spacing: <span id="helpLsList"></span> - em steps, so they scale with the font size; right-click resets to 0<sup>†</sup></span></div>
@@ -2313,7 +2325,8 @@
   const weightBtn = document.getElementById('weightBtn');
   const lhBtn = document.getElementById('lhBtn');
   const kernBtn = document.getElementById('kernBtn');
-  const themeBtn = document.getElementById('themeBtn');
+  const colourBtn = document.getElementById('colourBtn');
+  const variantBtn = document.getElementById('variantBtn');
   const shadeBtn = document.getElementById('shadeBtn');
   const presetBtn = document.getElementById('presetBtn');
   const fontSel = document.getElementById('fontSel');
@@ -2387,11 +2400,11 @@
                   '#66D9E8','#F783AC','#94D82D','#FFA94D','#B197FC','#63E6BE'];
   const LIGHT_COLORS = ['#c92a2a','#1971c2','#2f9e44','#b08800','#d9480f','#9c36b5',
                         '#0c8599','#c2255c','#5c940d','#e8590c','#7048e8','#0ca678'];
-  // Shades of phosphor green for the console theme's name palette.
+  // Shades of phosphor green for the phosphor variant's name palette.
   const CONSOLE_COLORS = ['#33dd55','#5fff8a','#22bb44','#88ffaa','#44ee77','#aaffcc',
                           '#19a03f','#66dd88','#bbffdd','#2bcc5f','#77ff99','#4dcc77'];
   let lightMode = false;
-  let monoNames = false;   // console theme: ignore chatter colors, stay green
+  let monoNames = false;   // phosphor variant: ignore chatter colors, stay on-hue
   let namePalette = COLORS;
 
   function colorForName(name) {
@@ -4854,56 +4867,84 @@
     }
   }
 
-  // ---- style + shade: style picks the hue/chroma/accent set (data-theme),
-  // shade picks one of ten lightness stops (data-shade, unset = system).
+  // ---- colour + variant + shade: colour picks the hue/chroma/accent set
+  // (data-colour), variant layers a finish over it (data-variant), shade
+  // picks one of ten lightness stops (data-shade, unset = system).
   // click/wheel cycles, right-click resets to system. ('themes' below are
-  // the named preset bundles; the palettes are the styles) ----
+  // the named preset bundles; the palettes are the colours) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 7,    font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 1,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 0, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
-    compact:  { theme: 'dark',    shade: 7,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
-    print:    { theme: 'light',   shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
-    cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
-    cinema:   { theme: 'black',   shade: 9,    font: 'lexend',     px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0, lbls: 0 },
-    phosphor: { theme: 'amber',   shade: 9,    font: 'vt323',      px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
-    dyslexic: { theme: 'lavender',shade: 2,    font: 'dyslexic',   px: 20, lhv: 2, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    midnight: { theme: 'nord',    shade: 6,    font: 'inter',      px: 14, lhv: 1.65, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    solar:    { theme: 'solarized',shade: 7,    font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    minimal:  { theme: 'mirc',    shade: 2,    font: 'lexend',     px: 16, lhv: 1, wv: 300, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: false, hfspx: -1, help: 0, lbls: 0 },
-    retro:    { theme: 'console', shade: 7,    font: 'terminus',   px: 28, lhv: 1, lines: 1, zebra: false, times: 1,  shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0, lbls: 0 },
-    irc:      { theme: 'mirc',    shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
-    gohu:     { theme: 'lavender',shade: 6,    font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15, help: 0, lbls: 0 },
-    heather:  { theme: 'lavender',shade: 5,    font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
-    twitch:   { theme: 'twitch',  shade: 7,    font: 'inter',      px: 14, lhv: 1.5, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    default:  { colour: 'gray',   shade: 7,    font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 1,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 0, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
+    compact:  { colour: 'gray',   shade: 7,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
+    print:    { colour: 'cream',  shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
+    cosy:     { colour: 'sepia',  shade: 2,    font: 'sans',       px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
+    cinema:   { colour: 'gray',   shade: 9,    font: 'lexend',     px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0, lbls: 0 },
+    phosphor: { colour: 'ember',  variant: 'phosphor', shade: 9, font: 'vt323', px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
+    dyslexic: { colour: 'lavender',shade: 2,   font: 'dyslexic',   px: 20, lhv: 2, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    midnight: { colour: 'nord',   shade: 6,    font: 'inter',      px: 14, lhv: 1.65, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    solar:    { colour: 'solarized',shade: 7,  font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    minimal:  { colour: 'mirc',   shade: 2,    font: 'lexend',     px: 16, lhv: 1, wv: 300, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: false, hfspx: -1, help: 0, lbls: 0 },
+    retro:    { colour: 'green',  variant: 'phosphor', shade: 7, font: 'terminus', px: 28, lhv: 1, lines: 1, zebra: false, times: 1, shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0, lbls: 0 },
+    irc:      { colour: 'mirc',   shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
+    gohu:     { colour: 'lavender',shade: 6,   font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15, help: 0, lbls: 0 },
+    heather:  { colour: 'lavender',shade: 5,   font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
+    twitch:   { colour: 'violet', shade: 7,    font: 'inter',      px: 14, lhv: 1.5, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
   };
-  // ordered by each style's designed shade stop, darkest → lightest
-  const THEMES = ['console', 'amber', 'black', 'twitch', 'wine', 'forest', 'ember', 'dark', 'solarized', 'nord', 'mid', 'steel', 'lavender', 'sepia', 'paper', 'ice', 'mirc', 'light'];
-  // each style's designed shade: swatch previews and popup clicks use it,
-  // while the ◐ cycle keeps whatever shade is currently active
-  const THEME_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, steel: 4, nord: 6, solarized: 7, dark: 7, ember: 7, forest: 7, wine: 7, twitch: 8, black: 9, amber: 9, console: 9 };
-  const THEME_ICONS = { light: '☀', sepia: '☼', paper: '▤', lavender: '❀', mid: '◐', steel: '▣', solarized: '◍', nord: '❄', dark: '☾', black: '●', amber: '◈', ember: '◉', console: '▮', mirc: '⊞', twitch: '◘' };
-  let themeMode = 'dark';
+  // ordered by each colour's designed shade stop, darkest → lightest
+  const COLOURS = ['violet', 'gray', 'red', 'wine', 'green', 'ember', 'solarized', 'nord', 'lavender', 'sepia', 'ice', 'cream', 'mirc'];
+  const VARIANTS = ['standard', 'phosphor', 'grain', 'contrast'];
+  // each colour's designed shade: swatch previews, popup clicks and the
+  // header cycles all land on it; a variant can overrule (phosphor
+  // designs at the black stop), else the colour's own stop applies
+  const COLOUR_SHADE = { violet: 8, gray: 7, red: 7, wine: 7, green: 7, ember: 7, solarized: 7, nord: 6, lavender: 2, sepia: 2, ice: 2, cream: 1, mirc: 0 };
+  const VARIANT_SHADE = { phosphor: 9 };
+  const designedShade = (c, v) => VARIANT_SHADE[v] ?? COLOUR_SHADE[c];
+  const COLOUR_ICONS = { gray: '☾', red: '♦', wine: '❋', sepia: '☼', cream: '☀', ember: '◉', green: '⬢', solarized: '◍', ice: '❅', mirc: '⊞', nord: '❄', violet: '◘', lavender: '❀' };
+  const VARIANT_ICONS = { standard: '▢', phosphor: '▮', grain: '▤', contrast: '◧' };
+  // old style names → [colour, variant]: saved options and ?theme=/?style=
+  // urls written before the split still resolve to their designed pair
+  const LEGACY_THEME = {
+    light: ['cream'], mirc: ['mirc'], ice: ['ice'], paper: ['sepia', 'grain'], sepia: ['sepia'],
+    lavender: ['lavender'], mid: ['gray'], steel: ['nord', 'contrast'], solarized: ['solarized'],
+    nord: ['nord'], dark: ['gray'], black: ['gray'], ember: ['ember'], forest: ['green'],
+    wine: ['wine'], twitch: ['violet'], amber: ['ember', 'phosphor'], console: ['green', 'phosphor'],
+  };
+  const LEGACY_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, steel: 4, nord: 6, solarized: 7, dark: 7, ember: 7, forest: 7, wine: 7, twitch: 8, black: 9, amber: 9, console: 9 };
+  let colourMode = 'gray';
+  let variantMode = 'standard';
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
 
   // tone = the derived light/dark split used for nick colours and emote
   // assets: light while the shade stop is 2 or brighter, else dark
   function updateTone() {
     lightMode = shadeIdx == null ? lightMQ.matches : shadeIdx <= 3;
-    monoNames = themeMode === 'console';
+    monoNames = variantMode === 'phosphor';
     namePalette = monoNames ? CONSOLE_COLORS : (lightMode ? LIGHT_COLORS : COLORS);
     sparkCols = null; // re-resolve canvas colours against the new scheme
   }
 
-  function applyTheme() {
-    if (themeMode === 'auto') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.dataset.theme = themeMode;
+  function applyColour() {
+    if (colourMode === 'auto') document.documentElement.removeAttribute('data-colour');
+    else document.documentElement.dataset.colour = colourMode;
     updateTone();
-    themeBtn.textContent = THEME_ICONS[themeMode] || '◐';
-    themeBtn.classList.toggle('tall', themeMode === 'solarized');
-    document.getElementById('helpThemeIcon').textContent = themeBtn.textContent;
-    themeBtn.title = `Style: ${themeMode} - click/scroll · ⇧click back · right-click: system`;
-    helpPanel.querySelectorAll('.helpTheme').forEach((a) => { setOn(a, a.dataset.theme === themeMode); });
+    colourBtn.textContent = COLOUR_ICONS[colourMode] || '◐';
+    colourBtn.classList.toggle('tall', colourMode === 'solarized');
+    document.getElementById('helpColourIcon').textContent = colourBtn.textContent;
+    colourBtn.title = `Colour: ${colourMode} - click/scroll · ⇧click back · right-click: system`;
+    helpPanel.querySelectorAll('.helpColour').forEach((a) => { setOn(a, a.dataset.colour === colourMode); });
     markPresets();
+    previewSwatches(); // variant/shade chips preview over the live colour
+  }
+  function applyVariant() {
+    if (variantMode === 'standard') document.documentElement.removeAttribute('data-variant');
+    else document.documentElement.dataset.variant = variantMode;
+    updateTone();
+    variantBtn.textContent = VARIANT_ICONS[variantMode] || '▢';
+    document.getElementById('helpVariantIcon').textContent = variantBtn.textContent;
+    variantBtn.title = `Variant: ${variantMode} - click/scroll · ⇧click back · right-click: standard`;
+    helpPanel.querySelectorAll('.helpVariant').forEach((a) => { setOn(a, a.dataset.variant === variantMode); });
+    markPresets();
+    previewSwatches(); // colour chips preview under the active finish
   }
 
   // shade stops by id, lightest → darkest; null follows the system. ids
@@ -4933,31 +4974,53 @@
     saveOpts();
   }
 
-  function stepTheme(dir) {
-    const cur = themeMode === 'auto' ? (lightMQ.matches ? 'light' : 'dark') : themeMode;
-    themeMode = THEMES[(THEMES.indexOf(cur) + dir + THEMES.length) % THEMES.length];
-    applyTheme();
+  // stepping an axis lands its designed shade - the header buttons take
+  // the same action as the popup's chips do
+  function stepColour(dir) {
+    const cur = colourMode === 'auto' ? (lightMQ.matches ? 'cream' : 'gray') : colourMode;
+    colourMode = COLOURS[(COLOURS.indexOf(cur) + dir + COLOURS.length) % COLOURS.length];
+    applyColour();
+    const ds = designedShade(colourMode, variantMode);
+    if (ds != null) { shadeIdx = ds; applyShade(); }
+    saveOpts();
+  }
+  function stepVariant(dir) {
+    variantMode = VARIANTS[(VARIANTS.indexOf(variantMode) + dir + VARIANTS.length) % VARIANTS.length];
+    applyVariant();
+    const ds = designedShade(colourMode, variantMode);
+    if (ds != null) { shadeIdx = ds; applyShade(); }
     saveOpts();
   }
 
-  themeBtn.addEventListener('click', (e) => stepTheme(e.shiftKey ? -1 : 1));
-  themeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTheme(e.deltaY < 0 ? 1 : -1); }, { passive: false });
-  themeBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); themeMode = 'auto'; applyTheme(); saveOpts(); });
+  colourBtn.addEventListener('click', (e) => stepColour(e.shiftKey ? -1 : 1));
+  colourBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepColour(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  colourBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); colourMode = 'auto'; applyColour(); saveOpts(); });
+  variantBtn.addEventListener('click', (e) => stepVariant(e.shiftKey ? -1 : 1));
+  variantBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepVariant(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  variantBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); variantMode = 'standard'; applyVariant(); saveOpts(); });
   shadeBtn.addEventListener('click', (e) => stepShade(e.shiftKey ? -1 : 1));
   shadeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepShade(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   shadeBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); shadeIdx = null; applyShade(); saveOpts(); });
   lightMQ.addEventListener('change', () => { updateTone(); previewSwatches(); });
-  // theme names in the help description are clickable quick-switches
-  document.getElementById('helpThemeList').innerHTML = THEMES.map((t) =>
-    `<a href="#" role="button" class="helpTheme" data-theme="${t}"><span class="chipName">${t}</span></a>`).join(' / ');
+  // colour and variant names in the help description are clickable quick-switches
+  document.getElementById('helpColourList').innerHTML = COLOURS.map((t) =>
+    `<a href="#" role="button" class="helpColour" data-colour="${t}"><span class="chipName">${t}</span></a>`).join(' / ');
+  document.getElementById('helpVariantList').innerHTML = VARIANTS.map((t) =>
+    `<a href="#" role="button" class="helpVariant" data-variant="${t}"><span class="chipName">${t}</span></a>`).join(' / ');
   helpPanel.addEventListener('click', (e) => {
-    const a = e.target.closest('a.helpTheme, a.helpShade, a.helpFont, a.helpLh, a.helpLs, a.helpLines, a.helpOpt');
+    const a = e.target.closest('a.helpColour, a.helpVariant, a.helpShade, a.helpFont, a.helpLh, a.helpLs, a.helpLines, a.helpOpt');
     if (!a) return;
     e.preventDefault();
-    if (a.classList.contains('helpTheme')) {
-      // a picked style lands on its designed shade; 'auto' leaves it be
-      themeMode = a.dataset.theme; applyTheme();
-      const ds = THEME_SHADE[themeMode];
+    if (a.classList.contains('helpColour')) {
+      // a picked colour lands on its designed shade; 'auto' leaves it be
+      colourMode = a.dataset.colour; applyColour();
+      const ds = designedShade(colourMode, variantMode);
+      if (ds != null) { shadeIdx = ds; applyShade(); markPresets(); }
+      saveOpts();
+    }
+    else if (a.classList.contains('helpVariant')) {
+      variantMode = a.dataset.variant; applyVariant();
+      const ds = designedShade(colourMode, variantMode);
       if (ds != null) { shadeIdx = ds; applyShade(); markPresets(); }
       saveOpts();
     }
@@ -5014,7 +5077,7 @@
   helpPanel.addEventListener('wheel', (e) => {
     const list = e.target.closest('span[id$="List"]');
     if (!list || !helpPanel.contains(list)) return;
-    const chips = [...list.querySelectorAll('a[data-idx], a[data-theme], a[data-preset]')];
+    const chips = [...list.querySelectorAll('a[data-idx], a[data-colour], a[data-variant], a[data-preset]')];
     if (chips.length < 2) return;
     e.preventDefault();
     const i = chips.findIndex((a) => a.classList.contains('on'));
@@ -6152,7 +6215,8 @@
     items.sort((x, y) => (act ? (x.d || 9999) - (y.d || 9999) : x.b - y.b) || x.b - y.b);
     authSecs.innerHTML = `<div><b>by ${a.dataset.asort}</b><span class="linkcols">${items.map((r) => r.html).join('')}</span></div>`;
   });
-  applyTheme();
+  applyColour();
+  applyVariant();
 
   // ---- text controls: click or scroll to cycle, shift+click goes back ----
   const FONT_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 28, 32];
@@ -7048,7 +7112,7 @@
   // theme slot stashes
   function curOpts() {
     return {
-      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], theme: themeMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
+      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], colour: colourMode, variant: variantMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -7111,14 +7175,31 @@
   // theme presets and url params
   function applyOpts(o) {
     if (!o) return;
-    if (typeof o.theme === 'string' && (o.theme === 'auto' || THEMES.includes(o.theme))) {
-      themeMode = o.theme; applyTheme();
-    } else if (Number.isInteger(o.theme)) { // legacy int index: 0=auto 1=light 2=dark
-      themeMode = ['auto', 'light', 'dark'][o.theme] || 'auto'; applyTheme();
+    // colour/variant take the current names; a saved 'theme' string or int
+    // resolves through the legacy style-name map instead
+    if (typeof o.theme === 'string' && o.theme !== 'auto') {
+      const leg = LEGACY_THEME[o.theme] || (COLOURS.includes(o.theme) ? [o.theme] : null);
+      if (leg) { [colourMode, variantMode = 'standard'] = leg; applyColour(); applyVariant(); }
+    } else if (o.theme === 'auto') { colourMode = 'auto'; applyColour(); }
+    else if (Number.isInteger(o.theme)) { // legacy int index: 0=auto 1=light 2=dark
+      const n = ['auto', 'light', 'dark'][o.theme] || 'auto';
+      if (n === 'auto') colourMode = 'auto';
+      else [colourMode, variantMode = 'standard'] = LEGACY_THEME[n];
+      applyColour(); applyVariant();
     }
-    // a bare ?style= with no shade lands on the style's designed stop
-    if (typeof o.theme === 'string' && o.shade === undefined && THEME_SHADE[o.theme] != null) {
-      shadeIdx = THEME_SHADE[o.theme]; applyShade();
+    if (typeof o.colour === 'string' && (o.colour === 'auto' || COLOURS.includes(o.colour))) {
+      colourMode = o.colour; applyColour();
+    }
+    if (typeof o.variant === 'string' && VARIANTS.includes(o.variant)) {
+      variantMode = o.variant; applyVariant();
+    }
+    // a bare colour/legacy style with no shade lands on its designed stop
+    if (o.shade === undefined) {
+      let ds;
+      if (typeof o.theme === 'string' && LEGACY_SHADE[o.theme] != null) ds = LEGACY_SHADE[o.theme];
+      else if (typeof o.colour === 'string' || typeof o.theme === 'string' || o.variant !== undefined)
+        ds = designedShade(colourMode, variantMode);
+      if (ds != null) { shadeIdx = ds; applyShade(); }
     }
     // saved bundles carry the stop's name beside its index, so widening the
     // scale can't shift a stored shade; the bare index is the legacy form
@@ -7239,13 +7320,15 @@
     // listed here (weight, hpw, hfspx…) still break the mark. the stream
     // embed is deliberately outside presets - one toggles it by hand
     const cmp = {
-      theme: themeMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
+      colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
       split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
     };
+    // a preset that pins a colour implicitly pins the standard finish
+    if ('colour' in p && (p.variant ?? 'standard') !== cmp.variant) return false;
     return Object.keys(p).every((k) => {
       if (!(k in cmp)) return true;
       // a preset can pin a level (zebra: 1); the boolean just pins on/off
@@ -7267,23 +7350,27 @@
     } catch {}
   }
   function applyPreset(name) {
-    applyOpts(THEME_PRESETS[name]);
+    const p = THEME_PRESETS[name];
+    // presets naming a colour pin the standard finish unless they say so
+    applyOpts('colour' in p ? { variant: 'standard', ...p } : p);
     markPresets();
   }
-  // swatch previews: a style/preset chip wears its own palette (and the
-  // preset's font). The composed vars only live on :root, so each palette
-  // is read by flipping data-theme/-shade in one synchronous pass - no
-  // paint can interleave - then restored
-  function paletteOf(theme, shade) {
+  // swatch previews: a colour/variant/preset chip wears its own palette
+  // (and the preset's font). The composed vars only live on :root, so each
+  // palette is read by flipping data-colour/-variant/-shade in one
+  // synchronous pass - no paint can interleave - then restored
+  function paletteOf(colour, variant, shade) {
     const root = document.documentElement;
-    const keepT = root.getAttribute('data-theme'), keepS = root.getAttribute('data-shade');
-    if (theme) root.setAttribute('data-theme', theme); else root.removeAttribute('data-theme');
+    const keepC = root.getAttribute('data-colour'), keepV = root.getAttribute('data-variant'), keepS = root.getAttribute('data-shade');
+    if (colour) root.setAttribute('data-colour', colour); else root.removeAttribute('data-colour');
+    if (variant && variant !== 'standard') root.setAttribute('data-variant', variant); else root.removeAttribute('data-variant');
     if (shade == null) root.removeAttribute('data-shade'); else root.setAttribute('data-shade', shade);
     const cs = getComputedStyle(root);
     const out = {};
     for (const [k, v] of [['bg', '--bg'], ['tx', '--text'], ['a', '--accent'], ['g', '--good'], ['v', '--vip'], ['ln', '--line']])
       out[k] = cs.getPropertyValue(v).trim();
-    if (keepT == null) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', keepT);
+    if (keepC == null) root.removeAttribute('data-colour'); else root.setAttribute('data-colour', keepC);
+    if (keepV == null) root.removeAttribute('data-variant'); else root.setAttribute('data-variant', keepV);
     if (keepS == null) root.removeAttribute('data-shade'); else root.setAttribute('data-shade', keepS);
     return out;
   }
@@ -7297,13 +7384,18 @@
       const keepCv = mainEl.style.contentVisibility;
       mainEl.style.contentVisibility = 'hidden';
       try {
-      helpPanel.querySelectorAll('a.helpTheme').forEach((a) => {
-        paintPal(a, paletteOf(a.dataset.theme === 'auto' ? null : a.dataset.theme, THEME_SHADE[a.dataset.theme] ?? shadeIdx));
+      // colour chips wear the colour at its designed stop under the
+      // active variant; variant chips wear the finish over the live colour
+      helpPanel.querySelectorAll('a.helpColour').forEach((a) => {
+        paintPal(a, paletteOf(a.dataset.colour === 'auto' ? null : a.dataset.colour, variantMode, designedShade(a.dataset.colour, variantMode) ?? shadeIdx));
+      });
+      helpPanel.querySelectorAll('a.helpVariant').forEach((a) => {
+        paintPal(a, paletteOf(colourMode === 'auto' ? null : colourMode, a.dataset.variant, designedShade(colourMode, a.dataset.variant) ?? shadeIdx));
       });
       helpPanel.querySelectorAll('a.helpPreset').forEach((a) => {
         const p = THEME_PRESETS[a.dataset.preset];
         if (!p) return;
-        paintPal(a, paletteOf(p.theme === 'auto' ? null : p.theme, p.shade));
+        paintPal(a, paletteOf(p.colour === 'auto' ? null : p.colour, p.variant, p.shade));
         const ff = FONT_STACKS[p.font];
         if (ff) a.style.fontFamily = ff;
       });
@@ -7311,7 +7403,7 @@
       // previews whatever the media query resolves to
       helpPanel.querySelectorAll('a.helpShade').forEach((a) => {
         const idx = a.dataset.idx === 'auto' ? null : +a.dataset.idx;
-        paintPal(a, paletteOf(themeMode === 'auto' ? null : themeMode, idx));
+        paintPal(a, paletteOf(colourMode === 'auto' ? null : colourMode, variantMode, idx));
       });
       } finally { mainEl.style.contentVisibility = keepCv; }
     } catch {}
@@ -7964,7 +8056,7 @@
   // close path (esc, ✕, the ? cycle) drops the hold
   let helpForced = false;
   const HDR_LABELS = [
-    [presetBtn, 'theme'], [themeBtn, 'style'], [shadeBtn, 'shade'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
+    [presetBtn, 'theme'], [colourBtn, 'colour'], [variantBtn, 'variant'], [shadeBtn, 'shade'], [zebraBtn, 'zebra'], [shadowBtn, 'shadow'],
     [fontSel, 'font'], [fontBtn, 'size'], [weightBtn, 'weight'], [lhBtn, 'height'], [kernBtn, 'spacing'],
     [linesBtn, 'lines'], [timeBtn, 'time'], [subBtn, 'sub'], [emoteBtn, 'emote'], [linkBtn, 'links'], [splitBtn, 'cols'], [vidBtn, 'video'], [sparkEl, 'msg rate'], [sendBtn, 'chat'], [findBtn, 'find'],
     [helpBtn, 'help'], [hdrMinBtn, 'header'], // corner buttons are absolute - the labels land in flow beside the side cluster
@@ -8130,7 +8222,8 @@
     const b = e.currentTarget;
     const q = new URLSearchParams();
     if (CHANNEL !== DEFAULT_CHANNEL || MULTI) q.set('channel', CHANNELS.join(','));
-    if (themeMode !== 'dark') q.set('style', themeMode);
+    if (colourMode !== 'gray') q.set('colour', colourMode);
+    if (variantMode !== 'standard') q.set('variant', variantMode);
     if (shadeIdx !== DEF.shade) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
     if (fontSel.value !== 'roobert') q.set('font', fontSel.value);
     if (fontCtl.get() !== DEF.size) q.set('size', FONT_SIZES[fontCtl.get()]);
@@ -8232,7 +8325,9 @@
     const pxv = b.px ?? FONT_SIZES[b.size];
     const px = pxv ? ` ${pxv}px` : '';
     const ft = b.font && FONT_STACKS[b.font] ? ` ${b.font}` : '';
-    return `theme slot ${i + 1}: ${b.theme || 'dark'}·${b.shade == null ? 'auto' : b.shade}${px}${ft} - click to recall, shift/right-click to overwrite`;
+    const cv = b.colour || b.theme || 'gray';
+    const vn = b.variant && b.variant !== 'standard' ? `+${b.variant}` : '';
+    return `theme slot ${i + 1}: ${cv}${vn}·${b.shade == null ? 'auto' : b.shade}${px}${ft} - click to recall, shift/right-click to overwrite`;
   }
   function paintSlots() {
     slotEls.forEach((el, i) => {
@@ -11558,14 +11653,30 @@
   loadOpts();
   restoreEmoteCache();
 
-  // ---- url params apply on top of saved options, e.g. ?split&theme=dark&size=18 ----
+  // ---- url params apply on top of saved options, e.g. ?split&colour=gray&size=18 ----
   {
     const q = new URLSearchParams(location.search);
     const flag = (k) => q.has(k) && q.get(k) !== '0';
-    const tq = q.get('theme') || q.get('style');
+    const tq = q.get('colour') || q.get('color') || q.get('theme') || q.get('style');
     if (tq && THEME_PRESETS[tq]) applyPreset(tq);
-    else if (tq && (tq === 'auto' || THEMES.includes(tq))) {
-      themeMode = tq; applyTheme();
+    else if (tq === 'auto') { colourMode = 'auto'; applyColour(); }
+    else if (tq) {
+      const leg = LEGACY_THEME[tq] || (COLOURS.includes(tq) ? [tq] : null);
+      if (leg) {
+        [colourMode, variantMode = 'standard'] = leg; applyColour(); applyVariant();
+        // a named colour or legacy style in the url lands its designed stop
+        if (!q.has('shade') && !q.has('variant')) {
+          const ds = LEGACY_SHADE[tq] ?? designedShade(colourMode, variantMode);
+          if (ds != null) { shadeIdx = ds; applyShade(); }
+        }
+      }
+    }
+    if (q.has('variant') && VARIANTS.includes(q.get('variant'))) {
+      variantMode = q.get('variant'); applyVariant();
+      if (!q.has('shade')) {
+        const ds = designedShade(colourMode, variantMode);
+        if (ds != null) { shadeIdx = ds; applyShade(); }
+      }
     }
     if (q.has('shade')) {
       const v = q.get('shade');
