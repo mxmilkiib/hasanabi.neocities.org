@@ -7984,7 +7984,8 @@
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
     else if (document.body.classList.contains('hdrmin')) q.set('min', '1');
     if (!selfHl) q.set('self', '0');
-    if (isSplit()) q.set('split', String(cols().length));
+    // rail mode counts its chat columns as 2 - the level lives on railEl
+    if (isSplit()) q.set('split', String(railEl.hidden ? cols().length : 4));
     if (!vidBox.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
