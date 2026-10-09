@@ -1082,6 +1082,9 @@
      title there wasn't the width */
   #statsBody .st-frow { display: flex; flex-wrap: wrap; gap: 0 6px;
     margin: -1px 0 1px; line-height: 1.4; }
+  /* docked in the rail the tab runs narrow: filter rows hide and the
+     headers carry a · 24h suffix since every ranked list is windowed */
+  #rail .st-frow, #rail .st-sort, #rail .st-scope { display: none; }
   #statsBody .st-key .st-sw { display: inline-block; width: .7em; height: .7em;
     border-radius: 2px; margin: 0 3px -1px 4px; }
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
@@ -5242,6 +5245,10 @@
     // every counter also runs per channel; a scope pick narrows the tab
     // to one joined channel, 'all' keeps the combined view
     const sc = CHANNELS.includes(statScope) ? statScope : '';
+    // docked into the rail the tab runs narrow: its filter rows hide via
+    // CSS, and the ranked lists all clamp to a 24h window so they stay
+    // 'top' lists - the stored prefs resume when it undocks
+    const inRail = !!el.closest('#rail');
     const nMsgs = sc ? (nickMsgsPer[sc] || new Map()) : nickMsgs;
     const eUse = {};
     if (sc) Object.assign(eUse, setFor(sc).emoteUse || {});
@@ -5249,7 +5256,7 @@
       const eu = setFor(c).emoteUse || {};
       for (const k in eu) eUse[k] = (eUse[k] || 0) + eu[k];
     }
-    const win = EMOTE_SRCS[emoteStatSrc] ?? 0;
+    const win = EMOTE_SRCS[inRail ? '24h' : emoteStatSrc] ?? 0;
     // per-emote count under the picked source: stream-elements figures,
     // or the buckets inside a trailing window
     const wMap = win !== 0
@@ -5262,7 +5269,8 @@
     // and version tallies; alltime is the plain session tally
     // the window only applies to the ranked 'use' view - grouped sorts
     // always read the full tally
-    const bWinSpec = badgeSort === 'use' ? (BADGE_WINS[badgeWin] ?? 0) : 0;
+    const bSort = inRail ? 'use' : badgeSort;
+    const bWinSpec = bSort === 'use' ? (BADGE_WINS[inRail ? '24h' : badgeWin] ?? 0) : 0;
     const bWSet = new Map(), bWVer = new Map();
     if (bWinSpec) {
       const bWFold = foldWin(bWinSpec, sc ? (badgeDayPer[sc] || {}) : badgeDay, sc ? (badgeHourPer[sc] || {}) : badgeHour);
@@ -5288,7 +5296,7 @@
     const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
     // windowed picks fold the per-login day buckets into a tally;
     // 'all' reads the plain session map
-    const cWinSpec = CHAT_WINS[chatSort] ?? CHAT_WINS['24h'];
+    const cWinSpec = CHAT_WINS[inRail ? '24h' : chatSort] ?? CHAT_WINS['24h'];
     const nView = cWinSpec
       ? foldWin(cWinSpec, sc ? (nickDayPer[sc] || {}) : nickDay, sc ? (nickHourPer[sc] || {}) : nickHour)
       : nMsgs;
@@ -5313,7 +5321,7 @@
     // form links-view dedup uses, so scheme/www/case variants fold. the
     // bots' evergreen promos crowd the ranking without news value - they
     // already live in the Hasan & co. links row, so they're hidden from the list
-    const lWinSpec = LINK_WINS[linkWin] ?? 0;
+    const lWinSpec = LINK_WINS[inRail ? '24h' : linkWin] ?? 0;
     const uUseM = lWinSpec
       ? foldWin(lWinSpec, sc ? (urlDayPer[sc] || {}) : urlDay, sc ? (urlHourPer[sc] || {}) : urlHour)
       : (sc ? (urlUsePer[sc] || new Map()) : urlUse);
@@ -5470,7 +5478,7 @@
       const vs = Object.entries(bInfo[id])
         .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
       const name = id.replace(/[-_]/g, ' ');
-      const metric = badgeSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
+      const metric = bSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
       // the sentence-length text goes on tooltips so an opened set
       // lists every version compactly: icon, title, count
       const tip = (t) => t ? ` title="${escapeHTML(t)}"` : '';
@@ -5491,7 +5499,7 @@
     const bKeep = (id, verN) => bOwner(id) || CORE_BADGES.includes(id) || (verN ?? bUse(id)) ||
       Object.keys(bInfo[id]).length < 2;
     let badgeSets;
-    if (badgeSort === 'use') {
+    if (bSort === 'use') {
       // use-sort flattens versions out of their sets and lists only the
       // badges actually seen in chat, ranked by count - no sets to open,
       // no unseen rows
@@ -5518,7 +5526,7 @@
             ? `<div class="st-row st-all"><button type="button" class="st-s" data-bfold>collapse to top 40</button></div>` : '');
     } else {
       const bShow = [], bMore = [];
-      for (const id of Object.keys(bInfo).sort(BSORTS[badgeSort] || BSORTS.use))
+      for (const id of Object.keys(bInfo).sort(BSORTS[bSort] || BSORTS.use))
         (bKeep(id) ? bShow : bMore).push(id);
       const bVis = statBadgeAll ? bShow : bShow.slice(0, 40);
       badgeSets = bVis.map(badgeRow).join('') +
@@ -5587,13 +5595,13 @@
       `</div>` +
       `<div class="st-panel st-rate"><div class="st-h">session rate</div><div class="st-frow">${rateWinBtns}</div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
-      `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
-      `<div class="st-panel st-emotes"><div class="st-h">top emotes</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `<div class="st-panel st-badges"><div class="st-h">top badges</div><div class="st-frow">${badgeWinBtns} ${badgeSortBtnsHtml}</div>` +
+      `<div class="st-panel st-wide"><div class="st-h">top links${inRail ? ' · 24h' : ''} <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
+      `<div class="st-panel st-emotes"><div class="st-h">top emotes${inRail ? ' · 24h' : ''}</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
+      `<div class="st-panel st-badges"><div class="st-h">top badges${inRail ? ' · 24h' : ''}</div><div class="st-frow">${badgeWinBtns} ${badgeSortBtnsHtml}</div>` +
       `<div class="st-cols st-bcols">` +
-      (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
+      (badgeSets || `<div class="st-row"><span class="nm">${bSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
-      `<div class="st-panel st-chatters"><div class="st-h">top chatters</div><div class="st-frow">${chatSortBtns}</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
+      `<div class="st-panel st-chatters"><div class="st-h">top chatters${inRail ? ' · 24h' : ''}</div><div class="st-frow">${chatSortBtns}</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
       `<div class="st-panel st-foot"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
     drawScrollGraph(el, sc);
@@ -5712,8 +5720,9 @@
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     const t1 = rateHistT[rateHistT.length - 1] || Date.now();
     let t0 = rateHistT[Math.max(0, off)] || t1;
-    // the span picker zooms to a trailing window; 'all' keeps the tail
-    const rWin = RATE_WINS[rateWin] || 0;
+    // the span picker zooms to a trailing window; 'all' keeps the tail -
+    // rail-docked stats hide the picker and always draw the full tail
+    const rWin = el.closest('#rail') ? 0 : (RATE_WINS[rateWin] || 0);
     if (rWin && t1 - rWin > t0) t0 = t1 - rWin;
     const span = Math.max(30000, t1 - t0);
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
