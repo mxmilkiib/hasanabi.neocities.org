@@ -3026,7 +3026,6 @@
   // the real copy arrives via backfill replay - tracked so it can adopt
   // the echo row rather than render a duplicate
   const echoRows = new Map(); // 'login\x00text' -> [echo rows] - identical sends share a key
-  const pendingEcho = [];     // keys, bound to rows in render order
   // every minted echo key, live row or not - a backfilled copy that finds
   // its echo row gone (evicted, trimmed) still knows the send was local,
   // so it drops the 'recovered' tooltip rather than claim lost history
@@ -3916,11 +3915,10 @@
         const ek = ch + '\x00' + echoKey(login, tags, rawMsg);
         selfEcho = echoKeys.has(ek);
         const arr = echoRows.get(ek);
-        // a stale echo already paged out with its column - treat it as
-        // spent and let this copy render fresh at the live edge rather
-        // than reviving a fading ghost mid-page; the oldest matching live
-        // echo still adopts first when the key is shared
-        while (arr && arr.length && (!arr[0].isConnected || arr[0].classList.contains('stale'))) arr.shift();
+        // only a fully evicted echo falls through to a fresh render - a
+        // paged-out ghost still adopts: the message chronologically belongs
+        // on its page, and a live-edge copy reads as a repost of old text
+        while (arr && arr.length && !arr[0].isConnected) arr.shift();
         const el = arr && arr[0];
         if (el) {
           arr.shift();
@@ -3942,7 +3940,7 @@
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
       html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay'}"${live || selfEcho ? '' : ' title="recovered from the recent-messages backlog"'}` +
-              ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
+              ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
@@ -4021,15 +4019,13 @@
         pingSnd();
         notifyMention(r);
       }
-      if (r.classList.contains('local')) {
-        const k = pendingEcho.shift();
-        if (k) {
-          (echoRows.get(k) || echoRows.set(k, []).get(k)).push(r);
-          // persists so a restored echo can still be adopted; encoded since
-          // the key holds a literal NUL that markup reparse would mangle
-          r.dataset.ek = encodeURIComponent(k);
-          if (echoRows.size > 50) echoRows.delete(echoRows.keys().next().value);
-        }
+      // the echo key rides the row itself - a fifo of pending keys went
+      // stale whenever a send flushed inside queueMessage (hidden tab),
+      // binding every later echo to the previous send's key
+      if (r.classList.contains('local') && r.dataset.ek) {
+        const k = decodeURIComponent(r.dataset.ek);
+        (echoRows.get(k) || echoRows.set(k, []).get(k)).push(r);
+        if (echoRows.size > 50) echoRows.delete(echoRows.keys().next().value);
       }
     }
     if (missed.length > 50) missed.splice(0, missed.length - 50);
@@ -9612,9 +9608,7 @@
     for (const t of inner.split(/\s+/)) if (t && noteRecentName(t, target)) bumped = true;
     if (bumped && !emotePick.hidden) rebuildPicker();
     if (chan) chan.postMessage({ type: 'echo', msg: echoMsg, raw: text });
-    pendingEcho.push(target + '\x00' + echoKey(auth.login, echoMsg.tags, shown));
-    noteEchoKey(pendingEcho[pendingEcho.length - 1]);
-    if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
+    noteEchoKey(target.toLowerCase() + '\x00' + echoKey(auth.login, echoMsg.tags, shown));
     // a send from inside a walk hands the stashed draft back to the box -
     // the entry was sent but the half-written text was never its own
     const shelved = histIdx !== null && histDraft;
@@ -11222,9 +11216,7 @@
     const ech = (m.msg.channel || '').replace(/^#/, '') || CHANNEL;
     if (!CHANNELS.includes(ech)) return;
     queueMessage(m.msg, false);
-    pendingEcho.push(ech + '\x00' + echoKey(m.msg.login, m.msg.tags || {}, m.msg.message));
-    noteEchoKey(pendingEcho[pendingEcho.length - 1]);
-    if (pendingEcho.length > 50) pendingEcho.splice(0, pendingEcho.length - 50);
+    noteEchoKey(ech.toLowerCase() + '\x00' + echoKey(m.msg.login, m.msg.tags || {}, m.msg.message));
     // a send from a sibling tab echoes here as a row - keep this copy's
     // input walk in step so ↑ finds it everywhere the message landed.
     // raw is the typed text; the row's own message carries the reply's
