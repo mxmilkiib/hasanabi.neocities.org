@@ -12012,7 +12012,14 @@
       peekTimer = 0;
       if (peekUrl !== url) return;
       const e = peekCache.get(url);
-      if (e && Date.now() - e.t < peekTtlOf(e.p)) { peekShow(e.p, url, false); return; }
+      if (e && Date.now() - e.t < peekTtlOf(e.p)) {
+        peekShow(e.p, url, false);
+        // a tweet peek stored before cards carried the avatar icon
+        // (the key absent, not merely empty) refetches quietly - the
+        // fresh answer swaps in through peekGot
+        try { if (e.p && !('icon' in e.p) && twStatusOf(new URL(url))) peekAsk(url); } catch {}
+        return;
+      }
       peekShow(null, url, peekAsk(url));
     }, 350);
   }
