@@ -8456,6 +8456,9 @@
         k.startsWith('hasan-stats-') || k.startsWith(EMOTE_CACHE_PREFIX);
       for (const k of Object.keys(localStorage))
         if (k.startsWith('hasan-') && !keep(k)) localStorage.removeItem(k);
+      // firefox restores the panel scroller's position across the reload -
+      // the flag asks the fresh page to put it back on top
+      sessionStorage.setItem('hasan-reset-hscroll', '1');
     } catch {}
     location.reload();
   });
@@ -11746,6 +11749,17 @@
 
   loadOpts();
   restoreEmoteCache();
+
+  // 'reset all settings' asked for the panel scroller back on top - it has
+  // to run on load, after the browser's own scroll-position restore
+  try {
+    if (sessionStorage.getItem('hasan-reset-hscroll')) {
+      sessionStorage.removeItem('hasan-reset-hscroll');
+      const top = () => { const sc = helpPanel.querySelector('.hp-scroll'); if (sc) sc.scrollTop = 0; };
+      if (document.readyState === 'complete') top();
+      else addEventListener('load', top, { once: true });
+    }
+  } catch {}
 
   // ---- url params apply on top of saved options, e.g. ?split&colour=gray&size=18 ----
   {
