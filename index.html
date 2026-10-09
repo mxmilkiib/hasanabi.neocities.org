@@ -7418,15 +7418,16 @@
   function presetMatch(p) {
     if (!p) return false;
     // compare only the fields the preset specifies: ones it pins that aren't
-    // listed here (epgeo - no stored box still means the default's own box)
-    // can't break the mark. the stream embed is deliberately outside
-    // presets - one toggles it by hand
+    // listed here can't break the mark - epgeo (no stored box still means
+    // the default's own box) and help (panel-open state is transient; the
+    // url only carries it via the copy-help pref, not the theme collapse).
+    // the stream embed is deliberately outside presets - one toggles it by hand
     const cmp = {
       colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
-      split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode, lbls: lblsOn ? 1 : 0,
+      split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
       clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
       hdrgraph: document.body.classList.contains('hdrgraph'),
