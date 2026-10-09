@@ -11858,7 +11858,7 @@
   const twPeek = (c, id) => c ? {
     title: c.author ? '@' + c.author : '', description: (c.text || '').slice(0, 300),
     author: c.author || '', published: c.ts ? new Date(c.ts).toISOString().slice(0, 10) : '',
-    image: c.photo || c.avatar || '', video: c.video || '',
+    image: c.photo || c.avatar || '', video: c.video || '', icon: c.avatar || '',
     url: 'https://x.com/i/status/' + id,
   } : null;
   function peekAsk(url) {
