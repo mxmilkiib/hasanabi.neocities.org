@@ -1072,7 +1072,11 @@
   #statsBody .st-panel { flex: 1 1 0; min-width: 10em; }
   #statsBody .st-panel.st-wide { flex: 2 1 0; min-width: 14em; }
   #statsBody .st-panel.st-foot { flex: 0 0 100%; }
-  #statsBody .st-panel.st-narrow { flex: 0.7 1 0; min-width: 8em; }
+  /* the ranked row's own weights: emotes are glyph lists so they run
+     leanest, badge names+images want room, chatters sit between */
+  #statsBody .st-panel.st-emotes { flex: 0.5 1 0; min-width: 6.5em; }
+  #statsBody .st-panel.st-badges { flex: 1.3 1 0; }
+  #statsBody .st-panel.st-chatters { flex: 0.8 1 0; min-width: 9em; }
   /* ranked-panel filters live in their own row under the title - a
      vertical stack beside it squeezed the rows narrow, and beside the
      title there wasn't the width */
@@ -5565,12 +5569,12 @@
       `<div class="st-panel st-rate"><div class="st-h">session rate</div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
-      `<div class="st-panel st-narrow"><div class="st-h">top emotes</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `<div class="st-panel st-narrow"><div class="st-h">top badges</div><div class="st-frow">${badgeWinBtns} ${badgeSortBtnsHtml}</div>` +
+      `<div class="st-panel st-emotes"><div class="st-h">top emotes</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
+      `<div class="st-panel st-badges"><div class="st-h">top badges</div><div class="st-frow">${badgeWinBtns} ${badgeSortBtnsHtml}</div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
-      `<div class="st-panel"><div class="st-h">top chatters</div><div class="st-frow">${chatSortBtns}</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
+      `<div class="st-panel st-chatters"><div class="st-h">top chatters</div><div class="st-frow">${chatSortBtns}</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
       `<div class="st-panel st-foot"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
     drawScrollGraph(el, sc);
