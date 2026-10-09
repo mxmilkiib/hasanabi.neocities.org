@@ -5809,6 +5809,18 @@
     const dur = mins >= 60 ? `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}m` : `${mins}m`;
     cv.title = `msgs/sec across the recorded session - ${dur} span`;
     cv.setAttribute('aria-label', cv.title);
+    // hovering reads the bin under the pointer: its time, the pooled
+    // msgs/s, and why a dead stretch shows no samples
+    const graphTitle = cv.title;
+    cv.onmousemove = (e) => {
+      const r = cv.getBoundingClientRect();
+      const i = Math.max(0, Math.min(N - 1, Math.floor((e.clientX - r.left) / r.width * N)));
+      cv.title = `${fmtRowTime(new Date(t0 + i * bw))} · ` +
+        (bn[i] ? `${(bins[i] / bn[i]).toFixed(1)} msgs/s` : 'no data') +
+        (bwhy[i] ? ` - ${bwhy[i]}` : '');
+    };
+    cv.onmouseleave = () => { cv.title = graphTitle; };
+    cap.innerHTML = `<div class="st-row"><span class="nm">${fmtRowTime(new Date(t0))} – ${fmtRowTime(new Date(t1))} (${dur})</span><i>peak ${peak.toFixed(1)}/s</i></div>`;
     // key under the caption - swatches track the theme via sparkCols or
     // the same CSS vars it resolves, so they always match the canvas
     cap.innerHTML += `<div class="st-row st-key"><span class="nm">` +
@@ -5817,7 +5829,6 @@
       `<i class="st-sw" style="background:${(sparkCols && sparkCols.vip) || 'var(--vip)'}"></i>page away ` +
       `<i class="st-sw" style="background:${(sparkCols && sparkCols.good) || 'var(--good)'}"></i>recovered ` +
       `<i class="st-sw st-dim"></i>clock marks</span></div>`;
-    cap.innerHTML = `<div class="st-row"><span class="nm">${fmtRowTime(new Date(t0))} – ${fmtRowTime(new Date(t1))} (${dur})</span><i>peak ${peak.toFixed(1)}/s</i></div>`;
   }
   // delegated - the stats body rewrites its innerHTML on every render
   document.getElementById('statsBody').addEventListener('click', (e) => {
