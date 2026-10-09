@@ -3064,7 +3064,13 @@
     // the flanking arrow circles ride the pill's visibility
     for (const c of document.querySelectorAll(`.jdc[data-for="${btn.id}"]`)) {
       c.hidden = at;
-      if (!at) c.textContent = revFlow ? '↑' : '↓';
+      // textContent= would wipe the ants svg - park it, set the arrow,
+      // put the ring back
+      if (!at) {
+        const svg = c.querySelector('.jdash');
+        c.textContent = revFlow ? '↑' : '↓';
+        if (svg) c.appendChild(svg);
+      }
     }
     if (!at) {
       const { n, sec } = belowFold(col);
