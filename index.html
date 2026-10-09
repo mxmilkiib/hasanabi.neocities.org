@@ -8053,7 +8053,7 @@
     ['rbw-pulse', 'ease-in-out'], ['rbw-flick', 'steps(1, end)'],
   ];
   let rbwStyle = 0;
-  const RBW_DEFAULT = RBW_STYLES.length - 1; // 'rbw-rand' - each mention's own motion
+  const RBW_DEFAULT = 0; // '' - the plain diagonal sweep
   function setRbwStyle(idx) {
     rbwStyle = Math.min(RBW_STYLES.length - 1, Math.max(0, idx | 0));
     document.body.classList.remove(...RBW_STYLES.slice(1));
