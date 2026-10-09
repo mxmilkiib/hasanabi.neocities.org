@@ -5338,9 +5338,9 @@
   const RATE_WINS = { all: 0, '24h': 86400e3, '12h': 43200e3, '6h': 21600e3,
     '3h': 10800e3, '2h': 7200e3, '1h': 3600e3, '30m': 1800e3, '15m': 900e3 };
   const RATE_WIN_KEY = 'hasan-ratewin';
-  let rateWin = 'all';
-  try { rateWin = localStorage.getItem(RATE_WIN_KEY) || 'all'; } catch {}
-  if (!(rateWin in RATE_WINS)) rateWin = 'all';
+  let rateWin = '3h';
+  try { rateWin = localStorage.getItem(RATE_WIN_KEY) || '3h'; } catch {}
+  if (!(rateWin in RATE_WINS)) rateWin = '3h';
   // a window spec folds its bucket family into a key -> count map:
   // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
   const foldWin = (spec, dayBag, hourBag) => {
@@ -5899,6 +5899,7 @@
     // long span reads as countable stretches; a finer rung gets a tick,
     // and a boundary stamps HH:MM when there's room for it
     const txtDim = (getComputedStyle(document.documentElement).getPropertyValue('--text-dim') || '#888').trim();
+    const txtInk = (getComputedStyle(document.documentElement).getPropertyValue('--text') || txtDim).trim();
     const RUNGS = [60e3, 300e3, 600e3, 900e3, 1800e3, 3600e3, 7200e3, 10800e3,
       21600e3, 43200e3, 86400e3];
     const tickInt = RUNGS.find((r) => r / span * wCss >= 4) || 3600e3;
@@ -5948,7 +5949,7 @@
     for (let t = Math.ceil(t0 / tickInt) * tickInt; t < t1; t += tickInt)
       g.fillRect(Math.round((t - t0) / span * wCss), 0, 1, 3);
     if (blockInt / span * wCss >= 40) {
-      g.globalAlpha = .55; g.font = '9px ' + getComputedStyle(cv).fontFamily; g.textBaseline = 'top';
+      g.fillStyle = txtInk; g.globalAlpha = .7; g.font = '9px ' + getComputedStyle(cv).fontFamily; g.textBaseline = 'top';
       for (let t = Math.ceil(t0 / blockInt) * blockInt; t < t1; t += blockInt) {
         const x = (t - t0) / span * wCss;
         if (peak > 0 && x < 34) continue; // clear of the peak label
