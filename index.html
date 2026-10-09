@@ -136,7 +136,9 @@
     --ph: 80; --pc: .012; --ptc: .02;
     --sh-bg: .95; --sh-tx: .16;
     --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c;
-    --bg: oklch(var(--sh-bg) var(--pc) var(--ph));
+    /* --bg-lift lets a colour nudge its paper a touch off the shade stop -
+       salmon needs .97 for the ft pink but the axis only stops at .95/.99 */
+    --bg: oklch(clamp(0, calc(var(--sh-bg) + var(--bg-lift, 0)), 1) var(--pc) var(--ph));
     --text: var(--text-c, oklch(var(--sh-tx) var(--ptc) var(--ph)));
     --panel: color-mix(in oklch, var(--bg), var(--text) 9%);
     --line: color-mix(in oklch, var(--bg), var(--text) 24%);
@@ -175,8 +177,8 @@
   :root[data-colour="lavender"] { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; }
   :root[data-colour="mirc"]     { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
   :root[data-colour="sepia"]    { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
-  /* financial times: pale peach-pink paper, teal links, oxblood danger */
-  :root[data-colour="salmon"]   { --ph: 40;  --pc: .045; --ptc: .025; --accent: #0f7680; --good: #00754d; --danger: #990f3d; --vip: #b8457a; }
+  /* financial times: the #fff1e5 paper pink, teal links, oxblood danger */
+  :root[data-colour="salmon"]   { --ph: 55;  --pc: .025; --ptc: .025; --bg-lift: .02; --accent: #0f7680; --good: #00754d; --danger: #990f3d; --vip: #b8457a; }
   :root[data-colour="ice"]      { --ph: 215; --pc: .02;  --ptc: .03;  --accent: #2a5fa8; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
   :root[data-colour="solarized"]{ --ph: 200; --pc: .038; --ptc: .03;  --accent: #b58900; --good: #859900; --danger: #dc322f; --vip: #d33682; }
   :root[data-colour="nord"]     { --ph: 245; --pc: .028; --ptc: .02;  --accent: #88c0d0; --good: #a3be8c; --danger: #bf616a; --vip: #b48ead; }
