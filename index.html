@@ -5330,7 +5330,7 @@
   // top links window the same way; 'all' is the plain tally
   const LINK_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   // the rail's narrow headers carry only the sub-day rungs
-  const RAIL_WINS = ['24h', '12h', '6h', '3h', '1h'];
+  const RAIL_WINS = ['12h', '6h', '3h', '1h'];
   const LINK_WIN_KEY = 'hasan-linkwin';
   let linkWin = '24h';
   try { linkWin = normWin(localStorage.getItem(LINK_WIN_KEY)) || '24h'; } catch {}
