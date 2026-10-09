@@ -747,7 +747,8 @@
      flush after the time/channel tag - a hair of air keeps it off it */
   .row > .role.sub { margin-left: 1px; }
   .role.sub[title] { color: var(--text-dim); }
-  .role.bits { color: var(--accent); }
+  /* the bits chip celebrates in the shared rainbow sweep */
+  .role.bits.rbw { color: transparent; }
   .role.first { color: #ff69b4; font-weight: 700; }
   .row.notice { color: color-mix(in oklch, var(--text-dim), var(--text) 70%); font-style: italic; }
   .row.notice .notice-label { font-style: normal; }
@@ -3781,7 +3782,7 @@
       // bots never carry a sub count - skip the placeholder chip entirely
       const subHtml = shimmer && !subM ? '' :
         `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${SUB_MODES[subMode] === 'num-left' ? ' style="margin-right:6px"' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
-      if (tags.bits) aux.push(`<span class="role bits">[bits ${escapeHTML(tags.bits)}]</span>`);
+      if (tags.bits) aux.push(`<span class="role bits rbw">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the
       // badge icons - 03 md; right modes keep it inside the aux
