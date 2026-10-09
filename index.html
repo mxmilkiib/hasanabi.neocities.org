@@ -2147,6 +2147,7 @@
       <button class="hdr-btn slot" data-i="1">➋</button>
       <button class="hdr-btn slot" data-i="2">➌</button>
     </div>
+    <div class="wide" style="margin-top: 6px"><span id="copyUrlPrev" style="display: block; text-align: left; word-break: break-all; font-size: .78em; opacity: .65; user-select: all" title="the url the button below copies"></span></div>
     <button id="copyUrl" class="hdr-btn" style="margin-top: 6px; width: 100%; height: 26px">copy settings url</button>
     <div class="wide" style="margin-top: 4px; font-size: .85em"><span>the copied url also carries this popup's open state and selected tab (?help/?htab): <span id="helpCopyHelpList"></span></span></div>
     <div style="margin-top: 6px; display: flex; gap: 6px">
@@ -5176,6 +5177,7 @@
     if (id !== 'htabStats') statsReturn();
     if (id === 'htabStats') setTimeout(renderStats); // the maps it reads init below; defer past the first pass
     try { localStorage.setItem('hasan-htab', id); } catch {}
+    updateUrlPrev();
   }
   // multicol offers no 'first in column' hook, so the link-columns are
   // measured after layout: when some column opens with a subsection
@@ -7238,6 +7240,7 @@
       // the TDZ throw the same way it already did for OPTS_KEY
       if (suppressSave) return;
       localStorage.setItem(OPTS_KEY, JSON.stringify(curOpts()));
+      updateUrlPrev();
     } catch {}
   }
 
@@ -8191,6 +8194,7 @@
       if (onTab && onTab.dataset.htab === 'htabStats') switchTab('htabStats');
     }
     document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = !lblsOn; });
+    updateUrlPrev();
     // labels widen the corner reserve so the pinned labels clear content
     document.body.classList.toggle('hdrlbl', lblsOn);
     // anchor below whatever height the header wraps to once labels are in
@@ -8325,8 +8329,9 @@
     markHelp('helpCopyHelp', copyHelp ? 1 : 0);
   }
   // builds a ?param url from the current non-default options
-  document.getElementById('copyUrl').addEventListener('click', (e) => {
-    const b = e.currentTarget;
+  // builds the settings url exactly as a copy emits it - the preview row
+  // above the button renders this, refreshed wherever options can change
+  function settingsUrl() {
     const q = new URLSearchParams();
     if (CHANNEL !== DEFAULT_CHANNEL || MULTI) q.set('channel', CHANNELS.join(','));
     if (colourMode !== 'gray') q.set('colour', colourMode);
@@ -8416,7 +8421,14 @@
       qs = new URLSearchParams([['theme', pin]]);
       for (const [k, v] of q) if (!(PINNED[k] in THEME_PRESETS[pin])) qs.append(k, v);
     }
-    const url = location.origin + location.pathname + ([...qs.keys()].length ? '?' + qs : '');
+    return location.origin + location.pathname + ([...qs.keys()].length ? '?' + qs : '');
+  }
+  function updateUrlPrev() {
+    try { document.getElementById('copyUrlPrev').textContent = settingsUrl(); } catch {}
+  }
+  document.getElementById('copyUrl').addEventListener('click', (e) => {
+    const b = e.currentTarget;
+    const url = settingsUrl();
     navigator.clipboard.writeText(url)
       .then(() => {
         b.textContent = 'copied'; b.classList.add('copied');
@@ -8424,6 +8436,7 @@
       })
       .catch(() => { b.textContent = url; });
   });
+  updateUrlPrev();
 
   // ---- theme slots: three stashable option bundles. Click recalls a
   // filled slot (or stores into an empty one); shift-click/right-click
