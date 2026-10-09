@@ -1091,6 +1091,7 @@
   /* docked in the rail the tab runs narrow: filter rows hide and the
      headers carry a · 24h suffix since every ranked list is windowed */
   #rail .st-frow, #rail .st-sort, #rail .st-scope { display: none; }
+  #rail .st-row i { font-size: .8em; }
   #statsBody .st-key .st-sw { display: inline-block; width: .7em; height: .7em;
     border-radius: 2px; margin: 0 3px -1px 4px; }
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
@@ -5525,7 +5526,7 @@
         // dedup still checks the full word so 'subed · Subscriber' can't show
         const raw = id.replace(/[-_]/g, ' ');
         const name = ({ subscriber: 'subed', moderator: 'mod' })[id] || raw;
-        const label = v.t && v.t.toLowerCase() !== raw ? `${name} · ${v.t}` : name;
+        const label = inRail ? name : v.t && v.t.toLowerCase() !== raw ? `${name} · ${v.t}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
