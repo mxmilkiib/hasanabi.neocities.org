@@ -9885,7 +9885,7 @@
   try { epickZoom = localStorage.getItem(EPICK_ZOOM_KEY) || ''; } catch {}
   if (epickZoom === '1') epickZoom = 'big'; // the old boolean save
   function paintZoom() {
-    for (const k of ['big', 'hf', 'q', 'sm']) {
+    for (const k of Object.keys(zoomBtns)) {
       emotePick.classList.toggle(k, epickZoom === k);
       setOn(zoomBtns[k], epickZoom === k);
     }
@@ -9966,6 +9966,9 @@
     for (const k of Object.keys(useTs)) delete useTs[k];
     for (const k of Object.keys(liveUse)) delete liveUse[k];
     useT0 = Date.now();
+    // drop the stored copy so the save's cross-tab merge can't fold the
+    // wiped stamps back in
+    try { localStorage.removeItem(EMOTEUSE_KEY); } catch {}
     saveUse();
     buildPicker();
   });
@@ -10212,32 +10215,62 @@
   // closed gap from it so rungs covering it keep the missed mark
   if (savedUse.w && !away.length) markAway(savedUse.w, Date.now(), 'page closed');
   let useSaveTimer = 0;
+  // sibling tabs share this key, and last-writer-wins would strand a
+  // tab's stamps: fold the stored copy into the live bags before each
+  // write. per-emote values take the max - the stored copy already holds
+  // this tab's earlier increments, so summing would double-count them
+  const mergeUse = () => {
+    let o = null;
+    try { o = JSON.parse(localStorage.getItem(EMOTEUSE_KEY)); } catch {}
+    if (!o) return;
+    for (const [k, v] of Object.entries(o.t || {})) if (v > (useTs[k] || 0)) useTs[k] = v;
+    for (const [k, v] of Object.entries(o.n || {})) if (v > (liveUse[k] || 0)) liveUse[k] = v;
+    for (const [k, v] of Object.entries(o.i || {})) useIds[k] ||= v;
+    const mergeBag = (dst, src) => {
+      for (const [k, m] of Object.entries(src || {})) {
+        const e = dst[k] || (dst[k] = {});
+        for (const [d, c] of Object.entries(m)) if (c > (e[d] || 0)) e[d] = c;
+      }
+    };
+    mergeBag(useDay, o.d); mergeBag(useHour, o.h);
+    for (const [c, m] of Object.entries(o.pd || {})) mergeBag(useDayPer[c] ||= {}, m);
+    for (const [c, m] of Object.entries(o.hp || {})) mergeBag(useHourPer[c] ||= {}, m);
+    if (o.s && o.s < useT0) useT0 = o.s;
+  };
+  const putUse = () => {
+    mergeUse();
+    // cap the map: on overflow, evict the stalest entries first
+    const ks = Object.keys(useTs);
+    if (ks.length > 6000) {
+      ks.sort((a, b) => useTs[a] - useTs[b]);
+      for (const k of ks.slice(0, ks.length - 6000)) {
+        delete useTs[k]; delete liveUse[k]; delete useDay[k]; delete useHour[k]; delete useIds[k];
+        for (const lp of Object.values(useDayPer)) delete lp[k];
+        for (const hp of Object.values(useHourPer)) delete hp[k];
+      }
+    }
+    const d0 = Math.floor(Date.now() / 864e5) - 31;
+    for (const bag of [useDay, ...Object.values(useDayPer)])
+      for (const e of Object.values(bag))
+        for (const d of Object.keys(e)) if (+d < d0) delete e[d];
+    const h0 = Math.floor(Date.now() / 36e5) - 7 * 24;
+    for (const bag of [useHour, ...Object.values(useHourPer)])
+      for (const e of Object.values(bag))
+        for (const h of Object.keys(e)) if (+h < h0) delete e[h];
+    // quota squeeze: free the emote-set cache for room, then shed the
+    // heavier history detail until the write lands - the order and count
+    // fields are what the picker runs on, so they ride to the last
+    const blob = (extra) => JSON.stringify({ n: liveUse, t: useTs, s: useT0, i: useIds, w: Date.now(), ...extra });
+    try { localStorage.setItem(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer, h: useHour, hp: useHourPer })); return; } catch {}
+    try { sweepEmoteCache(true); localStorage.setItem(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer, h: useHour, hp: useHourPer })); return; } catch {}
+    try { localStorage.setItem(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer })); return; } catch {}
+    try { localStorage.setItem(EMOTEUSE_KEY, blob({})); } catch {}
+  };
   const saveUse = () => {
     if (useSaveTimer) return;
-    useSaveTimer = setTimeout(() => {
-      useSaveTimer = 0;
-      // cap the map: on overflow, evict the stalest entries first
-      const ks = Object.keys(useTs);
-      if (ks.length > 6000) {
-        ks.sort((a, b) => useTs[a] - useTs[b]);
-        for (const k of ks.slice(0, ks.length - 6000)) {
-          delete useTs[k]; delete liveUse[k]; delete useDay[k]; delete useHour[k]; delete useIds[k];
-          for (const lp of Object.values(useDayPer)) delete lp[k];
-          for (const hp of Object.values(useHourPer)) delete hp[k];
-        }
-      }
-      const d0 = Math.floor(Date.now() / 864e5) - 31;
-      for (const bag of [useDay, ...Object.values(useDayPer)])
-        for (const e of Object.values(bag))
-          for (const d of Object.keys(e)) if (+d < d0) delete e[d];
-      const h0 = Math.floor(Date.now() / 36e5) - 7 * 24;
-      for (const bag of [useHour, ...Object.values(useHourPer)])
-        for (const e of Object.values(bag))
-          for (const h of Object.keys(e)) if (+h < h0) delete e[h];
-      try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds, w: Date.now() })); } catch {}
-    }, 4000);
+    useSaveTimer = setTimeout(() => { useSaveTimer = 0; putUse(); }, 4000);
   };
-  addEventListener('pagehide', () => { try { localStorage.setItem(EMOTEUSE_KEY, JSON.stringify({ n: liveUse, t: useTs, s: useT0, d: useDay, pd: useDayPer, h: useHour, hp: useHourPer, i: useIds, w: Date.now() })); } catch {} });
+  addEventListener('pagehide', () => { try { putUse(); } catch {} });
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
@@ -10455,7 +10488,7 @@
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;
     // in use mode, the cells mark where last-seen chat use ages past each
     // threshold; emotes never seen this session count as stale
-    const AGES = [[1e4, '10 seconds'], [2e4, '20 seconds'], [3e4, '30 seconds'], [45e3, '45 seconds'], [6e4, 'a minute'], [9e4, '90 seconds'], [12e4, '2 minutes'], [18e4, '3 minutes'], [24e4, '4 minutes'], [3e5, '5 minutes'], [45e4, '7½ minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, '30 minutes'], [24e5, '40 minutes'], [3e6, '50 minutes'], [36e5, 'an hour'],
+    const AGES = [[1e4, '10 seconds'], [2e4, '20 seconds'], [3e4, '30 seconds'], [45e3, '45 seconds'], [6e4, 'a minute'], [9e4, '90 seconds'], [12e4, '2 minutes'], [18e4, '3 minutes'], [24e4, '4 minutes'], [3e5, '5 minutes'], [36e4, '6 minutes'], [42e4, '7 minutes'], [48e4, '8 minutes'], [54e4, '9 minutes'], [6e5, '10 minutes'], [12e5, '20 minutes'], [18e5, '30 minutes'], [24e5, '40 minutes'], [3e6, '50 minutes'], [36e5, 'an hour'],
       ...[...Array(11)].map((_, i) => [(i + 2) * 36e5, `${i + 2} hours`])]; // 2h through 12h
     // the ladder is shared across sections - one timeline, one pending set
     const now = Date.now();
