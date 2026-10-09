@@ -1946,6 +1946,10 @@
   #emoteGrid .eage.missed:not(.lit) { color: #a06be0; }
   #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
+  /* crossed beats unlogged on the ring: a lit+missed rung gets the accent
+     back but keeps the dotted march, and its label carries the violet */
+  #emoteGrid .eage.lit.missed { color: #a06be0; }
+  #emoteGrid .eage.lit.missed .ants rect { stroke: var(--accent); }
   /* eras no emote has reached yet - tripped by the never-used tail or
      flushed at the list's end - wear violet like the missed mark, but
      keep the standard dash: a future boundary, not a logged gap */
@@ -10559,7 +10563,7 @@
           if (deferPend) {
             if (!ts && mk.t > oldestAge) continue;
             m += sqOf(mk, false);
-          } else m += sqOf(mk, !ts);
+          } else m += sqOf(mk, !ts && mk.t > oldestAge);
         }
         // the first rung beyond this cell's age is where it next crosses;
         // never-seen cells sit past every rung and never cross again
