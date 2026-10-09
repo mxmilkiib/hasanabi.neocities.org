@@ -7401,8 +7401,17 @@
       vidBox.style.left = vidBox.style.top = vidBox.style.right =
         vidBox.style.bottom = vidBox.style.width = '';
     } else if (mode === 'float') {
+      // popping straight out of the rail keeps the column rect; a box
+      // already floating (rail entry, or off->float) replays the save
+      const r = vidBox.parentNode === railEl && !vidBox.hidden ? vidBox.getBoundingClientRect() : null;
       mainEl.before(vidBox);
-      applyVidPos();
+      if (r) {
+        vidBox.style.left = r.left + 'px';
+        vidBox.style.top = r.top + 'px';
+        vidBox.style.right = vidBox.style.bottom = 'auto';
+        vidBox.style.width = r.width + 'px';
+        saveVidBox();
+      } else applyVidPos();
     }
     setVideo(mode !== 'off');
   }
