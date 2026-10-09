@@ -5619,10 +5619,13 @@
         // the everyday set names abbreviate in the ranked view; sub titles
         // drop their trailing 'Subscriber' ('3-Month Subscriber' reads
         // 'subbed · 3-Month'), and the dedup still checks the full word so
-        // a plain 'Subscriber' title never doubles the name
+        // a plain 'Subscriber' title never doubles the name. prime's set
+        // id reads as 'premium' - the row names what it is and drops the
+        // 'Prime Gaming' version title that would just double it
         const raw = id.replace(/[-_]/g, ' ');
-        const name = ({ subscriber: 'subbed', moderator: 'mod' })[id] || raw;
-        const vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '') : v.t;
+        const name = ({ subscriber: 'subbed', moderator: 'mod', premium: 'Prime subscriber' })[id] || raw;
+        const vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '')
+          : id === 'premium' ? '' : v.t;
         const label = vt && vt.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${vt}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
