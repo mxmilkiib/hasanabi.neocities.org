@@ -1121,12 +1121,12 @@
      title there wasn't the width */
   #statsBody .st-frow { display: flex; flex-wrap: wrap; gap: 0 6px;
     margin: -1px 0 1px; line-height: 1.4; }
-  /* docked in the rail the tab runs narrow: filter rows hide and the
-     headers carry a · 24h suffix since every ranked list is windowed */
+  /* docked in the rail the tab runs narrow: filter rows hide and each
+     windowed list's span buttons ride its own heading instead */
   #rail .st-frow, #rail .st-sort, #rail .st-scope { display: none; }
-  /* the session-rate span picker stays on in the rail, riding the
-     heading's right edge like top links' own sort row */
-  #rail .st-rate .st-sort { display: inline; }
+  /* the panels that carry their pickers in the heading still show them */
+  #rail .st-rate .st-sort, #rail .st-wide .st-sort, #rail .st-emotes .st-sort,
+  #rail .st-badges .st-sort, #rail .st-chatters .st-sort { display: inline; }
   #rail .st-row i { font-size: .8em; }
   /* the narrow rail's gutters run tighter than the wide form's 22px */
   #rail #statsBody { gap: 10px 14px; }
@@ -5306,7 +5306,7 @@
   // top emotes' count source: the channel's StreamElements figures, or
   // this client's own tallies - all of them or a recent window. window
   // specs fold hour buckets for sub-day spans and day buckets past that
-  const EMOTE_SRCS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const EMOTE_SRCS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   // saved prefs from before the labels were renamed still resolve
   const normWin = (v) => (v === 'alltime' || v === 'all-time' ? 'all' : (v === 'day' || v === 'today') ? '24h' : v);
@@ -5315,20 +5315,20 @@
   if (!(emoteStatSrc in EMOTE_SRCS)) emoteStatSrc = '24h';
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
-  const CHAT_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const CHAT_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const CHAT_SORT_KEY = 'hasan-chatsort';
   let chatSort = '24h';
   try { chatSort = normWin(localStorage.getItem(CHAT_SORT_KEY)) || '24h'; } catch {}
   if (!(chatSort in CHAT_WINS)) chatSort = '24h';
   // badge counts also window like the emote ones: 'all' is the plain
   // tally, the rest read trailing days out of the per-version buckets
-  const BADGE_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const BADGE_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = '24h';
   try { badgeWin = normWin(localStorage.getItem(BADGE_WIN_KEY)) || '24h'; } catch {}
   if (!(badgeWin in BADGE_WINS)) badgeWin = '24h';
   // top links window the same way; 'all' is the plain tally
-  const LINK_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const LINK_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const LINK_WIN_KEY = 'hasan-linkwin';
   let linkWin = '24h';
   try { linkWin = normWin(localStorage.getItem(LINK_WIN_KEY)) || '24h'; } catch {}
@@ -5385,7 +5385,7 @@
       const eu = setFor(c).emoteUse || {};
       for (const k in eu) eUse[k] = (eUse[k] || 0) + eu[k];
     }
-    const win = EMOTE_SRCS[inRail ? '24h' : emoteStatSrc] ?? 0;
+    const win = EMOTE_SRCS[emoteStatSrc] ?? 0;
     // per-emote count under the picked source: stream-elements figures,
     // or the buckets inside a trailing window
     const wMap = win !== 0
@@ -5399,7 +5399,7 @@
     // the window only applies to the ranked 'use' view - grouped sorts
     // always read the full tally
     const bSort = inRail ? 'use' : badgeSort;
-    const bWinSpec = bSort === 'use' ? (BADGE_WINS[inRail ? '24h' : badgeWin] ?? 0) : 0;
+    const bWinSpec = bSort === 'use' ? (BADGE_WINS[badgeWin] ?? 0) : 0;
     const bWSet = new Map(), bWVer = new Map();
     if (bWinSpec) {
       const bWFold = foldWin(bWinSpec, sc ? (badgeDayPer[sc] || {}) : badgeDay, sc ? (badgeHourPer[sc] || {}) : badgeHour);
@@ -5425,7 +5425,7 @@
     const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
     // windowed picks fold the per-login day buckets into a tally;
     // 'all' reads the plain session map
-    const cWinSpec = CHAT_WINS[inRail ? '24h' : chatSort] ?? CHAT_WINS['24h'];
+    const cWinSpec = CHAT_WINS[chatSort] ?? CHAT_WINS['24h'];
     const nView = cWinSpec
       ? foldWin(cWinSpec, sc ? (nickDayPer[sc] || {}) : nickDay, sc ? (nickHourPer[sc] || {}) : nickHour)
       : nMsgs;
@@ -5451,7 +5451,7 @@
     // form links-view dedup uses, so scheme/www/case variants fold. the
     // bots' evergreen promos crowd the ranking without news value - they
     // already live in the Hasan & co. links row, so they're hidden from the list
-    const lWinSpec = LINK_WINS[inRail ? '24h' : linkWin] ?? 0;
+    const lWinSpec = LINK_WINS[linkWin] ?? 0;
     const uUseM = lWinSpec
       ? foldWin(lWinSpec, sc ? (urlDayPer[sc] || {}) : urlDay, sc ? (urlHourPer[sc] || {}) : urlHour)
       : (sc ? (urlUsePer[sc] || new Map()) : urlUse);
@@ -5696,15 +5696,15 @@
     // the window buttons take the sort row's lead slot: each one is
     // 'use' ranked within that window, so they only light when the
     // ranked view is showing
-    const badgeWinTips = { 'all': 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', '24h': 'flat ranking by use, last 24 hours', '12h': 'flat ranking by use, last 12 hours', '1h': 'flat ranking by use, last hour' };
+    const badgeWinTips = { 'all': 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', '24h': 'flat ranking by use, last 24 hours', '12h': 'flat ranking by use, last 12 hours', '6h': 'flat ranking by use, last 6 hours', '3h': 'flat ranking by use, last 3 hours', '1h': 'flat ranking by use, last hour' };
     const badgeWinBtns = Object.keys(BADGE_WINS)
-      .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
+      .map((s) => `<button type="button" class="st-s${bSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
-    const chatWinTips = { 'all': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', '24h': 'message count, last 24 hours', '12h': 'message count, last 12 hours', '1h': 'message count, last hour' };
+    const chatWinTips = { 'all': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', '24h': 'message count, last 24 hours', '12h': 'message count, last 12 hours', '6h': 'message count, last 6 hours', '3h': 'message count, last 3 hours', '1h': 'message count, last hour' };
     const chatSortBtns = Object.keys(CHAT_WINS)
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="${chatWinTips[s]}">${s}</button>`)
       .join('');
-    const linkWinTips = { 'all': 'post count, all time', month: 'post count, last 31 days', week: 'post count, last 7 days', '24h': 'post count, last 24 hours', '12h': 'post count, last 12 hours', '1h': 'post count, last hour' };
+    const linkWinTips = { 'all': 'post count, all time', month: 'post count, last 31 days', week: 'post count, last 7 days', '24h': 'post count, last 24 hours', '12h': 'post count, last 12 hours', '6h': 'post count, last 6 hours', '3h': 'post count, last 3 hours', '1h': 'post count, last hour' };
     const linkWinBtns = Object.keys(LINK_WINS)
       .map((s) => `<button type="button" class="st-s${linkWin === s ? ' on' : ''}" data-lwin="${s}" title="${linkWinTips[s]}">${s}</button>`)
       .join('');
@@ -5742,13 +5742,18 @@
       `</div>` +
       `<div class="st-panel st-rate"><div class="st-h">session rate<span class="st-sort">${rateWinBtns}</span></div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
-      `<div class="st-panel st-wide"><div class="st-h">top links${inRail ? ' · 24h' : ''} <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
-      `<div class="st-panel st-emotes"><div class="st-h">top emotes${inRail ? ' · 24h' : ''}</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `<div class="st-panel st-badges"><div class="st-h">top badges${inRail ? ' · 24h' : ''}</div><div class="st-frow">${badgeWinBtns} ${badgeSortBtnsHtml}</div>` +
+      `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
+      `<div class="st-panel st-emotes"><div class="st-h">top emotes<span class="st-sort">${inRail ? emoteSrcBtns : ''}</span></div>` +
+        (inRail ? '' : `<div class="st-frow">${emoteSrcBtns}</div>`) +
+        `<div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
+      `<div class="st-panel st-badges"><div class="st-h">top badges<span class="st-sort">${inRail ? badgeWinBtns : ''}</span></div>` +
+        (inRail ? '' : `<div class="st-frow">${badgeWinBtns} ${badgeSortBtnsHtml}</div>`) +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${bSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
-      `<div class="st-panel st-chatters"><div class="st-h">top chatters${inRail ? ' · 24h' : ''}</div><div class="st-frow">${chatSortBtns}</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
+      `<div class="st-panel st-chatters"><div class="st-h">top chatters<span class="st-sort">${inRail ? chatSortBtns : ''}</span></div>` +
+        (inRail ? '' : `<div class="st-frow">${chatSortBtns}</div>`) +
+        `<div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
       `<div class="st-panel st-foot"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
     drawScrollGraph(el, sc);
