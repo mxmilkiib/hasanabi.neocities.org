@@ -1121,6 +1121,9 @@
   /* docked in the rail the tab runs narrow: filter rows hide and the
      headers carry a · 24h suffix since every ranked list is windowed */
   #rail .st-frow, #rail .st-sort, #rail .st-scope { display: none; }
+  /* the session-rate span picker stays on in the rail, riding the
+     heading's right edge like top links' own sort row */
+  #rail .st-rate .st-sort { display: inline; }
   #rail .st-row i { font-size: .8em; }
   /* the narrow rail's gutters run tighter than the wide form's 22px */
   #rail #statsBody { gap: 10px 14px; }
@@ -5725,7 +5728,7 @@
         `<div class="st-panel"><div class="st-h">glorps</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
-      `<div class="st-panel st-rate"><div class="st-h">session rate</div><div class="st-frow">${rateWinBtns}</div>` +
+      `<div class="st-panel st-rate"><div class="st-h">session rate<span class="st-sort">${rateWinBtns}</span></div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links${inRail ? ' · 24h' : ''} <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
       `<div class="st-panel st-emotes"><div class="st-h">top emotes${inRail ? ' · 24h' : ''}</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
@@ -5856,9 +5859,8 @@
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     const t1 = rateHistT[rateHistT.length - 1] || Date.now();
     let t0 = rateHistT[Math.max(0, off)] || t1;
-    // the span picker zooms to a trailing window; 'all' keeps the tail -
-    // rail-docked stats hide the picker and always draw the full tail
-    const rWin = el.closest('#rail') ? 0 : (RATE_WINS[rateWin] || 0);
+    // the span picker zooms to a trailing window; 'all' keeps the tail
+    const rWin = RATE_WINS[rateWin] || 0;
     if (rWin && t1 - rWin > t0) t0 = t1 - rWin;
     const span = Math.max(30000, t1 - t0);
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
