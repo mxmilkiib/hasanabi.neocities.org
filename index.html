@@ -1656,12 +1656,6 @@
      for plain text colour so it reads as the settled one */
   #helpPanel a.helpColour, #helpPanel a.helpVariant, #helpPanel a.helpFont, #helpPanel a.helpLh, #helpPanel a.helpLs, #helpPanel a.helpLines, #helpPanel a.helpOpt { color: var(--accent); cursor: pointer; text-decoration: underline; }
   #helpPanel a.helpColour.on, #helpPanel a.helpVariant.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLs.on, #helpPanel a.helpLines.on, #helpPanel a.helpOpt.on { color: var(--text); cursor: default; }
-  /* the labels row's lit pick reads white rather than theme text */
-  #helpPanel a.helpNoLbl.on { color: #fff; }
-  /* the lit pick: a tight black shadow under the white text; chips
-     painted in their own palette (--pv-*) and the shadow-demo chips
-     (inline text-shadow) keep their own look */
-  #helpPanel a.on:not([style*="--pv"]) { text-shadow: 0 1px 1px rgba(0, 0, 0, .55); }
   /* 'follow chat' names the resolved size while it leads the hdr row */
   #helpPanel.hfs-follow a.helpHfs[data-idx="0"]::after { content: " (" var(--chat-font, 15px) ")"; }
   /* zebra chips wear a gray wash - a little inset keeps the shade readable */
