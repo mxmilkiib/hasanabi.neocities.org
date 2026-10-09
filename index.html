@@ -5503,10 +5503,10 @@
         }
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
       const bVis = statBadgeAll ? flat : flat.slice(0, 40);
-      badgeSets = bVis.map(({ id, v, n }) => {
+      badgeSets = bVis.map(({ id, v, n }, i) => {
         const name = id.replace(/[-_]/g, ' ');
         const label = v.t && v.t.toLowerCase() !== name ? `${name} · ${v.t}` : name;
-        return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">·</span>` +
+        return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
           `<i>${n.toLocaleString('en')}</i></div>`;
