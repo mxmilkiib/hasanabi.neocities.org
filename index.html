@@ -2621,18 +2621,21 @@
   const gifLink = (q, label, g) => g
     ? `<a class="gifq" data-q="${escapeHTML(q)}" href="${escapeHTML(g.page)}" target="_blank" rel="noopener noreferrer"><img class="gifimg" src="${escapeHTML(g.url)}" alt="${escapeHTML(label)}" title="${escapeHTML(label)}"></a>`
     : `<a class="gifq" data-q="${escapeHTML(q)}" href="https://giphy.com/search/${encodeURIComponent(q.replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a>`;
-  // hits persist in localStorage (30 days, 300 entries, keyed with the rating
+  // results persist in localStorage (30-day hits, 1-day misses, 300 entries,
+  // keyed with the rating
   // flag) so a reload or a repeated title never spends a lookup; the image
   // files themselves are cached by the service worker. Lookups leave one
   // at a time, at least 1.2s apart and 80 an hour, and a 429 from giphy
   // pauses them for 5 minutes - a history walkback full of gif posts would
   // otherwise burn the key's hourly allowance in seconds
-  const GIF_KEY = 'hasan-gifs', GIF_TTL = 30 * 864e5, GIF_MAX = 300, GIF_GAP = 1200, GIF_HOURLY = 80;
+  const GIF_KEY = 'hasan-gifs', GIF_TTL = 30 * 864e5, GIF_MISS_TTL = 864e5, GIF_MAX = 300, GIF_GAP = 1200, GIF_HOURLY = 80;
   let gifStore = {};
   try { gifStore = JSON.parse(localStorage.getItem(GIF_KEY)) || {}; } catch {}
   const gifSk = (q) => (gifSafe ? '1|' : '0|') + q;
   function gifSave(q, g) {
-    gifStore[gifSk(q)] = { u: g.url, p: g.page, t: Date.now() };
+    // a miss stores an empty u with a short ttl, so a dead title doesn't
+    // spend a fresh lookup every reload - it may gain a gif later
+    gifStore[gifSk(q)] = { u: g ? g.url : '', p: g ? g.page : '', t: Date.now() };
     const ks = Object.keys(gifStore);
     if (ks.length > GIF_MAX) ks.sort((a, b) => gifStore[a].t - gifStore[b].t).slice(0, ks.length - GIF_MAX).forEach((k) => delete gifStore[k]);
     try { localStorage.setItem(GIF_KEY, JSON.stringify(gifStore)); } catch {}
@@ -2658,7 +2661,7 @@
     let hit = gifCache.get(q);
     if (hit === undefined) {
       const s = gifStore[gifSk(q)];
-      if (s && Date.now() - s.t < GIF_TTL) { hit = { url: s.u, page: s.p }; gifCache.set(q, hit); }
+      if (s && Date.now() - s.t < (s.u ? GIF_TTL : GIF_MISS_TTL)) { hit = s.u ? { url: s.u, page: s.p } : null; gifCache.set(q, hit); }
     }
     if (hit === undefined && !gifWait.has(q)) {
       gifWait.add(q); gifQueue.push(q);
@@ -11204,8 +11207,8 @@
         const g = d.url && /^https:\/\/media\d*\.giphy\.com\//.test(d.url) && /^https:\/\/giphy\.com\//.test(d.page || '')
           ? { url: d.url, page: d.page } : null;
         gifCache.set(d.q, g);
+        gifSave(d.q, g);
         if (g) {
-          gifSave(d.q, g);
           document.querySelectorAll('a.gifq').forEach((a) => {
             if (a.dataset.q !== d.q || a.querySelector('img')) return;
             a.outerHTML = gifLink(d.q, a.textContent, g);
