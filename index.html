@@ -1398,6 +1398,10 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
   }
   #helpPanel[hidden] { display: none; }
+  /* split-4's rail takes the top-right dock spot, so an unmoved popup
+     centers instead; --hcx carries the clamp's centered x. a dragged
+     left wins over the class, so user moves are untouched */
+  #helpPanel.hcenter { right: auto; left: var(--hcx, 12px); }
   /* the scrollable region lives one level in so the drag handle and
      corner grips can sit fixed over it */
   #helpPanel .hp-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 14px; border-radius: 5px; }
@@ -8238,10 +8242,17 @@
     const hpx = parseFloat(helpPanel.style.maxHeight.match(/[\d.]+/)?.[0] || helpPanel.style.height) || Math.round(innerHeight * .75);
     helpPanel.style.maxHeight = `min(${hpx}px, calc(100dvh - ${Math.round(top) + 8}px))`;
     const r = helpPanel.getBoundingClientRect();
+    // rail mode centers the panel until the user drags it - a set
+    // style.left is that drag's mark, so only the untouched one centers
+    const mid = !railEl.hidden && !helpPanel.style.left;
+    helpPanel.classList.toggle('hcenter', mid);
     if (helpPanel.style.left) {
       helpPanel.style.left = Math.max(0, Math.min(innerWidth - r.width, r.left)) + 'px';
       helpPanel.style.top = Math.max(top, Math.min(innerHeight - r.height, r.top)) + 'px';
-    } else helpPanel.style.top = top + 'px';
+    } else {
+      if (mid) helpPanel.style.setProperty('--hcx', Math.max(0, (innerWidth - r.width) / 2) + 'px');
+      helpPanel.style.top = top + 'px';
+    }
   }
   // a dragged width isn't one of the stops - note it in brackets
   const markHelpW = (w) => { helpWCur.textContent = w ? ` (${w}px)` : ''; };
