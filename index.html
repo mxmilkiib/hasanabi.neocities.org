@@ -8380,7 +8380,16 @@
       const t = helpPanel.querySelector('.htabs a.on');
       if (t && HTAB_URL_INV[t.dataset.htab]) q.set('htab', HTAB_URL_INV[t.dataset.htab]);
     }
-    const url = location.origin + location.pathname + ([...q.keys()].length ? '?' + q : '');
+    // a matching preset collapses to ?theme=name; only options the preset
+    // doesn't pin (presetMatch's field set) still need their own params
+    const pin = Object.keys(THEME_PRESETS).find((n) => n !== 'default' && presetMatch(THEME_PRESETS[n]));
+    let qs = q;
+    if (pin) {
+      const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls' };
+      qs = new URLSearchParams([['theme', pin]]);
+      for (const [k, v] of q) if (!(PINNED[k] in THEME_PRESETS[pin])) qs.append(k, v);
+    }
+    const url = location.origin + location.pathname + ([...qs.keys()].length ? '?' + qs : '');
     navigator.clipboard.writeText(url)
       .then(() => {
         b.textContent = 'copied'; b.classList.add('copied');
