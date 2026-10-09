@@ -8483,7 +8483,12 @@
       // reads have initialized - defer past the first eval pass
       setTimeout(renderStats);
     } else {
-      statsHome.parent.insertBefore(statsTab, statsHome.next);
+      // statsHome only exists after a dock - an undock before rail was
+      // ever entered (or after a restore) just hides the tab pane
+      if (statsHome) {
+        statsHome.parent.insertBefore(statsTab, statsHome.next);
+        statsHome = null;
+      }
       statsTab.hidden = true;
       statsLink.hidden = false;
       mainEl.before(vidBox);
