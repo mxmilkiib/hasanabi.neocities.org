@@ -2148,7 +2148,7 @@
       <button class="hdr-btn slot" data-i="2">➌</button>
     </div>
     <div class="wide" style="margin-top: 20px"><span id="copyUrlPrev" style="display: block; text-align: center; word-break: break-all; font-size: .78em; opacity: .65; user-select: all" title="the url the button below copies"></span></div>
-    <button id="copyUrl" class="hdr-btn" style="margin-top: 4px; width: 100%; height: 26px">copy settings url</button>
+    <button id="copyUrl" class="hdr-btn" style="margin-top: -2px; width: 100%; height: 26px">copy settings url</button>
     <div class="wide" style="margin-top: 4px; font-size: .85em"><span>the copied url also carries this popup's open state and selected tab (?help/?htab): <span id="helpCopyHelpList"></span></span></div>
     <div style="margin-top: 14px; display: flex; gap: 6px">
     <button id="resetOpts" class="hdr-btn" style="flex: 3; height: 26px">reset all settings</button>
@@ -8433,7 +8433,11 @@
     return location.origin + location.pathname + ([...qs.keys()].length ? '?' + qs : '');
   }
   function updateUrlPrev() {
-    try { document.getElementById('copyUrlPrev').textContent = settingsUrl(); } catch {}
+    // the scheme is noise - dim it and let the host + params carry the row
+    try {
+      document.getElementById('copyUrlPrev').innerHTML = escapeHTML(settingsUrl())
+        .replace(/^(https?:\/\/)/, '<span style="opacity:.45">$1</span>');
+    } catch {}
   }
   document.getElementById('copyUrl').addEventListener('click', (e) => {
     const b = e.currentTarget;
@@ -12015,7 +12019,7 @@
       const t = n.nodeType === 3 ? n
         : n.nodeType === 1 && n.tagName === 'SPAN' && n.firstChild?.nodeType === 3 ? n.firstChild
         : null;
-      if (!t) continue;
+      if (!t || t.parentElement?.id === 'copyUrlPrev') continue;
       const i = t.textContent.indexOf(':');
       if (i < 1 || i > 30) continue;
       const b = document.createElement('b');
