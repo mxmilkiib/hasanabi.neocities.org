@@ -2632,7 +2632,7 @@
   // at a time, at least 1.2s apart and 80 an hour, and a 429 from giphy
   // pauses them for 5 minutes - a history walkback full of gif posts would
   // otherwise burn the key's hourly allowance in seconds
-  const GIF_KEY = 'hasan-gifs', GIF_TTL = 30 * 864e5, GIF_MISS_TTL = 864e5, GIF_MAX = 300, GIF_GAP = 1200, GIF_HOURLY = 80;
+  const GIF_KEY = 'hasan-gifs', GIF_TTL = 30 * 864e5, GIF_MISS_TTL = 7 * 864e5, GIF_MAX = 300, GIF_GAP = 1200, GIF_HOURLY = 80;
   let gifStore = {};
   try { gifStore = JSON.parse(localStorage.getItem(GIF_KEY)) || {}; } catch {}
   const gifSk = (q) => (gifSafe ? '1|' : '0|') + q;
