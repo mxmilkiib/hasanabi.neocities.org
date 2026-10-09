@@ -3895,9 +3895,11 @@
         const ek = ch + '\x00' + echoKey(login, tags, rawMsg);
         selfEcho = echoKeys.has(ek);
         const arr = echoRows.get(ek);
-        // evicted echoes go stale in the bucket - skip to a live row; the
-        // oldest matching echo adopts first when the key is shared
-        while (arr && arr.length && !arr[0].isConnected) arr.shift();
+        // a stale echo already paged out with its column - treat it as
+        // spent and let this copy render fresh at the live edge rather
+        // than reviving a fading ghost mid-page; the oldest matching live
+        // echo still adopts first when the key is shared
+        while (arr && arr.length && (!arr[0].isConnected || arr[0].classList.contains('stale'))) arr.shift();
         const el = arr && arr[0];
         if (el) {
           arr.shift();
@@ -4442,10 +4444,10 @@
     const nc = chatterSeen.size;
     chattersEl.hidden = !nc;
     chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
-    // .local immunity exists so a send's real copy can adopt the row - an
-    // echo still unmatched a minute on isn't awaiting anything, so it
-    // stops dodging the column ghosting and pages out like any row. A
-    // late copy can still adopt it (the echoRows entry survives)
+    // an echo still unmatched a minute on isn't awaiting anything - drop
+    // its pending marker so a stored copy can't re-register on reload and
+    // get adopted by a far-later replay. A live late copy can still adopt
+    // it while the echoRows entry survives
     for (const r of document.querySelectorAll('.row.local'))
       if ((+r.dataset.ts || 0) < now - 6e4) r.classList.remove('local');
     rateSamples.push(downAt ? NaN : rate);
@@ -8369,13 +8371,11 @@
     let keep = 0, hSum = 0;
     while (keep < moveTail.length && hSum < to.clientHeight) hSum += heights[keep++];
     const spill = moveTail.splice(keep);
-    // a .local echo awaiting its real copy stays a live row - ghosting it
-    // strands the echo key and the real message lands as a duplicate
-    for (const r of to.children) if (!r.classList.contains('local')) r.classList.add('stale');
+    for (const r of to.children) r.classList.add('stale');
     let need = 0;
     const frag = document.createDocumentFragment();
     for (let i = moveTail.length - 1; i >= 0; i--) { frag.appendChild(moveTail[i]); need += heights[i]; }
-    for (const r of spill) if (!r.classList.contains('local')) r.classList.add('stale');
+    for (const r of spill) r.classList.add('stale');
     to.prepend(frag);
     const firstGhost = to.querySelector('.row.stale');
     if (firstGhost) consumeGhosts(firstGhost, need);
