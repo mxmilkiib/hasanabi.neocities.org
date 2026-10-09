@@ -1080,6 +1080,9 @@
      ems, split the space), then storage on its own last row */
   #statsBody .st-trio { display: flex; flex: 0 0 100%; gap: 0 22px; align-items: flex-start; }
   #statsBody .st-trio .st-panel { flex: 1 1 0; min-width: 0; }
+  /* session rows run longer than bursts/glorps entries, so it takes a
+     wider share of the trio than an equal third */
+  #statsBody .st-trio .st-panel:first-child { flex: 1.4 1 0; }
   /* st-panel.st-rate, not bare .st-rate - the generic panel rule sits
      later at equal specificity and would collapse it into the row */
   #statsBody .st-panel.st-rate { flex: 0 0 100%; }
@@ -1113,7 +1116,7 @@
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
-  #statsBody #stRate { display: block; width: 100%; height: 64px; }
+  #statsBody #stRate { display: block; width: 100%; height: 96px; }
   #statsBody .st-badge { break-inside: avoid; }
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
@@ -4091,7 +4094,7 @@
   // the session-long copy of the same series: pushed in lockstep with
   // rateSamples but kept to RATE_KEEP seconds instead of the spark's
   // window, so the stats rate chart covers the whole recorded session
-  const RATE_KEEP = 43200;
+  const RATE_KEEP = 86400;
   const rateHist = [];
   const rateHistT = [];
   const rateHistWhy = [];
@@ -5304,7 +5307,8 @@
   if (!(linkWin in LINK_WINS)) linkWin = '24h';
   // session-rate graph span: 'all' draws the whole recorded tail, the
   // rest zoom to a trailing window so long sessions keep readable bars
-  const RATE_WINS = { all: 0, '6h': 21600e3, '1h': 3600e3, '30m': 1800e3 };
+  const RATE_WINS = { all: 0, '24h': 86400e3, '12h': 43200e3, '6h': 21600e3,
+    '3h': 10800e3, '2h': 7200e3, '1h': 3600e3, '30m': 1800e3, '15m': 900e3 };
   const RATE_WIN_KEY = 'hasan-ratewin';
   let rateWin = 'all';
   try { rateWin = localStorage.getItem(RATE_WIN_KEY) || 'all'; } catch {}
@@ -5822,7 +5826,7 @@
       return;
     }
     const dpr = window.devicePixelRatio || 1;
-    const H = 64;
+    const H = 96;
     const wCss = Math.max(80, cv.clientWidth || 220);
     cv.width = Math.round(wCss * dpr);
     cv.height = Math.round(H * dpr);
@@ -5859,7 +5863,8 @@
     // long span reads as countable stretches; a finer rung gets a tick,
     // and a boundary stamps HH:MM when there's room for it
     const txtDim = (getComputedStyle(document.documentElement).getPropertyValue('--text-dim') || '#888').trim();
-    const RUNGS = [60e3, 300e3, 600e3, 900e3, 1800e3, 3600e3];
+    const RUNGS = [60e3, 300e3, 600e3, 900e3, 1800e3, 3600e3, 7200e3, 10800e3,
+      21600e3, 43200e3, 86400e3];
     const tickInt = RUNGS.find((r) => r / span * wCss >= 4) || 3600e3;
     const blockInt = RUNGS.find((r) => r / span * wCss >= 40) || 3600e3;
     g.fillStyle = 'rgba(0,0,0,.10)';
@@ -5888,21 +5893,37 @@
       }
     }
     g.globalAlpha = 1;
+    // scale labels: the peak value caps the top-left corner and a faint
+    // hairline marks half-height, so spikes read against real numbers
+    if (peak > 0) {
+      g.fillStyle = txtDim; g.font = '9px sans-serif'; g.textBaseline = 'top';
+      const pTxt = `${peak >= 10 ? peak.toFixed(0) : peak.toFixed(1)}/s`;
+      g.globalAlpha = .7;
+      g.fillText(pTxt, 3, 4);
+      const midY = 1 + (H - 3) / 2;
+      g.globalAlpha = .3;
+      g.fillRect(0, midY, wCss, 1);
+      g.globalAlpha = .6;
+      g.fillText(`${peak / 2 >= 10 ? (peak / 2).toFixed(0) : (peak / 2).toFixed(1)}`, 3, midY - 10);
+      g.globalAlpha = 1;
+    }
     // ticks and stamps ride the top edge - the bars grow from the floor
     g.fillStyle = txtDim; g.globalAlpha = .4;
     for (let t = Math.ceil(t0 / tickInt) * tickInt; t < t1; t += tickInt)
       g.fillRect(Math.round((t - t0) / span * wCss), 0, 1, 3);
-    if (blockInt / span * wCss >= 46) {
+    if (blockInt / span * wCss >= 40) {
       g.globalAlpha = .55; g.font = '9px sans-serif'; g.textBaseline = 'top';
       for (let t = Math.ceil(t0 / blockInt) * blockInt; t < t1; t += blockInt) {
+        const x = (t - t0) / span * wCss;
+        if (peak > 0 && x < 34) continue; // clear of the peak label
         const d = new Date(t);
-        g.fillText(`${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`, (t - t0) / span * wCss + 2, 4);
+        g.fillText(`${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`, x + 2, 4);
       }
     }
     g.globalAlpha = 1;
     const mins = Math.round((t1 - t0) / 60000);
     const dur = mins >= 60 ? `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}m` : `${mins}m`;
-    cv.title = `msgs/sec across the recorded session - ${dur} span`;
+    cv.title = `msgs/sec - ${rWin ? `trailing ${rateWin}` : 'recorded session'} · ${dur} span`;
     cv.setAttribute('aria-label', cv.title);
     // hovering reads the bin under the pointer: its time, the pooled
     // msgs/s, and why a dead stretch shows no samples
