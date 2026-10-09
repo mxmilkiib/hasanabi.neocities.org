@@ -1082,6 +1082,9 @@
      title there wasn't the width */
   #statsBody .st-frow { display: flex; flex-wrap: wrap; gap: 0 6px;
     margin: -1px 0 1px; line-height: 1.4; }
+  #statsBody .st-key .st-sw { display: inline-block; width: .7em; height: .7em;
+    border-radius: 2px; margin: 0 3px -1px 4px; }
+  #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
   #statsBody #stRate { display: block; width: 100%; height: 64px; }
@@ -5199,6 +5202,13 @@
   let linkWin = '24h';
   try { linkWin = normWin(localStorage.getItem(LINK_WIN_KEY)) || '24h'; } catch {}
   if (!(linkWin in LINK_WINS)) linkWin = '24h';
+  // session-rate graph span: 'all' draws the whole recorded tail, the
+  // rest zoom to a trailing window so long sessions keep readable bars
+  const RATE_WINS = { all: 0, '6h': 21600e3, '1h': 3600e3, '30m': 1800e3 };
+  const RATE_WIN_KEY = 'hasan-ratewin';
+  let rateWin = 'all';
+  try { rateWin = localStorage.getItem(RATE_WIN_KEY) || 'all'; } catch {}
+  if (!(rateWin in RATE_WINS)) rateWin = 'all';
   // a window spec folds its bucket family into a key -> count map:
   // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
   const foldWin = (spec, dayBag, hourBag) => {
@@ -5543,6 +5553,9 @@
     const linkWinBtns = Object.keys(LINK_WINS)
       .map((s) => `<button type="button" class="st-s${linkWin === s ? ' on' : ''}" data-lwin="${s}" title="${linkWinTips[s]}">${s}</button>`)
       .join('');
+    const rateWinBtns = Object.keys(RATE_WINS)
+      .map((s) => `<button type="button" class="st-s${rateWin === s ? ' on' : ''}" data-rwin="${s}" title="graph span${s === 'all' ? ' - whole recorded session' : ' - trailing ' + s}">${s}</button>`)
+      .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
     const pvCh = sc || Object.keys(peakViewers).reduce((a, b) => (peakViewers[b] > (peakViewers[a] || 0) ? b : a), null);
     const pvMax = pvCh ? peakViewers[pvCh] || 0 : 0;
@@ -5572,7 +5585,7 @@
         `<div class="st-panel"><div class="st-h">glorps</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
-      `<div class="st-panel st-rate"><div class="st-h">session rate</div>` +
+      `<div class="st-panel st-rate"><div class="st-h">session rate</div><div class="st-frow">${rateWinBtns}</div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
       `<div class="st-panel st-emotes"><div class="st-h">top emotes</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
@@ -5697,8 +5710,11 @@
     cv.height = Math.round(H * dpr);
     const g = cv.getContext('2d');
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const t0 = rateHistT[Math.max(0, off)] || Date.now();
     const t1 = rateHistT[rateHistT.length - 1] || Date.now();
+    let t0 = rateHistT[Math.max(0, off)] || t1;
+    // the span picker zooms to a trailing window; 'all' keeps the tail
+    const rWin = RATE_WINS[rateWin] || 0;
+    if (rWin && t1 - rWin > t0) t0 = t1 - rWin;
     const span = Math.max(30000, t1 - t0);
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
     const bw = span / N, bwPx = wCss / N;
@@ -5707,7 +5723,7 @@
     const bins = new Float64Array(N), bn = new Float64Array(N), bwhy = new Array(N).fill('');
     for (let i = 0; i < series.length; i++) {
       const t = rateHistT[off + i];
-      if (!t) continue;
+      if (!t || t < t0) continue;
       const b = Math.min(N - 1, Math.floor((t - t0) / bw));
       const v = series[i];
       if (Number.isFinite(v)) { bins[b] += v; bn[b]++; }
@@ -5731,7 +5747,8 @@
     if (sparkCols) {
       g.globalAlpha = .22;
       for (let i = 0; i < N; i++) if (bwhy[i]) {
-        g.fillStyle = /filled/.test(bwhy[i]) ? sparkCols.good : sparkCols.vip;
+        g.fillStyle = /filled/.test(bwhy[i]) ? sparkCols.good
+          : /closed|discarded/.test(bwhy[i]) ? sparkCols.vip : sparkCols.danger;
         g.fillRect(Math.floor(i * bwPx), 0, Math.max(1, Math.ceil(bwPx)), H);
       }
     }
@@ -5761,6 +5778,14 @@
     const dur = mins >= 60 ? `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}m` : `${mins}m`;
     cv.title = `msgs/sec across the recorded session - ${dur} span`;
     cv.setAttribute('aria-label', cv.title);
+    // key under the caption - swatches track the theme via sparkCols or
+    // the same CSS vars it resolves, so they always match the canvas
+    cap.innerHTML += `<div class="st-row st-key"><span class="nm">` +
+      `<i class="st-sw" style="background:${(sparkCols && sparkCols.accent) || 'var(--accent)'}"></i>rate ` +
+      `<i class="st-sw" style="background:${(sparkCols && sparkCols.danger) || 'var(--danger)'}"></i>socket lost ` +
+      `<i class="st-sw" style="background:${(sparkCols && sparkCols.vip) || 'var(--vip)'}"></i>page away ` +
+      `<i class="st-sw" style="background:${(sparkCols && sparkCols.good) || 'var(--good)'}"></i>recovered ` +
+      `<i class="st-sw st-dim"></i>clock marks</span></div>`;
     cap.innerHTML = `<div class="st-row"><span class="nm">${fmtRowTime(new Date(t0))} – ${fmtRowTime(new Date(t1))} (${dur})</span><i>peak ${peak.toFixed(1)}/s</i></div>`;
   }
   // delegated - the stats body rewrites its innerHTML on every render
@@ -5827,6 +5852,13 @@
     if (lw) {
       linkWin = lw.dataset.lwin;
       try { localStorage.setItem(LINK_WIN_KEY, linkWin); } catch {}
+      renderStats();
+      return;
+    }
+    const rw = e.target.closest('.st-s[data-rwin]');
+    if (rw) {
+      rateWin = rw.dataset.rwin;
+      try { localStorage.setItem(RATE_WIN_KEY, rateWin); } catch {}
       renderStats();
       return;
     }
