@@ -1074,7 +1074,7 @@
   #statsBody .st-panel.st-foot { flex: 0 0 100%; }
   /* the ranked row's own weights: emotes are glyph lists so they run
      leanest, badge names+images want room, chatters sit between */
-  #statsBody .st-panel.st-emotes { flex: 0.5 1 0; min-width: 6.5em; }
+  #statsBody .st-panel.st-emotes { flex: 0.9 1 0; min-width: 9em; }
   #statsBody .st-panel.st-badges { flex: 1.3 1 0; }
   /* chatters take their own row below the ranked trio; the list columns
      flow to fill it rather than stretching one tall strip */
@@ -1108,8 +1108,8 @@
   #statsBody .st-s.on { color: var(--accent); text-decoration: underline; }
   #statsBody .st-row { display: flex; align-items: baseline; gap: 6px;
     min-width: 0; padding: 1px 0; line-height: 1.7; }
-  #statsBody .st-row .n { color: var(--accent); font-weight: 600; min-width: 1.5em;
-    font-variant-numeric: tabular-nums; }
+  #statsBody .st-row .n { color: var(--vip); font-weight: 600; min-width: 1.5em;
+    font-size: .8em; font-variant-numeric: tabular-nums; }
   /* the 2.5em floor keeps a name stub readable in the tightest column -
      min-width:0 let the label collapse to nothing beside the count */
   #statsBody .st-row .nm { overflow: hidden; text-overflow: ellipsis;
@@ -5515,8 +5515,11 @@
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
       const bVis = statBadgeAll ? flat : flat.slice(0, 40);
       badgeSets = bVis.map(({ id, v, n }, i) => {
-        const name = id.replace(/[-_]/g, ' ');
-        const label = v.t && v.t.toLowerCase() !== name ? `${name} · ${v.t}` : name;
+        // the everyday set names abbreviate in the ranked view; the title
+        // dedup still checks the full word so 'subed · Subscriber' can't show
+        const raw = id.replace(/[-_]/g, ' ');
+        const name = ({ subscriber: 'subed', moderator: 'mod' })[id] || raw;
+        const label = v.t && v.t.toLowerCase() !== raw ? `${name} · ${v.t}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
