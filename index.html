@@ -1073,12 +1073,11 @@
   #statsBody .st-panel.st-wide { flex: 2 1 0; min-width: 14em; }
   #statsBody .st-panel.st-foot { flex: 0 0 100%; }
   #statsBody .st-panel.st-narrow { flex: 0.7 1 0; min-width: 8em; }
-  /* ranked-panel filters stack as a column right of the title - a
-     horizontal run beside it was squeezing the rows under it narrow */
-  #statsBody .st-h:has(.st-vsort) { display: flex; justify-content: space-between;
-    align-items: flex-start; gap: 2px 8px; }
-  #statsBody .st-sort.st-vsort { float: none; display: flex; flex-direction: column;
-    align-items: flex-end; flex: none; line-height: 1.35; }
+  /* ranked-panel filters live in their own row under the title - a
+     vertical stack beside it squeezed the rows narrow, and beside the
+     title there wasn't the width */
+  #statsBody .st-frow { display: flex; flex-wrap: wrap; gap: 0 6px;
+    margin: -1px 0 1px; line-height: 1.4; }
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
   #statsBody #stRate { display: block; width: 100%; height: 64px; }
@@ -5566,12 +5565,12 @@
       `<div class="st-panel st-rate"><div class="st-h">session rate</div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
-      `<div class="st-panel st-narrow"><div class="st-h">top emotes <span class="st-sort st-vsort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `<div class="st-panel st-narrow"><div class="st-h">top badges <span class="st-sort st-vsort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
+      `<div class="st-panel st-narrow"><div class="st-h">top emotes</div><div class="st-frow">${emoteSrcBtns}</div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
+      `<div class="st-panel st-narrow"><div class="st-h">top badges</div><div class="st-frow">${badgeWinBtns} ${badgeSortBtnsHtml}</div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
-      `<div class="st-panel"><div class="st-h">top chatters <span class="st-sort st-vsort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
+      `<div class="st-panel"><div class="st-h">top chatters</div><div class="st-frow">${chatSortBtns}</div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
       `<div class="st-panel st-foot"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
     drawScrollGraph(el, sc);
