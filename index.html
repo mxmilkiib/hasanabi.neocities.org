@@ -1070,11 +1070,13 @@
   #statsBody .st-panel { flex: 1 1 0; min-width: 10em; }
   #statsBody .st-panel.st-wide { flex: 2 1 0; min-width: 14em; }
   #statsBody .st-panel.st-foot { flex: 0 0 100%; }
-  /* a narrow panel keeps its filters beside the title by letting the
-     anchors wrap into right-aligned lines instead of widening the box */
   #statsBody .st-panel.st-narrow { flex: 0.7 1 0; min-width: 8em; }
-  #statsBody .st-panel.st-narrow .st-sort { display: inline-flex; flex-wrap: wrap;
-    justify-content: flex-end; max-width: 66%; }
+  /* ranked-panel filters stack as a column right of the title - a
+     horizontal run beside it was squeezing the rows under it narrow */
+  #statsBody .st-h:has(.st-vsort) { display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 2px 8px; }
+  #statsBody .st-sort.st-vsort { float: none; display: flex; flex-direction: column;
+    align-items: flex-end; flex: none; line-height: 1.35; }
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
   #statsBody #stRate { display: block; width: 100%; height: 64px; }
@@ -1094,8 +1096,10 @@
     min-width: 0; padding: 1px 0; line-height: 1.7; }
   #statsBody .st-row .n { color: var(--accent); font-weight: 600; min-width: 1.5em;
     font-variant-numeric: tabular-nums; }
+  /* the 2.5em floor keeps a name stub readable in the tightest column -
+     min-width:0 let the label collapse to nothing beside the count */
   #statsBody .st-row .nm { overflow: hidden; text-overflow: ellipsis;
-    white-space: nowrap; min-width: 0; }
+    white-space: nowrap; min-width: 2.5em; }
   #statsBody .st-row .emote { max-height: 1.4em; max-width: 2em; vertical-align: -0.3em; }
   /* a unicode emoji in the slot: optically sized and nudged to sit on
      the same line the emote images hang at */
@@ -1105,8 +1109,14 @@
   #statsBody .st-sub { padding-left: 1.4em; }
   #statsBody .st-sub .nm { color: var(--text-dim); font-size: .88em; }
   /* the fixed-width image slot lines up the names' left edges whether a
-     row carries an emote image or not */
-  #statsBody .st-row .ems { display: inline-block; width: 2em; text-align: center; }
+     row carries an emote image or not - a direct flex child so the row
+     can't shrink the art away, and centered so nothing pokes out of it */
+  #statsBody .st-row .ems { display: flex; flex: none; width: 2em;
+    align-items: center; justify-content: center; align-self: stretch; }
+  #statsBody .st-row .ems .emote { max-height: 1.5em; }
+  #statsBody .st-badge summary .emote, #statsBody .st-brow .emote { flex: none; }
+  #statsBody .st-badge summary .bt, #statsBody .st-brow .bt { min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; }
   #statsBody .st-row i { margin-left: auto; font-style: normal;
     color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
   #statsBody .st-badge summary { cursor: pointer; display: flex; align-items: center;
@@ -5107,33 +5117,33 @@
   // top emotes' count source: the channel's StreamElements figures, or
   // this client's own tallies - all of them or a recent window. window
   // specs fold hour buckets for sub-day spans and day buckets past that
-  const EMOTE_SRCS = { 'all-time': 0, local: -1, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const EMOTE_SRCS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
-  // saved prefs from before the labels were normalised still resolve
-  const normWin = (v) => (v === 'alltime' ? 'all-time' : v === 'day' ? 'today' : v);
-  let emoteStatSrc = 'today';
-  try { emoteStatSrc = normWin(localStorage.getItem(EMOTE_SRC_KEY)) || 'today'; } catch {}
-  if (!(emoteStatSrc in EMOTE_SRCS)) emoteStatSrc = 'today';
+  // saved prefs from before the labels were renamed still resolve
+  const normWin = (v) => (v === 'alltime' || v === 'all-time' ? 'all' : (v === 'day' || v === 'today') ? '24h' : v);
+  let emoteStatSrc = '24h';
+  try { emoteStatSrc = normWin(localStorage.getItem(EMOTE_SRC_KEY)) || '24h'; } catch {}
+  if (!(emoteStatSrc in EMOTE_SRCS)) emoteStatSrc = '24h';
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
-  const CHAT_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const CHAT_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const CHAT_SORT_KEY = 'hasan-chatsort';
-  let chatSort = 'today';
-  try { chatSort = localStorage.getItem(CHAT_SORT_KEY) || 'today'; } catch {}
-  if (!(chatSort in CHAT_WINS)) chatSort = 'today';
-  // badge counts also window like the emote ones: all-time is the plain
+  let chatSort = '24h';
+  try { chatSort = normWin(localStorage.getItem(CHAT_SORT_KEY)) || '24h'; } catch {}
+  if (!(chatSort in CHAT_WINS)) chatSort = '24h';
+  // badge counts also window like the emote ones: 'all' is the plain
   // tally, the rest read trailing days out of the per-version buckets
-  const BADGE_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  const BADGE_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const BADGE_WIN_KEY = 'hasan-badgewin';
-  let badgeWin = 'today';
-  try { badgeWin = normWin(localStorage.getItem(BADGE_WIN_KEY)) || 'today'; } catch {}
-  if (!(badgeWin in BADGE_WINS)) badgeWin = 'today';
-  // top links window the same way; all-time is the plain tally
-  const LINK_WINS = { 'all-time': 0, month: { d: 31 }, week: { d: 7 }, today: { d: 1 }, '12h': { h: 12 }, '1h': { h: 1 } };
+  let badgeWin = '24h';
+  try { badgeWin = normWin(localStorage.getItem(BADGE_WIN_KEY)) || '24h'; } catch {}
+  if (!(badgeWin in BADGE_WINS)) badgeWin = '24h';
+  // top links window the same way; 'all' is the plain tally
+  const LINK_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '1h': { h: 1 } };
   const LINK_WIN_KEY = 'hasan-linkwin';
-  let linkWin = 'today';
-  try { linkWin = localStorage.getItem(LINK_WIN_KEY) || 'today'; } catch {}
-  if (!(linkWin in LINK_WINS)) linkWin = 'today';
+  let linkWin = '24h';
+  try { linkWin = normWin(localStorage.getItem(LINK_WIN_KEY)) || '24h'; } catch {}
+  if (!(linkWin in LINK_WINS)) linkWin = '24h';
   // a window spec folds its bucket family into a key -> count map:
   // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
   const foldWin = (spec, dayBag, hourBag) => {
@@ -5166,7 +5176,6 @@
     // to one joined channel, 'all' keeps the combined view
     const sc = CHANNELS.includes(statScope) ? statScope : '';
     const nMsgs = sc ? (nickMsgsPer[sc] || new Map()) : nickMsgs;
-    const lUse = sc ? (liveUsePer[sc] || {}) : liveUse;
     const eUse = {};
     if (sc) Object.assign(eUse, setFor(sc).emoteUse || {});
     else for (const c of CHANNELS) {
@@ -5175,12 +5184,11 @@
     }
     const win = EMOTE_SRCS[emoteStatSrc] ?? 0;
     // per-emote count under the picked source: stream-elements figures,
-    // all local tallies, or the buckets inside a trailing window
-    const wMap = (win !== -1 && win !== 0)
+    // or the buckets inside a trailing window
+    const wMap = win !== 0
       ? foldWin(win, sc ? (useDayPer[sc] || {}) : useDay, sc ? (useHourPer[sc] || {}) : useHour)
       : null;
-    const lCount = (n) => win === -1 ? (lUse[n] || 0) : wMap.get(n) || 0;
-    const useS = win === 0 ? (n) => (eUse[n] || 0) : lCount;
+    const useS = win === 0 ? (n) => (eUse[n] || 0) : (n) => wMap.get(n) || 0;
     const bUseM = sc ? (badgeUsePer[sc] || new Map()) : badgeUse;
     const bVUseM = sc ? (badgeVerUsePer[sc] || new Map()) : badgeVerUse;
     // windowed badge counts fold the per-version day buckets into set
@@ -5203,8 +5211,8 @@
       ? `<div class="st-h st-scope">scope ` + ['', ...CHANNELS].map((c) =>
           `<button type="button" class="st-s${sc === c ? ' on' : ''}" data-sscope="${c}">${c ? '#' + escapeHTML(c) : 'all'}</button>`).join(' ') + `</div>`
       : '';
-    const row = (i, inner, count) =>
-      `<div class="st-row"><span class="n">${i}.</span><span class="nm">${inner}</span><i>${count}</i></div>`;
+    const row = (i, inner, count, pre = '') =>
+      `<div class="st-row"><span class="n">${i}.</span>${pre}<span class="nm">${inner}</span><i>${count}</i></div>`;
     // supa partitions a channel's logs by utc day - as deep as its urls
     // reach, so a burst time links the day that holds the spike
     const logDay = (t) => new Date(t).toISOString().slice(0, 10);
@@ -5212,8 +5220,8 @@
     // session totals, keep them out of the ranking
     const nmOf = (lg) => (seenNicks.get(lg) || {}).n || lg;
     // windowed picks fold the per-login day buckets into a tally;
-    // all-time reads the plain session map
-    const cWinSpec = CHAT_WINS[chatSort] ?? CHAT_WINS.today;
+    // 'all' reads the plain session map
+    const cWinSpec = CHAT_WINS[chatSort] ?? CHAT_WINS['24h'];
     const nView = cWinSpec
       ? foldWin(cWinSpec, sc ? (nickDayPer[sc] || {}) : nickDay, sc ? (nickHourPer[sc] || {}) : nickHour)
       : nMsgs;
@@ -5278,8 +5286,7 @@
     // twitch codes resolve once any set is in hand - ask for the global set
     // whenever it is missing so a second render can image those too
     if (!twSets.some((s) => s.setID === '0')) loadTwitchSets('');
-    const all = new Set(win === 0 ? Object.keys(eUse)
-      : win === -1 ? Object.keys(lUse) : wMap.keys());
+    const all = new Set(win === 0 ? Object.keys(eUse) : wMap.keys());
     const eRanked = [...all].map((n) => [n, useS(n)]).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
     const eVis = statEmoteAll ? eRanked : eRanked.slice(0, 40);
     const emo = eVis.map(([n, c], i) => {
@@ -5306,8 +5313,8 @@
         // align - the char itself is the code, so the name stays
         const ic = url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}">`
           : EMOJI_SET.has(en) ? `<span class="eme">${escapeHTML(en)}</span>` : '';
-        return row(i + 1, `<span class="ems">${ic}</span>` + escapeHTML(n),
-          c.toLocaleString('en'));
+        return row(i + 1, escapeHTML(n), c.toLocaleString('en'),
+          `<span class="ems">${ic}</span>`);
       }).join('') +
       (eRanked.length > eVis.length
         ? `<div class="st-row st-all"><button type="button" class="st-s" data-eall>` +
@@ -5401,7 +5408,7 @@
       // lists every version compactly: icon, title, count
       const tip = (t) => t ? ` title="${escapeHTML(t)}"` : '';
       return `<details class="st-badge" data-set="${escapeHTML(id)}"><summary${tip(BADGE_BLURB[id])}><img class="emote" src="${escapeHTML(vs[0][1].u || '')}" alt="">` +
-        `${escapeHTML(bOwner(id) ? bOwner(id) + ' ' + name : name)}<i>${metric}</i></summary>` +
+        `<span class="bt">${escapeHTML(bOwner(id) ? bOwner(id) + ' ' + name : name)}</span><i>${metric}</i></summary>` +
         vs.map(([ver, v]) => {
           const n = bVerUseM.get(id + '/' + ver) || 0;
           return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
@@ -5433,7 +5440,8 @@
         const name = id.replace(/[-_]/g, ' ');
         const label = v.t && v.t.toLowerCase() !== name ? `${name} · ${v.t}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">·</span>` +
-          `<span class="nm"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""> ${escapeHTML(label)}</span>` +
+          `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
+          `<span class="nm">${escapeHTML(label)}</span>` +
           `<i>${n.toLocaleString('en')}</i></div>`;
       }).join('') +
         (flat.length > bVis.length
@@ -5466,15 +5474,15 @@
     // the window buttons take the sort row's lead slot: each one is
     // 'use' ranked within that window, so they only light when the
     // ranked view is showing
-    const badgeWinTips = { 'all-time': 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', today: 'flat ranking by use, today', '12h': 'flat ranking by use, last 12 hours', '1h': 'flat ranking by use, last hour' };
+    const badgeWinTips = { 'all': 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', '24h': 'flat ranking by use, last 24 hours', '12h': 'flat ranking by use, last 12 hours', '1h': 'flat ranking by use, last hour' };
     const badgeWinBtns = Object.keys(BADGE_WINS)
       .map((s) => `<button type="button" class="st-s${badgeSort === 'use' && badgeWin === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
-    const chatWinTips = { 'all-time': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', today: 'message count, today', '12h': 'message count, last 12 hours', '1h': 'message count, last hour' };
+    const chatWinTips = { 'all': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', '24h': 'message count, last 24 hours', '12h': 'message count, last 12 hours', '1h': 'message count, last hour' };
     const chatSortBtns = Object.keys(CHAT_WINS)
       .map((s) => `<button type="button" class="st-s${chatSort === s ? ' on' : ''}" data-csort="${s}" title="${chatWinTips[s]}">${s}</button>`)
       .join('');
-    const linkWinTips = { 'all-time': 'post count, all time', month: 'post count, last 31 days', week: 'post count, last 7 days', today: 'post count, today', '12h': 'post count, last 12 hours', '1h': 'post count, last hour' };
+    const linkWinTips = { 'all': 'post count, all time', month: 'post count, last 31 days', week: 'post count, last 7 days', '24h': 'post count, last 24 hours', '12h': 'post count, last 12 hours', '1h': 'post count, last hour' };
     const linkWinBtns = Object.keys(LINK_WINS)
       .map((s) => `<button type="button" class="st-s${linkWin === s ? ' on' : ''}" data-lwin="${s}" title="${linkWinTips[s]}">${s}</button>`)
       .join('');
@@ -5504,12 +5512,12 @@
       `<div class="st-panel st-rate"><div class="st-h">session rate</div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
-      `<div class="st-panel st-narrow"><div class="st-h">top emotes <span class="st-sort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
-      `<div class="st-panel st-narrow"><div class="st-h">top badges <span class="st-sort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
+      `<div class="st-panel st-narrow"><div class="st-h">top emotes <span class="st-sort st-vsort">${emoteSrcBtns}</span></div><div class="st-cols">${emo || '<div class="st-row"><span class="nm">none seen</span></div>'}</div></div>` +
+      `<div class="st-panel st-narrow"><div class="st-h">top badges <span class="st-sort st-vsort">${badgeWinBtns} ${badgeSortBtnsHtml}</span></div>` +
       `<div class="st-cols st-bcols">` +
       (badgeSets || `<div class="st-row"><span class="nm">${badgeSort === 'use' && Object.keys(bInfo).length ? 'no badges seen yet' : 'badge data not loaded yet'}</span></div>`) +
       `</div></div>` +
-      `<div class="st-panel"><div class="st-h">top chatters <span class="st-sort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
+      `<div class="st-panel"><div class="st-h">top chatters <span class="st-sort st-vsort">${chatSortBtns}</span></div><div class="st-cols">${chat || '<div class="st-row"><span class="nm">nobody yet</span></div>'}</div></div>` +
       `<div class="st-panel st-foot"><div class="st-h">storage</div><div id="stStore"></div></div>`;
     updateStorageStats(el);
     drawScrollGraph(el, sc);
