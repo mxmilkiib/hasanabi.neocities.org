@@ -5112,17 +5112,6 @@
     else if (a.classList.contains('helpNoLbl')) { setLbls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx === 1);
   });
-  // the wheel over an option set cycles its pick, like the header
-  // buttons' wheels: scroll up advances, scroll down steps back
-  helpPanel.addEventListener('wheel', (e) => {
-    const list = e.target.closest('span[id$="List"]');
-    if (!list || !helpPanel.contains(list)) return;
-    const chips = [...list.querySelectorAll('a[data-idx], a[data-colour], a[data-variant], a[data-preset]')];
-    if (chips.length < 2) return;
-    e.preventDefault();
-    const i = chips.findIndex((a) => a.classList.contains('on'));
-    chips[(i < 0 ? 0 : i + (e.deltaY < 0 ? 1 : -1) + chips.length) % chips.length].click();
-  }, { passive: false });
   // anchors only fire on enter natively, and only when href'd - the
   // role=button and tab picks answer space, plus enter on the bare ones
   helpPanel.addEventListener('keydown', (e) => {
