@@ -8467,7 +8467,11 @@
       // the flag asks the fresh page to put it back on top
       sessionStorage.setItem('hasan-reset-hscroll', '1');
     } catch {}
-    location.reload();
+    // reload on a params-free url: settings params (?theme, ?colour, ?split…)
+    // would otherwise reapply over the wiped defaults. channel stays - it
+    // names the chat being watched, not an option
+    const ch = new URLSearchParams(location.search).get('channel');
+    location.href = location.pathname + (ch ? '?channel=' + encodeURIComponent(ch) : '');
   });
   // cache bust: a fresh ?_=ts query makes this a new request, so any
   // stale copy gets bypassed; existing params (channel, state) survive
