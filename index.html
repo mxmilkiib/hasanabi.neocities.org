@@ -4913,7 +4913,7 @@
   // so the chip row reads as a spectrum. grain/contrast finishes sit on
   // the lightest and darkest entries, phosphor on the terminals
   const THEME_PRESETS = {
-    default:  { colour: 'gray',   shade: 7,    font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 1,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 1, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
+    default:  { colour: 'gray',   shade: 7,    font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 2,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 1, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
     irc:      { colour: 'mirc',   shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
     print:    { colour: 'cream',  shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
     ft:       { colour: 'salmon', shade: 1,    font: 'times',      px: 15, lhv: 1.4, lines: 1, zebra: false, times: 2, shadow: 0, subMode: 3, eonly: 1, split: 4, help: 0, lbls: 0 },
@@ -7217,6 +7217,7 @@
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
       lbls: lblsOn ? 1 : 0,
       split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4,
+      rvid: vidRail,
     };
   }
   function saveOpts() {
@@ -7342,6 +7343,10 @@
       if (o.epgeo.left != null) setPin(true);
     }
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 4) setSplit(o.split);
+    // after the split so a rail exists to dock into; outside rail it just
+    // stores the mode for the next dock. the boolean 'video' above only
+    // spans shown/hidden - this carries dock/float too
+    if (['dock', 'float', 'off'].includes(o.rvid)) setRailVid(o.rvid);
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
     if (typeof o.hw === 'string') { hwInput.value = o.hw; setHideList(o.hw); }
@@ -7397,8 +7402,9 @@
   function presetMatch(p) {
     if (!p) return false;
     // compare only the fields the preset specifies: ones it pins that aren't
-    // listed here (weight, hpw, hfspx…) still break the mark. the stream
-    // embed is deliberately outside presets - one toggles it by hand
+    // listed here (epgeo - no stored box still means the default's own box)
+    // can't break the mark. the stream embed is deliberately outside
+    // presets - one toggles it by hand
     const cmp = {
       colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
@@ -7406,6 +7412,8 @@
       subMode, eonly: emoteMode,
       split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, help: helpMode, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
+      clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
+      hdrgraph: document.body.classList.contains('hdrgraph'),
     };
     // a preset that pins a colour implicitly pins the standard finish
     if ('colour' in p && (p.variant ?? 'standard') !== cmp.variant) return false;
@@ -11812,13 +11820,13 @@
     if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('ls')) { const i = LS_STEPS.indexOf(+q.get('ls')); if (i >= 0) lsCtl.set(i); }
     if (q.has('lw')) { const i = WEIGHTS.indexOf(+q.get('lw')); if (i >= 0) setLinkW(i); }
-    if (q.has('zebra')) { const v = q.get('zebra'); setZebra(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 1)); }
+    if (q.has('zebra')) { const v = q.get('zebra'); setZebra(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 2)); }
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
     if (q.has('bartop')) setBarTop(flag('bartop'));
     if (q.has('bauto')) setBarAuto(flag('bauto') ? (+q.get('bauto') || 1) : 0);
-    if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 3)); }
+    if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || DEF.lines)); }
     if (q.has('times')) setTimes({ nosec: 1, '24h': 1, '24hsec': 2, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
