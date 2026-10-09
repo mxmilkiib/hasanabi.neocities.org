@@ -614,6 +614,8 @@
     border-bottom: 1px solid var(--line); box-shadow: none; }
   #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
   #rail #htabStats { flex: 2 1 0; min-height: 0; overflow-y: auto; padding: 0 10px; }
+  /* video floated or off: the picker and stats split the column evenly */
+  #rail.novid #emotePick, #rail.novid #htabStats { flex: 1 1 0; }
 
   .empty {
     color: var(--text-dim);
@@ -4987,7 +4989,7 @@
     else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
     else if (a.classList.contains('helpEonly')) { emoteMode = +a.dataset.idx; applyEmoteMode(); saveOpts(); }
     else if (a.classList.contains('helpSplit')) { setSplit(+a.dataset.idx + 1); saveOpts(); }
-    else if (a.classList.contains('helpVideo')) { setVideo(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpVideo')) { const v = +a.dataset.idx === 1; railEl.hidden ? setVideo(v) : setRailVid(v ? 'dock' : 'off'); saveOpts(); }
     else if (a.classList.contains('helpFontFam')) { fontSel.selectedIndex = +a.dataset.idx; applyFont(); saveOpts(); }
     else if (a.classList.contains('helpPreset')) {
       // presets pin a header mode too - keep the panel open past its
@@ -7153,7 +7155,7 @@
       helpMode = o.help >= 2 ? o.help - 2 : o.help;
       applyHelp();
     }
-    if (typeof o.video === 'boolean') setVideo(o.video);
+    if (typeof o.video === 'boolean') { railEl.hidden ? setVideo(o.video) : setRailVid(o.video ? 'dock' : 'off'); }
     // a floating geometry only means something while pinned - same as
     // what dragging free does. applies before the split so a rail dock
     // still clears the parked geometry off the reparented picker
@@ -7375,15 +7377,43 @@
     vidBox.hidden = !on;
     vidBtn.classList.toggle('on', on);
     vidBtn.setAttribute('aria-expanded', String(!!on));
-    vidBtn.title = `Stream video: ${on ? 'on' : 'off'} - click/scroll\nuse the pause button in the video to stop the stream`;
+    vidBtn.title = `Stream video: ${on ? 'on' : 'off'}${railEl.hidden ? '' : ` · rail: ${vidRail}`} - click/scroll${railEl.hidden ? '' : ' cycles dock · float · off'}\nuse the pause button in the video to stop the stream`;
     markHelp('helpVideo', on ? 1 : 0);
     if (on) loadPlayer();
     else vidState();
   }
-  vidBtn.addEventListener('click', () => { setVideo(vidBox.hidden); saveOpts(); });
+  // rail mode gives the video a third placement axis: docked in the
+  // column, floated back over the chat at its saved geometry, or off
+  // entirely (unloaded, not just hidden)
+  const VIDRAIL_KEY = 'hasan-vidrail';
+  let vidRail = 'dock';
+  try {
+    const v = localStorage.getItem(VIDRAIL_KEY);
+    if (v === 'float' || v === 'off') vidRail = v;
+  } catch {}
+  function setRailVid(mode) {
+    vidRail = mode;
+    try { localStorage.setItem(VIDRAIL_KEY, mode); } catch {}
+    if (railEl.hidden) return;
+    railEl.classList.toggle('novid', mode !== 'dock');
+    if (mode === 'dock') {
+      railEl.prepend(vidBox);
+      vidBox.style.left = vidBox.style.top = vidBox.style.right =
+        vidBox.style.bottom = vidBox.style.width = '';
+    } else if (mode === 'float') {
+      mainEl.before(vidBox);
+      applyVidPos();
+    }
+    setVideo(mode !== 'off');
+  }
+  const vidNext = () => {
+    if (railEl.hidden) setVideo(vidBox.hidden);
+    else setRailVid(vidRail === 'dock' ? 'float' : vidRail === 'float' ? 'off' : 'dock');
+  };
+  vidBtn.addEventListener('click', () => { vidNext(); saveOpts(); });
   vidBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setVideo(vidBox.hidden);
+    vidNext();
     saveOpts();
   }, { passive: false });
 
@@ -8528,12 +8558,11 @@
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
     if (on) {
       if (!statsHome) statsHome = { parent: statsTab.parentNode, next: statsTab.nextSibling };
-      railEl.append(vidBox, emotePick, statsTab);
-      vidBox.style.left = vidBox.style.top = vidBox.style.right = vidBox.style.bottom = vidBox.style.width = '';
+      railEl.append(emotePick, statsTab);
       emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
       statsTab.hidden = false;
       if (statsLink.classList.contains('on')) switchTab('htabCfg');
-      if (vidBox.hidden) setVideo(true);
+      setRailVid(vidRail);
       // '0' means the picker was deliberately closed - the rail honours
       // that instead of reopening it on every entry
       let epClosed = false;
@@ -8557,6 +8586,7 @@
       }
       statsTab.hidden = true;
       statsLink.hidden = false;
+      railEl.classList.remove('novid');
       mainEl.before(vidBox);
       mainEl.after(emotePick);
       applyVidPos();
@@ -11554,7 +11584,7 @@
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
     if (q.has('self')) setSelfHl(flag('self'));
-    if (q.has('video')) setVideo(flag('video'));
+    if (q.has('video')) { const v = flag('video'); railEl.hidden ? setVideo(v) : setRailVid(v ? 'dock' : 'off'); }
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('bw')) { bwInput.value = q.get('bw'); setBlocked(bwInput.value); }
     if (q.has('hw')) { hwInput.value = q.get('hw'); setHideList(hwInput.value); }
