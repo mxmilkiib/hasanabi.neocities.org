@@ -884,6 +884,9 @@
      .auxr marks the right-anchored chips only - left-mode sub/aux keep
      their natural order ahead of the name instead of jumping the gutter */
   main.em-right .row.eonly > .auxr { order: 1; float: none; margin-left: 5px; }
+  /* a text row's wrapped trailing emote/emoji run floats to the right
+     edge - its tail docks where an emote-only row's emotes would */
+  main.em-right .row .msg .etrail { float: right; }
   /* zero-width overlay emotes stack on the previous emote's box */
   .estk { position: relative; display: inline-block; z-index: 4; }
   .estk .emote { height: 1.5em; }
@@ -3557,6 +3560,12 @@
       const r = el.getBoundingClientRect();
       if (r.width) left = Math.min(left, r.left);
     }
+    // a floated emote tail claims the same right-edge strip the button
+    // lands on - offset past it like a right-anchored chip
+    if (mainEl.classList.contains('em-right')) {
+      const et = row.querySelector('.msg .etrail');
+      if (et) { const r = et.getBoundingClientRect(); if (r.width) left = Math.min(left, r.left); }
+    }
     b.style.right = (left === Infinity ? 0
       : Math.max(0, row.getBoundingClientRect().right - left)) + 'px';
   }
@@ -3938,6 +3947,15 @@
           .replace(/(^|[\s>.,;:!])([a-z0-9_]{1,25})(\s+just\s+sub)/i,
             '$1<a class="at" href="https://www.twitch.tv/$2" target="_blank" rel="noopener noreferrer">@$2</a>$3')
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
+      }
+      // a text row ending in a run of emotes/emoji gets that run wrapped;
+      // em-right floats it to the row's right edge, docking its tail where
+      // an emote-only row's emotes would land. estk nests only imgs, and
+      // emoji arrive as bare text after escaping
+      if (!eonly) {
+        const tail = msgHtml.match(/((?:<img class="emote"[^>]*>|<span class="estk"><img[^>]*>(?:<img[^>]*>)*<\/span>|[\s\p{Extended_Pictographic}\uFE0F\u200D\u20E3\u{1F3FB}-\u{1F3FF}])+)$/u);
+        if (tail && /class="em(?:ote|stk)"|\p{Extended_Pictographic}/u.test(tail[1]))
+          msgHtml = msgHtml.slice(0, -tail[1].length) + `<span class="etrail">${tail[1]}</span>`;
       }
       // a real copy of a locally-echoed message adopts the echo row:
       // it drops .local (so it persists in history) and takes the real id.
