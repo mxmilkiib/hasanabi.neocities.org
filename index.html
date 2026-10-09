@@ -4096,6 +4096,10 @@
   const rateHistT = [];
   const rateHistWhy = [];
   const rateHistPer = {}; // ch -> long series; session-scoped, not saved
+  // glorp counts on the same long clock - the stats glorps list ranks the
+  // session's loudest spikes, not just the spark window's
+  const glorpHist = [];
+  const glorpHistPer = {};
   let sparkCols = null; // theme colours, resolved once instead of per draw
 
   function sparkSize() {
@@ -4355,6 +4359,9 @@
         if (quietGaps.length > 50) quietGaps.splice(0, quietGaps.length - 50);
       }
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
+      // the long glorp series isn't saved - pad it in step with rateHist
+      // so its positions still index against rateHistT
+      glorpHist.push(...Array(rateHist.length).fill(0));
       // scoped series restore beside the globals - each channel's tail
       // gets the same closed-gap padding so bursts keep real times
       for (const c of CHANNELS) {
@@ -4367,6 +4374,7 @@
         const gg = d.glorpPer && Array.isArray(d.glorpPer[c]) ? d.glorpPer[c].slice(-win) : [];
         glorpSamplesPer[c] = [...gg, ...Array(gap).fill(0)];
         if (glorpSamplesPer[c].length > win) glorpSamplesPer[c].splice(0, glorpSamplesPer[c].length - win);
+        glorpHistPer[c] = Array(rateHist.length).fill(0);
       }
       // keep the rolling chatter tally going across a reload - entries
       // already older than the hour window come back to expire at once
@@ -4425,6 +4433,7 @@
       rateHistWhy.push(why);
       rateHistT.push(t);
       glorpSamples.push(glorpCounts.get(sec) || 0);
+      glorpHist.push(glorpCounts.get(sec) || 0);
       for (const c of CHANNELS) {
         let cn = 0;
         const rc = rateCountsPer[c];
@@ -4439,6 +4448,9 @@
         const gcm = glorpCountsPer[c];
         garr.push(gcm ? (gcm.get(sec) || 0) : 0);
         if (garr.length > sparkWin) garr.splice(0, garr.length - sparkWin);
+        const gharr = glorpHistPer[c] = glorpHistPer[c] || [];
+        gharr.push(gcm ? (gcm.get(sec) || 0) : 0);
+        if (gharr.length > RATE_KEEP) gharr.splice(0, gharr.length - RATE_KEEP);
       }
     }
     lastTick = now;
@@ -4501,6 +4513,8 @@
     while (glorpTimestamps.length && glorpTimestamps[0] < gcut) glorpTimestamps.shift();
     glorpSamples.push(glorpTimestamps.length);
     if (glorpSamples.length > sparkWin) glorpSamples.splice(0, glorpSamples.length - sparkWin);
+    glorpHist.push(glorpTimestamps.length);
+    if (glorpHist.length > RATE_KEEP) glorpHist.splice(0, glorpHist.length - RATE_KEEP);
     // the per-channel series tick in lockstep with the globals so the
     // stats bursts' tail alignment holds - they only grew on missed
     // fills before, leaving sparse samples with borrowed timestamps
@@ -4519,6 +4533,9 @@
       const gcm = glorpCountsPer[c];
       garr.push(gcm ? (gcm.get(sNow) || 0) : 0);
       if (garr.length > sparkWin) garr.splice(0, garr.length - sparkWin);
+      const gharr = glorpHistPer[c] = glorpHistPer[c] || [];
+      gharr.push(gcm ? (gcm.get(sNow) || 0) : 0);
+      if (gharr.length > RATE_KEEP) gharr.splice(0, gharr.length - RATE_KEEP);
     }
     drawSpark();
     updateHeader();
@@ -5388,11 +5405,12 @@
         return row(i + 1, `<a class="at" style="color:${escapeHTML(col)}" href="https://www.twitch.tv/${escapeHTML(lg)}" target="_blank" rel="noopener noreferrer">${escapeHTML(nm)}</a>`,
           n.toLocaleString('en'));
       }).join('');
-    // the loudest samples of the series that paints the rate graph's red
-    // segments - the glorp/F spikes over the same >2/sec threshold, ranked
-    const gSeries = sc ? (glorpSamplesPer[sc] || []) : glorpSamples;
-    const gOff = rateTimes.length - gSeries.length;
-    const gPeaks = gSeries.map((n, i) => [n, rateTimes[gOff + i]])
+    // the loudest glorp/F spikes over >2/sec, ranked across the same long
+    // tail the rate graph draws - the spark-window series would drop
+    // peaks older than a few minutes even though they're still on the chart
+    const gSeries = sc ? (glorpHistPer[sc] || []) : glorpHist;
+    const gOff = rateHistT.length - gSeries.length;
+    const gPeaks = gSeries.map((n, i) => [n, rateHistT[gOff + i]])
       .filter(([n, t]) => n > 2 && t)
       .sort((a, b) => b[0] - a[0]).slice(0, 3)
       .map(([n, t]) => `<div class="st-row"><span class="n">·</span>` +
@@ -5476,9 +5494,11 @@
           `${(eRanked.length - eVis.length).toLocaleString('en')} more - show all</button></div>`
         : statEmoteAll && eRanked.length > 40
           ? `<div class="st-row st-all"><button type="button" class="st-s" data-efold>collapse to top 40</button></div>` : '');
-    const bSeries = sc ? (rateSamplesPer[sc] || []) : rateSamples;
-    const bOff = rateTimes.length - bSeries.length;
-    const bSamps = bSeries.map((r, i) => [r, rateTimes[bOff + i]])
+    // bursts rank the session-long series the graph draws - the spark
+    // window's copy ages peaks out while they're still on the chart
+    const bSeries = sc ? (rateHistPer[sc] || []) : rateHist;
+    const bOff = rateHistT.length - bSeries.length;
+    const bSamps = bSeries.map((r, i) => [r, rateHistT[bOff + i]])
       .filter(([r, t]) => Number.isFinite(r) && t)
       .sort((a, b) => b[0] - a[0]);
     // distinct bursts only: each pick suppresses every sample within 10s
@@ -5817,22 +5837,24 @@
     const span = Math.max(30000, t1 - t0);
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
     const bw = span / N, bwPx = wCss / N;
-    // per-second samples pool into pixel bins: rate bars average, and a
+    // per-second samples pool into pixel bins: rate bars average, each bin
+    // also keeps its sharpest second so a short burst still spikes, and a
     // bin with any dead sample flags the cause for the underlay band
-    const bins = new Float64Array(N), bn = new Float64Array(N), bwhy = new Array(N).fill('');
+    const bins = new Float64Array(N), bn = new Float64Array(N),
+      bmax = new Float64Array(N), bwhy = new Array(N).fill('');
     for (let i = 0; i < series.length; i++) {
       const t = rateHistT[off + i];
       if (!t || t < t0) continue;
       const b = Math.min(N - 1, Math.floor((t - t0) / bw));
       const v = series[i];
-      if (Number.isFinite(v)) { bins[b] += v; bn[b]++; }
+      if (Number.isFinite(v)) { bins[b] += v; bn[b]++; if (v > bmax[b]) bmax[b] = v; }
       else {
         const w = rateHistWhy[off + i] || '';
         if (w && !bwhy[b].includes(w)) bwhy[b] = bwhy[b] ? bwhy[b] + ' · ' + w : w;
       }
     }
     let peak = 0;
-    for (let i = 0; i < N; i++) if (bn[i] && bins[i] / bn[i] > peak) peak = bins[i] / bn[i];
+    for (let i = 0; i < N; i++) if (bmax[i] > peak) peak = bmax[i];
     // time scaffolding: alternate clock-aligned blocks shade darker so a
     // long span reads as countable stretches; a finer rung gets a tick,
     // and a boundary stamps HH:MM when there's room for it
@@ -5856,8 +5878,13 @@
       g.fillStyle = (sparkCols && sparkCols.accent) ||
         getComputedStyle(document.documentElement).getPropertyValue('--spark').trim() || '#888';
       for (let i = 0; i < N; i++) {
+        // the mean fills the bar; the bin's sharpest second extends it as
+        // a translucent tip - a >10/s burst inside a wide bin still reads
+        // as a spike instead of averaging away to the floor
         const rh = bn[i] ? (bins[i] / bn[i]) / peak * (H - 2) : 0;
-        if (rh > .3) g.fillRect(Math.floor(i * bwPx), H - rh, Math.max(1, Math.ceil(bwPx) - 1), rh);
+        const mh = bmax[i] / peak * (H - 2);
+        if (mh > .3) { g.globalAlpha = .3; g.fillRect(Math.floor(i * bwPx), H - mh, Math.max(1, Math.ceil(bwPx) - 1), mh); }
+        if (rh > .3) { g.globalAlpha = .8; g.fillRect(Math.floor(i * bwPx), H - rh, Math.max(1, Math.ceil(bwPx) - 1), rh); }
       }
     }
     g.globalAlpha = 1;
@@ -5884,7 +5911,7 @@
       const r = cv.getBoundingClientRect();
       const i = Math.max(0, Math.min(N - 1, Math.floor((e.clientX - r.left) / r.width * N)));
       cv.title = `${fmtRowTime(new Date(t0 + i * bw))} · ` +
-        (bn[i] ? `${(bins[i] / bn[i]).toFixed(1)} msgs/s` : 'no data') +
+        (bn[i] ? `${(bins[i] / bn[i]).toFixed(1)}${bmax[i] - bins[i] / bn[i] > .05 ? `–${bmax[i].toFixed(1)}` : ''} msgs/s` : 'no data') +
         (bwhy[i] ? ` - ${bwhy[i]}` : '');
     };
     cv.onmouseleave = () => { cv.title = graphTitle; };
