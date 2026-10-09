@@ -7903,6 +7903,7 @@
     ['rbw-pulse', 'ease-in-out'], ['rbw-flick', 'steps(1, end)'],
   ];
   let rbwStyle = 0;
+  const RBW_DEFAULT = RBW_STYLES.length - 1; // 'rbw-rand' - each mention's own motion
   function setRbwStyle(idx) {
     rbwStyle = Math.min(RBW_STYLES.length - 1, Math.max(0, idx | 0));
     document.body.classList.remove(...RBW_STYLES.slice(1));
@@ -7917,7 +7918,7 @@
     });
     markHelp('helpRbw', rbwStyle);
   }
-  setRbwStyle(0);
+  setRbwStyle(RBW_DEFAULT);
 
   // ---- text shadow on chat rows: graduated off/subtle/medium/strong ----
   const SHADOW_LVLS = [
