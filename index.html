@@ -8007,8 +8007,8 @@
     if (lhCtl.get() !== DEF.lh) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (weightCtl.get() !== DEF.weight) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (lsCtl.get() !== DEF.ls) q.set('ls', LS_STEPS[lsCtl.get()]);
-    if (linkW !== WEIGHTS.length - 1) q.set('lw', WEIGHTS[linkW]);
-    if (zebraLevel !== 1) q.set('zebra', String(zebraLevel));
+    if (linkW !== WEIGHTS.indexOf(400)) q.set('lw', WEIGHTS[linkW]);
+    if (zebraLevel !== 2) q.set('zebra', String(zebraLevel));
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
@@ -8027,7 +8027,8 @@
     if (!selfHl) q.set('self', '0');
     // rail mode counts its chat columns as 2 - the level lives on railEl
     if (isSplit()) q.set('split', String(railEl.hidden ? cols().length : 4));
-    if (!vidBox.hidden) q.set('video', '1');
+    // rail mode force-shows the player on apply - video=1 is redundant there
+    if (!vidBox.hidden && railEl.hidden) q.set('video', '1');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
     if (hwInput.value.trim()) {
@@ -8035,7 +8036,7 @@
       if (hideMode !== 1) q.set('hwm', HIDE_MODES[hideMode]);
     }
     if (pingOn) q.set('ping', '1');
-    if (cleanUrls) q.set('clean', '1');
+    if (!cleanUrls) q.set('clean', '0');
     if (gifSafe) q.set('gifsafe', '1');
     if (notifyOn) q.set('notify', '1');
     if (peekMode !== 2) q.set('peek', peekMode);
@@ -8128,16 +8129,14 @@
   });
 
   document.getElementById('resetOpts').addEventListener('click', () => {
+    // every hasan-* key goes - an explicit list kept drifting stale beside
+    // the standalone picker/stat keys. Kept: login ('hasanabi-' prefix
+    // misses the filter anyway), plus pure refillable caches and stat data
     try {
-      localStorage.removeItem(OPTS_KEY);
-      localStorage.removeItem('hasan-hint');
-      localStorage.removeItem(HISTORY_KEY);
-      localStorage.removeItem(SPARK_KEY);
-      localStorage.removeItem(LASTRUN_KEY);
-      localStorage.removeItem(SLOTS_KEY);
-      localStorage.removeItem(EMOTEUSE_KEY);
-      localStorage.removeItem('hasan-htab');
-      localStorage.removeItem('hasan-hsize');
+      const keep = (k) => k === PEEK_KEY || k === GIF_KEY || k === PRON_KEY ||
+        k.startsWith('hasan-stats-') || k.startsWith(EMOTE_CACHE_PREFIX);
+      for (const k of Object.keys(localStorage))
+        if (k.startsWith('hasan-') && !keep(k)) localStorage.removeItem(k);
     } catch {}
     location.reload();
   });
