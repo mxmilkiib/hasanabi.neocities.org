@@ -4956,7 +4956,7 @@
   const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 7, 10, 8, 9];
   // default option indices - the controls, the copy-url diffing and the
   // 'default' preset all read from here
-  const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4 };
+  const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4 };
   let shadeIdx = DEF.shade;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
@@ -7711,7 +7711,7 @@
   // help list and the ≡ cycle run off → faint dots → faint → medium →
   // solid; LINE_SHADES order stays put so saved indices don't remap
   const LINE_ORDER = [0, 4, 1, 2, 3];
-  let lineLevel = 4; // 'faint dots'
+  let lineLevel = DEF.lines; // 'faint dots'
   // each option's underbar wears the line it selects: the shade colour
   // for the strength, dotted for the dots mode, invisible when off - a
   // real 1px border reads closer to the row seam than a hairline underline
@@ -8241,7 +8241,7 @@
     if (revFlow) q.set('rev', '1');
     if (barTop) q.set('bartop', '1');
     if (barAuto) q.set('bauto', String(barAuto));
-    if (lineLevel !== 1) q.set('lines', String(lineLevel));
+    if (lineLevel !== DEF.lines) q.set('lines', String(lineLevel));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
     else if (timeIdx === 3) q.set('times', '12h');
@@ -8273,13 +8273,13 @@
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
     if (nickAnim !== 1) q.set('anim', nickAnim);
-    if (rbwStyle) q.set('rbw', rbwStyle);
+    if (rbwStyle !== RBW_DEFAULT) q.set('rbw', rbwStyle);
     // emote-picker options only enter the url off their defaults
     if (emotePick.classList.contains('names')) q.set('epnames', '1');
     if (epickZoom) q.set('epzoom', epickZoom);
     if (epickSort !== 'use' || epickSeen) q.set('epsort', epickSeen ? 'useseen' : epickSort);
     if (epickAge) q.set('epage', '1');
-    if (epickMerge) q.set('epmix', '1');
+    if (!epickMerge) q.set('epmix', '0');
     if (!epickHold) q.set('ephold', '0');
     if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
     if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
