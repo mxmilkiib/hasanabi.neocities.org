@@ -5015,15 +5015,21 @@
   });
   // tabs split the panel into config/help / resources / authors pages
   function switchTab(id) {
-    // stats docks out of the panel in rail mode - its tab is hidden and
-    // anything still asking for it lands on config instead
-    if (id === 'htabStats' && !helpPanel.contains(document.getElementById('htabStats'))) id = 'htabCfg';
+    const statsTab = document.getElementById('htabStats');
+    // stats docks out of the panel in rail mode - its tab stays live and
+    // borrowing floats the same node over the rail; a closed panel (or
+    // anything still asking pre-dock) lands on config instead
+    if (id === 'htabStats' && !helpPanel.contains(statsTab)) {
+      statsBorrow();
+      if (!helpPanel.contains(statsTab)) id = 'htabCfg';
+    }
     helpPanel.querySelectorAll('.htabs a').forEach((a) => {
       const on = a.dataset.htab === id;
       a.classList.toggle('on', on);
       a.setAttribute('aria-selected', String(on));
     });
     helpPanel.querySelectorAll('.htabpage').forEach((p) => p.hidden = p.id !== id);
+    if (id !== 'htabStats') statsReturn();
     if (id === 'htabStats') setTimeout(renderStats); // the maps it reads init below; defer past the first pass
     try { localStorage.setItem('hasan-htab', id); } catch {}
   }
@@ -7827,6 +7833,13 @@
     const showPanel = helpMode === 1;
     if (showPanel) helpForced = false;
     helpPanel.hidden = !showPanel && !helpForced;
+    // a borrowed stats pane follows the popup: back to the rail on close,
+    // and re-borrowed if the panel reopens with stats as the live tab
+    if (helpPanel.hidden) statsReturn();
+    else {
+      const onTab = helpPanel.querySelector('.htabs a.on');
+      if (onTab && onTab.dataset.htab === 'htabStats') switchTab('htabStats');
+    }
     document.querySelectorAll('.hdr-lbl').forEach((el) => { el.hidden = !lblsOn; });
     // labels widen the corner reserve so the pinned labels clear content
     document.body.classList.toggle('hdrlbl', lblsOn);
@@ -8404,6 +8417,21 @@
   // geometry is inline style, cleared on the way in and re-applied from
   // the position saves on the way out
   let statsHome = null;
+  // the docked stats pane can be borrowed into the help popup - the
+  // panel floats over the rail anyway, so the tab just moves the node;
+  // picking another tab, closing the popup or leaving rail returns it
+  function statsBorrow() {
+    const statsTab = document.getElementById('htabStats');
+    if (railEl.hidden || helpPanel.hidden || statsTab.parentNode !== railEl) return;
+    if (!statsHome) return;
+    statsHome.parent.insertBefore(statsTab, statsHome.next);
+  }
+  function statsReturn() {
+    const statsTab = document.getElementById('htabStats');
+    if (railEl.hidden || !helpPanel.contains(statsTab)) return;
+    railEl.appendChild(statsTab);
+    statsTab.hidden = false;
+  }
   function dockRail(on) {
     const statsTab = document.getElementById('htabStats');
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
@@ -8413,7 +8441,6 @@
       vidBox.style.left = vidBox.style.top = vidBox.style.right = vidBox.style.bottom = vidBox.style.width = '';
       emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
       statsTab.hidden = false;
-      statsLink.hidden = true;
       if (statsLink.classList.contains('on')) switchTab('htabCfg');
       if (vidBox.hidden) setVideo(true);
       // '0' means the picker was deliberately closed - the rail honours
