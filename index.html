@@ -2381,9 +2381,9 @@
   const hintEl = document.getElementById('hint');
   if (!localStorage.getItem('hasan-hint')) {
     hintEl.hidden = false;
-    /* first visit: sheen the doorway controls - video, login, help and
-       the emote picker - until each has been pressed once */
-    for (const id of ['vidBtn', 'sendBtn', 'helpBtn', 'emojiBtn']) {
+    /* first visit: sheen the doorway controls - video, columns, login,
+       help and the emote picker - until each has been pressed once */
+    for (const id of ['vidBtn', 'splitBtn', 'sendBtn', 'helpBtn', 'emojiBtn']) {
       const b = document.getElementById(id);
       b.classList.add('shiny');
       b.addEventListener('click', () => b.classList.remove('shiny'), { once: true });
@@ -5589,11 +5589,14 @@
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
       const bVis = statBadgeAll ? flat : flat.slice(0, 40);
       badgeSets = bVis.map(({ id, v, n }, i) => {
-        // the everyday set names abbreviate in the ranked view; the title
-        // dedup still checks the full word so 'subed · Subscriber' can't show
+        // the everyday set names abbreviate in the ranked view; sub titles
+        // drop their trailing 'Subscriber' ('3-Month Subscriber' reads
+        // 'subbed · 3-Month'), and the dedup still checks the full word so
+        // a plain 'Subscriber' title never doubles the name
         const raw = id.replace(/[-_]/g, ' ');
-        const name = ({ subscriber: 'subed', moderator: 'mod' })[id] || raw;
-        const label = v.t && v.t.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${v.t}` : name;
+        const name = ({ subscriber: 'subbed', moderator: 'mod' })[id] || raw;
+        const vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '') : v.t;
+        const label = vt && vt.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${vt}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
