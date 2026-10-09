@@ -5532,28 +5532,57 @@
   // per api underneath when the browser reports usageDetails. the db
   // count and estimate answer asynchronously, so they fill in on a slow
   // cadence while the localStorage row measures fresh on every render
-  let stIdbHtml = '', stEstHtml = '', stStoreAt = 0;
+  let stIdbHtml = '', stEstHtml = '', stStoreAt = 0, stKeysHtml = '', stExtraHtml = '';
   function updateStorageStats(el) {
     const box = el.querySelector('#stStore');
     if (!box) return;
     const fmtB = (n) => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB'
       : n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : Math.round(n) + ' B';
+    const fmtSpan = (ms) => ms >= 864e5 ? (ms / 864e5).toFixed(1) + 'd'
+      : ms >= 36e5 ? (ms / 36e5).toFixed(1) + 'h' : Math.max(1, Math.round(ms / 6e4)) + 'm';
     const srow = (nm, v) => `<div class="st-row"><span class="nm">${nm}</span><i>${v}</i></div>`;
     const ssub = (nm, v) => `<div class="st-row st-sub"><span class="nm">${nm}</span><i>${v}</i></div>`;
     let keys = 0, bytes = 0;
+    const sizes = [];
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (!k.startsWith('hasan-')) continue;
         keys++;
-        bytes += k.length + (localStorage.getItem(k) || '').length;
+        const sz = k.length + (localStorage.getItem(k) || '').length;
+        bytes += sz;
+        sizes.push([k.slice(6), sz]);
       }
     } catch {}
-    box.innerHTML = srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)}`) +
+    box.innerHTML = srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)}`) + stKeysHtml +
+      srow('scrollback', `${mainEl.querySelectorAll('.row[data-ts]').length} / ${MAX_MESSAGES} rows`) +
+      stExtraHtml +
       (stIdbHtml || srow('chat archive', archDb ? 'counting…' : 'not open')) +
       (stEstHtml || ((navigator.storage && navigator.storage.estimate) ? srow('origin estimate', 'measuring…') : ''));
     if (Date.now() - stStoreAt < 15000) return;
     stStoreAt = Date.now();
+    // per-key sizes and the in-memory spans recompute on the slow cadence
+    stKeysHtml = sizes.sort((a, b) => b[1] - a[1]).slice(0, 5)
+      .map(([k, sz]) => ssub(k, fmtB(sz * 2))).join('');
+    stExtraHtml = '';
+    let dLo = Infinity, dHi = 0;
+    for (const bag of [useDay, nickDay, badgeDay, urlDay])
+      for (const e of Object.values(bag))
+        for (const d of Object.keys(e)) { if (+d < dLo) dLo = +d; if (+d > dHi) dHi = +d; }
+    if (dHi) stExtraHtml += srow('stats history', `${(dHi - dLo + 1).toLocaleString('en')} days`);
+    let ecN = 0, ecOld = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k.startsWith(EMOTE_CACHE_PREFIX)) continue;
+        ecN++;
+        const t = (JSON.parse(localStorage.getItem(k)) || {}).t || 0;
+        if (t && (!ecOld || t < ecOld)) ecOld = t;
+      }
+    } catch {}
+    if (ecN) stExtraHtml += srow('emote cache', `${ecN} sets · oldest ${fmtSpan(Date.now() - ecOld)}`);
+    if (rateHistT.length > 1)
+      stExtraHtml += srow('rate history', fmtSpan(rateHistT[rateHistT.length - 1] - rateHistT[0]));
     if (archDb) {
       try {
         const rq = archDb.transaction('msgs').objectStore('msgs').count();
