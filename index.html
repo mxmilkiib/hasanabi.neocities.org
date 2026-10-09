@@ -10170,16 +10170,22 @@
     saveOpts();
     emoteQ.focus();
   });
-  // the chip breathes while the pointer is actually holding the grid
-  emotePick.addEventListener('pointerenter', () => {
-    gridHeld = epickHold;
-    holdBtn.classList.toggle('held', gridHeld);
+  // the hold engages only while the pointer rests on an emote/emoji cell -
+  // over the search row, tabs or grid gaps nothing needs freezing. a short
+  // grace keeps sliding across a cell gap from flickering a rebuild
+  // mid-crossing, and leaving the panel flushes the queue at once
+  let unholdTimer = 0;
+  const setGridHeld = (on) => {
+    clearTimeout(unholdTimer);
+    gridHeld = on;
+    holdBtn.classList.toggle('held', on);
+    if (!on && heldRebuild) { heldRebuild = false; rebuildPicker(); }
+  };
+  emotePick.addEventListener('pointerover', (e) => {
+    if (e.target.closest('button[data-ins]')) setGridHeld(epickHold);
+    else if (gridHeld) unholdTimer = setTimeout(() => setGridHeld(false), 200);
   });
-  emotePick.addEventListener('pointerleave', () => {
-    gridHeld = false;
-    holdBtn.classList.remove('held');
-    if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
-  });
+  emotePick.addEventListener('pointerleave', () => setGridHeld(false));
   // animation filter: anim/still chips work like the source tabs -
   // none lit means both, so a solo chip can't be turned into nothing
   const EPICK_ANIM_KEY = 'hasan-epickanim';
