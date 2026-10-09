@@ -5624,8 +5624,12 @@
         // 'Prime Gaming' version title that would just double it
         const raw = id.replace(/[-_]/g, ' ');
         const name = ({ subscriber: 'subbed', moderator: 'mod', premium: 'Prime subscriber' })[id] || raw;
-        const vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '')
+        let vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '')
           : id === 'premium' ? '' : v.t;
+        // a title that merely restates the set name ('Blossom Badge 2025'
+        // under 'blossom badge') is cut - the set name alone is the label
+        if (vt && vt.toLowerCase().replace(/[^a-z0-9]/g, '')
+          .startsWith(raw.replace(/[^a-z0-9]/g, ''))) vt = '';
         const label = vt && vt.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${vt}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
