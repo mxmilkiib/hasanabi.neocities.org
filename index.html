@@ -3224,6 +3224,19 @@
             ? (why ? why + ' · filled' : 'filled') : why;
         }
       }
+    // the windowed loop only reaches the spark tail - an outage longer
+    // than the window leaves its head in the long series band-less, so
+    // shade the part of rateHist that runs further back too
+    const headLim = Math.max(0, rateHistT.length - rateTimes.length);
+    if (s < (rateHistT[headLim] || Infinity))
+      for (let h = 0; h < headLim; h++) {
+        const t = rateHistT[h];
+        if (t && s < t && e > t - 1000) {
+          rateHist[h] = NaN;
+          rateHistWhy[h] = (rateHistWhy[h] || '').includes('filled')
+            ? (why ? why + ' · filled' : 'filled') : why;
+        }
+      }
   }
   // a replayed line inside an outage window proves the stretch was
   // recovered - flip those dead samples from the danger wash to violet,
@@ -3245,6 +3258,16 @@
           rateWhy[j] = rateWhy[j] ? rateWhy[j] + ' · filled' : 'filled';
           const h = j + hOff;
           if (h >= 0) rateHistWhy[h] = rateHistWhy[h] ? rateHistWhy[h] + ' · filled' : 'filled';
+        }
+      // same reach issue as markAway - recover the tag on the part of
+      // the long series older than the spark window
+      const headLim = Math.max(0, rateHistT.length - rateTimes.length);
+      if (covered < (rateHistT[headLim] || Infinity))
+        for (let h = 0; h < headLim; h++) {
+          const t = rateHistT[h];
+          if (!Number.isFinite(rateHist[h]) && t > covered && t - 1000 < e
+              && !(rateHistWhy[h] || '').includes('filled'))
+            rateHistWhy[h] = rateHistWhy[h] ? rateHistWhy[h] + ' · filled' : 'filled';
         }
       if (ts > s) return;
     }
