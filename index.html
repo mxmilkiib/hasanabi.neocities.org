@@ -5528,7 +5528,7 @@
         // dedup still checks the full word so 'subed · Subscriber' can't show
         const raw = id.replace(/[-_]/g, ' ');
         const name = ({ subscriber: 'subed', moderator: 'mod' })[id] || raw;
-        const label = inRail ? name : v.t && v.t.toLowerCase() !== raw ? `${name} · ${v.t}` : name;
+        const label = v.t && v.t.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${v.t}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
