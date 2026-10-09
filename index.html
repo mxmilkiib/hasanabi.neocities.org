@@ -1149,6 +1149,9 @@
      same glyph once --chat-w reaches 600-700 */
   .at { color: var(--accent); font-weight: max(700, calc(var(--chat-w, 400) + 200)); }
   .at:hover { color: var(--text); text-decoration: underline; }
+  /* .at's accent colour and the help panel's <b> tint would otherwise
+     outrank .rbw's transparent text and hide the clipped gradient */
+  .at.rbw, .at.rbw:hover, #helpPanel .rbw { color: transparent; }
   /* mentions are styled like links; give them the hand instead of the
      text i-beam so they read as interactive at a glance */
   .row .at { cursor: pointer; }
