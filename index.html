@@ -10190,8 +10190,8 @@
   });
   // mix merges every lit source into a single sectionless grid
   const EPICK_MIX_KEY = 'hasan-epickmix';
-  let epickMerge = false;
-  try { epickMerge = localStorage.getItem(EPICK_MIX_KEY) === '1'; } catch {}
+  let epickMerge = true;
+  try { epickMerge = localStorage.getItem(EPICK_MIX_KEY) !== '0'; } catch {}
   const mixBtn = document.getElementById('emoteMix');
   const setMix = (on) => {
     epickMerge = !!on;
