@@ -792,13 +792,13 @@
     background-clip: text;
     animation: notice-rainbow var(--rbw-t, 6s) linear infinite;
   }
-  /* a tight halo keeps the pale gradient stops legible - one near-crisp
-     pass instead of a wide murk that darkens the glyphs; a saturate +
-     contrast lift ahead of it separates the stops so the sweep pops
-     against the ground. it rides a custom property so the variants
+  /* the halo runs two passes - a tight dark edge hugging the glyphs for
+     definition, then a wider soft glow that lifts the whole word off the
+     ground; a saturate + contrast lift ahead separates the gradient stops
+     so the sweep pops harder. it rides a custom property so the variants
      that animate filter (hue/pulse) re-apply it inside their keyframes */
   .rbw {
-    --rbwshadow: saturate(1.15) contrast(1.08) drop-shadow(0 0 .45px rgba(0,0,0,.85));
+    --rbwshadow: saturate(1.25) contrast(1.12) drop-shadow(0 0 .6px rgba(0,0,0,.9)) drop-shadow(0 0 1.8px rgba(0,0,0,.35));
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
