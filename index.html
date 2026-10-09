@@ -4443,7 +4443,7 @@
     }
     const nc = chatterSeen.size;
     chattersEl.hidden = !nc;
-    chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> chatters` : '';
+    chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> <span title="unique chatters in the last hour">chatters/h</span>` : '';
     // an echo still unmatched a minute on isn't awaiting anything - drop
     // its pending marker so a stored copy can't re-register on reload and
     // get adopted by a far-later replay. A live late copy can still adopt
@@ -4554,6 +4554,7 @@
   // secondary channels' state only tints their row chips
   const streamStates = {};
   const peakViewers = {}; // ch -> highest reported viewer count this session
+  const peakViewersAt = {}; // ch -> when that high-water mark was set
   function onStream(d) {
     streamHeard = true;
     const sch = (d.channel || CHANNEL).toLowerCase();
@@ -4573,8 +4574,10 @@
     }
     const prevSt = streamStates[sch];
     streamStates[sch] = st;
-    if (st.live && st.viewers != null)
-      peakViewers[sch] = Math.max(peakViewers[sch] || 0, st.viewers);
+    if (st.live && st.viewers != null && st.viewers > (peakViewers[sch] || 0)) {
+      peakViewers[sch] = st.viewers;
+      peakViewersAt[sch] = Date.now();
+    }
     if (prevSt && !prevSt.live && st.live) notifyLive(sch, st.title);
     paintChTags(sch);
     paintProbe();
@@ -5536,7 +5539,9 @@
       .map((s) => `<button type="button" class="st-s${linkWin === s ? ' on' : ''}" data-lwin="${s}" title="${linkWinTips[s]}">${s}</button>`)
       .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
-    const pvMax = sc ? (peakViewers[sc] || 0) : Math.max(0, ...Object.values(peakViewers));
+    const pvCh = sc || Object.keys(peakViewers).reduce((a, b) => (peakViewers[b] > (peakViewers[a] || 0) ? b : a), null);
+    const pvMax = pvCh ? peakViewers[pvCh] || 0 : 0;
+    const pvAt = pvCh ? peakViewersAt[pvCh] : 0;
     // the tab re-renders live - keep opened sets, the folded group's
     // state and the scroll spot across the innerHTML swap
     const openSets = new Set(
@@ -5550,7 +5555,7 @@
         `<div class="st-row"><span class="nm">${nMsgs.size} chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
         `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
         `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
-        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers</span></div>` : '') +
+        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span></div>` : '') +
         `<div class="st-row st-note"><span class="nm">rows rendered since this page first ran - reloads keep the tally going</span></div>` +
         scopeBtns + `</div>` +
         `<div class="st-panel"><div class="st-h">bursts</div>` +
@@ -8913,6 +8918,7 @@
   for (const [ch, arr] of Object.entries(savedStats.bvp || {})) intoMap(perMap(badgeVerUsePer, ch), arr);
   for (const [ch, arr] of Object.entries(savedStats.uup || {})) intoMap(perMap(urlUsePer, ch), foldUrls(arr));
   Object.assign(peakViewers, savedStats.pv);
+  Object.assign(peakViewersAt, savedStats.pvt);
   for (const [ch, o] of Object.entries(savedStats.lup || {})) Object.assign(perObj(liveUsePer, ch), o);
   Object.assign(badgeDay, savedStats.bd);
   for (const [ch, o] of Object.entries(savedStats.bdp || {})) Object.assign(perObj(badgeDayPer, ch), o);
@@ -8944,7 +8950,7 @@
         lup: liveUsePer, bd: badgeDay, bdp: badgeDayPer, nd: nickDay, ndp: nickDayPer,
         nh: nickHour, nhp: nickHourPer, bh: badgeHour, bhp: badgeHourPer,
         ud: urlDay, udp: urlDayPer, uh: urlHour, uhp: urlHourPer,
-        uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers,
+        uu: [...urlUse], uup: per(urlUsePer), uo: [...urlOrig], pv: peakViewers, pvt: peakViewersAt,
       }));
     } catch {}
   };
