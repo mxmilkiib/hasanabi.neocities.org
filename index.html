@@ -4860,7 +4860,7 @@
   // the named preset bundles; the palettes are the styles) ----
   // each preset is a bundle of every display option, applied via applyOpts
   const THEME_PRESETS = {
-    default:  { theme: 'dark',    shade: 7,    font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 0, zebra: 1,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 0, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
+    default:  { theme: 'dark',    shade: 7,    font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 1,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 0, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
     compact:  { theme: 'dark',    shade: 7,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
     print:    { theme: 'light',   shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
     cosy:     { theme: 'sepia',   shade: 2,    font: 'sans',       px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
@@ -7615,7 +7615,7 @@
   // help list and the ≡ cycle run off → faint dots → faint → medium →
   // solid; LINE_SHADES order stays put so saved indices don't remap
   const LINE_ORDER = [0, 4, 1, 2, 3];
-  let lineLevel = 1;
+  let lineLevel = 4; // 'faint dots'
   // each option's underbar wears the line it selects: the shade colour
   // for the strength, dotted for the dots mode, invisible when off - a
   // real 1px border reads closer to the row seam than a hairline underline
