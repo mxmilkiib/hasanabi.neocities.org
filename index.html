@@ -146,6 +146,10 @@
     /* popup frames stay hue-neutral - any theme-relative mix turns
        amber/whatever the text hue is; white on dark shades, dark on light */
     --popline: rgba(255, 255, 255, .32);
+    /* secondary/tertiary accent (help tabs, config heads, selection):
+       hue-relative so it never clashes - lightness counter-shades the
+       bg so it stays legible on every stop */
+    --aux: oklch(clamp(.42, calc(.95 - var(--sh-bg) * .5), .88) .13 var(--ph));
   }
   :root[data-shade="0"], :root[data-shade="1"], :root[data-shade="2"], :root[data-shade="3"] { --popline: rgba(0, 0, 0, .30); }
   :root[data-shade="0"] { --sh-bg: .99; --sh-tx: .10; }
@@ -220,8 +224,9 @@
     --panel: color-mix(in oklch, var(--bg), var(--text) 12%);
   }
   * { box-sizing: border-box; }
-  /* selection highlight: the about page's lavender over dark ink */
-  ::selection { background: #b9a5f0; color: #1a1206; }
+  /* selection highlight rides the hue-relative secondary accent, inked
+       in the page colour so either shade direction stays readable */
+  ::selection { background: var(--aux); color: var(--bg); }
   html, body { height: 100%; margin: 0; }
   body {
     /* dynamic viewport: on mobile 100% is the toolbar-hidden height, which
@@ -498,7 +503,7 @@
   }
   #peek[hidden] { display: none; }
   /* the preview image floats right and the card text wraps its left */
-  #peek > img { float: right; max-width: 40%; max-height: 9em; border-radius: 4px; margin: 0 0 .3em .6em; border: 1px solid var(--peekline, #c39bff); box-sizing: border-box; }
+  #peek > img { float: right; max-width: 40%; max-height: 9em; border-radius: 4px; margin: 0 0 .3em .6em; border: 1px solid var(--peekline, var(--popline)); box-sizing: border-box; }
   /* a card carrying a playable file takes the pointer so its controls
      work - text cards stay click-through */
   #peek.pint { pointer-events: auto; }
@@ -1462,9 +1467,9 @@
   #helpPanel .htabs::before { content: ''; position: absolute; bottom: 100%;
     left: 0; right: 0; height: 16px; pointer-events: none;
     background: linear-gradient(color-mix(in srgb, var(--panel) 30%, transparent), color-mix(in srgb, var(--panel) 85%, transparent) 40%, var(--panel)); }
-  #helpPanel .htabs a { flex: 1; text-align: center; color: #c39bff; text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-color: color-mix(in srgb, var(--text-dim) 65%, var(--line)); border-radius: 4px; font-weight: 700; }
+  #helpPanel .htabs a { flex: 1; text-align: center; color: var(--aux); text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-color: color-mix(in srgb, var(--text-dim) 65%, var(--line)); border-radius: 4px; font-weight: 700; }
   #helpPanel .htabs a:hover { color: var(--text); background: var(--line); }
-  #helpPanel .htabs a.on { color: #c39bff; border-color: var(--accent); }
+  #helpPanel .htabs a.on { color: var(--aux); border-color: var(--accent); }
   /* height: auto lets the ✕ stretch to the tab row's height instead of
      using the taller hdr-btn height */
   #helpPanel .htabs button { flex: none; padding: 0 8px; height: auto; font-weight: 700; }
@@ -1488,7 +1493,7 @@
   #helpPanel #htabRes > div > b,
   #helpPanel #htabLib > div > b,
   #helpPanel #authSections > div > b,
-  #helpPanel #htabCfg > div > b:not([class]) { color: #c39bff; }
+  #helpPanel #htabCfg > div > b:not([class]) { color: var(--aux); }
   /* the ghbtns.com star-button look at small size, self-hosted - an
      iframe embed would be eaten by social-widget blocklists. The count
      fills from the relay's repo stats instead of their jsonp. Dark
