@@ -872,8 +872,10 @@
   main.em-right .row.eonly > .colon { margin-right: auto; }
   main.em-right .row.eonly .msg > .emote, main.em-right .row.eonly .msg > .estk { margin: -.7em 1px; }
   /* floats are dead weight inside the flex row, so the aux chips ride
-     flex order instead: emotes first, then [mod]/[sub]/bits at the tip */
-  main.em-right .row.eonly > .aux, main.em-right .row.eonly > .sub { order: 1; float: none; margin-left: 5px; }
+     flex order instead: emotes first, then [mod]/[sub]/bits at the tip.
+     .auxr marks the right-anchored chips only - left-mode sub/aux keep
+     their natural order ahead of the name instead of jumping the gutter */
+  main.em-right .row.eonly > .auxr { order: 1; float: none; margin-left: 5px; }
   /* zero-width overlay emotes stack on the previous emote's box */
   .estk { position: relative; display: inline-block; z-index: 4; }
   .estk .emote { height: 1.5em; }
