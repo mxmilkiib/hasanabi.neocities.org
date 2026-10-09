@@ -154,6 +154,9 @@
   :root[data-shade="7"] { --sh-bg: .25; --sh-tx: .95; }
   :root[data-shade="8"] { --sh-bg: .12; --sh-tx: .97; }
   :root[data-shade="9"] { --sh-bg: .02; --sh-tx: .98; }
+  /* murk sits between dark (.25) and deep (.12) but keeps its own id so
+     saved shade=8/9 still mean deep/black; the cycle orders by position */
+  :root[data-shade="10"] { --sh-bg: .18; --sh-tx: .96; }
   @media (prefers-color-scheme: light) {
     :root:not([data-shade]) { --popline: rgba(0, 0, 0, .30); }
   }
@@ -1459,7 +1462,7 @@
     margin-left: 4px; font: 700 11px/14px -apple-system, "Segoe UI", Arial, sans-serif;
     --gh-tx: #24292f; --gh-top: #fcfcfc; --gh-bot: #eee; --gh-hbg: linear-gradient(#eee, #ddd);
     --gh-ln: #d5d5d5; --gh-hln: #ccc; --gh-bub: #fafafa; --gh-bln: #d4d4d4; --gh-hv: #0366d6; }
-  :root:is(:not([data-shade]), [data-shade="4"], [data-shade="5"], [data-shade="6"], [data-shade="7"], [data-shade="8"], [data-shade="9"]) #helpPanel .ghbtn {
+  :root:is(:not([data-shade]), [data-shade="4"], [data-shade="5"], [data-shade="6"], [data-shade="7"], [data-shade="8"], [data-shade="9"], [data-shade="10"]) #helpPanel .ghbtn {
     --gh-tx: #c9d1d9; --gh-top: #2d333b; --gh-bot: #22272e; --gh-hbg: #30363d;
     --gh-ln: #444c56; --gh-hln: #768390; --gh-bub: #22272e; --gh-bln: #444c56; --gh-hv: #58a6ff; }
   @media (prefers-color-scheme: light) {
@@ -4899,9 +4902,12 @@
     markPresets();
   }
 
-  // ten shade stops, lightest → darkest; null follows the system
-  const SHADE_NAMES = ['white', 'lightest', 'light', 'pale', 'mid', 'dim', 'dusk', 'dark', 'deep', 'black'];
-  const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●', '●'];
+  // shade stops by id, lightest → darkest; null follows the system. ids
+  // are stable - murk (10) slots between dark and deep in the cycle
+  // order without renumbering saved shade= prefs or urls
+  const SHADE_NAMES = ['white', 'lightest', 'light', 'pale', 'mid', 'dim', 'dusk', 'dark', 'deep', 'black', 'murk'];
+  const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●', '●', '●'];
+  const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 7, 10, 8, 9];
   // default option indices - the controls, the copy-url diffing and the
   // 'default' preset all read from here
   const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4 };
@@ -4918,7 +4924,7 @@
   }
   function stepShade(dir) {
     const cur = shadeIdx == null ? (lightMQ.matches ? 0 : 8) : shadeIdx;
-    shadeIdx = (cur + dir + SHADE_NAMES.length) % SHADE_NAMES.length;
+    shadeIdx = SHADE_ORDER[(SHADE_ORDER.indexOf(cur) + dir + SHADE_ORDER.length) % SHADE_ORDER.length];
     applyShade();
     saveOpts();
   }
@@ -11624,7 +11630,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpShade: SHADE_NAMES, helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail'],
+    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpHfs: ['follow chat'].concat(HDR_SIZES),
@@ -11642,6 +11648,10 @@
       `<a href="#" role="button" class="helpOpt ${cls}" data-idx="${i}"><span class="chipName">${n}</span></a>`)
       // bare numbers space-join like the chat size row; wordy options keep ' / '
       .join(cls === 'helpHfs' || cls === 'helpFs' ? ' ' : ' / ');
+  // shade chips list in cycle order but carry their stable ids, so murk
+  // shows between dark and deep while answering as shade 10
+  document.getElementById('helpShadeList').innerHTML = SHADE_ORDER.map((i) =>
+    `<a href="#" role="button" class="helpOpt helpShade" data-idx="${i}"><span class="chipName">${SHADE_NAMES[i]}</span></a>`).join(' / ');
   document.getElementById('helpPresetList').innerHTML = Object.keys(THEME_PRESETS).map((n) =>
     `<a href="#" role="button" class="helpOpt helpPreset" data-preset="${n}"><span class="chipName">${n}</span></a>`).join(' / ');
   // each shadow chip wears its own level
