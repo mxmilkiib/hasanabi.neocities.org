@@ -175,6 +175,8 @@
   :root[data-colour="lavender"] { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; }
   :root[data-colour="mirc"]     { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; }
   :root[data-colour="sepia"]    { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
+  /* financial times: pale peach-pink paper, teal links, oxblood danger */
+  :root[data-colour="salmon"]   { --ph: 40;  --pc: .045; --ptc: .025; --accent: #0f7680; --good: #00754d; --danger: #990f3d; --vip: #b8457a; }
   :root[data-colour="ice"]      { --ph: 215; --pc: .02;  --ptc: .03;  --accent: #2a5fa8; --good: #2e7d46; --danger: #b04040; --vip: #a03060; }
   :root[data-colour="solarized"]{ --ph: 200; --pc: .038; --ptc: .03;  --accent: #b58900; --good: #859900; --danger: #dc322f; --vip: #d33682; }
   :root[data-colour="nord"]     { --ph: 245; --pc: .028; --ptc: .02;  --accent: #88c0d0; --good: #a3be8c; --danger: #bf616a; --vip: #b48ead; }
@@ -4915,12 +4917,12 @@
     phosphor: { colour: 'ember',  variant: 'phosphor', shade: 9, font: 'vt323', px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
   };
   // ordered by each colour's designed shade stop, darkest → lightest
-  const COLOURS = ['violet', 'gray', 'red', 'wine', 'green', 'ember', 'solarized', 'nord', 'lavender', 'sepia', 'ice', 'cream', 'mirc'];
+  const COLOURS = ['violet', 'gray', 'red', 'wine', 'green', 'ember', 'solarized', 'nord', 'lavender', 'sepia', 'salmon', 'ice', 'cream', 'mirc'];
   const VARIANTS = ['standard', 'phosphor', 'grain', 'contrast'];
   // each colour's designed shade: swatch previews, popup clicks and the
   // header cycles all land on it; a variant can overrule (phosphor
   // designs at the black stop), else the colour's own stop applies
-  const COLOUR_SHADE = { violet: 8, gray: 7, red: 7, wine: 7, green: 7, ember: 7, solarized: 7, nord: 6, lavender: 2, sepia: 2, ice: 2, cream: 1, mirc: 0 };
+  const COLOUR_SHADE = { violet: 8, gray: 7, red: 7, wine: 7, green: 7, ember: 7, solarized: 7, nord: 6, lavender: 2, sepia: 2, salmon: 1, ice: 2, cream: 1, mirc: 0 };
   const VARIANT_SHADE = { phosphor: 9 };
   const designedShade = (c, v) => VARIANT_SHADE[v] ?? COLOUR_SHADE[c];
   const COLOUR_ICONS = { gray: '☾', red: '♦', wine: '❋', sepia: '☼', cream: '☀', ember: '◉', green: '⬢', solarized: '◍', ice: '❅', mirc: '⊞', nord: '❄', violet: '◘', lavender: '❀' };
