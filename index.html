@@ -469,14 +469,15 @@
     transition: opacity .15s;
     touch-action: none;
   }
-  #vid .vid-size.br { right: 0; bottom: 0; cursor: nwse-resize; }
-  #vid .vid-size.bl { left: 0; bottom: 0; cursor: nesw-resize; }
-  #vid .vid-size.tr { right: 0; top: 0; cursor: nesw-resize; }
-  #vid .vid-size.tl { left: 0; top: 0; cursor: nwse-resize; }
-  #vid .vid-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-  #vid .vid-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-  #vid .vid-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  #vid .vid-size.br { right: 0; bottom: 0; cursor: grab; }
+  #vid .vid-size.bl { left: 0; bottom: 0; cursor: grab; }
+  #vid .vid-size.tr { right: 0; top: 0; cursor: grab; }
+  #vid .vid-size.tl { left: 0; top: 0; cursor: grab; }
+  #vid .vid-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: grab; }
+  #vid .vid-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: grab; }
+  #vid .vid-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: grab; }
   #vid:hover .vid-size, #vid.dragging .vid-size { opacity: 1; }
+  #vid.dragging .vid-size { cursor: grabbing; }
   #tt {
     position: fixed;
     z-index: 50;
@@ -1443,14 +1444,15 @@
     color: var(--text-dim); font-size: 9px; line-height: 1; padding: 1px;
     display: grid; place-items: center; opacity: 0;
     transition: opacity .15s; touch-action: none; }
-  #helpPanel .hp-size.br { right: 0; bottom: 0; cursor: nwse-resize; place-items: end end; }
-  #helpPanel .hp-size.bl { left: 0; bottom: 0; cursor: nesw-resize; place-items: end start; }
-  #helpPanel .hp-size.tr { right: 0; top: 0; cursor: nesw-resize; place-items: start end; }
-  #helpPanel .hp-size.tl { left: 0; top: 0; cursor: nwse-resize; place-items: start start; }
-  #helpPanel .hp-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; place-items: center start; }
-  #helpPanel .hp-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; place-items: center end; }
-  #helpPanel .hp-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; place-items: end center; }
+  #helpPanel .hp-size.br { right: 0; bottom: 0; cursor: grab; place-items: end end; }
+  #helpPanel .hp-size.bl { left: 0; bottom: 0; cursor: grab; place-items: end start; }
+  #helpPanel .hp-size.tr { right: 0; top: 0; cursor: grab; place-items: start end; }
+  #helpPanel .hp-size.tl { left: 0; top: 0; cursor: grab; place-items: start start; }
+  #helpPanel .hp-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center start; }
+  #helpPanel .hp-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center end; }
+  #helpPanel .hp-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: grab; place-items: end center; }
   #helpPanel:hover .hp-size, #helpPanel.dragging .hp-size { opacity: 1; }
+  #helpPanel.dragging .hp-size { cursor: grabbing; }
   #helpPanel b { color: var(--accent); font-weight: 600; }
   #helpPanel b .dot { display: inline-block; vertical-align: middle; }
   #helpPanel b.rowstyle { padding: 0 4px; }
@@ -1842,14 +1844,15 @@
     color: var(--text-dim); font-size: 12px; line-height: 1; padding: 1px 2px;
     display: grid; place-items: center; opacity: 0;
     transition: opacity .15s; touch-action: none; }
-  #emotePick .ep-size.br { right: 0; bottom: 0; cursor: nwse-resize; place-items: end end; }
-  #emotePick .ep-size.bl { left: 0; bottom: 0; cursor: nesw-resize; place-items: end start; }
-  #emotePick .ep-size.tr { right: 0; top: 0; cursor: nesw-resize; place-items: start end; }
-  #emotePick .ep-size.tl { left: 0; top: 0; cursor: nwse-resize; place-items: start start; }
-  #emotePick .ep-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; place-items: center start; }
-  #emotePick .ep-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: ew-resize; place-items: center end; }
-  #emotePick .ep-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; place-items: end center; }
+  #emotePick .ep-size.br { right: 0; bottom: 0; cursor: grab; place-items: end end; }
+  #emotePick .ep-size.bl { left: 0; bottom: 0; cursor: grab; place-items: end start; }
+  #emotePick .ep-size.tr { right: 0; top: 0; cursor: grab; place-items: start end; }
+  #emotePick .ep-size.tl { left: 0; top: 0; cursor: grab; place-items: start start; }
+  #emotePick .ep-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center start; }
+  #emotePick .ep-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center end; }
+  #emotePick .ep-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: grab; place-items: end center; }
   #emotePick:hover .ep-size, #emotePick.dragging .ep-size { opacity: 1; }
+  #emotePick.dragging .ep-size { cursor: grabbing; }
   #emotePick .erow { flex: none; display: flex; gap: 6px; }
   #emotePick .erow .qwrap { position: relative; flex: 1; min-width: 0; display: flex; }
   #emotePick #emoteQ { flex: 1; min-width: 0; box-sizing: border-box; font-family: var(--chat-ff, inherit); font-size: 13px; padding: 4px 22px 4px 8px; }
