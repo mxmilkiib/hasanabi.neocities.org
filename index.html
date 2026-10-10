@@ -4464,7 +4464,7 @@
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
   function saveSpark() {
     try {
-      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hist: rateHist, histT: rateHistT, histWhy: rateHistWhy }));
+      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hist: rateHist, histT: rateHistT, histWhy: rateHistWhy, ghist: glorpHist }));
     } catch {}
   }
   function restoreSpark() {
@@ -4512,9 +4512,11 @@
         if (quietGaps.length > 50) quietGaps.splice(0, quietGaps.length - 50);
       }
       glorpSamples.push(...(Array.isArray(d.glorp) ? d.glorp : []).slice(-win), ...Array(gap).fill(0));
-      // the long glorp series isn't saved - pad it in step with rateHist
-      // so its positions still index against rateHistT
-      glorpHist.push(...Array(rateHist.length).fill(0));
+      // the long glorp series rides beside hist in newer saves; older
+      // saves pad zeros in step so positions still index against rateHistT
+      const oldG = (Array.isArray(d.ghist) ? d.ghist : []).slice(-oldHist.length).map((v) => +v || 0);
+      while (oldG.length < oldHist.length) oldG.unshift(0);
+      glorpHist.push(...oldG, ...Array(hGap).fill(0));
       // scoped series restore beside the globals - each channel's tail
       // gets the same closed-gap padding so bursts keep real times
       for (const c of CHANNELS) {
@@ -5996,14 +5998,20 @@
     const bw = span / N, bwPx = wCss / N;
     // per-second samples pool into pixel bins: rate bars average, each bin
     // also keeps its sharpest second so a short burst still spikes, and a
-    // bin with any dead sample flags the cause for the underlay band
+    // bin with any dead sample flags the cause for the underlay band.
+    // glorp counts pool beside them off the same timestamps - the hottest
+    // second marks the bin, the sum feeds the hover readout
+    const gser = sc ? (glorpHistPer[sc] || []) : glorpHist;
     const bins = new Float64Array(N), bn = new Float64Array(N),
-      bmax = new Float64Array(N), bwhy = new Array(N).fill('');
+      bmax = new Float64Array(N), bwhy = new Array(N).fill(''),
+      bgs = new Float64Array(N), bgm = new Float64Array(N);
     for (let i = 0; i < series.length; i++) {
       const t = rateHistT[off + i];
       if (!t || t < t0) continue;
       const b = Math.min(N - 1, Math.floor((t - t0) / bw));
       const v = series[i];
+      const gv = gser[off + i] || 0;
+      if (gv) { bgs[b] += gv; if (gv > bgm[b]) bgm[b] = gv; }
       if (Number.isFinite(v)) { bins[b] += v; bn[b]++; if (v > bmax[b]) bmax[b] = v; }
       else {
         const w = rateHistWhy[off + i] || '';
@@ -6047,6 +6055,13 @@
       }
     }
     g.globalAlpha = 1;
+    // a bin holding a second with >2 glorp/F gets a hot cap along the
+    // top edge - the same trigger the header spark runs red on its line
+    if (sparkCols) {
+      g.fillStyle = sparkCols.danger;
+      for (let i = 0; i < N; i++) if (bgm[i] > 2)
+        g.fillRect(Math.floor(i * bwPx), 0, Math.max(1, Math.ceil(bwPx)), 3);
+    }
     // scale labels: the peak value caps the top-left corner and a faint
     // hairline marks half-height, so spikes read against real numbers
     if (peak > 0) {
@@ -6087,6 +6102,7 @@
       const i = Math.max(0, Math.min(N - 1, Math.floor((e.clientX - r.left) / r.width * N)));
       cv.title = `${fmtRowTime(new Date(t0 + i * bw))} · ` +
         (bn[i] ? `${(bins[i] / bn[i]).toFixed(1)}${bmax[i] - bins[i] / bn[i] > .05 ? `–${bmax[i].toFixed(1)}` : ''} msgs/s` : 'no data') +
+        (bgs[i] ? ` · ${bgs[i]} glorp${bgs[i] === 1 ? '' : 's'}` : '') +
         (bwhy[i] ? ` - ${bwhy[i]}` : '');
     };
     cv.onmouseleave = () => { cv.title = graphTitle; };
@@ -6098,6 +6114,7 @@
       `<i class="st-sw" style="background:${(sparkCols && sparkCols.danger) || 'var(--danger)'}"></i>socket lost ` +
       `<i class="st-sw" style="background:${(sparkCols && sparkCols.vip) || 'var(--vip)'}"></i>page away ` +
       `<i class="st-sw" style="background:${(sparkCols && sparkCols.good) || 'var(--good)'}"></i>recovered ` +
+      `<i class="st-sw" style="background:${(sparkCols && sparkCols.danger) || 'var(--danger)'}"></i>glorps ` +
       `<i class="st-sw st-dim"></i>clock marks</span></div>`;
   }
   // delegated - the stats body rewrites its innerHTML on every render
