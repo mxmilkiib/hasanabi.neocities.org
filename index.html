@@ -5751,24 +5751,18 @@
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
       const bVis = statBadgeAll ? flat : flat.slice(0, 40);
       badgeSets = bVis.map(({ id, ver, v, n }, i) => {
-        // the everyday set names abbreviate in the ranked view; sub titles
-        // drop their trailing 'Subscriber' ('3-Month Subscriber' reads
-        // 'subbed · 3-Month'), and the dedup still checks the full word so
-        // a plain 'Subscriber' title never doubles the name. prime's set
-        // id reads as 'premium' - the row names what it is and drops the
-        // 'Prime Gaming' version title that would just double it
+        // the version title is twitch's own name for the badge ('3-Month
+        // Subscriber', 'Moments Conqueror'), so it leads rather than
+        // tailing the set name. title-less versions fall back to the set
+        // name (with its common abbreviations), prime's title only
+        // doubles its name, and explicit overrides - BADGE_NAMES, the
+        // sub-gifter count - win outright
         const raw = id.replace(/[-_]/g, ' ');
         const name = ({ subscriber: 'subbed', moderator: 'mod',
           premium: 'Prime subscriber', 'bot-badge': 'chat bot' })[id] || BADGE_NAMES[id] || raw;
-        let vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '')
-          : id === 'premium' || id in BADGE_NAMES ? '' : v.t;
-        // a title that merely restates the set name ('Blossom Badge 2025'
-        // under 'blossom badge') or the display rename ('Chat Bot' under
-        // 'chat bot') is cut - the name alone is the label
-        const nz = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (vt && (nz(vt).startsWith(nz(raw)) || nz(vt).startsWith(nz(name)))) vt = '';
+        const vt = id === 'premium' ? '' : (v.t || '').trim();
         const label = id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` :
-          vt && vt.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${vt}` : name;
+          BADGE_NAMES[id] || vt || name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
