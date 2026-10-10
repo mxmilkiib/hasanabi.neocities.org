@@ -1374,7 +1374,18 @@
   .hdr-btn.shiny#vidBtn::after { animation-delay: .72s; }
   .hdr-btn.shiny#sendBtn::after { animation-delay: 1.08s; }
   .hdr-btn.shiny#emojiBtn::after { animation-delay: 1.44s; }
-  @media (prefers-reduced-motion: reduce) { .hdr-btn.shiny::after { animation: none; transform: none; width: 100%; opacity: .12; } }
+  /* ...except the emote button's hint orbits: the same rainbow band
+     wrapped into a beam that rotates around the button's centre - an
+     oversized layer so the spin never uncovers a corner */
+  .hdr-btn.shiny#emojiBtn::after {
+    top: -140%; bottom: -140%; left: -140%; width: 380%;
+    transform: none;
+    background: conic-gradient(from 0deg, transparent 0 70%,
+      #ff686899, #ffc45c99, #e1ee7299, #70dca399, #6ccbf299, #bc87ed99, transparent);
+    animation: sheen-spin 1.8s linear infinite;
+  }
+  @keyframes sheen-spin { to { transform: rotate(1turn); } }
+  @media (prefers-reduced-motion: reduce) { .hdr-btn.shiny::after { animation: none; transform: none; width: 100%; opacity: .12; } .hdr-btn.shiny#emojiBtn::after { left: 0; } }
   /* keep the ? button clickable above the help panel when they overlap */
   #helpBtn { position: absolute; z-index: 11; }
   select.hdr-btn { padding-right: 4px; }
