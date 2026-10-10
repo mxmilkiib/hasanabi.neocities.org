@@ -2539,7 +2539,10 @@
     for (const id of ['vidBtn', 'splitBtn', 'sendBtn', 'helpBtn', 'emojiBtn']) {
       const b = document.getElementById(id);
       b.classList.add('shiny');
-      b.addEventListener('click', () => b.classList.remove('shiny'), { once: true });
+      // wheel is a click on these buttons - count it as a press too
+      const unshine = () => b.classList.remove('shiny');
+      b.addEventListener('click', unshine, { once: true });
+      b.addEventListener('wheel', unshine, { once: true, passive: true });
     }
   }
   hintEl.addEventListener('click', () => {
