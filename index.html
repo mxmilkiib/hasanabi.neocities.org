@@ -534,6 +534,10 @@
   #epop .epemo { font-size: 64px; line-height: 1.1; margin: 0; max-width: none; max-height: none; }
   #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; }
   #vid #vidFrame { position: absolute; inset: 0; }
+  /* pending unmute affordance: sits over the player's own controls until
+     a confirmed delivery hides it */
+  #vid #vidWake { position: absolute; left: 6px; bottom: 6px; z-index: 3;
+    font-size: .85em; padding: 2px 8px; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
@@ -7782,7 +7786,10 @@
         // over the intent, which is how the record poisons itself
         if (wantSound) {
           const wake = () => {
-            if (vidWakeSpent || vidWakeTries >= 5 || !vidPlayer) return;
+            // no tries cap here: the poll's retry budget bounds automatic
+            // noise, but a real gesture is intentional - sharing the cap
+            // left clicks dead once the retries burned out
+            if (vidWakeSpent || !vidPlayer) return;
             if (saved.v != null) vidPlayer.setVolume(saved.v);
             vidPlayer.setMuted(false);
             if (wantPlay && vidPlayer.isPaused()) vidPlayer.play();
@@ -7798,6 +7805,25 @@
           });
         }
         vidState();
+        // a pending unmute is invisible until it stalls, then it gets a
+        // button: paused waits on a play gesture, playing-muted past the
+        // retries means the api call isn't landing - either way the chip
+        // gives the user a target and its click IS the gesture
+        const vidChip = document.createElement('button');
+        vidChip.id = 'vidWake'; vidChip.className = 'hdr-btn'; vidChip.hidden = true;
+        vidChip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!vidPlayer) return;
+          if (saved.v != null) vidPlayer.setVolume(saved.v);
+          vidPlayer.setMuted(false);
+          if (vidPlayer.isPaused()) vidPlayer.play();
+        });
+        vidBox.appendChild(vidChip);
+        // console hook so the real state can be read back when the
+        // unmute path misbehaves again: __vid() in devtools
+        window.__vid = () => ({ saved, wantSound, wantPlay,
+          pend: wantSound && !vidWakeSpent, tries: vidWakeTries, spent: vidWakeSpent,
+          muted: vidPlayer.getMuted(), paused: vidPlayer.isPaused() });
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
         emb.addEventListener(Twitch.Player.PLAYING, vidState);
@@ -7828,6 +7854,12 @@
           // tries cap already bounds the noise, and a mute the user
           // never chose must never be stamped deliberate
           if (pend && !vidPlayer.isPaused() && !vidPlayer.getMuted()) vidWakeSpent = true;
+          // paused waits on the first play gesture; playing-muted with
+          // retries already burned means the calls aren't landing - show
+          // the chip either way, hide it once delivery confirms
+          const paused = vidPlayer.isPaused();
+          vidChip.hidden = !pend || (!paused && vidWakeTries < 2);
+          if (!vidChip.hidden) vidChip.textContent = paused ? '▶ sound on' : '🔊 sound on';
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: pend ? false : vidPlayer.getMuted(), p: pend && wantPlay ? true : !vidPlayer.isPaused(), w: 3 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
