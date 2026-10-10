@@ -1377,23 +1377,25 @@
   .auxr { float: right; margin: 0 0 0 5px; }
   #subBtn { width: 30px; padding: 0 1px; display: flex; align-items: center; }
   .gifimg { max-height: 9em; max-width: 100%; vertical-align: middle; border-radius: 3px; }
-  #offBar { flex: none; text-align: center; padding: 3px 8px; font-size: .9em; background: var(--danger); color: #fff; }
-  #offBar[hidden] { display: none; }
-  /* deploy notice: accent strip under the header, buttons inked in the
-     page colour so they read on the accent ground */
-  #updateBar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; background: var(--accent); color: var(--bg); position: relative; }
-  #updateBar[hidden] { display: none; }
-  #updateTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
-  #updateBar .hdr-btn { flex: none; width: auto; height: 22px; padding: 0 7px; font-size: .92em; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 55%, transparent); }
-  #updateBar .hdr-btn:hover { color: var(--bg); background: color-mix(in srgb, var(--bg) 18%, transparent); }
-  /* boot/sync strip under the header: narrates the load phases as the
-     empty-state bar does, then returns to flag resyncs after a drop or
-     wake; the fill stretches the strip so progress reads at a glance */
-  #loadBar { flex: none; display: flex; align-items: center; gap: 10px;
-    padding: 2px 10px; font-size: .9em; color: var(--text-dim);
-    background: var(--panel); border-bottom: 1px solid var(--line); }
-  #loadBar[hidden] { display: none; }
+  /* under-header status strips: load narration, stream title, offline and
+     deploy notices share the one strip - ids carry only the colourway */
+  .hbar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; position: relative; }
+  .hbar[hidden] { display: none; }
+  .hbar-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+  .hbar .hdr-btn { flex: none; height: 22px; }
+  #offBar { background: var(--danger); color: #fff; }
+  #titleBar, #loadBar { background: var(--panel); border-bottom: 1px solid var(--line); }
+  #titleBar .hbar-txt { padding: 0 30px; }
+  /* boot/sync strip: narrates the load phases as the empty-state bar
+     does, then returns to flag resyncs after a drop or wake; the fill
+     stretches the strip so progress reads at a glance */
+  #loadBar { gap: 10px; padding: 2px 10px; color: var(--text-dim); }
   #loadBar .loadbar { flex: 1; width: auto; margin-top: 0; }
+  /* deploy notice: buttons inked in the page colour so they read on
+     the accent ground */
+  #updateBar { background: var(--accent); color: var(--bg); }
+  #updateBar .hdr-btn { width: auto; padding: 0 7px; font-size: .92em; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 55%, transparent); }
+  #updateBar .hdr-btn:hover { color: var(--bg); background: color-mix(in srgb, var(--bg) 18%, transparent); }
   /* a freshly replayed line washes --aux once then refades - distinct
      from the accent missflash so a backlog landing reads as sync, not
      as a jump-to-row highlight */
@@ -1402,11 +1404,6 @@
     100% { background-color: transparent; }
   }
   .row.repflash { animation: repflash 1.8s ease-out; }
-  /* stream title strip - same seat in the flow as the offline banner */
-  #titleBar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; background: var(--panel); border-bottom: 1px solid var(--line); position: relative; }
-  #titleBar[hidden] { display: none; }
-  #titleTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; padding: 0 30px; }
-  #titleBar .hdr-btn { height: 22px; }
   #titleX { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   #errBox {
@@ -2135,8 +2132,8 @@
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="colourBtn" title="Colour">◐</button><button class="hdr-btn" id="variantBtn" title="Variant">▢</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="inter">Inter</option><option value="sans">System Sans</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><div id="fontMenu" role="listbox" aria-label="Chat font" hidden></div><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
   </header>
-  <div id="loadBar" role="status"><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div>
-  <div id="titleBar" role="status" hidden><span id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
+  <div id="loadBar" class="hbar" role="status"><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div>
+  <div id="titleBar" class="hbar" role="status" hidden><span class="hbar-txt" id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">conf/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
@@ -2292,8 +2289,8 @@
     </div>
     </div>
     </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
-  <div id="offBar" role="status" hidden>you're offline - chat is paused and will catch up when the connection returns</div>
-  <div id="updateBar" role="status" hidden><span id="updateTxt">site updated - reload for the latest version</span><button class="hdr-btn" id="updateGo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
+  <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
+  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt">site updated - ctrl-r for the latest version</span><button class="hdr-btn" id="updateGo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
