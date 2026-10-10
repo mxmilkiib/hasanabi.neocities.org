@@ -3192,13 +3192,24 @@
   // is unchanged - only scroll geometry differs. The live edge reads as
   // a negative scrollTop, so all follow math routes through these two
   let revFlow = false;
+  // split columns carry blank slack below their last row (so a page can
+  // open at the top edge); the live end is the last row, not scrollHeight
+  const liveEnd = (col) => {
+    const l = col.lastElementChild;
+    return isSplit() && l ? l.getBoundingClientRect().bottom - col.getBoundingClientRect().top + col.scrollTop + 2 : col.scrollHeight;
+  };
   const liveDist = (col) => revFlow
     ? col.scrollTop + col.scrollHeight - col.clientHeight
-    : col.scrollHeight - col.scrollTop - col.clientHeight;
+    : liveEnd(col) - col.scrollTop - col.clientHeight;
   // the scroll event from a follow pin is programmatic, not a user scroll -
   // the peek card ignores it or every new row would drop an open preview
   let autoScrollAt = 0;
-  const snapLive = (col) => { autoScrollAt = performance.now(); col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : col.scrollHeight; };
+  const liveTop = (col) => revFlow ? col.clientHeight - col.scrollHeight : liveEnd(col) - col.clientHeight;
+  const snapLive = (col) => {
+    autoScrollAt = performance.now();
+    // the live split column holds its page at the top edge - never pulled back down
+    col.scrollTop = !revFlow && isSplit() && col === activeEl ? Math.max(col.scrollTop, liveTop(col)) : liveTop(col);
+  };
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
   // mid → raw message text, so quoting a row uses the real text rather
@@ -3323,7 +3334,7 @@
     for (const c of document.querySelectorAll(`.jdc[data-for="${btn.id}"]`)) c.hidden = true;
     jumpingCols.add(col);
     setTimeout(() => jumpingCols.delete(col), 1500);
-    col.scrollTo({ top: revFlow ? -col.scrollHeight : col.scrollHeight, behavior: 'smooth' });
+    col.scrollTo({ top: revFlow ? -col.scrollHeight : Math.max(0, liveTop(col)), behavior: 'smooth' });
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
   // the plain circles make the same jump as their column's counter pill
