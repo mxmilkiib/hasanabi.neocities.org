@@ -797,7 +797,7 @@
      definition, then a wider soft glow that lifts the whole word off the
      ground; a saturate + contrast lift ahead separates the gradient stops
      so the sweep pops harder. it rides a custom property so the variants
-     that animate filter (hue/pulse) re-apply it inside their keyframes */
+     that animate filter (hue cycle) re-apply it inside their keyframes */
   .rbw {
     --rbwshadow: saturate(1.25) contrast(1.12) drop-shadow(0 0 .6px rgba(0,0,0,.9)) drop-shadow(0 0 1.8px rgba(0,0,0,.35));
     filter: var(--rbwshadow);
@@ -808,15 +808,14 @@
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
   body.rbw-wave .rbw { animation-name: rbw-wave; animation-timing-function: ease-in-out; }
-  @keyframes rbw-hue { to { filter: hue-rotate(360deg) var(--rbwshadow); } }
-  body.rbw-hue .rbw { animation-name: rbw-hue; }
-  @keyframes rbw-pulse { 50% { filter: brightness(1.45) saturate(1.25) var(--rbwshadow); } }
-  body.rbw-pulse .rbw { animation-name: rbw-pulse; animation-timing-function: ease-in-out; }
-  @keyframes rbw-flick {
-    8% { opacity: .5; } 9%, 40% { opacity: 1; } 41% { opacity: .7; }
-    42%, 72% { opacity: 1; } 73% { opacity: .55; } 74% { opacity: 1; }
+  /* hue-rotate heads both ends' filter lists - a prepended function in
+     only one frame mismatches the pairwise lists and drops the whole
+     filter interpolation to a discrete flip instead of a turn */
+  @keyframes rbw-hue {
+    from { filter: hue-rotate(0deg) var(--rbwshadow); }
+    to { filter: hue-rotate(360deg) var(--rbwshadow); }
   }
-  body.rbw-flick .rbw { animation-name: rbw-flick; animation-timing-function: steps(1, end); }
+  body.rbw-hue .rbw { animation-name: rbw-hue; }
   /* links view: rows without a url, and repeat posts of a url, hide */
   body.linkview .row:not([data-lk]), body.linkview .row.linkdup { display: none; }
   body.nobots .row[data-u="blammobot"], body.nobots .row[data-u="fossabot"] { display: none; }
@@ -2565,7 +2564,7 @@
   // mention's palette index keeps every element on its own offset.
   // Catches names, links, @s and history-restored rows alike since
   // animationstart bubbles
-  const ANIM_NAMES = new Set(['shimmer', 'notice-rainbow', 'rbw-wave', 'rbw-hue', 'rbw-pulse', 'rbw-flick']);
+  const ANIM_NAMES = new Set(['shimmer', 'notice-rainbow', 'rbw-wave', 'rbw-hue']);
   document.addEventListener('animationstart', (e) => {
     if (!ANIM_NAMES.has(e.animationName) || e.target.dataset.sd) return;
     e.target.dataset.sd = 1;
@@ -8167,11 +8166,11 @@
   setSelfHl(true);
 
   // ---- nick style animations: shimmer/rainbow sweeps on styled nicks,
-  // mentions and the notice label. Rate levels 0 off / 1 on / 2 slow /
-  // 3 super slow - the help list runs speed order, so its indices map
-  // through ANIM_LVLS ----
+  // mentions and the notice label. Rate levels 0 off / 1 quicker /
+  // 2 slow / 3 super slow - the help list runs speed order, so its
+  // indices map through ANIM_LVLS ----
   const ANIM_LVLS = [0, 3, 2, 1];
-  let nickAnim = 1;
+  let nickAnim = 2;
   function setNickAnim(lvl) {
     nickAnim = Math.min(3, Math.max(0, lvl | 0));
     document.body.classList.toggle('noanim', nickAnim === 0);
@@ -8179,17 +8178,16 @@
     document.body.classList.toggle('animslow', nickAnim === 2);
     markHelp('helpAnim', ANIM_LVLS.indexOf(nickAnim));
   }
-  setNickAnim(1);
+  setNickAnim(2);
 
   // ---- @hasanabi rainbow motion: sweep is the base; the alternates swap
   // the keyframes on the same clipped gradient while the rate option
   // above still stretches the period. Index into body classes ----
-  const RBW_STYLES = ['', 'rbw-wave', 'rbw-hue', 'rbw-pulse', 'rbw-flick', 'rbw-rand'];
+  const RBW_STYLES = ['', 'rbw-wave', 'rbw-hue', 'rbw-rand'];
   // 'random' deals each mention a motion off its palette index - a given
   // chatter's @hasanabi keeps the same trick like it keeps its scheme
   const RBW_RAND = [
     ['notice-rainbow', 'linear'], ['rbw-wave', 'ease-in-out'], ['rbw-hue', 'linear'],
-    ['rbw-pulse', 'ease-in-out'], ['rbw-flick', 'steps(1, end)'],
   ];
   let rbwStyle = 0;
   const RBW_DEFAULT = 0; // '' - the plain diagonal sweep
@@ -8476,7 +8474,7 @@
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
-    if (nickAnim !== 1) q.set('anim', nickAnim);
+    if (nickAnim !== 2) q.set('anim', nickAnim);
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', rbwStyle);
     // emote-picker options only enter the url off their defaults
     if (emotePick.classList.contains('names')) q.set('epnames', '1');
@@ -12030,7 +12028,7 @@
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
     if (q.has('nbots')) setBotsHide(flag('nbots'));
-    if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 1 : +q.get('anim'));
+    if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 2 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     // emote-picker options: ?epnames=1&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&
     // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]
@@ -12098,11 +12096,11 @@
     helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpFs: ['chat −3', 'chat −2', 'chat −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
-    helpAnim: ['off', 'super slow', 'slow', 'on'],
+    helpAnim: ['off', 'super slow', 'slow', 'quicker'],
     helpHide: HIDE_MODES,
     helpBots: ['off', 'on'],
     helpNoLbl: ['off', 'on'],
-    helpRbw: ['sweep', 'wave', 'hue cycle', 'pulse', 'flicker', 'random'],
+    helpRbw: ['sweep', 'wave', 'hue cycle', 'random'],
     helpCopyHelp: ['off', 'on'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
