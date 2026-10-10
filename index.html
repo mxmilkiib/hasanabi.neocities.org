@@ -5415,9 +5415,9 @@
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   // saved prefs from before the labels were renamed still resolve
   const normWin = (v) => (v === 'alltime' || v === 'all-time' ? 'all' : (v === 'day' || v === 'today') ? '24h' : v);
-  let emoteStatSrc = '24h';
-  try { emoteStatSrc = normWin(localStorage.getItem(EMOTE_SRC_KEY)) || '24h'; } catch {}
-  if (!(emoteStatSrc in EMOTE_SRCS)) emoteStatSrc = '24h';
+  let emoteStatSrc = '3h';
+  try { emoteStatSrc = normWin(localStorage.getItem(EMOTE_SRC_KEY)) || '3h'; } catch {}
+  if (!(emoteStatSrc in EMOTE_SRCS)) emoteStatSrc = '3h';
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
   const CHAT_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
@@ -5429,9 +5429,9 @@
   // tally, the rest read trailing days out of the per-version buckets
   const BADGE_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const BADGE_WIN_KEY = 'hasan-badgewin';
-  let badgeWin = '24h';
-  try { badgeWin = normWin(localStorage.getItem(BADGE_WIN_KEY)) || '24h'; } catch {}
-  if (!(badgeWin in BADGE_WINS)) badgeWin = '24h';
+  let badgeWin = '3h';
+  try { badgeWin = normWin(localStorage.getItem(BADGE_WIN_KEY)) || '3h'; } catch {}
+  if (!(badgeWin in BADGE_WINS)) badgeWin = '3h';
   // top links window the same way; 'all' is the plain tally
   const LINK_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   // the rail's narrow headers carry only the sub-day rungs
