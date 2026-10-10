@@ -2875,6 +2875,12 @@
 
   // badge sets whose id isn't the readable title
   const BADGE_NAMES = { no_audio: 'no audio', 'no-audio': 'no audio', no_video: 'no video', 'no-video': 'no video' };
+  // twitch ships badge titles in title case; display runs lowercase,
+  // keeping acronyms, mid-word capitals (TwitchCon), digit strings and
+  // listed proper names upright
+  const BADGE_PROPER = new Set(['twitch', 'twitchcon', 'prime', 'gaming', 'turbo', 'youtube']);
+  const badgeCase = (t) => t.replace(/[\p{L}\p{N}][\p{L}\p{N}'’._-]*/gu, (w) =>
+    !/\p{L}/u.test(w) || /^[\p{Lu}]{2,}$/u.test(w) || /\p{Ll}.*\p{Lu}/u.test(w) || BADGE_PROPER.has(w.toLowerCase()) ? w : w.toLowerCase());
   // badge 'set/ver' -> image url; falls back to the highest version <= ver
   // (e.g. subscriber/34 uses the 24-month flair when no 34 exists)
   function badgeUrl(b, ch) {
@@ -5726,7 +5732,7 @@
         vs.map(([ver, v]) => {
           const n = bVerUseM.get(id + '/' + ver) || 0;
           return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
-            `<span class="bt">${escapeHTML(id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` : (BADGE_NAMES[id] || v.t || ''))}</span>` +
+            `<span class="bt">${escapeHTML(id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` : (BADGE_NAMES[id] || badgeCase(v.t || '')))}</span>` +
             (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
         }).join('') +
         `</details>`;
@@ -5760,7 +5766,7 @@
         const raw = id.replace(/[-_]/g, ' ');
         const name = ({ subscriber: 'subbed', moderator: 'mod',
           premium: 'Prime subscriber', 'bot-badge': 'chat bot' })[id] || BADGE_NAMES[id] || raw;
-        const vt = id === 'premium' ? '' : (v.t || '').trim();
+        const vt = id === 'premium' ? '' : badgeCase((v.t || '').trim());
         const label = id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` :
           BADGE_NAMES[id] || vt || name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
