@@ -3689,7 +3689,7 @@
         rc.set(sec, (rc.get(sec) || 0) + 1);
         if (ts > Date.now() - 5000) recentTimestamps.push(ts); // counted once rendered, not at queue time
         const chatWho = (login || tags['display-name'] || '').toLowerCase();
-        if (chatWho) chatterSeen.set(chatWho, ts);
+        if (chatWho && !STATS_EXCLUDE.has(chatWho)) chatterSeen.set(chatWho, ts);
       }
       // a long silence means the page missed a stretch - mark the gap with
       // its span and, when an away window overlaps, the cause
@@ -4441,7 +4441,7 @@
       // already older than the hour window come back to expire at once
       if (Array.isArray(d.chat)) {
         const cut = Date.now() - 60 * 60e3;
-        for (const [who, t] of d.chat) if (t >= cut) chatterSeen.set(who, t);
+        for (const [who, t] of d.chat) if (t >= cut && !STATS_EXCLUDE.has(who)) chatterSeen.set(who, t);
       }
       if (rateSamples.length > win) rateSamples.splice(0, rateSamples.length - win);
       if (rateTimes.length > win) rateTimes.splice(0, rateTimes.length - win);
