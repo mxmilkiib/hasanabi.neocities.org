@@ -5802,7 +5802,11 @@
         `<span class="bt">${escapeHTML(bOwner(id) ? bOwner(id) + ' ' + name : name)}</span><i>${metric}</i></summary>` +
         vs.map(([ver, v]) => {
           const n = bVerUseM.get(id + '/' + ver) || 0;
-          return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
+          // sub-age versions keyed in months but titled in years - the
+          // tooltip states the months the year period covers
+          const tt = [(id === 'subscriber' && /\byear\b/i.test(v.t || '') ? `${ver} months` : ''),
+            v.d && v.d !== v.t ? v.d : ''].filter(Boolean).join(' - ');
+          return `<div class="st-brow"${tip(tt)}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
             `<span class="bt">${escapeHTML(id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` : (BADGE_NAMES[id] || (id.includes('pokemon') ? pokeCase(v.t || '') : badgeCase(v.t || ''))))}</span>` +
             (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
         }).join('') +
@@ -5840,7 +5844,10 @@
         const vt = id === 'premium' ? '' : id.includes('pokemon') ? pokeCase((v.t || '').trim()) : badgeCase((v.t || '').trim());
         const label = id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` :
           BADGE_NAMES[id] || vt || name;
-        return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
+        // same year->months tooltip as the folded rows
+        const tt = [(id === 'subscriber' && /\byear\b/i.test(v.t || '') ? `${ver} months` : ''),
+          v.d && v.d !== v.t ? v.d : ''].filter(Boolean).join(' - ');
+        return `<div class="st-row"${tt ? ` title="${escapeHTML(tt)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
           `<i>${n.toLocaleString('en')}</i></div>`;
