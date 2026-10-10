@@ -1145,7 +1145,7 @@
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
-  #statsBody #stRate { display: block; width: 100%; height: 96px; }
+  #statsBody #stRate { display: block; width: 100%; height: 64px; }
   #statsBody .st-badge { break-inside: avoid; }
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
@@ -5982,7 +5982,7 @@
       return;
     }
     const dpr = window.devicePixelRatio || 1;
-    const H = 96;
+    const H = 64;
     const wCss = Math.max(80, cv.clientWidth || 220);
     cv.width = Math.round(wCss * dpr);
     cv.height = Math.round(H * dpr);
@@ -6020,18 +6020,14 @@
     }
     let peak = 0;
     for (let i = 0; i < N; i++) if (bmax[i] > peak) peak = bmax[i];
-    // time scaffolding: alternate clock-aligned blocks shade darker so a
-    // long span reads as countable stretches; a finer rung gets a tick,
-    // and a boundary stamps HH:MM when there's room for it
+    // time scaffolding: a fine rung gets a top-edge tick, and a boundary
+    // stamps HH:MM when there's room for it
     const txtDim = (getComputedStyle(document.documentElement).getPropertyValue('--text-dim') || '#888').trim();
     const txtInk = (getComputedStyle(document.documentElement).getPropertyValue('--text') || txtDim).trim();
     const RUNGS = [60e3, 300e3, 600e3, 900e3, 1800e3, 3600e3, 7200e3, 10800e3,
       21600e3, 43200e3, 86400e3];
     const tickInt = RUNGS.find((r) => r / span * wCss >= 4) || 3600e3;
     const blockInt = RUNGS.find((r) => r / span * wCss >= 40) || 3600e3;
-    g.fillStyle = 'rgba(0,0,0,.10)';
-    for (let b = Math.ceil(t0 / blockInt); b * blockInt < t1; b++)
-      if (b % 2) g.fillRect((b * blockInt - t0) / span * wCss, 0, blockInt / span * wCss, H);
     if (sparkCols) {
       g.globalAlpha = .22;
       for (let i = 0; i < N; i++) if (bwhy[i]) {
@@ -6045,13 +6041,13 @@
       g.fillStyle = (sparkCols && sparkCols.accent) ||
         getComputedStyle(document.documentElement).getPropertyValue('--spark').trim() || '#888';
       for (let i = 0; i < N; i++) {
-        // the mean fills the bar; the bin's sharpest second extends it as
-        // a translucent tip - a >10/s burst inside a wide bin still reads
-        // as a spike instead of averaging away to the floor
+        // the mean fills the bar at the histogram's flat .8; a 1px wick
+        // marks the bin's sharpest second, so a burst inside a wide bin
+        // still spikes without a second translucent layer
         const rh = bn[i] ? (bins[i] / bn[i]) / peak * (H - 2) : 0;
         const mh = bmax[i] / peak * (H - 2);
-        if (mh > .3) { g.globalAlpha = .3; g.fillRect(Math.floor(i * bwPx), H - mh, Math.max(1, Math.ceil(bwPx) - 1), mh); }
-        if (rh > .3) { g.globalAlpha = .8; g.fillRect(Math.floor(i * bwPx), H - rh, Math.max(1, Math.ceil(bwPx) - 1), rh); }
+        if (rh > .3) g.fillRect(Math.floor(i * bwPx), H - rh, Math.max(1, Math.ceil(bwPx) - 1), rh);
+        if (mh - rh > 1) g.fillRect(Math.floor(i * bwPx), H - mh, Math.max(1, Math.ceil(bwPx) - 1), 1);
       }
     }
     g.globalAlpha = 1;
