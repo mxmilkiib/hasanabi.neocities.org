@@ -6219,6 +6219,15 @@
     e.preventDefault();
     switchTab(a.dataset.htab);
   });
+  // a wheel over the tab row steps through the pages, wrapping like the
+  // preset button's
+  helpPanel.querySelector('.htabs').addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const tabs = [...helpPanel.querySelectorAll('a.htab')];
+    const cur = tabs.findIndex((a) => a.classList.contains('on'));
+    const next = tabs[(cur + ((e.deltaY || e.deltaX) > 0 ? 1 : -1) + tabs.length) % tabs.length];
+    if (next) switchTab(next.dataset.htab);
+  }, { passive: false });
   // the last-opened tab survives reloads - a ?channel hop reopens the
   // panel (persisted helpMode) and used to drop back to config/help
   const savedTab = localStorage.getItem('hasan-htab');
