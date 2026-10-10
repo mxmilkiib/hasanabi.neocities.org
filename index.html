@@ -4980,7 +4980,7 @@
   for (const el of [dotEl, infoEl])
     el.addEventListener('wheel', (e) => {
       e.preventDefault();
-      statusView = (statusView + (e.deltaY < 0 ? 1 : -1) + 3) % 3;
+      statusView = (statusView + (e.deltaY > 0 ? 1 : -1) + 3) % 3;
       updateHeader();
     }, { passive: false });
 
@@ -5166,13 +5166,13 @@
   }
 
   colourBtn.addEventListener('click', (e) => stepColour(e.shiftKey ? -1 : 1));
-  colourBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepColour(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  colourBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepColour(e.deltaY > 0 ? 1 : -1); }, { passive: false });
   colourBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); colourMode = 'auto'; applyColour(); saveOpts(); });
   variantBtn.addEventListener('click', (e) => stepVariant(e.shiftKey ? -1 : 1));
-  variantBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepVariant(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  variantBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepVariant(e.deltaY > 0 ? 1 : -1); }, { passive: false });
   variantBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); variantMode = 'standard'; applyVariant(); saveOpts(); });
   shadeBtn.addEventListener('click', (e) => stepShade(e.shiftKey ? -1 : 1));
-  shadeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepShade(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  shadeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepShade(e.deltaY > 0 ? 1 : -1); }, { passive: false });
   shadeBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); shadeIdx = null; applyShade(); saveOpts(); });
   lightMQ.addEventListener('change', () => { updateTone(); previewSwatches(); });
   // colour and variant names in the help description are clickable quick-switches
@@ -6520,7 +6520,7 @@
     btn.addEventListener('click', (e) => { idx = (idx + (e.shiftKey ? -1 : 1) + list.length) % list.length; apply(); });
     btn.addEventListener('wheel', (e) => {
       e.preventDefault();
-      idx = (idx + (e.deltaY < 0 ? 1 : -1) + list.length) % list.length;
+      idx = (idx + (e.deltaY > 0 ? 1 : -1) + list.length) % list.length;
       apply();
     }, { passive: false });
     return { set: (i) => { idx = i; apply(); }, get: () => idx };
@@ -7635,7 +7635,7 @@
     saveOpts();
   }
   presetBtn.addEventListener('click', (e) => stepPreset(e.shiftKey ? -1 : 1));
-  presetBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepPreset(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  presetBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepPreset(e.deltaY > 0 ? 1 : -1); }, { passive: false });
 
   // ---- stream video embed: the official JS embed API, lazily loaded so the
   // option carries no cost until enabled. The API (unlike a bare iframe) can
@@ -8035,7 +8035,7 @@
   }
 
   subBtn.addEventListener('click', (e) => stepSub(e.shiftKey ? -1 : 1));
-  subBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepSub(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  subBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepSub(e.deltaY > 0 ? 1 : -1); }, { passive: false });
   applySubMode();
 
   // ---- emote-only rows: enlarged inline / pinned right / normal ----
@@ -8059,7 +8059,7 @@
   }
 
   emoteBtn.addEventListener('click', (e) => stepEmote(e.shiftKey ? -1 : 1));
-  emoteBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepEmote(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  emoteBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepEmote(e.deltaY > 0 ? 1 : -1); }, { passive: false });
   applyEmoteMode();
 
   // ---- scroll pause while hovering a message row ----
@@ -8086,7 +8086,7 @@
   zebraBtn.addEventListener('click', (e) => { setZebra(zebraLevel + (e.shiftKey ? -1 : 1)); saveOpts(); });
   zebraBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setZebra(zebraLevel + (e.deltaY < 0 ? 1 : -1));
+    setZebra(zebraLevel + (e.deltaY > 0 ? 1 : -1));
     saveOpts();
   }, { passive: false });
   setZebra(zebraLevel);
@@ -8175,7 +8175,7 @@
   }
 
   timeBtn.addEventListener('click', (e) => stepTime(e.shiftKey ? -1 : 1));
-  timeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTime(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  timeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTime(e.deltaY > 0 ? 1 : -1); }, { passive: false });
   setTimes(2);
 
   // ---- accent edge on one's own messages (needs the twitch login) ----
@@ -8259,7 +8259,7 @@
   });
   shadowBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setShadow((shadLevel + (e.deltaY < 0 ? 1 : -1) + SHADOW_LVLS.length) % SHADOW_LVLS.length);
+    setShadow((shadLevel + (e.deltaY > 0 ? 1 : -1) + SHADOW_LVLS.length) % SHADOW_LVLS.length);
     saveOpts();
   }, { passive: false });
   setShadow(0);
@@ -8344,7 +8344,7 @@
     applyHelp(); saveOpts();
   });
   helpBtn.addEventListener('click', (e) => stepHelp(e.shiftKey ? -1 : 1));
-  helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  helpBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepHelp(e.deltaY > 0 ? 1 : -1); }, { passive: false });
 
   // ---- help popup width stops; narrow screens still get clamped by the
   // left/right insets regardless of the inline max-width ----
@@ -8648,7 +8648,7 @@
   linesBtn.addEventListener('click', (e) => { stepLines(e.shiftKey ? -1 : 1); saveOpts(); });
   linesBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
-    stepLines(e.deltaY < 0 ? 1 : -1);
+    stepLines(e.deltaY > 0 ? 1 : -1);
     saveOpts();
   }, { passive: false });
   setLines(lineLevel);
