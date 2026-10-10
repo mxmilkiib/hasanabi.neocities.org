@@ -9382,12 +9382,13 @@
   const joinTimer = setInterval(() => { if (!joined) join(); }, 3000);
 
   // If nothing's arrived by now, say why it might be stuck rather than
-  // leaving the bar mid-flight forever
+  // leaving the bar mid-flight forever - the card or the strip, whoever
+  // is narrating
   setTimeout(() => {
-    if (!emptyEl) return;
-    emptyLabel.textContent = joined
-      ? 'connected - the chat is just quiet right now'
-      : 'nothing arriving - a privacy or adblock extension may be blocking the relay iframe';
+    if (joined) { if (emptyEl) emptyLabel.textContent = 'connected - the chat is just quiet right now'; return; }
+    const stuck = 'nothing arriving - a privacy or adblock extension may be blocking the relay iframe';
+    if (emptyEl) emptyLabel.textContent = stuck;
+    else if (loadBar && !syncing) loadTxt.textContent = stuck;
   }, 12000);
 
   // If the relay never reports stream status, give up waiting for it.
@@ -11978,11 +11979,13 @@
         if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
         else if (d.state === 'reconnecting') emptyLabel.textContent = 'socket dropped - retrying…';
       }
-      if (d.state === 'reconnecting') syncShow('socket dropped - retrying…');
+      // a dropped socket only interrupts once a join was live - relay
+      // socket churn ahead of the first connect is the boot's own noise
+      if (d.state === 'reconnecting' && wasJoined) syncShow('socket dropped - retrying…');
     } else if (d.type === 'wscause') {
       wsCause = `${d.code}${d.reason ? ' ' + d.reason : ''}`;
       if (emptyEl) emptyLabel.textContent = `socket closed (${wsCause}) - retrying…`;
-      syncShow(`socket closed (${wsCause}) - retrying…`);
+      if (joined || downAt) syncShow(`socket closed (${wsCause}) - retrying…`);
       updateHeader();
     } else if (d.type === 'lines') {
       // a replay batch is what settles a deferred gap marker
