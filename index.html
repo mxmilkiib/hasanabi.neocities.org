@@ -674,7 +674,9 @@
     width: 0;
     background: var(--accent);
     transition: width .45s ease;
+    animation: loadpulse 1.2s ease-in-out infinite;
   }
+  @keyframes loadpulse { 50% { opacity: .45; } }
   .row {
     font-family: var(--chat-ff, ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace);
     font-size: var(--chat-font, 14px);
@@ -818,7 +820,7 @@
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i { animation: none; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
@@ -1427,7 +1429,7 @@
      from the accent missflash so a backlog landing reads as sync, not
      as a jump-to-row highlight */
   @keyframes repflash {
-    0%, 35% { background-color: color-mix(in srgb, var(--aux) 28%, transparent); }
+    0%, 35% { background-color: color-mix(in srgb, var(--aux) 14%, transparent); }
     100% { background-color: transparent; }
   }
   .row.repflash { animation: repflash 1.8s ease-out; }
