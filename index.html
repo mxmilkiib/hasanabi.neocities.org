@@ -1368,6 +1368,12 @@
   /* most of the cycle holds the bar off-canvas so the sweep reads as an
      occasional glint rather than a constant shimmer */
   @keyframes sheen-sweep { 55%, 100% { transform: translateX(340%) skewX(-20deg); } }
+  /* the doorway sheen chases across the controls in header order rather
+     than five glints in unison - a fifth of the cycle per step */
+  .hdr-btn.shiny#splitBtn::after { animation-delay: .36s; }
+  .hdr-btn.shiny#vidBtn::after { animation-delay: .72s; }
+  .hdr-btn.shiny#sendBtn::after { animation-delay: 1.08s; }
+  .hdr-btn.shiny#emojiBtn::after { animation-delay: 1.44s; }
   @media (prefers-reduced-motion: reduce) { .hdr-btn.shiny::after { animation: none; transform: none; width: 100%; opacity: .12; } }
   /* keep the ? button clickable above the help panel when they overlap */
   #helpBtn { position: absolute; z-index: 11; }
