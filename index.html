@@ -5726,7 +5726,7 @@
         vs.map(([ver, v]) => {
           const n = bVerUseM.get(id + '/' + ver) || 0;
           return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
-            `<span class="bt">${escapeHTML(id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` : (v.t || ''))}</span>` +
+            `<span class="bt">${escapeHTML(id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` : (BADGE_NAMES[id] || v.t || ''))}</span>` +
             (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
         }).join('') +
         `</details>`;
@@ -5761,7 +5761,7 @@
         const name = ({ subscriber: 'subbed', moderator: 'mod',
           premium: 'Prime subscriber', 'bot-badge': 'chat bot' })[id] || BADGE_NAMES[id] || raw;
         let vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '')
-          : id === 'premium' ? '' : v.t;
+          : id === 'premium' || id in BADGE_NAMES ? '' : v.t;
         // a title that merely restates the set name ('Blossom Badge 2025'
         // under 'blossom badge') or the display rename ('Chat Bot' under
         // 'chat bot') is cut - the name alone is the label
