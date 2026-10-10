@@ -803,7 +803,7 @@
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash { animation: none; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
@@ -1376,6 +1376,22 @@
   .gifimg { max-height: 9em; max-width: 100%; vertical-align: middle; border-radius: 3px; }
   #offBar { flex: none; text-align: center; padding: 3px 8px; font-size: .9em; background: var(--danger); color: #fff; }
   #offBar[hidden] { display: none; }
+  /* boot/sync strip under the header: narrates the load phases as the
+     empty-state bar does, then returns to flag resyncs after a drop or
+     wake; the fill stretches the strip so progress reads at a glance */
+  #loadBar { flex: none; display: flex; align-items: center; gap: 10px;
+    padding: 2px 10px; font-size: .9em; color: var(--text-dim);
+    background: var(--panel); border-bottom: 1px solid var(--line); }
+  #loadBar[hidden] { display: none; }
+  #loadBar .loadbar { flex: 1; width: auto; margin-top: 0; }
+  /* a freshly replayed line washes --aux once then refades - distinct
+     from the accent missflash so a backlog landing reads as sync, not
+     as a jump-to-row highlight */
+  @keyframes repflash {
+    0%, 35% { background-color: color-mix(in srgb, var(--aux) 28%, transparent); }
+    100% { background-color: transparent; }
+  }
+  .row.repflash { animation: repflash 1.8s ease-out; }
   /* stream title strip - same seat in the flow as the offline banner */
   #titleBar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; background: var(--panel); border-bottom: 1px solid var(--line); position: relative; }
   #titleBar[hidden] { display: none; }
@@ -2107,6 +2123,7 @@
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="colourBtn" title="Colour">◐</button><button class="hdr-btn" id="variantBtn" title="Variant">▢</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="inter">Inter</option><option value="sans">System Sans</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><div id="fontMenu" role="listbox" aria-label="Chat font" hidden></div><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
   </header>
+  <div id="loadBar" role="status"><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div>
   <div id="titleBar" role="status" hidden><span id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">conf/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
@@ -2427,13 +2444,40 @@
   // phase that's stuck.
   const LOAD_STEPS = 4;
   const emptyLabel = document.getElementById('emptyLabel');
+  // the under-header strip narrates the same steps the empty-state bar
+  // does, then returns for resyncs once the log owns the space
+  const loadBar = document.getElementById('loadBar');
+  const loadTxt = document.getElementById('loadTxt');
+  const loadFill = loadBar && loadBar.querySelector('.loadbar i');
   let loadPhase = 0;
   function loadStep(n, txt) {
-    if (!emptyEl || n <= loadPhase) return;
+    if (n <= loadPhase) return;
     loadPhase = n;
-    const fill = emptyEl.querySelector('.loadbar i');
-    if (fill) fill.style.width = (n / LOAD_STEPS * 100) + '%';
-    if (txt != null) emptyLabel.textContent = txt;
+    const w = (n / LOAD_STEPS * 100) + '%';
+    const fill = emptyEl && emptyEl.querySelector('.loadbar i');
+    if (fill) fill.style.width = w;
+    if (loadFill) loadFill.style.width = w;
+    if (txt != null) {
+      if (emptyEl) emptyLabel.textContent = txt;
+      if (loadTxt) loadTxt.textContent = txt;
+    }
+  }
+  // a resync can't clock its own completion - the replay batch's arrival
+  // is what ends it, so the strip falls back to a timeout in case the
+  // backlog comes back empty
+  let syncTimer = 0, syncing = false;
+  function syncShow(txt) {
+    if (!loadBar) return;
+    syncing = true;
+    loadTxt.textContent = txt;
+    loadBar.hidden = false;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; }, 8000);
+  }
+  function syncHide(ms) {
+    if (!loadBar) return;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; }, ms || 0);
   }
   const chanLink = document.getElementById('channelName');
   chanLink.textContent = CHAN_LABEL;
@@ -3643,6 +3687,9 @@
       e.style.opacity = '0';
       setTimeout(() => e.remove(), 350);
     }
+    // the strip goes once real rows flow - a live resync keeps it until
+    // its own hide beat so the 'syncing' text can actually be read
+    if (!syncing) loadBar.hidden = true;
     const nearBottom = stickBottom;
     let html = '';
     let whisHtml = ''; // whisper rows collect beside the log's own batch
@@ -4032,7 +4079,7 @@
       // matches what strict per-line alternation would give
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
-      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
+      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -9049,6 +9096,9 @@
       if (!Array.isArray(rows) || !rows.length) return;
       if (emptyEl) { emptyEl.remove(); emptyEl = null; }
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
+      // the one-shot sync wash is a render-time marker only - stripped
+      // here so restored scrollback doesn't strobe on every load
+      for (const el of logEl.querySelectorAll('.repflash')) el.classList.remove('repflash');
       // notices saved before mid-dedup have no id and were duplicated by
       // each replay - collapse identical no-id rows on restore
       const seenRows = new Set();
@@ -9162,8 +9212,10 @@
   // A page can still miss live lines while suspended, so on wake it asks the
   // relay for the backlog (recent-messages.robotty.de); rendered ids are skipped
   function backfill() {
-    if (joined && relayFrame.contentWindow)
+    if (joined && relayFrame.contentWindow) {
       relayFrame.contentWindow.postMessage({ type: 'backfill' }, RELAY_ORIGIN);
+      syncShow('chat is syncing - recovering missed lines…');
+    }
   }
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
@@ -11667,13 +11719,18 @@
         if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
         else if (d.state === 'reconnecting') emptyLabel.textContent = 'socket dropped - retrying…';
       }
+      if (d.state === 'reconnecting') syncShow('socket dropped - retrying…');
     } else if (d.type === 'wscause') {
       wsCause = `${d.code}${d.reason ? ' ' + d.reason : ''}`;
       if (emptyEl) emptyLabel.textContent = `socket closed (${wsCause}) - retrying…`;
+      syncShow(`socket closed (${wsCause}) - retrying…`);
       updateHeader();
     } else if (d.type === 'lines') {
       // a replay batch is what settles a deferred gap marker
       if (d.replay && pendingGap) pendingGap.batch = true;
+      // the sync strip's answer has arrived - let the text read for a
+      // beat, then hand the space back
+      if (d.replay) syncHide(1200);
       for (const line of d.lines) {
         try { handleLine(line, !!d.replay); }
         catch (err) { console.error('irc line dropped:', err, line); }
