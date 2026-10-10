@@ -10889,14 +10889,16 @@
       // the third leg got its own chip: hide both legs, resume the one
       // that was lit - frozen comes back frozen
       if (animState() === 'off') next = [...epickAnimOn, animLeg];
-      else { animLeg = animFrozen() ? 'animf' : 'anim'; next = [...epickAnimOn].filter((x) => x !== 'anim' && x !== 'animf'); }
+      // pausing from the unrestricted set can't just filter - an empty
+      // result reads as 'everything on', so stills are lit explicitly
+      else { animLeg = animFrozen() ? 'animf' : 'anim'; next = [...epickAnimOn, 'still'].filter((x) => x !== 'anim' && x !== 'animf'); }
     }
     else if (e.shiftKey) next = [k];
     else if (k === 'anim') {
       const st = animState();
       if (st === 'off') next = [...epickAnimOn, animLeg];
       else if (!epickAnimOn.size) next = ['animf', 'still']; // default was all-on; keep stills lit
-      else next = epickAnimOn.map((x) => x === 'anim' ? 'animf' : x === 'animf' ? 'anim' : x);
+      else next = [...epickAnimOn].map((x) => x === 'anim' ? 'animf' : x === 'animf' ? 'anim' : x);
     }
     else if (!epickAnimOn.size) next = ['anim'];
     else { next = [...epickAnimOn]; epickAnimOn.has(k) ? next.splice(next.indexOf(k), 1) : next.push(k); }
