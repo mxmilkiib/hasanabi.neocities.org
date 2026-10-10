@@ -921,9 +921,6 @@
   .row.stale { opacity: .7; }
   /* ghost rows near the fresh/ghost boundary fade hardest and ease off with
      depth as a pixel-distance gradient - applied inline by ghostFade() */
-  /* invisible spacer repaying ghost-height overage so the faded page keeps
-     its layout while fresh rows overwrite it */
-  .row.ghostgap { padding: 0; margin: 0; --rowline: transparent; }
   /* no separator above the first row of a column (the .empty placeholder
      is removed once rows land, so this matches in every column) */
   .col > .row:first-child { --rowline: transparent; }
@@ -3248,7 +3245,7 @@
         const r = col.children[i];
         if (r.classList.contains('blk')) continue; // display:none - no position
         if (r.getBoundingClientRect().bottom > top) break;
-        if (r.classList.contains('row') && !r.classList.contains('ghostgap')) {
+        if (r.classList.contains('row')) {
           n++;
           oldest = +r.dataset.ts || 0;
         }
@@ -3260,7 +3257,7 @@
       const r = col.children[i];
       if (r.classList.contains('blk')) continue; // display:none - no position
       if (r.offsetTop - col.offsetTop < fold) break;
-      if (r.classList.contains('row') && !r.classList.contains('ghostgap')) {
+      if (r.classList.contains('row')) {
         n++;
         oldest = +r.dataset.ts || 0;
       }
@@ -4162,24 +4159,12 @@
     // an empty find means the stretch was just quiet
     if (pendingGap && pendingGap.batch) pendingGap = null;
     histDirty = true;
-    // rev never marks stales (its overflow cascades instead of flipping),
-    // and any stragglers sit at the bottom edge where a tail append still
-    // lands correctly - so the seam path is split normal-mode only; a
-    // merged .stale leftover must not divert appends mid-log
-    const firstGhost = revFlow || !isSplit() ? null : activeEl.querySelector('.row.stale');
     const tpl = document.createElement('template');
     tpl.innerHTML = html;
     const newRows = tpl.content.querySelectorAll('.row[data-new]');
-    if (firstGhost) {
-      // overwrite: the ghost page stays put; consume ghost height equal to
-      // the inserted height at the fresh/ghost boundary, so a wrapped
-      // multi-line row eats as many ghosts as it needs and the rows below
-      // never shift
-      const boundary = firstGhost.offsetTop;
-      firstGhost.before(tpl.content);
-      consumeGhosts(firstGhost, firstGhost.offsetTop - boundary);
-      evictGhosts(activeEl);
-    } else activeEl.append(tpl.content);
+    // ghosts sit above the live tail in dom order, so a plain append
+    // lands after them in the right spot either way
+    activeEl.append(tpl.content);
     dedupeLinks(newRows);
     if (whisHtml) {
       whisLog.insertAdjacentHTML('beforeend', whisHtml);
@@ -8925,7 +8910,7 @@
   // Runs the flip for the whole column set. Normal mode rotates the live
   // column to whichever page just received the spill; rev keeps the first
   // column live and drains each column's below-fold tail into the next,
-  // the last one shedding rows off the end of history
+  // the last one keeping its spill as ghosts until the scrollback trim
   function flipCols() {
     if (revFlow) {
       const cs = cols();
@@ -8937,17 +8922,17 @@
     }
     if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
   }
-  // Moves rows below the fold of `from` to the top of `to`. The outgoing
-  // contents stay as faded ghosts and are evicted one by one as the new
-  // rows push them below the fold. The scan collects the moving run in
-  // one pass while nothing mutates - reading a row's offsetTop right
-  // after moving it forced a layout per row, which made a full-column
-  // deal quadratic.
+  // Moves rows below the fold of `from` to the bottom of `to`. The
+  // outgoing contents stay as faded ghosts - never deleted, they are the
+  // column's scrollback; the MAX_MESSAGES trim is the only thing that
+  // retires rows. The scan collects the moving run in one pass while
+  // nothing mutates - reading a row's offsetTop right after moving it
+  // forced a layout per row, which made a full-column deal quadratic.
   function pushOverflow(from, to) {
     if (revFlow) {
       // the flipped column keeps its newest page at the top; rows past
       // the page's bottom fold are its oldest, dom-first, and head onward.
-      // A column's stale stragglers and the last column's spill just drop.
+      // stale stragglers and the last column's spill stay put as ghosts.
       // rects because the flipped axis gives rows negative offsetTops, and
       // the fold is measured from the content's top edge, not the viewport
       const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
@@ -8960,22 +8945,18 @@
       const frag = to ? document.createDocumentFragment() : null;
       for (const r of head) {
         if (frag && !r.classList.contains('stale')) { frag.appendChild(r); moved = true; }
-        else r.remove();
       }
       if (frag) to.appendChild(frag);
       return moved;
     }
-    const staleTail = [], moveTail = [];
+    const moveTail = [];
     let moved = false;
     for (let r = from.lastElementChild; r; r = r.previousElementSibling) {
-      // ghosts below the fold drop with the page turn; ghosts still on it
-      // just stay ghosts - they're the outgoing page's fading remnant, not
-      // live rows. Rejoining them as live would instantly refill the column
-      // and flip the live edge straight back on the next insert
-      if (r.classList.contains('stale')) {
-        if (r.offsetTop - from.offsetTop + r.offsetHeight > from.clientHeight) staleTail.push(r);
-        continue;
-      }
+      // ghosts are skipped by the deal but never dropped - they're the
+      // column's faded scrollback. Rejoining them as live would instantly
+      // refill the column and flip the live edge straight back on the
+      // next insert
+      if (r.classList.contains('stale')) continue;
       // a display:none row reports offsetTop 0, which would read as inside
       // the fold - hidden tail rows ride along only once a visible row has
       // started moving
@@ -8989,12 +8970,7 @@
       } else if (r.offsetTop - from.offsetTop + r.offsetHeight <= from.clientHeight) break;
       moveTail.push(r); moved = true;
     }
-    for (const r of staleTail) r.remove();
     if (!moveTail.length) return false;
-    // ghost height consumption wants the height each moved row had in
-    // `from` (same-width column, so the wrap - and the height - carry
-    // over); read them before the first dom move so the batch below
-    // costs one layout instead of one per row
     const heights = moveTail.map((r) => r.offsetHeight);
     // `to` receives at most one page of live rows: the older part of an
     // oversized spill stays in `from` as ghosts. Handing `to` a multi-page
@@ -9004,55 +8980,20 @@
     while (keep < moveTail.length && hSum < to.clientHeight) hSum += heights[keep++];
     const spill = moveTail.splice(keep);
     for (const r of to.children) r.classList.add('stale');
-    let need = 0;
     const frag = document.createDocumentFragment();
-    for (let i = moveTail.length - 1; i >= 0; i--) { frag.appendChild(moveTail[i]); need += heights[i]; }
+    for (let i = moveTail.length - 1; i >= 0; i--) frag.appendChild(moveTail[i]);
     for (const r of spill) r.classList.add('stale');
-    to.prepend(frag);
-    const firstGhost = to.querySelector('.row.stale');
-    if (firstGhost) consumeGhosts(firstGhost, need);
-    evictGhosts(to);
+    // appended after `to`'s ghosts so the column stays chronological -
+    // older faded rows above, live rows below
+    to.appendChild(frag);
     ghostFade(to);
     return moved;
   }
 
-  // Removes ghost rows starting at `firstGhost` until `need` px of height is
-  // covered. A ghost taller than the remainder repays the overage as a
-  // spacer, so the surviving ghost rows keep their original offsets.
-  function consumeGhosts(firstGhost, need) {
-    // gather before removing - a height read after each removal would
-    // force a fresh layout for every ghost in the chain
-    const gone = [];
-    let g = firstGhost;
-    while (need > 0 && g?.classList.contains('stale')) {
-      need -= g.offsetHeight;
-      gone.push(g);
-      g = g.nextElementSibling;
-    }
-    for (const x of gone) x.remove();
-    if (need < 0 && g?.classList.contains('stale')) {
-      const sp = document.createElement('div');
-      sp.className = 'row stale ghostgap';
-      sp.style.height = `${-need}px`;
-      g.before(sp);
-    }
-  }
-
-  // Drops any ghost rows that have already fallen below `col`'s fold.
-  function evictGhosts(col) {
-    const gone = [];
-    for (let g = col.lastElementChild;
-         g?.classList.contains('stale') &&
-         (g.classList.contains('blk') || // no offsetTop while display:none
-          g.offsetTop - col.offsetTop + g.offsetHeight > col.clientHeight);
-         g = g.previousElementSibling) gone.push(g);
-    for (const g of gone) g.remove();
-  }
-
   // Ghost rows fade as a smooth gradient by pixel distance below the
-  // fresh/ghost boundary: the next row to be overwritten is faintest, and
-  // the dimming creeps well ahead of the incoming text rather than stepping.
-  const GHOST_LO = 0.35;  // boundary ghost, about to be overwritten
+  // fresh/ghost boundary: the youngest scrollback reads faintest and the
+  // dimming eases off with depth rather than stepping.
+  const GHOST_LO = 0.35;  // boundary ghost, closest to live
   const GHOST_HI = 0.7;   // resting ghost opacity (matches .row.stale)
   const GHOST_RAMP = 260; // px below the boundary the fade eases over
   // linear: the fade neither hugs the front nor leaps ahead - ghosts
@@ -9170,9 +9111,7 @@
     }
     // ghost markers are page-flip bookkeeping - rejoined or re-dealt rows
     // must read as ordinary messages (like setRev does), or pushOverflow's
-    // ghost handling would drop them. ghostgap spacers are pure column
-    // scaffolding and die with the layout they padded
-    for (const g of logEl.querySelectorAll('.row.ghostgap')) g.remove();
+    // ghost handling would skip them
     for (const r of logEl.querySelectorAll('.row.stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
     sideEl.hidden = level < 2;
     side2El.hidden = level !== 3;
@@ -9233,13 +9172,13 @@
       // ghost rows are still real messages - keep them, but strip the
       // stale marker and fade so they restore as ordinary rows (kept
       // markers would corrupt the next session's ghost bookkeeping).
-      // ghostgap spacers stay excluded; local echoes save with their
-      // data-ek key so a real copy arriving after restore adopts them.
+      // local echoes save with their data-ek key so a real copy arriving
+      // after restore adopts them.
       const rows = [];
       const limit = Math.min(HISTORY_SAVE_MAX, MAX_MESSAGES);
       for (const col of (revFlow ? c : [...c.slice(i + 1), ...c.slice(0, i + 1)].reverse())) {
         for (let r = col.lastElementChild; r && rows.length < limit; r = r.previousElementSibling)
-          if (r.classList.contains('row') && !r.classList.contains('ghostgap')) rows.push(r);
+          if (r.classList.contains('row')) rows.push(r);
         if (rows.length >= limit) break;
       }
       localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.reverse().map((r) => {
