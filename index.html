@@ -8238,7 +8238,7 @@
     mainEl.classList.toggle('rev', on);
     if (isSplit()) {
       if (on) flipCols(); // rev drains #log's tail into the next column
-      else deal();
+      else { const cs = cols(); activeEl = cs[cs.length - 1]; deal(); }
     }
     for (const col of [logEl, sideEl, side2El]) if (!col.hidden) snapLive(col);
     markHelp('helpFlow', on ? 1 : 0);
@@ -8976,11 +8976,13 @@
     frag.append(...page);
     logEl.insertBefore(frag, [...logEl.children].find((r) => !r.classList.contains('stale')) || null);
   }
-  // Lays the newest rows out one page per column - the oldest page in
-  // #log, the newest in the last column, which turns active. Rows older
-  // than those pages retire. Pages are cut from the tail by measured
-  // height, staged in a bordered side column: #log runs a hair wider,
-  // so rows measured there can only shrink where they land
+  // Lays the newest rows out one page per column, the live column
+  // keeping the newest - a re-deal re-cuts page heights but never
+  // shuffles a column's contents sideways. Older pages walk backwards
+  // in flip order from the live one; rows older than the pages retire.
+  // Pages are cut from the tail by measured height, staged in a bordered
+  // side column: #log runs a hair wider, so rows measured there can
+  // only shrink where they land
   function deal() {
     const cs = cols();
     const frag = document.createDocumentFragment();
@@ -9010,14 +9012,15 @@
     const arch = document.createDocumentFragment();
     arch.append(...live.slice(0, k + 1));
     logEl.insertBefore(arch, [...logEl.children].find((r) => !r.classList.contains('stale')) || null);
-    pages.reverse(); // oldest first - pages[j] belongs in cs[j]
+    pages.reverse(); // oldest first - pages[pages.length - 1] is live
+    const ai = Math.max(0, cs.indexOf(activeEl));
     for (let j = 0; j < pages.length; j++) {
-      if (j === 1) continue; // already home in the staging column
+      const target = cs[(ai + j - (pages.length - 1) + cs.length) % cs.length];
+      if (target === cs[1]) continue; // already home in the staging column
       const f = document.createDocumentFragment();
       f.append(...pages[j]);
-      cs[j].appendChild(f);
+      target.appendChild(f);
     }
-    activeEl = cs[Math.max(0, pages.length - 1)];
     autoScrollAt = performance.now();
     for (const c of cs) c.scrollTop = 0;
   }
@@ -9190,9 +9193,11 @@
       // lands in the next
       flipCols();
     } else {
-      // only with the columns unhidden do their widths - and so their
-      // page heights - exist to measure. all synchronous, so the first
-      // paint already sees the dealt pages
+      // dealt from the last column back so the live edge sits at the
+      // end of the flip order - the convention pages then keep as they
+      // rotate. synchronous, so the first paint already sees the deal
+      const cs = cols();
+      activeEl = cs[cs.length - 1];
       deal();
       jdownSet(jdownLog, logEl);
       jdownSet(jdownSide, sideEl);
