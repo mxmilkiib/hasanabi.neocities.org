@@ -1334,6 +1334,7 @@
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   /* the anim chip's frozen state: on, but dashed to read 'stilled' */
   .hdr-btn.on.frz { border-style: dashed; }
+  .hdr-btn.on.tmp { border-style: dotted; } /* on by another control's doing, not one's own */
   /* copy-settings flashes a full accent inversion on success, then
      eases back to chrome over the transition on the base state */
   #copyUrl { transition: background .4s ease, color .4s ease, border-color .4s ease; }
@@ -2161,7 +2162,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / right <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker; a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('anim' cycles playing → frozen stills → hidden), 'Aa' shows names, ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker (cycling to 'hold+' lights 'still' on top for as long as it lasts); a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -7386,7 +7387,7 @@
       video: !vidBox.hidden,
       kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0,
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
-      epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
+      epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
@@ -7420,7 +7421,7 @@
       if ((v = g(EPICK_SORT_KEY)) !== null) o.epsort = v;
       if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = v === '1' ? 1 : 0;
       if ((v = g(EPICK_MIX_KEY)) !== null) o.epmix = v === '1' ? 1 : 0;
-      if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '1' ? 1 : 0;
+      if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '0' || v === '2' ? +v : 1;
       if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
       if ((v = g(EPICK_ANIM_KEY)) !== null) o.epanim = JSON.parse(v);
       if ((v = g(EPICK_SIZE_KEY)) !== null) o.epgeo = JSON.parse(v);
@@ -7547,7 +7548,7 @@
     if (o.epsort !== undefined) { setSort(o.epsort); epDirty = true; }
     if (o.epage !== undefined) { setAge(!!o.epage); epDirty = true; }
     if (o.epmix !== undefined) { setMix(!!o.epmix); epDirty = true; }
-    if (o.ephold !== undefined) setHold(!!o.ephold);
+    if (o.ephold !== undefined) setHold(o.ephold);
     if (Array.isArray(o.eptabs)) { setTabs(o.eptabs); epDirty = true; }
     if (Array.isArray(o.epanim)) { setAnimFilter(o.epanim); epDirty = true; }
     if (epDirty) buildPicker();
@@ -7591,7 +7592,7 @@
       subMode, eonly: emoteMode,
       split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
-      clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold ? 1 : 0,
+      clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold,
       hdrgraph: document.body.classList.contains('hdrgraph'),
     };
     // a preset that pins a colour implicitly pins the standard finish
@@ -8588,7 +8589,7 @@
     if (epickSort !== 'use' || epickSeen) q.set('epsort', epickSeen ? 'useseen' : epickSort);
     if (epickAge) q.set('epage', '1');
     if (!epickMerge) q.set('epmix', '0');
-    if (!epickHold) q.set('ephold', '0');
+    if (epickHold !== 1) q.set('ephold', String(epickHold));
     if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
     if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
     try {
@@ -10692,22 +10693,32 @@
   // pending rebuild lands on pointer-leave, and user-made changes
   // (sort, filters, search, tabs) still rebuild at once
   const EPICK_HOLD_KEY = 'hasan-epickhold';
-  let epickHold = true;
-  try { epickHold = localStorage.getItem(EPICK_HOLD_KEY) !== '0'; } catch {}
+  // 0 off · 1 hold · 2 hold + still - the top leg lights stills on top of
+  // the saved anim filter for as long as the state lasts
+  let epickHold = 1;
+  try { const v = localStorage.getItem(EPICK_HOLD_KEY); if (v === '0' || v === '2') epickHold = +v; } catch {}
   let gridHeld = false, heldRebuild = false;
   const heldOr = () => gridHeld ? heldRebuild = true : rebuildPicker();
   const holdBtn = document.getElementById('emoteHold');
-  const setHold = (on) => {
-    epickHold = !!on;
-    try { localStorage.setItem(EPICK_HOLD_KEY, epickHold ? '1' : '0'); } catch {}
-    setOn(holdBtn, epickHold);
+  const paintHold = () => {
+    setOn(holdBtn, epickHold > 0);
+    holdBtn.textContent = epickHold === 2 ? 'hold+' : 'hold';
+    holdBtn.title = `hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor; click cycles hold → hold+ (stills on too) → off`;
+  };
+  const setHold = (i) => {
+    epickHold = Math.max(0, Math.min(2, +i || 0));
+    try { localStorage.setItem(EPICK_HOLD_KEY, String(epickHold)); } catch {}
+    paintHold();
     gridHeld = false;
     holdBtn.classList.remove('held');
     if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
+    paintAnim();
   };
-  setOn(holdBtn, epickHold);
+  paintHold();
   holdBtn.addEventListener('click', () => {
-    setHold(!epickHold);
+    const st = stillTmp();
+    setHold((epickHold + 1) % 3);
+    if (stillTmp() !== st) buildPicker();
     saveOpts();
     emoteQ.focus();
   });
@@ -10723,7 +10734,7 @@
     if (!on && heldRebuild) { heldRebuild = false; rebuildPicker(); }
   };
   emotePick.addEventListener('pointerover', (e) => {
-    if (e.target.closest('button[data-ins]')) setGridHeld(epickHold);
+    if (e.target.closest('button[data-ins]')) setGridHeld(!!epickHold);
     else if (gridHeld) unholdTimer = setTimeout(() => setGridHeld(false), 200);
   });
   emotePick.addEventListener('pointerleave', () => setGridHeld(false));
@@ -10734,7 +10745,11 @@
   try { epickAnimOn = new Set(JSON.parse(localStorage.getItem(EPICK_ANIM_KEY)) || []); } catch {}
   // the anim chip is tri-state: playing -> frozen (shown as stills) ->
   // hidden; 'animf' marks the frozen leg in the saved/url list
-  const animOk = (a) => !epickAnimOn.size || epickAnimOn.has(a ? 'anim' : 'still') || (a && epickAnimOn.has('animf'));
+  // hold's third leg lights stills without touching the saved filter; an
+  // empty set already means 'all', so there is nothing to add there
+  const stillTmp = () => epickHold === 2 && !!epickAnimOn.size && !epickAnimOn.has('still');
+  const animEff = () => stillTmp() ? new Set([...epickAnimOn, 'still']) : epickAnimOn;
+  const animOk = (a) => !animEff().size || animEff().has(a ? 'anim' : 'still') || (a && animEff().has('animf'));
   const animFrozen = () => epickAnimOn.has('animf') && !epickAnimOn.has('anim');
   const animState = () => animFrozen() ? 'frozen' : !epickAnimOn.size || epickAnimOn.has('anim') ? 'play' : 'off';
   const animBtns = { anim: document.getElementById('emoteAnim'), still: document.getElementById('emoteStill') };
@@ -10743,6 +10758,7 @@
     animBtns.anim.classList.toggle('frz', animFrozen());
     animBtns.anim.title = `animated emotes: ${{ play: 'playing', frozen: 'shown as stills', off: 'hidden' }[animState()]} - click cycles, shift-click solos`;
     setOn(animBtns.still, animOk(false));
+    animBtns.still.classList.toggle('tmp', stillTmp()); // a forced-on leg wears a dotted border
   }
   paintAnim();
   // the freeze test picker cells and chat rows share: a provider-flagged
@@ -12138,14 +12154,14 @@
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 2 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     // emote-picker options: ?epnames=1&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&
-    // epmix=1&ephold=0&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]
+    // epmix=1&ephold=0|1|2&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(flag('epnames')); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
     if (q.has('epsort')) { setSort(q.get('epsort')); epUrlDirty = true; }
     if (q.has('epage')) { setAge(flag('epage')); epUrlDirty = true; }
     if (q.has('epmix')) { setMix(flag('epmix')); epUrlDirty = true; }
-    if (q.has('ephold')) setHold(flag('ephold'));
+    if (q.has('ephold')) setHold(q.get('ephold') === '' ? 1 : +q.get('ephold'));
     if (q.has('eptabs')) { setTabs(q.get('eptabs').split(',')); epUrlDirty = true; }
     if (q.has('epanim')) { setAnimFilter(q.get('epanim').split(',')); epUrlDirty = true; }
     if (q.has('epgeo')) {
