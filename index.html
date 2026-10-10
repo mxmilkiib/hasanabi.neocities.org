@@ -12184,12 +12184,15 @@
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };
   addEventListener('online', netPaint); addEventListener('offline', netPaint); netPaint();
-  // update watch: a HEAD on the page every 5min and on tab-focus compares
-  // the served last-modified against the copy this page loaded from - a
-  // newer stamp means a deploy landed. dismiss snoozes that stamp only,
-  // so the next deploy flags again
+  // update watch: a HEAD on the page every 5min and on tab-focus. the
+  // first poll seeds the baseline (the page just loaded, so the live
+  // stamp is the running version) - a newer stamp on a later poll means
+  // a deploy landed while the tab was open. document.lastModified isn't
+  // trusted for this: its timezone handling varies and a service-worker
+  // response may carry no stamp at all. dismiss snoozes that stamp
+  // only, so the next deploy flags again
   const updateBar = document.getElementById('updateBar');
-  let docStamp = Date.parse(document.lastModified) || 0, updateSeen = 0;
+  let docStamp = 0, updateSeen = 0;
   async function updateCheck() {
     if (!updateBar.hidden) return;
     try {
