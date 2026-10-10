@@ -622,6 +622,7 @@
     overflow-y: auto;
     padding: 8px 18px 2px 6px;
   }
+  main.split:not(.rev) .col::after { content: ''; display: block; height: 100vh; }
   #side, #side2 { border-left: 1px solid var(--line); }
   /* split level 4's rail: a third column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
@@ -3312,7 +3313,7 @@
     jdownSet(jdownSide, sideEl, sideBottom);
   });
   side2El.addEventListener('scroll', () => {
-    const d = liveDist(sideEl);
+    const d = liveDist(side2El);
     if (d < 60) jumpingCols.delete(side2El);
     side2Bottom = jumpingCols.has(side2El) || d < 60;
     jdownSet(jdownSide2, side2El, side2Bottom);
@@ -8991,6 +8992,10 @@
     to.appendChild(frag);
     for (const r of from.children) r.classList.add('stale');
     ghostFade(to);
+    // the new page opens at the column's top edge, ghosts scrolled out
+    // above it; the column's ::after slack lets a short page sit there
+    autoScrollAt = performance.now();
+    to.scrollTop += moveTail[moveTail.length - 1].getBoundingClientRect().top - to.getBoundingClientRect().top - 8;
     return moved;
   }
 
