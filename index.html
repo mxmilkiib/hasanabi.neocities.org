@@ -8429,7 +8429,8 @@
       helpPanel.style.top = Math.max(top, Math.min(innerHeight - r.height, r.top)) + 'px';
     } else {
       if (mid) helpPanel.style.setProperty('--hcx', Math.max(0, (innerWidth - r.width) / 2) + 'px');
-      helpPanel.style.top = top + 'px';
+      // an unmoved panel rests mid-screen, never above the header line
+      helpPanel.style.top = Math.max(top, Math.round((innerHeight - r.height) / 2)) + 'px';
     }
   }
   // a dragged width isn't one of the stops - note it in brackets
