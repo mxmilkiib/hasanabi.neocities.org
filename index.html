@@ -622,7 +622,7 @@
     overflow-y: auto;
     padding: 8px 18px 2px 6px;
   }
-  main.split:not(.rev) .col::after { content: ''; display: block; height: 100vh; }
+  main.split:not(.rev) .col.live::after { content: ''; display: block; height: 100vh; }
   #side, #side2 { border-left: 1px solid var(--line); }
   /* split level 4's rail: a third column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
@@ -3378,7 +3378,10 @@
       resnapQueued = false;
       // page-flip columns hold their page at the top edge; a late image
       // growing a row must not slide the page up under the reader
-      if (isSplit() && !revFlow) return;
+      if (isSplit() && !revFlow) {
+        for (const c of cols()) if (c !== activeEl && !pausedCols.has(c)) snapLive(c);
+        return;
+      }
       if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
       if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
@@ -8939,6 +8942,21 @@
       return;
     }
     if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
+    markLive();
+  }
+  // Only the live column carries the blank slack that lets its page open at
+  // the top edge; a column leaving that role drops it and bottom-aligns its
+  // last page, so it never scrolls into blank space.
+  function markLive() {
+    for (const c of cols()) {
+      if (c === activeEl) c.classList.add('live');
+      else if (c.classList.contains('live')) {
+        const t = liveTop(c);
+        c.classList.remove('live');
+        autoScrollAt = performance.now();
+        c.scrollTop = t;
+      }
+    }
   }
   // Moves rows below the fold of `from` to the bottom of `to`. The
   // outgoing contents stay as faded ghosts - never deleted, they are the
@@ -9009,6 +9027,7 @@
     // the new page opens at the column's top edge, ghosts scrolled out
     // above it; the column's ::after slack lets a short page sit there
     autoScrollAt = performance.now();
+    to.classList.add('live');
     to.scrollTop += moveTail[moveTail.length - 1].getBoundingClientRect().top - to.getBoundingClientRect().top - 8;
     return moved;
   }
@@ -9164,6 +9183,7 @@
       side2El.scrollTop = 0;
       activeEl = side2El;
     }
+    markLive();
     // columns narrower than the merged one reflow taller, leaving saved
     // scroll offsets mid-page - re-pin every non-active column at the edge
     // opposite its page flow
