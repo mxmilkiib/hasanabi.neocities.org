@@ -2499,10 +2499,13 @@
   const LOAD_STEPS = 4;
   const emptyLabel = document.getElementById('emptyLabel');
   // the under-header strip narrates the same steps the empty-state bar
-  // does, then returns for resyncs once the log owns the space
+  // does - one or the other, never both: while the card is up it owns
+  // boot, and the strip returns for resyncs and for boots that already
+  // restored rows, where there is no card to carry the text
   const loadBar = document.getElementById('loadBar');
   const loadTxt = document.getElementById('loadTxt');
   const loadFill = loadBar && loadBar.querySelector('.loadbar i');
+  if (emptyEl) loadBar.hidden = true;
   let loadPhase = 0;
   function loadStep(n, txt) {
     if (n <= loadPhase) return;
@@ -2524,7 +2527,10 @@
     if (!loadBar) return;
     syncing = true;
     loadTxt.textContent = txt;
-    loadBar.hidden = false;
+    // sync text goes to whichever narrator is showing - a mid-boot
+    // resync surfaces in the card rather than doubling the bars
+    if (emptyEl) emptyLabel.textContent = txt;
+    loadBar.hidden = !!emptyEl;
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; }, 8000);
   }
@@ -9266,7 +9272,9 @@
     try {
       const rows = JSON.parse(localStorage.getItem(HISTORY_KEY));
       if (!Array.isArray(rows) || !rows.length) return;
-      if (emptyEl) { emptyEl.remove(); emptyEl = null; }
+      // restored rows mean the card's gone before it ever showed - the
+      // strip takes over narrating whatever boot steps are left
+      if (emptyEl) { emptyEl.remove(); emptyEl = null; if (loadBar && loadPhase < LOAD_STEPS) loadBar.hidden = false; }
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
       // the one-shot sync wash is a render-time marker only - stripped
       // here so restored scrollback doesn't strobe on every load
