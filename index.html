@@ -2870,6 +2870,8 @@
       relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN);
   }
 
+  // badge sets whose id isn't the readable title
+  const BADGE_NAMES = { no_audio: 'watching without audio', 'no-audio': 'watching without audio' };
   // badge 'set/ver' -> image url; falls back to the highest version <= ver
   // (e.g. subscriber/34 uses the 24-month flair when no 34 exists)
   function badgeUrl(b, ch) {
@@ -3917,7 +3919,7 @@
         const u = b && badgeUrl(b, ch);
         if (u) renderedSets.add(b.split('/')[0]);
         return u ? `<img class="badge" src="${escapeHTML(u)}"` +
-                   ` title="${escapeHTML(b.split('/')[0].replace(/-/g, ' '))}" alt="">` : '';
+                   ` title="${escapeHTML(BADGE_NAMES[b.split('/')[0]] || b.split('/')[0].replace(/-/g, ' '))}" alt="">` : '';
       }).filter(Boolean).join('');
       const role = badgeImgs ? '' : roleTag(tags);
       const profile = escapeHTML(encodeURIComponent(login || name.toLowerCase()));
@@ -5711,7 +5713,7 @@
     const badgeRow = (id) => {
       const vs = Object.entries(bInfo[id])
         .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
-      const name = id.replace(/[-_]/g, ' ');
+      const name = BADGE_NAMES[id] || id.replace(/[-_]/g, ' ');
       const metric = bSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
       // the sentence-length text goes on tooltips so an opened set
       // lists every version compactly: icon, title, count
@@ -5754,7 +5756,7 @@
         // 'Prime Gaming' version title that would just double it
         const raw = id.replace(/[-_]/g, ' ');
         const name = ({ subscriber: 'subbed', moderator: 'mod',
-          premium: 'Prime subscriber', 'bot-badge': 'chat bot' })[id] || raw;
+          premium: 'Prime subscriber', 'bot-badge': 'chat bot' })[id] || BADGE_NAMES[id] || raw;
         let vt = id === 'subscriber' ? (v.t || '').replace(/\s*subscriber$/i, '')
           : id === 'premium' ? '' : v.t;
         // a title that merely restates the set name ('Blossom Badge 2025'
