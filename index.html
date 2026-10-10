@@ -4018,8 +4018,9 @@
       // chatterino-style: messages made of only emotes render them bigger
       const mtoks = message.trim().split(/\s+/).filter(Boolean);
       // usage-age stats share one record across channels - the *Per bags
-      // still attribute each use to the row's own room
-      for (const t of mtoks) {
+      // still attribute each use to the row's own room. the local echo is
+      // one's own client, not chat activity - it counts nothing
+      if (!local) for (const t of mtoks) {
         const en = emoteNameOf(ch, t);
         if (en || rendered.names.has(t) || EMOJI_SET.has(t))
           noteEmoteUse(en || t, ch, rendered.nameId?.get(t), ts);
