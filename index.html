@@ -6164,7 +6164,7 @@
     cv.onmousemove = (e) => {
       const r = cv.getBoundingClientRect();
       const i = Math.max(0, Math.min(N - 1, Math.floor((e.clientX - r.left) / r.width * N)));
-      cv.title = `${fmtRowTime(new Date(t0 + i * bw))} · ` +
+      cv.title = `${fmtRowTime(new Date(t0 + i * bw)).replace(/<[^>]+>/g, '')} · ` +
         (bn[i] ? `${(bins[i] / bn[i]).toFixed(1)}${bmax[i] - bins[i] / bn[i] > .05 ? `–${bmax[i].toFixed(1)}` : ''} msgs/s` : 'no data') +
         (bgs[i] ? ` · ${bgs[i]} glorp${bgs[i] === 1 ? '' : 's'}` : '') +
         (bwhy[i] ? ` - ${bwhy[i]}` : '');
