@@ -1905,10 +1905,10 @@
   #emotePick .qwrap:has(#emoteQ:not(:placeholder-shown)) #emoteQx { display: block; }
   #emotePick #emoteQx:hover { opacity: 1; color: var(--text); }
   #emotePick #emoteNames { flex: none; font-size: 13px; padding: 4px 8px; }
-  #emotePick.names #emoteNames { background: var(--line); }
+  #emotePick.names #emoteNames { background: var(--line); color: var(--text); }
   /* sort chips hug their labels like the section tabs do */
   #emotePick .esort { flex: none; width: auto; font-size: 12px; padding: 0 8px; opacity: .55; }
-  #emotePick .esort.on { opacity: 1; background: var(--line); }
+  #emotePick .esort.on { opacity: 1; background: var(--line); color: var(--text); }
   /* the seen-only leg of the use sort marks itself with a dotted
      underline, echoing the anim chip's dashed frozen leg */
   #emotePick .esort.seen { text-decoration: underline dotted var(--accent); text-underline-offset: 3px; }
@@ -1925,7 +1925,7 @@
   #emotePick .eopts { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; justify-content: flex-end; }
   #emotePick .etabs { flex: none; display: flex; flex-wrap: wrap; gap: 4px; }
   #emotePick .etabs button { font-size: 12px; padding: 2px 8px; opacity: .55; width: auto; }
-  #emotePick .etabs button.on { opacity: 1; background: var(--line); }
+  #emotePick .etabs button.on { opacity: 1; background: var(--line); color: var(--text); }
   /* an accent wash when the emote was just used in chat - bright pop,
      slow tail so it stays readable while the grid resorts */
   #emoteGrid button.justused, #emoteRecent button.justused { animation: eflash 3.6s ease-out; }
