@@ -7659,7 +7659,7 @@
       subMode, eonly: emoteMode,
       split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
-      clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold,
+      clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold, anim: nickAnim, epzoom: epickZoom,
       hdrgraph: document.body.classList.contains('hdrgraph'),
     };
     // a preset that pins a colour implicitly pins the standard finish
@@ -8588,6 +8588,7 @@
     copyHelp = !!on;
     try { localStorage.setItem(COPYHELP_KEY, copyHelp ? '1' : '0'); } catch {}
     markHelp('helpCopyHelp', copyHelp ? 1 : 0);
+    updateUrlPrev();
   }
   // builds a ?param url from the current non-default options
   // builds the settings url exactly as a copy emits it - the preview row
@@ -8679,7 +8680,7 @@
     const pin = Object.keys(THEME_PRESETS).find((n) => n !== 'default' && presetMatch(THEME_PRESETS[n]));
     let qs = q;
     if (pin) {
-      const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls' };
+      const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls', anim: 'anim', epzoom: 'epzoom' };
       qs = new URLSearchParams([['theme', pin]]);
       for (const [k, v] of q) if (!(PINNED[k] in THEME_PRESETS[pin])) qs.append(k, v);
     }
