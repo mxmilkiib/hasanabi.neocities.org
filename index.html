@@ -534,10 +534,9 @@
   #epop .epemo { font-size: 64px; line-height: 1.1; margin: 0; max-width: none; max-height: none; }
   #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; }
   #vid #vidFrame { position: absolute; inset: 0; }
-  /* pending unmute affordance: sits over the player's own controls until
-     a confirmed delivery hides it */
-  #vid #vidWake { position: absolute; left: 6px; bottom: 6px; z-index: 3;
-    font-size: .85em; padding: 2px 8px; }
+  /* autoplay-policy note: sits over the player until sound plays or it is clicked away */
+  #vid #vidWake { position: absolute; left: 6px; right: 6px; bottom: 6px; z-index: 3;
+    font-size: .8em; padding: 4px 8px; text-align: left; white-space: normal; height: auto; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
@@ -7760,16 +7759,6 @@
   // read back mute/volume so the last setting survives a reload. ----
   const VOL_KEY = 'hasan-vidvol';
   let vidPlayer = null;
-  // a saved 'playing with sound' that autoplay couldn't honour stays
-  // pending until the first real gesture delivers it - without that the
-  // poll writes the forced muted/paused state back over the pref and
-  // every reload after starts quiet
-  let vidWakeSpent = false;
-  let vidWakeTries = 0; // bounds in-flight unmute retries after an iframe-side play
-  // a delivered unmute must read clean twice in a row before it counts -
-  // one stale or optimistic getMuted must not close pending and stamp a
-  // forced mute into the record as deliberate
-  let vidClearTicks = 0;
   let vidRatio = 16 / 9; // replaces the css default once stats report the real resolution
   function loadPlayer() {
     if (loadPlayer.done) return;
@@ -7791,51 +7780,20 @@
         if (saved.v != null) vidPlayer.setVolume(saved.v);
         vidPlayer.setMuted(!wantSound);
         if (!wantPlay) vidPlayer.pause();
-        // an unmuted autoplay needs a real user gesture; setMuted above is
-        // ignored without one, so the first click or keypress finishes the
-        // job. the wake is spent only on a confirmed unmute - spending it
-        // on a failed attempt lets the poll write the forced mute back
-        // over the intent, which is how the record poisons itself
-        if (wantSound) {
-          const wake = () => {
-            // no tries cap here: the poll's retry budget bounds automatic
-            // noise, but a real gesture is intentional - sharing the cap
-            // left clicks dead once the retries burned out
-            if (vidWakeSpent || !vidPlayer) return;
-            if (saved.v != null) vidPlayer.setVolume(saved.v);
-            vidPlayer.setMuted(false);
-            if (wantPlay && vidPlayer.isPaused()) vidPlayer.play();
-            vidWakeSpent = !vidPlayer.getMuted();
-          };
-          document.addEventListener('pointerdown', wake);
-          document.addEventListener('keydown', wake);
-          // a click inside the embed's iframe never reaches document -
-          // the window blurring to that iframe is the gesture signal
-          addEventListener('blur', () => {
-            const ae = document.activeElement;
-            if (ae && ae.tagName === 'IFRAME' && vidBox.contains(ae)) wake();
-          });
-        }
         vidState();
-        // a pending unmute is invisible until it stalls, then it gets a
-        // button: paused waits on a play gesture, playing-muted past the
-        // retries means the api call isn't landing - either way the chip
-        // gives the user a target and its click IS the gesture
-        const vidChip = document.createElement('button');
-        vidChip.id = 'vidWake'; vidChip.className = 'hdr-btn'; vidChip.hidden = true;
-        vidChip.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (!vidPlayer) return;
-          if (saved.v != null) vidPlayer.setVolume(saved.v);
-          vidPlayer.setMuted(false);
-          if (vidPlayer.isPaused()) vidPlayer.play();
-        });
-        vidBox.appendChild(vidChip);
-        // console hook so the real state can be read back when the
-        // unmute path misbehaves again: __vid() in devtools
-        window.__vid = () => ({ saved, wantSound, wantPlay,
-          pend: wantSound && !vidWakeSpent, tries: vidWakeTries, clear: vidClearTicks, spent: vidWakeSpent,
-          muted: vidPlayer.getMuted(), paused: vidPlayer.isPaused() });
+        // the browser, not the page, decides whether sound may autoplay:
+        // when it vetoes the saved unmuted state, this note says how to
+        // grant the site permission. click dismisses it for the session
+        const vidHint = document.createElement('button');
+        vidHint.id = 'vidWake'; vidHint.className = 'hdr-btn'; vidHint.hidden = true;
+        vidHint.textContent = 'Sound blocked by browser autoplay policy. Firefox: padlock > Permissions > Autoplay > Allow Audio and Video. Chrome: padlock > Site settings > Sound > Allow.';
+        let hintOff = false;
+        vidHint.addEventListener('click', (e) => { e.stopPropagation(); hintOff = true; vidHint.hidden = true; });
+        vidBox.appendChild(vidHint);
+        // until the player has been seen playing unmuted, a muted read is
+        // the browser's veto rather than the user's choice, so the record
+        // keeps the saved intent instead of storing the veto
+        let armed = !wantSound;
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
         emb.addEventListener(Twitch.Player.PLAYING, vidState);
@@ -7843,38 +7801,12 @@
         emb.addEventListener(Twitch.Player.ENDED, vidState);
         let last = '';
         setInterval(() => {          // poll + persist; the API emits no volume event
+          if (vidBox.hidden || document.hidden) return;
           vidState();
-          // while sound delivery is pending the record keeps its intent -
-          // the autoplay-blocked mute can land a beat after VIDEO_READY and
-          // must not overwrite it; once the gesture's spent the player's
-          // word is law
-          const pend = wantSound && !vidWakeSpent;
-          // the click that started playback may have landed inside the
-          // iframe, unseen by the document listeners - a playing player
-          // takes setMuted without a further gesture, so deliver pending
-          // sound here; bounded so a deliberate in-player mute isn't
-          // fought forever
-          if (pend && vidWakeTries < 5 && !vidPlayer.isPaused() && vidPlayer.getMuted()) {
-            vidWakeTries++;
-            if (saved.v != null) vidPlayer.setVolume(saved.v);
-            vidPlayer.setMuted(false);
-          }
-          // unmuted and playing by whatever path - player ui included -
-          // counts as delivered; pending must end so a mute made after
-          // lands in the record as deliberate. no give-up clause: the
-          // tries cap already bounds the noise, and a mute the user
-          // never chose must never be stamped deliberate. two clean
-          // reads in a row confirm the delivery
-          if (pend && !vidPlayer.isPaused() && !vidPlayer.getMuted()) {
-            if (++vidClearTicks >= 2) vidWakeSpent = true;
-          } else vidClearTicks = 0;
-          // paused waits on the first play gesture; playing-muted with
-          // retries already burned means the calls aren't landing - show
-          // the chip either way, hide it once delivery confirms
-          const paused = vidPlayer.isPaused();
-          vidChip.hidden = !pend || (!paused && vidWakeTries < 2);
-          if (!vidChip.hidden) vidChip.textContent = paused ? '▶ sound on' : '🔊 sound on';
-          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: pend ? false : vidPlayer.getMuted(), p: pend && wantPlay ? true : !vidPlayer.isPaused(), w: 3 });
+          const paused = vidPlayer.isPaused(), muted = vidPlayer.getMuted();
+          if (!armed && !paused && !muted) armed = true;
+          vidHint.hidden = hintOff || armed || paused || !muted;
+          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed ? muted : false, p: armed || !wantPlay ? !paused : true, w: 3 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}
