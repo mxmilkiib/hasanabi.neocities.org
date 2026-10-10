@@ -9187,9 +9187,10 @@
     // columns narrower than the merged one reflow taller, leaving saved
     // scroll offsets mid-page - re-pin every non-active column at the edge
     // opposite its page flow
-    if (level >= 2) requestAnimationFrame(() => {
-      for (const col of cols()) if (col !== activeEl) snapLive(col);
-    });
+    // pinned synchronously too, so the first paint is already settled and
+    // the frame-later pass only has scrollbar-width reflow left to fix
+    const pinIdle = () => { for (const col of cols()) if (col !== activeEl) snapLive(col); };
+    if (level >= 2) { pinIdle(); requestAnimationFrame(pinIdle); }
   }
 
   function cycleSplit(dir) {
