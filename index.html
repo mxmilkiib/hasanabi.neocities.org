@@ -8711,7 +8711,7 @@
     Promise.allSettled(wipe).then(() => {
       const u = new URL(location.href);
       u.searchParams.set('_', Date.now());
-      location.href = u.toString();
+      location.replace(u); // a refresh, not a navigation - no dead history entry
     });
   });
 
@@ -12161,6 +12161,13 @@
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
 
+  // the ?_=ts cache-bust did its work on the wire - drop it so the address
+  // bar (and any manual reload after it) stays clean
+  {
+    const u = new URL(location.href);
+    if (u.searchParams.has('_')) { u.searchParams.delete('_'); history.replaceState(null, '', u); }
+  }
+
   // ?mid=<id> - a copied permalink: scroll to and flash the row once
   // ingest or the restored history lands it; give up quietly if the row
   // is older than scrollback/history reach
@@ -12291,7 +12298,7 @@
   document.getElementById('updateGo').addEventListener('click', () => {
     const u = new URL(location.href);
     u.searchParams.set('_', Date.now());
-    location.href = u.toString();
+    location.replace(u); // a refresh, not a navigation - no dead history entry
   });
   document.getElementById('updateX').addEventListener('click', () => { updateBar.hidden = true; });
   // header controls are glyph-only: mirror each title into an aria-label so
