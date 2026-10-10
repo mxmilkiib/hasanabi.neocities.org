@@ -8952,25 +8952,24 @@
       if (frag) to.appendChild(frag);
       return moved;
     }
+    // the fold is one clientHeight of LIVE rows: ghosts sit above the live
+    // tail as scrollback, so measuring offsets against the column's height
+    // reads every live row as below the fold and shuttles the same page
+    // between columns forever. live height is summed first, then the
+    // overflow is collected off the tail
+    let liveH = 0;
+    for (const r of from.children)
+      if (!r.classList.contains('stale') && !rowCollapsed(r)) liveH += r.offsetHeight;
     const moveTail = [];
-    let moved = false;
-    for (let r = from.lastElementChild; r; r = r.previousElementSibling) {
+    let moved = false, budget = liveH - from.clientHeight;
+    for (let r = from.lastElementChild; r && budget > 0; r = r.previousElementSibling) {
       // ghosts are skipped by the deal but never dropped - they're the
-      // column's faded scrollback. Rejoining them as live would instantly
-      // refill the column and flip the live edge straight back on the
-      // next insert
+      // column's faded scrollback
       if (r.classList.contains('stale')) continue;
-      // a display:none row reports offsetTop 0, which would read as inside
-      // the fold - hidden tail rows ride along only once a visible row has
-      // started moving
-      if (rowCollapsed(r)) {
-        if (!moved) {
-          let p = r.previousElementSibling;
-          while (p && rowCollapsed(p)) p = p.previousElementSibling;
-          if (!p || p.classList.contains('stale') ||
-              p.offsetTop - from.offsetTop + p.offsetHeight <= from.clientHeight) break;
-        }
-      } else if (r.offsetTop - from.offsetTop + r.offsetHeight <= from.clientHeight) break;
+      // a display:none row reports no height - hidden rows ride along
+      // only once a visible row has started moving
+      if (rowCollapsed(r)) { if (!moved) continue; }
+      else budget -= r.offsetHeight;
       moveTail.push(r); moved = true;
     }
     if (!moveTail.length) return false;
