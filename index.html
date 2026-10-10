@@ -7704,6 +7704,7 @@
   // poll writes the forced muted/paused state back over the pref and
   // every reload after starts quiet
   let vidWakeSpent = false;
+  let vidWakeTries = 0; // bounds in-flight unmute retries after an iframe-side play
   let vidRatio = 16 / 9; // replaces the css default once stats report the real resolution
   function loadPlayer() {
     if (loadPlayer.done) return;
@@ -7736,6 +7737,12 @@
           };
           document.addEventListener('pointerdown', wake);
           document.addEventListener('keydown', wake);
+          // a click inside the embed's iframe never reaches document -
+          // the window blurring to that iframe is the gesture signal
+          addEventListener('blur', () => {
+            const ae = document.activeElement;
+            if (ae && ae.tagName === 'IFRAME' && vidBox.contains(ae)) wake();
+          });
         }
         vidState();
         // player events are forwarded on the embed - getPlayer() is a
@@ -7751,6 +7758,21 @@
           // must not overwrite it; once the gesture's spent the player's
           // word is law
           const pend = wantSound && !vidWakeSpent;
+          // the click that started playback may have landed inside the
+          // iframe, unseen by the document listeners - a playing player
+          // takes setMuted without a further gesture, so deliver pending
+          // sound here; bounded so a deliberate in-player mute isn't
+          // fought forever
+          if (pend && vidWakeTries < 5 && !vidPlayer.isPaused() && vidPlayer.getMuted()) {
+            vidWakeTries++;
+            if (saved.v != null) vidPlayer.setVolume(saved.v);
+            vidPlayer.setMuted(false);
+            vidWakeSpent = !vidPlayer.getMuted();
+          }
+          // unmuted and playing by whatever path - player ui included -
+          // counts as delivered; pending must end so a mute made after
+          // lands in the record as deliberate
+          if (pend && !vidPlayer.isPaused() && !vidPlayer.getMuted()) vidWakeSpent = true;
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: pend ? false : vidPlayer.getMuted(), p: pend && saved.p !== false ? true : !vidPlayer.isPaused(), w: 2 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
