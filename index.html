@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<htmght  lang="en">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2071,7 +2071,9 @@
   #emotePick.big #emoteGrid .eage { height: 78px; font-size: 1.4em; }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
-    position: relative; color: var(--text-dim); font-size: .7em; opacity: .4; }
+    /* the label purples with rung depth: --agep climbs the ladder toward
+       the picker's light violet, so deep-past eras read nightshade */
+    position: relative; color: color-mix(in srgb, var(--text-dim), #a06be0 var(--agep, 0%)); font-size: .7em; opacity: .4; }
   /* the border is a dashed svg rect whose dashoffset marches - the
      classic processing-ants border; the rung's inline animation-delay
      is inherited so the marches stay staggered per rung */
@@ -2081,7 +2083,7 @@
   #emoteGrid .eage .ants { position: absolute; top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
   #emoteGrid .eage .ants rect { fill: none; stroke: var(--line); stroke-width: 1;
     stroke-dasharray: 4 3; animation: eage-ants .9s linear infinite; animation-delay: inherit; }
-  #emoteGrid .eage.lit { opacity: 1; color: var(--text); font-weight: 700; }
+  #emoteGrid .eage.lit { opacity: 1; color: color-mix(in srgb, var(--text), #a06be0 var(--agep, 0%)); font-weight: 700; }
   #emoteGrid .eage.lit .ants rect { stroke: var(--accent); }
   /* a lit era whose window spans a stretch chat wasn't logging - the
      count could be understated, so the border turns purple, the text
@@ -11342,6 +11344,9 @@
     const now = Date.now();
     const marks = AGES.map(([t, words]) => ({ t, words }));
     marks.sort((a, b) => a.t - b.t);
+    // rung depth as a 0-100% label tint - even across the ladder, since a
+    // linear share of the 12h ceiling would cluster the recent end at ~0
+    marks.forEach((mk, i) => mk.p = (i / (marks.length - 1) * 100).toFixed(0) + '%');
     // a rung whose era reaches back into an 'away' window (socket
     // dropped or page closed) covers time chat wasn't logging - but a
     // sliver left over a quick reload shouldn't dim the ladder, so the
@@ -11372,7 +11377,7 @@
     // marches stagger instead of beating in lockstep
     let sqN = 0;
     const sqOf = (mk, soon) => {
-      const dl = ` style="animation-delay:${(-(sqN++ % 7) * 0.34).toFixed(2)}s"`;
+      const dl = ` style="animation-delay:${(-(sqN++ % 7) * 0.34).toFixed(2)}s; --agep:${mk.p}"`;
       // 'soon' = a rung no used emote has reached yet (tripped by the
       // never-used tail or flushed at the list's end) - the violet
       // marks a time still to happen rather than a crossed boundary
