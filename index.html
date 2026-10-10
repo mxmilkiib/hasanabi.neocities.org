@@ -165,6 +165,8 @@
   /* murk sits between dark (.25) and deep (.12) but keeps its own id so
      saved shade=8/9 still mean deep/black; the cycle orders by position */
   :root[data-shade="10"] { --sh-bg: .18; --sh-tx: .96; }
+  /* twilight slots between dusk (.40) and dark (.25) the same way */
+  :root[data-shade="11"] { --sh-bg: .32; --sh-tx: .945; }
   @media (prefers-color-scheme: light) {
     :root:not([data-shade]) { --popline: rgba(0, 0, 0, .30); }
   }
@@ -1547,7 +1549,7 @@
     margin-left: 4px; font: 700 11px/14px -apple-system, "Segoe UI", Arial, sans-serif;
     --gh-tx: #24292f; --gh-top: #fcfcfc; --gh-bot: #eee; --gh-hbg: linear-gradient(#eee, #ddd);
     --gh-ln: #d5d5d5; --gh-hln: #ccc; --gh-bub: #fafafa; --gh-bln: #d4d4d4; --gh-hv: #0366d6; }
-  :root:is(:not([data-shade]), [data-shade="4"], [data-shade="5"], [data-shade="6"], [data-shade="7"], [data-shade="8"], [data-shade="9"], [data-shade="10"]) #helpPanel .ghbtn {
+  :root:is(:not([data-shade]), [data-shade="4"], [data-shade="5"], [data-shade="6"], [data-shade="7"], [data-shade="8"], [data-shade="9"], [data-shade="10"], [data-shade="11"]) #helpPanel .ghbtn {
     --gh-tx: #c9d1d9; --gh-top: #2d333b; --gh-bot: #22272e; --gh-hbg: #30363d;
     --gh-ln: #444c56; --gh-hln: #768390; --gh-bub: #22272e; --gh-bln: #444c56; --gh-hv: #58a6ff; }
   @media (prefers-color-scheme: light) {
@@ -5122,11 +5124,11 @@
   }
 
   // shade stops by id, lightest → darkest; null follows the system. ids
-  // are stable - murk (10) slots between dark and deep in the cycle
-  // order without renumbering saved shade= prefs or urls
-  const SHADE_NAMES = ['white', 'lightest', 'light', 'pale', 'mid', 'dim', 'dusk', 'dark', 'deep', 'black', 'murk'];
-  const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●', '●', '●'];
-  const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 7, 10, 8, 9];
+  // are stable - murk (10) and twilight (11) slot mid-cycle in the order
+  // without renumbering saved shade= prefs or urls
+  const SHADE_NAMES = ['white', 'lightest', 'light', 'pale', 'mid', 'dim', 'dusk', 'dark', 'deep', 'black', 'murk', 'twilight'];
+  const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●', '●', '●', '●'];
+  const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 11, 7, 10, 8, 9];
   // default option indices - the controls, the copy-url diffing and the
   // 'default' preset all read from here
   const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4 };
@@ -12132,7 +12134,7 @@
       // bare numbers space-join like the chat size row; wordy options keep ' / '
       .join(cls === 'helpHfs' || cls === 'helpFs' ? ' ' : ' / ');
   // shade chips list in cycle order but carry their stable ids, so murk
-  // shows between dark and deep while answering as shade 10
+  // and twilight show mid-cycle while answering as shades 10 and 11
   document.getElementById('helpShadeList').innerHTML = SHADE_ORDER.map((i) =>
     `<a href="#" role="button" class="helpOpt helpShade" data-idx="${i}"><span class="chipName">${SHADE_NAMES[i]}</span></a>`).join(' / ');
   document.getElementById('helpPresetList').innerHTML = Object.keys(THEME_PRESETS).map((n) =>
