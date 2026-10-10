@@ -1619,7 +1619,7 @@
      with tighter tracking to match the annotation face */
   #helpPanel .linkcols > i > a.ml { font-weight: var(--linkw, 400); }
   #helpPanel .st-row .nm a { font-weight: var(--linkw, 400); }
-  #helpPanel .linkcols > i a.tl { font-weight: var(--chat-w, 400); letter-spacing: -0.05em; }
+  #helpPanel a.tl { font-weight: var(--chat-w, 400); letter-spacing: -0.05em; }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run longest (name + work + dates + tagline), so
      the widest columns there */
@@ -11744,7 +11744,7 @@
         const p = t.parentElement;
         // link/label/sup text can't hold a descriptor; an i nested in an i
         // or the authors' aw/ad/ag spans already carry the small note face
-        if (p.closest('a,b,sup,.aw,.ad,.ag,.am')) continue;
+        if (p.closest('a,b,sup,.aw,.ad,.ag,.am,.bw')) continue;
         if (p.tagName === 'I' && p.parentElement.closest('i')) continue;
         texts.push(t);
       }
@@ -11759,7 +11759,11 @@
         r.setStart(open.n, open.off);
         r.setEnd(n, to + 1);
         const inner = document.createElement('i');
+        // .bw marks the wrap so later passes don't re-wrap it into a
+        // double-shrunk face; its links take the tl descriptor face
+        inner.className = 'bw';
         try { r.surroundContents(inner); wrapped = true; } catch {}
+        inner.querySelectorAll('a').forEach((a) => a.classList.add('tl'));
         break;
       }
       if (!wrapped) break;
