@@ -4128,8 +4128,8 @@
       if (kind === 'PRIVMSG' && !local && auth && login === auth.login) {
         const ek = ch + '\x00' + echoKey(login, tags, rawMsg);
         const arr = echoRows.get(ek);
-        // a paged-out ghost still adopts - the message chronologically
-        // belongs on its page, faded or not
+        // a paged-out row still adopts - the message chronologically
+        // belongs on its page, archived or not
         while (arr && arr.length && !arr[0].isConnected) arr.shift();
         const el = arr && arr[0];
         if (el) {
@@ -4146,7 +4146,7 @@
         }
         if (arr && !arr.length) echoRows.delete(ek);
         // echoKeys outlives the row map - a known send whose echo is gone
-        // (consumed ghost, trimmed) drops the copy instead of replaying it
+        // (scrollback-trimmed away) drops the copy instead of replaying it
         if (echoKeys.has(ek)) continue;
       }
       // a reply's quote block renders as its own line above the message, so
@@ -4175,8 +4175,8 @@
     const tpl = document.createElement('template');
     tpl.innerHTML = html;
     const newRows = tpl.content.querySelectorAll('.row[data-new]');
-    // ghosts sit above the live tail in dom order, so a plain append
-    // lands after them in the right spot either way
+    // the archive sits above the live tail in dom order, so a plain
+    // append lands after it in the right spot either way
     activeEl.append(tpl.content);
     dedupeLinks(newRows);
     if (whisHtml) {
@@ -9042,8 +9042,8 @@
   // Runs the flip for the whole column set. Normal mode moves the rows
   // hanging past the active page's fold onto a fresh page in the next
   // column; rev keeps the first column live and drains each column's
-  // below-fold tail into the next, the last one keeping its spill as
-  // ghosts until the scrollback trim
+  // below-fold tail into the next, the last one keeping its spill
+  // until the scrollback trim
   function flipCols() {
     if (revFlow) {
       const cs = cols();
@@ -9091,7 +9091,7 @@
   function pushOverflow(from, to) {
     // the flipped column keeps its newest page at the top; rows past
     // the page's bottom fold are its oldest, dom-first, and head onward.
-    // stale stragglers and the last column's spill stay put as ghosts.
+    // stale stragglers and the last column's spill stay put.
     // rects because the flipped axis gives rows negative offsetTops, and
     // the fold is measured from the content's top edge, not the viewport
     const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
@@ -10767,8 +10767,9 @@
   // pending rebuild lands on pointer-leave, and user-made changes
   // (sort, filters, search, tabs) still rebuild at once
   const EPICK_HOLD_KEY = 'hasan-epickhold';
-  // 0 off · 1 hold · 2 hold + still - the top leg lights stills on top of
-  // the saved anim filter, but only while the hold is engaged
+  // 0 off · 1 hold · 2 hold + pause - the top leg borrows the pause
+  // freeze on top of the saved anim filter, but only while the hold is
+  // engaged; pausing off by hand demotes it back to plain hold
   let epickHold = 1;
   try { const v = localStorage.getItem(EPICK_HOLD_KEY); if (v === '0' || v === '2') epickHold = +v; } catch {}
   let gridHeld = false, heldRebuild = false;
