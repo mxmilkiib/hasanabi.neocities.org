@@ -1026,7 +1026,7 @@
   body.overlay, body.overlay main { background: transparent; }
   body.overlay header, body.overlay #chatbar, body.overlay #vid,
   body.overlay #helpPanel, body.overlay #whis, body.overlay #findbar,
-  body.overlay .jdown, body.overlay #offBar, body.overlay #titleBar, body.overlay #hint,
+  body.overlay .jdown, body.overlay #offBar, body.overlay #updateBar, body.overlay #titleBar, body.overlay #hint,
   body.overlay #emotePick, body.overlay #peek, body.overlay #epop,
   body.overlay #tt { display: none !important; }
   body.overlay main { height: 100vh; }
@@ -1376,6 +1376,13 @@
   .gifimg { max-height: 9em; max-width: 100%; vertical-align: middle; border-radius: 3px; }
   #offBar { flex: none; text-align: center; padding: 3px 8px; font-size: .9em; background: var(--danger); color: #fff; }
   #offBar[hidden] { display: none; }
+  /* deploy notice: accent strip under the header, buttons inked in the
+     page colour so they read on the accent ground */
+  #updateBar { flex: none; display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: .9em; background: var(--accent); color: var(--bg); position: relative; }
+  #updateBar[hidden] { display: none; }
+  #updateTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+  #updateBar .hdr-btn { flex: none; width: auto; height: 22px; padding: 0 7px; font-size: .92em; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 55%, transparent); }
+  #updateBar .hdr-btn:hover { color: var(--bg); background: color-mix(in srgb, var(--bg) 18%, transparent); }
   /* boot/sync strip under the header: narrates the load phases as the
      empty-state bar does, then returns to flag resyncs after a drop or
      wake; the fill stretches the strip so progress reads at a glance */
@@ -2283,6 +2290,7 @@
     </div>
     </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" role="status" hidden>you're offline - chat is paused and will catch up when the connection returns</div>
+  <div id="updateBar" role="status" hidden><span id="updateTxt">site updated - reload for the latest version</span><button class="hdr-btn" id="updateGo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
@@ -12173,6 +12181,33 @@
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };
   addEventListener('online', netPaint); addEventListener('offline', netPaint); netPaint();
+  // update watch: a HEAD on the page every 5min and on tab-focus compares
+  // the served last-modified against the copy this page loaded from - a
+  // newer stamp means a deploy landed. dismiss snoozes that stamp only,
+  // so the next deploy flags again
+  const updateBar = document.getElementById('updateBar');
+  let docStamp = Date.parse(document.lastModified) || 0, updateSeen = 0;
+  async function updateCheck() {
+    if (!updateBar.hidden) return;
+    try {
+      const r = await fetch('/', { method: 'HEAD', cache: 'no-store' });
+      const lm = Date.parse(r.headers.get('last-modified') || '');
+      if (!lm) return;
+      if (!docStamp) docStamp = lm;
+      else if (lm > docStamp && lm !== updateSeen) { updateSeen = lm; updateBar.hidden = false; }
+    } catch {}
+  }
+  setInterval(() => { if (!document.hidden) updateCheck(); }, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) updateCheck(); });
+  updateCheck();
+  // the shell worker is network-first so a bare reload lands the deploy;
+  // the ?_=ts also shakes any http-cached copy of the document
+  document.getElementById('updateGo').addEventListener('click', () => {
+    const u = new URL(location.href);
+    u.searchParams.set('_', Date.now());
+    location.href = u.toString();
+  });
+  document.getElementById('updateX').addEventListener('click', () => { updateBar.hidden = true; });
   // header controls are glyph-only: mirror each title into an aria-label so
   // screen readers announce them, and keep it in step as titles change
   const ariaSync = (el) => {
