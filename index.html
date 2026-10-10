@@ -8980,14 +8980,16 @@
     // flips it straight back - the same run shuttling between columns
     let keep = 0, hSum = 0;
     while (keep < moveTail.length && hSum < to.clientHeight) hSum += heights[keep++];
-    const spill = moveTail.splice(keep);
+    moveTail.splice(keep); // the rest stays in `from` and ghosts with it
     for (const r of to.children) r.classList.add('stale');
     const frag = document.createDocumentFragment();
     for (let i = moveTail.length - 1; i >= 0; i--) frag.appendChild(moveTail[i]);
-    for (const r of spill) r.classList.add('stale');
     // appended after `to`'s ghosts so the column stays chronological -
-    // older faded rows above, live rows below
+    // older faded rows above, live rows below. `from` is done being live:
+    // if the page it kept stayed live it would count against its fold
+    // forever and bounce every later arrival straight back
     to.appendChild(frag);
+    for (const r of from.children) r.classList.add('stale');
     ghostFade(to);
     return moved;
   }
