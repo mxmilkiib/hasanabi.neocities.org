@@ -513,6 +513,9 @@
   #peek .psite { color: var(--accent); font-weight: 600; font-size: .78em; }
   #peek .ptitle { font-weight: 600; margin: 2px 0; overflow-wrap: anywhere; }
   #peek .pico { width: .85em; height: .85em; margin: 0 .35em -.1em 0; border-radius: 2px; display: inline-block; max-height: none; }
+  /* a peek's profile icon (tweet author) wears the round avi cut the
+     inline tweet cards use */
+  #peek .pavi { width: 1.5em; height: 1.5em; margin: 0 .35em -.35em 0; border-radius: 50%; object-fit: cover; }
   #peek .pmeta { color: var(--text-dim); font-size: .78em; }
   #peek .pto { color: var(--accent); font-size: .78em; overflow-wrap: anywhere; }
   /* a plain block so the body text wraps under the floated image's edge;
@@ -12483,6 +12486,7 @@
       title: s('title'), description: s('description'), site: s('site'),
       image: /^https:\/\//.test(s('image')) ? s('image') : '',
       icon: /^https:\/\//.test(s('icon')) ? s('icon') : '',
+      picon: /^https:\/\//.test(s('picon')) ? s('picon') : '',
       color: /^#[0-9a-f]{3,8}$/i.test(s('color')) ? s('color') : '',
       author: s('author').slice(0, 80),
       published: /^\d{4}-\d\d-\d\d$/.test(s('published')) ? s('published') : '',
@@ -12519,7 +12523,7 @@
   const twPeek = (c, id) => c ? {
     title: c.author ? '@' + c.author : '', description: (c.text || '').slice(0, 300),
     author: c.author || '', published: c.ts ? new Date(c.ts).toISOString().slice(0, 10) : '',
-    image: c.photo || c.avatar || '', video: c.video || '', icon: c.avatar || '',
+    image: c.photo || c.avatar || '', video: c.video || '', picon: c.avatar || '',
     url: 'https://x.com/i/status/' + id,
   } : null;
   function peekAsk(url) {
@@ -12610,6 +12614,14 @@
     if (p && p.title) {
       const t = document.createElement('div');
       t.className = 'ptitle'; t.textContent = p.title;
+      if (p.picon && peekMode >= 2) {
+        const av = document.createElement('img');
+        av.className = 'pavi'; av.alt = '';
+        av.referrerPolicy = 'no-referrer';
+        av.addEventListener('error', () => av.remove());
+        av.src = p.picon;
+        t.prepend(av);
+      }
       peekEl.appendChild(t);
     }
     const by = p && [p.author && 'by ' + p.author, p.views, p.published && peekAge(p.published)].filter(Boolean).join(' · ');
@@ -12665,7 +12677,7 @@
         // a tweet peek stored before cards carried the avatar icon
         // (the key absent, not merely empty) refetches quietly - the
         // fresh answer swaps in through peekGot
-        try { if (e.p && !('icon' in e.p) && twStatusOf(new URL(url))) peekAsk(url); } catch {}
+        try { if (e.p && (!('icon' in e.p) || !('picon' in e.p)) && twStatusOf(new URL(url))) peekAsk(url); } catch {}
         return;
       }
       peekShow(null, url, peekAsk(url));
