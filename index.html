@@ -2141,7 +2141,7 @@
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">conf/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
     <div class="wide"><span>width: <span id="helpWList"></span><span id="helpWCur"></span></span></div>
-    <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span></div>
+    <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span> · <span>position: <span id="helpPosList"></span><sup>†</sup></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
@@ -5135,7 +5135,7 @@
   const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 11, 7, 10, 8, 9];
   // default option indices - the controls, the copy-url diffing and the
   // 'default' preset all read from here
-  const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4 };
+  const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4, hpos: 4 };
   let shadeIdx = DEF.shade;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
@@ -5242,7 +5242,8 @@
       applyPreset(a.dataset.preset); saveOpts();
     }
     else if (a.classList.contains('helpHelp')) { helpForced = !helpPanel.hidden; helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
-    else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; helpPanel.style.top = (headerEl.getBoundingClientRect().bottom + 4) + 'px'; applyHelpW(); const s = readHsize(); delete s.w; delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a width pick also docks the panel top-right
+    else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; applyHelpW(); const s = readHsize(); delete s.w; delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a width pick re-docks the panel to the position pref
+    else if (a.classList.contains('helpPos')) { helpPos = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; applyHelpPos(); const s = readHsize(); delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a position pick undoes a drag
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
     else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i <= 2 ? i - 3 : i === 3 ? -4 : i - 4; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
@@ -7378,7 +7379,7 @@
       eptabs: [...epickOn], epanim: [...epickAnimOn],
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
-      hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
+      hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos,
       lbls: lblsOn ? 1 : 0,
       split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4,
       rvid: vidRail,
@@ -7557,6 +7558,7 @@
       if (helpFs < -4) helpFs = -1; // a px no longer offered falls back to follow
       applyHelpFs();
     }
+    if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
     // late on purpose - after o.help's legacy modes feed it
     if (o.lbls !== undefined) setLbls(!!o.lbls);
   }
@@ -8407,6 +8409,11 @@
     helpWCur.textContent = '';
     clampHelpPanel();
   }
+  // popup dock: the unmoved panel rests on a 3x3 screen anchor (corners,
+  // mid-edges, centre). A drag takes over until a position or width chip
+  // re-docks it
+  let helpPos = DEF.hpos;
+  function applyHelpPos() { markHelp('helpPos', helpPos); clampHelpPanel(); }
   // the popup must never sit past a screen edge: its intended size (the
   // preset or a dragged px) goes inside a viewport-capped min() so a
   // smaller window shrinks it and a bigger one grows it back, and a
@@ -8420,17 +8427,20 @@
     const hpx = parseFloat(helpPanel.style.maxHeight.match(/[\d.]+/)?.[0] || helpPanel.style.height) || Math.round(innerHeight * .75);
     helpPanel.style.maxHeight = `min(${hpx}px, calc(100dvh - ${Math.round(top) + 8}px))`;
     const r = helpPanel.getBoundingClientRect();
-    // rail mode centers the panel until the user drags it - a set
-    // style.left is that drag's mark, so only the untouched one centers
-    const mid = !railEl.hidden && !helpPanel.style.left;
-    helpPanel.classList.toggle('hcenter', mid);
-    if (helpPanel.style.left) {
+    // a set style.left is a drag's mark - the untouched panel docks to the
+    // hpos grid cell via --hcx/top instead. The narrow-screen css pins the
+    // panel full-width, so hcenter (and the column half of the pick) is
+    // dropped there
+    const narrow = matchMedia('(max-width: 720px), (pointer: coarse) and (max-width: 1080px)').matches;
+    const free = !helpPanel.style.left;
+    helpPanel.classList.toggle('hcenter', free && !narrow);
+    if (!free) {
       helpPanel.style.left = Math.max(0, Math.min(innerWidth - r.width, r.left)) + 'px';
       helpPanel.style.top = Math.max(top, Math.min(innerHeight - r.height, r.top)) + 'px';
     } else {
-      if (mid) helpPanel.style.setProperty('--hcx', Math.max(0, (innerWidth - r.width) / 2) + 'px');
-      // an unmoved panel rests mid-screen, never above the header line
-      helpPanel.style.top = Math.max(top, Math.round((innerHeight - r.height) / 2)) + 'px';
+      const col = helpPos % 3, row = (helpPos / 3) | 0;
+      helpPanel.style.setProperty('--hcx', Math.max(0, [12, (innerWidth - r.width) / 2, innerWidth - r.width - 12][col]) + 'px');
+      helpPanel.style.top = Math.max(top, [top, (innerHeight - r.height) / 2, innerHeight - r.height - 8][row]) + 'px';
     }
   }
   // a dragged width isn't one of the stops - note it in brackets
@@ -8553,6 +8563,7 @@
     } catch {}
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs !== -1) q.set('hpfs', helpFs < 0 ? helpFs : HDR_SIZES[helpFs]);
+    if (helpPos !== DEF.hpos) q.set('hpos', helpPos);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
     if (lblsOn) q.set('lbls', '1');
     if (copyHelp) {
@@ -12118,6 +12129,7 @@
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const v = +q.get('hpfs'), i = v < 0 ? Math.max(Math.round(v), -4) : HDR_SIZES.indexOf(v); if (v < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
+    if (q.has('hpos')) { const i = +q.get('hpos'); if (i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
     if (q.has('lbls')) setLbls(flag('lbls'));
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
@@ -12152,6 +12164,7 @@
     helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
+    helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpFs: ['chat −3', 'chat −2', 'chat −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
@@ -12284,6 +12297,7 @@
   markHelp('helpNoLbl', lblsOn ? 1 : 0);
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
+  markHelp('helpPos', helpPos);
   markHfs();
   markHelpFs();
   markHelp('helpSelf', selfHl ? 1 : 0);
@@ -12443,7 +12457,7 @@
     });
   });
   // restore a dragged size once saved options and url params have settled;
-  // an explicit ?hpw= beats a stored width
+  // an explicit ?hpw= beats a stored width, ?hpos= a stored drag spot
   try {
     const hs = readHsize();
     const q2 = new URLSearchParams(location.search);
@@ -12456,7 +12470,7 @@
       else { markHelp('helpW', -1); markHelpW(hs.w); }
     }
     if (hs.h >= 120) { helpPanel.style.height = hs.h + 'px'; helpPanel.style.maxHeight = 'none'; }
-    if (hs.x != null) {
+    if (hs.x != null && !q2.has('hpos')) {
       helpPanel.style.left = hs.x + 'px'; helpPanel.style.top = hs.y + 'px';
       helpPanel.style.right = 'auto';
     }
