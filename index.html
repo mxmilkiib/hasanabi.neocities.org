@@ -7836,14 +7836,25 @@
     vidBtn.classList.toggle('stopped', !vidBox.hidden && !!vidPlayer && !playing && !live);
     vidBtn.classList.toggle('live', live);
   }
+  // a hidden player still decodes - pause it so 'off' frees the stream
+  // and its audio. the persist-poll skips while hidden, so a hide-forced
+  // pause never lands in the saved state; reshow resumes only if the
+  // hide itself was what paused it
+  let vidPausedByHide = false;
   function setVideo(on) {
     vidBox.hidden = !on;
+    if (on) {
+      loadPlayer();
+      if (vidPausedByHide) { vidPausedByHide = false; try { vidPlayer && vidPlayer.play(); } catch {} }
+    } else if (vidPlayer && !vidPlayer.isPaused()) {
+      vidPausedByHide = true;
+      try { vidPlayer.pause(); } catch {}
+    }
     vidBtn.classList.toggle('on', on);
     vidBtn.setAttribute('aria-expanded', String(!!on));
     vidBtn.title = `Stream video: ${on ? 'on' : 'off'}${railEl.hidden ? '' : ` · rail: ${vidRail}`} - click/scroll${railEl.hidden ? '' : ' cycles dock · float · off'}\nuse the pause button in the video to stop the stream`;
     markHelp('helpVideo', on ? 1 : 0);
-    if (on) loadPlayer();
-    else vidState();
+    if (!on) vidState();
   }
   // rail mode gives the video a third placement axis: docked in the
   // column, floated back over the chat at its saved geometry, or off
