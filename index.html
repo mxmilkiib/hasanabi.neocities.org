@@ -7680,6 +7680,10 @@
   // read back mute/volume so the last setting survives a reload. ----
   const VOL_KEY = 'hasan-vidvol';
   let vidPlayer = null;
+  // a saved 'unmuted' that autoplay couldn't honour stays armed until the
+  // first real gesture - otherwise the poll writes the forced mute back
+  // over the pref and every reload after starts quiet again
+  let vidWantSound = false;
   let vidRatio = 16 / 9; // replaces the css default once stats report the real resolution
   function loadPlayer() {
     if (loadPlayer.done) return;
@@ -7697,6 +7701,19 @@
         if (saved.v != null) vidPlayer.setVolume(saved.v);
         if (saved.m != null) vidPlayer.setMuted(saved.m);
         if (saved.p === false) vidPlayer.pause();
+        // an unmuted autoplay needs a real user gesture; setMuted above is
+        // ignored without one, so arm a wake for the first click or keypress
+        vidWantSound = saved.m === false && vidPlayer.getMuted();
+        if (vidWantSound) {
+          const wake = () => {
+            if (!vidWantSound || !vidPlayer) return;
+            if (saved.v != null) vidPlayer.setVolume(saved.v);
+            vidPlayer.setMuted(false);
+            if (!vidPlayer.getMuted()) vidWantSound = false;
+          };
+          document.addEventListener('pointerdown', wake);
+          document.addEventListener('keydown', wake);
+        }
         vidState();
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
@@ -7706,7 +7723,8 @@
         let last = '';
         setInterval(() => {          // poll + persist; the API emits no volume event
           vidState();
-          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: vidPlayer.getMuted(), p: !vidPlayer.isPaused() });
+          vidWantSound &&= vidPlayer.getMuted(); // unmuted by whatever path - disarm
+          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: vidWantSound ? false : vidPlayer.getMuted(), p: !vidPlayer.isPaused() });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}
