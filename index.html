@@ -9396,11 +9396,14 @@
   }, 10000);
 
   // A page can still miss live lines while suspended, so on wake it asks the
-  // relay for the backlog (recent-messages.robotty.de); rendered ids are skipped
-  function backfill() {
+  // relay for the backlog (recent-messages.robotty.de); rendered ids are skipped.
+  // loud narrates the sweep on the strip - the routine post-join passes stay
+  // quiet, since a banner for lines that were never missed reads as a
+  // phantom reconnect
+  function backfill(loud = true) {
     if (joined && relayFrame.contentWindow) {
       relayFrame.contentWindow.postMessage({ type: 'backfill' }, RELAY_ORIGIN);
-      syncShow('chat is syncing - recovering missed lines…');
+      if (loud) syncShow('chat is syncing - recovering missed lines…');
     }
   }
   document.addEventListener('visibilitychange', () => {
@@ -9420,7 +9423,7 @@
     if (!scheduled && queue.length) scheduleFlush();
     backfill();
   });
-  window.addEventListener('pageshow', backfill);
+  window.addEventListener('pageshow', () => backfill());
 
   // ---- read marker: a red line between the last-seen row and whatever
   // arrived while the page was inactive. Each blur/hide arms a fresh
@@ -11956,14 +11959,17 @@
       joined = d.state === 'connected';
       if (joined) wsCause = '';
       if (joined) {
+        // only a rejoin after a real outage narrates its backlog sweep -
+        // the same pass on a first join is just part of the boot
+        const wasDown = downAt > 0;
         if (downAt) {
           markAway(downAt, Date.now(), 'socket dropped');
           downAt = 0;
         }
-        clearInterval(joinTimer); backfill();
-        // robotty ingests on its own lag - a trailing pass catches lines
-        // (own sent messages) that missed the first snapshot
-        setTimeout(backfill, 45000);
+        clearInterval(joinTimer); backfill(wasDown);
+        // robotty ingests on its own lag - a silent trailing pass catches
+        // lines (own sent messages) that missed the first snapshot
+        setTimeout(() => backfill(false), 45000);
         // tweet previews requested before the socket was up wait for this
         tweetWait.forEach((id) =>
           relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN));
