@@ -622,7 +622,12 @@
     overflow-y: auto;
     padding: 8px 18px 2px 6px;
   }
-  main.split:not(.rev) .col.live::after { content: ''; display: block; height: 100vh; }
+  /* page-flip columns show only their current page: retired pages wait
+     hidden in #log's archive until the split folds back to one column.
+     No scrollbar either - a page never overflows, and a bar blinking in
+     for the instant before a flip reflowed every row */
+  main.split:not(.rev) .col > .stale { display: none; }
+  main.split:not(.rev) .col { scrollbar-width: none; }
   #side, #side2 { border-left: 1px solid var(--line); }
   /* split level 4's rail: a third column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
@@ -920,8 +925,6 @@
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
   .row.stale { opacity: .7; }
-  /* ghost rows near the fresh/ghost boundary fade hardest and ease off with
-     depth as a pixel-distance gradient - applied inline by ghostFade() */
   /* no separator above the first row of a column (the .empty placeholder
      is removed once rows land, so this matches in every column) */
   .col > .row:first-child { --rowline: transparent; }
@@ -3192,24 +3195,14 @@
   // is unchanged - only scroll geometry differs. The live edge reads as
   // a negative scrollTop, so all follow math routes through these two
   let revFlow = false;
-  // split columns carry blank slack below their last row (so a page can
-  // open at the top edge); the live end is the last row, not scrollHeight
-  const liveEnd = (col) => {
-    const l = col.lastElementChild;
-    return isSplit() && l ? l.getBoundingClientRect().bottom - col.getBoundingClientRect().top + col.scrollTop + 2 : col.scrollHeight;
-  };
   const liveDist = (col) => revFlow
     ? col.scrollTop + col.scrollHeight - col.clientHeight
-    : liveEnd(col) - col.scrollTop - col.clientHeight;
+    : col.scrollHeight - col.scrollTop - col.clientHeight;
   // the scroll event from a follow pin is programmatic, not a user scroll -
   // the peek card ignores it or every new row would drop an open preview
   let autoScrollAt = 0;
-  const liveTop = (col) => revFlow ? col.clientHeight - col.scrollHeight : liveEnd(col) - col.clientHeight;
-  const snapLive = (col) => {
-    autoScrollAt = performance.now();
-    // the live split column holds its page at the top edge - never pulled back down
-    col.scrollTop = !revFlow && isSplit() && col === activeEl ? Math.max(col.scrollTop, liveTop(col)) : liveTop(col);
-  };
+  // split pages anchor at their top edge; single-column flow at the bottom
+  const snapLive = (col) => { autoScrollAt = performance.now(); col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : isSplit() ? 0 : col.scrollHeight; };
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
   // mid → raw message text, so quoting a row uses the real text rather
@@ -3334,7 +3327,7 @@
     for (const c of document.querySelectorAll(`.jdc[data-for="${btn.id}"]`)) c.hidden = true;
     jumpingCols.add(col);
     setTimeout(() => jumpingCols.delete(col), 1500);
-    col.scrollTo({ top: revFlow ? -col.scrollHeight : Math.max(0, liveTop(col)), behavior: 'smooth' });
+    col.scrollTo({ top: revFlow ? -col.scrollHeight : col.scrollHeight, behavior: 'smooth' });
   }
   jdownLog.addEventListener('click', () => { stickBottom = true; jumpDown(logEl, jdownLog); });
   // the plain circles make the same jump as their column's counter pill
@@ -3376,10 +3369,11 @@
     resnapQueued = true;
     requestAnimationFrame(() => {
       resnapQueued = false;
-      // page-flip columns hold their page at the top edge; a late image
-      // growing a row must not slide the page up under the reader
+      // page-flip columns never scroll - a late image growing a row past
+      // the fold flips the spill on, or re-deals if it was an idle page
       if (isSplit() && !revFlow) {
-        for (const c of cols()) if (c !== activeEl && !pausedCols.has(c)) snapLive(c);
+        if (cols().some((c) => c !== activeEl && c.scrollHeight > c.clientHeight + 1)) deal();
+        else flipCols();
         return;
       }
       if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
@@ -3648,17 +3642,12 @@
   }
 
   // page-flip never trims by itself - bound the total across columns;
-  // the column after the active one holds the oldest rows (the last
-  // one in rev, where the cascade drains oldest-first)
+  // chronoRows lists the archive (oldest) first, then each live page
   function trimScrollback() {
-    const c = cols();
-    const i = c.indexOf(activeEl);
-    const pages = revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)];
-    let total = c.reduce((n, col) => n + col.children.length, 0);
-    while (total > MAX_MESSAGES) {
-      const oldest = pages.find((col) => col.firstElementChild);
-      if (!oldest) break;
-      const row = oldest.firstElementChild;
+    let total = cols().reduce((n, col) => n + col.children.length, 0);
+    if (total <= MAX_MESSAGES) return;
+    for (const row of chronoRows()) {
+      if (total <= MAX_MESSAGES) break;
       if (row.dataset.mid && rowById.get(row.dataset.mid) === row) rowById.delete(row.dataset.mid);
       row.remove();
       total--;
@@ -4241,10 +4230,7 @@
     }
     if (missed.length > 50) missed.splice(0, missed.length - 50);
     if (unfocused) updateMissedBadge();
-    if (isSplit()) {
-      flipCols();
-      for (const c of cols()) ghostFade(c);
-    }
+    if (isSplit()) flipCols();
     trimScrollback();
     // evicted rows leave their ids behind - drop only the disconnected
     if (rowById.size > MAX_MESSAGES + 1000)
@@ -6593,7 +6579,9 @@
     repinQ = true;
     queueMicrotask(() => {
       repinQ = false;
-      if (isSplit()) flipCols();
+      // a metric change re-sizes every row - split lays its pages out
+      // afresh, rev re-runs its drain, single column re-pins
+      if (isSplit()) { if (revFlow) flipCols(); else deal(); }
       else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       // font/metric changes move the name column in px - the reply quote
       // indents cached there go stale, so re-measure them. measure pass
@@ -6606,6 +6594,10 @@
       }
     });
   }
+  // the column box itself changing - window resize, chat-bar growth, the
+  // rail docking - refits every page. the observer fires after layout
+  // but before paint, so a re-deal never shows a one-frame spill
+  new ResizeObserver(() => repin()).observe(logEl);
 
   // the row's line box and negative margin, resolved to whole pixels:
   // a fractional line-height (e.g. 1.65 * 14px = 23.1px) puts every row
@@ -8237,13 +8229,16 @@
 
   // ---- reversed flow: newest rows at the top of each column ----
   function setRev(on) {
+    // page markers are bookkeeping for the current flow - fold every
+    // page back into #log (reading the old flow's order), then deal
+    // fresh under the new one
+    mergeCols();
     revFlow = on;
     mainEl.classList.toggle('rev', on);
-    // ghost markers straddling the flip would sit mid-column - drop the
-    // marker and let the rows stand as ordinary content
-    for (const col of [logEl, sideEl, side2El])
-      for (const r of col.querySelectorAll('.row.stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
-    if (isSplit()) { activeEl = logEl; flipCols(); }
+    if (isSplit()) {
+      if (on) flipCols(); // rev drains #log's tail into the next column
+      else deal();
+    }
     for (const col of [logEl, sideEl, side2El]) if (!col.hidden) snapLive(col);
     markHelp('helpFlow', on ? 1 : 0);
   }
@@ -8925,13 +8920,111 @@
 
 
 
-  // ---- split view: page-flip columns. New rows fill the active column;
-  // once a row drops below the fold the other column is cleared and becomes
-  // the target, flipping back and forth. Inactive column scrolls freely. ----
-  // Runs the flip for the whole column set. Normal mode rotates the live
-  // column to whichever page just received the spill; rev keeps the first
-  // column live and drains each column's below-fold tail into the next,
-  // the last one keeping its spill as ghosts until the scrollback trim
+  // ---- split view: page-flip columns. New rows fill the active column
+  // top to bottom; the row that would cross its fold starts a fresh page
+  // at the top of the next column, round and round. Each column holds
+  // exactly one page and never scrolls. The page a flip replaces retires
+  // into #log's archive - hidden while split, it's the scrollback that
+  // returns when the columns fold back into one. Pages retire oldest
+  // first, so the archive stays chronological on its own ----
+  // Every column's rows in chronological order. Normal flow: #log's
+  // archive, then each live page from the column after the active one
+  // round to the active one. Rev drains its oldest rows into the last
+  // column, so it reads last column first
+  function chronoRows() {
+    const c = cols();
+    if (revFlow) return [...c].reverse().flatMap((col) => [...col.children]);
+    const i = c.indexOf(activeEl);
+    const live = (col) => [...col.children].filter((r) => !r.classList.contains('stale'));
+    return [...logEl.querySelectorAll(':scope > .stale'),
+      ...[...c.slice(i + 1), ...c.slice(0, i + 1)].flatMap(live)];
+  }
+  // Folds every column back into #log in flow order, the archive rejoined
+  // as ordinary rows, #log live again
+  function mergeCols() {
+    const c = cols();
+    const i = c.indexOf(activeEl);
+    const order = revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)];
+    for (let k = 0; k < order.length; k++) {
+      const col = order[k];
+      // logEl's own tail re-append only matters when earlier columns'
+      // rows must land ahead of it - first in the sequence it's a no-op.
+      // its archive already sits ahead of every live page and stays put
+      if (k === 0 && col === logEl) continue;
+      const frag = document.createDocumentFragment();
+      for (const r of [...col.children]) if (revFlow || col !== logEl || !r.classList.contains('stale')) frag.appendChild(r);
+      logEl.appendChild(frag);
+    }
+    for (const r of logEl.querySelectorAll(':scope > .stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
+    activeEl = logEl;
+  }
+  // a column's content-box height and fold line, in viewport coordinates
+  // so they compare straight against row rects at any scroll offset
+  function pageBox(col) {
+    const st = getComputedStyle(col);
+    const room = col.clientHeight - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom);
+    return { room, fold: col.getBoundingClientRect().top + col.clientTop + col.clientHeight - parseFloat(st.paddingBottom) };
+  }
+  // A column's page leaves view: its rows turn stale and join the end of
+  // #log's archive, ahead of #log's own live page
+  function retire(col) {
+    const page = [...col.children].filter((r) => !r.classList.contains('stale'));
+    for (const r of page) r.classList.add('stale');
+    if (col === logEl) return;
+    const frag = document.createDocumentFragment();
+    frag.append(...page);
+    logEl.insertBefore(frag, [...logEl.children].find((r) => !r.classList.contains('stale')) || null);
+  }
+  // Lays the newest rows out one page per column - the oldest page in
+  // #log, the newest in the last column, which turns active. Rows older
+  // than those pages retire. Pages are cut from the tail by measured
+  // height, staged in a bordered side column: #log runs a hair wider,
+  // so rows measured there can only shrink where they land
+  function deal() {
+    const cs = cols();
+    const frag = document.createDocumentFragment();
+    for (const r of chronoRows()) if (!r.classList.contains('stale')) frag.appendChild(r);
+    cs[1].appendChild(frag);
+    const live = [...cs[1].children].filter((r) => !r.classList.contains('stale'));
+    const { room } = pageBox(cs[1]);
+    const pages = []; // newest first
+    let page = [], end = null, k = live.length - 1;
+    for (; k >= 0; k--) {
+      const r = live[k];
+      // a display:none row has no rect - it rides with the row after it
+      if (!rowCollapsed(r)) {
+        const rc = r.getBoundingClientRect();
+        if (end === null) end = rc.bottom;
+        else if (end - rc.top > room) {
+          pages.push(page);
+          if (pages.length === cs.length) break;
+          page = []; end = rc.bottom;
+        }
+      }
+      page.unshift(r);
+    }
+    if (k < 0 && page.length) pages.push(page);
+    for (let j = 0; j <= k; j++) live[j].classList.add('stale');
+    // retired rows join the end of #log's archive, ahead of its live page
+    const arch = document.createDocumentFragment();
+    arch.append(...live.slice(0, k + 1));
+    logEl.insertBefore(arch, [...logEl.children].find((r) => !r.classList.contains('stale')) || null);
+    pages.reverse(); // oldest first - pages[j] belongs in cs[j]
+    for (let j = 0; j < pages.length; j++) {
+      if (j === 1) continue; // already home in the staging column
+      const f = document.createDocumentFragment();
+      f.append(...pages[j]);
+      cs[j].appendChild(f);
+    }
+    activeEl = cs[Math.max(0, pages.length - 1)];
+    autoScrollAt = performance.now();
+    for (const c of cs) c.scrollTop = 0;
+  }
+  // Runs the flip for the whole column set. Normal mode moves the rows
+  // hanging past the active page's fold onto a fresh page in the next
+  // column; rev keeps the first column live and drains each column's
+  // below-fold tail into the next, the last one keeping its spill as
+  // ghosts until the scrollback trim
   function flipCols() {
     if (revFlow) {
       const cs = cols();
@@ -8941,115 +9034,55 @@
       for (const c of cs) if (!pausedCols.has(c)) repinCol(c);
       return;
     }
-    if (pushOverflow(activeEl, nextCol())) activeEl = nextCol();
-    markLive();
-  }
-  // Only the live column carries the blank slack that lets its page open at
-  // the top edge; a column leaving that role drops it and bottom-aligns its
-  // last page, so it never scrolls into blank space.
-  function markLive() {
-    for (const c of cols()) {
-      if (c === activeEl) c.classList.add('live');
-      else if (c.classList.contains('live')) {
-        const t = liveTop(c);
-        c.classList.remove('live');
-        autoScrollAt = performance.now();
-        c.scrollTop = t;
-      }
+    const from = activeEl, to = nextCol();
+    const live = [...from.children].filter((r) => !r.classList.contains('stale'));
+    const { fold } = pageBox(from);
+    // scanned off the tail until a row fits. the page's first row never
+    // moves - one taller than the column would only flip on forever
+    let k = live.length;
+    for (let j = live.length - 1; j > 0; j--) {
+      if (rowCollapsed(live[j])) continue;
+      if (live[j].getBoundingClientRect().bottom <= fold + 0.5) break;
+      k = j;
     }
-  }
-  // Moves rows below the fold of `from` to the bottom of `to`. The
-  // outgoing contents stay as faded ghosts - never deleted, they are the
-  // column's scrollback; the MAX_MESSAGES trim is the only thing that
-  // retires rows. The scan collects the moving run in one pass while
-  // nothing mutates - reading a row's offsetTop right after moving it
-  // forced a layout per row, which made a full-column deal quadratic.
-  function pushOverflow(from, to) {
-    if (revFlow) {
-      // the flipped column keeps its newest page at the top; rows past
-      // the page's bottom fold are its oldest, dom-first, and head onward.
-      // stale stragglers and the last column's spill stay put as ghosts.
-      // rects because the flipped axis gives rows negative offsetTops, and
-      // the fold is measured from the content's top edge, not the viewport
-      const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
-      const head = [];
-      for (let r = from.firstElementChild; r; r = r.nextElementSibling) {
-        if (r.getBoundingClientRect().top < fold) break;
-        head.push(r);
-      }
-      let moved = false;
-      const frag = to ? document.createDocumentFragment() : null;
-      for (const r of head) {
-        if (frag && !r.classList.contains('stale')) { frag.appendChild(r); moved = true; }
-      }
-      if (frag) to.appendChild(frag);
-      return moved;
-    }
-    // the fold is one clientHeight of LIVE rows: ghosts sit above the live
-    // tail as scrollback, so measuring offsets against the column's height
-    // reads every live row as below the fold and shuttles the same page
-    // between columns forever. live height is summed first, then the
-    // overflow is collected off the tail
-    let liveH = 0;
-    for (const r of from.children)
-      if (!r.classList.contains('stale') && !rowCollapsed(r)) liveH += r.offsetHeight;
-    const moveTail = [];
-    let moved = false, budget = liveH - from.clientHeight;
-    for (let r = from.lastElementChild; r && budget > 0; r = r.previousElementSibling) {
-      // ghosts are skipped by the deal but never dropped - they're the
-      // column's faded scrollback
-      if (r.classList.contains('stale')) continue;
-      // a display:none row reports no height - hidden rows ride along
-      // only once a visible row has started moving
-      if (rowCollapsed(r)) { if (!moved) continue; }
-      else budget -= r.offsetHeight;
-      moveTail.push(r); moved = true;
-    }
-    if (!moveTail.length) return false;
-    const heights = moveTail.map((r) => r.offsetHeight);
-    // `to` receives at most one page of live rows: the older part of an
-    // oversized spill stays in `from` as ghosts. Handing `to` a multi-page
-    // live block leaves its tail below the fold already, so the next flush
-    // flips it straight back - the same run shuttling between columns
-    let keep = 0, hSum = 0;
-    while (keep < moveTail.length && hSum < to.clientHeight) hSum += heights[keep++];
-    moveTail.splice(keep); // the rest stays in `from` and ghosts with it
-    for (const r of to.children) r.classList.add('stale');
+    if (k === live.length) return;
+    const moving = live.slice(k);
+    // a spill taller than a page (a backfill burst) would leave the new
+    // page overflowing too - lay the newest pages out afresh instead
+    const vis = moving.filter((r) => !rowCollapsed(r));
+    if (vis[vis.length - 1].getBoundingClientRect().bottom - vis[0].getBoundingClientRect().top > pageBox(to).room) return deal();
+    // lifted out before the retire, so an outgoing #log page only holds
+    // what stays on it when the next column's page lands ahead of it
     const frag = document.createDocumentFragment();
-    for (let i = moveTail.length - 1; i >= 0; i--) frag.appendChild(moveTail[i]);
-    // appended after `to`'s ghosts so the column stays chronological -
-    // older faded rows above, live rows below. `from` is done being live:
-    // if the page it kept stayed live it would count against its fold
-    // forever and bounce every later arrival straight back
+    frag.append(...moving);
+    retire(to);
     to.appendChild(frag);
-    for (const r of from.children) r.classList.add('stale');
-    ghostFade(to);
-    // the new page opens at the column's top edge, ghosts scrolled out
-    // above it; the column's ::after slack lets a short page sit there
     autoScrollAt = performance.now();
-    to.classList.add('live');
-    to.scrollTop += moveTail[moveTail.length - 1].getBoundingClientRect().top - to.getBoundingClientRect().top - 8;
-    return moved;
+    to.scrollTop = 0;
+    activeEl = to;
   }
-
-  // Ghost rows fade as a smooth gradient by pixel distance below the
-  // fresh/ghost boundary: the youngest scrollback reads faintest and the
-  // dimming eases off with depth rather than stepping.
-  const GHOST_LO = 0.35;  // boundary ghost, closest to live
-  const GHOST_HI = 0.7;   // resting ghost opacity (matches .row.stale)
-  const GHOST_RAMP = 260; // px below the boundary the fade eases over
-  // linear: the fade neither hugs the front nor leaps ahead - ghosts
-  // stay readable through the column and only dip near the boundary
-  const GHOST_CURVE = 1.0;
-  function ghostFade(col) {
-    const first = col.querySelector('.row.stale');
-    if (!first) return;
-    const top = first.offsetTop;
-    for (let r = first; r && r.classList.contains('stale'); r = r.nextElementSibling) {
-      const d = r.offsetTop - top;
-      r.style.opacity = d >= GHOST_RAMP ? '' :
-        (GHOST_LO + Math.pow(d / GHOST_RAMP, GHOST_CURVE) * (GHOST_HI - GHOST_LO)).toFixed(3);
+  // Rev's drain: moves rows below the fold of `from` onto `to`. The scan
+  // collects the moving run in one pass while nothing mutates - reading
+  // a row's position right after moving it forced a layout per row
+  function pushOverflow(from, to) {
+    // the flipped column keeps its newest page at the top; rows past
+    // the page's bottom fold are its oldest, dom-first, and head onward.
+    // stale stragglers and the last column's spill stay put as ghosts.
+    // rects because the flipped axis gives rows negative offsetTops, and
+    // the fold is measured from the content's top edge, not the viewport
+    const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
+    const head = [];
+    for (let r = from.firstElementChild; r; r = r.nextElementSibling) {
+      if (r.getBoundingClientRect().top < fold) break;
+      head.push(r);
     }
+    let moved = false;
+    const frag = to ? document.createDocumentFragment() : null;
+    for (const r of head) {
+      if (frag && !r.classList.contains('stale')) { frag.appendChild(r); moved = true; }
+    }
+    if (frag) to.appendChild(frag);
+    return moved;
   }
 
   // level 4's rail deals no rows - it re-parents the floating panels:
@@ -9134,27 +9167,12 @@
       if (railEl.hidden === (level !== 4)) return;
       railEl.hidden = level !== 4;
       dockRail(level === 4);
+      // the rail resizes the chat columns - refit the pages
+      repin();
       return;
     }
-    // merge every column back into logEl chronologically - the column after
-    // the active one in flip order holds the oldest page (the last column
-    // in rev's drain order) - then re-deal
-    const c = cols();
-    const i = c.indexOf(activeEl);
-    const order = revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)];
-    for (let k = 0; k < order.length; k++) {
-      const col = order[k];
-      // logEl's own tail re-append only matters when earlier columns'
-      // rows must land ahead of it - first in the sequence it's a no-op
-      if (k === 0 && col === logEl) continue;
-      const frag = document.createDocumentFragment();
-      for (const r of [...col.children]) frag.appendChild(r);
-      logEl.appendChild(frag);
-    }
-    // ghost markers are page-flip bookkeeping - rejoined or re-dealt rows
-    // must read as ordinary messages (like setRev does), or pushOverflow's
-    // ghost handling would skip them
-    for (const r of logEl.querySelectorAll('.row.stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
+    // every column folds back into #log in flow order, then re-deals
+    mergeCols();
     sideEl.hidden = level < 2;
     side2El.hidden = level !== 3;
     railEl.hidden = level !== 4;
@@ -9164,33 +9182,21 @@
     jdownSet(jdownSide2, side2El, true);
     dockRail(level === 4);
     if (level === 1) {
-      activeEl = logEl;
       // columns widen on rejoin - re-pin the live column if it was following
       requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); });
     } else if (revFlow) {
       // rev never rotates: the first column stays live, its spill page
       // lands in the next
-      activeEl = logEl;
       flipCols();
-    } else if (level === 2 || level === 4) {
-      if (cur === 3) { // three -> two: move logEl's below-fold page to #side
-        activeEl = logEl;
-        if (pushOverflow(logEl, sideEl)) activeEl = sideEl;
-      } else { sideEl.scrollTop = 0; activeEl = sideEl; }
-    } else { // level 3: #side gets #log's overflow page, the rest lands in #side2
-      pushOverflow(logEl, sideEl);
-      pushOverflow(sideEl, side2El);
-      side2El.scrollTop = 0;
-      activeEl = side2El;
+    } else {
+      // only with the columns unhidden do their widths - and so their
+      // page heights - exist to measure. all synchronous, so the first
+      // paint already sees the dealt pages
+      deal();
+      jdownSet(jdownLog, logEl);
+      jdownSet(jdownSide, sideEl);
+      jdownSet(jdownSide2, side2El, side2El.hidden);
     }
-    markLive();
-    // columns narrower than the merged one reflow taller, leaving saved
-    // scroll offsets mid-page - re-pin every non-active column at the edge
-    // opposite its page flow
-    // pinned synchronously too, so the first paint is already settled and
-    // the frame-later pass only has scrollbar-width reflow left to fix
-    const pinIdle = () => { for (const col of cols()) if (col !== activeEl) snapLive(col); };
-    if (level >= 2) { pinIdle(); requestAnimationFrame(pinIdle); }
   }
 
   function cycleSplit(dir) {
@@ -9211,26 +9217,18 @@
   let histDirty = false; // set when rows render or mutate
   function saveHistory() {
     try {
-      const c = cols();
-      const i = c.indexOf(activeEl);
-      // ghost rows are still real messages - keep them, but strip the
-      // stale marker and fade so they restore as ordinary rows (kept
-      // markers would corrupt the next session's ghost bookkeeping).
+      // archived pages are still real messages - keep them, but strip the
+      // stale marker so they restore as ordinary rows (kept markers would
+      // corrupt the next session's page bookkeeping).
       // local echoes save with their data-ek key so a real copy arriving
       // after restore adopts them.
-      const rows = [];
       const limit = Math.min(HISTORY_SAVE_MAX, MAX_MESSAGES);
-      for (const col of (revFlow ? c : [...c.slice(i + 1), ...c.slice(0, i + 1)].reverse())) {
-        for (let r = col.lastElementChild; r && rows.length < limit; r = r.previousElementSibling)
-          if (r.classList.contains('row')) rows.push(r);
-        if (rows.length >= limit) break;
-      }
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.reverse().map((r) => {
+      const rows = chronoRows().filter((r) => r.classList.contains('row')).slice(-limit);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.map((r) => {
         const media = r.querySelector('.ytcard, video, audio');
         if (!r.classList.contains('stale') && !media) return r.outerHTML;
         const cl = r.cloneNode(true);
         cl.classList.remove('stale');
-        cl.style.opacity = '';
         // a live media embed saved into history would autostart on the
         // next load without any click - drop yt iframes back to their
         // ▶ toggle and let saved <video> restore paused but playable
