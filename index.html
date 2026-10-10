@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<htmght  lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7764,6 +7764,10 @@
   // every reload after starts quiet
   let vidWakeSpent = false;
   let vidWakeTries = 0; // bounds in-flight unmute retries after an iframe-side play
+  // a delivered unmute must read clean twice in a row before it counts -
+  // one stale or optimistic getMuted must not close pending and stamp a
+  // forced mute into the record as deliberate
+  let vidClearTicks = 0;
   let vidRatio = 16 / 9; // replaces the css default once stats report the real resolution
   function loadPlayer() {
     if (loadPlayer.done) return;
@@ -7828,7 +7832,7 @@
         // console hook so the real state can be read back when the
         // unmute path misbehaves again: __vid() in devtools
         window.__vid = () => ({ saved, wantSound, wantPlay,
-          pend: wantSound && !vidWakeSpent, tries: vidWakeTries, spent: vidWakeSpent,
+          pend: wantSound && !vidWakeSpent, tries: vidWakeTries, clear: vidClearTicks, spent: vidWakeSpent,
           muted: vidPlayer.getMuted(), paused: vidPlayer.isPaused() });
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
@@ -7852,14 +7856,16 @@
             vidWakeTries++;
             if (saved.v != null) vidPlayer.setVolume(saved.v);
             vidPlayer.setMuted(false);
-            vidWakeSpent = !vidPlayer.getMuted();
           }
           // unmuted and playing by whatever path - player ui included -
           // counts as delivered; pending must end so a mute made after
           // lands in the record as deliberate. no give-up clause: the
           // tries cap already bounds the noise, and a mute the user
-          // never chose must never be stamped deliberate
-          if (pend && !vidPlayer.isPaused() && !vidPlayer.getMuted()) vidWakeSpent = true;
+          // never chose must never be stamped deliberate. two clean
+          // reads in a row confirm the delivery
+          if (pend && !vidPlayer.isPaused() && !vidPlayer.getMuted()) {
+            if (++vidClearTicks >= 2) vidWakeSpent = true;
+          } else vidClearTicks = 0;
           // paused waits on the first play gesture; playing-muted with
           // retries already burned means the calls aren't landing - show
           // the chip either way, hide it once delivery confirms
