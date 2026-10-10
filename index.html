@@ -2818,7 +2818,10 @@
     }, Math.max(GIF_GAP, gifPause - Date.now()));
   }
   function gifHtml(title, label) {
-    const q = title.replace(/\bGIF\b/gi, '').replace(/\s+/g, ' ').trim() || title;
+    // titles read "<name> GIF by <channel>" - giphy search wants the
+    // channel word but not the 'GIF by' connective ('by' alone can stay:
+    // 'stand by me' is a real title)
+    const q = title.replace(/\bGIF\s+by\s+/i, ' ').replace(/\bGIF\b/gi, ' ').replace(/\s+/g, ' ').trim() || title;
     let hit = gifCache.get(q);
     if (hit === undefined) {
       const s = gifStore[gifSk(q)];
