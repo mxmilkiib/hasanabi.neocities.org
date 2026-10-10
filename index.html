@@ -3376,6 +3376,9 @@
     resnapQueued = true;
     requestAnimationFrame(() => {
       resnapQueued = false;
+      // page-flip columns hold their page at the top edge; a late image
+      // growing a row must not slide the page up under the reader
+      if (isSplit() && !revFlow) return;
       if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
       if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
@@ -9932,9 +9935,11 @@
     chatInput.style.overflowY = chatInput.scrollHeight > chatInput.clientHeight ? 'auto' : 'hidden';
     // the taller bar shrinks the columns from below; keep a following
     // column pinned or the newest rows slide under it
+    if (!(isSplit() && !revFlow)) {
     if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
     if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
     if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
+    }
     paintLen();
   };
   // fossabot's long-message cutoff isn't public, so the warn rung is a
