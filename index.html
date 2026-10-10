@@ -5723,7 +5723,7 @@
         vs.map(([ver, v]) => {
           const n = bVerUseM.get(id + '/' + ver) || 0;
           return `<div class="st-brow"${v.d && v.d !== v.t ? tip(v.d) : ''}><img class="emote" src="${escapeHTML(v.u || '')}" alt="">` +
-            `<span class="bt">${escapeHTML(v.t || '')}</span>` +
+            `<span class="bt">${escapeHTML(id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` : (v.t || ''))}</span>` +
             (n ? `<i>${n.toLocaleString('en')}</i>` : '') + `</div>`;
         }).join('') +
         `</details>`;
@@ -5743,11 +5743,11 @@
       for (const [id, vers] of Object.entries(bInfo))
         for (const [ver, v] of Object.entries(vers)) {
           const n = bVerUseM.get(id + '/' + ver) || 0;
-          if (n) flat.push({ id, v, n });
+          if (n) flat.push({ id, ver, v, n });
         }
       flat.sort((a, b) => b.n - a.n || byName(a.id, b.id) || byName(a.v.t || '', b.v.t || ''));
       const bVis = statBadgeAll ? flat : flat.slice(0, 40);
-      badgeSets = bVis.map(({ id, v, n }, i) => {
+      badgeSets = bVis.map(({ id, ver, v, n }, i) => {
         // the everyday set names abbreviate in the ranked view; sub titles
         // drop their trailing 'Subscriber' ('3-Month Subscriber' reads
         // 'subbed · 3-Month'), and the dedup still checks the full word so
@@ -5764,7 +5764,8 @@
         // 'chat bot') is cut - the name alone is the label
         const nz = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
         if (vt && (nz(vt).startsWith(nz(raw)) || nz(vt).startsWith(nz(name)))) vt = '';
-        const label = vt && vt.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${vt}` : name;
+        const label = id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` :
+          vt && vt.toLowerCase() !== raw ? `${name}${inRail ? ' ' : ' · '}${vt}` : name;
         return `<div class="st-row"${v.d && v.d !== v.t ? ` title="${escapeHTML(v.d)}"` : ''}><span class="n">${i + 1}.</span>` +
           `<span class="ems"><img class="emote" src="${escapeHTML(v.u || '')}" alt=""></span>` +
           `<span class="nm">${escapeHTML(label)}</span>` +
