@@ -1360,7 +1360,8 @@
   .hdr-btn.shiny::after {
     content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
     transform: translateX(-140%) skewX(-20deg); pointer-events: none;
-    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--text) 45%, transparent), transparent);
+    background: linear-gradient(90deg, transparent,
+      #ff686899, #ffc45c99, #e1ee7299, #70dca399, #6ccbf299, #bc87ed99, transparent);
     animation: sheen-sweep 1.8s ease-in-out infinite;
   }
   /* most of the cycle holds the bar off-canvas so the sweep reads as an
