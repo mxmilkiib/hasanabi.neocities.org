@@ -5445,9 +5445,9 @@
   const RATE_WINS = { all: 0, '24h': 86400e3, '12h': 43200e3, '6h': 21600e3,
     '3h': 10800e3, '2h': 7200e3, '1h': 3600e3, '30m': 1800e3, '15m': 900e3 };
   const RATE_WIN_KEY = 'hasan-ratewin';
-  let rateWin = '3h';
-  try { rateWin = localStorage.getItem(RATE_WIN_KEY) || '3h'; } catch {}
-  if (!(rateWin in RATE_WINS)) rateWin = '3h';
+  let rateWin = '1h';
+  try { rateWin = localStorage.getItem(RATE_WIN_KEY) || '1h'; } catch {}
+  if (!(rateWin in RATE_WINS)) rateWin = '1h';
   // a window spec folds its bucket family into a key -> count map:
   // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
   const foldWin = (spec, dayBag, hourBag) => {
