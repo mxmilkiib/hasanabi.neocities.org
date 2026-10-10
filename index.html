@@ -7710,30 +7710,34 @@
     if (loadPlayer.done) return;
     loadPlayer.done = true;
     const saved = (() => { try { return JSON.parse(localStorage.getItem(VOL_KEY)) || {}; } catch { return {}; } })();
+    // only a w:3-stamped record is trusted as deliberate - anything older
+    // may be the forced muted/paused state a blocked autoplay left behind
+    const wantSound = saved.m !== true || saved.w !== 3;
+    const wantPlay = saved.p !== false || saved.w !== 3;
     const s = document.createElement('script');
     s.src = 'https://embed.twitch.tv/embed/v1.js';
     s.onload = () => {
       const emb = new Twitch.Embed('vidFrame', {
         channel: CHANNEL, width: '100%', height: '100%', layout: 'video',
-        parent: [location.hostname], muted: saved.m !== false, autoplay: saved.p !== false
+        parent: [location.hostname], muted: !wantSound, autoplay: wantPlay
       });
       emb.addEventListener(Twitch.Embed.VIDEO_READY, () => {
         vidPlayer = emb.getPlayer();
         if (saved.v != null) vidPlayer.setVolume(saved.v);
-        if (saved.m != null) vidPlayer.setMuted(saved.m);
-        if (saved.p === false) vidPlayer.pause();
+        vidPlayer.setMuted(!wantSound);
+        if (!wantPlay) vidPlayer.pause();
         // an unmuted autoplay needs a real user gesture; setMuted above is
         // ignored without one, so the first click or keypress finishes the
-        // job. only a w:2-stamped mute is trusted as deliberate - an older
-        // muted record may be the forced state a blocked unmute left behind
-        const wantSound = saved.m !== true || saved.w !== 2;
+        // job. the wake is spent only on a confirmed unmute - spending it
+        // on a failed attempt lets the poll write the forced mute back
+        // over the intent, which is how the record poisons itself
         if (wantSound) {
           const wake = () => {
-            if (vidWakeSpent || !vidPlayer) return;
-            vidWakeSpent = true;
+            if (vidWakeSpent || vidWakeTries >= 5 || !vidPlayer) return;
             if (saved.v != null) vidPlayer.setVolume(saved.v);
             vidPlayer.setMuted(false);
-            if (saved.p !== false && vidPlayer.isPaused()) vidPlayer.play();
+            if (wantPlay && vidPlayer.isPaused()) vidPlayer.play();
+            vidWakeSpent = !vidPlayer.getMuted();
           };
           document.addEventListener('pointerdown', wake);
           document.addEventListener('keydown', wake);
@@ -7771,9 +7775,11 @@
           }
           // unmuted and playing by whatever path - player ui included -
           // counts as delivered; pending must end so a mute made after
-          // lands in the record as deliberate
+          // lands in the record as deliberate. no give-up clause: the
+          // tries cap already bounds the noise, and a mute the user
+          // never chose must never be stamped deliberate
           if (pend && !vidPlayer.isPaused() && !vidPlayer.getMuted()) vidWakeSpent = true;
-          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: pend ? false : vidPlayer.getMuted(), p: pend && saved.p !== false ? true : !vidPlayer.isPaused(), w: 2 });
+          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: pend ? false : vidPlayer.getMuted(), p: pend && wantPlay ? true : !vidPlayer.isPaused(), w: 3 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}
