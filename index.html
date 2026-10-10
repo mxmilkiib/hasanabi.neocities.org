@@ -3372,11 +3372,7 @@
       resnapQueued = false;
       // page-flip columns never scroll - a late image growing a row past
       // the fold flips the spill on, or re-deals if it was an idle page
-      if (isSplit() && !revFlow) {
-        if (cols().some((c) => c !== activeEl && c.scrollHeight > c.clientHeight + 1)) deal();
-        else flipCols();
-        return;
-      }
+      if (isSplit() && !revFlow) { refitPages(); return; }
       if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
       if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
@@ -6580,9 +6576,11 @@
     repinQ = true;
     queueMicrotask(() => {
       repinQ = false;
-      // a metric change re-sizes every row - split lays its pages out
-      // afresh, rev re-runs its drain, single column re-pins
-      if (isSplit()) { if (revFlow) flipCols(); else deal(); }
+      // a metric change re-sizes every row - rev re-runs its drain and a
+      // single column re-pins; split only re-deals when a page actually
+      // outgrew its column - re-cutting on every wobble shuffled whole
+      // pages sideways and read as a second backfill landing late
+      if (isSplit()) { if (revFlow) flipCols(); else refitPages(); }
       else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       // font/metric changes move the name column in px - the reply quote
       // indents cached there go stale, so re-measure them. measure pass
@@ -9065,6 +9063,11 @@
     to.scrollTop = 0;
     activeEl = to;
   }
+  // After a reflow (font swap, resize, a late image): an idle page that
+  // outgrew its column re-deals, otherwise the live column's own spill
+  // just flips on - nothing else moves rows
+  const refitPages = () =>
+    cols().some((c) => c !== activeEl && c.scrollHeight > c.clientHeight + 1) ? deal() : flipCols();
   // Rev's drain: moves rows below the fold of `from` onto `to`. The scan
   // collects the moving run in one pass while nothing mutates - reading
   // a row's position right after moving it forced a layout per row
