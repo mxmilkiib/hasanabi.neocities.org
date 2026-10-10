@@ -1145,7 +1145,7 @@
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
-  #statsBody #stRate { display: block; width: 100%; height: 64px; }
+  #statsBody #stRate { display: block; width: 100%; height: 100px; }
   #statsBody .st-badge { break-inside: avoid; }
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
@@ -5457,9 +5457,20 @@
   const RATE_WINS = { all: 0, '24h': 86400e3, '12h': 43200e3, '6h': 21600e3,
     '3h': 10800e3, '2h': 7200e3, '1h': 3600e3, '30m': 1800e3, '15m': 900e3 };
   const RATE_WIN_KEY = 'hasan-ratewin';
-  let rateWin = '1h';
-  try { rateWin = localStorage.getItem(RATE_WIN_KEY) || '1h'; } catch {}
-  if (!(rateWin in RATE_WINS)) rateWin = '1h';
+  // untouched, the span auto-steps: it starts at 15m and climbs a rung
+  // whenever the recorded history outgrows it, settling at 3h - a manual
+  // pick saves the pref and the stepping never engages again
+  let rateWin = '3h', rateWinAuto = true;
+  try {
+    const v = localStorage.getItem(RATE_WIN_KEY);
+    if (v && v in RATE_WINS) { rateWin = v; rateWinAuto = false; }
+  } catch {}
+  const rateWinEff = () => {
+    if (!rateWinAuto) return rateWin;
+    const t1 = rateHistT[rateHistT.length - 1] || Date.now();
+    const hist = t1 - (rateHistT[0] || t1);
+    return ['15m', '30m', '1h', '2h', '3h'].find((r) => hist <= RATE_WINS[r]) || '3h';
+  };
   // a window spec folds its bucket family into a key -> count map:
   // {h: n} sums the last n hours, {d: n} sums n calendar days incl today
   const foldWin = (spec, dayBag, hourBag) => {
@@ -5822,8 +5833,9 @@
     const linkWinBtns = (inRail ? RAIL_WINS : Object.keys(LINK_WINS))
       .map((s) => `<button type="button" class="st-s${linkWin === s ? ' on' : ''}" data-lwin="${s}" title="${linkWinTips[s]}">${s}</button>`)
       .join('');
+    const rwe = rateWinEff();
     const rateWinBtns = Object.keys(RATE_WINS)
-      .map((s) => `<button type="button" class="st-s${rateWin === s ? ' on' : ''}" data-rwin="${s}" title="graph span${s === 'all' ? ' - whole recorded session' : ' - trailing ' + s}">${s}</button>`)
+      .map((s) => `<button type="button" class="st-s${rwe === s ? ' on' : ''}" data-rwin="${s}" title="graph span${s === 'all' ? ' - whole recorded session' : ' - trailing ' + s}">${s}</button>`)
       .join('');
     const total = [...nMsgs.values()].reduce((a, b) => a + b, 0);
     const pvCh = sc || Object.keys(peakViewers).reduce((a, b) => (peakViewers[b] > (peakViewers[a] || 0) ? b : a), null);
@@ -5982,7 +5994,7 @@
       return;
     }
     const dpr = window.devicePixelRatio || 1;
-    const H = 64;
+    const H = 100;
     const wCss = Math.max(80, cv.clientWidth || 220);
     cv.width = Math.round(wCss * dpr);
     cv.height = Math.round(H * dpr);
@@ -5991,7 +6003,8 @@
     const t1 = rateHistT[rateHistT.length - 1] || Date.now();
     let t0 = rateHistT[Math.max(0, off)] || t1;
     // the span picker zooms to a trailing window; 'all' keeps the tail
-    const rWin = RATE_WINS[rateWin] || 0;
+    const rwe = rateWinEff();
+    const rWin = RATE_WINS[rwe] || 0;
     if (rWin && t1 - rWin > t0) t0 = t1 - rWin;
     const span = Math.max(30000, t1 - t0);
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
@@ -6020,14 +6033,18 @@
     }
     let peak = 0;
     for (let i = 0; i < N; i++) if (bmax[i] > peak) peak = bmax[i];
-    // time scaffolding: a fine rung gets a top-edge tick, and a boundary
-    // stamps HH:MM when there's room for it
+    // time scaffolding: alternate clock-aligned blocks shade darker so a
+    // long span reads as countable stretches; a finer rung gets a tick,
+    // and a boundary stamps HH:MM when there's room for it
     const txtDim = (getComputedStyle(document.documentElement).getPropertyValue('--text-dim') || '#888').trim();
     const txtInk = (getComputedStyle(document.documentElement).getPropertyValue('--text') || txtDim).trim();
     const RUNGS = [60e3, 300e3, 600e3, 900e3, 1800e3, 3600e3, 7200e3, 10800e3,
       21600e3, 43200e3, 86400e3];
     const tickInt = RUNGS.find((r) => r / span * wCss >= 4) || 3600e3;
     const blockInt = RUNGS.find((r) => r / span * wCss >= 40) || 3600e3;
+    g.fillStyle = 'rgba(0,0,0,.10)';
+    for (let b = Math.ceil(t0 / blockInt); b * blockInt < t1; b++)
+      if (b % 2) g.fillRect((b * blockInt - t0) / span * wCss, 0, blockInt / span * wCss, H);
     if (sparkCols) {
       g.globalAlpha = .22;
       for (let i = 0; i < N; i++) if (bwhy[i]) {
@@ -6088,7 +6105,7 @@
     g.globalAlpha = 1;
     const mins = Math.round((t1 - t0) / 60000);
     const dur = mins >= 60 ? `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}m` : `${mins}m`;
-    cv.title = `msgs/sec - ${rWin ? `trailing ${rateWin}` : 'recorded session'} · ${dur} span`;
+    cv.title = `msgs/sec - ${rWin ? `trailing ${rwe}` : 'recorded session'} · ${dur} span`;
     cv.setAttribute('aria-label', cv.title);
     // hovering reads the bin under the pointer: its time, the pooled
     // msgs/s, and why a dead stretch shows no samples
@@ -6183,6 +6200,7 @@
     const rw = e.target.closest('.st-s[data-rwin]');
     if (rw) {
       rateWin = rw.dataset.rwin;
+      rateWinAuto = false;
       try { localStorage.setItem(RATE_WIN_KEY, rateWin); } catch {}
       renderStats();
       return;
