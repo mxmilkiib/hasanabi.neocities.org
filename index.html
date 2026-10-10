@@ -1911,7 +1911,7 @@
   #emotePick .esort.on { opacity: 1; background: var(--line); color: var(--text); }
   /* the seen-only leg of the use sort marks itself with a dotted
      underline, echoing the anim chip's dashed frozen leg */
-  #emotePick .esort.seen { text-decoration: underline dotted var(--accent); text-underline-offset: 3px; }
+  #emotePick .esort.seen { text-decoration: underline dotted color-mix(in oklch, var(--accent), var(--text) 40%); text-underline-offset: 3px; }
   #emotePick .esort:disabled { opacity: .25; cursor: default; }
   /* agerows: an age square trails the row of the newer era it closes;
      the first cell past it opens the next row, so the ladder reads as
