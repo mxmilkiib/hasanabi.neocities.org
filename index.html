@@ -11596,13 +11596,14 @@
         }
         if (!twSets.length && !q) h += head('twitch - loading…');
       }
-      // a-z parks emoji at the tail in list order (hands first, then the
-      // traditional groups); under use they join the ladder - a stamped
-      // emoji floats up by recency like any other cell
+      // emoji always park at the tail of the merged grid - a-z keeps
+      // list order, use runs the block freshest-first; the age ladder
+      // stays an emote thing
       const ejs = [];
       if (groupOn('emoji') && animOk(false))
-        for (const c of EMOJIS) if (ehit(c)) (epickSort === 'use' ? all : ejs).push({ c, r: ejiBtn(c) });
+        for (const c of EMOJIS) if (ehit(c)) ejs.push({ c, r: ejiBtn(c) });
       all.sort((a, b) => epickSort === 'az' ? byFam(a.c, b.c) : byUse(a.c, b.c));
+      if (epickSort === 'use') ejs.sort((a, b) => (useTs[b.c] || 0) - (useTs[a.c] || 0));
       h += aged(all, (x) => x.c, (x) => x.r) + ejs.map((x) => x.r).join('');
     } else {
       // codes dedupe across sources too - 7tv/bttv both ship <3 and the
