@@ -9159,6 +9159,7 @@
     // stale stragglers and the last column's spill stay put.
     // rects because the flipped axis gives rows negative offsetTops, and
     // the fold is measured from the content's top edge, not the viewport
+    if (!from.lastElementChild) return false;
     const fold = from.lastElementChild.getBoundingClientRect().top + from.clientHeight;
     const head = [];
     for (let r = from.firstElementChild; r; r = r.nextElementSibling) {
