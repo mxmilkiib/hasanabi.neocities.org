@@ -627,6 +627,8 @@
     min-width: 0;
     overflow-y: auto;
     padding: 8px 18px 2px 6px;
+    /* anchored so the ghostpage overlay can cover the column box */
+    position: relative;
   }
   /* page-flip columns show only their current page: retired pages wait
      hidden in #log's archive until the split folds back to one column.
@@ -634,6 +636,10 @@
      for the instant before a flip reflowed every row */
   main.split:not(.rev) .col > .stale { display: none; }
   main.split:not(.rev) .col { scrollbar-width: none; }
+  /* a retired page's clones linger over their column, swept as the live
+     page writes over them - the real rows archive on the same flip */
+  .ghostpage { position: absolute; inset: 0; box-sizing: border-box; padding: inherit;
+    overflow: hidden; pointer-events: none; z-index: 5; }
   #side, #side2 { border-left: 1px solid var(--line); }
   /* split level 4's rail: a third column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
@@ -2530,6 +2536,9 @@
   // after the active one, so the column after it holds the oldest rows
   const cols = () => [logEl, sideEl, side2El].slice(0, 1 + !sideEl.hidden + !side2El.hidden);
   const nextCol = () => { const c = cols(); return c[(c.indexOf(activeEl) + 1) % c.length]; };
+  // a column's real page: children minus the stale archive and any
+  // lingering ghostpage overlay (the overlay is cosmetic, not content)
+  const liveRows = (col) => [...col.children].filter((r) => !r.classList.contains('stale') && !r.classList.contains('ghostpage'));
   const isSplit = () => !sideEl.hidden;
   const splitBtn = document.getElementById('splitBtn');
   const fontBtn = document.getElementById('fontBtn');
@@ -3356,6 +3365,7 @@
       for (let i = col.children.length - 1; i >= 0; i--) {
         const r = col.children[i];
         if (r.classList.contains('blk')) continue; // display:none - no position
+        if (r.classList.contains('ghostpage')) continue;
         if (r.getBoundingClientRect().bottom > top) break;
         if (r.classList.contains('row')) {
           n++;
@@ -3368,7 +3378,10 @@
     for (let i = col.children.length - 1; i >= 0; i--) {
       const r = col.children[i];
       if (r.classList.contains('blk')) continue; // display:none - no position
-      if (r.offsetTop - col.offsetTop < fold) break;
+      if (r.classList.contains('ghostpage')) continue;
+      // .col is the rows' offsetParent, so offsetTop already reads
+      // column-relative
+      if (r.offsetTop < fold) break;
       if (r.classList.contains('row')) {
         n++;
         oldest = +r.dataset.ts || 0;
@@ -4330,7 +4343,7 @@
     }
     if (missed.length > 50) missed.splice(0, missed.length - 50);
     if (unfocused) updateMissedBadge();
-    if (isSplit()) flipCols();
+    if (isSplit()) { flipCols(); if (!revFlow) sweepGhosts(activeEl); }
     trimScrollback();
     // evicted rows leave their ids behind - drop only the disconnected
     if (rowById.size > MAX_MESSAGES + 1000)
@@ -9189,13 +9202,13 @@
     const c = cols();
     if (revFlow) return [...c].reverse().flatMap((col) => [...col.children]);
     const i = c.indexOf(activeEl);
-    const live = (col) => [...col.children].filter((r) => !r.classList.contains('stale'));
     return [...logEl.querySelectorAll(':scope > .stale'),
-      ...[...c.slice(i + 1), ...c.slice(0, i + 1)].flatMap(live)];
+      ...[...c.slice(i + 1), ...c.slice(0, i + 1)].flatMap(liveRows)];
   }
   // Folds every column back into #log in flow order, the archive rejoined
   // as ordinary rows, #log live again
   function mergeCols() {
+    clearGhosts();
     const c = cols();
     const i = c.indexOf(activeEl);
     const order = revFlow ? [...c].reverse() : [...c.slice(i + 1), ...c.slice(0, i + 1)];
@@ -9206,7 +9219,7 @@
       // its archive already sits ahead of every live page and stays put
       if (k === 0 && col === logEl) continue;
       const frag = document.createDocumentFragment();
-      for (const r of [...col.children]) if (revFlow || col !== logEl || !r.classList.contains('stale')) frag.appendChild(r);
+      for (const r of [...col.children]) if (!r.classList.contains('ghostpage') && (revFlow || col !== logEl || !r.classList.contains('stale'))) frag.appendChild(r);
       logEl.appendChild(frag);
     }
     for (const r of logEl.querySelectorAll(':scope > .stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
@@ -9219,10 +9232,53 @@
     const room = col.clientHeight - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom);
     return { room, fold: col.getBoundingClientRect().top + col.clientTop + col.clientHeight - parseFloat(st.paddingBottom) };
   }
+  // A retired page's clones hang over the column in a .ghostpage overlay,
+  // faintest where the live page is about to overwrite them. The real
+  // rows archive as usual - the overlay is cosmetic only, so nothing in
+  // the page bookkeeping ever sees it
+  const GHOST_LO = 0.04;  // opacity at the overwrite edge
+  const GHOST_HI = 0.22;  // resting opacity deeper down the page
+  const GHOST_RAMP = 340; // px the fade eases over
+  function ghostify(col) {
+    clearGhosts(col);
+    const page = liveRows(col);
+    if (!page.length) return;
+    const ov = document.createElement('div');
+    ov.className = 'ghostpage';
+    ov.setAttribute('aria-hidden', 'true');
+    for (const r of page) {
+      const cl = r.cloneNode(true);
+      cl.removeAttribute('data-mid');
+      const d = r.offsetTop;
+      cl.style.opacity = d >= GHOST_RAMP ? GHOST_HI : (GHOST_LO + (d / GHOST_RAMP) * (GHOST_HI - GHOST_LO)).toFixed(3);
+      // a live embed clone would autoplay under the overlay - same strip
+      // saveHistory applies
+      cl.querySelectorAll('.ytcard').forEach((e) => e.remove());
+      cl.querySelectorAll('video, audio').forEach((v) => v.removeAttribute('autoplay'));
+      cl.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
+      ov.appendChild(cl);
+    }
+    col.appendChild(ov);
+  }
+  // Drops every clone the live page has already written over, then the
+  // overlay itself once empty
+  function sweepGhosts(col) {
+    const ov = col && col.querySelector(':scope > .ghostpage');
+    if (!ov) return;
+    const live = liveRows(col);
+    const covered = live.length ? live[live.length - 1].offsetTop + live[live.length - 1].offsetHeight : 0;
+    // evict bottom-up: dropping a lower clone reflows the ones beneath it
+    // and would cascade the covered check past the real boundary
+    for (const g of [...ov.children].reverse()) if (g.offsetTop < covered) g.remove();
+    if (!ov.firstElementChild) ov.remove();
+  }
+  function clearGhosts(root) {
+    for (const ov of (root || mainEl).querySelectorAll('.ghostpage')) ov.remove();
+  }
   // A column's page leaves view: its rows turn stale and join the end of
   // #log's archive, ahead of #log's own live page
   function retire(col) {
-    const page = [...col.children].filter((r) => !r.classList.contains('stale'));
+    const page = liveRows(col);
     for (const r of page) r.classList.add('stale');
     if (col === logEl) return;
     const frag = document.createDocumentFragment();
@@ -9237,11 +9293,12 @@
   // side column: #log runs a hair wider, so rows measured there can
   // only shrink where they land
   function deal() {
+    clearGhosts(); // re-cut pages make any lingering overlay positions moot
     const cs = cols();
     const frag = document.createDocumentFragment();
     for (const r of chronoRows()) if (!r.classList.contains('stale')) frag.appendChild(r);
     cs[1].appendChild(frag);
-    const live = [...cs[1].children].filter((r) => !r.classList.contains('stale'));
+    const live = liveRows(cs[1]);
     const { room } = pageBox(cs[1]);
     const pages = []; // newest first
     let page = [], end = null, k = live.length - 1;
@@ -9284,6 +9341,7 @@
   // until the scrollback trim
   function flipCols() {
     if (revFlow) {
+      clearGhosts(); // rev keeps its own stragglers - no overlay to sweep
       const cs = cols();
       for (let i = 0; i < cs.length; i++) pushOverflow(cs[i], cs[i + 1] || null);
       // appends land at a column's top edge, which moves the live edge the
@@ -9292,7 +9350,7 @@
       return;
     }
     const from = activeEl, to = nextCol();
-    const live = [...from.children].filter((r) => !r.classList.contains('stale'));
+    const live = liveRows(from);
     const { fold } = pageBox(from);
     // scanned off the tail until a row fits. the page's first row never
     // moves - one taller than the column would only flip on forever
@@ -9304,6 +9362,8 @@
     }
     if (k === live.length) return;
     const moving = live.slice(k);
+    // `from` is done being live - leftover ghosts there have no wave left
+    clearGhosts(from);
     // a spill taller than a page (a backfill burst) would leave the new
     // page overflowing too - lay the newest pages out afresh instead
     const vis = moving.filter((r) => !rowCollapsed(r));
@@ -9312,8 +9372,10 @@
     // what stays on it when the next column's page lands ahead of it
     const frag = document.createDocumentFragment();
     frag.append(...moving);
+    ghostify(to); // snapshot the outgoing page before its rows archive
     retire(to);
     to.appendChild(frag);
+    sweepGhosts(to); // the moved block already covers the top ghosts
     autoScrollAt = performance.now();
     to.scrollTop = 0;
     activeEl = to;
@@ -9342,7 +9404,7 @@
     let moved = false;
     const frag = to ? document.createDocumentFragment() : null;
     for (const r of head) {
-      if (frag && !r.classList.contains('stale')) { frag.appendChild(r); moved = true; }
+      if (frag && !r.classList.contains('stale') && !r.classList.contains('ghostpage')) { frag.appendChild(r); moved = true; }
     }
     if (frag) to.appendChild(frag);
     return moved;
