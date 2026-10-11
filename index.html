@@ -9826,6 +9826,13 @@
         : (tEl ? parseRowTimeText(tEl.textContent) : 0);
       applySubMode();
       snapLive(logEl);
+      // the first snap can land before layout settles (webfonts, saved
+      // media placeholders) and clamp short of the real tail - re-pin
+      // once it has so a reload opens on the newest stored rows
+      const repinLog = () => { if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); };
+      requestAnimationFrame(() => requestAnimationFrame(repinLog));
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(repinLog);
+      addEventListener('load', repinLog, { once: true });
     } catch {}
   }
   restoreHistory();

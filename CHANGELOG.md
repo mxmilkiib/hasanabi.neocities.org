@@ -97,6 +97,9 @@ not versions - the page ships continuously to Neocities.
   down, sprout distro, 325, tangled wilderness and archive.org zines
 - the site-updated bar centres a wider reload button on each side of
   its text
+- a reload now opens on the tail of stored history - the first scroll
+  pin could clamp before layout settled, flashing the oldest rows until
+  backfill re-snapped; deferred re-pins cover fonts, media and load
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,
