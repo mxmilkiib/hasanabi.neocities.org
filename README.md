@@ -522,7 +522,7 @@ force off.
 | `lkico` | `0` | link favicons off |
 | `pn` | `0` | pronoun lookups on profile cards off |
 | `cmodes` | `0` | active chat-mode display off (chips and status-line mode text) |
-| `anim` | `0`–`3` | nick styles: off / super slow / slow / on |
+| `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
 | `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
 | `epnames` | `1` | picker: emote names on cells |
 | `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
