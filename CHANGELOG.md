@@ -93,6 +93,8 @@ not versions - the page ships continuously to Neocities.
   canvas' own bin readout
 - the storage section runs two columns; each row keeps its sub-list
   attached across the column gap
+- a zines row in media links equator, zine library, libcom, it's going
+  down, sprout distro, 325, tangled wilderness and archive.org zines
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,
