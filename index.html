@@ -7681,11 +7681,14 @@
       if ((v = g(EPICK_ANIM_KEY)) !== null) o.epanim = JSON.parse(v);
       if ((v = g(EPICK_SIZE_KEY)) !== null) o.epgeo = JSON.parse(v);
     } catch {}
-    try { suppressSave = true; applyOpts(o); }
-    finally { suppressSave = false; }
-    // no bundle at all means a first visit - the video opens like the
-    // picker does, and only a deliberate off is stored from here on
-    if (!o) setVideo(true);
+    try {
+      suppressSave = true;
+      applyOpts(o);
+      // no bundle at all means a first visit: nightshade is the face,
+      // and the video opens like the picker does - only a deliberate
+      // off is stored from here on
+      if (!o) { applyPreset('nightshade'); setVideo(true); }
+    } finally { suppressSave = false; }
   }
 
   // applies a (possibly partial) option bundle; used by saved options,
@@ -8905,7 +8908,7 @@
     // a theme rides as ?theme=name: an exact preset match is cleanest,
     // else the last applied one stays the base - either way only options
     // moved off the preset's pinned values still need their own params
-    const exact = Object.keys(THEME_PRESETS).find((n) => n !== 'default' && presetMatch(THEME_PRESETS[n]));
+    const exact = Object.keys(THEME_PRESETS).find((n) => n !== 'nightshade' && presetMatch(THEME_PRESETS[n]));
     const pin = exact || (curTheme && THEME_PRESETS[curTheme] ? curTheme : null);
     let qs = q;
     if (pin) {
