@@ -8860,9 +8860,11 @@
     } catch {}
     // the popup's open state rides the url too: an open picker emits 1 and
     // a deliberate close (the '0' pref an × click stamps) emits 0 - a
-    // picker that was simply never opened stays out of the url
+    // picker that was simply never opened stays out of the url. under a
+    // docked rail an open picker is implied (the rail reopens it unless
+    // that '0' vetoes it), so only the deliberate close is worth a param
     try {
-      if (!emotePick.hidden) q.set('epopen', '1');
+      if (!emotePick.hidden && railEl.hidden) q.set('epopen', '1');
       else if (localStorage.getItem(EPICK_OPEN_KEY) === '0') q.set('epopen', '0');
     } catch {}
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
@@ -10038,9 +10040,9 @@
     paintChatPick();
     document.body.classList.toggle('chaton', on);
     // inline rather than clearReply(): that path refreshes this same UI.
-    // the slimmer split modes own the picker - a logged-out refresh
-    // must not pull the rail's content out from under it
-    if (!on) { replyCtx = null; replyBar.hidden = true; if (!epickPinned && splitLevel < 5) closePicker(); }
+    // the picker's open state is its own pref now - a logged-out
+    // refresh leaves it be
+    if (!on) { replyCtx = null; replyBar.hidden = true; }
   }
 
   // ---- replies: pick a row with its hover ↩, then Enter sends it as a
@@ -10133,7 +10135,7 @@
     if (auth && auth.token) {
       if (e.shiftKey) { logout(); return; }
       chatbarEl.hidden = !chatbarEl.hidden;
-      if (chatbarEl.hidden && !epickPinned && splitLevel < 5) closePicker();
+      if (chatbarEl.hidden && !epickPinned && splitLevel < 5) closePicker(true);
       else if (!chatbarEl.hidden) chatInput.focus();
     } else {
       // preflight id.twitch.tv before handing the tab to oauth - a stalled
@@ -11831,10 +11833,11 @@
       } catch {}
     }
   }
-  function closePicker() {
+  function closePicker(silent) {
     // an already-hidden picker has nothing to close - a stray call here
-    // must not stamp a 'deliberately closed' pref the user never made
-    // (init's updateSendUI reaches this logged-out before the rail docks)
+    // must not stamp a 'deliberately closed' pref the user never made.
+    // silent callers (chat-bar hides) hide without stamping '0' - only a
+    // deliberate × / esc / ☻-off says 'keep it closed next visit'
     if (emotePick.hidden) return;
     emotePick.hidden = true;
     railSplitEl.hidden = true;
@@ -11844,7 +11847,7 @@
     // stashed position, so the next ☻ press reopens it where it was.
     // It stays closed across a reload though - the pin remembers where
     // it floats, not that it was up
-    try { localStorage.setItem(EPICK_OPEN_KEY, '0'); } catch {}
+    if (!silent) try { localStorage.setItem(EPICK_OPEN_KEY, '0'); } catch {}
   }
   emotePin.addEventListener('click', () => { setPin(!epickPinned); saveOpts(); });
   document.getElementById('emoteX').addEventListener('click', closePicker);
@@ -12078,12 +12081,11 @@
     }
   };
   try { applyEpickBox(JSON.parse(localStorage.getItem(EPICK_SIZE_KEY))); } catch {}
-  // a pinned picker reopens where it was left, but only if it was open
-  // when the page went away - a closed one stays closed, pin or not
+  // the picker opens by default - only a deliberate × close (the '0'
+  // pref) keeps it down; a pinned one restores its stashed position
   try {
-    if (localStorage.getItem(EPICK_PIN_KEY) === '1' &&
-        localStorage.getItem(EPICK_OPEN_KEY) !== '0') {
-      setPin(true);
+    if (localStorage.getItem(EPICK_OPEN_KEY) !== '0') {
+      if (localStorage.getItem(EPICK_PIN_KEY) === '1') setPin(true);
       emotePick.hidden = false;
       emojiBtn.classList.add('on');
       emojiBtn.setAttribute('aria-expanded', 'true');
