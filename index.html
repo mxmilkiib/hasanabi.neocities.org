@@ -5576,9 +5576,9 @@
   // the rail's narrow headers carry only the sub-day rungs
   const RAIL_WINS = ['12h', '6h', '3h', '1h'];
   const LINK_WIN_KEY = 'hasan-linkwin';
-  let linkWin = '24h';
-  try { linkWin = normWin(localStorage.getItem(LINK_WIN_KEY)) || '24h'; } catch {}
-  if (!(linkWin in LINK_WINS)) linkWin = '24h';
+  let linkWin = '3h';
+  try { linkWin = normWin(localStorage.getItem(LINK_WIN_KEY)) || '3h'; } catch {}
+  if (!(linkWin in LINK_WINS)) linkWin = '3h';
   // session-rate graph span: 'all' draws the whole recorded tail, the
   // rest zoom to a trailing window so long sessions keep readable bars
   const RATE_WINS = { all: 0, '24h': 86400e3, '12h': 43200e3, '6h': 21600e3,
