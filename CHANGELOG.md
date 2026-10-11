@@ -100,6 +100,11 @@ not versions - the page ships continuously to Neocities.
   the clock ran backwards for logging purposes
 - youtube inline-card titles run strong - the same chat-weight+300
   rule the bits rows use
+- quota-full saves now fight back: a failed write evicts the largest
+  refillable caches (peeks, gifs, pronouns, emote sets) and retries
+  before giving up, so a full localStorage stops silently eating
+  the spark, emote-use stamps, history, stats and input history -
+  the caches refetch, the session data can't come back
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;

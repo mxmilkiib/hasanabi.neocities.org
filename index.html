@@ -4758,10 +4758,8 @@
   function saveSpark() {
     const base = () => ({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples,
       ratePer: rateSamplesPer, glorpPer: glorpSamplesPer });
-    const put = (extra) => {
-      try { localStorage.setItem(SPARK_KEY, JSON.stringify({ ...base(), ...extra })); return true; }
-      catch { return false; }
-    };
+    const put = (extra) =>
+      trySet(SPARK_KEY, JSON.stringify({ ...base(), ...extra }));
     const hExt = (n) => {
       const k = Math.min(rateHist.length, n);
       return { hT0: rateHistT[rateHist.length - k] || 0, hT1: rateHistT[rateHist.length - 1] || 0,
@@ -9839,7 +9837,7 @@
       // after restore adopts them.
       const limit = Math.min(HISTORY_SAVE_MAX, MAX_MESSAGES);
       const rows = chronoRows().filter((r) => r.classList.contains('row')).slice(-limit);
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.map((r) => {
+      trySet(HISTORY_KEY, JSON.stringify(rows.map((r) => {
         const media = r.querySelector('.ytcard, video, audio');
         if (!r.classList.contains('stale') && !media) return r.outerHTML;
         const cl = r.cloneNode(true);
@@ -10201,7 +10199,7 @@
       for (const e of Object.values(bag))
         for (const h of Object.keys(e)) if (+h < bH0) delete e[h];
     try {
-      localStorage.setItem(STATS_KEY, JSON.stringify({
+      trySet(STATS_KEY, JSON.stringify({
         nm: [...nickMsgs], sn: [...seenNicks], nf: [...nickFirst], nl: [...nickLast],
         bu: [...badgeUse], bv: [...badgeVerUse],
         nmp: per(nickMsgsPer), bup: per(badgeUsePer), bvp: per(badgeVerUsePer),
@@ -10546,7 +10544,7 @@
       for (const i of sv.p || []) if (i >= 0 && i < hist.length) parked.add(i);
     }
   } catch {}
-  const writeHist = () => { try { localStorage.setItem(INHIST_KEY, JSON.stringify({ h: hist, p: [...parked] })); } catch {} };
+  const writeHist = () => { trySet(INHIST_KEY, JSON.stringify({ h: hist, p: [...parked] })); };
   let histSaveT = 0;
   const saveHist = (now) => {
     clearTimeout(histSaveT);
@@ -11736,14 +11734,14 @@
     for (const bag of [useHour, ...Object.values(useHourPer)])
       for (const e of Object.values(bag))
         for (const h of Object.keys(e)) if (+h < h0) delete e[h];
-    // quota squeeze: free the emote-set cache for room, then shed the
-    // heavier history detail until the write lands - the order and count
-    // fields are what the picker runs on, so they ride to the last
+    // quota squeeze: trySet evicts refillable caches between retries,
+    // then the blob itself sheds the heavier history detail until the
+    // write lands - the order and count fields are what the picker runs
+    // on, so they ride to the last
     const blob = (extra) => JSON.stringify({ n: liveUse, t: useTs, s: useT0, i: useIds, w: Date.now(), ...extra });
-    try { localStorage.setItem(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer, h: useHour, hp: useHourPer })); return; } catch {}
-    try { sweepEmoteCache(true); localStorage.setItem(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer, h: useHour, hp: useHourPer })); return; } catch {}
-    try { localStorage.setItem(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer })); return; } catch {}
-    try { localStorage.setItem(EMOTEUSE_KEY, blob({})); } catch {}
+    if (trySet(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer, h: useHour, hp: useHourPer }))) return;
+    if (trySet(EMOTEUSE_KEY, blob({ d: useDay, pd: useDayPer }))) return;
+    trySet(EMOTEUSE_KEY, blob({}));
   };
   const saveUse = () => {
     if (useSaveTimer) return;
@@ -12840,6 +12838,32 @@
         if (all || !(Date.now() - t < EMOTE_CACHE_TTL)) localStorage.removeItem(k);
       }
     } catch {}
+  }
+  // quota relief: shed refillable caches one at a time so session data
+  // keeps landing - peeks, gifs, pronouns and emote sets all refetch,
+  // where lost spark or emote-use samples never come back. Evicts the
+  // single largest shed-able key left and returns its size
+  function freeStorage() {
+    let big = '', n = 0;
+    try {
+      for (const k of Object.keys(localStorage)) {
+        if (!(k === PEEK_KEY || k === GIF_KEY || k === GIF_META_KEY || k === PRON_KEY ||
+            k.startsWith(EMOTE_CACHE_PREFIX))) continue;
+        const l = (localStorage.getItem(k) || '').length;
+        if (l > n) { big = k; n = l; }
+      }
+      if (big) localStorage.removeItem(big);
+    } catch { return 0; }
+    return n;
+  }
+  // a setItem that buys room first: each retry evicts the largest
+  // remaining refillable key until the write lands or nothing's left
+  function trySet(k, v) {
+    try { localStorage.setItem(k, v); return true; } catch {}
+    for (let i = 0; i < 8 && freeStorage(); i++) {
+      try { localStorage.setItem(k, v); return true; } catch {}
+    }
+    return false;
   }
   function restoreEmoteCache() {
     sweepEmoteCache(false);
