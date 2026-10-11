@@ -169,7 +169,7 @@ not versions - the page ships continuously to Neocities.
 - a zines row in media links equator, zine library, libcom, it's going
   down, sprout distro, 325, tangled wilderness and archive.org zines
 - the site-updated bar centres a wider reload button on each side of
-  its text
+  its text - 30px of side padding now, up from 14
 - a reload now opens on the tail of stored history - the first scroll
   pin could clamp before layout settled, flashing the oldest rows until
   backfill re-snapped; deferred re-pins cover fonts, media and load
