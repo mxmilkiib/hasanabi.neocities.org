@@ -5622,7 +5622,7 @@
   // top emotes' count source: the channel's StreamElements figures, or
   // this client's own tallies - all of them or a recent window. window
   // specs fold hour buckets for sub-day spans and day buckets past that
-  const EMOTE_SRCS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
+  const EMOTE_SRCS = { 'all': 0, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const EMOTE_SRC_KEY = 'hasan-emotesrc';
   // saved prefs from before the labels were renamed still resolve
   const normWin = (v) => (v === 'alltime' || v === 'all-time' ? 'all' : (v === 'day' || v === 'today') ? '24h' : v);
@@ -5631,20 +5631,20 @@
   if (!(emoteStatSrc in EMOTE_SRCS)) emoteStatSrc = '3h';
   // top chatters rank message counts inside a trailing day window,
   // folded out of the per-login day buckets like the badge windows
-  const CHAT_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
+  const CHAT_WINS = { 'all': 0, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const CHAT_SORT_KEY = 'hasan-chatsort';
   let chatSort = '24h';
   try { chatSort = normWin(localStorage.getItem(CHAT_SORT_KEY)) || '24h'; } catch {}
   if (!(chatSort in CHAT_WINS)) chatSort = '24h';
   // badge counts also window like the emote ones: 'all' is the plain
   // tally, the rest read trailing days out of the per-version buckets
-  const BADGE_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
+  const BADGE_WINS = { 'all': 0, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   const BADGE_WIN_KEY = 'hasan-badgewin';
   let badgeWin = '3h';
   try { badgeWin = normWin(localStorage.getItem(BADGE_WIN_KEY)) || '3h'; } catch {}
   if (!(badgeWin in BADGE_WINS)) badgeWin = '3h';
   // top links window the same way; 'all' is the plain tally
-  const LINK_WINS = { 'all': 0, month: { d: 31 }, week: { d: 7 }, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
+  const LINK_WINS = { 'all': 0, '24h': { h: 24 }, '12h': { h: 12 }, '6h': { h: 6 }, '3h': { h: 3 }, '1h': { h: 1 } };
   // the rail's narrow headers carry only the sub-day rungs
   const RAIL_WINS = ['12h', '6h', '3h', '1h'];
   const LINK_WIN_KEY = 'hasan-linkwin';
@@ -6033,15 +6033,15 @@
     // the window buttons take the sort row's lead slot: each one is
     // 'use' ranked within that window, so they only light when the
     // ranked view is showing
-    const badgeWinTips = { 'all': 'flat ranking by use, all time', month: 'flat ranking by use, last 31 days', week: 'flat ranking by use, last 7 days', '24h': 'flat ranking by use, last 24 hours', '12h': 'flat ranking by use, last 12 hours', '6h': 'flat ranking by use, last 6 hours', '3h': 'flat ranking by use, last 3 hours', '1h': 'flat ranking by use, last hour' };
+    const badgeWinTips = { 'all': 'flat ranking by use, all time', '24h': 'flat ranking by use, last 24 hours', '12h': 'flat ranking by use, last 12 hours', '6h': 'flat ranking by use, last 6 hours', '3h': 'flat ranking by use, last 3 hours', '1h': 'flat ranking by use, last hour' };
     const badgeWinBtns = (inRail ? RAIL_WINS : Object.keys(BADGE_WINS))
       .map((s) => `<button type="button" class="st-s${bSort === 'use' && badgeWinEff === s ? ' on' : ''}" data-bwin="${s}" title="${badgeWinTips[s]}">${s}</button>`)
       .join('');
-    const chatWinTips = { 'all': 'message count, all time', month: 'message count, last 31 days', week: 'message count, last 7 days', '24h': 'message count, last 24 hours', '12h': 'message count, last 12 hours', '6h': 'message count, last 6 hours', '3h': 'message count, last 3 hours', '1h': 'message count, last hour' };
+    const chatWinTips = { 'all': 'message count, all time', '24h': 'message count, last 24 hours', '12h': 'message count, last 12 hours', '6h': 'message count, last 6 hours', '3h': 'message count, last 3 hours', '1h': 'message count, last hour' };
     const chatSortBtns = (inRail ? RAIL_WINS : Object.keys(CHAT_WINS))
       .map((s) => `<button type="button" class="st-s${chatSortEff === s ? ' on' : ''}" data-csort="${s}" title="${chatWinTips[s]}">${s}</button>`)
       .join('');
-    const linkWinTips = { 'all': 'post count, all time', month: 'post count, last 31 days', week: 'post count, last 7 days', '24h': 'post count, last 24 hours', '12h': 'post count, last 12 hours', '6h': 'post count, last 6 hours', '3h': 'post count, last 3 hours', '1h': 'post count, last hour' };
+    const linkWinTips = { 'all': 'post count, all time', '24h': 'post count, last 24 hours', '12h': 'post count, last 12 hours', '6h': 'post count, last 6 hours', '3h': 'post count, last 3 hours', '1h': 'post count, last hour' };
     const linkWinBtns = (inRail ? RAIL_WINS : Object.keys(LINK_WINS))
       .map((s) => `<button type="button" class="st-s${linkWinEff === s ? ' on' : ''}" data-lwin="${s}" title="${linkWinTips[s]}">${s}</button>`)
       .join('');
