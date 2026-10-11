@@ -4512,22 +4512,24 @@
   // page was closed is padded with NaN so it draws shaded, not flat
   // (NaN serializes as null in JSON - mapped back on restore)
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
-  // the long series saves compact: its 1Hz times rebuild from the head
-  // stamp and the causes store sparse. the old parallel-array shape grew
-  // past quota on long sessions, the write silently failed, and the stale
-  // restore banded everything since as 'page closed'
+  // the long series saves compact: its ~1Hz times rebuild between the
+  // head and tail stamps (live ticks land a little late each second, so
+  // a strict 1Hz rebuild slides the tail early), and the causes store
+  // sparse. the old parallel-array shape grew past quota on long
+  // sessions, the write silently failed, and the stale restore banded
+  // everything since as 'page closed'
   function saveSpark() {
-    const put = (h0, hist, hwhy, ghist) => {
+    const put = (h0, h1, hist, hwhy, ghist) => {
       try {
-        localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hT0: h0, hist, ghist, hWhy: hwhy.flatMap((w, i) => w ? [[i, w]] : []) }));
+        localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hT0: h0, hT1: h1, hist, ghist, hWhy: hwhy.flatMap((w, i) => w ? [[i, w]] : []) }));
         return true;
       } catch { return false; }
     };
     // a quota squeeze still keeps a recent tail; a wiped key beats a
     // stale save lying about a day of missed chat
-    if (!put(rateHistT[0] || 0, rateHist, rateHistWhy, glorpHist)) {
+    if (!put(rateHistT[0] || 0, rateHistT[rateHist.length - 1] || 0, rateHist, rateHistWhy, glorpHist)) {
       const keep = Math.min(rateHist.length, 21600);
-      if (!put(rateHistT[rateHist.length - keep] || 0,
+      if (!put(rateHistT[rateHist.length - keep] || 0, rateHistT[rateHist.length - 1] || 0,
                rateHist.slice(-keep), rateHistWhy.slice(-keep), glorpHist.slice(-keep)))
         try { localStorage.removeItem(SPARK_KEY); } catch {}
     }
@@ -4541,29 +4543,40 @@
       const savedAt = d.t || now;
       const gap = Math.min(win, Math.max(0, Math.round((now - savedAt) / 1000)));
       const oldRate = d.rate.slice(-win).map((v) => (v === null ? NaN : v));
+      // the session-long series: current saves carry it beside the
+      // windowed arrays; older saves fall back to the windowed tail
+      const oldHist = (Array.isArray(d.hist) ? d.hist : d.rate).slice(-RATE_KEEP)
+        .map((v) => (v === null ? NaN : v));
+      // 1Hz in name, ~1Hz in truth: ticks land a little late each second,
+      // so compact times rebuild between the stored head and tail stamps
+      // (the tail falls back to the save's own clock). an exact 1Hz
+      // rebuild slid the tail earlier and notched a dead span at the edge
+      const hSkip = (Array.isArray(d.hist) ? d.hist.length : oldHist.length) - oldHist.length;
+      const hN = Array.isArray(d.hist) ? d.hist.length : 0;
+      const hLast = d.hT1 || savedAt;
+      const hStep = d.hT0 && hN > 1 && hLast > d.hT0
+        ? (hLast - d.hT0) / (hN - 1) : 1000;
+      const histTimes = d.hT0
+        ? oldHist.map((_, i) => Math.round(d.hT0 + (hSkip + i) * hStep))
+        : Array.isArray(d.histT) && d.histT.length >= oldHist.length
+          ? d.histT.slice(-oldHist.length)
+          : oldHist.map((_, i) => savedAt - (oldHist.length - i) * 1000);
       rateSamples.push(...oldRate, ...Array(gap).fill(NaN));
+      // the windowed tail is the long series' own last seconds - ride its
+      // times; a stub tail from an old save falls back to the save grid
       rateTimes.push(
-        ...oldRate.map((_, i) => savedAt - (oldRate.length - i) * 1000),
+        ...(histTimes.length >= oldRate.length
+          ? histTimes.slice(-oldRate.length)
+          : oldRate.map((_, i) => savedAt - (oldRate.length - i) * 1000)),
         ...Array.from({ length: gap }, (_, i) => savedAt + (i + 1) * 1000));
       // saved causes ride with the samples; older saves have none, and the
       // closed-gap positions get theirs from markAway just below
       const oldWhy = (Array.isArray(d.why) ? d.why.slice(-win) : []);
       while (oldWhy.length < oldRate.length) oldWhy.unshift('');
       rateWhy.push(...oldWhy, ...Array(gap).fill(''));
-      // the session-long series: current saves carry it beside the
-      // windowed arrays; older saves fall back to the windowed tail
-      const oldHist = (Array.isArray(d.hist) ? d.hist : d.rate).slice(-RATE_KEEP)
-        .map((v) => (v === null ? NaN : v));
       const hGap = Math.min(RATE_KEEP, Math.max(0, Math.round((now - savedAt) / 1000)));
       rateHist.push(...oldHist, ...Array(hGap).fill(NaN));
-      // compact saves rebuild the 1Hz times from the head stamp; older
-      // saves carried the whole array, and the oldest carried none
-      const hSkip = (Array.isArray(d.hist) ? d.hist.length : oldHist.length) - oldHist.length;
-      rateHistT.push(
-        ...(d.hT0 ? oldHist.map((_, i) => d.hT0 + (hSkip + i) * 1000)
-          : Array.isArray(d.histT) && d.histT.length >= oldHist.length
-            ? d.histT.slice(-oldHist.length)
-            : oldHist.map((_, i) => savedAt - (oldHist.length - i) * 1000)),
+      rateHistT.push(...histTimes,
         ...Array.from({ length: hGap }, (_, i) => savedAt + (i + 1) * 1000));
       const oldHWhy = Array(oldHist.length).fill('');
       if (Array.isArray(d.hWhy))
