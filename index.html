@@ -3885,19 +3885,19 @@
   // split into measure and apply so repin's full-column re-pass reads
   // every offset in one layout instead of forcing a fresh one per row
   // the name column's x anchors both the reply quote's landing spot and
-  // the preview cards' left inset - badge icons (or the role chip that
-  // stands in for them) push the name right, so anchor on the cluster's
-  // leading edge instead. Only .vip/.host count - .sub/.mod/.bits/.first
-  // are status chips that live ahead of the name column, not part of it
-  // (a hidden sub chip would anchor at x=0 and drag the box off the row's
-  // edge)
+  // the preview cards' left inset - badge icons and left-docked chips
+  // push the name right, so anchor on the cluster's leading edge instead:
+  // the first visible .badge/.role/.aux before the name, whatever count
+  // or kind the chatter carries. Hidden chips (a concealed sub count,
+  // ...) render at x=0 and must not anchor, so the walk only accepts
+  // elements with width
   function nameColX(r) {
     const nm = r && r.querySelector('.name');
     if (!nm) return null;
     let anchor = nm;
     for (let el = nm.previousElementSibling; el; el = el.previousElementSibling) {
-      if (el.matches('img.badge, .role.vip, .role.host')) anchor = el;
-      else break;
+      if (!el.matches('img.badge, .role, .aux')) break;
+      if (el.offsetWidth) anchor = el;
     }
     return anchor.offsetLeft;
   }

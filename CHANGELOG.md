@@ -91,6 +91,10 @@ not versions - the page ships continuously to Neocities.
 - a watch-streak usernotice ('watched 150 consecutive streams…')
   rainbows the streak number itself, leaving the rest of the
   system-msg plain
+- reply quotes and preview cards land on a normalised name-column
+  anchor: the cluster's leading edge now counts every visible
+  badge/role/aux chip, so a mod chip or left-docked sub count no
+  longer slides the indent deeper with each extra badge
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;
