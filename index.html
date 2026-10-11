@@ -2222,6 +2222,8 @@
   #emoteGrid .eage.missed:not(.lit) { color: #a06be0; }
   #emoteGrid .eage.missed .ants rect { stroke: #a06be0; stroke-dasharray: 1.6 3.4;
     animation-name: eage-ants-missed; }
+  /* the unlogged rungs march counterclockwise - their stretch ran the
+     clock backwards, logging nothing as it passed */
   /* crossed beats unlogged on the ring: a lit+missed rung gets the accent
      back but keeps the dotted march, and its label carries the violet */
   #emoteGrid .eage.lit.missed { color: #a06be0; }
@@ -2237,7 +2239,7 @@
      keep the standard dash: a future boundary, not a logged gap */
   #emoteGrid .eage.soon { opacity: .85; color: #a06be0; }
   #emoteGrid .eage.soon .ants rect { stroke: #a06be0; }
-  @keyframes eage-ants-missed { to { stroke-dashoffset: -5; } }
+  @keyframes eage-ants-missed { to { stroke-dashoffset: 5; } }
   @keyframes eage-ants { to { stroke-dashoffset: -7; } }
   @media (prefers-reduced-motion: reduce) { #emoteGrid .eage .ants rect { animation: none; } }
 

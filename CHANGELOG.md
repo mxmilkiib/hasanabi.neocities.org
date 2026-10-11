@@ -95,6 +95,9 @@ not versions - the page ships continuously to Neocities.
   anchor: the cluster's leading edge now counts every visible
   badge/role/aux chip, so a mod chip or left-docked sub count no
   longer slides the indent deeper with each extra badge
+- the picker's 'chat was not being logged' rungs march their dotted
+  ring counterclockwise - the reversed drift marks a stretch where
+  the clock ran backwards for logging purposes
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;
