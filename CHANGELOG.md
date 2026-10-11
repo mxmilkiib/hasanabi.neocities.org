@@ -121,6 +121,9 @@ not versions - the page ships continuously to Neocities.
   what firefox reports as OpaqueResponseBlocking noise (the
   onerror retry already caught it); unknown emotes keep guessing
   animated so unseen animated ones still play
+- the storage section's fixed two-column split becomes a 18em
+  column flow - groups pack into as many narrow columns as the
+  panel allows instead of two sprawling halves
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;
