@@ -9244,13 +9244,14 @@
     const room = col.clientHeight - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom);
     return { room, fold: col.getBoundingClientRect().top + col.clientTop + col.clientHeight - parseFloat(st.paddingBottom) };
   }
-  // A retired page's clones hang over the column in a .ghostpage overlay,
-  // faintest where the live page is about to overwrite them. The real
-  // rows archive as usual - the overlay is cosmetic only, so nothing in
-  // the page bookkeeping ever sees it
-  const GHOST_LO = 0.04;  // opacity at the overwrite edge
-  const GHOST_HI = 0.22;  // resting opacity deeper down the page
-  const GHOST_RAMP = 340; // px the fade eases over
+  // A retired page's clones hang over the column in a .ghostpage overlay.
+  // The fade tracks the wave itself: clones just below the clip edge sit
+  // faintest and a smoothstep ramp deepens them toward the page's newest
+  // rows at the bottom. The real rows archive as usual - the overlay is
+  // cosmetic only, so nothing in the page bookkeeping ever sees it
+  const GHOST_LO = 0.04;  // opacity just under the wave edge
+  const GHOST_HI = 0.5;   // resting opacity at the page's newest rows
+  const GHOST_RAMP = 160; // px below the wave the fade eases over
   function ghostify(col) {
     clearGhosts(col);
     const page = liveRows(col);
@@ -9261,8 +9262,7 @@
     for (const r of page) {
       const cl = r.cloneNode(true);
       cl.removeAttribute('data-mid');
-      const d = r.offsetTop;
-      cl.style.opacity = d >= GHOST_RAMP ? GHOST_HI : (GHOST_LO + (d / GHOST_RAMP) * (GHOST_HI - GHOST_LO)).toFixed(3);
+      cl.style.opacity = GHOST_HI;
       // a live embed clone would autoplay under the overlay - same strip
       // saveHistory applies
       cl.querySelectorAll('.ytcard').forEach((e) => e.remove());
@@ -9285,6 +9285,12 @@
     const covered = live.length ? live[live.length - 1].offsetTop + live[live.length - 1].offsetHeight : 0;
     if (!last || last.offsetTop + last.offsetHeight <= covered) { ov.remove(); return; }
     ov.style.clipPath = `inset(${covered}px 0 0 0)`;
+    // the fade follows the descending edge, not the clone's spot on the
+    // page - smoothstep so the melt reads as a curve, not a straight ramp
+    for (const g of ov.children) {
+      const w = Math.min(1, Math.max(0, g.offsetTop - covered) / GHOST_RAMP);
+      g.style.opacity = (GHOST_LO + (GHOST_HI - GHOST_LO) * (w * w * (3 - 2 * w))).toFixed(3);
+    }
   }
   function clearGhosts(root) {
     for (const ov of (root || mainEl).querySelectorAll('.ghostpage')) ov.remove();
