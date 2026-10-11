@@ -105,6 +105,10 @@ not versions - the page ships continuously to Neocities.
   before giving up, so a full localStorage stops silently eating
   the spark, emote-use stamps, history, stats and input history -
   the caches refetch, the session data can't come back
+- double-clicking an emote or emoji in chat sends it to the input
+  box - imgs hand over their alt token, and a dblclick's own text
+  selection only goes in when it resolves to a real emote or emoji,
+  so ordinary word selection is left alone
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;

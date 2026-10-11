@@ -12263,24 +12263,46 @@
     }
     if (helpMode === 1) { helpMode = 0; applyHelp(); saveOpts(); }
   });
-  // inserts at the caret, spaced from neighbours; the panel stays open so
-  // several emotes can stack, like chatterino's picker - the recents band
-  // above the grid picks the same way
-  const pickClick = (e) => {
-    const b = e.target.closest('button[data-ins]');
-    if (!b) return;
-    noteRecent(b); // the row itself redraws on the next open, so the grid doesn't shift mid-click
+  // inserts at the caret, spaced from neighbours; the chat bar comes
+  // back if it was hidden so the token lands somewhere visible
+  const insertTok = (tok) => {
     const s = chatInput.selectionStart ?? chatInput.value.length;
     const pad = s > 0 && !/\s/.test(chatInput.value[s - 1]) ? ' ' : '';
-    chatInput.setRangeText(pad + b.dataset.ins + ' ', s, chatInput.selectionEnd ?? s, 'end');
-    // a pinned picker can outlive the chat bar - bring the bar back so the
-    // insert lands somewhere visible
+    chatInput.setRangeText(pad + tok + ' ', s, chatInput.selectionEnd ?? s, 'end');
     chatbarEl.hidden = false;
     growInput();
     chatInput.focus();
   };
+  // the panel stays open so several emotes can stack, like chatterino's
+  // picker - the recents band above the grid picks the same way
+  const pickClick = (e) => {
+    const b = e.target.closest('button[data-ins]');
+    if (!b) return;
+    noteRecent(b); // the row itself redraws on the next open, so the grid doesn't shift mid-click
+    insertTok(b.dataset.ins);
+  };
   emoteGrid.addEventListener('click', pickClick);
   emoteRecent.addEventListener('click', pickClick);
+  // double-click an emote in chat to send it to the input - the img
+  // carries its token in alt; an emoji (or an emote name) is bare text,
+  // so the dblclick's own selection is the token. Ordinary words stay
+  // selected, not inserted - only a real emote or emoji goes in
+  mainEl.addEventListener('dblclick', (e) => {
+    const row = e.target.closest('.row');
+    if (!row) return;
+    const im = e.target.closest('img.emote');
+    if (im && row.contains(im)) {
+      const tok = im.getAttribute('alt');
+      if (tok) insertTok(tok);
+      e.preventDefault();
+      return;
+    }
+    if (!e.target.closest('.msg')) return;
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed) return;
+    const tok = sel.toString().trim();
+    if (tok && (emoteNameOf(row.dataset.ch || CHANNEL, tok) || EMOJI_SET.has(tok))) insertTok(tok);
+  });
   // the picker closes via ☻ or esc (or stays up when 📌 pinned);
   // outside clicks leave it alone
 
