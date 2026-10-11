@@ -2,7 +2,7 @@
 
 ![HasanAbi Chat Thing - a compact, customisable, one-page Twitch chat client](og.png)
 
-A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/hasanabi),
+A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/hasanabi), aka Hasan Piker,
 hosted on Neocities - orientated around the Hasan Piker stream, aka the
 Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool,
 organising, media and other resources, & more! Live at
