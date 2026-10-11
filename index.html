@@ -8792,6 +8792,13 @@
       if (es && es.w && !(dg && es.w === dg.w && es.h === dg.h && es.left === dg.left && es.top === dg.top))
         q.set('epgeo', es.w + 'x' + (es.h || 0) + (es.left != null ? ',' + es.left + ',' + es.top : ''));
     } catch {}
+    // the popup's open state rides the url too: an open picker emits 1 and
+    // a deliberate close (the '0' pref an × click stamps) emits 0 - a
+    // picker that was simply never opened stays out of the url
+    try {
+      if (!emotePick.hidden) q.set('epopen', '1');
+      else if (localStorage.getItem(EPICK_OPEN_KEY) === '0') q.set('epopen', '0');
+    } catch {}
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs !== -1) q.set('hpfs', helpFs < 0 ? helpFs : HDR_SIZES[helpFs]);
     if (helpPos !== DEF.hpos) q.set('hpos', helpPos);
@@ -12480,7 +12487,7 @@
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 2 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     // emote-picker options: ?epnames=1&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&
-    // epmix=1&ephold=0|1|2&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]
+    // epmix=1&ephold=0|1|2&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]&epopen=0|1
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(flag('epnames')); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
@@ -12500,6 +12507,17 @@
         try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(es)); } catch {}
         if (es.left != null) setPin(true);
       }
+    }
+    // ?epopen recalls whether the popup was up: '1' opens it (and the
+    // rail's epClosed check honours the same key), '0' closes it and
+    // stamps the deliberate-close pref so it stays down on reload
+    if (q.has('epopen')) {
+      const on = flag('epopen');
+      emotePick.hidden = !on;
+      emojiBtn.classList.toggle('on', on);
+      emojiBtn.setAttribute('aria-expanded', String(on));
+      try { localStorage.setItem(EPICK_OPEN_KEY, on ? '1' : '0'); } catch {}
+      if (on) { if (!twSetsKey) loadTwitchSets(''); buildPicker(); }
     }
     if (epUrlDirty) buildPicker();
     // ?overlay strips every chrome for an obs browser source - rows only,
