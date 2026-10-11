@@ -6147,7 +6147,7 @@
     // to fill the chart; 'all' keeps the whole tail
     const rwe = rateWinEff();
     const rWin = RATE_WINS[rwe] || 0;
-    if (rWin) t0 = Math.min(t0, t1 - rWin);
+    if (rWin) t0 = t1 - rWin;
     const span = Math.max(30000, t1 - t0);
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
     const bw = span / N, bwPx = wCss / N;
