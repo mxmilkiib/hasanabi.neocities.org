@@ -4704,13 +4704,13 @@
     // quota ladder: shed the biggest optional payload before history -
     // the chatter tally can outweigh every series - then trim the long
     // tail, then drop it; a windowed save still keeps the spark alive
-    // and a wiped key beats a stale one lying about missed chat
-    const ok =
-      put({ chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), ...hExt(rateHist.length) }) ||
+    put({ chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), ...hExt(rateHist.length) }) ||
       put({ chat: [...chatterSeen].slice(-2000), quiet: quietGaps, away: away.slice(-30), ...hExt(21600) }) ||
       put({ away: away.slice(-30), ...hExt(3600) }) ||
       put({});
-    if (!ok) try { localStorage.removeItem(SPARK_KEY); } catch {}
+    // a failed write means the store is full, not that the save is bad -
+    // the last-good key still restores honestly (its gap marks away),
+    // where wiping it loses every sample for good
   }
   function restoreSpark() {
     try {
@@ -9153,7 +9153,7 @@
     // the standalone picker/stat keys. Kept: login ('hasanabi-' prefix
     // misses the filter anyway), plus pure refillable caches and stat data
     try {
-      const keep = (k) => k === PEEK_KEY || k === GIF_KEY || k === PRON_KEY ||
+      const keep = (k) => k === PEEK_KEY || k === GIF_KEY || k === PRON_KEY || k === SPARK_KEY ||
         k.startsWith('hasan-stats-') || k.startsWith(EMOTE_CACHE_PREFIX);
       for (const k of Object.keys(localStorage))
         if (k.startsWith('hasan-') && !keep(k)) localStorage.removeItem(k);

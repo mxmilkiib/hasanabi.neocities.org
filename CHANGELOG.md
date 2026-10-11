@@ -109,6 +109,10 @@ not versions - the page ships continuously to Neocities.
   as @name with the chatter's colour; resub headers colour the same way
 - a thanked name the emote pass already imaged (chatter emotes carry
   real names) still links instead of staying a bare emote
+- a full localStorage no longer wipes the rate graph - the spark save's
+  last-good key restores with its gap marked instead of being deleted
+- the options reset keeps the spark series too - it's session telemetry,
+  not a setting
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,
