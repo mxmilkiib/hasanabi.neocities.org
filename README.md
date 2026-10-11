@@ -6,10 +6,8 @@ A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/ha
 hosted on Neocities — orientated around the Hasan Piker stream, aka the
 Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool,
 organising, media and other resources, & more! Live at
-<https://hasanabi.neocities.org/>, mirrored on GitHub Pages at
-<https://mxmilkiib.github.io/hasanabi.neocities.org/> — project page at
-<https://hasanabi.neocities.org/about/> (also on the
-[pages mirror](https://mxmilkiib.github.io/hasanabi.neocities.org/about/)).
+<https://hasanabi.neocities.org/> — project page at
+<https://hasanabi.neocities.org/about/>.
 
 In plainer terms: it is the stream's chat, liberated from twitch.tv. The
 log renders in a single self-contained page that runs on a static host,
@@ -160,7 +158,10 @@ no dependencies beyond CDN-hosted fonts.
 - `☻` opens a Chatterino-style grid: 7TV / BTTV / FFZ / Twitch / emoji
   (~600 glyphs) sections with search, a `recent` row of the last 24
   used, per-source tab toggles, still/animated filters, and a `mix`
-  toggle that merges every enabled source into one flat grid.
+  toggle that merges every enabled source into one flat grid. Cells
+  dedupe across providers up to case — 7tv's `glorp` and bttv's `Glorp`
+  collapse to the first source scanned — and emoji always trail the
+  merged grid.
 - Ordering is alphabetical or by usage — most recently used in chat
   first (StreamElements chatstats via the relay seed lifetime counts
   for tie-breaks; live session use updates both and persists across
@@ -170,15 +171,17 @@ no dependencies beyond CDN-hosted fonts.
   cells mark where emotes were last used over that long ago — dim until
   recording has actually covered that span, then bold and
   accent-bordered — plus a solid accent square at the point recording
-  began (everything below it was never seen). The `▤` age-rows mode
-  gives each square its own row, and all the squares' borders breathe
-  on a slow pulse so they catch the eye.
+  began (everything below it was never seen). A square an emote crossed
+  this session turns gold, and the `▤`/`▥` button cycles three row
+  modes: flowing, each era on its own row, or inline with each visual
+  row ending at its last square.
 - Reshuffles animate emotes sliding to their new spots; a just-used
   emote flashes behind its cell, each use stepping the flash ~24° round
   the hue wheel so consecutive uses read as a spectral walk.
-- `Aa` overlays each emote's code, `½x`/`¾x`/`1x`/`2x` buttons size the
-  grid, and `hold` freezes usage reshuffles while the pointer is over
-  the picker.
+- `Aa` overlays each emote's code, `½x`/`¾x`/`1x`/`1⅓x`/`1½x`/`1⅔x`/`2x`
+  buttons size the grid, `hold` freezes usage reshuffles while the
+  pointer is over the grid (`hold+` also pauses animated cells), and a
+  pause chip swaps cells for their still frames.
 - The box resizes from its left and top edges and drags by a dotted
   grip strip (both persist); a `📌` pin keeps it open across chat-bar
   hides and reloads. All display options — names, size, sort, age rows,
@@ -260,18 +263,23 @@ no dependencies beyond CDN-hosted fonts.
   12-hour / 12-hour + seconds), five sub-chip modes (right / compact
   `[NN]` / before badges / compact-left / hidden; a dim " -- " marks
   chatters Twitch reported no month count for, skipped on the bots).
-- Page-flip columns — two, or three in landscape; a full column hands
-  its overflow to the next, whose old page lingers as faded ghost rows
-  that incoming messages overwrite in a dimming wave from the fold.
+- Split columns — six modes: two page-flip columns (three in
+  landscape), each holding one page that hands its overflow to the
+  next while retired pages archive into the log; then three rail
+  layouts alongside two chat columns — stream + emote picker + stats,
+  stream + picker, and picker alone (the video floats over the chat on
+  demand there).
 - `live?` in the media tab pings every linked Twitch channel
   through the relay; live links gain a green dot and an
   uptime/viewers/title tooltip, offline ones grey out.
 - Stream video overlay — draggable, resizable, loads only when
-  enabled; its glyph goes green while the stream is live, red when a
+  enabled; in the rail modes it docks, floats or turns off (an 'off'
+  revives docked on rail re-entry), and it pauses while hidden so no
+  audio leaks; its glyph goes green while the stream is live, red when a
   stopped player exists and the stream is not.
-- Tabbed help panel (config/help · media · liberatory · authors ·
-  stats) with its own width and font-size controls; resizes from its
-  edges.
+- Tabbed help panel (config/help · stats · media · left · libre ·
+  authors) with its own width and font-size controls; resizes from its
+  edges and rests in a 9-spot dock until dragged.
 - Everything persists in `localStorage`; every option answers to
   click, shift+click (reverse) and the scroll wheel. In the popup the
   style and preset links render as live swatches — background, text
@@ -285,7 +293,9 @@ no dependencies beyond CDN-hosted fonts.
 
 - Mention highlighting — your own login joins the keyword set when
   logged in; a block-words field does the inverse, hiding any matching
-  line outright.
+  line outright. `@name` mention text and reply-parent nicks render in
+  the mentioned chatter's own nick colour (their real Twitch colour
+  once seen, the palette hash otherwise).
 - GLORP/F red rows, channel-point tints, fossabot/blammobot name
   shimmer (and the urls in their posts), game-line styling, braille
   art restacking.
@@ -374,7 +384,7 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Help popup & resources
 
-- Five tabs — config/help, stats (a session cell with chatter/message/
+- Six tabs — config/help, stats (a session cell with chatter/message/
   badge counts and peak viewers; a channel scope picker when several
   are joined; top chatters and badges over all-time/month/week/today/
   12h/1h windows folded from per-day and per-hour buckets; top emotes
@@ -384,10 +394,11 @@ no dependencies beyond CDN-hosted fonts.
   that day's supa chat log; and a storage cell sizing the app's own
   footprint — localStorage keys, archive row count, origin estimate),
   media (re Hasan, clips, news, yt channels, twitch streams,
-  community), left/libre (usa pol, dsa chapters, left parties,
-  organising, conduct, dual power, mutual aid, free software, free
-  culture, open hardware, open social, open gov, justice, extra
-  links), and authors (era-grouped reading lists) — laid out in link
+  community), left (usa pol, dsa chapters, left parties, orgs,
+  organising, conduct, dual power, mutual aid, activism, justice),
+  libre (free software, free culture, open hardware, open social,
+  open net, open knowledge, open gov, digital rights, osint),
+  and authors (era-grouped reading lists) — laid out in link
   columns whose count is capped by the popup's own width via
   container queries.
 - Split rule between left/libre and authors: people and their texts
@@ -408,7 +419,7 @@ force off.
 
 | key | values | effect |
 |---|---|---|
-| `split` | `2` / `3` | page-flip columns (3 on landscape screens) |
+| `split` | `1`–`6` | column modes: 1 single · 2/3 page-flip (3 on landscape) · 4 rail of video·emotes·stats · 5 rail of video·emotes · 6 emotes rail (video floats on demand) |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
 | `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |
@@ -430,7 +441,7 @@ force off.
 | `lines` | `0`–`3` | row separator shades |
 | `times` | `nosec`/`24h` / `24hsec` / `12h` / `12hsec` / `0` | timestamp mode |
 | `shadow` | `0`–`2` | text shadow level |
-| `video` | flag | stream video overlay |
+| `video` | flag / `dock` / `float` / `off` | stream video overlay; rail placement in mode 4, shown/hidden in 5–6 |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
@@ -450,14 +461,15 @@ force off.
 | `anim` | `0`–`3` | nick styles: off / super slow / slow / on |
 | `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
 | `epnames` | `1` | picker: emote names on cells |
-| `epzoom` | `sm`/`q`/`big` | picker cell size (½x / ¾x / 2x) |
+| `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
 | `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
-| `epage` | `1` | picker age-rows mode |
+| `epage` | `0`–`2` | picker age-square rows: flowing / era rows / rows end at the last square |
 | `epmix` | `1` | picker merged provider grid |
-| `ephold` | `0` | picker reshuffle hold off |
+| `ephold` | `0`–`2` | picker reshuffle hold (2 = hold+, pauses animated cells) |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
 | `epanim` | `anim`,`animf`,`still` | picker animation filter (`animf` = animated shown as stills) |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
+| `epopen` | flag | picker open state — the popup opens or stays closed |
 | `overlay` | flag | OBS browser-source mode: transparent page, live rows only |
 | `mid` | a message id | scroll to and flash that row on load (set by timestamp clicks) |
 | `hw` | comma list | hide these logins' rows |
@@ -465,12 +477,17 @@ force off.
 
 `theme` names a preset bundle of all display options (`default`,
 `compact`, `print`, `cosy`, `cinema`, `phosphor`, `dyslexic`,
-`midnight`, `solar`, `minimal`, `retro`, `irc`, `gohu`, `heather`); a
-style name like `theme=dark` still selects just the palette, which is
+`midnight`, `solar`, `minimal`, `retro`, `irc`, `gohu`, `heather`,
+`nightshade`, `ft`, `ftdark`, `twitch`); a style name like `theme=dark`
+still selects just the palette, which is
 also what the retired preset names `paper`, `mirc` and `console` now
 resolve to. Presets never share a name with a style. Each preset also
 pins the header button labels: `default` keeps them on and every other
 preset runs the bare header (the `?` popup is unaffected either way).
+
+The copy-settings button builds this url for the current options; a set
+theme rides it as `?theme=name` and options still matching the preset
+drop their param, so only drifted settings spell out.
 
 ### Performance
 
@@ -511,7 +528,7 @@ Where this sits relative to the usual suspects:
 | whispers | ✅ pane + unread chip | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ |
 | stream stats line | ✅ uptime·viewers·chatters | viewers/uptime | ❌ | partial | ✅ | ❌ | partial | partial |
 | stream video alongside | ✅ drag/resize overlay | ✅ | ❌ | ❌ | partial ext. | ❌ | ❌ | ❌ |
-| multi-column log | ✅ 2-3 page-flip | ❌ | ❌ | ✅ splits | partial | ❌ | ❌ | ❌ |
+| multi-column log | ✅ 2-3 page-flip + rail layouts | ❌ | ❌ | ✅ splits | partial | ❌ | ❌ | ❌ |
 | screen-reader landmarks | ✅ live region + feeds | partial | partial | ❌ | ❌ | ❌ | partial | partial |
 | config as shareable url | ✅ settings-as-query | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
 | free/libre/open source | ✅ AGPL | ❌ | ❌ | ✅ MIT | ✅ GPLv3+ | ✅ GPLv3 | ✅ MIT | ✅ AGPLv3 |

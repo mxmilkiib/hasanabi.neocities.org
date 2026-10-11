@@ -3,6 +3,152 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions — the page ships continuously to Neocities.
 
+## 2026-10-11
+
+### Split columns
+- page-flip rewritten around one page per column: retired pages archive
+  hidden in the log rather than lingering as faded scrollback, so
+  columns deal top-down, never scroll, and flip clean without slack,
+  scroll snaps or ghost bookkeeping; a ResizeObserver refits pages
+  after column-box changes, closing the one-frame spill flashes, and
+  re-deals only fire on real overflow anchored to the live column
+- split modes 5 and 6 join the cycle as rail variants on the same two
+  chat columns - 5 runs stream-on-top + emote picker (stats out), 6
+  the picker alone with the video off by default; both modes own the
+  video's placement, so the ▶ button toggles it there (floating over
+  the chat in 6)
+- an 'off' rail video revives docked on rail re-entry, 4→5→6
+  transitions re-dock the rail properly, and the sync strip floats
+  above the rail's video and picker popups
+
+### Emote picker
+- cells dedupe across providers up to case - 7tv's 'glorp' and bttv's
+  'Glorp' keep only the first source scanned; emoji always trail the
+  merged grid
+- age-rows gains a third state '▥': cells flow inline but each visual
+  row ends at its last square, measured off the rendered grid and
+  re-cut on rebuilds and resizes
+- hold engages across the whole cell grid including gaps, hold+ borrows
+  the pause freeze rather than forcing the still filter, and the anim
+  filter simplifies to show/hide with a separate pause chip for stills
+
+### Settings url
+- a set theme rides the copied url as ?theme=name even after options
+  drift - each preset-pinned field drops its param while it matches and
+  returns the moment it changes, the attribution persisting in the
+  saved bundle
+- epopen= recalls the emote popup's open state; video= under modes 5/6
+  only emits when the mode-forced video is hidden
+
+### Rows & chat
+- @mention text and reply-parent nicks render in the mentioned
+  chatter's nick colour (their real twitch colour once seen, the
+  palette hash otherwise)
+- backfill replay rows flash at half brightness; the sync strip
+  narrates only real outages, one load narrator speaks at a time, and
+  the strip docks over the column tops instead of shoving chat down
+
+### Gifs
+- giphy results, misses and rate-limit backoff persist across reloads;
+  gif bytes proxy through the worker's edge cache and a KV layer pools
+  answers across viewers
+
+### Resources
+- la izquierda diario joins the news south america group; the re Hasan
+  row's bracketed links stay strong through the descriptor demotion
+
+### Misc
+- rate-window picks set the graph's frame and the rail's window set
+  clamps to its short list; the spark save shrinks and survives quota
+  pressure
+- the twitch embed pauses while its box is hidden, so a 'hidden' video
+  no longer leaks audio; the update bar bolds its text and buttons
+
+## 2026-10-10
+
+### Split columns
+- page-flip polish: idle columns pin synchronously for a settled first
+  paint, flipped pages open at the column top, the outgoing page ghosts
+  fully, follow and jump-down measure to the last row instead of slack,
+  and the fold counts live rows only
+
+### Emote picker
+- the anim filter gains a freeze leg behind its own pause chip; hold+
+  stills cells while the hold is engaged; age squares crossed this
+  session turn gold and fade toward purple with rung depth
+
+### Themes
+- nightshade preset (heather on lavender's dark stop) re-specced across
+  the day; ft and ftdark presets (salmon paper, georgia broadsheet);
+  heather preset; a twilight shade stop interleaves between dusk and
+  dark; --aux replaces fixed lavender as a hue-relative tertiary
+- the style axis splits into colour + variant; a red colour joins;
+  nick sweeps run slow by default
+
+### Help popup & stats
+- the popup rests centred until dragged, gains a 9-spot dock anchor, a
+  styled scrollbar and grab grips on the resize edges; the wheel cycles
+  its tabs; left/libre splits into separate 'left' and 'libre' tabs and
+  extra links moves to media
+- rail stats dresses in the chat font with per-chart window pickers
+  (12h/6h/3h/1h); the stats rate graph auto-spans from the data, caps
+  glorp-hot seconds red in its bins and persists the long glorp series
+- badge rows title their versions, pokemon names capitalise,
+  no_audio/no_video sets read 'watching/listening without', and
+  sub-gifter versions read 'N gifted subs'
+
+### Video & audio
+- the stream video keeps its unmuted preference across reloads; a
+  gesture wake keeps retrying until a clean read, and an autoplay
+  permission hint replaces the unmute workarounds
+- a 5-minute HEAD poll flags new deploys on an under-header update bar
+
+### Resources
+- big left/libre restructure across ~120 link edits: activism gains the
+  icerr rapid-response directory and a protest fold; bds splits into
+  its boycott/divest/sanctions pillars; participatory, dual power and
+  mutual aid regroup; unions gain striking and mexico groups; left
+  orgs fill out by region; wikipedia links mark canonical repeats with
+  a star
+- news adds politico, socialist worker, rolling stone, private eye and
+  memeorandum; dsa chapters keep growing
+
+### Misc
+- the first-visit sheen sweeps a rainbow beam across the doorway
+  buttons; the help panel scrolls on the wheel instead of cycling
+  options; the cache-bust nonce clears from the url after load; em-right
+  floats a row's trailing emote run to the right edge; own sends no
+  longer count as chat activity in use stats
+
+## 2026-10-09
+
+### Themes
+- ft and ftdark presets land (salmon paper, georgia broadsheet),
+  heatherdark becomes nightshade, and salmon joins the colours as the
+  ft paper; presets order light→dark, cosy takes grain and cinema
+  contrast; a murk stop interleaves the shade axis, --aux becomes the
+  hue-relative tertiary
+- rainbow mention halo tightens; nick styles default to a slow sweep
+  with 'on' renamed 'quicker'
+
+### Settings url
+- the copied settings url collapses to ?theme=name on an exact preset
+  match and previews live above the button; rail-video state and the
+  picker geometry baseline join the emitted set; preset matching
+  covers clean/epmix/ephold/hdrgraph and ignores panel-open state;
+  reset drops url params so the theme goes too
+
+### Stats
+- rail stats narrow form - chat-font dress, filters hidden, ranked
+  lists clamped to 24h with per-chart span pickers; top chatters flows
+  in columns; badge rows read 'prime subscriber' and 'chat bot'
+
+### Misc
+- the rail video cycles dock/float/off and pops out at the column's
+  geometry; the help popup centres in rail mode until dragged; the
+  emote picker mixes sources by default and hold only engages over
+  cells; drafts mark over-cap text
+
 ## 2026-10-08
 
 ### Resources
@@ -1659,7 +1805,6 @@ not versions — the page ships continuously to Neocities.
   row hold whole option bundles; click recalls (stores when empty),
   shift/right-click overwrites, filled slots read as `on`, and slots
   sync across open tabs
-- GitHub Pages mirror at mxmilkiib.github.io/hasanabi.neocities.org
 - Emote-picker era markers carry a marching-ants dashed border (an
   animated svg stroke-dashoffset), still staggered per rung; era rungs
   now extend from 1h through 12h with `Nh` labels
