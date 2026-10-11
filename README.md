@@ -261,8 +261,7 @@ no dependencies beyond CDN-hosted fonts.
   followed by tab, completes emote codes the same way, with a small
   preview beside each candidate.
 - The box is a growing textarea - a wrapping draft gains a line at a
-  time up to five before scrolling; ⇧`enter` writes a newline, plain
-  `enter` sends.
+  time up to five before scrolling; `enter` sends, shift or no.
 - A character count sits beside the box - amber past ~200 chars (the
   guessed [fossabot](https://fossabot.com/) long-message cutoff; the
   real filter isn't public)

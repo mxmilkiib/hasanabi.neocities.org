@@ -64,6 +64,9 @@ not versions - the page ships continuously to Neocities.
 - backfill replay rows flash at half brightness; the sync strip
   narrates only real outages, one load narrator speaks at a time, and
   the strip docks over the column tops instead of shoving chat down
+- the ⇧enter newline is gone: irc frames on newlines so one typed into
+  the box could never survive the wire - shift-enter now just sends,
+  like enter, and the placeholder/help/overlay hints drop the claim
 - links view honours visibility in its 'first post wins' dedupe: a
   first post archived under split (or hidden by a block) can't claim
   its link, so the first shown post stands in instead of the url

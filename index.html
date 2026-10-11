@@ -2294,7 +2294,7 @@
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
-    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ⇧enter breaks a line; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
+    <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
@@ -9934,8 +9934,7 @@
       chatPick.innerHTML = `chat as @${escapeHTML(auth.login)} → ` +
         CHANNELS.map((c) =>
           `<a data-ch="${escapeHTML(c)}" href="#" class="${c === tgt ? 'on' : ''}"${c === tgt ? ' aria-current="true"' : ''} ` +
-          `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' / ') +
-        ' (shift-enter for newline)';
+          `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' / ');
       chatInput.placeholder = '';
     }
     // offsets sum through the highlight wrap, which owns the input's
@@ -10232,7 +10231,7 @@
     chatbarEl.hidden = !on && !(pending && !chatbarEl.hidden);
     chatInput.disabled = pending;
     chatInput.placeholder = on
-      ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''} (shift-enter for newline)`
+      ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}`
       : pending ? 'finishing twitch login…' : 'log in to chat';
     if (toUntils[sendTarget()]) paintTimeout();
     paintChatPick();
@@ -10536,8 +10535,9 @@
       if (!emotePick.hidden) return; // the document handler closes the picker
       if (replyCtx) { clearReply(); return; }
     }
-    // ⇧enter writes a newline into the box; plain enter sends
-    if (e.key !== 'Enter' || e.isComposing || e.shiftKey) return;
+    // enter sends, shift or no - irc frames on newlines so a typed one
+    // could never survive the wire anyway
+    if (e.key !== 'Enter' || e.isComposing) return;
     e.preventDefault();
     sendChat();
   });
