@@ -98,6 +98,8 @@ not versions - the page ships continuously to Neocities.
 - the picker's 'chat was not being logged' rungs march their dotted
   ring counterclockwise - the reversed drift marks a stretch where
   the clock ran backwards for logging purposes
+- youtube inline-card titles run strong - the same chat-weight+300
+  rule the bits rows use
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;
