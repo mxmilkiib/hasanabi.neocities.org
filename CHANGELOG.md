@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to the HasanAbi chat client, newest first. Dates,
-not versions — the page ships continuously to Neocities.
+not versions - the page ships continuously to Neocities.
 
 ## 2026-10-11
 
@@ -513,7 +513,7 @@ not versions — the page ships continuously to Neocities.
   channels/streams, `liberatory` takes usa pol down to extra links;
   `?htab=resources` still resolves to media
 - kopimistsamfundet (sweden's file-sharing church) joins sharing;
-  its `—` divider moves above the row so sharing + free culture sit
+  its `-` divider moves above the row so sharing + free culture sit
   inside the free/open block
 - the channels/streams `links` column pins to the rightmost service
   slot instead of sorting in by frequency
@@ -1617,7 +1617,7 @@ not versions — the page ships continuously to Neocities.
   knowledge`: free courseware (mit ocw, openlearn, khan, freecodecamp,
   saylor, p2pu), course indexes, open textbooks and wikiversity
 - a `live tv` row joins after `news`: the major free 24/7 streams
-  grouped by region — al jazeera, west asian, uk, eu, us nets and
+  grouped by region - al jazeera, west asian, uk, eu, us nets and
   c-span, asia-pacific, canada and nigeria
 - the open cluster completes: `open access` (preprints, shadow
   libraries, unlockers, the swartz manifesto), `open science` (osf,
@@ -1745,11 +1745,11 @@ not versions — the page ships continuously to Neocities.
 ### Fixes & polish
 - `re Hasan` pairs twitchtracker with the media tracker and moves
   wikipedia ahead of fear& pod; `justice` slides up under `conduct`,
-  and the `—` spacers between re Hasan/clips, free software/open
+  and the `-` spacers between re Hasan/clips, free software/open
   hardware and after extra links go; `extra links` columns widen to
   match the other sections
 - Section rows in the popup get more margin between them (7px over the
-  old 4px), and the config `—` separators dim to opacity .4
+  old 4px), and the config `-` separators dim to opacity .4
 - The authors tab's info and sort filters share a line whenever the
   popup is wide enough, wrapping back to two centered lines when narrow,
   and 'all' folds the dates into the merged bracket after a comma rather
@@ -1854,7 +1854,7 @@ not versions — the page ships continuously to Neocities.
 - Config rows sort with the header-control settings first; the
   chat-side settings (pause, ping, scrollback, flow, clean urls)
   follow after them
-- Section `—` separators gain real margins - 9px/7px in config,
+- Section `-` separators gain real margins - 9px/7px in config,
   5px/3px in resources - so sections read as blocks
 - Bot command lists drop `wider` so they actually columnise - 30em
   columns never fit twice in the default-width panel
@@ -1868,7 +1868,7 @@ not versions — the page ships continuously to Neocities.
   above the status text, a touch less below
 - `usa pol` splits in two - the dsa block keeps the labelled row,
   act blue / votehub / vote-vote-vote drop to a line of their own
-- Config's keyword inputs retitle `to highlight`/`to block`, and `—`
+- Config's keyword inputs retitle `to highlight`/`to block`, and `-`
   separators section the tab: above the bot commands, around the pair
   and above the source line
 - Chatbar tightens: the empty char-count stops reserving 2.5ch
@@ -2251,7 +2251,7 @@ not versions — the page ships continuously to Neocities.
   shareable via `?shade=0..6` or `auto` (system-following)
 - Header text now follows the chat font; header font sizes run 7–20px
   and its option list is a separate help row without px suffixes
-- Header button labels (`?` labels mode) scale with `--hdr-fs` — they
+- Header button labels (`?` labels mode) scale with `--hdr-fs` - they
   were pinned at 13px
 - Default chat font size is now 18px; lavender sits just before mirc in
   the similarity-ordered style cycle
@@ -2286,7 +2286,7 @@ not versions — the page ships continuously to Neocities.
 
 ### Columns & ghosting
 - Ghost (stale) rows fade on a pixel-distance gradient from the
-  fresh/ghost boundary — the row about to be overwritten is nearly
+  fresh/ghost boundary - the row about to be overwritten is nearly
   invisible, resting rows sit at a milder dim; the fade creeps ahead
   of incoming text
 - Ghost rows overwrite in place by height, repay height overage, and
@@ -2318,15 +2318,15 @@ not versions — the page ships continuously to Neocities.
   (.45 → .8) - the strike is the signal, not the fade
 - Own messages can carry an accent edge (`?self=1`); own-name mentions
   auto-highlight once logged in
-- `@N` chip queues mentions/keyword hits arriving while unfocused —
+- `@N` chip queues mentions/keyword hits arriving while unfocused -
   click to jump to each, ⇧click clears; it queues only *your* matches,
   not `@hasanabi` channel mentions
 - Compact `[12]` sub-chip variants on both sides of the name
 - Notice rows dedup so backlog replays don't re-add them
 
 ### Links & previews
-- Status links (`x.com/…/status/…`) render an inline preview card —
-  author, text, up to 4 photos — fetched by the relay through
+- Status links (`x.com/…/status/…`) render an inline preview card -
+  author, text, up to 4 photos - fetched by the relay through
   `api.fxtwitter.com`
 - Profile links route nitter → bird.makeup → x.com; the dead
   netbub fallback is gone and the relay probes the tracker's pick
@@ -2334,12 +2334,12 @@ not versions — the page ships continuously to Neocities.
   serving profiles only)
 - Stepped boot progress bar in the empty state (`loading relay…` →
   `joining chat` → `socket connected` → first lines) with diagnostic
-  text when nothing arrives — quiet chat vs blocked iframe
+  text when nothing arrives - quiet chat vs blocked iframe
 
 ### Help popup
 - Live repo stars + created/updated dates in the source row via the
   relay's GitHub API fetch; README.md and CHANGELOG.md linked directly
-- Era markers inside the author rows; `—` separators between the link
+- Era markers inside the author rows; `-` separators between the link
   sections; DSA, ActBlue, indymedia (+ucimc/nl) and the turbulence
   wayback archive added; rows reordered (channels above authors,
   US-first news)
@@ -2381,7 +2381,7 @@ not versions — the page ships continuously to Neocities.
 - News and channels rows join the help panel, ordered US → UK → Middle
   East; the authors row grew to a curated set tagged with works and
   birth-death years, ordered by era (anarchists, marxists, feminists,
-  radicals & labour, culture, free culture — Stallman, Cunningham,
+  radicals & labour, culture, free culture - Stallman, Cunningham,
   Raymond, Lessig, Boal, Öcalan, Sitrin et al.)
 
 ## 2026-09-24

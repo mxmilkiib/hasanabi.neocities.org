@@ -3,28 +3,28 @@
 ![HasanAbi Chat Thing - a compact, customisable, one-page Twitch chat client](og.png)
 
 A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/hasanabi),
-hosted on Neocities — orientated around the Hasan Piker stream, aka the
+hosted on Neocities - orientated around the Hasan Piker stream, aka the
 Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool,
 organising, media and other resources, & more! Live at
-<https://hasanabi.neocities.org/> — project page at
+<https://hasanabi.neocities.org/> - project page at
 <https://hasanabi.neocities.org/about/>.
 
 In plainer terms: it is the stream's chat, liberated from twitch.tv. The
 log renders in a single self-contained page that runs on a static host,
 follows one along through suspends and reloads (backfilling whatever was
 missed), draws a live messages-per-second graph, understands every major
-emote ecosystem, and — after an optional Twitch login — replies, `/me`s
+emote ecosystem, and - after an optional Twitch login - replies, `/me`s
 and chat history walkbacks work like a real IRC client. Beyond chat, the
 page doubles as a curated hub: the help popup carries resources, news,
 organising links and era-grouped author reading lists. Any other Twitch
 channel can be pointed at with `?channel=login`, and a comma list
-(`?channel=a,b,c`, up to 6) merges several rooms into one log — the first
+(`?channel=a,b,c`, up to 6) merges several rooms into one log - the first
 channel stays focused (title, stream status, video, chat target, storage)
 while each row carries a `#chan` chip that refocuses on click.
 
 The project comes in two parts: the frontend
 ([hasanabi.neocities.org](https://github.com/mxmilkiib/hasanabi.neocities.org),
-this repo — a single `index.html`) and the backend chat relay
+this repo - a single `index.html`) and the backend chat relay
 ([twitch-chat-relay](https://github.com/mxmilkiib/twitch-chat-relay),
 also a single `index.html`, hosted on GitHub Pages).
 
@@ -43,14 +43,14 @@ hosted on GitHub Pages (which sends no CSP) and talks to it with `postMessage`.
 The split is therefore by network privilege, not by concern: the frontend
 owns all presentation and state, while the relay owns every outbound
 connection. Because the relay learns its channels from the `join` message
-rather than anything hardcoded, it is channel-agnostic — any page on any
+rather than anything hardcoded, it is channel-agnostic - any page on any
 CSP-locked host can embed the same iframe for any Twitch channel. The
 hasanabi specifics all live in this file; the relay could just as well
 serve a completely different channel page.
 
-## Backend — `twitch-chat-relay` (GitHub Pages)
+## Backend - `twitch-chat-relay` (GitHub Pages)
 
-Repo: <https://github.com/mxmilkiib/twitch-chat-relay> — also a single
+Repo: <https://github.com/mxmilkiib/twitch-chat-relay> - also a single
 `index.html`, loaded as a hidden iframe from
 `https://mxmilkiib.github.io/twitch-chat-relay/`.
 
@@ -82,42 +82,42 @@ Parent → relay:
 
 Relay → parent:
 
-- `{type: 'status', state}` — connecting / connected / reconnecting
-- `{type: 'lines', lines[]}` — raw IRC lines, live or backfilled
-- `backfill` — on request, the relay fetches the backlog from
+- `{type: 'status', state}` - connecting / connected / reconnecting
+- `{type: 'lines', lines[]}` - raw IRC lines, live or backfilled
+- `backfill` - on request, the relay fetches the backlog from
   recent-messages.robotty.de (the same service Chatterino uses) and
   forwards it as `lines`; the page skips already-rendered msg ids
-- `{type: 'stream', channel, uptime, viewers, title}` — decapi poll
+- `{type: 'stream', channel, uptime, viewers, title}` - decapi poll
   result, per joined channel
 - `{type: 'emotes', channel, emotes, emoteSrc, zeroWidth, badges,
-  lastBroadcast, lastVod, emoteUse, emoteAnim}` — per-channel emote map +
+  lastBroadcast, lastVod, emoteUse, emoteAnim}` - per-channel emote map +
   sources + badge sets + stream history + per-emote channel usage counts
   (StreamElements chatstats) + animated-emote names, refetched every
   10 minutes (global sets are fetched once per cycle and merged in)
-- `{type: 'nitter', host}` — fastest healthy nitter instance from
+- `{type: 'nitter', host}` - fastest healthy nitter instance from
   status.d420.de, rechecked every 15 minutes
-- `{type: 'wscause', code, reason}` — why the Twitch socket last closed,
+- `{type: 'wscause', code, reason}` - why the Twitch socket last closed,
   sent with each `reconnecting` status; the page shows it in the header
-- `{type: 'repo', stars, created, pushed}` — GitHub metadata for the
+- `{type: 'repo', stars, created, pushed}` - GitHub metadata for the
   source row of the help popup
-- `{type: 'auth', login}` (or `{type: 'auth', error}`) — after `auth`, the
+- `{type: 'auth', login}` (or `{type: 'auth', error}`) - after `auth`, the
   relay validates the token at id.twitch.tv, reconnects the socket with
   the user's credentials, and reports the resolved login
-- `{type: 'tweet', id, tweet}` — preview data for a tweet link
-- `{type: 'twsets', key, sets}` — the emote-set metadata reply (`key`
+- `{type: 'tweet', id, tweet}` - preview data for a tweet link
+- `{type: 'twsets', key, sets}` - the emote-set metadata reply (`key`
   echoes the asked `ids`)
 
-## Frontend — `index.html` (this repo, on Neocities)
+## Frontend - `index.html` (this repo, on Neocities)
 
-Everything runs client-side in one file — no build step, no framework,
+Everything runs client-side in one file - no build step, no framework,
 no dependencies beyond CDN-hosted fonts.
 
 ### Chat log
 
-- Rows — timestamps, linked names, real badge icons (mod, VIP, sub
+- Rows - timestamps, linked names, real badge icons (mod, VIP, sub
   flair, bits, founder…) with text chips as fallback, and `[sub N]` /
   `[bits]` / `[first]` chips.
-- Replies — the full original is quoted in a ruled block above the
+- Replies - the full original is quoted in a ruled block above the
   line; click it to jump back to the source row.
 - `/me` actions, `!command` and `#tag` lines render in italics (names,
   chips and timestamps stay upright).
@@ -127,18 +127,18 @@ no dependencies beyond CDN-hosted fonts.
   ghosts that user's rows in place (struck-through but readable,
   including own echoes); a timeout or ban on the logged-in user locks
   the chat input with a live countdown until it expires.
-- Name colours — the chatter's own Twitch colour when set, a
+- Name colours - the chatter's own Twitch colour when set, a
   hash-derived palette colour otherwise; either way the luminance is
   nudged so names stay legible on the active theme (the console theme
   ignores chatter colours for its phosphor-green palette).
-- Gap notices — stretches the page wasn't watching (hidden tab,
+- Gap notices - stretches the page wasn't watching (hidden tab,
   suspended timers, page closed, socket dropped) get a
   `· Nm gap · cause · start → end` row so lost context stays visible.
-- Whispers — `WHISPER` lines render in their own floating pane beside
+- Whispers - `WHISPER` lines render in their own floating pane beside
   the log (needs a login carrying whisper scopes); an unread count
   badges a `✉` header chip that opens it, and `/w name text` replies
   through `#jtv` like other clients.
-- Permalinks — clicking a row's timestamp copies a `?mid=` link;
+- Permalinks - clicking a row's timestamp copies a `?mid=` link;
   opening it scrolls to and flashes the row.
 
 ### Emotes
@@ -149,7 +149,7 @@ no dependencies beyond CDN-hosted fonts.
 - Zero-width 7TV emotes stack onto the previous one.
 - Emote-only rows render large (mode configurable: inline / pinned
   right / normal).
-- Hovering an emote — in a row or in the picker — pops a card with the
+- Hovering an emote - in a row or in the picker - pops a card with the
   art at the provider's largest size plus the code and its source set
   (emoji cells show the glyph with their search keywords).
 
@@ -159,18 +159,18 @@ no dependencies beyond CDN-hosted fonts.
   (~600 glyphs) sections with search, a `recent` row of the last 24
   used, per-source tab toggles, still/animated filters, and a `mix`
   toggle that merges every enabled source into one flat grid. Cells
-  dedupe across providers up to case — 7tv's `glorp` and bttv's `Glorp`
-  collapse to the first source scanned — and emoji always trail the
+  dedupe across providers up to case - 7tv's `glorp` and bttv's `Glorp`
+  collapse to the first source scanned - and emoji always trail the
   merged grid.
-- Ordering is alphabetical or by usage — most recently used in chat
+- Ordering is alphabetical or by usage - most recently used in chat
   first (StreamElements chatstats via the relay seed lifetime counts
   for tie-breaks; live session use updates both and persists across
   reloads). In mix mode anything used in the last minute pins to the
   very top; sectioned mode keeps recents atop their own section.
 - In usage mode, dashed `2m`/`5m`/`10m`/`20m`/`30m`/`40m`/`50m`/`60m`
-  cells mark where emotes were last used over that long ago — dim until
+  cells mark where emotes were last used over that long ago - dim until
   recording has actually covered that span, then bold and
-  accent-bordered — plus a solid accent square at the point recording
+  accent-bordered - plus a solid accent square at the point recording
   began (everything below it was never seen). A square an emote crossed
   this session turns gold, and the `▤`/`▥` button cycles three row
   modes: flowing, each era on its own row, or inline with each visual
@@ -184,15 +184,15 @@ no dependencies beyond CDN-hosted fonts.
   pause chip swaps cells for their still frames.
 - The box resizes from its left and top edges and drags by a dotted
   grip strip (both persist); a `📌` pin keeps it open across chat-bar
-  hides and reloads. All display options — names, size, sort, age rows,
-  mix, hold, tabs, anim filter, geometry — ride the settings bundle,
+  hides and reloads. All display options - names, size, sort, age rows,
+  mix, hold, tabs, anim filter, geometry - ride the settings bundle,
   theme slots and copied URLs.
-- Clicking inserts at the caret; `Esc` peels the topmost layer —
+- Clicking inserts at the caret; `Esc` peels the topmost layer -
   picker first, then the help panel.
 
 ### Sending & the input bar
 
-- Optional Twitch login (the Twitch button, implicit OAuth — no secret
+- Optional Twitch login (the Twitch button, implicit OAuth - no secret
   ships in the page) enables a chat input bar. Chat-scoped tokens live
   in localStorage until logout.
 - A `➤` button sends for pointer/voice-only users; typing a character
@@ -200,7 +200,7 @@ no dependencies beyond CDN-hosted fonts.
 - `/me` is wrapped as a CTCP ACTION so it renders as a proper action
   line; slash commands pass through as Twitch reads them (`/timeout`,
   `/ban`, `/announce`, `/raid`…), dropping any pending reply tag.
-- Hovering a row shows `↩` to reply — the pending-reply bar shows the
+- Hovering a row shows `↩` to reply - the pending-reply bar shows the
   target and cancels on `Esc`; the send carries `reply-parent-msg-id`.
   Twitch prepends the `@login` itself, so only the local echo spells
   it out.
@@ -210,14 +210,14 @@ no dependencies beyond CDN-hosted fonts.
 - A plain click on a chatter's name types `@name ` at the input caret
   (modifier-clicks still open the profile).
 - `@` at a word boundary opens a narrowing pick of the joined channels
-  plus recently seen nicks (freshest first, each in its chat colour) — tab/⇧tab walks it, enter
+  plus recently seen nicks (freshest first, each in its chat colour) - tab/⇧tab walks it, enter
   or a click fills the name. `:word`, or any bare word of 3+ letters
   followed by tab, completes emote codes the same way, with a small
   preview beside each candidate.
-- The box is a growing textarea — a wrapping draft gains a line at a
+- The box is a growing textarea - a wrapping draft gains a line at a
   time up to five before scrolling; ⇧`enter` writes a newline, plain
   `enter` sends.
-- A character count sits beside the box — amber past ~200 chars (the
+- A character count sits beside the box - amber past ~200 chars (the
   guessed fossabot long-message cutoff; the real filter isn't public)
   and red near Twitch's 500 cap, with the box border tinting to match.
 - Readline-style history: `↑`/`↓` in the input walk sent messages,
@@ -226,7 +226,7 @@ no dependencies beyond CDN-hosted fonts.
   navigable slot under whatever is sent next. The ring (100 deep,
   per channel) persists in `localStorage`, so `↑` after a reload still
   reaches older sends like an IRC client.
-- Channel rules apply server-side — slow mode counts down in the input
+- Channel rules apply server-side - slow mode counts down in the input
   after each send (mods/VIPs exempt), and rejections arrive as
   ordinary `[notice]` rows.
 
@@ -244,7 +244,7 @@ no dependencies beyond CDN-hosted fonts.
 - Messages-per-second sparkline with 10s/minute ticks and red-on-halo
   glorp/F bursts; dim bands shade spans the page wasn't watching
   (suspended timers, reloads) instead of drawing them flat. Hovering
-  reads the sample under the cursor — msgs/s (or the band's cause on
+  reads the sample under the cursor - msgs/s (or the band's cause on
   a gap), glorp count, wall-clock time. It flexes to fill whatever
   header space is free (the whole bar in reduced mode), re-rasterises
   to match its box so it stays sharp through resizes, and persists
@@ -256,23 +256,23 @@ no dependencies beyond CDN-hosted fonts.
   shade stop) plus a separate 9-stop shade axis (white → black, or
   system-following auto); the `◐` cycle swaps hue family alone while
   picking a chip also applies its shade.
-- Typography — font picker (incl. dyslexia-friendly faces), size,
+- Typography - font picker (incl. dyslexia-friendly faces), size,
   weight, line height, graduated text shadow.
-- Rows — zebra striping (highlighted rows keep their own colour), row
+- Rows - zebra striping (highlighted rows keep their own colour), row
   separator shades, five timestamp modes (off / no seconds / seconds /
   12-hour / 12-hour + seconds), five sub-chip modes (right / compact
   `[NN]` / before badges / compact-left / hidden; a dim " -- " marks
   chatters Twitch reported no month count for, skipped on the bots).
-- Split columns — six modes: two page-flip columns (three in
+- Split columns - six modes: two page-flip columns (three in
   landscape), each holding one page that hands its overflow to the
   next while retired pages archive into the log; then three rail
-  layouts alongside two chat columns — stream + emote picker + stats,
+  layouts alongside two chat columns - stream + emote picker + stats,
   stream + picker, and picker alone (the video floats over the chat on
   demand there).
 - `live?` in the media tab pings every linked Twitch channel
   through the relay; live links gain a green dot and an
   uptime/viewers/title tooltip, offline ones grey out.
-- Stream video overlay — draggable, resizable, loads only when
+- Stream video overlay - draggable, resizable, loads only when
   enabled; in the rail modes it docks, floats or turns off (an 'off'
   revives docked on rail re-entry), and it pauses while hidden so no
   audio leaks; its glyph goes green while the stream is live, red when a
@@ -282,16 +282,16 @@ no dependencies beyond CDN-hosted fonts.
   edges and rests in a 9-spot dock until dragged.
 - Everything persists in `localStorage`; every option answers to
   click, shift+click (reverse) and the scroll wheel. In the popup the
-  style and preset links render as live swatches — background, text
+  style and preset links render as live swatches - background, text
   colour and, for presets, the bundled font.
 - Three **theme slots** under the copy-settings-URL button stash whole
-  option bundles — click recalls a filled slot (or stores the current
+  option bundles - click recalls a filled slot (or stores the current
   options into an empty one), ⇧click/right-click overwrites; they sync
   across open tabs and clear with `reset all settings`.
 
 ### Formatting extras
 
-- Mention highlighting — your own login joins the keyword set when
+- Mention highlighting - your own login joins the keyword set when
   logged in; a block-words field does the inverse, hiding any matching
   line outright. `@name` mention text and reply-parent nicks render in
   the mentioned chatter's own nick colour (their real Twitch colour
@@ -305,7 +305,7 @@ no dependencies beyond CDN-hosted fonts.
   profile links fall back to Bird.makeup when nitter is down).
 - `[notice]` labels on event rows get a cycling rainbow wash.
 - Mentions landing while the page is unfocused queue on a clickable
-  `@N` chip in the header — click to jump to each, ⇧click clears; a
+  `@N` chip in the header - click to jump to each, ⇧click clears; a
   `♪` toggle in config/help adds a soft ping for those lines.
 - `🔗` links view filters the log to rows carrying a URL and shows
   each link only once (session-only, not saved); `✂` clean urls
@@ -314,27 +314,27 @@ no dependencies beyond CDN-hosted fonts.
   yt's `si`, x's `s`/`t` and friends) are stripped from the target
   itself on render, so the clean form is also what stats tallies and
   dedupe folds on.
-- Find bar — `ctrl+f` (a second tap hands off to the browser's own find),
+- Find bar - `ctrl+f` (a second tap hands off to the browser's own find),
   `/` or the `⌕` button floats a search over the
   rendered scrollback: bare words match text, `user:login` the
   chatter, `kind:notice|mod|gap|action|emote|mention|kw|deleted|sub`
   the row type. `enter`/`⇧enter` step between matches with a counter,
   `only` collapses non-matching rows, and `archive` searches the local
-  IndexedDB store — every rendered row indexes flat fields per channel
+  IndexedDB store - every rendered row indexes flat fields per channel
   (30-day retention, ~50MB cap) so search reaches past scrollback's
   edge; hits that still render jump to the row.
-- User hiding — a comma list of logins in config/help hides their
+- User hiding - a comma list of logins in config/help hides their
   rows in one of three modes: `vanish` drops them, `stub` folds them
   into a running count line, `ghost` strikes them dim like deleted
   rows; persisted across visits.
-- User card — clicking a nick or @mention pins an inspector: colour,
+- User card - clicking a nick or @mention pins an inspector: colour,
   pronouns, first-seen, session message count, recent lines, and
   profile / @mention / hide buttons. Where one's own USERSTATE flags
   mod, broadcaster or VIP privileges the card also offers
   `timeout 10m`, `ban` and `delete msg`, each a click-twice confirm
   sent through the relay as IRC commands. `⇧`/`⌃`/`⌘`-click still
   opens the Twitch profile.
-- Hover previews — external links, nicks and @mentions pop a card:
+- Hover previews - external links, nicks and @mentions pop a card:
   title and description, where a shortened link really lands, a
   playable video for instagram reels (resolved through kkclip),
   x/twitter status cards through fxtwitter anywhere outside chat
@@ -351,7 +351,7 @@ no dependencies beyond CDN-hosted fonts.
 - With the chat bar up, `↑`/`↓` select a row (accent outline),
   `r`/`enter` replies to it, `Esc` drops the pick, and typing jumps
   into the input.
-- `Esc` peels layers in order — row pick, emote picker, help panel.
+- `Esc` peels layers in order - row pick, emote picker, help panel.
 - Pause-on-hover option holds the scroll while a row is hovered.
 - Scrolling follows new messages only while at the bottom; scrolling
   up releases it and shows a jump-to-latest button with a count of
@@ -361,13 +361,13 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Persistence, sync & channels
 
-- Scrollback — the config/help panel offers limits from 250 to 100,000
+- Scrollback - the config/help panel offers limits from 250 to 100,000
   rows (1,000 by default). Larger limits use more browser memory and
   may slow long-running tabs; at most the newest 1,000 rows (including
   gap notices) survive reloads via `localStorage`.
 - Stream run history, graph samples, emote-use stats, per-day/hour
   stats buckets, option bundles and picker geometry persist too.
-- Multi-tab — option changes and login/logout propagate to other open
+- Multi-tab - option changes and login/logout propagate to other open
   copies through `storage` events; sent-message echoes broadcast over
   a `BroadcastChannel` so every copy renders them at once.
 - `?channel=login` points chat, stream embed and status at another
@@ -376,7 +376,7 @@ no dependencies beyond CDN-hosted fonts.
   OAuth round-trip carries the channel in `state`. The media tab's
   twitch streams row links each streamer with a `*` that switches to
   them.
-- PWA — installable (manifest + pass-through service worker); an
+- PWA - installable (manifest + pass-through service worker); an
   installed standalone window survives backgrounding better than a
   tab. On cold join, wake or reconnect the page asks the relay for
   missed lines via recent-messages.robotty.de, so the log backfills
@@ -384,7 +384,7 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Help popup & resources
 
-- Six tabs — config/help, stats (a session cell with chatter/message/
+- Six tabs - config/help, stats (a session cell with chatter/message/
   badge counts and peak viewers; a channel scope picker when several
   are joined; top chatters and badges over all-time/month/week/today/
   12h/1h windows folded from per-day and per-hour buckets; top emotes
@@ -392,13 +392,13 @@ no dependencies beyond CDN-hosted fonts.
   counts; top links with favicons, fetched page titles and tweet
   previews; the rate graph's loudest bursts and glorp peaks linked to
   that day's supa chat log; and a storage cell sizing the app's own
-  footprint — localStorage keys, archive row count, origin estimate),
+  footprint - localStorage keys, archive row count, origin estimate),
   media (re Hasan, clips, news, yt channels, twitch streams,
   community), left (usa pol, dsa chapters, left parties, orgs,
   organising, conduct, dual power, mutual aid, activism, justice),
   libre (free software, free culture, open hardware, open social,
   open net, open knowledge, open gov, digital rights, osint),
-  and authors (era-grouped reading lists) — laid out in link
+  and authors (era-grouped reading lists) - laid out in link
   columns whose count is capped by the popup's own width via
   container queries.
 - Split rule between left/libre and authors: people and their texts
@@ -406,7 +406,7 @@ no dependencies beyond CDN-hosted fonts.
   left/libre links concepts, organisations and tools. Where a topic
   wants its texts in context they sit under a **reading** row, and the
   author's name is an `a.au[data-au]` cite that hops to the authors tab
-  and flashes the entry — so a text only appears in left/libre when its
+  and flashes the entry - so a text only appears in left/libre when its
   author has an entry.
 - The popup resizes from its edges and offers widths from 480 to
   1600px.
@@ -428,13 +428,13 @@ force off.
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
-| `lw` | `300`–`700` | weight of entry links across the `?` popup — media, left/libre, authors, stats |
+| `lw` | `300`–`700` | weight of entry links across the `?` popup - media, left/libre, authors, stats |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
 | `hpfs` | px / `-1`…`-3` | help popup font size (negatives follow the chat font that many steps down) |
 | `hpw` | `480`–`1600` | help popup width |
 | `pause` | flag | hold the scroll while hovering a row |
 | `scrollback` | `250`…`100000` | row cap |
-| `rev` | flag | reverse flow — new messages cascade down from the top |
+| `rev` | flag | reverse flow - new messages cascade down from the top |
 | `bartop` | flag | dock the chat input under the header instead of at the bottom |
 | `channel` | a twitch login | point the whole page at another channel |
 | `zebra` | `0`–`4` / flag | zebra stripe contrast (0=off, 1=faint, 2=mild, 3=strong, 4=heavy; a bare flag = mild) |
@@ -445,10 +445,10 @@ force off.
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
-| `lbls` | flag | header button labels shown beside each header control — independent of the `?` cycle |
+| `lbls` | flag | header button labels shown beside each header control - independent of the `?` cycle |
 | `htab` | `config`/`media`/`left`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`resources` and `liberatory` still resolve to `media`/`left`) |
 | `kw` | comma list | keyword highlights (green edge) |
-| `bw` | comma list | block words — matching lines hidden |
+| `bw` | comma list | block words - matching lines hidden |
 | `ping` | flag | mention ping sound |
 | `clean` | flag | cleaned link text |
 | `gifsafe` | flag | giphy pg-13 safe-search |
@@ -469,7 +469,7 @@ force off.
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
 | `epanim` | `anim`,`animf`,`still` | picker animation filter (`animf` = animated shown as stills) |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
-| `epopen` | flag | picker open state — the popup opens or stays closed |
+| `epopen` | flag | picker open state - the popup opens or stays closed |
 | `overlay` | flag | OBS browser-source mode: transparent page, live rows only |
 | `mid` | a message id | scroll to and flash that row on load (set by timestamp clicks) |
 | `hw` | comma list | hide these logins' rows |
@@ -533,7 +533,7 @@ Where this sits relative to the usual suspects:
 | config as shareable url | ✅ settings-as-query | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
 | free/libre/open source | ✅ AGPL | ❌ | ❌ | ✅ MIT | ✅ GPLv3+ | ✅ GPLv3 | ✅ MIT | ✅ AGPLv3 |
 
-Broad strokes only — feature sets drift; Chatterino in particular is the
+Broad strokes only - feature sets drift; Chatterino in particular is the
 much deeper client if one lives at a desktop, the Twitch site carries
 the platform-only surface (polls, predictions, channel points), and
 DankChat/Chatsen cover the phone. The niche here is zero
@@ -558,4 +558,4 @@ The relay deploys automatically via GitHub Pages on push.
 
 ## License
 
-AGPL-3.0 — see [LICENSE](LICENSE).
+AGPL-3.0 - see [LICENSE](LICENSE).
