@@ -1425,11 +1425,16 @@
   /* rail modes keep the video/picker populated beside the strip's span -
      a resync still has to narrate over them and the mode-6 float */
   main:has(#rail:not([hidden])) #loadBar { z-index: 15; }
-  /* the strip can't clock progress - steps land too fast to see and a
+  /* The strip can't clock progress - steps land too fast to see and a
      resync has no milestones at all - so it's a pair of filled poles
-     flanking the label rather than a fake fill */
+     flanking the label rather than a fake fill. The fills breathe their
+     width in toward the label - pure activity, no progress implied */
   #loadBar .loadbar { flex: 1; width: auto; max-width: 30%; height: 12px; margin-top: 0; opacity: .8; }
-  #loadBar .loadbar i { width: 100%; }
+  #loadBar .loadbar i { width: 100%; animation: loadpulse 1.2s ease-in-out infinite, barber 1s linear infinite, syncshrink 2.6s ease-in-out infinite; }
+  /* Docking the left pole's fill to its inner end means the width drain
+     eats the outer edge instead of the edge beside the text */
+  #loadBar .loadbar:first-child i { margin-left: auto; }
+  @keyframes syncshrink { 50% { width: 12%; } }
   /* the label inks in the page colour on an accent chip - dim text on
      the panel ground read as decoration next to the poles */
   #loadTxt { background: var(--accent); color: var(--bg); padding: 0 7px; border-radius: 3px; }
