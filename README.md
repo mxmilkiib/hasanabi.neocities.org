@@ -223,9 +223,9 @@ no dependencies beyond CDN-hosted fonts.
   emote flashes behind its cell, each use stepping the flash ~24° round
   the hue wheel so consecutive uses read as a spectral walk.
 - `Aa` overlays each emote's code, `½x`/`¾x`/`1x`/`1⅓x`/`1½x`/`1⅔x`/`2x`
-  buttons size the grid, `hold` freezes usage reshuffles while the
-  pointer is over the grid (`hold+` also pauses animated cells), and a
-  pause chip swaps cells for their still frames.
+  buttons size the grid, `hold`/`hold+` freezes usage reshuffles while
+  the pointer is over the grid - `hold+`, the default, also pauses
+  animated cells - and a pause chip swaps cells for their still frames.
 - The box resizes from its left and top edges (shading on hover) and
   drags by a dotted grip strip (both persist). It opens by default -
   only a deliberate close keeps it down next visit - and a `📌` pin
@@ -323,11 +323,13 @@ no dependencies beyond CDN-hosted fonts.
 - `live?` in the media tab pings every linked Twitch channel
   through the relay; live links gain a green dot and an
   uptime/viewers/title tooltip, offline ones grey out.
-- Stream video overlay - draggable, resizable, loads only when
-  enabled; in the rail modes it docks, floats or turns off (an 'off'
-  revives docked on rail re-entry), and it pauses while hidden so no
-  audio leaks; its glyph goes green while the stream is live, red when a
-  stopped player exists and the stream is not.
+- Stream video overlay - draggable, resizable, opens by default (only
+  a deliberate off persists); in the rail modes it docks, floats or
+  turns off (an 'off' revives docked on rail re-entry), and it pauses
+  while hidden so no audio leaks; when the stream goes live a stale
+  offline slate is rebuilt if a play() nudge doesn't take. Its glyph
+  goes green while the stream is live, red when a stopped player exists
+  and the stream is not.
 - Tabbed help panel (help/conf · stats · media · left · libre ·
   authors) with its own width and font-size controls; resizes from its
   edges (the affected surfaces shading on hover) and rests in a 9-spot

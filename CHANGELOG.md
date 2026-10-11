@@ -30,7 +30,9 @@ not versions - the page ships continuously to Neocities.
   re-cut on rebuilds and resizes
 - hold engages across the whole cell grid including gaps, hold+ borrows
   the pause freeze rather than forcing the still filter, and the anim
-  filter simplifies to show/hide with a separate pause chip for stills
+  filter simplifies to show/hide with a separate pause chip for stills;
+  hold+ is the default, mix leads the options group beside the emoji
+  tab, and the search field's focus violet moves onto its own border
 
 ### Settings url
 - a set theme rides the copied url as ?theme=name even after options
@@ -62,7 +64,10 @@ not versions - the page ships continuously to Neocities.
   clamps to its short list; the spark save shrinks and survives quota
   pressure
 - the twitch embed pauses while its box is hidden, so a 'hidden' video
-  no longer leaks audio; the update bar bolds its text and buttons
+  no longer leaks audio; it opens by default now (only a deliberate off
+  persists) and a stale offline slate that ignores a play() nudge gets
+  rebuilt ~12s into a live stream; the update bar bolds its text and
+  buttons
 
 ### Help popup
 - the config rows reorganise: popup width, font size and position run
