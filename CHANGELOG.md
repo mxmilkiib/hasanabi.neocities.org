@@ -31,6 +31,10 @@ not versions - the page ships continuously to Neocities.
   fading message can still be replied to before the wave takes it
 - the rail's emote and stats panes pin their scrollbars so a pane never
   reads as already bottomed-out
+- split modes 7 and 8 pair a single chat column with the rail instead
+  of the 4-6 pair's two - 7 docks video + emote picker (stats out), 8
+  the same with stats back in; cycling, restoring and switching between
+  them re-docks in place without re-dealing the column
 
 ### Emote picker
 - cells dedupe across providers up to case - 7tv's 'glorp' and bttv's

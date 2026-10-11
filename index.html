@@ -9707,7 +9707,7 @@
     const statsTab = document.getElementById('htabStats');
     if (railEl.hidden || !helpPanel.contains(statsTab)) return;
     railEl.appendChild(statsTab);
-    statsTab.hidden = splitLevel >= 5;
+    statsTab.hidden = splitLevel >= 5 && splitLevel !== 8;
     syncRailSplit();
   }
   // the seam only matters while both its panes sit docked in the rail
@@ -9748,9 +9748,9 @@
       if (!statsHome) statsHome = { parent: statsTab.parentNode, next: statsTab.nextSibling };
       railEl.append(emotePick, railSplitEl, statsTab);
       emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
-      statsTab.hidden = level >= 5;
+      statsTab.hidden = level !== 4 && level !== 8;
       if (statsLink.classList.contains('on')) switchTab('htabCfg');
-      if (level === 5) {
+      if (level === 5 || level >= 7) {
         // docked at the rail's top for the mode only - the saved rail
         // placement is untouched
         railEl.classList.remove('novid');
@@ -9800,27 +9800,31 @@
   // the rail's stats keep ticking while they're docked
   setInterval(() => { if (!railEl.hidden) renderStats(); }, 8000);
 
-  // Sets the pane count (1..6); a third column only exists in landscape,
+  // Sets the pane count (1..8); a third column only exists in landscape,
   // where it's actually wider than it is tall enough to be readable.
-  // Level 4 is the docked rail rather than a third chat column; 5 and 6
-  // keep the two chat columns and slim the rail instead - video +
-  // emotes, then emotes alone with the video floated over the chat
+  // Levels 4-6 pair two chat columns with the docked rail - stats in 4,
+  // video+emotes in 5, emotes alone in 6 (video floats). 7 and 8 run
+  // one chat column beside the rail instead - video+emotes, then the
+  // same with stats back in
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
-    level = Math.max(1, Math.min(6, level));
+    level = Math.max(1, Math.min(8, level));
     const prevSplit = splitLevel;
     splitLevel = level;
     markHelp('helpSplit', level - 1);
     setOn(splitBtn, level > 1);
-    splitBtn.textContent = level === 6 ? '▮▮☻' : level === 5 ? '▮▮▶' : level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
-    splitBtn.classList.toggle('tri', level >= 3);
+    splitBtn.textContent = level === 8 ? '▮▯' : level === 7 ? '▮▶' : level === 6 ? '▮▮☻' : level === 5 ? '▮▮▶' : level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
+    splitBtn.classList.toggle('tri', level >= 3 && level <= 6);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = `${level}/6 ${['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)'][level - 1]} - click/scroll · ⇧click back`;
+    splitBtn.title = `${level}/8 ${['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', '2col+vid·emotes·stats'][level - 1]} - click/scroll · ⇧click back`;
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
-    // flipping between 2 and a rail level keeps the deal - only the
-    // rail and its contents toggle. the rail modes share one visible
-    // rail, so 4→5→6 must still re-dock; only a true no-op exits early
-    if ((level >= 4 ? 2 : level) === cur) {
+    // want counts chat columns only - the rail never figures in it. a
+    // change that keeps the same chat-column count just re-docks the
+    // rail: 2↔4-6 and 1↔7-8 alike. the rail modes share one visible
+    // rail, so level changes must still re-dock; only a true no-op
+    // exits early
+    const want = level <= 3 ? level : level <= 6 ? 2 : 1;
+    if (want === cur) {
       if (railEl.hidden === (level < 4) && prevSplit === level) return;
       railEl.hidden = level < 4;
       dockRail(level >= 4 ? level : 0);
@@ -9830,15 +9834,15 @@
     }
     // every column folds back into #log in flow order, then re-deals
     mergeCols();
-    sideEl.hidden = level < 2;
-    side2El.hidden = level !== 3;
+    sideEl.hidden = want < 2;
+    side2El.hidden = want !== 3;
     railEl.hidden = level < 4;
-    mainEl.classList.toggle('split', level >= 2);
-    mainEl.classList.toggle('split3', level >= 3);
+    mainEl.classList.toggle('split', want >= 2);
+    mainEl.classList.toggle('split3', want >= 3);
     jdownSet(jdownSide, sideEl, true);
     jdownSet(jdownSide2, side2El, true);
     dockRail(level >= 4 ? level : 0);
-    if (level === 1) {
+    if (want === 1) {
       // columns widen on rejoin - re-pin the live column if it was following
       requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); });
     } else if (revFlow) {
@@ -9859,7 +9863,7 @@
   }
 
   function cycleSplit(dir) {
-    const max = window.innerWidth > window.innerHeight ? 6 : 2;
+    const max = window.innerWidth > window.innerHeight ? 8 : 2;
     setSplit(((splitLevel + dir - 1) % max + max) % max + 1);
     saveOpts();
   }
@@ -13134,7 +13138,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes'],
+    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes', '2col+vid·emotes', '2col+vid·emotes·stats'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
