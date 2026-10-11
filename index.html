@@ -433,7 +433,7 @@
     z-index: 14; /* above the panels even when raise-on-press tops them at 13, under hover cards */
     border: 1px solid var(--popline);
     background: #000;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, .45);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .45), var(--egx, inset 0 0 0 transparent), var(--egy, inset 0 0 0 transparent);
   }
   #vid .vid-handle {
     position: absolute;
@@ -1478,8 +1478,17 @@
     line-height: 1.5;
     z-index: 12; /* above the emote picker (11) */
     container-type: inline-size;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .35), var(--egx, inset 0 0 0 transparent), var(--egy, inset 0 0 0 transparent);
   }
+  /* resize-edge marks: the invisible edge zones toggle .edge-* classes
+     from their hover code, the grip divs drive it straight from :hover;
+     --egx carries the left/right inset, --egy top/bottom, so a corner
+     lights both inner surfaces at once */
+  #helpPanel, #emotePick, #vid { --egc: color-mix(in srgb, var(--text-dim) 55%, transparent); }
+  :is(#helpPanel, #emotePick).edge-l, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.l, .tl, .bl):hover) { --egx: inset 10px 0 8px -6px var(--egc); }
+  :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.r, .tr, .br):hover) { --egx: inset -10px 0 8px -6px var(--egc); }
+  :is(#helpPanel, #emotePick).edge-b, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.b, .bl, .br):hover) { --egy: inset 0 -10px 8px -6px var(--egc); }
+  :is(#helpPanel, #emotePick).edge-t, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.tl, .tr):hover) { --egy: inset 0 10px 8px -6px var(--egc); }
   #helpPanel[hidden] { display: none; }
   /* split-4's rail takes the top-right dock spot, so an unmoved popup
      centers instead; --hcx carries the clamp's centered x. a dragged
@@ -1895,7 +1904,7 @@
     display: flex; flex-direction: column; gap: 6px; padding: 12px 8px 8px; /* top pad clears the drag-strip glyphs */
     background: var(--panel); border: 1px solid var(--popline);
     border-radius: 6px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .35), var(--egx, inset 0 0 0 transparent), var(--egy, inset 0 0 0 transparent);
   }
   #emotePick[hidden] { display: none; }
   /* the hold chip breathes while the pointer is actually holding the
@@ -11934,9 +11943,13 @@
     return l && t ? 'tl' : l ? 'l' : t ? 't' : '';
   };
   emotePick.addEventListener('pointermove', (e) => {
-    if (e.buttons || e.target.closest('.epick-handle, .ep-size')) return;
-    emotePick.style.cursor = EPICK_CURS[epickEdge(e)] || '';
+    if (e.buttons) return; // a drag keeps its lit edge
+    const edge = e.target.closest('.epick-handle, .ep-size') ? '' : epickEdge(e);
+    emotePick.style.cursor = EPICK_CURS[edge] || '';
+    emotePick.classList.toggle('edge-l', edge.includes('l'));
+    emotePick.classList.toggle('edge-t', edge.includes('t'));
   });
+  emotePick.addEventListener('pointerleave', (e) => { if (!e.buttons) emotePick.classList.remove('edge-l', 'edge-t'); });
   emotePick.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || emotePick.hidden) return;
     const edge = epickEdge(e);
@@ -12751,9 +12764,13 @@
     return l && b ? 'bl' : l ? 'l' : b ? 'b' : '';
   };
   helpPanel.addEventListener('pointermove', (e) => {
-    if (e.buttons || e.target.closest('.hp-handle, .hp-size')) return;
-    helpPanel.style.cursor = HS_CURS[edgeAt(e)] || '';
+    if (e.buttons) return; // a drag keeps its lit edge
+    const edge = e.target.closest('.hp-handle, .hp-size') ? '' : edgeAt(e);
+    helpPanel.style.cursor = HS_CURS[edge] || '';
+    helpPanel.classList.toggle('edge-l', edge.includes('l'));
+    helpPanel.classList.toggle('edge-b', edge.includes('b'));
   });
+  helpPanel.addEventListener('pointerleave', (e) => { if (!e.buttons) helpPanel.classList.remove('edge-l', 'edge-b'); });
   // w/h and position live in the same key; a width that lands on a
   // preset re-marks the preset button instead of storing the px
   const saveHsize = (edges) => {
