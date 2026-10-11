@@ -104,6 +104,11 @@ not versions - the page ships continuously to Neocities.
   wrap that would strand the icon at the line's end carries it onto
   the next line with the url - the path still wraps freely after,
   and the split is cut before escaping so no entity severs
+- card and quote indents stop collapsing on hidden rows: a display:none
+  page (archived under split, hidden by links view) measured a name
+  column of 0, so every repin and card fill stamped --nx:0 and the
+  tweet card came back flush-left - the measurement now declines
+  unrendered rows and keeps the stamp they had
 - reply quotes and preview cards land on a normalised name-column
   anchor: the cluster's leading edge now counts every visible
   badge/role/aux chip, so a mod chip or left-docked sub count no

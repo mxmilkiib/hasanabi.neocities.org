@@ -3929,7 +3929,10 @@
   // elements with width
   function nameColX(r) {
     const nm = r && r.querySelector('.name');
-    if (!nm) return null;
+    // a display:none row (a stale page under split, a linkview-hidden
+    // row) measures all-zero - returning null keeps whatever stamp it
+    // had instead of clobbering the card indent to flush-left
+    if (!nm || !nm.offsetWidth) return null;
     let anchor = nm;
     for (let el = nm.previousElementSibling; el; el = el.previousElementSibling) {
       if (!el.matches('img.badge, .role, .aux')) break;
