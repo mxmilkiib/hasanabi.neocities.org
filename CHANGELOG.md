@@ -29,6 +29,11 @@ not versions - the page ships continuously to Neocities.
   edge keeps covered clones from catching clicks, and a clone's hover
   ↩ arms the same reply context as a live row via data-omid, so a
   fading message can still be replied to before the wave takes it
+- the ghost fade reads as a depth map now: each clone wears the ramp as
+  a vertical alpha mask sampled at its own top and bottom, so a tall
+  row's lower half sits at the same fade as the shorter clones beside
+  it instead of all-or-nothing off its top edge - resting opacity
+  rises to .6, the just-covered floor to .12
 - the rail's emote and stats panes pin their scrollbars so a pane never
   reads as already bottomed-out
 - split modes 7 and 8 pair a single chat column with the rail instead
