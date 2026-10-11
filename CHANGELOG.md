@@ -67,6 +67,10 @@ not versions - the page ships continuously to Neocities.
 - the ⇧enter newline is gone: irc frames on newlines so one typed into
   the box could never survive the wire - shift-enter now just sends,
   like enter, and the placeholder/help/overlay hints drop the claim
+- instagram reel/post links grow the same peek-backed card as youtube -
+  poster, title and caption under the message, with a ▶ that unfolds the
+  reel's mp4 in place (the signed url rots inside a day, so a dead play
+  re-asks the peek and the card refreshes itself)
 - tweet and youtube cards (and the click-to-unfold player) indent to
   the row's name column - the same anchor a replied-to message's quote
   lands on - via a --nx stamped on the row, so clones, restores and
