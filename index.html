@@ -5009,6 +5009,7 @@
           if (!stream || !stream.live || vidBox.hidden) return;
           if (vidPlayer && !vidPlayer.isPaused() &&
               !(vidPlayer.isEnded && vidPlayer.isEnded())) return;
+          clearInterval(vidPoll); // the rebuilt embed starts its own poll
           vidPlayer = null;
           loadPlayer.done = false;
           document.getElementById('vidFrame').innerHTML = '';
@@ -8007,8 +8008,9 @@
         emb.addEventListener(Twitch.Player.PAUSE, vidState);
         emb.addEventListener(Twitch.Player.ENDED, vidState);
         let last = '';
-        setInterval(() => {          // poll + persist; the API emits no volume event
-          if (vidBox.hidden || document.hidden) return;
+        clearInterval(vidPoll);
+        vidPoll = setInterval(() => {          // poll + persist; the API emits no volume event
+          if (vidBox.hidden || document.hidden || !vidPlayer) return;
           vidState();
           const paused = vidPlayer.isPaused(), muted = vidPlayer.getMuted();
           if (!armed && !paused && !muted) armed = true;
@@ -8049,6 +8051,7 @@
   // hide itself was what paused it
   let vidPausedByHide = false;
   let vidRetry = 0;
+  let vidPoll = 0;
   function setVideo(on) {
     vidBox.hidden = !on;
     if (on) {
