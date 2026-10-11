@@ -82,6 +82,7 @@ not versions - the page ships continuously to Neocities.
 ### Resources
 - la izquierda diario joins the news south america group; the re Hasan
   row's bracketed links stay strong through the descriptor demotion
+- trans liberation and intersex rights join the activism movements list
 
 ### Misc
 - rate-window picks set the graph's frame and the rail's window set
