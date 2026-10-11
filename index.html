@@ -4512,10 +4512,25 @@
   // page was closed is padded with NaN so it draws shaded, not flat
   // (NaN serializes as null in JSON - mapped back on restore)
   const SPARK_KEY = 'hasan-spark' + CHAN_SFX;
+  // the long series saves compact: its 1Hz times rebuild from the head
+  // stamp and the causes store sparse. the old parallel-array shape grew
+  // past quota on long sessions, the write silently failed, and the stale
+  // restore banded everything since as 'page closed'
   function saveSpark() {
-    try {
-      localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hist: rateHist, histT: rateHistT, histWhy: rateHistWhy, ghist: glorpHist }));
-    } catch {}
+    const put = (h0, hist, hwhy, ghist) => {
+      try {
+        localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hT0: h0, hist, ghist, hWhy: hwhy.flatMap((w, i) => w ? [[i, w]] : []) }));
+        return true;
+      } catch { return false; }
+    };
+    // a quota squeeze still keeps a recent tail; a wiped key beats a
+    // stale save lying about a day of missed chat
+    if (!put(rateHistT[0] || 0, rateHist, rateHistWhy, glorpHist)) {
+      const keep = Math.min(rateHist.length, 21600);
+      if (!put(rateHistT[rateHist.length - keep] || 0,
+               rateHist.slice(-keep), rateHistWhy.slice(-keep), glorpHist.slice(-keep)))
+        try { localStorage.removeItem(SPARK_KEY); } catch {}
+    }
   }
   function restoreSpark() {
     try {
@@ -4541,13 +4556,24 @@
         .map((v) => (v === null ? NaN : v));
       const hGap = Math.min(RATE_KEEP, Math.max(0, Math.round((now - savedAt) / 1000)));
       rateHist.push(...oldHist, ...Array(hGap).fill(NaN));
+      // compact saves rebuild the 1Hz times from the head stamp; older
+      // saves carried the whole array, and the oldest carried none
+      const hSkip = (Array.isArray(d.hist) ? d.hist.length : oldHist.length) - oldHist.length;
       rateHistT.push(
-        ...(Array.isArray(d.histT) && d.histT.length >= oldHist.length
-          ? d.histT.slice(-oldHist.length)
-          : oldHist.map((_, i) => savedAt - (oldHist.length - i) * 1000)),
+        ...(d.hT0 ? oldHist.map((_, i) => d.hT0 + (hSkip + i) * 1000)
+          : Array.isArray(d.histT) && d.histT.length >= oldHist.length
+            ? d.histT.slice(-oldHist.length)
+            : oldHist.map((_, i) => savedAt - (oldHist.length - i) * 1000)),
         ...Array.from({ length: hGap }, (_, i) => savedAt + (i + 1) * 1000));
-      const oldHWhy = (Array.isArray(d.histWhy) ? d.histWhy : []).slice(-oldHist.length);
-      while (oldHWhy.length < oldHist.length) oldHWhy.unshift('');
+      const oldHWhy = Array(oldHist.length).fill('');
+      if (Array.isArray(d.hWhy))
+        for (const p of d.hWhy)
+          if (Array.isArray(p) && p[0] - hSkip >= 0 && p[0] - hSkip < oldHist.length) oldHWhy[p[0] - hSkip] = p[1];
+      else {
+        const s = (Array.isArray(d.histWhy) ? d.histWhy : []).slice(-oldHist.length);
+        while (s.length < oldHist.length) s.unshift('');
+        s.forEach((w, i) => { oldHWhy[i] = w || ''; });
+      }
       rateHistWhy.push(...oldHWhy, ...Array(hGap).fill(''));
       // windows carried over from the last session, so rungs covering an
       // in-session socket drop still read missed after a reload
