@@ -20,6 +20,13 @@ not versions - the page ships continuously to Neocities.
 - an 'off' rail video revives docked on rail re-entry, 4→5→6
   transitions re-dock the rail properly, and the sync strip floats
   above the rail's video and picker popups
+- the fade/wave returns on flips as a cosmetic .ghostpage overlay: a
+  retiring page's clones linger under the live page, faded on the old
+  depth gradient, while a clip-path edge descends with each new row -
+  the real rows still archive on the flip, and the clones never reflow
+  since nothing beneath them is ever removed
+- the rail's emote and stats panes pin their scrollbars so a pane never
+  reads as already bottomed-out
 
 ### Emote picker
 - cells dedupe across providers up to case - 7tv's 'glorp' and bttv's

@@ -9270,17 +9270,19 @@
     }
     col.appendChild(ov);
   }
-  // Drops every clone the live page has already written over, then the
-  // overlay itself once empty
+  // Clips the overlay at the live page's bottom edge rather than dropping
+  // covered clones - a removed clone reflows every one below it, which
+  // reads as the old page sliding up instead of holding still under the
+  // wave. The overlay's top edge shares the column's padding-box origin,
+  // so covered measures straight into the clip
   function sweepGhosts(col) {
     const ov = col && col.querySelector(':scope > .ghostpage');
     if (!ov) return;
     const live = liveRows(col);
+    const last = ov.lastElementChild;
     const covered = live.length ? live[live.length - 1].offsetTop + live[live.length - 1].offsetHeight : 0;
-    // evict bottom-up: dropping a lower clone reflows the ones beneath it
-    // and would cascade the covered check past the real boundary
-    for (const g of [...ov.children].reverse()) if (g.offsetTop < covered) g.remove();
-    if (!ov.firstElementChild) ov.remove();
+    if (!last || last.offsetTop + last.offsetHeight <= covered) { ov.remove(); return; }
+    ov.style.clipPath = `inset(${covered}px 0 0 0)`;
   }
   function clearGhosts(root) {
     for (const ov of (root || mainEl).querySelectorAll('.ghostpage')) ov.remove();
