@@ -1583,6 +1583,10 @@
   #helpPanel #htabRes div.sep, #helpPanel #htabLib div.sep, #helpPanel #htabLbr div.sep { margin: 5px 0 3px; line-height: 1.1; }
   #helpPanel #htabCfg div.sep { opacity: .4; }
   #helpPanel div.wide > span { grid-column: 1 / -1; text-align: center; }
+  /* .one keeps its option groups on a single line - the wide grid would
+     otherwise row each span under the last */
+  #helpPanel #htabCfg > div.wide.one { display: block; text-align: center; }
+  #helpPanel #htabCfg > div.wide.one > span + span { margin-left: 1.1em; }
   /* section titles in resources/authors go azure - apart from the
      accent-coloured label <b>s elsewhere in the panel */
   /* the wide conf rows carry their option name inside the cell span,
@@ -2204,7 +2208,7 @@
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">conf/help</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
-    <div class="wide"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span> <span>popup font size: <span id="helpFsList"></span><sup>†</sup></span> <span>position: <span id="helpPosList"></span><sup>†</sup></span></div>
+    <div class="wide one"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><span>[?] font size: <span id="helpFsList"></span><sup>†</sup></span><span>position: <span id="helpPosList"></span><sup>†</sup></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span></div>
     <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: the dot mirrors the stream - accent-pulsing while checking, green while live, red-pulsing if the chat socket drops under a live stream, steady accent while the stream is off but chat is connected, grey while it is down; the page favicon repaints in the dot's own colour so the tab icon tracks the same state; hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
