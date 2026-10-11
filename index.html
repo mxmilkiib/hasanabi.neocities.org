@@ -136,6 +136,9 @@
     --ph: 80; --pc: .012; --ptc: .02;
     --sh-bg: .95; --sh-tx: .16;
     --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; --wiki: #3368b0;
+    /* the unset font floor rides the browser's root size - 1rem honours
+       a bumped user default where a bare px would not */
+    --chat-font: 1rem;
     /* --bg-lift lets a colour nudge its paper a touch off the shade stop -
        salmon needs .97 for the ft pink but the axis only stops at .95/.99 */
     --bg: oklch(clamp(0, calc(var(--sh-bg) + var(--bg-lift, 0)), 1) var(--pc) var(--ph));
@@ -2203,9 +2206,6 @@
      controls get a larger touch target, and the spark canvas clamps so it
      can't hog the row */
   @media (max-width: 720px), (pointer: coarse) and (max-width: 1080px) {
-    /* a 15px chat font reads tiny on a phone - the raised floor only
-       holds while nothing is picked: an inline --chat-font always wins */
-    :root { --chat-font: 16px; }
     /* tapping rows shouldn't arm the browser's double-tap zoom */
     body { touch-action: manipulation; }
     header { padding: 3px 8px 2px; padding-right: 92px; column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
