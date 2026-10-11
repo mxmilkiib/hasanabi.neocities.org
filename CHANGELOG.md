@@ -64,6 +64,8 @@ not versions - the page ships continuously to Neocities.
 - backfill replay rows flash at half brightness; the sync strip
   narrates only real outages, one load narrator speaks at a time, and
   the strip docks over the column tops instead of shoving chat down
+- → accepts the open nick/emote completion like enter does - the caret
+  already sits past the token, so the key means 'take this one'
 - theme chips can't split between name and palette swatch any more -
   inline-block + nowrap keeps each atomic, so the selected chip's
   marching-ants ring frames the chip instead of a two-line
