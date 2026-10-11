@@ -12697,7 +12697,7 @@
         // .bw marks the wrap so later passes don't re-wrap it into a
         // double-shrunk face; its links take the tl descriptor face
         inner.className = 'bw';
-        try { r.surroundContents(inner); wrapped = true; } catch {}
+        try { inner.appendChild(r.extractContents()); r.insertNode(inner); wrapped = true; } catch {}
         inner.querySelectorAll('a').forEach((a) => a.classList.add('tl'));
         break;
       }

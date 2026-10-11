@@ -164,6 +164,10 @@ not versions - the page ships continuously to Neocities.
 - trans liberation and intersex rights join the activism movements list
 
 ### Misc
+- bracketed descriptors holding their own links (the dsa row's join /
+  donate / chapters cluster) shrink to the note face in firefox too -
+  the wrap used surroundContents, which firefox refuses on ranges
+  spanning elements; extractContents + insertNode lands the same tree
 - the header shaves a pixel of padding top and bottom - the rate graph
   and its button row sit 2px from the header edges instead of 3, the
   pinned corner buttons and minimised-strip hover following suit
