@@ -149,6 +149,11 @@ not versions - the page ships continuously to Neocities.
   answers across viewers
 
 ### Resources
+- magazines get their own row: the left cluster (equator, jacobin,
+  current affairs, monthly review, organise!, jewish currents, +972,
+  scottish left review) plus a press & journals row for the
+  mainstream/policy/global-south mags pulled out of news, which keeps
+  its broadcasters, wires, dailies and investigative sites
 - equator owns up to being a magazine, not a zine - the wikipedia *
   joins its link in the zines row
 - libcom leaves the zines row - a library, already listed under
