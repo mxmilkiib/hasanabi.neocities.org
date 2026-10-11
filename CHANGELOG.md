@@ -69,6 +69,12 @@ not versions - the page ships continuously to Neocities.
   rebuilt ~12s into a live stream; the update bar bolds its text and
   buttons
 
+### Themes
+- nightshade becomes the out-of-box face - a first visit and a
+  reset-all land on lavender/contrast with the rail split and docked
+  video; 'default' stays a named preset, and copied urls can emit
+  theme=default again now the baseline moved
+
 ### Help popup
 - the config rows reorganise: popup width, font size and position run
   on one flowing line, header font size merges into the button-labels

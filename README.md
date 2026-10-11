@@ -552,6 +552,9 @@ force off.
   `dyslexic`, `midnight`, `solar`, `minimal`, `retro`, `irc`,
   `gohu`, `heather`, `nightshade`, `ft`, `ftdark`, `twitch`
 
+A first visit and a settings reset both land on `nightshade`;
+`default` stays a selectable preset like the rest.
+
 A style name like `theme=dark`
 still selects just the palette, which is
 also what the retired preset names `paper`, `mirc` and `console` now
