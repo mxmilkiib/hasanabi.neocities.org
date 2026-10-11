@@ -223,6 +223,9 @@ not versions - the page ships continuously to Neocities.
   axes at once; the scrollback default rises to 5,000
 - the stream-status key drops its redundant live dot (the states carry
   their own) and breaks the favicon note onto its own line
+- the emote picker's mix row owns up: the merged grid takes the active
+  sort, so 'freshest uses first' only held under 'use' - it now reads
+  'ordered by the active sort'
 - a rainbow palette list joins the motion options: classic keeps the
   hashed pastel arcs and hand-tuned label strip, while vivid, candy,
   ocean and sunset re-tint both - each banded palette keeps a mention's
