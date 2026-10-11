@@ -230,7 +230,8 @@ not versions - the page ships continuously to Neocities.
 
 ### Sync & notice strips
 - the sync poles breathe width in from their outer ends on a ~42s
-  cycle, drifting to twitch purple at their narrowest; fixed 30%
+  cycle, drifting from the emote-rung gold at full width to twitch
+  purple at their narrowest; fixed 30%
   tracks keep label swaps from shoving them, stripes scroll at 3s, the
   brightness pulse is gone and the poles shave to 10px
 - the update bar sheds 2px of padding and settles on black with gold
