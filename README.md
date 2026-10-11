@@ -2,33 +2,39 @@
 
 ![HasanAbi Chat Thing - a compact, customisable, one-page Twitch chat client](og.png)
 
-A compact, customizable Twitch chat page for [HasanAbi](https://www.twitch.tv/hasanabi), aka Hasan Piker,
-hosted on Neocities - orientated around the Hasan Piker stream, aka the
-Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool,
-organising, media and other resources, & more! Live at
-<https://hasanabi.neocities.org/> - project page at
+A compact, customizable Twitch chat page orientated around the [HasanAbi](https://www.twitch.tv/hasanabi) ( aka Hasan Piker) stream (aka the Piker Broadcasting Service, PBS)
+
+It's a one page, alt-UX, second-screen/accessibility tool that's super customisable, with channel related resource links!
+
+Live at
+<https://hasanabi.neocities.org/>
+
+About at
 <https://hasanabi.neocities.org/about/>.
 
-In plainer terms: it is the stream's chat, liberated from twitch.tv. The
+In wordier terms: it's the stream's chat, liberated from twitch.tv. The
 log renders in a single self-contained page that runs on a static host,
-follows one along through suspends and reloads (backfilling whatever was
-missed), draws a live messages-per-second graph, understands every major
-emote ecosystem, and - after an optional Twitch login - replies, `/me`s
-and chat history walkbacks work like a real IRC client. Beyond chat, the
-page doubles as a curated hub: the help popup carries resources, news,
-organising links and era-grouped author reading lists. Any other Twitch
-channel can be pointed at with `?channel=login`, and a comma list
+suspend/discard and reload-aware (backfilling whatever was
+missed), draws a live messages-per-second rate graph, understands every major
+emote ecosystem, and - after an optional Twitch OAuth login - replies, `/me`s
+and chat history walkbacks work like a real IRC client.
+
+Beyond chat, the page doubles as a curated hub: the [?] help/config popup
+also carries media, news, left, libre, and organising links plus era-grouped
+author reading lists.
+
+Any other Twitch channel can be pointed at with `?channel=login`, and a comma list
 (`?channel=a,b,c`, up to 6) merges several rooms into one log - the first
 channel stays focused (title, stream status, video, chat target, storage)
 while each row carries a `#chan` chip that refocuses on click.
 
-The project comes in two parts: the frontend
+Technically the project comes in two parts: the frontend
 ([hasanabi.neocities.org](https://github.com/mxmilkiib/hasanabi.neocities.org),
 this repo - a single `index.html`) and the backend chat relay
 ([twitch-chat-relay](https://github.com/mxmilkiib/twitch-chat-relay),
 also a single `index.html`, hosted on GitHub Pages).
 
-## Why two parts
+## Why two parts?
 
 Neocities serves pages with a strict
 [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP):
@@ -48,7 +54,7 @@ CSP-locked host can embed the same iframe for any Twitch channel. The
 hasanabi specifics all live in this file; the relay could just as well
 serve a completely different channel page.
 
-## Backend - `twitch-chat-relay` (GitHub Pages)
+## The Backend - `twitch-chat-relay` (GitHub Pages)
 
 Repo: <https://github.com/mxmilkiib/twitch-chat-relay> - also a single
 `index.html`, loaded as a hidden iframe from
@@ -107,7 +113,7 @@ Relay → parent:
 - `{type: 'twsets', key, sets}` - the emote-set metadata reply (`key`
   echoes the asked `ids`)
 
-## Frontend - `index.html` (this repo, on Neocities)
+## The Frontend - `index.html` (this repo, on Neocities)
 
 Everything runs client-side in one file - no build step, no framework,
 no dependencies beyond CDN-hosted fonts.
@@ -155,7 +161,7 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Emote picker
 
-- `☻` opens a Chatterino-style grid: 7TV / BTTV / FFZ / Twitch / emoji
+- `☻`, in the bottom left corner, opens a Chatterino-style grid: 7TV / BTTV / FFZ / Twitch / emoji
   (~600 glyphs) sections with search, a `recent` row of the last 24
   used, per-source tab toggles, still/animated filters, and a `mix`
   toggle that merges every enabled source into one flat grid. Cells
