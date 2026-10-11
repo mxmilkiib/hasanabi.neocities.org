@@ -3763,7 +3763,13 @@
   }
   const seenLinks = new Set();
   function dedupeLinks(rows) {
-    for (const r of rows || [logEl, sideEl, side2El].flatMap((col) => [...col.querySelectorAll('.row:not([data-lks])')])) {
+    // direct rows only - a ghostpage clone would otherwise claim a link's
+    // 'first post' and hide the live row that really carries it. a row
+    // chat can't show (stale under split, or collapsed by a hide) is no
+    // first post either - its link's reposts get to stand in for it
+    const unseen = (r) => rowCollapsed(r) || (r.classList.contains('stale') && isSplit() && !revFlow);
+    for (const r of rows || [logEl, sideEl, side2El].flatMap((col) => [...col.querySelectorAll(':scope > .row:not([data-lks])')])) {
+      if (unseen(r)) continue;
       r.dataset.lks = '1';
       let k = r.dataset.lk;
       if (k == null) {
@@ -3781,6 +3787,14 @@
       }
     }
   }
+  // links view rebuilds the dedup from what can actually show - rows that
+  // archived or evicted away release their claim so reposts resurface
+  function redupeLinks() {
+    seenLinks.clear();
+    for (const r of document.querySelectorAll('.row.linkdup')) r.classList.remove('linkdup');
+    dedupeLinks([logEl, sideEl, side2El].flatMap((col) => [...col.querySelectorAll(':scope > .row')]));
+  }
+  const redupeIfLinkview = () => { if (document.body.classList.contains('linkview')) redupeLinks(); };
 
   // page-flip never trims by itself - bound the total across columns;
   // chronoRows lists the archive (oldest) first, then each live page
@@ -3793,6 +3807,7 @@
       row.remove();
       total--;
     }
+    redupeIfLinkview(); // evicted first posts free their link's reposts
   }
   function setScrollback(n) {
     if (!SCROLLBACK_SIZES.includes(n)) return;
@@ -7041,7 +7056,8 @@
   // rows a display:none path hid, however it did so - page-flip reads
   // offsetTop 0 off one and mistakes it for inside the fold
   const rowCollapsed = (r) =>
-    r.classList.contains('blk') || r.classList.contains('uhide') || r.classList.contains('fhide');
+    r.classList.contains('blk') || r.classList.contains('uhide') || r.classList.contains('fhide') ||
+    (document.body.classList.contains('linkview') && (r.classList.contains('linkdup') || r.dataset.lk == null));
   function applyHideRow(r) {
     const u = r.dataset.u;
     if (!u || !hideUsers.has(u)) return;
@@ -8538,8 +8554,11 @@
 
   // ---- links view: only rows carrying a url, first post of each link ----
   function setLinkview(on) {
-    if (on) dedupeLinks();
+    if (on) redupeLinks();
     document.body.classList.toggle('linkview', on);
+    // hidden rows collapse out of the page math - re-deal so the columns
+    // pack the shown links instead of holding empty slots
+    if (isSplit() && !revFlow) deal();
     setOn(linkBtn, on);
     linkBtn.title = `Links view: ${on ? 'on' : 'off'} - click toggles`;
     markHelp('helpLinks', on ? 1 : 0);
@@ -9255,6 +9274,7 @@
     }
     for (const r of logEl.querySelectorAll(':scope > .stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
     activeEl = logEl;
+    redupeIfLinkview(); // merged rows can claim first-posts again
   }
   // a column's content-box height and fold line, in viewport coordinates
   // so they compare straight against row rects at any scroll offset
@@ -9325,6 +9345,7 @@
     const frag = document.createDocumentFragment();
     frag.append(...page);
     logEl.insertBefore(frag, [...logEl.children].find((r) => !r.classList.contains('stale')) || null);
+    redupeIfLinkview();
   }
   // Lays the newest rows out one page per column, the live column
   // keeping the newest - a re-deal re-cuts page heights but never
@@ -9374,6 +9395,7 @@
     }
     autoScrollAt = performance.now();
     for (const c of cs) c.scrollTop = 0;
+    redupeIfLinkview();
   }
   // Runs the flip for the whole column set. Normal mode moves the rows
   // hanging past the active page's fold onto a fresh page in the next
@@ -9724,7 +9746,7 @@
         }
         if (id) reqTweet(id);
       }
-      dedupeLinks();
+      redupeLinks();
       // continue the stripe alternation from the restored tail
       zFlip = !!(logEl.lastElementChild && logEl.lastElementChild.classList.contains('z'));
       // seed the gap clock so a reload marks the span the page was closed

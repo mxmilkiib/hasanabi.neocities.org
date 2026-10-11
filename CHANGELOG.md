@@ -64,6 +64,12 @@ not versions - the page ships continuously to Neocities.
 - backfill replay rows flash at half brightness; the sync strip
   narrates only real outages, one load narrator speaks at a time, and
   the strip docks over the column tops instead of shoving chat down
+- links view honours visibility in its 'first post wins' dedupe: a
+  first post archived under split (or hidden by a block) can't claim
+  its link, so the first shown post stands in instead of the url
+  vanishing - the dedup rebuilds as rows archive, evict or remerge,
+  ghost clones stay out of the running, and toggling the view re-deals
+  pages so columns pack the shown links rather than hold empty slots
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;
