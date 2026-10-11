@@ -1436,7 +1436,7 @@
      flanking the label rather than a fake fill. The fills breathe their
      width in toward the label - pure activity, no progress implied */
   #loadBar .loadbar { flex: 1; width: auto; max-width: 30%; height: 12px; margin-top: 0; opacity: .8; }
-  #loadBar .loadbar i { width: 100%; animation: loadpulse 1.2s ease-in-out infinite, barber 1s linear infinite, syncshrink 10.4s ease-in-out infinite; }
+  #loadBar .loadbar i { width: 100%; animation: loadpulse 1.2s ease-in-out infinite, barber 1s linear infinite, syncshrink 20.8s ease-in-out infinite; }
   /* Docking the left pole's fill to its inner end means the width drain
      eats the outer edge instead of the edge beside the text */
   #loadBar .loadbar:first-child i { margin-left: auto; }
@@ -1446,11 +1446,11 @@
   /* the label inks in the page colour on an accent chip - dim text on
      the panel ground read as decoration next to the poles */
   #loadTxt { background: var(--accent); color: var(--bg); padding: 0 7px; border-radius: 3px; }
-  /* deploy notice: buttons inked in the page colour so they read on
-     the accent ground */
-  #updateBar { background: var(--accent); color: var(--bg); font-weight: 600; padding-top: 2px; padding-bottom: 2px; }
-  #updateBar .hdr-btn { width: auto; padding: 0 7px; font-size: .92em; font-weight: inherit; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 55%, transparent); }
-  #updateBar .hdr-btn:hover { color: var(--bg); background: color-mix(in srgb, var(--bg) 18%, transparent); }
+  /* deploy notice: vip ground with accent ink - a notice tone, not the
+     alert loudness the accent ground carried */
+  #updateBar { background: var(--vip); color: var(--accent); font-weight: 600; padding-top: 2px; padding-bottom: 2px; }
+  #updateBar .hdr-btn { width: auto; padding: 0 7px; font-size: .92em; font-weight: inherit; color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+  #updateBar .hdr-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); }
   /* a freshly replayed line washes --aux once then refades - distinct
      from the accent missflash so a backlog landing reads as sync, not
      as a jump-to-row highlight */
