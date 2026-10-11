@@ -25,6 +25,10 @@ not versions - the page ships continuously to Neocities.
   depth gradient, while a clip-path edge descends with each new row -
   the real rows still archive on the flip, and the clones never reflow
   since nothing beneath them is ever removed
+- ghost clones stay interactive in their visible window: the clip-path
+  edge keeps covered clones from catching clicks, and a clone's hover
+  ↩ arms the same reply context as a live row via data-omid, so a
+  fading message can still be replied to before the wave takes it
 - the rail's emote and stats panes pin their scrollbars so a pane never
   reads as already bottomed-out
 

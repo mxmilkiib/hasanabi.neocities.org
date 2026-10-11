@@ -639,7 +639,7 @@
   /* a retired page's clones linger over their column, swept as the live
      page writes over them - the real rows archive on the same flip */
   .ghostpage { position: absolute; inset: 0; box-sizing: border-box; padding: inherit;
-    overflow: hidden; pointer-events: none; z-index: 5; }
+    overflow: hidden; z-index: 5; }
   #side, #side2 { border-left: 1px solid var(--line); }
   /* split level 4's rail: a third column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
@@ -9275,7 +9275,9 @@
     ov.setAttribute('aria-hidden', 'true');
     for (const r of page) {
       const cl = r.cloneNode(true);
-      cl.removeAttribute('data-mid');
+      // the real mid moves aside as omid so a clone can still be replied
+      // to while rowById and mid lookups keep resolving to the real row
+      if (cl.dataset.mid) { cl.dataset.omid = cl.dataset.mid; delete cl.dataset.mid; }
       cl.style.opacity = GHOST_HI;
       // a live embed clone would autoplay under the overlay - same strip
       // saveHistory applies
@@ -10195,11 +10197,13 @@
   function setReply(row) {
     if (!auth || !row || row.classList.contains('notice')) return;
     const nameEl = row.querySelector('.name');
-    if (!row.dataset.mid || !nameEl) return;
+    // ghostpage clones carry the live mid as data-omid
+    const mid = row.dataset.mid || row.dataset.omid;
+    if (!mid || !nameEl) return;
     // the stored raw text is exact; restored rows fall back to a walk that
     // skips rendered furniture so glyphs like the ▶ play button and chip
     // labels don't glue into the quoted body
-    let body = rowBody.get(row.dataset.mid) || '';
+    let body = rowBody.get(mid) || '';
     if (!body) {
       for (let n = nameEl.nextSibling; n; n = n.nextSibling) {
         if (n.nodeType !== 1) { body += n.textContent; continue; }
@@ -10209,7 +10213,7 @@
       }
     }
     replyCtx = {
-      id: row.dataset.mid,
+      id: mid,
       name: nameEl.textContent,
       login: decodeURIComponent(new URL(nameEl.href).pathname.slice(1)),
       body: body.replace(/^:\s*/, '').trim().slice(0, 500),
@@ -10241,7 +10245,9 @@
     const inField = /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(tag);
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !inField) {
       e.preventDefault();
-      const rows = [...document.querySelectorAll('.col .row')];
+      // direct rows only - ghost clones inside .ghostpage would step the
+      // selection through their overlay order, not their screen order
+      const rows = [...document.querySelectorAll('.col > .row')];
       if (!rows.length) return;
       const i = rows.indexOf(selRow);
       setSel(rows[i < 0 ? rows.length - 1
