@@ -1421,11 +1421,11 @@
      stretches the strip so progress reads at a glance. docked over the
      column tops rather than in flow - it floats in for its beat and
      leaves without shoving the chat down */
-  #loadBar { position: absolute; top: 0; left: 0; right: 0; z-index: 6; gap: 10px; padding: 2px 10px; color: var(--text-dim); }
+  #loadBar { position: absolute; top: 0; left: 0; right: 0; z-index: 6; gap: 10px; padding: 2px 10px; color: var(--text-dim); justify-content: center; }
   /* the strip can't clock progress - steps land too fast to see and a
      resync has no milestones at all - so it's a pair of filled poles
      flanking the label rather than a fake fill */
-  #loadBar .loadbar { flex: 1; width: auto; margin-top: 0; }
+  #loadBar .loadbar { flex: 1; width: auto; max-width: 30%; height: 5px; margin-top: 0; opacity: .7; }
   #loadBar .loadbar i { width: 100%; }
   /* deploy notice: buttons inked in the page colour so they read on
      the accent ground */
@@ -2337,7 +2337,7 @@
     </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt">site updated - ctrl-r for the latest version</span><button class="hdr-btn" id="updateGo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
-  <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss</div>
+  <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss - page permission for autoplay audio unmuted stream on reload</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
