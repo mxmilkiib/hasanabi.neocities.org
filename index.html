@@ -3088,7 +3088,8 @@
     while (walker.nextNode()) nodes.push(walker.currentNode);
     for (const node of nodes) {
       if (node.parentElement.closest('.time,.reply,.aux,a')) continue;
-      const rowCh = (node.parentElement.closest('.row') || {}).dataset || {};
+      const rowEl = node.parentElement.closest('.row');
+      const rowCh = (rowEl || {}).dataset || {};
       const em = emotesOf(rowCh.ch || CHANNEL), eml = emotesLcOf(rowCh.ch || CHANNEL);
       const parts = node.nodeValue.split(/(\s+)/);
       if (!parts.some((t) => em[t] || eml[t.toLowerCase()])) continue;
@@ -3104,6 +3105,10 @@
           img.alt = name;
         img.title = name + (es[name] ? ' - ' + es[name] : '');
           frag.appendChild(img);
+          // a text token reaching retokenize never resolved at render time,
+          // so this is its first usage stamp - land it at the row's own ts
+          // or the backfill window stays a dead zone in the age ladder
+          if (rowEl) noteEmoteUse(name, rowCh.ch || CHANNEL, null, +rowCh.ts || undefined, true);
         } else frag.appendChild(document.createTextNode(tok));
       }
       node.parentNode.replaceChild(frag, node);
@@ -11624,7 +11629,7 @@
     clearTimeout(flashTimers.get(n));
     flashTimers.set(n, setTimeout(() => unflash(n), 3600));
   }
-  function noteEmoteUse(n, ch, id, when) {
+  function noteEmoteUse(n, ch, id, when, quiet) {
     // replayed backfill keeps the message's own send time - a recovered use
     // holds its real age instead of landing at 'now' over fresher cells
     const at = when || Date.now();
@@ -11648,7 +11653,9 @@
     // cell back down the ladder
     useTs[n] = Math.max(useTs[n] || 0, at);
     saveUse();
-    if (emotePick.hidden) return;
+    // retokenize catches up hundreds of backfilled uses at once - none of
+    // them should light a cell the chatter isn't watching right now
+    if (quiet || emotePick.hidden) return;
     flashSet.add(n);
     flashT0.set(n, Date.now());
     // every use steps the wheel - a re-use while still lit trades the

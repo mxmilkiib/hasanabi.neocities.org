@@ -36,6 +36,10 @@ not versions - the page ships continuously to Neocities.
 - cells dedupe across providers up to case - 7tv's 'glorp' and bttv's
   'Glorp' keep only the first source scanned; emoji always trail the
   merged grid
+- retokenize now stamps usage too: emotes in rows that rendered before
+  the set landed (backfill on a cold cache, restored history) counted
+  nothing, leaving a dead band between fresh uses and the persisted
+  record - the catch-up stamps at the row's own ts, quiet, once
 - age-rows gains a third state '▥': cells flow inline but each visual
   row ends at its last square, measured off the rendered grid and
   re-cut on rebuilds and resizes
