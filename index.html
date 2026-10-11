@@ -1270,7 +1270,7 @@
   .at:hover { color: var(--text); text-decoration: underline; }
   /* .at's accent colour and the help panel's <b> tint would otherwise
      outrank .rbw's transparent text and hide the clipped gradient */
-  .at.rbw, .at.rbw:hover, #helpPanel .rbw { color: transparent; }
+  .at.rbw, .at.rbw:hover, a.rbw, a.rbw:hover, #helpPanel .rbw { color: transparent; }
   /* mentions are styled like links; give them the hand instead of the
      text i-beam so they read as interactive at a glance */
   .row .at { cursor: pointer; }
@@ -2794,7 +2794,8 @@
         // esc is html-escaped - &amp; would read as a param named amp;x
         const urlC = stripTrack(url2.replace(/&amp;/g, '&')), esc2 = escapeHTML(urlC);
         const u = /^https?:/i.test(urlC) ? esc2 : `https://${esc2}`;
-        return `<a href="${u}" target="_blank" rel="noopener noreferrer" data-u="${esc2}">${cleanUrls ? cleanUrlDisp(esc2) : esc2}</a>${post}`;
+        const rbwU = /^(?:https?:\/\/)?(?:www\.)?icerr\.com(?:[/?#]|$)/i.test(urlC);
+        return `<a${rbwU ? ' class="rbw"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${esc2}">${cleanUrls ? cleanUrlDisp(esc2) : esc2}</a>${post}`;
       });
   }
 
@@ -3198,8 +3199,10 @@
                    `<a href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}"><i>${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</i></a>` + escapeHTML(post));
         } else {
           // this site's own domain gets the fossabot shimmer; so does any
-          // url in a line the bots post - their !link commands output urls
+          // url in a line the bots post - their !link commands output
+          // urls. icerr.com runs the rainbow sweep outright
           const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?/#]|$)/i.test(url);
+          const icer = /^(?:https?:\/\/)?(?:www\.)?icerr\.com(?:[/?#]|$)/i.test(url);
           let ico = '';
           if (lkIco) ico = lkIcoImg(u.replace(/&amp;/g, '&'));
           // a watchable youtube link gets a ▶ glyph that unfolds the
@@ -3223,7 +3226,7 @@
               pendingTw.push(`<span class="ytprev${fossa ? ' foss' : ''}" data-ytu="${escapeHTML(ypk)}" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} data-href="${u}"></span>`);
             }
           }
-          out.push(escapeHTML(pre) + `<a${home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
+          out.push(escapeHTML(pre) + `<a${icer ? ' class="rbw"' : home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
         }
       }
       else {
