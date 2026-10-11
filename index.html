@@ -977,7 +977,10 @@
   .row.notice.raid { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 0 0); }
   .twcard {
     display: block;
-    margin: 2px 0;
+    /* the left margin hangs the card off the row's --nx so its text sits
+       on the name column like a replied-to message (2px border + 8px pad
+       insets the text, so the box edge reaches 10px back) */
+    margin: 2px 0 2px max(0px, calc(var(--nx, 0px) - 10px));
     padding: 2px 8px;
     border-left: 2px solid var(--accent);
     color: var(--text);
@@ -996,9 +999,9 @@
   /* youtube links gain a ▶ glyph; a click unfolds the embed under the row */
   a.ytemb { margin-left: .2em; text-decoration: none; color: var(--danger); font-size: .9em; }
   a.ytemb:hover { text-shadow: 0 0 4px currentColor; }
-  .ytcard { display: block; margin: 2px 0; }
+  .ytcard { display: block; margin: 2px 0 2px max(0px, var(--nx, 0px)); }
   /* the linkpeek info card under a youtube link mirrors .twcard */
-  .ytinfo { display: block; margin: 2px 0; padding: 2px 8px; border-left: 2px solid var(--accent); font-size: .92em; white-space: normal; }
+  .ytinfo { display: block; margin: 2px 0 2px max(0px, calc(var(--nx, 0px) - 10px)); padding: 2px 8px; border-left: 2px solid var(--accent); font-size: .92em; white-space: normal; }
   .ytinfo .ytth { max-height: 3.8em; border-radius: 4px; vertical-align: middle; margin-right: .45em; }
   .ytinfo a.ytemb { margin-left: 0; font-size: 1em; }
   .ytinfo i { font-style: italic; opacity: .75; }
@@ -3841,27 +3844,42 @@
   // quoted text inside the band
   // split into measure and apply so repin's full-column re-pass reads
   // every offset in one layout instead of forcing a fresh one per row
-  function rqMeasure(r) {
-    const rq = r.querySelector('.reply.rq'), nm = r.querySelector('.name');
-    if (!rq || !nm) return null;
-    // badge icons (or the role chip that stands in for them) push the
-    // name right - anchor on the cluster's leading edge instead so the
-    // quote column is identical whether the responder has any or not.
-    // Only .vip/.host count - .sub/.mod/.bits/.first are status chips
-    // that live ahead of the name column, not part of it (a hidden sub
-    // chip would anchor at x=0 and drag the box off the row's edge)
+  // the name column's x anchors both the reply quote's landing spot and
+  // the preview cards' left inset - badge icons (or the role chip that
+  // stands in for them) push the name right, so anchor on the cluster's
+  // leading edge instead. Only .vip/.host count - .sub/.mod/.bits/.first
+  // are status chips that live ahead of the name column, not part of it
+  // (a hidden sub chip would anchor at x=0 and drag the box off the row's
+  // edge)
+  function nameColX(r) {
+    const nm = r && r.querySelector('.name');
+    if (!nm) return null;
     let anchor = nm;
     for (let el = nm.previousElementSibling; el; el = el.previousElementSibling) {
       if (el.matches('img.badge, .role.vip, .role.host')) anchor = el;
       else break;
     }
-    const nx = anchor.offsetLeft;
+    return anchor.offsetLeft;
+  }
+  // stamped once when a card lands so the markup inherits --nx - clones
+  // and saved outerHTML carry the row's style along with it
+  function nxStamp(r) {
+    const nx = nameColX(r);
+    if (nx !== null) r.style.setProperty('--nx', nx + 'px');
+  }
+  function rqMeasure(r) {
+    const rq = r.querySelector('.reply.rq');
+    if (!rq) return null;
+    const nx = nameColX(r);
+    if (nx === null) return null;
     const qt = rq.querySelector('.chtag'), tg = r.querySelector(':scope > .chtag');
-    if (qt && tg) return { qt, nx, tgl: tg.offsetLeft, qtw: qt.offsetWidth };
-    return { rq, nx, rql: rq.offsetLeft, pl: parseFloat(getComputedStyle(rq).paddingLeft) };
+    if (qt && tg) return { r, qt, nx, tgl: tg.offsetLeft, qtw: qt.offsetWidth };
+    return { r, rq, nx, rql: rq.offsetLeft, pl: parseFloat(getComputedStyle(rq).paddingLeft) };
   }
   function rqApply(m) {
     if (!m) return;
+    const nxs = m.nx + 'px';
+    if (m.r.style.getPropertyValue('--nx') !== nxs) m.r.style.setProperty('--nx', nxs);
     if (m.qt) {
       // the tag's right margin stretches so the quoted nick lands on the
       // name column (the -8 margin-left and the content box's 8px
@@ -6898,13 +6916,16 @@
       if (isSplit()) { if (revFlow) flipCols(); else refitPages(); }
       else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       // font/metric changes move the name column in px - the reply quote
-      // indents cached there go stale, so re-measure them. measure pass
-      // first, write pass second - each row's offsets read while layout
-      // stays clean, and non-reply rows cost one querySelector
+      // indents and the cards' --nx stamps cached there go stale, so
+      // re-measure them. measure pass first, write pass second - each
+      // row's offsets read while layout stays clean
       for (const col of [logEl, sideEl, side2El]) {
         const ms = [...col.querySelectorAll('.reply.rq')]
           .map((rq) => rqMeasure(rq.closest('.row')));
+        const cs = [...col.querySelectorAll('.row:has(.twcard, .ytinfo, .ytcard)')]
+          .map((r) => [r, nameColX(r)]);
         for (const m of ms) rqApply(m);
+        for (const [r, nx] of cs) if (nx !== null) r.style.setProperty('--nx', nx + 'px');
       }
     });
   }
@@ -9301,6 +9322,7 @@
       f.allow = 'autoplay; encrypted-media; picture-in-picture';
       f.allowFullscreen = true;
       wrap.appendChild(f);
+      if (row) nxStamp(row);
       (row || ytg.parentElement).appendChild(wrap);
       return;
     }
@@ -12665,6 +12687,7 @@
           const holder = document.createElement('span');
           el.replaceWith(holder);
           const row = holder.closest('.row');
+          if (row) nxStamp(row);
           holder.outerHTML = twCard(entry, row ? row.textContent : '', d.id);
         });
       repin();
@@ -13355,6 +13378,7 @@
           // a fossabot-marked slot drops when the Channel turns out to be
           // Fear& - the pod's videos stay cardless while the rest paint
           if (el.classList.contains('foss') && ytFossaHide(p)) { el.remove(); return; }
+          nxStamp(el.closest('.row'));
           el.outerHTML = ytInfoCard(p, el.dataset.href || url, el.dataset.ytid || '', +el.dataset.ytt || 0);
         });
       repin();

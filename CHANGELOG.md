@@ -67,6 +67,11 @@ not versions - the page ships continuously to Neocities.
 - the ⇧enter newline is gone: irc frames on newlines so one typed into
   the box could never survive the wire - shift-enter now just sends,
   like enter, and the placeholder/help/overlay hints drop the claim
+- tweet and youtube cards (and the click-to-unfold player) indent to
+  the row's name column - the same anchor a replied-to message's quote
+  lands on - via a --nx stamped on the row, so clones, restores and
+  late card swaps all hang off the one measurement, re-stamped when
+  font metrics move the column
 - links view honours visibility in its 'first post wins' dedupe: a
   first post archived under split (or hidden by a block) can't claim
   its link, so the first shown post stands in instead of the url
