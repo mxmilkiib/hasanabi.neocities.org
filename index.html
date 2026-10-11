@@ -8728,6 +8728,11 @@
   function markHfs() {
     markHelp('helpHfs', hdrFs + 1);
     helpPanel.classList.toggle('hfs-follow', hdrFs < 0);
+    // follow chat: light the rung the header is actually riding, like markHelpFs
+    if (hdrFs >= 0) return;
+    const i = HDR_SIZES.indexOf(Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font'))));
+    const eq = i >= 0 && helpPanel.querySelector(`a.helpHfs[data-idx="${i + 1}"]`);
+    if (eq) setOn(eq, true);
   }
   let helpWIdx = DEF.hpw;
   const helpWCur = document.getElementById('helpWCur');
