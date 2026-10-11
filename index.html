@@ -5248,6 +5248,9 @@
   const LEGACY_SHADE = { light: 1, mirc: 0, ice: 2, paper: 1, sepia: 2, lavender: 2, mid: 4, steel: 4, nord: 6, solarized: 7, dark: 7, ember: 7, forest: 7, wine: 7, twitch: 8, black: 9, amber: 9, console: 9 };
   let colourMode = 'gray';
   let variantMode = 'standard';
+  // the last applied preset - survives drift so a copied url can say
+  // ?theme=X plus only the options that have moved off it
+  let curTheme = null;
   const lightMQ = matchMedia('(prefers-color-scheme: light)');
 
   // tone = the derived light/dark split used for nick colours and emote
@@ -7571,6 +7574,7 @@
       lbls: lblsOn ? 1 : 0,
       split: splitLevel,
       rvid: vidRail,
+      preset: curTheme,
     };
   }
   function saveOpts() {
@@ -7749,21 +7753,25 @@
       applyHelpFs();
     }
     if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
+    // a saved bundle carries the applied preset's name for copy-url
+    // attribution - no re-apply, the concrete fields already rode along
+    if (typeof o.preset === 'string' && THEME_PRESETS[o.preset]) curTheme = o.preset;
     // late on purpose - after o.help's legacy modes feed it
     if (o.lbls !== undefined) setLbls(!!o.lbls);
   }
 
   // ---- theme presets: a named combo of every display option. The active
   // mark means the current options exactly match the preset, so it clears
-  // itself the moment any covered option changes ----
-  function presetMatch(p) {
-    if (!p) return false;
-    // compare only the fields the preset specifies: ones it pins that aren't
-    // listed here can't break the mark - epgeo (no stored box still means
-    // the default's own box) and help (panel-open state is transient; the
-    // url only carries it via the copy-help pref, not the theme collapse).
-    // the stream embed is deliberately outside presets - one toggles it by hand
-    const cmp = {
+  // itself the moment any covered option changes. curTheme remembers the
+  // last applied preset past that mark - it stays the settings url's base
+  // while individual options drift on top of it ----
+  // compare only the fields the preset specifies: ones it pins that aren't
+  // listed here can't break the mark - epgeo (no stored box still means
+  // the default's own box) and help (panel-open state is transient; the
+  // url only carries it via the copy-help pref, not the theme collapse).
+  // the stream embed is deliberately outside presets - one toggles it by hand
+  function presetCmp() {
+    return {
       colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
@@ -7773,13 +7781,20 @@
       clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold, anim: nickAnim, epzoom: epickZoom,
       hdrgraph: document.body.classList.contains('hdrgraph'),
     };
+  }
+  // one pinned field vs the live option - zebra compares the level it would
+  // apply: a number pins it directly, a boolean means on(2)/off
+  const presetFieldEq = (p, f, cmp) =>
+    f === 'zebra' ? (typeof p[f] === 'number' ? p[f] : p[f] ? 2 : 0) === zebraLevel
+      : f in cmp ? p[f] === cmp[f] : false;
+  function presetMatch(p) {
+    if (!p) return false;
+    const cmp = presetCmp();
     // a preset that pins a colour implicitly pins the standard finish
     if ('colour' in p && (p.variant ?? 'standard') !== cmp.variant) return false;
     return Object.keys(p).every((k) => {
       if (!(k in cmp)) return true;
-      // a preset can pin a level (zebra: 1); the boolean just pins on/off
-      if (k === 'zebra' && typeof p[k] === 'number') return p[k] === zebraLevel;
-      return p[k] === cmp[k];
+      return presetFieldEq(p, k, cmp);
     });
   }
   function markPresets() {
@@ -7792,11 +7807,12 @@
           if (on) cur = a.dataset.preset;
         });
       setOn(presetBtn, !!cur);
-      presetBtn.title = `Theme preset: ${cur || 'custom'} - click/scroll · ⇧click back`;
+      presetBtn.title = `Theme preset: ${cur || (curTheme ? curTheme + ' (tweaked)' : 'custom')} - click/scroll · ⇧click back`;
     } catch {}
   }
   function applyPreset(name) {
     const p = THEME_PRESETS[name];
+    curTheme = name;
     // presets naming a colour pin the standard finish unless they say so
     applyOpts('colour' in p ? { variant: 'standard', ...p } : p);
     markPresets();
@@ -8789,14 +8805,20 @@
       const t = helpPanel.querySelector('.htabs a.on');
       if (t && HTAB_URL_INV[t.dataset.htab]) q.set('htab', HTAB_URL_INV[t.dataset.htab]);
     }
-    // a matching preset collapses to ?theme=name; only options the preset
-    // doesn't pin (presetMatch's field set) still need their own params
-    const pin = Object.keys(THEME_PRESETS).find((n) => n !== 'default' && presetMatch(THEME_PRESETS[n]));
+    // a theme rides as ?theme=name: an exact preset match is cleanest,
+    // else the last applied one stays the base - either way only options
+    // moved off the preset's pinned values still need their own params
+    const exact = Object.keys(THEME_PRESETS).find((n) => n !== 'default' && presetMatch(THEME_PRESETS[n]));
+    const pin = exact || (curTheme && THEME_PRESETS[curTheme] ? curTheme : null);
     let qs = q;
     if (pin) {
+      const p = THEME_PRESETS[pin], cmp = presetCmp();
       const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls', anim: 'anim', epzoom: 'epzoom' };
       qs = new URLSearchParams([['theme', pin]]);
-      for (const [k, v] of q) if (!(PINNED[k] in THEME_PRESETS[pin])) qs.append(k, v);
+      for (const [k, v] of q) {
+        const f = PINNED[k];
+        if (!f || !(f in p) || !presetFieldEq(p, f, cmp)) qs.append(k, v);
+      }
     }
     return location.origin + location.pathname + ([...qs.keys()].length ? '?' + qs : '');
   }
