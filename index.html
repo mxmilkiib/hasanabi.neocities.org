@@ -5272,11 +5272,11 @@
   // click/wheel cycles, right-click resets to system. ('themes' below are
   // the named preset bundles; the palettes are the colours) ----
   // each preset is a bundle of every display option, applied via applyOpts.
-  // 'default' anchors the cycle; the rest run light -> dark by shade stop
+  // 'old-default' anchors the cycle; the rest run light -> dark by shade stop
   // so the chip row reads as a spectrum. grain/contrast finishes sit on
   // the lightest and darkest entries, phosphor on the terminals
   const THEME_PRESETS = {
-    default:  { colour: 'gray',   shade: 7,    font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 2,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 2, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
+    'old-default': { colour: 'gray', shade: 7, font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 2,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 2, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
     irc:      { colour: 'mirc',   shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
     print:    { colour: 'cream',  shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
     ft:       { colour: 'salmon', shade: 1,    font: 'georgia',    px: 16, lhv: 1.5, lines: 1, zebra: false, times: 2, shadow: 0, subMode: 3, eonly: 1, split: 4, help: 0, lbls: 0 },
@@ -5291,10 +5291,14 @@
     retro:    { colour: 'green',  variant: 'phosphor', shade: 7, font: 'terminus', px: 28, lhv: 1, lines: 1, zebra: false, times: 1, shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0, lbls: 0 },
     solar:    { colour: 'solarized',shade: 7,  font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
     twitch:   { colour: 'violet', shade: 7,    font: 'inter',      px: 14, lhv: 1.5, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  px: 15, lhv: 1.4, wv: 400, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, split: 4, anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: 'q', help: 0, lbls: 0 },
+    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  px: 18, lhv: 1.4, wv: 400, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, split: 4, anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: 'q', help: 0, lbls: 0 },
     cinema:   { colour: 'gray',   variant: 'contrast', shade: 9, font: 'lexend', px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0, lbls: 0 },
     phosphor: { colour: 'ember',  variant: 'phosphor', shade: 9, font: 'vt323', px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
   };
+  // renamed presets keep answering their old url/bundle names
+  const PRESET_ALIASES = { default: 'old-default' };
+  const presetName = (n) => PRESET_ALIASES[n] || n;
+  const presetByName = (n) => THEME_PRESETS[presetName(n)];
   // ordered by each colour's designed shade stop, darkest → lightest
   const COLOURS = ['violet', 'gray', 'red', 'wine', 'green', 'ember', 'solarized', 'nord', 'lavender', 'sepia', 'salmon', 'ice', 'cream', 'mirc'];
   const VARIANTS = ['standard', 'phosphor', 'grain', 'contrast'];
@@ -5362,7 +5366,7 @@
   const SHADE_ICONS = ['○', '◌', '◔', '◔', '◑', '◕', '◕', '●', '●', '●', '●', '●'];
   const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 11, 7, 10, 8, 9];
   // default option indices - the controls, the copy-url diffing and the
-  // 'default' preset all read from here
+  // 'old-default' preset all read from here
   const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4, hpos: 4 };
   let shadeIdx = DEF.shade;
   function applyShade() {
@@ -7840,7 +7844,7 @@
     if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
     // a saved bundle carries the applied preset's name for copy-url
     // attribution - no re-apply, the concrete fields already rode along
-    if (typeof o.preset === 'string' && THEME_PRESETS[o.preset]) curTheme = o.preset;
+    if (typeof o.preset === 'string' && presetByName(o.preset)) curTheme = presetName(o.preset);
     // late on purpose - after o.help's legacy modes feed it
     if (o.lbls !== undefined) setLbls(!!o.lbls);
   }
@@ -8878,7 +8882,7 @@
     if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
     try {
       const es = JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null');
-      const dg = THEME_PRESETS.default.epgeo;
+      const dg = THEME_PRESETS['old-default'].epgeo;
       // a stored geometry matching the default preset's own box isn't a diff
       if (es && es.w && !(dg && es.w === dg.w && es.h === dg.h && es.left === dg.left && es.top === dg.top))
         q.set('epgeo', es.w + 'x' + (es.h || 0) + (es.left != null ? ',' + es.left + ',' + es.top : ''));
@@ -12535,10 +12539,10 @@
     const flag = (k) => q.has(k) && q.get(k) !== '0';
     // a preset is the base; colour/variant/shade (and everything else)
     // apply over it - ?theme=X&colour=Y keeps X's non-colour fields
-    if (q.get('theme') && THEME_PRESETS[q.get('theme')]) applyPreset(q.get('theme'));
+    if (presetByName(q.get('theme'))) applyPreset(presetName(q.get('theme')));
     const tq = q.get('colour') || q.get('color') || q.get('style') ||
-      (q.get('theme') && !THEME_PRESETS[q.get('theme')] ? q.get('theme') : null);
-    if (tq && THEME_PRESETS[tq]) applyPreset(tq);
+      (q.get('theme') && !presetByName(q.get('theme')) ? q.get('theme') : null);
+    if (tq && presetByName(tq)) applyPreset(presetName(tq));
     else if (tq === 'auto') { colourMode = 'auto'; applyColour(); }
     else if (tq) {
       const leg = LEGACY_THEME[tq] || (COLOURS.includes(tq) ? [tq] : null);

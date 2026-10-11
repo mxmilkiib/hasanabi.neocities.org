@@ -548,18 +548,19 @@ force off.
 
 `theme` names a preset bundle of all display options:
 
-- `default`, `compact`, `print`, `cosy`, `cinema`, `phosphor`,
+- `old-default`, `compact`, `print`, `cosy`, `cinema`, `phosphor`,
   `dyslexic`, `midnight`, `solar`, `minimal`, `retro`, `irc`,
   `gohu`, `heather`, `nightshade`, `ft`, `ftdark`, `twitch`
 
 A first visit and a settings reset both land on `nightshade`;
-`default` stays a selectable preset like the rest.
+`old-default` stays a selectable preset like the rest, and the retired
+name `theme=default` still resolves to it.
 
 A style name like `theme=dark`
 still selects just the palette, which is
 also what the retired preset names `paper`, `mirc` and `console` now
 resolve to. Presets never share a name with a style. Each preset also
-pins the header button labels: `default` keeps them on and every other
+pins the header button labels: `old-default` keeps them on and every other
 preset runs the bare header (the `?` popup is unaffected either way).
 
 The copy-settings button builds this url for the current options; a set

@@ -73,10 +73,11 @@ not versions - the page ships continuously to Neocities.
   buttons
 
 ### Themes
-- nightshade becomes the out-of-box face - a first visit and a
+- nightshade becomes the out-of-box face at 18px - a first visit and a
   reset-all land on lavender/contrast with the rail split and docked
-  video; 'default' stays a named preset, and copied urls can emit
-  theme=default again now the baseline moved
+  video; the former baseline preset renames to 'old-default' (the
+  retired theme=default still resolves), and copied urls emit
+  theme=old-default for it
 
 ### Help popup
 - the config rows reorganise: popup width, font size and position run
