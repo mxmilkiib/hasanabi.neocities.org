@@ -88,6 +88,9 @@ not versions - the page ships continuously to Neocities.
 - rate-window picks set the graph's frame and the rail's window set
   clamps to its short list; the spark save shrinks and survives quota
   pressure
+- hovering a msg-bursts entry bands its span on the session msg rate
+  graph - an accent bracket over the burst's window, transparent to the
+  canvas' own bin readout
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,

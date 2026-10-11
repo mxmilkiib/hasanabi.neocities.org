@@ -1196,6 +1196,11 @@
   /* inside a fixed column the ranked lists run single-file */
   #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
   #statsBody #stRate { display: block; width: 100%; height: 100px; }
+  /* a burst row's hover bands its span over the graph - transparent to
+     the pointer so the canvas' own bin readout keeps working */
+  #statsBody .st-rwrap { position: relative; }
+  #statsBody #stRateHl { position: absolute; top: 0; bottom: 0; pointer-events: none;
+    background: color-mix(in oklch, var(--accent), transparent 78%); border-inline: 1px solid var(--accent); }
   #statsBody .st-badge { break-inside: avoid; }
   /* the folded 'more sets' group must let its rows flow across columns */
   #statsBody .st-more { break-inside: auto; }
@@ -5989,7 +5994,9 @@
     const bursts = bPicks.map(([r, t]) => {
       const t0 = bSamps.reduce((m, [r2, t2]) =>
         Math.abs(t2 - t) <= 30000 && r2 >= r - .05 ? Math.min(m, t2) : m, t);
-      return `<div class="st-row"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
+      // bt0/bt1 frame the burst on the session graph: the first matching
+      // window's start through the peak window's end
+      return `<div class="st-row" data-bt0="${t0 - 5000}" data-bt1="${t}"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
         `<a class="at" href="https://tv.supa.sh/logs?c=${encodeURIComponent(sc || CHANNEL)}&d=${logDay(t0)}" target="_blank" rel="noopener" title="this day in the supa logs">${fmtRowTime(new Date(t0))}</a></span></div>`;
     }).join('');
     // badge reference: the channel's own sets lead, then the badges that
@@ -6189,7 +6196,7 @@
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
       `<div class="st-panel st-rate"><div class="st-h">session msg rate<span class="st-sort">${rateWinBtns}</span> <span class="st-hint">(tick: peak second · red cap: glorp)</span></div>` +
-        `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
+        `<div class="st-rwrap"><canvas id="stRate" role="img"></canvas><div id="stRateHl" hidden></div></div><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
       `<div class="st-panel st-emotes"><div class="st-h">top emotes<span class="st-sort">${inRail ? emoteSrcBtns : ''}</span></div>` +
         (inRail ? '' : `<div class="st-frow">${emoteSrcBtns}</div>`) +
@@ -6305,6 +6312,9 @@
   // gap marker rows aren't messages and don't count
   // the session-long rate series - the same samples the header spark
   // draws, kept past its window; scoped views take the per-channel tail
+  // the frame the session graph last drew - burst hovers map their span
+  // onto it to place the highlight band
+  let stRateFrame = null;
   function drawScrollGraph(el, sc) {
     const cv = el.querySelector('#stRate');
     const cap = el.querySelector('#stRateCap');
@@ -6313,6 +6323,7 @@
     const off = rateHistT.length - series.length;
     if (!series.length) {
       cap.innerHTML = '<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>';
+      stRateFrame = null;
       return;
     }
     const dpr = window.devicePixelRatio || 1;
@@ -6331,6 +6342,7 @@
     const rWin = RATE_WINS[rwe] || 0;
     if (rWin) t0 = t1 - rWin;
     const span = Math.max(30000, t1 - t0);
+    stRateFrame = { t0, span };
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
     const bw = span / N, bwPx = wCss / N;
     // per-second samples pool into pixel bins: rate bars average, each bin
@@ -6534,6 +6546,27 @@
     chatSort = cs.dataset.csort;
     try { localStorage.setItem(CHAT_SORT_KEY, chatSort); } catch {}
     renderStats();
+  });
+  // a msg-burst row hovers its span onto the session graph - the frame
+  // the graph last drew maps the burst's window onto canvas coordinates
+  const statsBodyEl = document.getElementById('statsBody');
+  statsBodyEl.addEventListener('mouseover', (e) => {
+    const row = e.target.closest('.st-row[data-bt0]');
+    if (!row || (e.relatedTarget && row.contains(e.relatedTarget))) return;
+    const hl = document.getElementById('stRateHl');
+    if (!hl || !stRateFrame) return;
+    const l = Math.max(0, (+row.dataset.bt0 - stRateFrame.t0) / stRateFrame.span);
+    const r = Math.min(1, (+row.dataset.bt1 - stRateFrame.t0) / stRateFrame.span);
+    if (r <= l) return; // the burst predates the framed window
+    hl.style.left = l * 100 + '%';
+    hl.style.width = (r - l) * 100 + '%';
+    hl.hidden = false;
+  });
+  statsBodyEl.addEventListener('mouseout', (e) => {
+    const row = e.target.closest('.st-row[data-bt0]');
+    if (!row || (e.relatedTarget && row.contains(e.relatedTarget))) return;
+    const hl = document.getElementById('stRateHl');
+    if (hl) hl.hidden = true;
   });
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
