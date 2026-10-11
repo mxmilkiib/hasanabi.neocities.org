@@ -1606,6 +1606,9 @@
   #helpPanel .htabpage > div, #helpPanel #authSections > div { margin: 7px 0; display: grid; grid-template-columns: 9em 1fr; gap: 0 13px; }
   /* theme/colour/variant/shade rows breathe - the swatch chips want the air */
   #helpPanel .htabpage > div.thm { margin: 17px 0; }
+  /* wrapped chip rows read as a stack of buttons, not lines of text -
+     extra pitch keeps the boxes from crowding each other */
+  #helpPanel span[id$="List"] { line-height: 1.95; }
   /* the resource/author sections breathe more than the config rows */
   #helpPanel #htabRes > div, #helpPanel #htabLib > div, #helpPanel #htabLbr > div, #helpPanel #authSections > div { margin: 12px 0; }
   /* column tops sit a touch below the section name, not level with it */
