@@ -1593,7 +1593,9 @@
   #helpPanel:hover .hp-size, #helpPanel.dragging .hp-size { opacity: 1; }
   #helpPanel.dragging .hp-size { cursor: move; }
   #helpPanel b { color: var(--accent); font-weight: 600; }
-  #helpPanel .dot { display: inline-block; vertical-align: middle; }
+  /* grid items ignore vertical-align - a key dot centres on its
+     description row instead of riding the cell's top edge */
+  #helpPanel .dot { display: inline-block; vertical-align: middle; align-self: center; }
   #helpPanel b.rowstyle { padding: 0 4px; }
   #helpPanel b.glorp { background-color: rgba(232, 93, 93, .13); box-shadow: inset 4px 0 0 var(--danger); }
   #helpPanel b.mention { background-color: rgba(232, 163, 61, .13); box-shadow: inset 4px 0 0 var(--accent); }
