@@ -6052,6 +6052,12 @@
     const openSets = new Set(
       [...el.querySelectorAll('details.st-badge[open]')].map((d) => d.dataset.set || '*'));
     const scEl = el.closest('.hp-scroll');
+    // the glorps title borrows the channel's own glorp cell once sets are
+    // in - a scoped view falls back to the focused channel's copy
+    const gCh = sc || CHANNEL;
+    let gEmo = emoteNameOf(gCh, 'glorp'), gUrl = gEmo && emotesOf(gCh)[gEmo];
+    if (!gUrl && sc) { gEmo = emoteNameOf(CHANNEL, 'glorp'); gUrl = gEmo && emotesOf(CHANNEL)[gEmo]; }
+    const gImg = gUrl ? `<img class="emote" src="${escapeHTML(gUrl)}" alt="glorp">` : '';
     const scTop = scEl ? scEl.scrollTop : 0;
     el.innerHTML =
       `<div class="st-trio">` +
@@ -6066,7 +6072,7 @@
         scopeBtns + `</div>` +
         `<div class="st-panel"><div class="st-h">msg bursts</div>` +
         (bursts || `<div class="st-row"><span class="nm">no 4+ msgs/s bursts yet</span></div>`) + `</div>` +
-        `<div class="st-panel"><div class="st-h">glorps</div>` +
+        `<div class="st-panel"><div class="st-h">glorps${gImg}/F</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
       `<div class="st-panel st-rate"><div class="st-h">session msg rate<span class="st-sort">${rateWinBtns}</span> <span class="st-hint">(accent tick: a bin's sharpest second · red cap: glorp burst)</span></div>` +
