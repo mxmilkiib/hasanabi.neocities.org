@@ -1162,6 +1162,8 @@
   /* the badge list's show-all row bridges the column flow */
   #statsBody .st-all { column-span: all; }
   #statsBody .st-sort { float: right; font-weight: 400; }
+  /* the bracketed key inside a title keeps body ink, not the title accent */
+  #statsBody .st-h .st-hint { color: var(--text-dim); font-weight: 400; }
   #statsBody .st-scope .st-s { font-weight: 400; }
   #statsBody .st-s { border: 0; background: none; color: var(--text-dim);
     font: inherit; font-size: .9em; cursor: pointer; padding: 0 4px; }
@@ -6067,7 +6069,7 @@
         `<div class="st-panel"><div class="st-h">glorps</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
-      `<div class="st-panel st-rate"><div class="st-h">session msg rate<span class="st-sort">${rateWinBtns}</span></div>` +
+      `<div class="st-panel st-rate"><div class="st-h">session msg rate<span class="st-sort">${rateWinBtns}</span> <span class="st-hint">(accent tick: a bin's sharpest second · red cap: glorp burst)</span></div>` +
         `<canvas id="stRate" role="img"></canvas><div id="stRateCap"></div></div>` +
       `<div class="st-panel st-wide"><div class="st-h">top links <span class="st-sort">${linkWinBtns}</span></div><div class="st-cols st-ucols">${topLinks || '<div class="st-row"><span class="nm">none posted yet</span></div>'}</div></div>` +
       `<div class="st-panel st-emotes"><div class="st-h">top emotes<span class="st-sort">${inRail ? emoteSrcBtns : ''}</span></div>` +
