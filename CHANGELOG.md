@@ -102,6 +102,9 @@ not versions - the page ships continuously to Neocities.
   backfill re-snapped; deferred re-pins cover fonts, media and load
 - the three rail modes are named 3col+vid·emotes·stats,
   3col+vid·emotes and 3col+emotes
+- cached tweet peeks that came back iconless now refetch on hover
+  instead of sitting iconless for their whole ttl - the refetch guard
+  only covered entries that predated the picon key entirely
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,
