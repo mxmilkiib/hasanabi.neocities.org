@@ -12106,8 +12106,12 @@
       gifWait.delete(d.q);
       if (d.limited) { gifPause = Date.now() + 5 * 60000; gifMetaSave(); } // 429: back off, cache nothing
       else {
-        const g = d.url && /^https:\/\/media\d*\.giphy\.com\//.test(d.url) && /^https:\/\/giphy\.com\//.test(d.page || '')
-          ? { url: d.url, page: d.page } : null;
+        // img is the worker's own proxy url - the bytes came through its
+        // edge cache, so a repeated gif asks giphy's cdn once per colo
+        const src = d.img && /^https:\/\/[\w.-]+\.workers\.dev\//.test(d.img) ? d.img
+          : d.url && /^https:\/\/media\d*\.giphy\.com\//.test(d.url) ? d.url : null;
+        const g = src && /^https:\/\/giphy\.com\//.test(d.page || '')
+          ? { url: src, page: d.page } : null;
         gifCache.set(d.q, g);
         gifSave(d.q, g);
         if (g) {
