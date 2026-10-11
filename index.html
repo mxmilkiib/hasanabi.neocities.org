@@ -656,8 +656,9 @@
   #rail.novid #emotePick, #rail.novid #htabStats { flex: 1 1 0; }
   /* the emotes/stats seam: an invisible grab strip centred on the
      picker's bottom border, so the drag starts right on the line */
-  #railSplit { flex: none; height: 7px; margin: -4px 0 -3px; cursor: ns-resize;
+  #railSplit { flex: none; height: 7px; margin: -4px 0 -3px; cursor: grab;
     position: relative; z-index: 3; touch-action: none; }
+  #railSplit:active { cursor: grabbing; }
   #railSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
   /* a squeezed stats pane sheds its lower lists first - the rate graph
      climbs to the top of what remains, alone once the pane can fit
