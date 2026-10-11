@@ -2215,7 +2215,7 @@
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
     <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, squares an emote crossed this session turn gold, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends, cycling on to '▥' where rows flow inline but each ends at its last square; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('⏸' freezes animated cells to stills, 'anim' hides them), 'Aa' shows names, ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker (cycling to 'hold+' pauses animated cells too, but only while the pointer is over the cell grid); a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - then two slimmer rails on the same columns: video + emotes, and emotes alone with the video floated over the chat<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
@@ -8008,7 +8008,8 @@
     setVideo(mode !== 'off');
   }
   const vidNext = () => {
-    if (railEl.hidden) setVideo(vidBox.hidden);
+    // modes 5/6 own the video's placement - the button only toggles it
+    if (railEl.hidden || splitLevel >= 5) setVideo(vidBox.hidden);
     else setRailVid(vidRail === 'dock' ? 'float' : vidRail === 'float' ? 'off' : 'dock');
   };
   vidBtn.addEventListener('click', () => { vidNext(); saveOpts(); });
@@ -8758,7 +8759,7 @@
     // outside it video=1 only when the box is shown. modes 5/6 own the
     // placement themselves - vidRail is stale there, so the url only
     // needs the param when the mode-forced video is actually hidden
-    if (splitLevel >= 5) { if (vidBox.hidden) q.set('video', '0'); }
+    if (splitLevel >= 5) { if (vidBox.hidden !== (splitLevel === 6)) q.set('video', vidBox.hidden ? '0' : '1'); }
     else if (railEl.hidden) { if (!vidBox.hidden) q.set('video', '1'); }
     else if (vidRail !== 'dock') q.set('video', vidRail === 'off' ? '0' : 'float');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
@@ -9279,12 +9280,12 @@
           vidBox.style.bottom = vidBox.style.width = '';
         setVideo(true);
       } else if (level === 6) {
-        // the video floats free over the chat columns at its saved
-        // geometry, leaving the rail to the picker alone
+        // no video by default - it sits floated out of the rail at its
+        // saved geometry, so enabling it pops up over the chat
         railEl.classList.add('novid');
         if (vidBox.parentNode === railEl) mainEl.before(vidBox);
         applyVidPos();
-        setVideo(true);
+        setVideo(false);
       } else setRailVid(vidRail === 'off' && !suppressSave ? 'dock' : vidRail); // an offed video revives on rail re-entry, not on restore
       // '0' means the picker was deliberately closed - the rail honours
       // that instead of reopening it on every entry
@@ -9334,7 +9335,7 @@
     splitBtn.textContent = level === 6 ? '▮▮☻' : level === 5 ? '▮▮▶' : level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
     splitBtn.classList.toggle('tri', level >= 3);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = `${level}/6 ${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)', 'two chat columns + rail (video · emotes)', 'two chat columns + rail (emotes · video floats)'][level - 1]} - click/scroll · ⇧click back`;
+    splitBtn.title = `${level}/6 ${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)', 'two chat columns + rail (video · emotes)', 'two chat columns + rail (emotes only · video off, ▶ floats it)'][level - 1]} - click/scroll · ⇧click back`;
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     // flipping between 2 and a rail level keeps the deal - only the
     // rail and its contents toggle. the rail modes share one visible
@@ -12470,7 +12471,8 @@
     if (q.has('self')) setSelfHl(flag('self'));
     if (q.has('video')) {
       const v = q.get('video');
-      if (railEl.hidden) setVideo(flag('video'));
+      // modes 5/6 own the video's placement - here the param just toggles it
+      if (splitLevel >= 5 || railEl.hidden) setVideo(flag('video'));
       else setRailVid({ float: 'float', dock: 'dock', off: 'off' }[v] || (flag('video') ? 'dock' : 'off'));
     }
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
