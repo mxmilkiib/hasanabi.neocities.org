@@ -650,6 +650,10 @@
   #rail #htabStats { flex: 2 1 0; min-height: 0; overflow-y: auto; padding: 0 10px; }
   /* video floated or off: the picker and stats split the column evenly */
   #rail.novid #emotePick, #rail.novid #htabStats { flex: 1 1 0; }
+  /* the chatless levels run the rail alone across main: level 5 docks
+     video left of the picker, level 6 leaves the whole width to it */
+  #rail.vrow { flex-direction: row; }
+  #rail.vrow #vid { width: 60%; flex: none; border-bottom: 0; border-right: 1px solid var(--line); }
 
   .empty {
     color: var(--text-dim);
@@ -2212,7 +2216,7 @@
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
     <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, squares an emote crossed this session turn gold, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends, cycling on to '▥' where rows flow inline but each ends at its last square; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('⏸' freezes animated cells to stills, 'anim' hides them), 'Aa' shows names, ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker (cycling to 'hold+' pauses animated cells too, but only while the pointer is over the cell grid); a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - then two chatless rail modes: video + emotes, and emotes alone with the video floated<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
@@ -2463,6 +2467,7 @@
   const side2El = document.getElementById('side2');
   const railEl = document.getElementById('rail');
   let activeEl = logEl; // column currently receiving new rows
+  let splitLevel = 1; // the applied column mode - 5/6 are the chatless rails
   // the visible columns in page-flip order; a row page-flips to the column
   // after the active one, so the column after it holds the oldest rows
   const cols = () => [logEl, sideEl, side2El].slice(0, 1 + !sideEl.hidden + !side2El.hidden);
@@ -7556,7 +7561,7 @@
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos,
       lbls: lblsOn ? 1 : 0,
-      split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4,
+      split: splitLevel,
       rvid: vidRail,
     };
   }
@@ -7683,11 +7688,13 @@
       try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
       if (o.epgeo.left != null) setPin(true);
     }
-    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 4) setSplit(o.split);
+    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 6) setSplit(o.split);
     // after the split so a rail exists to dock into; outside rail it just
     // stores the mode for the next dock. the boolean 'video' above only
     // spans shown/hidden - this carries dock/float too
-    if (['dock', 'float', 'off'].includes(o.rvid)) setRailVid(o.rvid);
+    // a chatless split owns its video placement - the saved rail mode
+    // just waits for the next dock rather than rearranging the mode
+    if (['dock', 'float', 'off'].includes(o.rvid)) { vidRail = o.rvid; if (splitLevel < 5) setRailVid(o.rvid); }
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
     if (typeof o.hw === 'string') { hwInput.value = o.hw; setHideList(o.hw); }
@@ -7753,7 +7760,7 @@
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
-      split: railEl.hidden ? 1 + !sideEl.hidden + !side2El.hidden : 4, hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
+      split: splitLevel, hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
       clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold, anim: nickAnim, epzoom: epickZoom,
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -8722,8 +8729,7 @@
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
     else if (document.body.classList.contains('hdrmin')) q.set('min', '1');
     if (!selfHl) q.set('self', '0');
-    // rail mode counts its chat columns as 2 - the level lives on railEl
-    if (isSplit()) q.set('split', String(railEl.hidden ? cols().length : 4));
+    if (splitLevel > 1) q.set('split', String(splitLevel));
     // in rail mode the video state is vidRail (dock is the baseline);
     // outside it video=1 only when the box is shown
     if (railEl.hidden) { if (!vidBox.hidden) q.set('video', '1'); }
@@ -9212,18 +9218,33 @@
     const statsTab = document.getElementById('htabStats');
     if (railEl.hidden || !helpPanel.contains(statsTab)) return;
     railEl.appendChild(statsTab);
-    statsTab.hidden = false;
+    statsTab.hidden = splitLevel >= 5;
   }
-  function dockRail(on) {
+  function dockRail(level) {
+    const on = level >= 4;
     const statsTab = document.getElementById('htabStats');
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
     if (on) {
       if (!statsHome) statsHome = { parent: statsTab.parentNode, next: statsTab.nextSibling };
       railEl.append(emotePick, statsTab);
       emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
-      statsTab.hidden = false;
+      statsTab.hidden = level >= 5;
       if (statsLink.classList.contains('on')) switchTab('htabCfg');
-      setRailVid(vidRail);
+      railEl.classList.toggle('vrow', level === 5);
+      if (level === 5) {
+        // docked for the mode only - the saved rail placement is untouched
+        railEl.classList.remove('novid');
+        railEl.prepend(vidBox);
+        vidBox.style.left = vidBox.style.top = vidBox.style.right =
+          vidBox.style.bottom = vidBox.style.width = '';
+        setVideo(true);
+      } else if (level === 6) {
+        // the video floats free over the chatless page at its saved geometry
+        railEl.classList.add('novid');
+        if (vidBox.parentNode === railEl) mainEl.before(vidBox);
+        applyVidPos();
+        setVideo(true);
+      } else setRailVid(vidRail);
       // '0' means the picker was deliberately closed - the rail honours
       // that instead of reopening it on every entry
       let epClosed = false;
@@ -9247,7 +9268,7 @@
       }
       statsTab.hidden = true;
       statsLink.hidden = false;
-      railEl.classList.remove('novid');
+      railEl.classList.remove('novid', 'vrow');
       mainEl.before(vidBox);
       mainEl.after(emotePick);
       applyVidPos();
@@ -9257,41 +9278,51 @@
   // the rail's stats keep ticking while they're docked
   setInterval(() => { if (!railEl.hidden) renderStats(); }, 8000);
 
-  // Sets the pane count (1..4); a third column only exists in landscape,
+  // Sets the pane count (1..6); a third column only exists in landscape,
   // where it's actually wider than it is tall enough to be readable.
-  // Level 4 is the docked rail rather than a third chat column
+  // Level 4 is the docked rail rather than a third chat column; 5 and 6
+  // are chatless rail layouts - video + emotes, then emotes alone with
+  // the video floated free over the page
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
-    level = Math.max(1, Math.min(4, level));
+    level = Math.max(1, Math.min(6, level));
+    splitLevel = level;
     markHelp('helpSplit', level - 1);
     setOn(splitBtn, level > 1);
-    splitBtn.textContent = level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
+    splitBtn.textContent = level === 6 ? '☻' : level === 5 ? '▶☻' : level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
     splitBtn.classList.toggle('tri', level >= 3);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = `${level}/4 ${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)'][level - 1]} - click/scroll · ⇧click back`;
+    splitBtn.title = `${level}/6 ${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)', 'video + emote popup', 'emote popup (video floats)'][level - 1]} - click/scroll · ⇧click back`;
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
-    // flipping between 2 and 4 keeps the deal - only the rail toggles
-    if ((level === 4 ? 2 : level) === cur) {
+    // flipping between 2 and 4 keeps the deal - only the rail toggles.
+    // !logEl.hidden gates the bare modes out: they count as 1 column
+    // but the full path must unhide them on the way back
+    if ((level === 4 ? 2 : level) === cur && !logEl.hidden) {
       if (railEl.hidden === (level !== 4)) return;
       railEl.hidden = level !== 4;
-      dockRail(level === 4);
+      dockRail(level === 4 ? level : 0);
       // the rail resizes the chat columns - refit the pages
       repin();
       return;
     }
     // every column folds back into #log in flow order, then re-deals
     mergeCols();
-    sideEl.hidden = level < 2;
+    const bare = level >= 5;
+    sideEl.hidden = level < 2 || bare;
     side2El.hidden = level !== 3;
-    railEl.hidden = level !== 4;
-    mainEl.classList.toggle('split', level >= 2);
-    mainEl.classList.toggle('split3', level >= 3);
+    logEl.hidden = bare;
+    railEl.hidden = level < 4;
+    mainEl.classList.toggle('split', level >= 2 && !bare);
+    mainEl.classList.toggle('split3', level === 3 || level === 4);
     jdownSet(jdownSide, sideEl, true);
     jdownSet(jdownSide2, side2El, true);
-    dockRail(level === 4);
+    if (bare) jdownSet(jdownLog, logEl, true);
+    dockRail(bare || level === 4 ? level : 0);
     if (level === 1) {
       // columns widen on rejoin - re-pin the live column if it was following
       requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); });
+    } else if (bare) {
+      // the folded log sits hidden behind the rail - nothing to deal
     } else if (revFlow) {
       // rev never rotates: the first column stays live, its spill page
       // lands in the next
@@ -9310,9 +9341,8 @@
   }
 
   function cycleSplit(dir) {
-    const max = window.innerWidth > window.innerHeight ? 4 : 2;
-    const n = (railEl.hidden ? cols().length : 4) + dir;
-    setSplit(((n - 1) % max + max) % max + 1);
+    const max = window.innerWidth > window.innerHeight ? 6 : 2;
+    setSplit(((splitLevel + dir - 1) % max + max) % max + 1);
     saveOpts();
   }
 
@@ -9874,8 +9904,10 @@
     if (toUntils[sendTarget()]) paintTimeout();
     paintChatPick();
     document.body.classList.toggle('chaton', on);
-    // inline rather than clearReply(): that path refreshes this same UI
-    if (!on) { replyCtx = null; replyBar.hidden = true; if (!epickPinned) closePicker(); }
+    // inline rather than clearReply(): that path refreshes this same UI.
+    // the chatless split modes own the picker - a logged-out refresh
+    // must not pull the rail's only content out from under it
+    if (!on) { replyCtx = null; replyBar.hidden = true; if (!epickPinned && splitLevel < 5) closePicker(); }
   }
 
   // ---- replies: pick a row with its hover ↩, then Enter sends it as a
@@ -9968,7 +10000,7 @@
     if (auth && auth.token) {
       if (e.shiftKey) { logout(); return; }
       chatbarEl.hidden = !chatbarEl.hidden;
-      if (chatbarEl.hidden && !epickPinned) closePicker();
+      if (chatbarEl.hidden && !epickPinned && splitLevel < 5) closePicker();
       else if (!chatbarEl.hidden) chatInput.focus();
     } else {
       // preflight id.twitch.tv before handing the tab to oauth - a stalled
@@ -11658,6 +11690,10 @@
     }
   }
   function closePicker() {
+    // an already-hidden picker has nothing to close - a stray call here
+    // must not stamp a 'deliberately closed' pref the user never made
+    // (init's updateSendUI reaches this logged-out before the rail docks)
+    if (emotePick.hidden) return;
     emotePick.hidden = true;
     emojiBtn.classList.remove('on');
     emojiBtn.setAttribute('aria-expanded', 'false');
@@ -12389,7 +12425,7 @@
     if (q.has('split')) {
       const n = q.get('split');
       const v = parseInt(n, 10);
-      if (n !== '0') setSplit(v >= 1 && v <= 4 ? v : 2);
+      if (n !== '0') setSplit(v >= 1 && v <= 6 ? v : 2);
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
@@ -12483,7 +12519,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail'],
+    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail', 'vid+emotes', 'emotes'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
@@ -12610,7 +12646,7 @@
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
   markHelp('helpEonly', emoteMode);
-  markHelp('helpSplit', !sideEl.hidden + !side2El.hidden + !railEl.hidden);
+  markHelp('helpSplit', splitLevel - 1);
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);
   markHelp('helpLinks', document.body.classList.contains('linkview') ? 1 : 0);
   markHelp('helpBots', hideBots ? 1 : 0);
