@@ -5000,6 +5000,21 @@
           (vidPlayer.isPaused() || (vidPlayer.isEnded && vidPlayer.isEnded()))) {
         try { vidPlayer.play(); } catch {}
       }
+      // a slate that shrugs off play() is stale outright - give the
+      // nudge a beat, then rebuild the embed if a live stream still
+      // isn't rolling
+      if (prevSt && !prevSt.live && !vidBox.hidden) {
+        clearTimeout(vidRetry);
+        vidRetry = setTimeout(() => {
+          if (!stream || !stream.live || vidBox.hidden) return;
+          if (vidPlayer && !vidPlayer.isPaused() &&
+              !(vidPlayer.isEnded && vidPlayer.isEnded())) return;
+          vidPlayer = null;
+          loadPlayer.done = false;
+          document.getElementById('vidFrame').innerHTML = '';
+          loadPlayer();
+        }, 12000);
+      }
       if (stream.startedAt && (!lastRun || lastRun.ended || lastRun.started !== stream.startedAt)) {
         lastRun = { started: stream.startedAt, ended: null, seen: Date.now() };
         saveLastRun();
@@ -7668,6 +7683,9 @@
     } catch {}
     try { suppressSave = true; applyOpts(o); }
     finally { suppressSave = false; }
+    // no bundle at all means a first visit - the video opens like the
+    // picker does, and only a deliberate off is stored from here on
+    if (!o) setVideo(true);
   }
 
   // applies a (possibly partial) option bundle; used by saved options,
@@ -7751,7 +7769,10 @@
       helpMode = o.help >= 2 ? o.help - 2 : o.help;
       applyHelp();
     }
-    if (typeof o.video === 'boolean') { railEl.hidden ? setVideo(o.video) : setRailVid(o.video ? 'dock' : 'off'); }
+    // an unset video pref defaults on - a deliberate off is the only
+    // stored 'no'
+    const vidPref = typeof o.video === 'boolean' ? o.video : true;
+    if (railEl.hidden) setVideo(vidPref); else setRailVid(vidPref ? 'dock' : 'off');
     // a floating geometry only means something while pinned - same as
     // what dragging free does. applies before the split so a rail dock
     // still clears the parked geometry off the reparented picker
@@ -8020,6 +8041,7 @@
   // pause never lands in the saved state; reshow resumes only if the
   // hide itself was what paused it
   let vidPausedByHide = false;
+  let vidRetry = 0;
   function setVideo(on) {
     vidBox.hidden = !on;
     if (on) {
