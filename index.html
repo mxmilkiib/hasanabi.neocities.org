@@ -9292,6 +9292,7 @@
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
     level = Math.max(1, Math.min(6, level));
+    const prevSplit = splitLevel;
     splitLevel = level;
     markHelp('helpSplit', level - 1);
     setOn(splitBtn, level > 1);
@@ -9301,9 +9302,10 @@
     splitBtn.title = `${level}/6 ${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)', 'two chat columns + rail (video · emotes)', 'two chat columns + rail (emotes · video floats)'][level - 1]} - click/scroll · ⇧click back`;
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     // flipping between 2 and a rail level keeps the deal - only the
-    // rail and its contents toggle
+    // rail and its contents toggle. the rail modes share one visible
+    // rail, so 4→5→6 must still re-dock; only a true no-op exits early
     if ((level >= 4 ? 2 : level) === cur) {
-      if (railEl.hidden === (level < 4)) return;
+      if (railEl.hidden === (level < 4) && prevSplit === level) return;
       railEl.hidden = level < 4;
       dockRail(level >= 4 ? level : 0);
       // the rail resizes the chat columns - refit the pages
