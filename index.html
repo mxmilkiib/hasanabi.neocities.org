@@ -2838,14 +2838,16 @@
   const gifLink = (q, label, g) => g
     ? `<a class="gifq" data-q="${escapeHTML(q)}" href="${escapeHTML(g.page)}" target="_blank" rel="noopener noreferrer"><img class="gifimg" src="${escapeHTML(g.url)}" alt="${escapeHTML(label)}" title="${escapeHTML(label)}"></a>`
     : `<a class="gifq" data-q="${escapeHTML(q)}" href="https://giphy.com/search/${encodeURIComponent(q.replace(/\s+/g, '-'))}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a>`;
-  // results persist in localStorage (30-day hits, 1-day misses, 300 entries,
-  // keyed with the rating
-  // flag) so a reload or a repeated title never spends a lookup; the image
-  // files themselves are cached by the service worker. Lookups leave one
-  // at a time, at least 1.2s apart and 80 an hour, and a 429 from giphy
-  // pauses them for 5 minutes - a history walkback full of gif posts would
-  // otherwise burn the key's hourly allowance in seconds
-  const GIF_KEY = 'hasan-gifs', GIF_TTL = 30 * 864e5, GIF_MISS_TTL = 7 * 864e5, GIF_MAX = 300, GIF_GAP = 1200, GIF_HOURLY = 80;
+  // results persist in localStorage (30-day hits, week-long misses, 300
+  // entries, keyed with the rating flag) so a reload or a repeated title
+  // never spends a lookup; the image files themselves are cached by the
+  // service worker. Lookups leave one at a time, at least 1.2s apart and
+  // 80 an hour, and a 429 from giphy pauses them for 5 minutes - a
+  // history walkback full of gif posts would otherwise burn the key's
+  // hourly allowance in seconds. The backoff deadline and the hourly
+  // tally persist too, so a reload can't slip past either
+  const GIF_KEY = 'hasan-gifs', GIF_META_KEY = 'hasan-gifs-meta',
+    GIF_TTL = 30 * 864e5, GIF_MISS_TTL = 7 * 864e5, GIF_MAX = 300, GIF_GAP = 1200, GIF_HOURLY = 80;
   let gifStore = {};
   try { gifStore = JSON.parse(localStorage.getItem(GIF_KEY)) || {}; } catch {}
   const gifSk = (q) => (gifSafe ? '1|' : '0|') + q;
@@ -2857,8 +2859,15 @@
     if (ks.length > GIF_MAX) ks.sort((a, b) => gifStore[a].t - gifStore[b].t).slice(0, ks.length - GIF_MAX).forEach((k) => delete gifStore[k]);
     try { localStorage.setItem(GIF_KEY, JSON.stringify(gifStore)); } catch {}
   }
-  const gifQueue = [], gifSent = [];
-  let gifTimer = 0, gifPause = 0;
+  const gifQueue = [];
+  let gifMeta = { pause: 0, sent: [] };
+  try { gifMeta = { pause: 0, sent: [], ...(JSON.parse(localStorage.getItem(GIF_META_KEY)) || {}) }; } catch {}
+  const gifSent = gifMeta.sent.filter((t) => Date.now() - t < 36e5);
+  let gifTimer = 0, gifPause = gifMeta.pause || 0;
+  const gifMetaSave = () => {
+    gifMeta = { pause: gifPause, sent: gifSent.slice(-GIF_HOURLY) };
+    try { localStorage.setItem(GIF_META_KEY, JSON.stringify(gifMeta)); } catch {}
+  };
   function gifPump() {
     if (gifTimer || !gifQueue.length) return;
     gifTimer = setTimeout(() => {
@@ -2868,7 +2877,7 @@
       const q = gifQueue.shift();
       if (q !== undefined) {
         if (gifSent.length >= GIF_HOURLY || !joined || !relayFrame.contentWindow) gifWait.delete(q);
-        else { gifSent.push(now); relayFrame.contentWindow.postMessage({ type: 'giphy', q, safe: gifSafe }, RELAY_ORIGIN); }
+        else { gifSent.push(now); gifMetaSave(); relayFrame.contentWindow.postMessage({ type: 'giphy', q, safe: gifSafe }, RELAY_ORIGIN); }
       }
       gifPump();
     }, Math.max(GIF_GAP, gifPause - Date.now()));
@@ -12095,7 +12104,7 @@
       updateSendUI();
     } else if (d.type === 'giphy' && typeof d.q === 'string') {
       gifWait.delete(d.q);
-      if (d.limited) gifPause = Date.now() + 5 * 60000; // 429: back off, cache nothing
+      if (d.limited) { gifPause = Date.now() + 5 * 60000; gifMetaSave(); } // 429: back off, cache nothing
       else {
         const g = d.url && /^https:\/\/media\d*\.giphy\.com\//.test(d.url) && /^https:\/\/giphy\.com\//.test(d.page || '')
           ? { url: d.url, page: d.page } : null;
