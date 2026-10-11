@@ -3358,9 +3358,13 @@
       const alt = escapeHTML(name);
       const eid = escapeHTML(e.id);
       const tone = lightMode ? 'light' : 'dark';
-      // frozen stills take the default frame outright - static emotes
-      // have one anyway, so the fallback below simply never fires
-      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${animFrozen() ? 'default' : 'animated'}/${tone}/2.0"` +
+      // frozen stills take the default frame outright. so do emotes
+      // the loaded sets know as static - the animated path 404s them
+      // (firefox shows the opaque-blocked error), so ask correctly and
+      // leave the fallback for emotes no set knows
+      const tstat = twSets.some((s) => s.emoteList.some((x) =>
+        (x.id == e.id || x.code === name) && x.assetType !== 'ANIMATED'));
+      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${animFrozen() || tstat ? 'default' : 'animated'}/${tone}/2.0"` +
               ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${eid}/default/${tone}/2.0'"` +
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;

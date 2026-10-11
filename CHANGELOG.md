@@ -116,6 +116,11 @@ not versions - the page ships continuously to Neocities.
   of every key - quota deaths now show up here instead of needing
   a console dig. the localstorage row and origin estimate both
   carry their percentage share
+- static twitch emotes ask for the default frame outright when the
+  loaded sets know them - the animated path 404s them, which is
+  what firefox reports as OpaqueResponseBlocking noise (the
+  onerror retry already caught it); unknown emotes keep guessing
+  animated so unseen animated ones still play
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;
