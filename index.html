@@ -4275,11 +4275,16 @@
         }
       }
       if (fossa) {
-        // a resub announcement names its subber as bare text at the head
-        // of the line - link it like a name so hover and the profile work
+        // fossa's notices name their user as bare text - the resubber at
+        // the head of a just-sub line, the thanked name at the tail of a
+        // bits/sub thank-you. link it like a name so hover, the card and
+        // the chatter's colour all work
+        const nwho = (who) => `<a class="at nwho" style="color:${mentionCol(who)}" href="https://www.twitch.tv/${who.toLowerCase()}" target="_blank" rel="noopener noreferrer">@${who}</a>`;
         msgHtml = msgHtml
           .replace(/(^|[\s>.,;:!])([a-z0-9_]{1,25})(\s+just\s+sub)/i,
-            '$1<a class="at" href="https://www.twitch.tv/$2" target="_blank" rel="noopener noreferrer">@$2</a>$3')
+            (m, p, who, tail) => `${p}${nwho(who)}${tail}`)
+          .replace(/((?:thank(?:s| you)?|thx)[^!<]{0,120}?),\s*(?:@)?([A-Za-z0-9_]{1,25})([!.]{0,2}\s*)$/i,
+            (m, pre, who, tail) => `${pre}, ${nwho(who)}${tail}`)
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
       // a text row ending in a run of emotes/emoji gets that run wrapped;

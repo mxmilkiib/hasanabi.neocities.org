@@ -105,6 +105,8 @@ not versions - the page ships continuously to Neocities.
 - cached tweet peeks that came back iconless now refetch on hover
   instead of sitting iconless for their whole ttl - the refetch guard
   only covered entries that predated the picon key entirely
+- fossabot's thank-you notices (bits, subs) link the trailing username
+  as @name with the chatter's colour; resub headers colour the same way
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,
