@@ -64,6 +64,44 @@ not versions - the page ships continuously to Neocities.
 - the twitch embed pauses while its box is hidden, so a 'hidden' video
   no longer leaks audio; the update bar bolds its text and buttons
 
+### Help popup
+- the config rows reorganise: popup width, font size and position run
+  on one flowing line, header font size merges into the button-labels
+  row, and invisible spacer lines take over from the `-` separators
+- the stream-status key shows its five states as live dots, the graph
+  entry sits beneath it, twitch login moves under the stream overlay
+  reworded 'Twitch login:', and the tab reads 'help/conf'
+- kw/block/hide fields and the theme slots align to the description
+  column; the copied-url note sits above its button; nick styles
+  renames to nick shimmer
+- popup resize surfaces shade the hovered edge - corners light both
+  axes at once; the scrollback default rises to 5,000
+
+### Rail
+- mode 4's emotes/stats seam drags vertically to share the column under
+  a grab-hand cursor - the panes trade flex proportions, so the split
+  holds through resizes and video dock changes
+- a squeezed stats pane sheds its lower lists first: the rate graph
+  floats to the top of what remains, alone below ~160px; rail session
+  rows tighten and lose their rendered-since tally
+
+### Stats
+- the rate panel titles 'session msg rate' with a bracketed dot key
+  (tick: peak second · red cap: glorp); msg bursts needs a 4+ msgs/s
+  second to qualify; glorps renames 'glorps/F' with the channel emote
+  inline
+- the top lists drop the month/week rungs - all/24h/12h/6h/3h/1h - and
+  top badges drops the a-z sort
+
+### Sync & notice strips
+- the sync poles breathe width in from their outer ends on a ~42s
+  cycle, drifting to twitch purple at their narrowest; fixed 30%
+  tracks keep label swaps from shoving them, stripes scroll at 3s, the
+  brightness pulse is gone and the poles shave to 10px
+- the update bar sheds 2px of padding and settles on black with gold
+  text; the jump-down circles' marching ring unclips and thickens to
+  match the pill
+
 ## 2026-10-10
 
 ### Split columns

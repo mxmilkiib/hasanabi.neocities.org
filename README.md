@@ -32,7 +32,7 @@ A single self-contained page, running on a static host, that:
   login, replies, `/me`s and chat-history walkbacks work like a real
   [IRC](https://en.wikipedia.org/wiki/IRC) client
 
-Beyond chat, the page doubles as a curated hub - the `?` help/config
+Beyond chat, the page doubles as a curated hub - the `?` help/conf
 popup also carries:
 
 - media - clips, news outlets, youtube channels and sister twitch
@@ -226,9 +226,10 @@ no dependencies beyond CDN-hosted fonts.
   buttons size the grid, `hold` freezes usage reshuffles while the
   pointer is over the grid (`hold+` also pauses animated cells), and a
   pause chip swaps cells for their still frames.
-- The box resizes from its left and top edges and drags by a dotted
-  grip strip (both persist); a `📌` pin keeps it open across chat-bar
-  hides and reloads. All display options - names, size, sort, age rows,
+- The box resizes from its left and top edges (shading on hover) and
+  drags by a dotted grip strip (both persist); a `📌` pin keeps it
+  open across chat-bar hides and reloads. All display options - names,
+  size, sort, age rows,
   mix, hold, tabs, anim filter, geometry - ride the settings bundle,
   theme slots and copied URLs.
 - Clicking inserts at the caret; `Esc` peels the topmost layer -
@@ -315,7 +316,9 @@ no dependencies beyond CDN-hosted fonts.
   next while retired pages archive into the log; then three rail
   layouts alongside two chat columns - stream + emote picker + stats,
   stream + picker, and picker alone (the video floats over the chat on
-  demand there).
+  demand there). In the first, the seam between the picker and the
+  stats pane drags to share the column, and a squeezed stats pane
+  sheds its lists before its rate graph.
 - `live?` in the media tab pings every linked Twitch channel
   through the relay; live links gain a green dot and an
   uptime/viewers/title tooltip, offline ones grey out.
@@ -324,9 +327,10 @@ no dependencies beyond CDN-hosted fonts.
   revives docked on rail re-entry), and it pauses while hidden so no
   audio leaks; its glyph goes green while the stream is live, red when a
   stopped player exists and the stream is not.
-- Tabbed help panel (config/help · stats · media · left · libre ·
+- Tabbed help panel (help/conf · stats · media · left · libre ·
   authors) with its own width and font-size controls; resizes from its
-  edges and rests in a 9-spot dock until dragged.
+  edges (the affected surfaces shading on hover) and rests in a 9-spot
+  dock until dragged.
 - Everything persists in `localStorage`; every option answers to
   click, shift+click (reverse) and the scroll wheel. In the popup the
   style and preset links render as live swatches - background, text
@@ -356,7 +360,7 @@ no dependencies beyond CDN-hosted fonts.
 - `[notice]` labels on event rows get a cycling rainbow wash.
 - Mentions landing while the page is unfocused queue on a clickable
   `@N` chip in the header - click to jump to each, ⇧click clears; a
-  `♪` toggle in config/help adds a soft ping for those lines.
+  `♪` toggle in help/conf adds a soft ping for those lines.
 - `🔗` links view filters the log to rows carrying a URL and shows
   each link only once (session-only, not saved); `✂` clean urls
   rewrites link text without the `https://`, `www.` or a trailing
@@ -374,7 +378,7 @@ no dependencies beyond CDN-hosted fonts.
   store - every rendered row indexes flat fields per channel
   (30-day retention, ~50MB cap) so search reaches past scrollback's
   edge; hits that still render jump to the row.
-- User hiding - a comma list of logins in config/help hides their
+- User hiding - a comma list of logins in help/conf hides their
   rows in one of three modes: `vanish` drops them, `stub` folds them
   into a running count line, `ghost` strikes them dim like deleted
   rows; persisted across visits.
@@ -395,7 +399,7 @@ no dependencies beyond CDN-hosted fonts.
   [alejo.io](https://pronouns.alejo.io/). Lookups run
   through the [linkpeek Cloudflare
   worker](https://github.com/mxmilkiib/twitch-chat-relay/blob/main/linkpeek-worker.js);
-  a config/help option scales
+  a help/conf option scales
   the card down to text or off, and it's skipped on touch screens.
 
 ### Keyboard & accessibility
@@ -416,7 +420,7 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Persistence, sync & channels
 
-- Scrollback - the config/help panel offers limits from 250 to 100,000
+- Scrollback - the help/conf panel offers limits from 250 to 100,000
   rows (5,000 by default). Larger limits use more browser memory and
   may slow long-running tabs; at most the newest 1,000 rows (including
   gap notices) survive reloads via
@@ -442,13 +446,13 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Help popup & resources
 
-- Six tabs - config/help, stats (a session cell with chatter/message/
+- Six tabs - help/conf, stats (a session cell with chatter/message/
   badge counts and peak viewers; a channel scope picker when several
-  are joined; top chatters and badges over all-time/month/week/today/
-  12h/1h windows folded from per-day and per-hour buckets; top emotes
+  are joined; top chatters and badges over all-time/24h/12h/6h/3h/1h
+  windows folded from per-day and per-hour buckets; top emotes
   by channel usage, the same buckets, or StreamElements lifetime
   counts; top links with favicons, fetched page titles and tweet
-  previews; the rate graph's loudest bursts and glorp peaks linked to
+  previews; the rate graph's loudest bursts (4+ msgs/s) and glorp peaks linked to
   that day's [supa chat](https://tv.supa.sh/) log; and a storage cell
   sizing the app's own
   footprint - localStorage keys, archive row count, origin estimate),
