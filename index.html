@@ -9282,7 +9282,7 @@
         if (vidBox.parentNode === railEl) mainEl.before(vidBox);
         applyVidPos();
         setVideo(true);
-      } else setRailVid(vidRail);
+      } else setRailVid(vidRail === 'off' && !suppressSave ? 'dock' : vidRail); // an offed video revives on rail re-entry, not on restore
       // '0' means the picker was deliberately closed - the rail honours
       // that instead of reopening it on every entry
       let epClosed = false;
