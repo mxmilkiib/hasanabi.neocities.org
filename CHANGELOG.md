@@ -109,6 +109,13 @@ not versions - the page ships continuously to Neocities.
   box - imgs hand over their alt token, and a dblclick's own text
   selection only goes in when it resolves to a real emote or emoji,
   so ordinary word selection is left alone
+- the stats storage section grows a save-health group: a live
+  write probe (ok / quota-blocked), each session key's size and
+  last-write age ('absent' when missing), the unlogged-span count
+  and latest window, in-memory cache sizes, and an expandable list
+  of every key - quota deaths now show up here instead of needing
+  a console dig. the localstorage row and origin estimate both
+  carry their percentage share
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;

@@ -6326,7 +6326,7 @@
     } catch {}
     // each grp is one column-safe block - a row keeps its sub-list
     const grp = (s) => `<div class="st-grp">${s}</div>`;
-    box.innerHTML = grp(srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)}`) + stKeysHtml) +
+    box.innerHTML = grp(srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)} · ${Math.round(bytes * 2 / 5242880 * 100)}% of ~5mb`) + stKeysHtml) +
       grp(srow('scrollback', `${mainEl.querySelectorAll('.row[data-ts]').length} / ${MAX_MESSAGES} rows`)) +
       stExtraHtml +
       grp(stIdbHtml || srow('chat archive', archDb ? 'counting…' : 'not open')) +
@@ -6337,6 +6337,47 @@
     stKeysHtml = sizes.sort((a, b) => b[1] - a[1]).slice(0, 5)
       .map(([k, sz]) => ssub(k, fmtB(sz * 2))).join('');
     stExtraHtml = '';
+    // save health: a one-byte probe answers whether writes even land
+    // right now, then each session key shows its size and, where the
+    // blob carries a write stamp, its age - an absent key or a stale
+    // stamp is how a quota death shows up
+    let canWrite = 'ok';
+    try { localStorage.setItem('hasan-probe', '1'); localStorage.removeItem('hasan-probe'); }
+    catch { canWrite = 'blocked - quota full'; }
+    let saverRows = srow('writes', canWrite);
+    for (const [nm, k, st] of [
+        ['history', HISTORY_KEY, null],
+        ['rate spark', SPARK_KEY, (d) => d.t],
+        ['emote use', EMOTEUSE_KEY, (d) => d.w],
+        ['stats', STATS_KEY, null],
+        ['input history', INHIST_KEY, null]]) {
+      let raw = null;
+      try { raw = localStorage.getItem(k); } catch {}
+      if (raw === null) { saverRows += srow(nm, 'absent'); continue; }
+      let age = '';
+      if (st) {
+        try {
+          const t = st(JSON.parse(raw));
+          if (t) age = ` · saved ${fmtSpan(Math.max(0, Date.now() - t))} ago`;
+        } catch {}
+      }
+      saverRows += srow(nm, fmtB((k.length + raw.length) * 2) + age);
+    }
+    stExtraHtml += `<div class="st-grp">${saverRows}</div>`;
+    // the in-memory side: tracked emote stamps drive the picker's age
+    // ladder, the unlogged spans paint its 'missed' rungs
+    stExtraHtml += `<div class="st-grp">` +
+      srow('emotes tracked', `${Object.keys(useTs).length.toLocaleString('en')} with use stamps`) +
+      srow('peek cache', `${peekCache.size.toLocaleString('en')} urls`) +
+      srow('gif cache', `${Object.keys(gifStore).length.toLocaleString('en')} lookups`) +
+      (away.length ? srow('unlogged spans', `${away.length} · last ${fmtSpan(away[away.length - 1][1] - away[away.length - 1][0])}${away[away.length - 1][2] ? ` · ${escapeHTML(away[away.length - 1][2])}` : ''}`) : '') +
+      `</div>`;
+    // the full key list rides under a details - open state persists
+    // across re-renders through the same data-more tracking as the
+    // badge sets
+    if (sizes.length > 5)
+      stExtraHtml += `<div class="st-grp"><details class="st-badge st-more" data-more><summary>all ${sizes.length} keys</summary>` +
+        sizes.map(([k, sz]) => ssub(k, fmtB(sz * 2))).join('') + `</details></div>`;
     let dLo = Infinity, dHi = 0;
     for (const bag of [useDay, nickDay, badgeDay, urlDay])
       for (const e of Object.values(bag))
@@ -6367,7 +6408,7 @@
     } else stIdbHtml = srow('chat archive', 'not open');
     if (navigator.storage && navigator.storage.estimate)
       navigator.storage.estimate().then((e) => {
-        stEstHtml = srow('origin estimate', `${fmtB(e.usage || 0)} of ${fmtB(e.quota || 0)}`);
+        stEstHtml = srow('origin estimate', `${fmtB(e.usage || 0)} of ${fmtB(e.quota || 0)}${e.quota ? ` · ${Math.round((e.usage || 0) / e.quota * 100)}%` : ''}`);
         // usageDetails (chromium) splits the lump per api - indexeddb,
         // caches, service workers. whatever the split doesn't name rides
         // as 'unattributed'; localstorage sits in it, having no key
