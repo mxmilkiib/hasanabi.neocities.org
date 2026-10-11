@@ -149,6 +149,8 @@ not versions - the page ships continuously to Neocities.
   answers across viewers
 
 ### Resources
+- equator owns up to being a magazine, not a zine - the wikipedia *
+  joins its link in the zines row
 - the chappo trap house row gains an instagram link
 - la izquierda diario joins the news south america group; the re Hasan
   row's bracketed links stay strong through the descriptor demotion
