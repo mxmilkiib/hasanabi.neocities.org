@@ -600,9 +600,13 @@
      also runs counterclockwise, opposite the pill's */
   .jdown.jdc::before { content: none; }
   .jdown .jdash { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-  .jdown.jdc .jdash rect { fill: none; stroke: var(--accent); stroke-width: 1px;
-    stroke-dasharray: 4 3; animation: jdc-march 3s linear infinite; }
-  @keyframes jdc-march { to { stroke-dashoffset: 7px; } }
+  /* the svg's own clip was eating the outer half of the rim-centred
+     stroke - overflow lets the full dash paint, at a bolder weight so it
+     reads like the pill's conic ring beside it */
+  .jdown.jdc .jdash { overflow: visible; }
+  .jdown.jdc .jdash rect { fill: none; stroke: var(--accent); stroke-width: 1.5px;
+    stroke-dasharray: 4.5 3; animation: jdc-march 3s linear infinite; }
+  @keyframes jdc-march { to { stroke-dashoffset: 7.5px; } }
   @media (prefers-reduced-motion: reduce) { .jdown.jdc .jdash rect { animation: none; } }
   /* rev flow: the column axis flips so newest rows land at the top. The
      scroll origin anchors to the bottom, so the live edge sits at
