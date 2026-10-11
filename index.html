@@ -847,8 +847,10 @@
      @hasanabi mentions share it */
   .row.notice .notice-label, .rbw {
     color: transparent;
-    background: linear-gradient(90deg, #ff6868, #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868,
-      #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868);
+    /* --rbwgrad swaps the band when an alt rainbow palette is picked;
+       unset it falls back to this hand-tuned classic strip */
+    background: var(--rbwgrad, linear-gradient(90deg, #ff6868, #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868,
+      #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868));
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -2331,7 +2333,7 @@
     <div class="sep">&nbsp;</div>
     <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤' gives each populated era its own row · '▥' flows rows inline ending at each last square</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, freshest uses first</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
+    <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 1,000 are saved across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
@@ -2747,11 +2749,26 @@
   // colours) with its own spread, saturation and lightness - low sat,
   // high light keeps them pastel - mirrored into a palindrome so the
   // position sweep loops seamlessly whatever the arc length
-  let rbwSeq = 0;
+  // the palette pick re-tints both rainbow sources: hb bounds the hue
+  // band a mention's arc sweeps (360 = full wheel, a band rides the
+  // palindrome back through its range), s/l give the sat/light base
+  // and per-index spread. 'classic' keeps the original free-wheel arcs
+  // and the hand-tuned label gradient; the rest stamp --rbwgrad too
+  const RBW_PALS = [
+    { n: 'classic', hb: [0, 360], s: [62, 24], l: [56, 16] },
+    { n: 'vivid',   hb: [0, 360], s: [90, 10], l: [52, 8] },
+    { n: 'candy',   hb: [285, 75], s: [85, 15], l: [62, 10] },
+    { n: 'ocean',   hb: [170, 85], s: [72, 18], l: [55, 10] },
+    { n: 'sunset',  hb: [335, 70], s: [82, 15], l: [56, 10] },
+  ];
+  let rbwPal = 0, rbwSeq = 0;
   function rbwPalette(i) {
-    const h0 = (i * 137.508) % 360;
-    const arc = [360, 220, 160, 280][i % 4];
-    const s = 62 + (i * 13) % 24, l = 56 + (i * 7) % 16;
+    const p = RBW_PALS[rbwPal], bw = p.hb[1];
+    const arc = bw === 360 ? [360, 220, 160, 280][i % 4] : bw * [1, .7, .5, .85][i % 4];
+    // a banded arc starts inside the band's remainder so the whole sweep
+    // stays in-palette - past the end it would wrap into foreign hues
+    const h0 = bw === 360 ? (i * 137.508) % 360 : p.hb[0] + (i * 137.508) % Math.max(1, bw - arc);
+    const s = p.s[0] + (i * 13) % (p.s[1] || 1), l = p.l[0] + (i * 7) % (p.l[1] || 1);
     const fwd = [];
     for (let k = 0; k <= 4; k++)
       fwd.push(`hsl(${Math.round((h0 + arc * k / 4) % 360)} ${s}% ${l}%)`);
@@ -5637,6 +5654,7 @@
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpRbwPal')) { setRbwPal(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpHide')) { setHideMode(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpNoLbl')) { setLbls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx === 1);
@@ -7898,7 +7916,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0,
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epmix: epickMerge ? 1 : 0, ephold: epickHold,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
@@ -8066,6 +8084,7 @@
     if (o.nbots !== undefined) setBotsHide(!!o.nbots);
     if (o.anim !== undefined) setNickAnim(+o.anim);
     if (o.rbw !== undefined) setRbwStyle(+o.rbw);
+    if (o.rbp !== undefined) setRbwPal(+o.rbp);
     // emote-picker display options ride the bundle too; one rebuild
     // covers any combination of them
     let epDirty = false;
@@ -8849,6 +8868,30 @@
   }
   setRbwStyle(RBW_DEFAULT);
 
+  // ---- rainbow palette: re-tints the hashed mention arcs and the fixed
+  // label strip alike - the strip rides --rbwgrad so a pick stamps :root
+  // once, and each stamped arc re-draws off its saved palette index ----
+  function rbwGrad() {
+    const p = RBW_PALS[rbwPal], st = [];
+    for (let k = 0; k <= 6; k++)
+      st.push(`hsl(${Math.round(p.hb[0] + p.hb[1] * k / 6) % 360} ${Math.round(p.s[0] + p.s[1] / 2)}% ${Math.round(p.l[0] + p.l[1] / 2)}%)`);
+    const per = st.concat(st.slice(1, -1).reverse());
+    return `linear-gradient(90deg, ${per.concat(per).join(',')})`;
+  }
+  function setRbwPal(idx) {
+    rbwPal = Math.max(0, Math.min(RBW_PALS.length - 1, idx | 0));
+    const de = document.documentElement.style;
+    if (rbwPal === 0) de.removeProperty('--rbwgrad');
+    else de.setProperty('--rbwgrad', rbwGrad());
+    // re-stamp the arcs that already drew - only elements with a recorded
+    // palette index; unstamped .rbw keeps the css strip either way
+    document.querySelectorAll('.rbw[data-rseq]').forEach((el) => {
+      el.style.backgroundImage = rbwPalette(+el.dataset.rseq);
+    });
+    markHelp('helpRbwPal', rbwPal);
+  }
+  setRbwPal(0);
+
   // ---- text shadow on chat rows: graduated off/subtle/medium/strong ----
   const SHADOW_LVLS = [
     'none',
@@ -9136,6 +9179,7 @@
     if (hideBots) q.set('nbots', '1');
     if (nickAnim !== 2) q.set('anim', nickAnim);
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', rbwStyle);
+    if (rbwPal !== 0) q.set('rbp', rbwPal);
     // emote-picker options only enter the url off their defaults
     if (emotePick.classList.contains('names')) q.set('epnames', '1');
     if (epickZoom) q.set('epzoom', epickZoom);
@@ -13059,6 +13103,7 @@
     if (q.has('nbots')) setBotsHide(flag('nbots'));
     if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 2 : +q.get('anim'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
+    if (q.has('rbp')) setRbwPal(+q.get('rbp'));
     // emote-picker options: ?epnames=1&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&
     // epmix=1&ephold=0|1|2&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]&epopen=0|1
     let epUrlDirty = false;
@@ -13150,6 +13195,7 @@
     helpBots: ['off', 'on'],
     helpNoLbl: ['off', 'on'],
     helpRbw: ['sweep', 'wave', 'hue cycle', 'random'],
+    helpRbwPal: RBW_PALS.map((p) => p.n),
     helpCopyHelp: ['off', 'on'],
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
@@ -13281,6 +13327,7 @@
   markHelp('helpSelf', selfHl ? 1 : 0);
   markHelp('helpAnim', ANIM_LVLS.indexOf(nickAnim));
   markHelp('helpRbw', rbwStyle);
+  markHelp('helpRbwPal', rbwPal);
   markPresets();
   previewSwatches();
 
