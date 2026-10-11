@@ -107,6 +107,8 @@ not versions - the page ships continuously to Neocities.
   only covered entries that predated the picon key entirely
 - fossabot's thank-you notices (bits, subs) link the trailing username
   as @name with the chatter's colour; resub headers colour the same way
+- a thanked name the emote pass already imaged (chatter emotes carry
+  real names) still links instead of staying a bare emote
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,
