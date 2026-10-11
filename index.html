@@ -9882,7 +9882,8 @@
       chatPick.innerHTML = `chat as @${escapeHTML(auth.login)} → ` +
         CHANNELS.map((c) =>
           `<a data-ch="${escapeHTML(c)}" href="#" class="${c === tgt ? 'on' : ''}"${c === tgt ? ' aria-current="true"' : ''} ` +
-          `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' / ');
+          `style="--cc:${chColor(c)}" title="send to #${escapeHTML(c)}">#${escapeHTML(c)}</a>`).join(' / ') +
+        ' (shift-enter for newline)';
       chatInput.placeholder = '';
     }
     // offsets sum through the highlight wrap, which owns the input's
@@ -10176,7 +10177,7 @@
     chatbarEl.hidden = !on && !(pending && !chatbarEl.hidden);
     chatInput.disabled = pending;
     chatInput.placeholder = on
-      ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}`
+      ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''} (shift-enter for newline)`
       : pending ? 'finishing twitch login…' : 'log in to chat';
     if (toUntils[sendTarget()]) paintTimeout();
     paintChatPick();
