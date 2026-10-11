@@ -149,6 +149,7 @@ not versions - the page ships continuously to Neocities.
   answers across viewers
 
 ### Resources
+- the chappo trap house row gains an instagram link
 - la izquierda diario joins the news south america group; the re Hasan
   row's bracketed links stay strong through the descriptor demotion
 - trans liberation and intersex rights join the activism movements list
