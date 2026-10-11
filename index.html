@@ -11607,23 +11607,30 @@
     if (epickMerge) {
       // mix: one flat grid across every lit source - headers go away and
       // the active sort runs across the whole pool, age markers included
-      const all = [];
+      const all = [], seenMix = new Set();
       for (const src of ['7TV', 'BTTV', 'FFZ', 'FFZ animated', 'other']) {
         const g = groups[src];
         const on = src === 'other' ? ['7tv', 'bttv', 'ffz'].some(groupOn) : groupOn(srcTab[src]);
         if (!g || !on) continue;
-        for (const n of g) all.push({ c: n, r: btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n)) });
+        for (const n of g) {
+          // codes collide across providers up to case - bttv's 'Glorp'
+          // and 7tv's 'glorp' - the first source scanned keeps the cell
+          const k = n.toLowerCase();
+          if (seenMix.has(k)) continue;
+          seenMix.add(k);
+          all.push({ c: n, r: btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n)) });
+        }
       }
       if (groupOn('twitch')) {
         // codes recur across twitch sets AND third-party providers
         // (bttv ships a <3 too) - whoever was scanned first wins
-        const seenTw = new Set(all.map((x) => x.c));
+        const seenTw = seenMix;
         for (const s of twSets) {
           const srcName = s.channelLogin ? s.channelLogin + (s.tier ? ' t' + s.tier : '')
                         : (s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ');
           for (const e of s.emoteList)
-            if (!seenTw.has(e.code) && hit(e.code) && animOk(e.assetType === 'ANIMATED')) {
-              seenTw.add(e.code);
+            if (!seenTw.has(e.code.toLowerCase()) && hit(e.code) && animOk(e.assetType === 'ANIMATED')) {
+              seenTw.add(e.code.toLowerCase());
               all.push({ c: e.code, r: btn(e.code, srcName, twEmoteUrl(e.id, e.assetType === 'ANIMATED'), e.assetType === 'ANIMATED') });
             }
         }
@@ -11640,14 +11647,15 @@
       h += aged(all, (x) => x.c, (x) => x.r) + ejs.map((x) => x.r).join('');
     } else {
       // codes dedupe across sources too - 7tv/bttv both ship <3 and the
-      // classics - first section scanned wins, later copies drop out
+      // classics, and 'Glorp'/'glorp' pair up across them - first
+      // section scanned wins, later copies drop out
       const seenAll = new Set();
       for (const src of ['7TV', 'BTTV', 'FFZ', 'FFZ animated', 'other']) {
         const g0 = groups[src];
         // unlabelled extras ride along with whichever third-party tab is lit
         const on = src === 'other' ? ['7tv', 'bttv', 'ffz'].some(groupOn) : groupOn(srcTab[src]);
         if (!g0 || !on) continue;
-        const g = g0.filter((n) => !seenAll.has(n) && (seenAll.add(n), true));
+        const g = g0.filter((n) => !seenAll.has(n.toLowerCase()) && (seenAll.add(n.toLowerCase()), true));
         if (!g.length) continue;
         pushSec(g.reduce((t, n) => t + useOf(n), 0), src === 'other' ? 'emotes' : src.toLowerCase(),
           aged(g, (n) => n, (n) => btn(n, src, thirdPartyEmotes[n], emoteAnim.has(n)), true));
@@ -11658,11 +11666,11 @@
         const sets = [...twSets].sort((a, b) => rank(a) - rank(b) || byName(a.channelLogin || '', b.channelLogin || '') || (+a.tier || 0) - (+b.tier || 0));
         const seenTw = seenAll; // keeps deduping twitch sets - now vs third-party too
         for (const s of sets) {
-          const g = s.emoteList.filter((e) => !seenTw.has(e.code) && hit(e.code) && animOk(e.assetType === 'ANIMATED'))
+          const g = s.emoteList.filter((e) => !seenTw.has(e.code.toLowerCase()) && hit(e.code) && animOk(e.assetType === 'ANIMATED'))
             .sort(epickSort === 'az' ? (a, b) => byName(a.code, b.code)
                 : (a, b) => (useTs[b.code] || 0) - (useTs[a.code] || 0) || useOf(b.code) - useOf(a.code) || byName(a.code, b.code));
           if (!g.length) continue;
-          for (const e of g) seenTw.add(e.code);
+          for (const e of g) seenTw.add(e.code.toLowerCase());
           const label = s.channelLogin ? `twitch - ${s.channelLogin}${s.tier ? ' t' + s.tier : ''}`
                       : `twitch - ${(s.emoteList[0].type || 'global').toLowerCase().replace(/_/g, ' ')}`;
           pushSec(g.reduce((t, e) => t + useOf(e.code), 0), label,
