@@ -1440,9 +1440,9 @@
   /* Docking the left pole's fill to its inner end means the width drain
      eats the outer edge instead of the edge beside the text */
   #loadBar .loadbar:first-child i { margin-left: auto; }
-  /* The drain paces a hue drift too - accent at full width, vip at the
+  /* The drain paces a hue drift too - accent at full width, aux at the
      narrowest point, so a long sync visibly cycles rather than idling */
-  @keyframes syncshrink { 50% { width: 12%; background-color: var(--vip); } }
+  @keyframes syncshrink { 50% { width: 12%; background-color: var(--aux); } }
   /* the label inks in the page colour on an accent chip - dim text on
      the panel ground read as decoration next to the poles */
   #loadTxt { background: var(--accent); color: var(--bg); padding: 0 7px; border-radius: 3px; }
