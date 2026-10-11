@@ -162,6 +162,8 @@ not versions - the page ships continuously to Neocities.
   renames to nick shimmer
 - popup resize surfaces shade the hovered edge - corners light both
   axes at once; the scrollback default rises to 5,000
+- the stream-status key drops its redundant live dot (the states carry
+  their own) and breaks the favicon note onto its own line
 
 ### Rail
 - mode 4's emotes/stats seam drags vertically to share the column under
