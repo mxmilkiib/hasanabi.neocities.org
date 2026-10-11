@@ -1956,6 +1956,9 @@
   /* pending rungs with no cells after them still ride the last row's
      tail - nothing follows them to break on */
   #emotePick.agerows #emoteGrid .eage + button { grid-column-start: 1; }
+  /* agerows2 flows like inline mode except the last square on each
+     visual row ends it - the mark is measured on by paintAgeRows */
+  #emotePick.agerows2 #emoteGrid .eage.rowend + button { grid-column-start: 1; }
   /* the source tabs sit left, the option buttons right; a thin popup
      wraps .eopts onto its own line, still hugging the right edge */
   #emotePick .etabsrow { flex: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
@@ -2204,7 +2207,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / right <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick styles: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span><sup>†</sup></span></div>
-    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, squares an emote crossed this session turn gold, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('⏸' freezes animated cells to stills, 'anim' hides them), 'Aa' shows names, ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker (cycling to 'hold+' pauses animated cells too, but only while the pointer is over the cell grid); a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
+    <div><b>☻</b> <span>emote picker: drag/resize anywhere, 📌 pins it open past the chat bar; a fixed 'recent' band above the lists counts picks plus emotes typed and sent; 'use' sorts by channel usage with dashed age squares marking eras since each emote's last use — empty stretches pack together, squares an emote crossed this session turn gold, and violet squares tail the list as eras no emote has reached yet - after a reset that pending ladder is all of them ('▤' gives each populated era its own row, the square trailing the era it ends, cycling on to '▥' where rows flow inline but each ends at its last square; a second 'use' click cycles in a seen-only view that hides never-used emotes, and middle-click forgets the recorded order), 'a-z' sorts alphabetically; the provider tabs (7tv/bttv/ffz/twitch/emoji) toggle sources, 'mix' merges them into one grid, freshest uses first, 'anim'/'still' filter ('⏸' freezes animated cells to stills, 'anim' hides them), 'Aa' shows names, ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells, and 'hold' keeps usage reshuffles from shuffling cells while the pointer is over the picker (cycling to 'hold+' pauses animated cells too, but only while the pointer is over the cell grid); a used cell keeps its colour wash until every chat row carrying it has scrolled away, and hovering a cell - or an emote in chat - pops a big preview with its source set</span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>page-flip columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -7544,7 +7547,7 @@
       video: !vidBox.hidden,
       kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0,
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
-      epage: epickAge ? 1 : 0, epmix: epickMerge ? 1 : 0, ephold: epickHold,
+      epage: epickAge, epmix: epickMerge ? 1 : 0, ephold: epickHold,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
@@ -7576,7 +7579,7 @@
       if ((v = g(EPICK_NAMES_KEY)) !== null) o.epnames = v === '1' ? 1 : 0;
       if ((v = g(EPICK_ZOOM_KEY)) !== null) o.epzoom = v;
       if ((v = g(EPICK_SORT_KEY)) !== null) o.epsort = v;
-      if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = v === '1' ? 1 : 0;
+      if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = Math.min(2, +v || 0);
       if ((v = g(EPICK_MIX_KEY)) !== null) o.epmix = v === '1' ? 1 : 0;
       if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '0' || v === '2' ? +v : 1;
       if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
@@ -7703,7 +7706,7 @@
     if (o.epnames !== undefined) { setNames(!!o.epnames); epDirty = true; }
     if (o.epzoom !== undefined) { setZoom(o.epzoom); epDirty = true; }
     if (o.epsort !== undefined) { setSort(o.epsort); epDirty = true; }
-    if (o.epage !== undefined) { setAge(!!o.epage); epDirty = true; }
+    if (o.epage !== undefined) { setAge(+o.epage); epDirty = true; }
     if (o.epmix !== undefined) { setMix(!!o.epmix); epDirty = true; }
     if (o.ephold !== undefined) setHold(o.ephold);
     if (Array.isArray(o.eptabs)) { setTabs(o.eptabs); epDirty = true; }
@@ -8744,7 +8747,7 @@
     if (emotePick.classList.contains('names')) q.set('epnames', '1');
     if (epickZoom) q.set('epzoom', epickZoom);
     if (epickSort !== 'use' || epickSeen) q.set('epsort', epickSeen ? 'useseen' : epickSort);
-    if (epickAge) q.set('epage', '1');
+    if (epickAge) q.set('epage', String(epickAge));
     if (!epickMerge) q.set('epmix', '0');
     if (epickHold !== 1) q.set('ephold', String(epickHold));
     if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
@@ -10778,24 +10781,59 @@
   // age squares only exist under the use sort - the rows toggle stays
   // dimmed and unpressable otherwise
   const EPICK_AGE_KEY = 'hasan-epickage';
-  let epickAge = false;
-  try { epickAge = localStorage.getItem(EPICK_AGE_KEY) === '1'; } catch {}
+  // 0 inline · 1 each era's own row · 2 a row ends at its last square
+  let epickAge = 0;
+  try { epickAge = Math.min(2, Math.max(0, +localStorage.getItem(EPICK_AGE_KEY) || 0)); } catch {}
   const ageBtn = document.getElementById('emoteAgeRows');
+  // mode 2's row-end marks: the last square on each visual row ends it.
+  // measured off the rendered grid since css can't see wraps; the mark
+  // itself moves layout, so it loops until stable
+  function paintAgeRows() {
+    if (!emotePick.classList.contains('agerows2')) return;
+    const sqs = [...emoteGrid.querySelectorAll('.eage')];
+    for (let pass = 0; pass < 5; pass++) {
+      const want = new Set();
+      let prev = null, prevTop = 0;
+      for (const sq of sqs) {
+        const t = sq.offsetTop;
+        if (prev && t !== prevTop) want.add(prev);
+        prev = sq; prevTop = t;
+      }
+      if (prev) want.add(prev);
+      let changed = false;
+      for (const sq of sqs)
+        if (sq.classList.contains('rowend') !== want.has(sq)) {
+          sq.classList.toggle('rowend', want.has(sq));
+          changed = true;
+        }
+      if (!changed) break;
+    }
+  }
   function paintAge() {
     ageBtn.disabled = epickSort !== 'use';
-    setOn(ageBtn, epickAge && epickSort === 'use');
-    emotePick.classList.toggle('agerows', epickAge && epickSort === 'use');
+    setOn(ageBtn, epickAge > 0 && epickSort === 'use');
+    ageBtn.textContent = epickAge === 2 ? '▥' : '▤';
+    ageBtn.title = `age rows: ${['inline', 'each era its own row', 'each row ends at its last square'][epickAge]} - click cycles, use sort only`;
+    emotePick.classList.toggle('agerows', epickAge === 1 && epickSort === 'use');
+    emotePick.classList.toggle('agerows2', epickAge === 2 && epickSort === 'use');
+    paintAgeRows();
   }
-  const setAge = (on) => {
-    epickAge = !!on;
-    try { localStorage.setItem(EPICK_AGE_KEY, epickAge ? '1' : '0'); } catch {}
+  const setAge = (i) => {
+    epickAge = Math.max(0, Math.min(2, +i || 0));
+    try { localStorage.setItem(EPICK_AGE_KEY, String(epickAge)); } catch {}
     paintAge();
   };
   ageBtn.addEventListener('click', () => {
-    setAge(!epickAge);
+    setAge((epickAge + 1) % 3);
     saveOpts();
     emoteQ.focus();
   });
+  // wrapping reshuffles where rows end - re-mark on any grid resize
+  let ageRowRaf = 0;
+  new ResizeObserver(() => {
+    if (ageRowRaf || !emotePick.classList.contains('agerows2')) return;
+    ageRowRaf = requestAnimationFrame(() => { ageRowRaf = 0; paintAgeRows(); });
+  }).observe(emoteGrid);
   function paintSort() {
     setOn(sortBtns.az, epickSort === 'az');
     setOn(sortBtns.use, epickSort === 'use');
@@ -11577,6 +11615,7 @@
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
     // rebuilt cells drop their classes - relight whatever is still on screen
     for (const n of litEms) litApply(n, true);
+    paintAgeRows();
     // cells keep ageing between uses - rebuild when the next one crosses
     // a rung so squares drift down with them instead of waiting for a use
     clearTimeout(ageTimer);
@@ -12379,7 +12418,7 @@
     if (q.has('epnames')) { setNames(flag('epnames')); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
     if (q.has('epsort')) { setSort(q.get('epsort')); epUrlDirty = true; }
-    if (q.has('epage')) { setAge(flag('epage')); epUrlDirty = true; }
+    if (q.has('epage')) { setAge(+q.get('epage') || (flag('epage') ? 1 : 0)); epUrlDirty = true; }
     if (q.has('epmix')) { setMix(flag('epmix')); epUrlDirty = true; }
     if (q.has('ephold')) setHold(q.get('ephold') === '' ? 1 : +q.get('ephold'));
     if (q.has('eptabs')) { setTabs(q.get('eptabs').split(',')); epUrlDirty = true; }
