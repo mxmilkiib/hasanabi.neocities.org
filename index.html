@@ -10085,7 +10085,10 @@
       for (const ch of CHANNELS) {
         if (!ch.startsWith(tok.q)) continue;
         seen.add(ch);
-        compList.push({ n: ch, c: colorForName(ch) });
+        // the map's display name carries real case (HasanAbi); the home
+        // channel gets it even when unseen, other joins fall back to login
+        const rec = seenNicks.get(ch);
+        compList.push({ n: (rec && rec.n) || (ch === DEFAULT_CHANNEL ? 'HasanAbi' : ch), c: (rec && rec.c) || colorForName(ch) });
       }
       for (const [lg, rec] of [...seenNicks].reverse()) {
         if (compList.length >= 9) break;
