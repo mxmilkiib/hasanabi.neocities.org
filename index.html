@@ -9671,7 +9671,7 @@
     splitBtn.textContent = level === 6 ? '▮▮☻' : level === 5 ? '▮▮▶' : level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
     splitBtn.classList.toggle('tri', level >= 3);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = `${level}/6 ${['one column', 'two page-flip columns', 'three page-flip columns', 'two chat columns + rail (video · emotes · stats)', 'two chat columns + rail (video · emotes)', 'two chat columns + rail (emotes only · video off, ▶ floats it)'][level - 1]} - click/scroll · ⇧click back`;
+    splitBtn.title = `${level}/6 ${['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)'][level - 1]} - click/scroll · ⇧click back`;
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     // flipping between 2 and a rail level keeps the deal - only the
     // rail and its contents toggle. the rail modes share one visible
@@ -12938,7 +12938,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail', '2+vid·emotes', '2+emotes'],
+    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],

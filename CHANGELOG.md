@@ -100,6 +100,8 @@ not versions - the page ships continuously to Neocities.
 - a reload now opens on the tail of stored history - the first scroll
   pin could clamp before layout settled, flashing the oldest rows until
   backfill re-snapped; deferred re-pins cover fonts, media and load
+- the three rail modes are named 3col+vid·emotes·stats,
+  3col+vid·emotes and 3col+emotes
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,

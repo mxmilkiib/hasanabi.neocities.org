@@ -488,7 +488,7 @@ force off.
 
 | key | values | effect |
 |---|---|---|
-| `split` | `1`–`6` | column modes: 1 single · 2/3 page-flip (3 on landscape) · 4 rail of video·emotes·stats · 5 rail of video·emotes · 6 emotes rail (video floats on demand) |
+| `split` | `1`–`6` | column modes: 1 single · 2/3 page-flip (3 on landscape) · 4 3col+vid·emotes·stats · 5 3col+vid·emotes · 6 3col+emotes (video floats on demand) |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
 | `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |
