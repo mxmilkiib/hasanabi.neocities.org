@@ -115,6 +115,8 @@ not versions - the page ships continuously to Neocities.
   not a setting
 - the font floor returns to 1rem
 - cheers ([bits N] rows) set their message text strong
+- the update bar's reload buttons centre in each half of the gap rather
+  than hugging the text
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,

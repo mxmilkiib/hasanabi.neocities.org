@@ -1501,8 +1501,9 @@
   /* deploy notice: aux ground with accent ink - a notice tone, not the
      alert loudness the accent ground carried */
   #updateBar { background: #000; color: var(--accent); font-weight: 600; padding-top: 2px; padding-bottom: 2px; }
-  #updateBar .hbar-txt { display: flex; align-items: center; justify-content: center; gap: 10px; }
-  #updateBar .hbar-txt > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  #updateBar .hbar-txt { display: flex; align-items: center; }
+  #updateBar .hbar-txt > span:not(.updgap) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  #updateBar .updgap { flex: 1; display: flex; justify-content: center; min-width: 0; }
   #updateBar .hbar-txt .hdr-btn { padding: 0 14px; }
   #updateBar .hdr-btn { width: auto; padding: 0 7px; font-size: .92em; font-weight: inherit; color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
   #updateBar .hdr-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); }
@@ -2444,7 +2445,7 @@
     </div>
     </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
-  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button><span>site updated - ctrl-r for the latest version</span><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
+  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>site updated - ctrl-r for the latest version</span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss - p.s. page autoplay audio permission allows unmuted stream on open/reload</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
