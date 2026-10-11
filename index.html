@@ -826,7 +826,7 @@
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i, #titleTxt.fin { animation: none; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
@@ -1417,6 +1417,8 @@
   #offBar { background: var(--danger); color: #fff; }
   #titleBar, #loadBar { background: var(--panel); border-bottom: 1px solid var(--line); }
   #titleBar .hbar-txt { padding: 0 30px; }
+  #titleTxt.fin { animation: tfin .5s ease-out; }
+  @keyframes tfin { from { opacity: 0; } }
   /* boot/sync strip: narrates the load phases as the empty-state bar
      does, then returns to flag resyncs after a drop or wake; the fill
      stretches the strip so progress reads at a glance. docked over the
@@ -4956,7 +4958,14 @@
     const hold = !streamHeard && !streamDead;
     titleBar.hidden = !(titleBarOn && (hold || (t && t !== titleDismissed)));
     titleX.hidden = !t;
-    if (t) titleTxt.textContent = t;
+    // a fresh title fades into the space the strip already holds; the
+    // same string repainting (header updates, metric churn) stays put
+    if (t && titleTxt.textContent !== t) {
+      titleTxt.textContent = t;
+      titleTxt.classList.remove('fin');
+      void titleTxt.offsetWidth;
+      titleTxt.classList.add('fin');
+    }
   }
   function setTitleBar(on) { titleBarOn = on; markHelp('helpTitle', on ? 1 : 0); paintTitleBar(); }
   titleX.addEventListener('click', () => {
