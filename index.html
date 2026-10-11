@@ -4945,15 +4945,21 @@
   // a fresh live flip resets it, the config toggle persists off/on
   const titleBar = document.getElementById('titleBar');
   const titleTxt = document.getElementById('titleTxt');
+  const titleX = document.getElementById('titleX');
   let titleBarOn = true;   // config toggle, default on
   let titleDismissed = ''; // the title string the ✕ silenced this session
   function paintTitleBar() {
     const t = (stream && stream.live && stream.title) || '';
-    titleBar.hidden = !(titleBarOn && t && t !== titleDismissed);
-    if (!titleBar.hidden) titleTxt.textContent = t;
+    // ahead of the first stream report the strip holds its space empty -
+    // a live title lands in place instead of shoving the chat down; an
+    // offline report (or the watchdog) folds it back away instead
+    const hold = !streamHeard && !streamDead;
+    titleBar.hidden = !(titleBarOn && (hold || (t && t !== titleDismissed)));
+    titleX.hidden = !t;
+    if (t) titleTxt.textContent = t;
   }
   function setTitleBar(on) { titleBarOn = on; markHelp('helpTitle', on ? 1 : 0); paintTitleBar(); }
-  document.getElementById('titleX').addEventListener('click', () => {
+  titleX.addEventListener('click', () => {
     titleDismissed = (stream && stream.title) || '';
     paintTitleBar();
   });
