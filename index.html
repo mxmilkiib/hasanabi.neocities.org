@@ -6136,10 +6136,12 @@
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     const t1 = rateHistT[rateHistT.length - 1] || Date.now();
     let t0 = rateHistT[Math.max(0, off)] || t1;
-    // the span picker zooms to a trailing window; 'all' keeps the tail
+    // the span picker sets the frame, not just a crop: a short series
+    // still sits in the tail of the picked window rather than stretching
+    // to fill the chart; 'all' keeps the whole tail
     const rwe = rateWinEff();
     const rWin = RATE_WINS[rwe] || 0;
-    if (rWin && t1 - rWin > t0) t0 = t1 - rWin;
+    if (rWin) t0 = Math.min(t0, t1 - rWin);
     const span = Math.max(30000, t1 - t0);
     const N = Math.min(480, Math.max(60, Math.round(wCss)));
     const bw = span / N, bwPx = wCss / N;
