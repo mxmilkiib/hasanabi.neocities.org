@@ -998,6 +998,9 @@
   /* inline site icons lead chat links; a 404 hides the chip rather than
      showing a broken image */
   .lkico { width: 1em; height: 1em; vertical-align: -.12em; margin-right: .25em; border-radius: 2px; }
+  /* icon + host run move as one piece - a wrap carries both to the next
+     line rather than stranding the favicon behind the break */
+  .lkgrp { white-space: nowrap; }
   /* youtube and instagram links gain a ▶ glyph; a click unfolds the
      embed under the row */
   a.ytemb, a.igemb { margin-left: .2em; text-decoration: none; color: var(--danger); font-size: .9em; }
@@ -3253,7 +3256,7 @@
         // the icon always asks for x.com: profile hrefs reroute to nitter
         // (whose own favicon means nothing), and ddg 404s twitter.com
         const twIco = lkIco ? '<img class="lkico" data-h="x.com" src="https://icons.duckduckgo.com/ip3/x.com.ico" alt="" loading="lazy" referrerpolicy="no-referrer">' : '';
-        out.push(`<a${shiny ? ' class="shimmer"' : ''} href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${twIco}${escapeHTML(cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
+        out.push(`<a${shiny ? ' class="shimmer"' : ''} href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(twDisp)}">${lkIcoGrp(twIco, cleanUrls ? cleanUrlDisp(twDisp) : twDisp)}</a>`);
       }
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
@@ -3313,7 +3316,7 @@
               pendingTw.push(`<span class="ytprev${fossa ? ' foss' : ''}" data-ytu="${escapeHTML(ypk)}" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} data-href="${u}"></span>`);
             }
           }
-          out.push(escapeHTML(pre) + `<a${icer || md ? ' class="rbw"' : home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${ico}${escapeHTML(cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
+          out.push(escapeHTML(pre) + `<a${icer || md ? ' class="rbw"' : home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${lkIcoGrp(ico, cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
         }
       }
       else {
@@ -3831,6 +3834,14 @@
       return `<img class="lkico" data-h="${escapeHTML(f)}" src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(f)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer">`;
     }
     catch { return ''; }
+  };
+  // binds a favicon to the link text's host run in a nowrap span - the
+  // pair breaks to the next line together; the path wraps freely after.
+  // Split before escaping so a cut never lands mid-entity
+  const lkIcoGrp = (ico, disp) => {
+    if (!ico) return escapeHTML(disp);
+    const head = (disp.match(/^(?:https?:\/\/)?[^/?#]*/) || [''])[0];
+    return `<span class="lkgrp">${ico}${escapeHTML(head)}</span>${escapeHTML(disp.slice(head.length))}`;
   };
   // display-only cleanup for the 'clean urls' option: drops the scheme, a
   // www. prefix, and a bare trailing / or /index.htm[l]
@@ -6030,7 +6041,7 @@
           }
         } else peekAsk(pk);
         return row(i + 1,
-          `<a class="at" href="https://${escapeHTML(orig)}" title="${escapeHTML(orig)}" target="_blank" rel="noopener noreferrer">${lkIco ? lkIcoImg('https://' + orig) : ''}${escapeHTML(label)}</a>`,
+          `<a class="at" href="https://${escapeHTML(orig)}" title="${escapeHTML(orig)}" target="_blank" rel="noopener noreferrer">${lkIcoGrp(lkIco ? lkIcoImg('https://' + orig) : '', label)}</a>`,
           n.toLocaleString('en'));
       }).join('');
     // names in the counts outlive set loads: third-party lookups fold case,

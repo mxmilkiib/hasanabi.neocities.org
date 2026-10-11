@@ -100,6 +100,10 @@ not versions - the page ships continuously to Neocities.
 - a watch-streak usernotice ('watched 150 consecutive streams…')
   rainbows the streak number itself, leaving the rest of the
   system-msg plain
+- a link's favicon and its host run move as one nowrap piece, so a
+  wrap that would strand the icon at the line's end carries it onto
+  the next line with the url - the path still wraps freely after,
+  and the split is cut before escaping so no entity severs
 - reply quotes and preview cards land on a normalised name-column
   anchor: the cluster's leading edge now counts every visible
   badge/role/aux chip, so a mod chip or left-docked sub count no
