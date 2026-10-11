@@ -5616,6 +5616,7 @@
   const BADGE_SORT_KEY = 'hasan-badgesort';
   let badgeSort = 'use';
   try { badgeSort = localStorage.getItem(BADGE_SORT_KEY) || 'use'; } catch {}
+  if (!['use', 'vers', 'kind'].includes(badgeSort)) badgeSort = 'use';
   const STAT_SCOPE_KEY = 'hasan-statscope';
   let statScope = '';
   try { statScope = localStorage.getItem(STAT_SCOPE_KEY) || ''; } catch {}
@@ -5939,7 +5940,6 @@
       use: (a, b) => bUse(b) - bUse(a) || bRank(a) - bRank(b) || byName(a, b),
       vers: (a, b) => Object.keys(bInfo[b]).length - Object.keys(bInfo[a]).length || byName(a, b),
       kind: (a, b) => bRank(a) - bRank(b) || byName(a, b),
-      name: (a, b) => byName(a, b),
     };
     const badgeRow = (id) => {
       const vs = Object.entries(bInfo[id])
@@ -6025,8 +6025,8 @@
     const emoteSrcBtns = (inRail ? RAIL_WINS : Object.keys(EMOTE_SRCS))
       .map((s) => `<button type="button" class="st-s${emoteSrcEff === s ? ' on' : ''}" data-esrc="${s}" title="count source">${s}</button>`)
       .join('');
-    const badgeSortBtns = { vers: 'grouped', kind: 'kind', name: 'name' };
-    const badgeSortTips = { vers: 'group by set, most versions first', kind: "group by set, the channel's own first", name: 'group by set, a-z' };
+    const badgeSortBtns = { vers: 'grouped', kind: 'kind' };
+    const badgeSortTips = { vers: 'group by set, most versions first', kind: "group by set, the channel's own first" };
     const badgeSortBtnsHtml = Object.entries(badgeSortBtns)
       .map(([s, l]) => `<button type="button" class="st-s${badgeSort === s ? ' on' : ''}" data-bsort="${s}" title="${badgeSortTips[s]}">${l}</button>`)
       .join('');
