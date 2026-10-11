@@ -91,6 +91,8 @@ not versions - the page ships continuously to Neocities.
 - hovering a msg-bursts entry bands its span on the session msg rate
   graph - an accent bracket over the burst's window, transparent to the
   canvas' own bin readout
+- the storage section runs two columns; each row keeps its sub-list
+  attached across the column gap
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,

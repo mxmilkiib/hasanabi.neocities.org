@@ -1229,6 +1229,10 @@
   #statsBody .st-row .eme { font-size: 1.3em; vertical-align: -0.18em; }
   /* usageDetails' per-api split indents under the origin estimate */
   #statsBody .st-sub { padding-left: 1.4em; }
+  /* storage runs two columns; a group keeps a row's sub-list attached
+     to its parent across the column gap */
+  #statsBody #stStore { columns: 2; column-gap: 22px; }
+  #statsBody #stStore .st-grp { break-inside: avoid; }
   #statsBody .st-sub .nm { color: var(--text-dim); font-size: .88em; }
   /* the fixed-width image slot lines up the names' left edges whether a
      row carries an emote image or not - a direct flex child so the row
@@ -6247,11 +6251,13 @@
         sizes.push([k.slice(6), sz]);
       }
     } catch {}
-    box.innerHTML = srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)}`) + stKeysHtml +
-      srow('scrollback', `${mainEl.querySelectorAll('.row[data-ts]').length} / ${MAX_MESSAGES} rows`) +
+    // each grp is one column-safe block - a row keeps its sub-list
+    const grp = (s) => `<div class="st-grp">${s}</div>`;
+    box.innerHTML = grp(srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)}`) + stKeysHtml) +
+      grp(srow('scrollback', `${mainEl.querySelectorAll('.row[data-ts]').length} / ${MAX_MESSAGES} rows`)) +
       stExtraHtml +
-      (stIdbHtml || srow('chat archive', archDb ? 'counting…' : 'not open')) +
-      (stEstHtml || ((navigator.storage && navigator.storage.estimate) ? srow('origin estimate', 'measuring…') : ''));
+      grp(stIdbHtml || srow('chat archive', archDb ? 'counting…' : 'not open')) +
+      grp(stEstHtml || ((navigator.storage && navigator.storage.estimate) ? srow('origin estimate', 'measuring…') : ''));
     if (Date.now() - stStoreAt < 15000) return;
     stStoreAt = Date.now();
     // per-key sizes and the in-memory spans recompute on the slow cadence
@@ -6262,7 +6268,7 @@
     for (const bag of [useDay, nickDay, badgeDay, urlDay])
       for (const e of Object.values(bag))
         for (const d of Object.keys(e)) { if (+d < dLo) dLo = +d; if (+d > dHi) dHi = +d; }
-    if (dHi) stExtraHtml += srow('stats history', `${(dHi - dLo + 1).toLocaleString('en')} days`);
+    if (dHi) stExtraHtml += `<div class="st-grp">${srow('stats history', `${(dHi - dLo + 1).toLocaleString('en')} days`)}</div>`;
     let ecN = 0, ecOld = 0;
     try {
       for (let i = 0; i < localStorage.length; i++) {
@@ -6273,9 +6279,9 @@
         if (t && (!ecOld || t < ecOld)) ecOld = t;
       }
     } catch {}
-    if (ecN) stExtraHtml += srow('emote cache', `${ecN} sets · oldest ${fmtSpan(Date.now() - ecOld)}`);
+    if (ecN) stExtraHtml += `<div class="st-grp">${srow('emote cache', `${ecN} sets · oldest ${fmtSpan(Date.now() - ecOld)}`)}</div>`;
     if (rateHistT.length > 1)
-      stExtraHtml += srow('rate history', fmtSpan(rateHistT[rateHistT.length - 1] - rateHistT[0]));
+      stExtraHtml += `<div class="st-grp">${srow('rate history', fmtSpan(rateHistT[rateHistT.length - 1] - rateHistT[0]))}</div>`;
     if (archDb) {
       try {
         const rq = archDb.transaction('msgs').objectStore('msgs').count();
