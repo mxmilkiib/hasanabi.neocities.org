@@ -1422,6 +1422,9 @@
      column tops rather than in flow - it floats in for its beat and
      leaves without shoving the chat down */
   #loadBar { position: absolute; top: 0; left: 0; right: 0; z-index: 6; gap: 10px; padding: 2px 10px; color: var(--text-dim); justify-content: center; }
+  /* rail modes keep the video/picker populated beside the strip's span -
+     a resync still has to narrate over them and the mode-6 float */
+  main:has(#rail:not([hidden])) #loadBar { z-index: 15; }
   /* the strip can't clock progress - steps land too fast to see and a
      resync has no milestones at all - so it's a pair of filled poles
      flanking the label rather than a fake fill */
