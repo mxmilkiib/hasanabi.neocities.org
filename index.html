@@ -534,9 +534,6 @@
   #epop .epemo { font-size: 64px; line-height: 1.1; margin: 0; max-width: none; max-height: none; }
   #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; }
   #vid #vidFrame { position: absolute; inset: 0; }
-  /* autoplay-policy note: sits over the player until sound plays or it is clicked away */
-  #vid #vidWake { position: absolute; left: 6px; right: 6px; bottom: 6px; z-index: 3;
-    font-size: .8em; padding: 4px 8px; text-align: left; white-space: normal; height: auto; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
@@ -7807,15 +7804,6 @@
         vidPlayer.setMuted(!wantSound);
         if (!wantPlay) vidPlayer.pause();
         vidState();
-        // the browser, not the page, decides whether sound may autoplay:
-        // when it vetoes the saved unmuted state, this note says how to
-        // grant the site permission. click dismisses it for the session
-        const vidHint = document.createElement('button');
-        vidHint.id = 'vidWake'; vidHint.className = 'hdr-btn'; vidHint.hidden = true;
-        vidHint.textContent = 'Sound blocked by browser autoplay policy. Firefox: padlock > Permissions > Autoplay > Allow Audio and Video. Chrome: padlock > Site settings > Sound > Allow.';
-        let hintOff = false;
-        vidHint.addEventListener('click', (e) => { e.stopPropagation(); hintOff = true; vidHint.hidden = true; });
-        vidBox.appendChild(vidHint);
         // until the player has been seen playing unmuted, a muted read is
         // the browser's veto rather than the user's choice, so the record
         // keeps the saved intent instead of storing the veto
@@ -7831,7 +7819,6 @@
           vidState();
           const paused = vidPlayer.isPaused(), muted = vidPlayer.getMuted();
           if (!armed && !paused && !muted) armed = true;
-          vidHint.hidden = hintOff || armed || paused || !muted;
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed ? muted : false, p: armed || !wantPlay ? !paused : true, w: 3 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
