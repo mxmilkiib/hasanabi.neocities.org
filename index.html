@@ -2244,6 +2244,7 @@
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row</div>
+    <div class="sep">&nbsp;</div>
     <div><b>stats</b> the tab beside this one: session top chatters, glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts</div>
     <div style="margin-top: 17px"><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles - hovering one (or an @mention in the text) previews the channel; a plain click pins a user card with pronouns, first-seen, session count, recent lines and profile / @mention / hide buttons (mods get timeout · ban · delete there too, each a click-twice confirm) - ⇧/⌃/⌘-click opens the profile · fossabot + blammobot names shimmer, as do urls they post · @ostonox mentions shimmer too and @hasanabi mentions get a rainbow sweep whose palette is hashed per author, and the #room tags in a merged view run the same sweep per channel - the ✦ row above switches these styles off · urls are clickable · images and gifs embed pinned right</div>
@@ -2253,25 +2254,23 @@
     <div><b>fossabot</b><span class="linkcols wider cmds"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
     <div><b></b><span>this page colours each game's [tag] chip and bolds answers, rolls and point counts</span></div>
     <div class="sep">—</div>
-    <div style="margin-top: 8px"><b>to highlight</b><span>comma separated; a line containing one gets a green edge (own username, phrases…):</span></div>
-    <input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
-    <div style="margin-top: 8px"><b>to block</b><span>comma separated; a chat line containing one is hidden:</span></div>
-    <input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
-    <div style="margin-top: 8px"><b>to hide (users)</b><span>comma separated logins; their messages: <span id="helpHideList"></span><sup>†</sup></span></div>
-    <input id="hwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="login, another login" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left">
+    <div style="margin-top: 8px"><b>to highlight</b><span>comma separated; a line containing one gets a green edge (own username, phrases…):</span><b></b><span><input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left"></span></div>
+    <div style="margin-top: 8px"><b>to block</b><span>comma separated; a chat line containing one is hidden:</span><b></b><span><input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left"></span></div>
+    <div style="margin-top: 8px"><b>to hide (users)</b><span>comma separated logins; their messages: <span id="helpHideList"></span><sup>†</sup></span><b></b><span><input id="hwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="login, another login" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left"></span></div>
     <div><b></b><span>vanish drops the rows outright · stub folds them into a running count line · ghost strikes them dim like deleted rows</span></div>
     <div style="margin-top: 8px"><b>safe gifs</b><span>limit giphy lookups for gif posts to a PG-13 rating: <span id="helpGifList"></span><sup>†</sup></span></div>
     <div class="sep">—</div>
-    <div id="slotRow" style="margin-top: 8px; display: flex; gap: 6px; align-items: center">
+    <div style="margin-top: 8px"><b></b><div id="slotRow" style="display: flex; gap: 6px; align-items: center">
       <b>theme slots</b>
       <button class="hdr-btn slot" data-i="0">➊</button>
       <button class="hdr-btn slot" data-i="1">➋</button>
       <button class="hdr-btn slot" data-i="2">➌</button>
-    </div>
+    </div></div>
     <div class="wide" style="margin-top: 20px"><span id="copyUrlPrev" style="display: block; text-align: center; word-break: break-all; font-size: .78em; opacity: .65; user-select: all" title="the url the button below copies"></span></div>
-    <button id="copyUrl" class="hdr-btn" style="margin-top: -2px; width: 100%; height: 26px">copy settings url</button>
     <div class="wide" style="margin-top: 4px; font-size: .85em"><span>the copied url also carries this popup's open state and selected tab (?help/?htab): <span id="helpCopyHelpList"></span></span></div>
-    <div style="margin-top: 14px; display: flex; gap: 6px">
+    <button id="copyUrl" class="hdr-btn" style="margin-top: 2px; width: 100%; height: 26px">copy settings url</button>
+    <div class="sep">&nbsp;</div>
+    <div style="display: flex; gap: 6px">
     <button id="resetOpts" class="hdr-btn" style="flex: 3; height: 26px">reset all settings</button>
     <button id="cacheBust" class="hdr-btn" style="flex: 1; height: 26px" title="reload the page bypassing the cache - keeps this url's settings">↻ clear cache</button>
     </div>
@@ -2443,7 +2442,7 @@
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
   const SCROLLBACK_SIZES = [250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
-  let MAX_MESSAGES = 1000;
+  let MAX_MESSAGES = 5000;
   const BACKLOG_FLUSH = 1000;
   const HISTORY_SAVE_MAX = 1000;
   // '@channel' pings highlight per the row's own channel - cached per name
@@ -8750,7 +8749,7 @@
     if (linkW !== WEIGHTS.indexOf(400)) q.set('lw', WEIGHTS[linkW]);
     if (zebraLevel !== 2) q.set('zebra', String(zebraLevel));
     if (pauseOnText) q.set('pause', '1');
-    if (MAX_MESSAGES !== 1000) q.set('scrollback', MAX_MESSAGES);
+    if (MAX_MESSAGES !== 5000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
     if (barTop) q.set('bartop', '1');
     if (barAuto) q.set('bauto', String(barAuto));

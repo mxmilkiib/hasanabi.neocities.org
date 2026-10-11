@@ -417,7 +417,7 @@ no dependencies beyond CDN-hosted fonts.
 ### Persistence, sync & channels
 
 - Scrollback - the config/help panel offers limits from 250 to 100,000
-  rows (1,000 by default). Larger limits use more browser memory and
+  rows (5,000 by default). Larger limits use more browser memory and
   may slow long-running tabs; at most the newest 1,000 rows (including
   gap notices) survive reloads via
   [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
@@ -559,7 +559,7 @@ drop their param, so only drifted settings spell out.
 ### Performance
 
 - Incoming lines queue and flush once per animation frame.
-- The log defaults to 1,000 rows, with higher optional caps up to
+- The log defaults to 5,000 rows, with higher optional caps up to
   100,000; background message queues and saved reload history stay
   bounded at 1,000 rows.
 
