@@ -9464,8 +9464,10 @@
       if (loud) syncShow('chat is syncing - recovering missed lines…');
     }
   }
+  let hiddenAt = 0;
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
+      hiddenAt = Date.now();
       if (scheduled && !hiddenFlush) {
         if (flushFrame) { window.cancelAnimationFrame(flushFrame); flushFrame = 0; }
         hiddenFlush = setTimeout(flush, 1000);
@@ -9479,7 +9481,10 @@
       scheduled = false;
     }
     if (!scheduled && queue.length) scheduleFlush();
-    backfill();
+    // a brief tab-away can't miss enough to narrate - the sweep still
+    // runs, just without the banner a real suspension earns
+    backfill(Date.now() - hiddenAt > 15000);
+    hiddenAt = 0;
   });
   window.addEventListener('pageshow', () => backfill());
 
@@ -10052,9 +10057,9 @@
     // the taller bar shrinks the columns from below; keep a following
     // column pinned or the newest rows slide under it
     if (!(isSplit() && !revFlow)) {
-    if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
-    if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
-    if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
+      if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
+      if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
+      if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
     }
     paintLen();
   };
