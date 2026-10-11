@@ -5944,7 +5944,7 @@
     for (const s of bSamps) {
       if (bPicks.every((p) => Math.abs(p[1] - s[1]) > 10000 &&
           !(Math.abs(p[1] - s[1]) <= 30000 && s[0] >= p[0] - .05))) bPicks.push(s);
-      if (bPicks.length === 3) break;
+      if (bPicks.length === 5) break;
     }
     // a sustained flow notes its earliest highest: the listed time rolls
     // back to the first sample inside 30s that reached the pick's rate
