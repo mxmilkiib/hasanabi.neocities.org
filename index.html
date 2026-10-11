@@ -4519,20 +4519,28 @@
   // sessions, the write silently failed, and the stale restore banded
   // everything since as 'page closed'
   function saveSpark() {
-    const put = (h0, h1, hist, hwhy, ghist) => {
-      try {
-        localStorage.setItem(SPARK_KEY, JSON.stringify({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples, ratePer: rateSamplesPer, glorpPer: glorpSamplesPer, chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), hT0: h0, hT1: h1, hist, ghist, hWhy: hwhy.flatMap((w, i) => w ? [[i, w]] : []) }));
-        return true;
-      } catch { return false; }
+    const base = () => ({ t: Date.now(), rate: rateSamples, why: rateWhy, glorp: glorpSamples,
+      ratePer: rateSamplesPer, glorpPer: glorpSamplesPer });
+    const put = (extra) => {
+      try { localStorage.setItem(SPARK_KEY, JSON.stringify({ ...base(), ...extra })); return true; }
+      catch { return false; }
     };
-    // a quota squeeze still keeps a recent tail; a wiped key beats a
-    // stale save lying about a day of missed chat
-    if (!put(rateHistT[0] || 0, rateHistT[rateHist.length - 1] || 0, rateHist, rateHistWhy, glorpHist)) {
-      const keep = Math.min(rateHist.length, 21600);
-      if (!put(rateHistT[rateHist.length - keep] || 0, rateHistT[rateHist.length - 1] || 0,
-               rateHist.slice(-keep), rateHistWhy.slice(-keep), glorpHist.slice(-keep)))
-        try { localStorage.removeItem(SPARK_KEY); } catch {}
-    }
+    const hExt = (n) => {
+      const k = Math.min(rateHist.length, n);
+      return { hT0: rateHistT[rateHist.length - k] || 0, hT1: rateHistT[rateHist.length - 1] || 0,
+        hist: rateHist.slice(-k), ghist: glorpHist.slice(-k),
+        hWhy: rateHistWhy.slice(-k).flatMap((w, i) => w ? [[i, w]] : []) };
+    };
+    // quota ladder: shed the biggest optional payload before history -
+    // the chatter tally can outweigh every series - then trim the long
+    // tail, then drop it; a windowed save still keeps the spark alive
+    // and a wiped key beats a stale one lying about missed chat
+    const ok =
+      put({ chat: [...chatterSeen], quiet: quietGaps, away: away.slice(-30), ...hExt(rateHist.length) }) ||
+      put({ chat: [...chatterSeen].slice(-2000), quiet: quietGaps, away: away.slice(-30), ...hExt(21600) }) ||
+      put({ away: away.slice(-30), ...hExt(3600) }) ||
+      put({});
+    if (!ok) try { localStorage.removeItem(SPARK_KEY); } catch {}
   }
   function restoreSpark() {
     try {
