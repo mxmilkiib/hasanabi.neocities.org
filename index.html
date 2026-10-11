@@ -1436,7 +1436,7 @@
      flanking the label rather than a fake fill. The fills breathe their
      width in toward the label - pure activity, no progress implied */
   #loadBar .loadbar { flex: 1; width: auto; max-width: 30%; height: 12px; margin-top: 0; opacity: .8; }
-  #loadBar .loadbar i { width: 100%; animation: loadpulse 1.2s ease-in-out infinite, barber 1s linear infinite, syncshrink 20.8s ease-in-out infinite; }
+  #loadBar .loadbar i { width: 100%; animation: barber 1s linear infinite, syncshrink 20.8s ease-in-out infinite; }
   /* Docking the left pole's fill to its inner end means the width drain
      eats the outer edge instead of the edge beside the text */
   #loadBar .loadbar:first-child i { margin-left: auto; }
