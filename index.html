@@ -8755,8 +8755,11 @@
     if (!selfHl) q.set('self', '0');
     if (splitLevel > 1) q.set('split', String(splitLevel));
     // in rail mode the video state is vidRail (dock is the baseline);
-    // outside it video=1 only when the box is shown
-    if (railEl.hidden) { if (!vidBox.hidden) q.set('video', '1'); }
+    // outside it video=1 only when the box is shown. modes 5/6 own the
+    // placement themselves - vidRail is stale there, so the url only
+    // needs the param when the mode-forced video is actually hidden
+    if (splitLevel >= 5) { if (vidBox.hidden) q.set('video', '0'); }
+    else if (railEl.hidden) { if (!vidBox.hidden) q.set('video', '1'); }
     else if (vidRail !== 'dock') q.set('video', vidRail === 'off' ? '0' : 'float');
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
