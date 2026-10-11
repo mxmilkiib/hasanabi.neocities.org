@@ -171,8 +171,8 @@ not versions - the page ships continuously to Neocities.
 - the update bar's reload pair now stretch to fill their flanks, each
   pinned at a third of the bar minimum - the label ellipsizes before a
   button can
-- the header shaves a pixel of padding top and bottom - the rate graph
-  and its button row sit 2px from the header edges instead of 3, the
+- the header's rate graph and button row sit 1px from the header edges
+  after a second padding shave, the
   pinned corner buttons and minimised-strip hover following suit
 - rate-window picks set the graph's frame and the rail's window set
   clamps to its short list; the spark save shrinks and survives quota
