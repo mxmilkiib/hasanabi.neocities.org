@@ -1576,11 +1576,14 @@
   #helpPanel div.wide > span { grid-column: 1 / -1; text-align: center; }
   /* section titles in resources/authors go azure - apart from the
      accent-coloured label <b>s elsewhere in the panel */
+  /* the wide conf rows carry their option name inside the cell span,
+     not in a leading <b> - the label still gets the accent colour */
   #helpPanel #htabRes > div > b,
   #helpPanel #htabLib > div > b,
   #helpPanel #htabLbr > div > b,
   #helpPanel #authSections > div > b,
-  #helpPanel #htabCfg > div > b:not([class]) { color: var(--aux); }
+  #helpPanel #htabCfg > div > b:not([class]),
+  #helpPanel #htabCfg > div.wide > span > b:not([class]) { color: var(--aux); }
   /* the ghbtns.com star-button look at small size, self-hosted - an
      iframe embed would be eaten by social-widget blocklists. The count
      fills from the relay's repo stats instead of their jsonp. Dark
@@ -2196,9 +2199,9 @@
     <div class="wide"><span>popup font size: <span id="helpFsList"></span><sup>†</sup></span> · <span>position: <span id="helpPosList"></span><sup>†</sup></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span></div>
-    <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
+    <div><b><span class="dot connecting" id="helpDot"></span></b> stream status: the dot mirrors the stream - accent-pulsing while checking, green while live, red-pulsing if the chat socket drops under a live stream, steady accent while the stream is off but chat is connected, grey while it is down; the page favicon repaints in the dot's own colour so the tab icon tracks the same state; hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
-    <div><b>modes</b> active chat modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)</div>
+    <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
     <div class="thm"><b id="helpVariantIcon">▢</b><span>variant: <span id="helpVariantList"></span> - a finish layered over any colour: phosphor tints text and accents toward the hue, grain adds texture, contrast widens the bg/text gap</span></div>
@@ -5055,7 +5058,7 @@
                   : 'connecting to chat';
     // the full status line already carries the mode phrases; the chips span
     // only earns its place in the two compact views
-    modesEl.hidden = statusView === 0;
+    modesEl.hidden = statusView === 0 || !modesOn;
     if (!stream) {
       if (streamDead) {
         // Relay never reported stream status (stale cache or blocked API):
@@ -5126,7 +5129,7 @@
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
       : (since ? `<b>live</b> since <b>${since}</b>, up <b>${up}</b>` : '<b>live</b>') +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') +
-        (chatState === 'connected' ? ` · ${chatModesTxt || 'chat'}` : chatSuffix);
+        (chatState === 'connected' ? ` · ${modesOn && chatModesTxt ? chatModesTxt : 'chat'}` : chatSuffix);
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
     dotEl.setAttribute('aria-label', dotEl.title);
@@ -5149,6 +5152,8 @@
   // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
   const modesEl = document.getElementById('chatModes');
   let chatModesTxt = ''; // compact mode list folded into the live status line
+  let modesOn = true;    // config toggle, default on
+  function setModesOn(on) { modesOn = on; markHelp('helpModes', on ? 1 : 0); updateHeader(); }
   function onRoomState(tags, ch) {
     const chips = [];
     const slow = parseInt(tags.slow || '0', 10);
@@ -5378,6 +5383,7 @@
     else if (a.classList.contains('helpGif')) { setGifSafe(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpYtem')) { setYtEmb(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpTitle')) { setTitleBar(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpModes')) { setModesOn(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpFav')) { setLkIco(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPn')) { setPronouns(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
@@ -7564,7 +7570,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0,
       epnames: emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epmix: epickMerge ? 1 : 0, ephold: epickHold,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
@@ -7717,6 +7723,7 @@
     if (Number.isInteger(o.peek) && o.peek >= 0 && o.peek < PEEK_MODES.length) setPeek(o.peek);
     if (o.yt !== undefined) setYtEmb(!!o.yt);
     if (o.stitle !== undefined) setTitleBar(!!o.stitle);
+    if (o.cmodes !== undefined) setModesOn(!!o.cmodes);
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.pn !== undefined) setPronouns(!!o.pn);
     if (o.nbots !== undefined) setBotsHide(!!o.nbots);
@@ -8775,6 +8782,7 @@
     if (peekMode !== 2) q.set('peek', peekMode);
     if (!ytEmbed) q.set('yt', '0');
     if (!titleBarOn) q.set('stitle', '0');
+    if (!modesOn) q.set('cmodes', '0');
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
@@ -12494,6 +12502,7 @@
     if (q.has('peek') && +q.get('peek') >= 0 && +q.get('peek') < PEEK_MODES.length) setPeek(+q.get('peek'));
     if (q.has('yt')) setYtEmb(flag('yt'));
     if (q.has('stitle')) setTitleBar(flag('stitle'));
+    if (q.has('cmodes')) setModesOn(flag('cmodes'));
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
     if (q.has('nbots')) setBotsHide(flag('nbots'));
@@ -12579,7 +12588,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', 'rail', '2+vid·emotes', '2+emotes'],
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
@@ -12647,6 +12656,7 @@
   markHelp('helpPeek', peekMode);
   markHelp('helpYtem', ytEmbed ? 1 : 0);
   markHelp('helpTitle', titleBarOn ? 1 : 0);
+  markHelp('helpModes', modesOn ? 1 : 0);
   markHelp('helpFav', lkIco ? 1 : 0);
   markHelp('helpPn', pronounsOn ? 1 : 0);
   markHelp('helpCopyHelp', copyHelp ? 1 : 0);
