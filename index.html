@@ -835,6 +835,8 @@
      sweep - their role colours would hide the transparent-clipped
      gradient otherwise */
   .role.bits.rbw, .role.first.rbw { color: transparent; }
+  /* a cheer's message text goes strong like its rainbow chip */
+  .row.bits .msg { font-weight: max(700, calc(var(--chat-w, 400) + 300)); }
   .role.first { color: #ff69b4; font-weight: 700; }
   .row.notice { color: color-mix(in oklch, var(--text-dim), var(--text) 70%); font-style: italic; }
   .row.notice .notice-label { font-style: normal; }
@@ -4331,7 +4333,7 @@
       // matches what strict per-line alternation would give
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
-      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
+      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${tags.bits ? ' bits' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +

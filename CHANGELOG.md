@@ -114,6 +114,7 @@ not versions - the page ships continuously to Neocities.
 - the options reset keeps the spark series too - it's session telemetry,
   not a setting
 - the font floor returns to 1rem
+- cheers ([bits N] rows) set their message text strong
 - the unset font floor becomes 1.05rem and finally rules the default:
   boot no longer stamps a px rung over it, the metric maths resolve it
   rem-to-px, an unpicked font saves no px so the floor survives reloads,
