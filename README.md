@@ -227,8 +227,9 @@ no dependencies beyond CDN-hosted fonts.
   pointer is over the grid (`hold+` also pauses animated cells), and a
   pause chip swaps cells for their still frames.
 - The box resizes from its left and top edges (shading on hover) and
-  drags by a dotted grip strip (both persist); a `📌` pin keeps it
-  open across chat-bar hides and reloads. All display options - names,
+  drags by a dotted grip strip (both persist). It opens by default -
+  only a deliberate close keeps it down next visit - and a `📌` pin
+  floats it free of the chat bar. All display options - names,
   size, sort, age rows,
   mix, hold, tabs, anim filter, geometry - ride the settings bundle,
   theme slots and copied URLs.
