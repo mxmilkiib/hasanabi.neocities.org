@@ -140,6 +140,9 @@ not versions - the page ships continuously to Neocities.
 - trans liberation and intersex rights join the activism movements list
 
 ### Misc
+- the header shaves a pixel of padding top and bottom - the rate graph
+  and its button row sit 2px from the header edges instead of 3, the
+  pinned corner buttons and minimised-strip hover following suit
 - rate-window picks set the graph's frame and the rail's window set
   clamps to its short list; the spark save shrinks and survives quota
   pressure
