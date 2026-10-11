@@ -84,8 +84,12 @@ not versions - the page ships continuously to Neocities.
 - rate-window picks set the graph's frame and the rail's window set
   clamps to its short list; the spark save shrinks and survives quota
   pressure
-- the unset font floor becomes 1rem - a bumped browser root size is
-  honoured instead of the fixed px floor (which also subsumes the old
+- the unset font floor becomes 1.05rem and finally rules the default:
+  boot no longer stamps a px rung over it, the metric maths resolve it
+  rem-to-px, an unpicked font saves no px so the floor survives reloads,
+  nightshade stops pinning 18px, and a right-click on the font-size
+  button drops a rung pick back onto the floor - a bumped browser root
+  size is honoured instead of a fixed px (which also subsumes the old
   narrow-screen 16px floor)
 - the twitch embed pauses while its box is hidden, so a 'hidden' video
   no longer leaks audio; it opens by default now (only a deliberate off

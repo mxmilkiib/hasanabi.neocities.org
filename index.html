@@ -136,9 +136,9 @@
     --ph: 80; --pc: .012; --ptc: .02;
     --sh-bg: .95; --sh-tx: .16;
     --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; --wiki: #3368b0;
-    /* the unset font floor rides the browser's root size - 1rem honours
-       a bumped user default where a bare px would not */
-    --chat-font: 1.1rem;
+    /* the unset font floor rides the browser's root size - a rem value
+       honours a bumped user default where a bare px would not */
+    --chat-font: 1.05rem;
     /* --bg-lift lets a colour nudge its paper a touch off the shade stop -
        salmon needs .97 for the ft pink but the axis only stops at .95/.99 */
     --bg: oklch(clamp(0, calc(var(--sh-bg) + var(--bg-lift, 0)), 1) var(--pc) var(--ph));
@@ -5358,7 +5358,7 @@
     retro:    { colour: 'green',  variant: 'phosphor', shade: 7, font: 'terminus', px: 28, lhv: 1, lines: 1, zebra: false, times: 1, shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0, lbls: 0 },
     solar:    { colour: 'solarized',shade: 7,  font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
     twitch:   { colour: 'violet', shade: 7,    font: 'inter',      px: 14, lhv: 1.5, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  px: 18, lhv: 1.4, wv: 400, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, split: 4, anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: 'q', help: 0, lbls: 0 },
+    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  lhv: 1.4, wv: 400, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, split: 4, anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: 'q', help: 0, lbls: 0 },
     cinema:   { colour: 'gray',   variant: 'contrast', shade: 9, font: 'lexend', px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0, lbls: 0 },
     phosphor: { colour: 'ember',  variant: 'phosphor', shade: 9, font: 'vt323', px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
   };
@@ -6863,9 +6863,16 @@
   // a fractional line-height (e.g. 1.65 * 14px = 23.1px) puts every row
   // boundary on a different sub-pixel, which reads as a tiny wiggle each
   // time a trim or append shifts the column under a paused scroll
+  // --chat-font sits at a rem floor until a rung pick stamps it inline -
+  // resolve to px for the metric maths either way
+  const chatFontPx = () => {
+    const cs = getComputedStyle(document.documentElement);
+    const raw = cs.getPropertyValue('--chat-font').trim();
+    return parseFloat(raw) * (raw.endsWith('rem') ? parseFloat(cs.fontSize) || 16 : 1);
+  };
   function syncLh() {
     const cs = getComputedStyle(document.documentElement);
-    const fs = parseFloat(cs.getPropertyValue('--chat-font')) || 14;
+    const fs = chatFontPx() || 14;
     const lh = parseFloat(cs.getPropertyValue('--chat-lh')) || 1.65;
     const de = document.documentElement.style;
     de.setProperty('--chat-lhpx', Math.round(fs * Math.max(lh, 1.15)) + 'px');
@@ -6897,12 +6904,12 @@
       idx = (idx + (e.deltaY > 0 ? 1 : -1) + list.length) % list.length;
       apply();
     }, { passive: false });
-    return { set: (i) => { idx = i; apply(); }, get: () => idx };
+    return { set: (i) => { idx = i; apply(); }, get: () => idx, seat: (i) => { idx = i; } };
   }
 
   // the Ladder starts on the live Font size so a raised mobile floor
   // steps up from there instead of from an unrelated rung
-  const fsNow = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font'));
+  const fsNow = chatFontPx();
   const fontCtl = cycle(fontBtn, FONT_SIZES, FONT_SIZES.indexOf(fsNow) >= 0 ? FONT_SIZES.indexOf(fsNow) : DEF.size, '--chat-font', 'Font size', 'px', 'helpFont');
   const lhCtl = cycle(lhBtn, LINE_HEIGHTS, DEF.lh, '--chat-lh', 'Line height', '', 'helpLh');
   const WEIGHTS = [300, 400, 500, 600, 700];
@@ -6912,6 +6919,19 @@
   const LS_STEPS = [-0.08, -0.05, -0.03, -0.015, 0, 0.015, 0.03, 0.05, 0.08, 0.12];
   const lsCtl = cycle(kernBtn, LS_STEPS, DEF.ls, '--chat-lse', 'Letter spacing', 'em', 'helpLs');
   kernBtn.addEventListener('contextmenu', (e) => { e.preventDefault(); lsCtl.set(DEF.ls); });
+  // a rung pick stamps --chat-font inline - right-click drops the stamp so
+  // the css floor takes it back; the ladder re-seats on the floor's size
+  fontBtn.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    document.documentElement.style.removeProperty('--chat-font');
+    const fi = FONT_SIZES.indexOf(Math.round(chatFontPx()));
+    fontCtl.seat(fi >= 0 ? fi : DEF.size);
+    fontBtn.title = 'Font size: floor - click/scroll · ⇧click back · right-click resets';
+    markHelp('helpFont', -1);
+    syncLh();
+    repin();
+    saveOpts();
+  });
   document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
     // each weight chip renders at the weight it picks
     `<a href="#" role="button" class="helpOpt helpWg" data-idx="${i}" style="font-weight:${WEIGHTS[i]}">${n}</a>`).join(' ');
@@ -6922,7 +6942,9 @@
     `<a href="#" role="button" class="helpLh" data-idx="${i}">${lh}</a>`).join(' ');
   document.getElementById('helpLsList').innerHTML = LS_STEPS.map((v, i) =>
     `<a href="#" role="button" class="helpLs" data-idx="${i}" style="letter-spacing:${v}em">${v}</a>`).join(' ');
-  fontCtl.set(fontCtl.get());
+  // no fontCtl set here: an apply would stamp px over the css floor, and the
+  // floor is the default - only a real pick (click, wheel, saved px, preset
+  // or url param, all through set()/apply()) earns the stamp
   lhCtl.set(lhCtl.get());
   weightCtl.set(weightCtl.get());
   lsCtl.set(lsCtl.get());
@@ -7691,11 +7713,14 @@
   // otherwise write partially-applied state back over the source bundle
   let suppressSave = false;
 
+  // a rung pick stamps --chat-font inline; the bare css floor is unpicked,
+  // and an unpicked font saves no px so the floor survives the reload
+  const fontPicked = () => document.documentElement.style.getPropertyValue('--chat-font') !== '';
   // the full display-option bundle - what saveOpts persists and what a
   // theme slot stashes
   function curOpts() {
     return {
-      font: fontSel.value, px: FONT_SIZES[fontCtl.get()], lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], colour: colourMode, variant: variantMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
+      font: fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : undefined, lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], colour: colourMode, variant: variantMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -7929,7 +7954,7 @@
   // the stream embed is deliberately outside presets - one toggles it by hand
   function presetCmp() {
     return {
-      colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontSel.value, px: FONT_SIZES[fontCtl.get()],
+      colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : Math.round(chatFontPx()),
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
@@ -8796,7 +8821,7 @@
     helpPanel.classList.toggle('hfs-follow', hdrFs < 0);
     // follow chat: light the rung the header is actually riding, like markHelpFs
     if (hdrFs >= 0) return;
-    const i = HDR_SIZES.indexOf(Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font'))));
+    const i = HDR_SIZES.indexOf(Math.round(chatFontPx()));
     const eq = i >= 0 && helpPanel.querySelector(`a.helpHfs[data-idx="${i + 1}"]`);
     if (eq) setOn(eq, true);
   }
