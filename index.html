@@ -2265,7 +2265,7 @@
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row</div>
     <div class="sep">&nbsp;</div>
-    <div><b>stats</b> the tab beside this one: session top chatters, glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts</div>
+    <div><b>stats</b> the tab beside this one: session top chatters, glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts (4+ msgs/s)</div>
     <div style="margin-top: 17px"><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b></b>names link to twitch profiles - hovering one (or an @mention in the text) previews the channel; a plain click pins a user card with pronouns, first-seen, session count, recent lines and profile / @mention / hide buttons (mods get timeout · ban · delete there too, each a click-twice confirm) - ⇧/⌃/⌘-click opens the profile · fossabot + blammobot names shimmer, as do urls they post · @ostonox mentions shimmer too and @hasanabi mentions get a rainbow sweep whose palette is hashed per author, and the #room tags in a merged view run the same sweep per channel - the ✦ row above switches these styles off · urls are clickable · images and gifs embed pinned right</div>
     <div><b></b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
@@ -5857,7 +5857,7 @@
     const bSeries = sc ? (rateHistPer[sc] || []) : rateHist;
     const bOff = rateHistT.length - bSeries.length;
     const bSamps = bSeries.map((r, i) => [r, rateHistT[bOff + i]])
-      .filter(([r, t]) => Number.isFinite(r) && t)
+      .filter(([r, t]) => Number.isFinite(r) && t && r >= 4)
       .sort((a, b) => b[0] - a[0]);
     // distinct bursts only: each pick suppresses every sample within 10s
     // of it, and the walk goes down by rate so a taller spike inside the
@@ -6064,8 +6064,8 @@
         (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span></div>` : '') +
         `<div class="st-row st-note"><span class="nm">rows rendered since this page first ran - reloads keep the tally going</span></div>` +
         scopeBtns + `</div>` +
-        `<div class="st-panel"><div class="st-h">bursts</div>` +
-        (bursts || `<div class="st-row"><span class="nm">no rate data yet - the graph fills in as chat flows</span></div>`) + `</div>` +
+        `<div class="st-panel"><div class="st-h">msg bursts</div>` +
+        (bursts || `<div class="st-row"><span class="nm">no 4+ msgs/s bursts yet</span></div>`) + `</div>` +
         `<div class="st-panel"><div class="st-h">glorps</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +
