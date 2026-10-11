@@ -4100,8 +4100,11 @@
         const dup = who && sys.slice(0, who.length).toLowerCase() === who.toLowerCase() && !/\w/.test(sys[who.length] || '');
         const sysText = dup ? sys.slice(who.length).replace(/^\s*[-–—,:]?\s*/, '') : sys;
         const whoLink = `<a class="at nwho" style="color:${escapeHTML(wcol)}" href="https://www.twitch.tv/${escapeHTML(tags.login || login || who)}" target="_blank" rel="noopener noreferrer">${escapeHTML(who)}</a>`;
+        // a watch-streak milestone earns the number the rainbow sweep
+        const sysHtml = linkifyEsc(escapeHTML(sysText))
+          .replace(/\b(watched\s+)(\d[\d,]*)(\s+consecutive\s+streams?\b)/i, '$1<b class="rbw">$2</b>$3');
         html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> ${whoLink} ` +
-                `${linkifyEsc(escapeHTML(sysText))}${message ? (sysText ? ' - ' : '') + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
+                `${sysHtml}${message ? (sysText ? ' - ' : '') + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {

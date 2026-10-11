@@ -88,6 +88,9 @@ not versions - the page ships continuously to Neocities.
   vanishing - the dedup rebuilds as rows archive, evict or remerge,
   ghost clones stay out of the running, and toggling the view re-deals
   pages so columns pack the shown links rather than hold empty slots
+- a watch-streak usernotice ('watched 150 consecutive streams…')
+  rainbows the streak number itself, leaving the rest of the
+  system-msg plain
 
 ### Gifs
 - giphy results, misses and rate-limit backoff persist across reloads;
