@@ -6,6 +6,11 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-12
 
 ### Split columns
+- level 9 (▮☻) is mode 7 minus the video: one chat column beside a
+  rail holding just the emote picker, which flexes to fill it through
+  the same novid branch mode 6 uses - the video stays off and the ▶
+  button floats it over the chat on demand. the mode clamps, the
+  wheel cycle, the menu, saved opts and ?split= all learn 9
 - level 8 trades the stacked rail for a vertical split: main becomes a
   two-column grid, chat over the emote picker on the left, video over
   stats in a rail spanning both rows. the left seam still drags the

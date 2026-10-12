@@ -2371,7 +2371,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; the button's click lists every mode while the wheel cycles; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them, and its left edge drags the chat columns narrower or wider - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat; the last pair run one chat column instead, plain or a vertical split - emotes under the chat, stats under the video<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; the button's click lists every mode while the wheel cycles; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them, and its left edge drags the chat columns narrower or wider - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat; the last trio run one chat column instead: video + emotes, a vertical split with emotes under the chat and stats under the video, or emotes alone - the video floats the same way<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
@@ -8126,7 +8126,7 @@
       try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
       if (o.epgeo.left != null) setPin(true);
     }
-    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 8) setSplit(o.split);
+    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 9) setSplit(o.split);
     railEl.classList.toggle('fixed', o.railw > 0);
     if (o.railw > 0) mainEl.style.setProperty('--railw', o.railw + 'px');
     // after the split so a rail exists to dock into; outside rail it just
@@ -9911,7 +9911,7 @@
       emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
       statsTab.hidden = level !== 4 && level !== 8;
       if (statsLink.classList.contains('on')) switchTab('htabCfg');
-      if (level === 5 || level >= 7) {
+      if (level === 5 || level === 7 || level === 8) {
         // docked at the rail's top for the mode only - the saved rail
         // placement is untouched
         railEl.classList.remove('novid');
@@ -9919,7 +9919,7 @@
         vidBox.style.left = vidBox.style.top = vidBox.style.right =
           vidBox.style.bottom = vidBox.style.width = '';
         setVideo(true);
-      } else if (level === 6) {
+      } else if (level === 6 || level === 9) {
         // no video by default - it sits floated out of the rail at its
         // saved geometry, so enabling it pops up over the chat
         railEl.classList.add('novid');
@@ -9962,17 +9962,17 @@
   // the rail's stats keep ticking while they're docked
   setInterval(() => { if (!railEl.hidden) renderStats(); }, 8000);
 
-  // Sets the pane count (1..8); a third column only exists in landscape,
+  // Sets the pane count (1..9); a third column only exists in landscape,
   // where it's actually wider than it is tall enough to be readable.
   // Levels 4-6 pair two chat columns with the docked rail - stats in 4,
-  // video+emotes in 5, emotes alone in 6 (video floats). 7 and 8 run
-  // one chat column beside the rail instead - video+emotes, then the
-  // same with stats back in
-  const SPLIT_NAMES = ['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', 'vsplit: chat·emotes | vid·stats'];
-  const splitGlyph = (l) => l === 1 ? '▮' : l === 8 ? '⊞' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
+  // video+emotes in 5, emotes alone in 6 (video floats). 7-9 run
+  // one chat column beside the rail instead - video+emotes, the same
+  // with stats back in, then emotes alone (video floats like 6)
+  const SPLIT_NAMES = ['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', 'vsplit: chat·emotes | vid·stats', '2col+emotes (video off, ▶ floats it)'];
+  const splitGlyph = (l) => l === 1 ? '▮' : l === 8 ? '⊞' : l === 9 ? '▮☻' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
-    level = Math.max(1, Math.min(8, level));
+    level = Math.max(1, Math.min(9, level));
     const prevSplit = splitLevel;
     splitLevel = level;
     markHelp('helpSplit', level - 1);
@@ -9980,12 +9980,12 @@
     splitBtn.textContent = splitGlyph(level);
     splitBtn.classList.toggle('tri', level >= 3 && level <= 6);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = `${level}/8 ${SPLIT_NAMES[level - 1]} - click for menu · scroll cycles · ⇧click back`;
+    splitBtn.title = `${level}/9 ${SPLIT_NAMES[level - 1]} - click for menu · scroll cycles · ⇧click back`;
     if (!splitMenu.hidden) markSplitMenu();
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     // want counts chat columns only - the rail never figures in it. a
     // change that keeps the same chat-column count just re-docks the
-    // rail: 2↔4-6 and 1↔7-8 alike. the rail modes share one visible
+    // rail: 2↔4-6 and 1↔7-9 alike. the rail modes share one visible
     // rail, so level changes must still re-dock; only a true no-op
     // exits early
     const want = level <= 3 ? level : level <= 6 ? 2 : 1;
@@ -10028,7 +10028,7 @@
   }
 
   function cycleSplit(dir) {
-    const max = window.innerWidth > window.innerHeight ? 8 : 2;
+    const max = window.innerWidth > window.innerHeight ? 9 : 2;
     setSplit(((splitLevel + dir - 1) % max + max) % max + 1);
     saveOpts();
   }
@@ -10038,7 +10038,7 @@
   splitMenu.innerHTML = SPLIT_NAMES.map((n, i) =>
     `<button type="button" role="option" data-i="${i + 1}"><span class="sg">${splitGlyph(i + 1)}</span>${n}</button>`).join('');
   const markSplitMenu = () => {
-    const max = window.innerWidth > window.innerHeight ? 8 : 2;
+    const max = window.innerWidth > window.innerHeight ? 9 : 2;
     splitMenu.querySelectorAll('button').forEach((b, j) => {
       b.classList.toggle('on', j + 1 === splitLevel);
       b.setAttribute('aria-selected', String(j + 1 === splitLevel));
@@ -13293,7 +13293,7 @@
     if (q.has('split')) {
       const n = q.get('split');
       const v = parseInt(n, 10);
-      if (n !== '0') setSplit(v >= 1 && v <= 8 ? v : 2);
+      if (n !== '0') setSplit(v >= 1 && v <= 9 ? v : 2);
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
@@ -13401,7 +13401,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes', '2col+vid·emotes', 'vsplit: chat·emotes | vid·stats'],
+    helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes', '2col+vid·emotes', 'vsplit: chat·emotes | vid·stats', '2col+emotes'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
