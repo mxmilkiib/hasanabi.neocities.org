@@ -115,6 +115,8 @@ not versions - the page ships continuously to Neocities.
   like the other rare labels
 
 ### Header
+- the title bar's ✕ shrinks to a 20px square - the shared hbar
+  button rule had it a 30px slab nearly filling the strip
 - the wrapped button strip sheds its breathing room - the header's
   row-gap tightens from 4px to a 1px hairline when hdrwrap kicks in
 - the rate graph canvas gains 1px of air above and below
