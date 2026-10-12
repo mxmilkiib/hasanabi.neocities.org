@@ -75,6 +75,8 @@ not versions - the page ships continuously to Neocities.
   after the soviet (council) article it describes
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
+- spaces moves up above activism, heading the action block after the
+  union rows instead of trailing co-ops
 - unruly subjects joins channels/streams: chenjerai kumanyika's weekly
   politics show out of rowhome productions, carrying site, patreon,
   ig and the buzzsprout feed - which rides deprogram's service column
