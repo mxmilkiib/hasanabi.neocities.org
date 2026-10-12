@@ -77,6 +77,8 @@ not versions - the page ships continuously to Neocities.
   solidarity after community organizing
 - mobilize joins the dem-pol row between action network and votehub -
   the volunteer-shift platform
+- history persists 5,000 rows across reloads now (was 1,000) - a
+  reload restores the full default scrollback instead of a fifth
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
 - spaces moves up above activism, heading the action block after the
