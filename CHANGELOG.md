@@ -52,6 +52,8 @@ not versions - the page ships continuously to Neocities.
 - free culture leads the libre page, promoted from seventh
 
 ### Help popup
+- the localStorage/PWA footnote gains an "&amp;c" heading, sitting as a
+  titled row like stats / etc / blammobot
 - opening the help panel brings it forward over the emote picker, not
   just pressing on it - a re-apply on an already-open panel keeps
   whatever order the last press settled
