@@ -6400,11 +6400,11 @@
       `<div class="st-trio">` +
         `<div class="st-panel">` +
         `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
-        `<div class="st-row"><span class="nm">${nMsgs.size.toLocaleString('en')} unique chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
-        `<div class="st-row"><span class="nm">${total.toLocaleString('en')} message${total === 1 ? '' : 's'} rendered</span></div>` +
-        `<div class="st-row"><span class="nm">${bSeenN} badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
-        `<div class="st-row"><span class="nm">tracking since ${sinceTxt} · ${fmtSpan(Date.now() - statsSince)}</span></div>` +
-        (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span></div>` : '') +
+        `<div class="st-row"><span class="nm">unique chatter${nMsgs.size === 1 ? '' : 's'}</span><i>${nMsgs.size.toLocaleString('en')}</i></div>` +
+        `<div class="st-row"><span class="nm">message${total === 1 ? '' : 's'} rendered</span><i>${total.toLocaleString('en')}</i></div>` +
+        `<div class="st-row"><span class="nm">badge${bSeenN === 1 ? '' : 's'} seen</span><i>${bSeenN}</i></div>` +
+        `<div class="st-row"><span class="nm">tracking since</span><i>${sinceTxt} · ${fmtSpan(Date.now() - statsSince)}</i></div>` +
+        (pvMax ? `<div class="st-row"><span class="nm">peak viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span><i>${pvMax.toLocaleString('en')}</i></div>` : '') +
         scopeBtns + `</div>` +
         `<div class="st-panel"><div class="st-h">msg bursts</div>` +
         (bursts || `<div class="st-row"><span class="nm">no ${Math.round(bMin)}+ msgs/s bursts yet</span></div>`) + `</div>` +
