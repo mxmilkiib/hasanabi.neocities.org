@@ -15,6 +15,69 @@ not versions - the page ships continuously to Neocities.
   their glyphs like the font picker does - the wheel still cycles and
   shift-click still steps back; portrait-only levels sit disabled in
   the list
+- the ghost fade reads as a depth map now: each clone wears the ramp as
+  a vertical alpha mask sampled at its own top and bottom, so a tall
+  row's lower half sits at the same fade as the shorter clones beside
+  it instead of all-or-nothing off its top edge - resting opacity
+  rises to .6, the just-covered floor to .12
+- split modes 7 and 8 pair a single chat column with the rail instead
+  of the 4-6 pair's two - 7 docks video + emote picker (stats out), 8
+  the same with stats back in; cycling, restoring and switching between
+  them re-docks in place without re-dealing the column
+
+### Rows & chat
+- a link's favicon and its host run move as one nowrap piece, so a
+  wrap that would strand the icon at the line's end carries it onto
+  the next line with the url - the path still wraps freely after,
+  and the split is cut before escaping so no entity severs
+- card and quote indents stop collapsing on hidden rows: a display:none
+  page (archived under split, hidden by links view) measured a name
+  column of 0, so every repin and card fill stamped --nx:0 and the
+  tweet card came back flush-left - the measurement now declines
+  unrendered rows and keeps the stamp they had
+
+### Resources
+- magazines get their own row: the left cluster (equator, jacobin,
+  current affairs, monthly review, organise!, jewish currents, +972,
+  scottish left review) plus a press & journals row for the
+  mainstream/policy/global-south mags pulled out of news, which keeps
+  its broadcasters, wires, dailies and investigative sites
+- equator owns up to being a magazine, not a zine - the wikipedia *
+  joins its link in the zines row
+- libcom leaves the zines row - a library, already listed under
+  organising's reading group, which now takes the /library target
+- the chappo trap house row gains an instagram link
+- the onion (us satire) caps extra links
+
+### Help popup
+- the emote picker's mix row owns up: the merged grid takes the active
+  sort, so 'freshest uses first' only held under 'use' - it now reads
+  'ordered by the active sort'
+- a rainbow palette list joins the motion options: classic keeps the
+  hashed pastel arcs and hand-tuned label strip, while vivid, candy,
+  ocean and sunset re-tint both - each banded palette keeps a mention's
+  whole sweep inside its hue range, and the fixed strip rides a
+  --rbwgrad var so one pick re-themes every rainbow at once
+
+### Sync & notice strips
+- the sync poles drift from the emote-rung gold at full width to twitch
+  purple at their narrowest, and the dead 30% track behind them drops
+  its line tint - only the draining fill shows
+- the update bar's reload pair settle at a third of the flank each,
+  centred in the space between bar edge and label - the label still
+  ellipsizes before the flanks do
+
+### Misc
+- bracketed descriptors holding their own links (the dsa row's join /
+  donate / chapters cluster) shrink to the note face in firefox too -
+  the wrap used surroundContents, which firefox refuses on ranges
+  spanning elements; extractContents + insertNode lands the same tree
+- preview cards in nameless rows (notices, gap markers) get the name
+  column's indent too - they anchor on what leads after the time; a
+  sub-mode switch re-measures card rows, not just reply rows
+- the header's rate graph and button row sit 1px from the header edges
+  after a second padding shave, the pinned corner buttons and
+  minimised-strip hover following suit
 
 ## 2026-10-11
 
@@ -42,17 +105,8 @@ not versions - the page ships continuously to Neocities.
   edge keeps covered clones from catching clicks, and a clone's hover
   ↩ arms the same reply context as a live row via data-omid, so a
   fading message can still be replied to before the wave takes it
-- the ghost fade reads as a depth map now: each clone wears the ramp as
-  a vertical alpha mask sampled at its own top and bottom, so a tall
-  row's lower half sits at the same fade as the shorter clones beside
-  it instead of all-or-nothing off its top edge - resting opacity
-  rises to .6, the just-covered floor to .12
 - the rail's emote and stats panes pin their scrollbars so a pane never
   reads as already bottomed-out
-- split modes 7 and 8 pair a single chat column with the rail instead
-  of the 4-6 pair's two - 7 docks video + emote picker (stats out), 8
-  the same with stats back in; cycling, restoring and switching between
-  them re-docks in place without re-dealing the column
 
 ### Emote picker
 - cells dedupe across providers up to case - 7tv's 'glorp' and bttv's
@@ -113,15 +167,6 @@ not versions - the page ships continuously to Neocities.
 - a watch-streak usernotice ('watched 150 consecutive streams…')
   rainbows the streak number itself, leaving the rest of the
   system-msg plain
-- a link's favicon and its host run move as one nowrap piece, so a
-  wrap that would strand the icon at the line's end carries it onto
-  the next line with the url - the path still wraps freely after,
-  and the split is cut before escaping so no entity severs
-- card and quote indents stop collapsing on hidden rows: a display:none
-  page (archived under split, hidden by links view) measured a name
-  column of 0, so every repin and card fill stamped --nx:0 and the
-  tweet card came back flush-left - the measurement now declines
-  unrendered rows and keeps the stamp they had
 - reply quotes and preview cards land on a normalised name-column
   anchor: the cluster's leading edge now counts every visible
   badge/role/aux chip, so a mod chip or left-docked sub count no
@@ -162,34 +207,11 @@ not versions - the page ships continuously to Neocities.
   answers across viewers
 
 ### Resources
-- magazines get their own row: the left cluster (equator, jacobin,
-  current affairs, monthly review, organise!, jewish currents, +972,
-  scottish left review) plus a press & journals row for the
-  mainstream/policy/global-south mags pulled out of news, which keeps
-  its broadcasters, wires, dailies and investigative sites
-- equator owns up to being a magazine, not a zine - the wikipedia *
-  joins its link in the zines row
-- libcom leaves the zines row - a library, already listed under
-  organising's reading group, which now takes the /library target
-- the chappo trap house row gains an instagram link
 - la izquierda diario joins the news south america group; the re Hasan
   row's bracketed links stay strong through the descriptor demotion
 - trans liberation and intersex rights join the activism movements list
 
 ### Misc
-- bracketed descriptors holding their own links (the dsa row's join /
-  donate / chapters cluster) shrink to the note face in firefox too -
-  the wrap used surroundContents, which firefox refuses on ranges
-  spanning elements; extractContents + insertNode lands the same tree
-- preview cards in nameless rows (notices, gap markers) get the name
-  column's indent too - they anchor on what leads after the time; a
-  sub-mode switch re-measures card rows, not just reply rows
-- the update bar's reload pair now stretch to fill their flanks, each
-  pinned at a third of the bar minimum - the label ellipsizes before a
-  button can
-- the header's rate graph and button row sit 1px from the header edges
-  after a second padding shave, the
-  pinned corner buttons and minimised-strip hover following suit
 - rate-window picks set the graph's frame and the rail's window set
   clamps to its short list; the spark save shrinks and survives quota
   pressure
@@ -256,15 +278,6 @@ not versions - the page ships continuously to Neocities.
   axes at once; the scrollback default rises to 5,000
 - the stream-status key drops its redundant live dot (the states carry
   their own) and breaks the favicon note onto its own line
-- the emote picker's mix row owns up: the merged grid takes the active
-  sort, so 'freshest uses first' only held under 'use' - it now reads
-  'ordered by the active sort'
-- a rainbow palette list joins the motion options: classic keeps the
-  hashed pastel arcs and hand-tuned label strip, while vivid, candy,
-  ocean and sunset re-tint both - each banded palette keeps a mention's
-  whole sweep inside its hue range, and the fixed strip rides a
-  --rbwgrad var so one pick re-themes every rainbow at once
-
 ### Rail
 - mode 4's emotes/stats seam drags vertically to share the column under
   a grab-hand cursor - the panes trade flex proportions, so the split
@@ -283,10 +296,8 @@ not versions - the page ships continuously to Neocities.
 
 ### Sync & notice strips
 - the sync poles breathe width in from their outer ends on a ~42s
-  cycle, drifting from the emote-rung gold at full width to twitch
-  purple at their narrowest; fixed 30%
-  tracks keep label swaps from shoving them, stripes scroll at 3s, the
-  brightness pulse is gone and the poles shave to 10px
+  cycle; fixed 30% tracks keep label swaps from shoving them, stripes
+  scroll at 3s, the brightness pulse is gone and the poles shave to 10px
 - the update bar sheds 2px of padding and settles on black with gold
   text; the jump-down circles' marching ring unclips and thickens to
   match the pill
