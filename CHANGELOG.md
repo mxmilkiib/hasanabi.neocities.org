@@ -76,6 +76,9 @@ not versions - the page ships continuously to Neocities.
   names then a hardcoded descriptive pass. the generated list now
   carries the descriptive labels in cycle order and the duplicate
   tail is gone
+- 'stream status' claims its label column: the row's <b> sat empty
+  with the name inlined into the right-hand text - it now heads the
+  left column, above the state dots that were already stacking there
 - the localStorage/PWA footnote gains an "&amp;c" heading, sitting as a
   titled row like stats / etc / blammobot
 - opening the help panel brings it forward over the emote picker, not
