@@ -83,8 +83,7 @@ not versions - the page ships continuously to Neocities.
   reload restores the full default scrollback instead of a fifth
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
-- spaces moves up above activism, heading the action block after the
-  union rows instead of trailing co-ops
+- spaces settles at the bottom of the resources page, after osint
 - unruly subjects joins channels/streams: chenjerai kumanyika's weekly
   politics show out of rowhome productions, carrying site, patreon,
   ig and the buzzsprout feed - which rides deprogram's service column
