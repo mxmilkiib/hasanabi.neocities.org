@@ -2143,7 +2143,7 @@
      the first cell past it opens the next row, so the ladder reads as
      rungs crossed on the way down rather than era nameplates */
   /* pending rungs with no cells after them still ride the last row's
-     tail - nothing follows them to break on. a dead stretch packs the
+     tail - nothing follows them to break on. the tail packs its
      squares back-to-back, so the break has to fire on a square sibling
      too, not only a cell */
   #emotePick.agerows #emoteGrid .eage + :is(button, .eage) { grid-column-start: 1; }
@@ -2452,7 +2452,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · 'tip' toggles the hover card · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells nudge a few slots over or wrap off the edge and back on, ripple, or queue one at a time; the grid pops, blurs, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - a dead stretch between cells collapses to the deepest square that bounds it, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · 'tip' toggles the hover card · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells nudge a few slots over or wrap off the edge and back on, ripple, or queue one at a time; the grid pops, blurs, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -12725,6 +12725,9 @@
         const ts = useTs[codeOf(x)] || 0;
         const age = now - ts;
         let m = '';
+        // a cell keeps only the deepest rung it crossed - a dead stretch
+        // of empty eras between two cells collapses to the one square
+        // that actually bounds what sits below it
         while (next < marks.length && age >= marks[next].t) {
           const mk = marks[next++];
           // past the record's horizon no stamp can ever be old enough -
@@ -12736,8 +12739,8 @@
           // elsewhere still reads lit - it is a real boundary
           if (deferPend) {
             if (!ts && mk.t > oldestAge) continue;
-            m += sqOf(mk, false);
-          } else m += sqOf(mk, !ts && mk.t > oldestAge);
+            m = sqOf(mk, false);
+          } else m = sqOf(mk, !ts && mk.t > oldestAge);
         }
         // the first rung beyond this cell's age is where it next crosses;
         // never-seen cells sit past every rung and never cross again

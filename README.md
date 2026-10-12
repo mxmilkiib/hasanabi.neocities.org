@@ -216,7 +216,9 @@ no dependencies beyond CDN-hosted fonts.
   cells mark where emotes were last used over that long ago - dim until
   recording has actually covered that span, then bold and
   accent-bordered - plus a solid accent square at the point recording
-  began (everything below it was never seen). A square an emote crossed
+  began (everything below it was never seen). A dead stretch of empty
+  eras between two cells collapses to the deepest square that bounds
+  what sits below it. A square an emote crossed
   this session turns gold, and the `▤`/`▥`/`▦` button - labelled with
   its mode number - cycles four states: squares flowing inline between
   cells (0), every era starting a fresh row (1), a row ending at its

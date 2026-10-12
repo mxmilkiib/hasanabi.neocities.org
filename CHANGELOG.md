@@ -237,6 +237,11 @@ not versions - the page ships continuously to Neocities.
   their images stretch to the cell's width (up to 42px tall) instead of
   the stock 34px cap, so KatTime / ppL / peepoRiot stop reading as thin
   strips. a picked zoom keeps its own cap
+- a dead stretch of empty eras stops printing its whole wall: each
+  cell keeps only the deepest rung it crossed - the one square that
+  actually bounds what sits below it - so a 60s-to-1h gap with no
+  emotes inside collapses to a single boundary instead of thirty
+  back-to-back lit squares
 - and a lone time-ago rung keeps a cell-sized floor: an age box on a
   row with no emotes beside it collapsed to its label's text height -
   it now stretches with its row but never under 60px
