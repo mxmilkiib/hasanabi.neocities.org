@@ -2417,7 +2417,7 @@
     <button id="copyUrl" class="hdr-btn" style="margin-top: 2px; width: 100%; height: 26px">copy settings url</button>
     <div class="sep">&nbsp;</div>
     <div style="display: flex; gap: 6px">
-    <button id="resetOpts" class="hdr-btn" style="flex: 3; height: 26px">reset all settings</button>
+    <button id="resetOpts" class="hdr-btn" style="flex: 3; height: 26px" title="wipe the saved options and reload clean - ?reset does the same via url">reset all settings</button>
     <button id="cacheBust" class="hdr-btn" style="flex: 1; height: 26px" title="reload the page bypassing the cache - keeps this url's settings">↻ clear cache</button>
     </div>
     <div class="sep">—</div>
@@ -9377,10 +9377,10 @@
     });
   });
 
-  document.getElementById('resetOpts').addEventListener('click', () => {
-    // every hasan-* key goes - an explicit list kept drifting stale beside
-    // the standalone picker/stat keys. Kept: login ('hasanabi-' prefix
-    // misses the filter anyway), plus pure refillable caches and stat data
+  // every hasan-* key goes - an explicit list kept drifting stale beside
+  // the standalone picker/stat keys. Kept: login ('hasanabi-' prefix
+  // misses the filter anyway), plus pure refillable caches and stat data
+  function resetOpts() {
     try {
       const keep = (k) => k === PEEK_KEY || k === GIF_KEY || k === PRON_KEY || k === SPARK_KEY ||
         k.startsWith('hasan-stats-') || k.startsWith(EMOTE_CACHE_PREFIX);
@@ -9395,7 +9395,8 @@
     // names the chat being watched, not an option
     const ch = new URLSearchParams(location.search).get('channel');
     location.href = location.pathname + (ch ? '?channel=' + encodeURIComponent(ch) : '');
-  });
+  }
+  document.getElementById('resetOpts').addEventListener('click', resetOpts);
   // cache bust: a fresh ?_=ts query makes this a new request, so any
   // stale copy gets bypassed; existing params (channel, state) survive
   document.getElementById('cacheBust').addEventListener('click', () => {
@@ -13213,6 +13214,11 @@
   {
     const q = new URLSearchParams(location.search);
     const flag = (k) => q.has(k) && q.get(k) !== '0';
+    // ?reset is the button via url: same wipe, same params-free reload.
+    // deferred past the script's end - resetOpts' keep-list reads
+    // PEEK_KEY, which is still in TDZ at this point of init.
+    // suppressSave stops the applies below re-writing keys in the gap
+    if (flag('reset')) { suppressSave = true; setTimeout(resetOpts); }
     // a preset is the base; colour/variant/shade (and everything else)
     // apply over it - ?theme=X&colour=Y keeps X's non-colour fields
     if (presetByName(q.get('theme'))) applyPreset(presetName(q.get('theme')));
