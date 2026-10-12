@@ -86,7 +86,9 @@ not versions - the page ships continuously to Neocities.
 - history persists 5,000 rows across reloads now (was 1,000) - a
   reload restores the full default scrollback instead of a fifth
 - baby milk action's nestlé boycott list joins the boycott row, the
-  oldest running consumer boycott's product index
+  oldest running consumer boycott's product index - flanked by the
+  1977 boycott's own article and coca-cola criticism; uk divest (the
+  fossil-fuel council/pension network) joins the divest row
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
 - spaces settles at the bottom of the resources page, after osint
