@@ -115,8 +115,8 @@ not versions - the page ships continuously to Neocities.
   like the other rare labels
 
 ### Header
-- the wrapped button strip drops a text line below the top row -
-  1em of margin where only 4px of row-gap stood before
+- the wrapped button strip sheds its breathing room - the header's
+  row-gap tightens from 4px to a 1px hairline when hdrwrap kicks in
 - the rate graph canvas gains 1px of air above and below
 
 ### Sync strip
