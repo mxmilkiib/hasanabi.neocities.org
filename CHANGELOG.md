@@ -77,6 +77,8 @@ not versions - the page ships continuously to Neocities.
   solidarity after community organizing
 - mobilize joins the dem-pol row between action network and votehub -
   the volunteer-shift platform
+- the dsa bracket's sub-links shed the tightened tracking - the usa
+  pol row wears .notrack, the first opt-out from tl's -0.05em
 - history persists 5,000 rows across reloads now (was 1,000) - a
   reload restores the full default scrollback instead of a fifth
 - diggers & dreamers joins spaces beside intentional community - the
