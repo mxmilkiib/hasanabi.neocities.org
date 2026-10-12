@@ -219,6 +219,10 @@ not versions - the page ships continuously to Neocities.
 - the merged grid's 'still to happen' squares flush after everything
   now - the parked emoji tail sat below the violet rungs, so cells
   printed under 'no items' squares that nothing should outrank
+- the age-rows button names its mode with a digit - modes 0 and 1
+  shared the ▤ glyph - and its tooltip spells the state out ('2 row
+  ends - a row closes at its last square'), the help row and the
+  readme's ?epage doc catching up to the fourth centred state too
 
 ### Misc
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls
