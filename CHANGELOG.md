@@ -201,6 +201,9 @@ not versions - the page ships continuously to Neocities.
   their images stretch to the cell's width (up to 42px tall) instead of
   the stock 34px cap, so KatTime / ppL / peepoRiot stop reading as thin
   strips. a picked zoom keeps its own cap
+- and a lone time-ago rung keeps a cell-sized floor: an age box on a
+  row with no emotes beside it collapsed to its label's text height -
+  it now stretches with its row but never under 60px
 
 ### Misc
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls

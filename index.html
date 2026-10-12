@@ -2277,7 +2277,10 @@
      the cell's width instead. a picked zoom's own cap still wins */
   #emotePick.names.namesb:not(.sm):not(.q):not(.th):not(.hf):not(.tw):not(.big) #emoteGrid button img { max-width: 100%; max-height: 42px; }
   #emotePick.names.namesb #emoteGrid .ename { text-align: center; }
-  #emotePick.names.namesb #emoteGrid .eage { height: auto; }
+  /* eage stretches to its grid row's height; a rung alone on a row (no
+     emotes beside it) keeps a cell-sized floor instead of collapsing to
+     the label's text height */
+  #emotePick.names.namesb #emoteGrid .eage { height: auto; min-height: 60px; }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }
   #emoteGrid .eage { height: 40px; display: flex; align-items: center; justify-content: center;
     /* the label purples with rung depth: --agep climbs the ladder toward
