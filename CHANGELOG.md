@@ -254,7 +254,7 @@ not versions - the page ships continuously to Neocities.
   square followed by another square never broke - the layout stayed
   merged while the centring math counted a break, and rows centred
   against phantom boundaries
-- the ladder picks up rungs at 150s, 210s and 4½m, thinning the
+- the ladder picks up rungs at 150s, 210s and 270s, thinning the
   long 2m-5m stretch where cells used to bunch between far-apart
   squares, and the sub-2m stretch becomes a ten-second walk -
   40s, 50s, 70s, 80s, 90s, 100s, 110s replacing the 45s/105s pair
