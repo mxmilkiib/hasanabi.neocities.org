@@ -69,6 +69,13 @@ not versions - the page ships continuously to Neocities.
   ellipsizes before the flanks do
 
 ### Misc
+- a fresh/reset profile copies a param-free settings url again:
+  theme=nightshade only writes when an option actually differs from the
+  preset (the name still lands then, so the recipient gets the base),
+  and size= stops emitting for the floor font - DEF.size still pointed
+  at the old 1.05rem floor's rung after the floor returned to 1rem. a
+  deliberate pick on the floor rung keeps its param, since a picked
+  16px isn't the floor for a recipient with a different root size
 - bracketed descriptors holding their own links (the dsa row's join /
   donate / chapters cluster) shrink to the note face in firefox too -
   the wrap used surroundContents, which firefox refuses on ranges

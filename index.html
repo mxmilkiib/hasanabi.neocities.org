@@ -5573,7 +5573,7 @@
   const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 11, 7, 10, 8, 9];
   // default option indices - the controls, the copy-url diffing and the
   // 'old-default' preset all read from here
-  const DEF = { shade: 7, size: 10, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4, hpos: 4 };
+  const DEF = { shade: 7, size: 9, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4, hpos: 4 };
   let shadeIdx = DEF.shade;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
@@ -9172,7 +9172,9 @@
     if (variantMode !== 'standard') q.set('variant', variantMode);
     if (shadeIdx !== DEF.shade) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
     if (fontSel.value !== 'roobert') q.set('font', fontSel.value);
-    if (fontCtl.get() !== DEF.size) q.set('size', FONT_SIZES[fontCtl.get()]);
+    // a pick on the floor rung still travels - 16px picked isn't 16px
+    // floored for a recipient whose root size isn't 16
+    if (fontCtl.get() !== DEF.size || fontPicked()) q.set('size', FONT_SIZES[fontCtl.get()]);
     if (lhCtl.get() !== DEF.lh) q.set('lh', LINE_HEIGHTS[lhCtl.get()]);
     if (weightCtl.get() !== DEF.weight) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (lsCtl.get() !== DEF.ls) q.set('ls', LS_STEPS[lsCtl.get()]);
@@ -9269,11 +9271,15 @@
     if (pin) {
       const p = THEME_PRESETS[pin], cmp = presetCmp();
       const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls', anim: 'anim', epzoom: 'epzoom' };
-      qs = new URLSearchParams([['theme', pin]]);
+      qs = new URLSearchParams();
       for (const [k, v] of q) {
         const f = PINNED[k];
         if (!f || !(f in p) || !presetFieldEq(p, f, cmp)) qs.append(k, v);
       }
+      // the default face needs no name: an untouched nightshade leaves a
+      // param-free url, and any real diff still earns theme=nightshade so
+      // the recipient lands on the same base
+      if (pin !== 'nightshade' || [...qs.keys()].length) qs = new URLSearchParams([['theme', pin], ...qs]);
     }
     return location.origin + location.pathname + ([...qs.keys()].length ? '?' + qs : '');
   }
