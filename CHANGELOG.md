@@ -52,6 +52,9 @@ not versions - the page ships continuously to Neocities.
 - free culture leads the libre page, promoted from seventh
 
 ### Help popup
+- opening the help panel brings it forward over the emote picker, not
+  just pressing on it - a re-apply on an already-open panel keeps
+  whatever order the last press settled
 - the emote picker's mix row owns up: the merged grid takes the active
   sort, so 'freshest uses first' only held under 'use' - it now reads
   'ordered by the active sort'

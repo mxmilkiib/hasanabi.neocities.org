@@ -8998,6 +8998,11 @@
   function applyHelp() {
     const showPanel = helpMode === 1;
     if (showPanel) helpForced = false;
+    // a fresh open comes forward like a press does
+    if (helpPanel.hidden && (showPanel || helpForced)) {
+      helpPanel.style.zIndex = 13;
+      emotePick.style.zIndex = '';
+    }
     helpPanel.hidden = !showPanel && !helpForced;
     // a borrowed stats pane follows the popup: back to the rail on close,
     // and re-borrowed if the panel reopens with stats as the live tab
