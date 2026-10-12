@@ -6334,7 +6334,7 @@
     const badgeRow = (id) => {
       const vs = Object.entries(bInfo[id])
         .sort((a, b) => (+a[0] - +b[0]) || byName(a[0], b[0]));
-      const name = BADGE_NAMES[id] || id.replace(/[-_]/g, ' ');
+      const name = BADGE_NAMES[id] || (id.includes('pokemon') ? pokeCase(id) : id).replace(/[-_]/g, ' ');
       const metric = bSort === 'use' ? (bUse(id) ? bUse(id).toLocaleString('en') : '') : vs.length;
       // the sentence-length text goes on tooltips so an opened set
       // lists every version compactly: icon, title, count
@@ -6381,7 +6381,7 @@
         // sub-gifter count - win outright
         const raw = id.replace(/[-_]/g, ' ');
         const name = ({ subscriber: 'subbed', moderator: 'mod',
-          premium: 'Prime subscriber', 'bot-badge': 'chat bot' })[id] || BADGE_NAMES[id] || raw;
+          premium: 'Prime subscriber', 'bot-badge': 'chat bot' })[id] || BADGE_NAMES[id] || (id.includes('pokemon') ? pokeCase(raw) : raw);
         const vt = id === 'premium' ? '' : id.includes('pokemon') ? pokeCase((v.t || '').trim()) : badgeCase((v.t || '').trim());
         const label = id === 'sub-gifter' ? `${ver} gifted sub${+ver === 1 ? '' : 's'}` :
           BADGE_NAMES[id] || vt || name;

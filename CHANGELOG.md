@@ -216,6 +216,10 @@ not versions - the page ships continuously to Neocities.
   ellipsizes before the flanks do
 
 ### Stats
+- the pokemon badge names capitalise in the two places the version
+  title couldn't reach: the folded set's own name and title-less
+  versions in the ranked list - both fell back to the raw lowercase
+  set id
 - the glorps heading's icon double-clicks into the message box, same
   as an emote in chat - it carries the channel's real glorp token
 - msg bursts stop flagging half of a busy session: the trigger scales
