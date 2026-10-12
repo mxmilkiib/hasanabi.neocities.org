@@ -59,6 +59,8 @@ not versions - the page ships continuously to Neocities.
 - a temp aid groups row lands under mutual aid: brighton abc, bristol
   abc, the abcf federation and abc wien for prisoner support, plus the
   325 collective's repression docs - marked for folding later
+- an action groups row follows it, opening with the hunt saboteurs
+  association
 
 ### Help popup
 - the localStorage/PWA footnote gains an "&amp;c" heading, sitting as a
