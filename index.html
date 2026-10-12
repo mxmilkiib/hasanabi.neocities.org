@@ -6112,26 +6112,20 @@
     const bSamps = bSeries.map((r, i) => [r, rateHistT[bOff + i]])
       .filter(([r, t]) => Number.isFinite(r) && t && r >= 4)
       .sort((a, b) => b[0] - a[0]);
-    // distinct bursts only: each pick suppresses every sample within 10s
-    // of it, and the walk goes down by rate so a taller spike inside the
-    // window 'overwrites' its neighbours rather than listing beside them.
-    // a strong similar-rate flow stretches the window to 30s
-    const bPicks = [];
-    for (const s of bSamps) {
-      if (bPicks.every((p) => Math.abs(p[1] - s[1]) > 10000 &&
-          !(Math.abs(p[1] - s[1]) <= 30000 && s[0] >= p[0] - .05))) bPicks.push(s);
-      if (bPicks.length === 5) break;
+    // distinct bursts only: qualifying samples chain into one event
+    // while no gap between them runs past 30s, and each event lists
+    // once at its peak - a sustained flow can't re-list its own ramp
+    const bEvents = [];
+    for (const [r, t] of [...bSamps].sort((a, b) => a[1] - b[1])) {
+      const e = bEvents[bEvents.length - 1];
+      if (e && t - e.t1 <= 30000) { e.t1 = t; if (r > e.r) e.r = r; }
+      else bEvents.push({ r, t0: t, t1: t });
     }
-    // a sustained flow notes its earliest highest: the listed time rolls
-    // back to the first sample inside 30s that reached the pick's rate
-    const bursts = bPicks.map(([r, t]) => {
-      const t0 = bSamps.reduce((m, [r2, t2]) =>
-        Math.abs(t2 - t) <= 30000 && r2 >= r - .05 ? Math.min(m, t2) : m, t);
-      // bt0/bt1 frame the burst on the session graph: the first matching
-      // window's start through the peak window's end
-      return `<div class="st-row" data-bt0="${t0 - 5000}" data-bt1="${t}"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
-        `<a class="at" href="https://tv.supa.sh/logs?c=${encodeURIComponent(sc || CHANNEL)}&d=${logDay(t0)}" target="_blank" rel="noopener" title="this day in the supa logs">${fmtRowTime(new Date(t0))}</a></span></div>`;
-    }).join('');
+    // bt0/bt1 frame the event on the session graph: the first qualifying
+    // window's start through the last one's end
+    const bursts = bEvents.sort((a, b) => b.r - a.r).slice(0, 5).map(({ r, t0, t1 }) =>
+      `<div class="st-row" data-bt0="${t0 - 5000}" data-bt1="${t1}"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
+        `<a class="at" href="https://tv.supa.sh/logs?c=${encodeURIComponent(sc || CHANNEL)}&d=${logDay(t0)}" target="_blank" rel="noopener" title="this day in the supa logs">${fmtRowTime(new Date(t0))}</a></span></div>`).join('');
     // badge reference: the channel's own sets lead, then the badges that
     // actually turn up in chat, then every remaining global set a-z; each
     // set collapses so the hundreds of promo sets stay out of the way

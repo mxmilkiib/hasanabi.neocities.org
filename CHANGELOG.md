@@ -69,6 +69,11 @@ not versions - the page ships continuously to Neocities.
   ellipsizes before the flanks do
 
 ### Misc
+- msg bursts list distinct events again: qualifying samples now chain
+  into one entry while no gap runs past 30s, so a sustained flow shows
+  its peak once with the onset time instead of re-listing its ramp as
+  near-duplicate rows sharing the displayed second. hover bands the
+  whole event on the session graph
 - a fresh/reset profile copies a param-free settings url again:
   theme=nightshade only writes when an option actually differs from the
   preset (the name still lands then, so the recipient gets the base),
