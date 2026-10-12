@@ -865,7 +865,12 @@
   /* in the left-positioned sub modes the chip is a direct row child sat
      flush after the time/channel tag - a hair of air keeps it off it */
   .row > .role.sub { margin-left: 1px; }
-  .role.sub[title] { color: var(--text-dim); }
+  /* counted chips carry the Yyr, Xm tooltip now, so the no-count dim
+     keys off the placeholder's exact title rather than [title] alone */
+  .role.sub[title="No subscriber months reported"] { color: var(--text-dim); }
+  /* ?subg: a counted chip climbs teal → accent on --subp, its month
+     count as a % of the 120-month ceiling */
+  body.subgrad .role.sub[data-mo] { color: color-mix(in srgb, #4fbecd, var(--accent) var(--subp, 0%)); }
   /* the bits chip and first-time poster celebrate in the shared rainbow
      sweep - their role colours would hide the transparent-clipped
      gradient otherwise */
@@ -2386,7 +2391,7 @@
     <div><b>▦</b> <span>zebra striping: <span id="helpZebraList"></span> - bg shading on alternating rows<sup>†</sup></span></div>
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
-    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription<sup>†</sup></span></div>
+    <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; months gradient: <span id="helpSubgList"></span> shades counted chips teal → accent as the count climbs to 120 months, and a counted chip's tooltip restates the span - say 2yr, 10m<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; the button's click lists every mode while the wheel cycles; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them, and its left edge drags the chat columns narrower or wider - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat; the last trio run one chat column instead: video + emotes, a vertical split with emotes under the chat and stats under the video, or emotes alone - the video floats the same way<sup>†</sup></span></div>
@@ -4348,9 +4353,14 @@
         aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? 'md' : '[ mod. ]'}</span>`);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
+      // a counted chip carries the months in data-mo, restates them as
+      // Yyr, Xm on the tooltip, and stamps --subp (the count as a % of
+      // the 120-month ceiling) for the subg gradient to read
+      const subSt = (subM ? `--subp:${Math.min(100, Math.round(+subM[1] / 120 * 100))}%` : '') +
+        (SUB_MODES[subMode] === 'num-left' ? (subM ? ';' : '') + 'margin-right:6px' : '');
       // bots never carry a sub count - skip the placeholder chip entirely
       const subHtml = shimmer && !subM ? '' :
-        `<span class="role sub"${subM ? '' : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${SUB_MODES[subMode] === 'num-left' ? ' style="margin-right:6px"' : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
+        `<span class="role sub"${subM ? ` data-mo="${+subM[1]}" title="${subAgeTxt(+subM[1])}"` : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${subSt ? ` style="${subSt}"` : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits rbw">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first rbw">[first]</span>');
       // left modes lead with the chip ahead of the aux cluster and the
@@ -5722,6 +5732,7 @@
     else if (a.classList.contains('helpTimes')) { setTimes(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
+    else if (a.classList.contains('helpSubg')) { setSubGrad(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpEonly')) { emoteMode = +a.dataset.idx; applyEmoteMode(); saveOpts(); }
     else if (a.classList.contains('helpSplit')) { setSplit(+a.dataset.idx + 1); saveOpts(); }
     else if (a.classList.contains('helpVideo')) { const v = +a.dataset.idx === 1; railEl.hidden ? setVideo(v) : setRailVid(v ? 'dock' : 'off'); saveOpts(); }
@@ -7992,7 +8003,7 @@
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
-      subMode,
+      subMode, subg: subGrad ? 1 : 0,
       zebra: zebraLevel,
       pause: pauseOnText,
       scrollback: MAX_MESSAGES,
@@ -8117,6 +8128,7 @@
       subMode = 'spark' in o ? [4, 2, 0][o.sub] : ('hfspx' in o || 'hpfs' in o) ? o.sub : [0, 2, 4][o.sub];
       applySubMode();
     }
+    if (o.subg !== undefined) setSubGrad(!!o.subg);
     if (o.zebra != null) setZebra(o.zebra === true ? 2 : +o.zebra || 0);
     if (typeof o.pause === 'boolean') setPause(o.pause);
     if (SCROLLBACK_SIZES.includes(o.scrollback)) setScrollback(o.scrollback);
@@ -8668,6 +8680,27 @@
   // ---- sub badge placement: hidden / left of name / right edge of row ----
   const SUB_MODES = ['right', 'num-right', 'left', 'num-left', 'hidden'];
   let subMode = 3;
+  // a month count as a span: 7m under a year, 2yr, 10m past it
+  const subAgeTxt = (m) => m >= 12 ? `${Math.floor(m / 12)}yr, ${m % 12}m` : `${m}m`;
+  // stamps a counted chip's data-mo / tooltip / --subp rung - the render
+  // path inlines them, this catches rows restored from saved html and
+  // chips conjured without a count
+  const subAgeStamp = (sub) => {
+    if (sub.dataset.mo) return;
+    const mo = +sub.textContent.replace(/\D/g, '');
+    if (!mo) return;
+    sub.dataset.mo = mo;
+    sub.title = subAgeTxt(mo);
+    sub.style.setProperty('--subp', `${Math.min(100, Math.round(mo / 120 * 100))}%`);
+  };
+  // subg: counted chips shade teal → accent with the month count
+  let subGrad = false;
+  function setSubGrad(on) {
+    subGrad = !!on;
+    document.body.classList.toggle('subgrad', subGrad);
+    if (on) document.querySelectorAll('.row .role.sub').forEach(subAgeStamp);
+    markHelp('helpSubg', subGrad ? 1 : 0);
+  }
 
   function applySubMode() {
     const mode = SUB_MODES[subMode];
@@ -8719,9 +8752,12 @@
       };
       if (sub) {
         sub.hidden = mode === 'hidden';
+        // rows restored from saved html predate data-mo - stamp them so
+        // the tooltip and the subg ramp can read the count
+        subAgeStamp(sub);
         // restyle the chip text to match: [sub 12] vs compact 12
         const months = (sub.title || sub.dataset.tt) === 'No subscriber months reported'
-          ? ' -- ' : sub.textContent.replace(/\D/g, '');
+          ? ' -- ' : (sub.dataset.mo || sub.textContent.replace(/\D/g, ''));
         if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? '--' : '[sub --]')
           : mode.startsWith('num') ? months.padStart(2, '0') : `[sub ${months}]`;
         // the lead gap belongs to num-left rows only - clear it in other
@@ -9249,6 +9285,7 @@
     else if (timeIdx === 4) q.set('times', '12hsec');
     if (shadLevel) q.set('shadow', shadLevel);
     if (SUB_MODES[subMode] !== 'num-left') q.set('sub', SUB_MODES[subMode]);
+    if (subGrad) q.set('subg', '1');
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
     else if (document.body.classList.contains('hdrmin')) q.set('min', '1');
@@ -13303,6 +13340,7 @@
     if (q.has('times')) setTimes({ nosec: 1, '24h': 1, '24hsec': 2, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
     if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
+    if (q.has('subg')) setSubGrad(flag('subg'));
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
     if (q.has('help')) {
       const v = q.get('help'), i = HELP_MODES.indexOf(v);
@@ -13432,7 +13470,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpEonly: EMOTE_MODES, helpSplit: SPLIT_NAMES.map((n) => n.replace(/ \(.*$/, '')),
+    helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpEonly: EMOTE_MODES, helpSplit: SPLIT_NAMES.map((n) => n.replace(/ \(.*$/, '')),
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
@@ -13560,6 +13598,7 @@
   markHelp('helpTimes', timeIdx);
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
+  markHelp('helpSubg', subGrad ? 1 : 0);
   markHelp('helpEonly', emoteMode);
   markHelp('helpSplit', splitLevel - 1);
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);

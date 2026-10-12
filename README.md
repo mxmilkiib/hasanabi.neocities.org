@@ -158,7 +158,8 @@ no dependencies beyond CDN-hosted fonts.
 
 - Rows - timestamps, linked names, real badge icons (mod, VIP, sub
   flair, bits, founder…) with text chips as fallback, and `[sub N]` /
-  `[bits]` / `[first]` chips.
+  `[bits]` / `[first]` chips. A counted sub chip tooltips the span as
+  `2yr, 10m` and can shade teal → accent with tenure (`?subg`).
 - Replies - the full original is quoted in a ruled block above the
   line; click it to jump back to the source row.
 - `/me` actions, `!command` and `#tag` lines render in italics (names,
@@ -514,6 +515,7 @@ force off.
 | `shadow` | `0`–`2` | text shadow level |
 | `video` | flag / `dock` / `float` / `off` | stream video overlay; rail placement in mode 4, shown/hidden in 5–6 |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
+| `subg` | `1` | sub-chip months gradient - teal → accent across 120 months |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
 | `lbls` | flag | header button labels shown beside each header control - independent of the `?` cycle |
