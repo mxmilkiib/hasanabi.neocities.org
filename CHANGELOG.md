@@ -189,9 +189,9 @@ not versions - the page ships continuously to Neocities.
   to 3x the channel's median rate (median, so the bursts themselves
   can't float it), floored at the old 4/s for quiet streams - the
   empty-state text reports the live bar
-- the session panel reads as a label/value list now: '1,234 unique
-  chatters' splits into a flush-left label and a right-aligned count,
-  matching the storage and ranked rows' shape
+- the session panel reads as a value/label list now: '1,234 unique
+  chatters' splits into a flush-left count and a right-hugging label,
+  the ranked rows' shape mirrored
 
 ### Emote picker
 - the Aa names toggle becomes a three-state cycle: off → the code

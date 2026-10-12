@@ -1244,6 +1244,10 @@
   #rail #statsBody .st-trio { gap: 0 14px; }
   /* the rail's session rows pack tighter than the popup's 1.7 pitch */
   #rail #statsBody .st-trio .st-panel:first-child .st-row { line-height: 1.4; }
+  /* the session panel mirrors the ranked rows - its count leads on the
+     left and the label hugs the right edge where the count would sit */
+  #statsBody .st-trio .st-panel:first-child .st-row i { margin-left: 0; padding-left: 0; }
+  #statsBody .st-trio .st-panel:first-child .st-row .nm { margin-left: auto; }
   #statsBody .st-key .st-sw { display: inline-block; width: .7em; height: .7em;
     border-radius: 2px; margin: 0 3px -1px 4px; }
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
@@ -6400,11 +6404,11 @@
       `<div class="st-trio">` +
         `<div class="st-panel">` +
         `<div class="st-h">session${sc ? ' · #' + escapeHTML(sc) : ''}</div>` +
-        `<div class="st-row"><span class="nm">unique chatter${nMsgs.size === 1 ? '' : 's'}</span><i>${nMsgs.size.toLocaleString('en')}</i></div>` +
-        `<div class="st-row"><span class="nm">message${total === 1 ? '' : 's'} rendered</span><i>${total.toLocaleString('en')}</i></div>` +
-        `<div class="st-row"><span class="nm">badge${bSeenN === 1 ? '' : 's'} seen</span><i>${bSeenN}</i></div>` +
-        `<div class="st-row"><span class="nm">tracking since</span><i>${sinceTxt} · ${fmtSpan(Date.now() - statsSince)}</i></div>` +
-        (pvMax ? `<div class="st-row"><span class="nm">peak viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span><i>${pvMax.toLocaleString('en')}</i></div>` : '') +
+        `<div class="st-row"><i>${nMsgs.size.toLocaleString('en')}</i><span class="nm">unique chatter${nMsgs.size === 1 ? '' : 's'}</span></div>` +
+        `<div class="st-row"><i>${total.toLocaleString('en')}</i><span class="nm">message${total === 1 ? '' : 's'} rendered</span></div>` +
+        `<div class="st-row"><i>${bSeenN}</i><span class="nm">badge${bSeenN === 1 ? '' : 's'} seen</span></div>` +
+        `<div class="st-row"><i>${sinceTxt} · ${fmtSpan(Date.now() - statsSince)}</i><span class="nm">tracking since</span></div>` +
+        (pvMax ? `<div class="st-row"><i>${pvMax.toLocaleString('en')}</i><span class="nm">peak viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span></div>` : '') +
         scopeBtns + `</div>` +
         `<div class="st-panel"><div class="st-h">msg bursts</div>` +
         (bursts || `<div class="st-row"><span class="nm">no ${Math.round(bMin)}+ msgs/s bursts yet</span></div>`) + `</div>` +
