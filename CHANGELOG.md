@@ -72,6 +72,9 @@ not versions - the page ships continuously to Neocities.
   ellipsizes before the flanks do
 
 ### Misc
+- nightshade stops pinning the quarter-size emote grid - the preset now
+  names 1x, so a fresh profile and any nightshade apply both land on the
+  normal cell size (a saved zoom pick still overrides)
 - msg bursts list distinct events again: qualifying samples now chain
   into one entry while no gap runs past 30s, so a sustained flow shows
   its peak once with the onset time instead of re-listing its ramp as
