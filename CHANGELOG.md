@@ -75,6 +75,8 @@ not versions - the page ships continuously to Neocities.
   after deliberative - glossed council democracy
 - organising's concept cluster gains community building before and
   solidarity after community organizing
+- mobilize joins the dem-pol row between action network and votehub -
+  the volunteer-shift platform
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
 - spaces moves up above activism, heading the action block after the
