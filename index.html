@@ -7828,6 +7828,7 @@
       archDb = req.result;
       document.getElementById('findArch').hidden = false;
       archPrune();
+      healUseArchive();
     };
     req.onerror = () => { archDb = null; };
   }
@@ -12146,6 +12147,37 @@
     }
     if (healed) saveUse();
   }
+  // deeper hole: rows whose debounced history save never landed never
+  // reach the dom heal either - but the archive writes synchronously at
+  // render, so it holds every use the dead band is missing. walk records
+  // newer than the blob's last write and re-touch their stamps the same
+  // way; runs once per emote-set pass since name resolution needs them
+  function healUseArchive() {
+    if (!archDb || !savedUse.w || !(chanSets[CHANNEL] || twSets.length)) return;
+    let healed = false;
+    const twCodes = new Set();
+    for (const s of twSets) for (const e of s.emoteList) twCodes.add(e.code);
+    try {
+      const tx = archDb.transaction('msgs', 'readonly');
+      tx.objectStore('msgs').index('ts')
+        .openCursor(IDBKeyRange.lowerBound(savedUse.w + 1)).onsuccess = (e) => {
+          const cur = e.target.result;
+          if (!cur) return;
+          const r = cur.value;
+          if (r.kind === 'msg' && r.ts >= useT0 && r.text)
+            for (const tok of r.text.split(/\s+/)) {
+              // the archived text is the whole row - the chatter's own
+              // nick can coincide with an emote code, so skip name tokens
+              if (tok === r.name || tok === r.login) continue;
+              const en = emoteNameOf(r.ch || CHANNEL, tok);
+              const n = en || (twCodes.has(tok) || EMOJI_SET.has(tok) ? tok : null);
+              if (n && r.ts > (useTs[n] || 0)) { useTs[n] = r.ts; healed = true; }
+            }
+          cur.continue();
+        };
+      tx.oncomplete = () => { if (healed) { saveUse(); if (!emotePick.hidden) heldOr(); } };
+    } catch {}
+  }
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
@@ -13255,6 +13287,9 @@
       emoteAnim = chanSets[ech].emoteAnim;
     }
     retokenizeRows();
+    // a loaded set widens what the archive heal can resolve - idempotent,
+    // so it just re-runs as more rooms' name maps land
+    healUseArchive();
     if (ech === CHANNEL && !emotePick.hidden) rebuildPicker();
     // lastBroadcast.startedAt is actually the last run's END for an
     // offline channel; the VOD carries the real start and end. A cached

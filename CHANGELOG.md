@@ -215,7 +215,10 @@ not versions - the page ships continuously to Neocities.
   left a dead band in the ladder over that stretch - each restored
   emote's stamp now re-touches at its row's own time, floored at the
   recorded era's start so a reset stays reset, and counts stay put
-  since the row tallied them when it first ran
+  since the row tallied them when it first ran. rows whose history save
+  never landed heal off the archive instead - its records write
+  synchronously at render, so the stretch between the blob's last write
+  and the reload re-stamps once the emote sets land
 - the merged grid's 'still to happen' squares flush after everything
   now - the parked emoji tail sat below the violet rungs, so cells
   printed under 'no items' squares that nothing should outrank
