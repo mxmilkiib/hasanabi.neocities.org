@@ -238,10 +238,9 @@ not versions - the page ships continuously to Neocities.
   shared the ▤ glyph - and its tooltip spells the state out ('2 row
   ends - a row closes at its last square'), the help row and the
   readme's ?epage doc catching up to the fourth centred state too
-- centred age rows now bank the sub-minute era: a row holding the 45s
-  square ends at it even when later rungs or cells share the row, so
-  minute-plus eras always open on a fresh line, and the 3m square got
-  the same hard end - the fresh eras each closing their own row
+- centred age rows briefly banked the sub-minute era on a hard 45s/3m
+  break list - the forced rung ends are gone again and mode 3 simply
+  centres whatever rows the natural wrap forms
 - pending rungs past the record's horizon stop printing: a 'still to
   happen' square only makes sense while a stamp could still age into
   it, and nothing can out-age the tracking record's own start - so a
@@ -261,7 +260,8 @@ not versions - the page ships continuously to Neocities.
 - the option row breathes: 'still' moves left of 'anim' so the filter
   pair runs still->anim->pause, 'Aa' settles between the zoom group
   and the sort group, and wider seams split the chips into zoom /
-  names / sort / filter / hold
+  names / sort / filter / hold, with 'mix' gaining the same seam off
+  the source tabs
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever
