@@ -12122,6 +12122,24 @@
     useSaveTimer = setTimeout(() => { useSaveTimer = 0; putUse(); }, 4000);
   };
   addEventListener('pagehide', () => { try { putUse(); } catch {} });
+  // rows restored whole never pass render, so the uses they carry only
+  // survive where a save landed - a frozen or crashed tab drops the tail
+  // of debounced writes and the ladder opens a dead band over that
+  // stretch. re-touch each restored emote's stamp at its row's own time,
+  // floored at the recorded era's start so a deliberate wipe stays wiped;
+  // counts were tallied when the row first ran, so only recency heals
+  {
+    let healed = false;
+    for (const row of mainEl.querySelectorAll('.row[data-ts]')) {
+      const rts = +row.dataset.ts || 0;
+      if (rts < useT0 || row.classList.contains('local')) continue;
+      for (const im of row.querySelectorAll('img.emote')) {
+        if (!im.alt || im.closest('.reply,.aux')) continue;
+        if (rts > (useTs[im.alt] || 0)) { useTs[im.alt] = rts; healed = true; }
+      }
+    }
+    if (healed) saveUse();
+  }
   const flashSet = new Set();
   const flashTimers = new Map();
   const flashT0 = new Map();
@@ -12490,7 +12508,9 @@
         for (const c of EMOJIS) if (ehit(c)) ejs.push({ c, r: ejiBtn(c) });
       all.sort((a, b) => epickSort === 'az' ? byFam(a.c, b.c) : byUse(a.c, b.c));
       if (epickSort === 'use') ejs.sort((a, b) => (useTs[b.c] || 0) - (useTs[a.c] || 0));
-      h += aged(all, (x) => x.c, (x) => x.r) + ejs.map((x) => x.r).join('');
+      // deferPend so the 'still to happen' squares flush after the parked
+      // emoji too - nothing should ever print below them
+      h += aged(all, (x) => x.c, (x) => x.r, true) + ejs.map((x) => x.r).join('');
     } else {
       // codes dedupe across sources too - 7tv/bttv both ship <3 and the
       // classics, and 'Glorp'/'glorp' pair up across them - first
@@ -12535,11 +12555,12 @@
       // a-z keeps the fixed provider order; use sorts sections busiest-first
       if (epickSort === 'use') secs.sort((a, b) => b[0] - a[0]);
       for (const s of secs) h += s[1];
-      // pending rungs trail the whole grid once - a per-section flush
-      // would park violet squares ahead of later sections' used cells
-      if (epickSort === 'use')
-        for (const mk of marks) if (mk.t > oldestAge) h += sqOf(mk, true);
     }
+    // pending rungs trail the whole grid once - a per-section flush would
+    // park violet squares ahead of later sections' used cells, and the
+    // merged grid's parked emoji the same way
+    if (epickSort === 'use')
+      for (const mk of marks) if (mk.t > oldestAge) h += sqOf(mk, true);
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
     insIdx = new Map();
     for (const b of emotePick.querySelectorAll('button[data-ins]'))

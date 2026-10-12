@@ -210,6 +210,15 @@ not versions - the page ships continuously to Neocities.
 - cell tooltips say what they are: 'KatTime - 7tv animated emote -
   click to add to the input' instead of a bare name - provider pair;
   emoji cells name their keywords and the click's effect too
+- a reload heals the use ladder off restored rows: rows restored whole
+  never pass render, so a save that never landed (frozen tab, crash)
+  left a dead band in the ladder over that stretch - each restored
+  emote's stamp now re-touches at its row's own time, floored at the
+  recorded era's start so a reset stays reset, and counts stay put
+  since the row tallied them when it first ran
+- the merged grid's 'still to happen' squares flush after everything
+  now - the parked emoji tail sat below the violet rungs, so cells
+  printed under 'no items' squares that nothing should outrank
 
 ### Misc
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls
