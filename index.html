@@ -4504,6 +4504,12 @@
           // so the tail pattern can't reach it; the count runs rainbow
           .replace(/\b(thanks?\s+(?:you\s+)?|thx\s+)(?:@)?([a-z0-9_]{1,25})(\s+for\s+the\s+)(\d[\d,]*)(\s+gift)/i,
             (m, pre, who, mid, n, tail) => `${pre}${nwho(who)}${mid}<b class="rbw">${n}</b>${tail}`)
+          // 'thank you NAME for the N bits' - same mid-line shape as the
+          // gifties line; a bare 'thanks for the N bits' just paints the
+          // count, which the named pass already left wrapped
+          .replace(/\b(thanks?\s+(?:you\s+)?|thx\s+)(?:@)?([a-z0-9_]{1,25})(\s+for\s+the\s+)(\d[\d,]*)(\s+bits?\b)/i,
+            (m, pre, who, mid, n, tail) => `${pre}${nwho(who)}${mid}<b class="rbw">${n}</b>${tail}`)
+          .replace(/\b(for\s+the\s+)(\d[\d,]*)(\s+bits?\b)/i, '$1<b class="rbw">$2</b>$3')
           .replace(/\b(rolls?\s+)(\d[\d,]*\s*\/\s*\d[\d,]*)/gi, '$1<b>$2</b>');
       }
       // a text row ending in a run of emotes/emoji gets that run wrapped;

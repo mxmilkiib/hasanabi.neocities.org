@@ -67,6 +67,9 @@ not versions - the page ships continuously to Neocities.
   gifties' - gets the same treatment as the tail pattern: the name
   links in the thanked chatter's colour, and the gift count runs the
   rainbow sweep
+- fossa's bits thanks paint the count the same way: 'thank you NAME
+  for the 100 bits' links the name and rainbows the number, and a
+  bare 'thanks for the N bits' just rainbows the number
 
 ### Resources
 - vimium joins extra links beside scroll anywhere - the
