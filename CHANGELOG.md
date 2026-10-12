@@ -247,6 +247,9 @@ not versions - the page ships continuously to Neocities.
   square followed by another square never broke - the layout stayed
   merged while the centring math counted a break, and rows centred
   against phantom boundaries
+- the ladder picks up half-minute rungs at 2½, 3½ and 4½, thinning the
+  long 2m-5m stretch where cells used to bunch between far-apart
+  squares
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever
