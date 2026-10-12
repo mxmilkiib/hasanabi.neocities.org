@@ -167,6 +167,8 @@ not versions - the page ships continuously to Neocities.
   boxed chips gain a 3px vertical margin - adjacent lines sat
   line-height tight, and the selected ring's -5px reach now clears the
   next line's box with a px to spare
+- 'font menu' shortens to 'font', and its option names bump to 1.333rem
+  so each face's glyphs are legible enough to tell apart
 
 ### Sync & notice strips
 - the sync poles drift from the emote-rung gold at full width to twitch
