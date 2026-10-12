@@ -89,6 +89,8 @@ not versions - the page ships continuously to Neocities.
   cluster, right after pedagogy of the oppressed - it is freire's term
 - open manufacturing joins open design's concept pair on the libre
   page - the production-side sibling
+- consensus democracy joins the participatory row's democracy models;
+  marxian economics heads the marxism cluster's economic trio
 - baby milk action's nestlé boycott list joins the boycott row, the
   oldest running consumer boycott's product index - flanked by the
   1977 boycott's own article and coca-cola criticism; uk divest (the
