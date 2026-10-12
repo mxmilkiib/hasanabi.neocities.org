@@ -228,6 +228,10 @@ not versions - the page ships continuously to Neocities.
   readme's ?epage doc catching up to the fourth centred state too
 
 ### Misc
+- tooltips break their clauses onto real lines now: ' - ' was only ever
+  the separator titles are written in, so the parked-title tooltip and
+  the emote card's source line translate it to linebreaks at display
+  instead of serving hyphen-joined sentences
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls
   back to two columns (the url path's clamp still stopped at 6 after the
   saved-opts one went to 8), the spark's static label says 4 minutes like

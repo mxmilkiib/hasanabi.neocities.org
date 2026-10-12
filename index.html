@@ -539,7 +539,7 @@
   #epop[hidden] { display: none; }
   #epop .epbig { display: block; margin: 0 auto 5px; max-width: 112px; max-height: 112px; }
   #epop .epemo { font-size: 64px; line-height: 1.1; margin: 0; max-width: none; max-height: none; }
-  #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; }
+  #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; white-space: pre-line; }
   #vid #vidFrame { position: absolute; inset: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
@@ -14206,6 +14206,9 @@
     .replace(/(cdn\.frankerfacez\.com\/emote\/\d+\/)1$/, '$14')   // ffz
     .replace(/(emoticons\/v2\/[^/]+\/(?:default|animated)\/(?:dark|light))\/2\.0$/, '$1/3.0'); // twitch
   const epopHide = () => { clearTimeout(epopT); epopT = 0; epopEl = null; epop.hidden = true; };
+  // ' - ' is the clause separator every title string is written with;
+  // the tooltip surfaces wrap on real linebreaks, so translate at display
+  const ttLines = (s) => s.split(' - ').join('\n');
   function epopShow(t) {
     const btn = t.tagName === 'BUTTON' ? t : null;
     const img = btn ? btn.querySelector('img') : t;
@@ -14232,7 +14235,7 @@
     const sub = isEji ? label : dash > 0 ? label.slice(dash + 3) : '';
     if (sub) {
       const s = document.createElement('div');
-      s.className = 'epsrc'; s.textContent = sub;
+      s.className = 'epsrc'; s.textContent = ttLines(sub);
       epop.appendChild(s);
     }
     epop.hidden = false;
@@ -14300,7 +14303,7 @@
     if (el) {
       el.dataset.tt = el.title;
       el.removeAttribute('title');
-      ttEl.textContent = el.dataset.tt;
+      ttEl.textContent = ttLines(el.dataset.tt);
       ttMove(e);
     }
   });
@@ -14312,7 +14315,7 @@
       if (v != null) {
         ttTarget.dataset.tt = v;
         ttTarget.removeAttribute('title');
-        ttEl.textContent = v;
+        ttEl.textContent = ttLines(v);
       }
     }
   }).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['title'] });
