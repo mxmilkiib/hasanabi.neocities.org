@@ -14,7 +14,8 @@ not versions - the page ships continuously to Neocities.
 - the column button's click opens a menu listing all eight modes with
   their glyphs like the font picker does - the wheel still cycles and
   shift-click still steps back; portrait-only levels sit disabled in
-  the list
+  the list. 'one column' wears a single ▮ now instead of sharing the
+  two-column pair, and the button icon follows it at level 1
 - the ghost fade reads as a depth map now: each clone wears the ramp as
   a vertical alpha mask sampled at its own top and bottom, so a tall
   row's lower half sits at the same fade as the shorter clones beside

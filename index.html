@@ -9918,7 +9918,7 @@
   // one chat column beside the rail instead - video+emotes, then the
   // same with stats back in
   const SPLIT_NAMES = ['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', '2col+vid·emotes·stats'];
-  const splitGlyph = (l) => l === 8 ? '▮▯' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
+  const splitGlyph = (l) => l === 1 ? '▮' : l === 8 ? '▮▯' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
     level = Math.max(1, Math.min(8, level));
