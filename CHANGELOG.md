@@ -85,7 +85,7 @@ not versions - the page ships continuously to Neocities.
   like the other rare labels
 
 ### Sync strip
-- the barber poles' outer ends round off to 2px - the drain's
+- the barber poles' outer ends round off to 4px - the drain's
   retracting edge was cutting square while the track clip only
   rounded the label-side ends
 
