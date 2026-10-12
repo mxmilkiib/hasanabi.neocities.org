@@ -2402,7 +2402,7 @@
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row</div>
     <div class="sep">&nbsp;</div>
-    <div><b>stats</b> the tab beside this one: session top chatters, glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts (4+ msgs/s)</div>
+    <div><b>stats</b> the tab beside this one: session top chatters, glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts (3x the channel's median rate, 4+ msgs/s floor)</div>
     <div style="margin-top: 17px"><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b>etc</b> <span class="linkcols ecfg"><i><b>names</b> link to twitch profiles · hovering one (or an @mention in the text) previews the channel · a plain click pins a user card · ⇧/⌃/⌘-click opens the profile</i><i><b>user card</b> pronouns, first-seen, session count, recent lines and profile / @mention / hide buttons - mods get timeout · ban · delete there, each a click-twice confirm</i><i><b>shimmer</b> fossabot + blammobot names shimmer, as do urls they post · @ostonox mentions too · @hasanabi mentions get a rainbow sweep hashed per author · merged-view #room tags run the same sweep per channel · the ✦ row switches these styles off</i><i><b>embeds</b> urls are clickable · images and gifs embed pinned right</i></span></div>
     <div><b>&amp;c</b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
@@ -6144,11 +6144,17 @@
         : statEmoteAll && eRanked.length > 40
           ? `<div class="st-row st-all"><button type="button" class="st-s" data-efold>collapse to top 40</button></div>` : '');
     // bursts rank the session-long series the graph draws - the spark
-    // window's copy ages peaks out while they're still on the chart
+    // window's copy ages peaks out while they're still on the chart.
+    // a burst outruns the channel's own pace, not a fixed 4/s: on a
+    // busy stream that floor flags half the session, so the bar sits
+    // at 3x the median rate (median, not mean - the bursts themselves
+    // would float the average)
     const bSeries = sc ? (rateHistPer[sc] || []) : rateHist;
     const bOff = rateHistT.length - bSeries.length;
+    const bRates = bSeries.filter(Number.isFinite).sort((a, b) => a - b);
+    const bMin = Math.max(4, (bRates[Math.floor(bRates.length / 2)] || 0) * 3);
     const bSamps = bSeries.map((r, i) => [r, rateHistT[bOff + i]])
-      .filter(([r, t]) => Number.isFinite(r) && t && r >= 4)
+      .filter(([r, t]) => Number.isFinite(r) && t && r >= bMin)
       .sort((a, b) => b[0] - a[0]);
     // distinct bursts only: qualifying samples chain into one event
     // while no gap between them runs past 30s, and each event lists
@@ -6356,7 +6362,7 @@
         (pvMax ? `<div class="st-row"><span class="nm">peak ${pvMax.toLocaleString('en')} viewers${pvAt ? ' at ' + fmtRowTime(new Date(pvAt)) : ''}</span></div>` : '') +
         scopeBtns + `</div>` +
         `<div class="st-panel"><div class="st-h">msg bursts</div>` +
-        (bursts || `<div class="st-row"><span class="nm">no 4+ msgs/s bursts yet</span></div>`) + `</div>` +
+        (bursts || `<div class="st-row"><span class="nm">no ${Math.round(bMin)}+ msgs/s bursts yet</span></div>`) + `</div>` +
         `<div class="st-panel"><div class="st-h">glorps${gImg}/F</div>` +
         (gPeaks || '<div class="st-row"><span class="nm">none logged yet</span></div>') + `</div>` +
       `</div>` +

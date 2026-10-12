@@ -156,6 +156,12 @@ not versions - the page ships continuously to Neocities.
   centred in the space between bar edge and label - the label still
   ellipsizes before the flanks do
 
+### Stats
+- msg bursts stop flagging half of a busy session: the trigger scales
+  to 3x the channel's median rate (median, so the bursts themselves
+  can't float it), floored at the old 4/s for quiet streams - the
+  empty-state text reports the live bar
+
 ### Misc
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls
   back to two columns (the url path's clamp still stopped at 6 after the
