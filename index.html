@@ -12341,14 +12341,14 @@
     // nearest upcoming rung crossing, fed by aged() - arms a rebuild so
     // cells drift down past the squares as they age, not just on new uses
     let nextAgeDelta = Infinity;
-    const ejiBtn = (c) => `<button type="button" class="eji" data-ins="${c}" title="${escapeHTML(EMOJI_KW[c] || c)}">${c}</button>`;
+    const ejiBtn = (c) => `<button type="button" class="eji" data-ins="${c}" title="${escapeHTML(EMOJI_KW[c] || c)} - emoji, click to add to the input">${c}</button>`;
     const btn = (n, src, img, a) => {
       const e = escapeHTML(n);
       // the flag can miss - older recents stored no 'a', and a twitch url
       // still says /animated/ or a .gif says it for itself - so freeze on
       // either signal
       const im = stillUrl(img, a);
-      return `<button type="button" data-ins="${e}"${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}" aria-label="${e}">` +
+      return `<button type="button" data-ins="${e}"${a ? ' data-a="1"' : ''} title="${e} - ${escapeHTML(src)}${a ? ' animated' : ''} emote - click to add to the input" aria-label="${e}">` +
         `<img src="${escapeHTML(im)}" alt="" loading="lazy"><span class="ename" aria-hidden="true">${e}</span></button>`;
     };
     const head = (t) => `<div class="ehead">${escapeHTML(t)}</div>`;

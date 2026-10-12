@@ -204,6 +204,9 @@ not versions - the page ships continuously to Neocities.
 - and a lone time-ago rung keeps a cell-sized floor: an age box on a
   row with no emotes beside it collapsed to its label's text height -
   it now stretches with its row but never under 60px
+- cell tooltips say what they are: 'KatTime - 7tv animated emote -
+  click to add to the input' instead of a bare name - provider pair;
+  emoji cells name their keywords and the click's effect too
 
 ### Misc
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls
