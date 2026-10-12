@@ -65,6 +65,8 @@ not versions - the page ships continuously to Neocities.
 - the sync poles drift from the emote-rung gold at full width to twitch
   purple at their narrowest, and the dead 30% track behind them drops
   its line tint - only the draining fill shows
+- the update bar's reload pair wear the old 18% accent fill at rest now;
+  hover deepens to 32% and firms the border up to full accent
 - the update bar's reload pair settle at a third of the flank each,
   centred in the space between bar edge and label - the label still
   ellipsizes before the flanks do
