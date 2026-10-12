@@ -88,9 +88,9 @@ not versions - the page ships continuously to Neocities.
 - preview cards in nameless rows (notices, gap markers) get the name
   column's indent too - they anchor on what leads after the time; a
   sub-mode switch re-measures card rows, not just reply rows
-- the header's rate graph and button row sit 1px from the header edges
-  after a second padding shave, the pinned corner buttons and
-  minimised-strip hover following suit
+- the header's rate graph and button row sit flush with the header
+  edges after the vertical padding went away entirely, the pinned
+  corner buttons and minimised-strip hover following suit
 
 ## 2026-10-11
 
