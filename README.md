@@ -230,7 +230,7 @@ no dependencies beyond CDN-hosted fonts.
   usage reshuffles while the pointer is over the grid - `hold+`, the
   default, also pauses animated cells - a pause chip swaps cells for
   their still frames, and `↔` cycles how a re-sort moves: cells nudge
-  a square over or wrap off the popup's edge and back on at their new
+  a few slots over or wrap off the popup's edge and back on at their new
   spot, wrap in a cascading ripple or snap over one at a time, the
   rebuilt grid pops,
   un-blurs or fades in, or reshuffles draw with no motion

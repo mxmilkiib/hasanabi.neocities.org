@@ -314,10 +314,13 @@ not versions - the page ships continuously to Neocities.
   seen-only leg), age rows, re-sort motion and hold run their rings;
   the anim legs, source tabs and mix just toggle
 - a '↔' chip after the age-rows button cycles re-sort motion across
-  seven modes: cells shifting a square over nudge into place while
+  seven modes: cells shifting a few slots over nudge into place while
   only relocating emotes wrap off the nearer edge and back on from
   the left (the FLIP default) - before this split, every displaced
   cell took the wrap and whole rows marched off each re-sort - the
+  nudge is measured in reading order now, not pixels: a one-slot hop
+  over a row break leapt the whole width and wrapped in from the
+  left, so a bump spanning rows painted a left-entry on each - the
   grid fades back
   in, reshuffles draw with no motion, movers wrap in a cascading
   ripple or snap to their spots one at a time, and the rebuilt grid
