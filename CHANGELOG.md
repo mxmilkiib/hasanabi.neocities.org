@@ -221,8 +221,8 @@ not versions - the page ships continuously to Neocities.
   can't float it), floored at the old 4/s for quiet streams - the
   empty-state text reports the live bar
 - the session panel reads as a value/label list now: '1,234 unique
-  chatters' splits into a flush-left count and a right-hugging label,
-  the ranked rows' shape mirrored
+  chatters' splits into a flush-left label and a right-hugging
+  count, the same form the ranked rows run
 - the rate graph's bracketed key '(tick: peak second · red cap: glorp)'
   drops to .85em so it sits quieter beside its title
 
