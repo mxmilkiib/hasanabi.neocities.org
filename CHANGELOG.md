@@ -259,8 +259,9 @@ not versions - the page ships continuously to Neocities.
   first cell past each used->never seam wears a marker that the break
   css sends to column one
 - the option row breathes: 'still' moves left of 'anim' so the filter
-  pair runs still->anim->pause, and a wider seam splits the zoom group
-  from the sort group and the sort group from the filters
+  pair runs still->anim->pause, 'Aa' settles between the zoom group
+  and the sort group, and wider seams split the chips into zoom /
+  names / sort / filter / hold
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever
