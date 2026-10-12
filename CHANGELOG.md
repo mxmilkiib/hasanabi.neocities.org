@@ -216,6 +216,8 @@ not versions - the page ships continuously to Neocities.
   ellipsizes before the flanks do
 
 ### Stats
+- the glorps heading's icon double-clicks into the message box, same
+  as an emote in chat - it carries the channel's real glorp token
 - msg bursts stop flagging half of a busy session: the trigger scales
   to 3x the channel's median rate (median, so the bursts themselves
   can't float it), floored at the old 4/s for quiet streams - the

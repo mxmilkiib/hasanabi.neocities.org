@@ -6456,7 +6456,7 @@
     const gCh = sc || CHANNEL;
     let gEmo = emoteNameOf(gCh, 'glorp'), gUrl = gEmo && emotesOf(gCh)[gEmo];
     if (!gUrl && sc) { gEmo = emoteNameOf(CHANNEL, 'glorp'); gUrl = gEmo && emotesOf(CHANNEL)[gEmo]; }
-    const gImg = gUrl ? `<img class="emote" src="${escapeHTML(gUrl)}" alt="glorp">` : '';
+    const gImg = gUrl ? `<img class="emote" data-gtok="${escapeHTML(gEmo)}" src="${escapeHTML(gUrl)}" alt="glorp" title="${escapeHTML(gEmo)} - double-click to add to the input">` : '';
     const scTop = scEl ? scEl.scrollTop : 0;
     el.innerHTML =
       `<div class="st-trio">` +
@@ -6888,6 +6888,14 @@
     if (!row || (e.relatedTarget && row.contains(e.relatedTarget))) return;
     const hl = document.getElementById('stRateHl');
     if (hl) hl.hidden = true;
+  });
+  // the glorps heading's icon double-clicks into the input like an
+  // emote in chat - the img carries the real token in data-gtok
+  statsBodyEl.addEventListener('dblclick', (e) => {
+    const im = e.target.closest('img.emote[data-gtok]');
+    if (!im) return;
+    insertTok(im.dataset.gtok);
+    e.preventDefault();
   });
   helpPanel.querySelector('.htabs').addEventListener('click', (e) => {
     const a = e.target.closest('a.htab');
