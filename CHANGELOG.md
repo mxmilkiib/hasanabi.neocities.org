@@ -63,6 +63,10 @@ not versions - the page ships continuously to Neocities.
   no-count dim now keys off the placeholder's title text instead of
   [title] alone - restored-history chips backfill their stamp on a
   mode switch or when the option turns on
+- fossa's mid-line thanks - 'thank you sillybilly01 for the 11
+  gifties' - gets the same treatment as the tail pattern: the name
+  links in the thanked chatter's colour, and the gift count runs the
+  rainbow sweep
 
 ### Resources
 - vimium joins extra links beside scroll anywhere - the
