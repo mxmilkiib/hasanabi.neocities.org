@@ -1604,6 +1604,12 @@
   :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.r, .tr, .br):hover) { --egx: inset -10px 0 8px -6px var(--egc); }
   :is(#helpPanel, #emotePick).edge-b, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.b, .bl, .br):hover) { --egy: inset 0 -10px 8px -6px var(--egc); }
   :is(#helpPanel, #emotePick).edge-t, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.tl, .tr):hover) { --egy: inset 0 10px 8px -6px var(--egc); }
+  /* the top-edge glow sits under the move glyph run - fade the run
+     while a top grip (or an edge-t drag) is signalling, so the
+     highlight reads through */
+  #helpPanel:is(.edge-t, :has(> .hp-size:is(.tl, .tr):hover)) .hp-handle,
+  #emotePick:is(.edge-t, :has(> .ep-size:is(.tl, .tr):hover)) .epick-handle,
+  #vid:has(> .vid-size:is(.tl, .tr):hover) .vid-handle { opacity: .35; }
   #helpPanel[hidden] { display: none; }
   /* split-4's rail takes the top-right dock spot, so an unmoved popup
      centers instead; --hcx carries the clamp's centered x. a dragged

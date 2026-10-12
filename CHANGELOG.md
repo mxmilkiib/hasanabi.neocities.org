@@ -63,6 +63,10 @@ not versions - the page ships continuously to Neocities.
   association
 
 ### Help popup
+- a top-corner hover's resize glow was masked by the move glyph run
+  painted over the same band - the run now fades to a ghost while a
+  top grip (or an edge-t drag) signals, on the help panel, the emote
+  picker and the video overlay
 - the sub-badge row listed the five modes twice - generated internal
   names then a hardcoded descriptive pass. the generated list now
   carries the descriptive labels in cycle order and the duplicate
