@@ -2168,7 +2168,7 @@
   #emotePick .etabs button { font-size: 12px; padding: 2px 8px; opacity: .55; width: auto; }
   #emotePick .etabs button.on { opacity: 1; background: var(--line); color: var(--text); }
   /* an accent wash when the emote was just used in chat - bright pop,
-     slow tail so it stays readable while the grid resorts */
+     slow tail so it stays readable while the grid re-sorts */
   #emoteGrid button.justused, #emoteRecent button.justused { animation: eflash 3.6s ease-out; }
   /* while a chat row carrying the emote is on screen the cell holds the
      last use's wash; the colour only drops once every copy has scrolled
@@ -2199,11 +2199,19 @@
     from { background: color-mix(in srgb, var(--fc, var(--accent)) 95%, transparent); }
     45% { background: color-mix(in srgb, var(--fc, var(--accent)) 55%, transparent); }
   }
-  /* resort moves animate; set inline by the FLIP step in rebuildPicker */
+  /* re-sort moves animate; set inline by the FLIP step in rebuildPicker */
   #emoteGrid .emove { transition: transform .35s ease; }
-  /* the fade resort mode eases the rebuilt grid's opacity back in */
+  /* the whole-grid re-sort modes sweep the rebuilt grid back in off
+     their own keyframes - each class is pulled and re-added so a new
+     rebuild retriggers the animation */
   #emoteGrid.efade { animation: efadein .28s ease; }
   @keyframes efadein { from { opacity: 0; } }
+  #emoteGrid.ezoom { animation: ezoomin .3s ease; }
+  @keyframes ezoomin { from { transform: scale(.82); opacity: .35; } }
+  #emoteGrid.eblur { animation: eblurin .3s ease; }
+  @keyframes eblurin { from { filter: blur(9px); opacity: .45; } }
+  #emoteGrid.eflip { transform-origin: 50% 0; animation: eflipin .34s ease; }
+  @keyframes eflipin { from { transform: perspective(700px) rotateX(-58deg); opacity: .25; } }
   #emoteGrid {
     flex: 1; overflow-y: auto;
     display: grid; grid-template-columns: repeat(auto-fill, 40px);
@@ -2439,7 +2447,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a resort moves - cells slide, the grid fades, or off</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells slide, ripple, the grid pops, blurs, page-turns, fades, or off</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -2582,7 +2590,7 @@
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><div id="chatWrap"><div id="chatHl" aria-hidden="true"></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" placeholder="chat" aria-label="message" rows="1"></textarea></div><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="age rows cycle - use sort only">▤</button><button class="hdr-btn esort on" id="emoteMove" type="button" title="resort motion cycle">↔</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="age rows cycle - use sort only">▤</button><button class="hdr-btn esort on" id="emoteMove" type="button" title="re-sort motion cycle">↔</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
 // global safety net: an uncaught error or rejected promise raises a small
@@ -8111,7 +8119,7 @@
       if ((v = g(EPICK_ZOOM_KEY)) !== null) o.epzoom = v;
       if ((v = g(EPICK_SORT_KEY)) !== null) o.epsort = v;
       if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = Math.min(3, +v || 0);
-      if ((v = g(EPICK_MOVE_KEY)) !== null) o.epmove = Math.min(2, +v || 0);
+      if ((v = g(EPICK_MOVE_KEY)) !== null) o.epmove = Math.min(6, +v || 0);
       if ((v = g(EPICK_MIX_KEY)) !== null) o.epmix = v === '1' ? 1 : 0;
       if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '0' || v === '1' || v === '2' ? +v : 2;
       if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
@@ -11790,29 +11798,38 @@
     saveOpts();
     emoteQ.focus();
   });
-  // resort motion cycles: 0 cells slide to their spots, 1 the rebuilt
-  // grid fades back in, 2 reshuffles redraw with no motion at all
+  // re-sort motion cycles: 0 cells slide to their spots, 1 the rebuilt
+  // grid fades back in, 2 reshuffles redraw with no motion at all, 3
+  // the slide ripples down the grid, 4 the grid pops back to size,
+  // 5 it sharpens out of a blur, 6 it swings down like a page turn
   const EPICK_MOVE_KEY = 'hasan-epickmove';
+  const MOVE_MODES = [
+    'slide - cells glide to their new spots',
+    'fade - the rebuilt grid fades back in',
+    'off - reshuffles redraw instantly',
+    'ripple - movers glide in a top-down cascade',
+    'zoom - the rebuilt grid pops back to size',
+    'blur - the rebuilt grid sharpens back in',
+    'page - the grid swings down like a page turn',
+  ];
+  // the grid-level modes animate by class; each maps to its keyframe
+  const GRID_FX = { 1: 'efade', 4: 'ezoom', 5: 'eblur', 6: 'eflip' };
   let epickMove = 0;
-  try { epickMove = Math.min(2, Math.max(0, +localStorage.getItem(EPICK_MOVE_KEY) || 0)); } catch {}
+  try { epickMove = Math.min(6, Math.max(0, +localStorage.getItem(EPICK_MOVE_KEY) || 0)); } catch {}
   const moveBtn = document.getElementById('emoteMove');
   function paintMove() {
     // the digit does the telling, like the age-rows glyph
     moveBtn.textContent = `↔${epickMove}`;
     setOn(moveBtn, epickMove !== 2);
-    moveBtn.title = `resort motion - ${epickMove} ${[
-      'slide - cells glide to their new spots',
-      'fade - the rebuilt grid fades back in',
-      'off - reshuffles redraw instantly',
-    ][epickMove]} - click cycles 0-2`;
+    moveBtn.title = `re-sort motion - ${epickMove} ${MOVE_MODES[epickMove]} - click cycles 0-6`;
   }
   const setMove = (i) => {
-    epickMove = Math.max(0, Math.min(2, +i || 0));
+    epickMove = Math.max(0, Math.min(6, +i || 0));
     try { localStorage.setItem(EPICK_MOVE_KEY, String(epickMove)); } catch {}
     paintMove();
   };
   moveBtn.addEventListener('click', () => {
-    setMove((epickMove + 1) % 3);
+    setMove((epickMove + 1) % 7);
     saveOpts();
     emoteQ.focus();
   });
@@ -12114,7 +12131,7 @@
   };
   const EMOJI_SET = new Set(EMOJIS);
   // live usage: emotes seen in chat bump a session count folded into the
-  // use-sort, flash their picker button, and lazily resort the open grid
+  // use-sort, flash their picker button, and lazily re-sort the open grid
   // session-use counts and last-seen times, persisted so the use sort and
   // its age markers keep working across a reload instead of going cold -
   // one shared record across channels: a shared emote used on one stream
@@ -12295,7 +12312,7 @@
   // name -> its cells, rebuilt with each buildPicker so poke, litApply
   // and unflash hit the index instead of re-scanning the whole picker
   let insIdx = new Map();
-  let resortTimer = 0;
+  let reSortTimer = 0;
   // the stamp holder currently leading the use sort - a re-use of it
   // reorders nothing, so those uses skip the rebuild entirely
   let useTop = null;
@@ -12317,34 +12334,36 @@
     }
   };
   // rebuild keeping the scroll spot and any flashes still fading; rows
-  // that moved in the resort get a brief FLIP slide so the change reads
+  // that moved in the re-sort get a brief FLIP slide so the change reads
   // as a swap rather than a redraw
   const rebuildPicker = () => {
     const st = emoteGrid.scrollTop;
     // a name shows twice when it's both recent and in its home section -
     // queue rects per name so each button animates from its own spot.
     // age squares ride the FLIP too - except in own-row mode, where they
-    // trail rows rather than flowing with the cells. the fade and off
-    // resort modes skip the snapshot: one fades, one just redraws
+    // trail rows rather than flowing with the cells. the whole-grid and
+    // off re-sort modes skip the snapshot entirely
     const flipSel = emotePick.classList.contains('agerows') ? 'button[data-ins]' : 'button[data-ins], .eage[data-age]';
     const flipKey = (b) => b.dataset.ins !== undefined ? 'i' + b.dataset.ins : 'a' + b.dataset.age;
     const before = new Map();
+    // slide and ripple both fly the FLIP - ripple just delays each mover
+    const doFlip = !epickMove || epickMove === 3;
     // layout metrics, not rects: a rect would read a cell's centre-shift
     // or a live emove as movement, and they batch into one layout pass
-    if (!epickMove)
+    if (doFlip)
       for (const b of emotePick.querySelectorAll(flipSel))
         (before.get(flipKey(b)) || before.set(flipKey(b), []).get(flipKey(b)))
           .push([b.offsetLeft, b.offsetTop]);
     buildPicker();
     emoteGrid.scrollTop = st;
-    if (epickMove === 1) {
-      // remove+reflow+add retriggers the opacity sweep on every rebuild
-      emoteGrid.classList.remove('efade');
+    if (GRID_FX[epickMove]) {
+      // remove+reflow+add retriggers the sweep on every rebuild
+      emoteGrid.classList.remove(GRID_FX[epickMove]);
       void emoteGrid.offsetWidth;
-      emoteGrid.classList.add('efade');
-    } else if (!epickMove) {
+      emoteGrid.classList.add(GRID_FX[epickMove]);
+    } else if (doFlip) {
       // write all offsets first, reflow once, then release to 0 together -
-      // a reflow per button would thrash layout on a full-grid resort
+      // a reflow per button would thrash layout on a full-grid re-sort
       const movers = [];
       for (const b of emotePick.querySelectorAll(flipSel)) {
         const r0 = before.get(flipKey(b))?.shift();
@@ -12354,11 +12373,17 @@
       }
       if (movers.length) {
         void emoteGrid.offsetWidth;
-        for (const b of movers) {
+        movers.forEach((b, i) => {
           b.classList.add('emove');
+          // ripple staggers each mover by its grid order, so the slide
+          // cascades down the picker instead of landing all at once
+          b.style.transitionDelay = epickMove === 3 ? Math.min(240, i * 9) + 'ms' : '';
           b.style.transform = '';
-          b.addEventListener('transitionend', () => b.classList.remove('emove'), { once: true });
-        }
+          b.addEventListener('transitionend', () => {
+            b.classList.remove('emove');
+            b.style.transitionDelay = '';
+          }, { once: true });
+        });
       }
     }
     for (const f of flashSet) poke(f, (Date.now() - flashT0.get(f)) / 1e3);
@@ -12410,14 +12435,14 @@
     flashHues.set(n, flashHueNext = (flashHueNext + 5) % 360);
     poke(n);
     flashLater(n);
-    if (epickSort === 'use' && !resortTimer) {
+    if (epickSort === 'use' && !reSortTimer) {
       // a stamp older than the leader (replay, catch-up) reorders nothing;
       // only a use that actually takes the lead earns a rebuild
       if (useTop === null) for (const k in useTs) if (useTop === null || useTs[k] > useTs[useTop]) useTop = k;
       if (useTs[n] >= (useTs[useTop] || 0)) {
         const moved = n !== useTop;
         useTop = n;
-        if (moved) resortTimer = setTimeout(() => { resortTimer = 0; heldOr(); }, 1500);
+        if (moved) reSortTimer = setTimeout(() => { reSortTimer = 0; heldOr(); }, 1500);
       }
     }
   }
@@ -13592,7 +13617,7 @@
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     if (q.has('rbp')) setRbwPal(+q.get('rbp'));
     // emote-picker options: ?epnames=0|1|2&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&
-    // epmix=1&ephold=0|1|2&epmove=0|1|2&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]&epopen=0|1
+    // epmix=1&ephold=0|1|2&epmove=0-6&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]&epopen=0|1
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(+q.get('epnames') || (flag('epnames') ? 1 : 0)); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }

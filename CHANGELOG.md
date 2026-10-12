@@ -276,10 +276,12 @@ not versions - the page ships continuously to Neocities.
   and the sort group, and wider seams split the chips into zoom /
   names / sort / filter / hold, with 'mix' gaining the same seam off
   the source tabs
-- a '↔' chip after the age-rows button cycles resort motion: cells
-  slide to their new spots (the FLIP default), the rebuilt grid fades
-  back in, or reshuffles redraw with no motion - saved through the
-  standalone key, the options bundle and ?epmove=
+- a '↔' chip after the age-rows button cycles re-sort motion across
+  seven modes: cells slide to their new spots (the FLIP default), the
+  grid fades back in, reshuffles draw with no motion, movers ripple
+  down the grid in a cascade, the rebuilt grid pops back to size,
+  sharpens out of a blur, or swings down like a page turn - saved
+  through the standalone key, the options bundle and ?epmove= (0-6)
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever
