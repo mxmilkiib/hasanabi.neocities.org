@@ -87,6 +87,8 @@ not versions - the page ships continuously to Neocities.
   reload restores the full default scrollback instead of a fifth
 - critical consciousness joins the marxist/critical row's liberation
   cluster, right after pedagogy of the oppressed - it is freire's term
+- open manufacturing joins open design's concept pair on the libre
+  page - the production-side sibling
 - baby milk action's nestlé boycott list joins the boycott row, the
   oldest running consumer boycott's product index - flanked by the
   1977 boycott's own article and coca-cola criticism; uk divest (the
