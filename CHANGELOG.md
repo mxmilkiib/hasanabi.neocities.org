@@ -58,6 +58,8 @@ not versions - the page ships continuously to Neocities.
   unrendered rows and keeps the stamp they had
 
 ### Resources
+- hckr news pairs with memeorandum in the us cluster - the hacker
+  news timeline frontend
 - magazines get their own row: the left cluster (equator, jacobin,
   current affairs, monthly review, organise!, jewish currents, +972,
   scottish left review) plus a press & journals row for the
