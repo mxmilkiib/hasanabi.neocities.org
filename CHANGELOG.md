@@ -85,6 +85,8 @@ not versions - the page ships continuously to Neocities.
   pol row wears .notrack, the first opt-out from tl's -0.05em
 - history persists 5,000 rows across reloads now (was 1,000) - a
   reload restores the full default scrollback instead of a fifth
+- baby milk action's nestlé boycott list joins the boycott row, the
+  oldest running consumer boycott's product index
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
 - spaces settles at the bottom of the resources page, after osint
