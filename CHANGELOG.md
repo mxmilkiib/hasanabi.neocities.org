@@ -294,7 +294,9 @@ not versions - the page ships continuously to Neocities.
   marks, so that stretch also walks in tens, and 190s/200s do
   the same for 3m-4m - and the sub-2m stretch
   becomes a ten-second walk -
-  40s, 50s, 70s, 80s, 90s, 100s, 110s replacing the 45s/105s pair
+  40s, 50s, 70s, 80s, 90s, 100s, 110s replacing the 45s/105s pair -
+  and the deep end fills in: 12m, 14m, 16m, 18m between 10m and 20m,
+  plus 25m between 20m and 30m
 - the never-used tail opens on its own row in every age-rows mode: the
   first cell past each used->never seam wears a marker that the break
   css sends to column one
