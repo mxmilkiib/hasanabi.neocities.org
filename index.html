@@ -2149,6 +2149,9 @@
      the rowend break reads the same pair */
   #emotePick.agerows2 #emoteGrid .eage.rowend + :is(button, .eage),
   #emotePick.agerows3 #emoteGrid .eage.rowend + :is(button, .eage) { grid-column-start: 1; }
+  /* the never-used tail opens on its own row - .enew marks the first
+     cell past each used->never seam */
+  #emotePick:where(.agerows,.agerows2,.agerows3) #emoteGrid button.enew { grid-column-start: 1; }
   /* the source tabs sit left, the option buttons right; a thin popup
      wraps .eopts onto its own line, still hugging the right edge */
   #emotePick .etabsrow { flex: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
@@ -11675,6 +11678,18 @@
   const AGE_ROW_BREAKS = new Set([45e3, 18e4]);
   function paintAgeRows() {
     const centred = emotePick.classList.contains('agerows3');
+    // every row mode opens the never-used tail on a fresh line - mark
+    // each used->never seam for the css break (the empty grid short-
+    // circuits before useTs is even declared at init)
+    if (epickAge && epickSort === 'use') {
+      let seam = false;
+      for (const k of emoteGrid.children) {
+        const b = k.tagName === 'BUTTON' && k.dataset.ins;
+        const u = b && !!useTs[k.dataset.ins];
+        if (b && !u && seam) k.classList.add('enew');
+        if (b) seam = u;
+      }
+    }
     if (!centred && !emotePick.classList.contains('agerows2')) {
       // stepping out of the centred state strips its visual shifts
       if (ageRowsShifted) {
@@ -11696,11 +11711,11 @@
     for (let i = 0; i < n;) {
       if (isHead(kids[i])) { spans.push([i, ++i]); continue; }
       let end = Math.min(i + cols, n);
-      for (let j = i; j < end; j++) if (isHead(kids[j])) { end = j; break; }
+      for (let j = i; j < end; j++) if (isHead(kids[j]) || (j > i && kids[j].classList.contains('enew'))) { end = j; break; }
       let lastSq = -1;
       for (let j = i; j < end; j++) if (isSq(kids[j])) lastSq = j;
-      // centred rows bank the freshest eras: a row holding a 45s, 90s or
-      // 3m square ends at the leftmost one even when later rungs or
+      // centred rows bank the freshest eras: a row holding a 45s or 3m
+      // square ends at the leftmost one even when later rungs or
       // cells share the row
       if (centred) {
         for (let j = i; j < end - 1; j++)

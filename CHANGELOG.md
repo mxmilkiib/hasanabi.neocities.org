@@ -255,6 +255,9 @@ not versions - the page ships continuously to Neocities.
 - the ladder picks up rungs at 150s, 210s and 4½m, thinning the
   long 2m-5m stretch where cells used to bunch between far-apart
   squares, plus a 105s rung closing the 90s-2m gap
+- the never-used tail opens on its own row in every age-rows mode: the
+  first cell past each used->never seam wears a marker that the break
+  css sends to column one
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever
