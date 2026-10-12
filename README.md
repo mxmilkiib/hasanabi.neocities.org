@@ -228,15 +228,16 @@ no dependencies beyond CDN-hosted fonts.
   tighter cells (the button lights accent on the last) - `½x`/`¾x`/`1x`/
   `1⅓x`/`1½x`/`1⅔x`/`2x` buttons size the grid, `hold`/`hold+` freezes
   usage reshuffles while the pointer is over the grid - `hold+`, the
-  default, also pauses animated cells - and a pause chip swaps cells for
-  their still frames.
+  default, also pauses animated cells - a pause chip swaps cells for
+  their still frames, and `↔` cycles how a resort moves: cells slide,
+  the rebuilt grid fades in, or no motion at all.
 - The box resizes from its left and top edges (shading on hover) and
   drags by a dotted grip strip (both persist). It opens by default -
   only a deliberate close keeps it down next visit - and a `📌` pin
   floats it free of the chat bar. All display options - names,
   size, sort, age rows,
-  mix, hold, tabs, anim filter, geometry - ride the settings bundle,
-  theme slots and copied URLs.
+  mix, hold, resort motion, tabs, anim filter, geometry - ride the
+  settings bundle, theme slots and copied URLs.
 - Clicking inserts at the caret; `Esc` peels the topmost layer -
   picker first, then the help panel.
 
@@ -541,6 +542,7 @@ force off.
 | `epage` | `0`–`3` | picker age-square rows: inline / era rows / row ends at last square / centred |
 | `epmix` | `1` | picker merged provider grid |
 | `ephold` | `0`–`2` | picker reshuffle hold (2 = hold+, pauses animated cells) |
+| `epmove` | `0`–`2` | picker resort motion: cells slide / grid fades in / off |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
 | `epanim` | `anim`,`animf`,`still` | picker animation filter (`animf` = animated shown as stills) |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
