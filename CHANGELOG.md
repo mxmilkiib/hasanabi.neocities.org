@@ -192,6 +192,8 @@ not versions - the page ships continuously to Neocities.
 - the session panel reads as a value/label list now: '1,234 unique
   chatters' splits into a flush-left count and a right-hugging label,
   the ranked rows' shape mirrored
+- the rate graph's bracketed key '(tick: peak second · red cap: glorp)'
+  drops to .85em so it sits quieter beside its title
 
 ### Emote picker
 - the Aa names toggle becomes a three-state cycle: off → the code
