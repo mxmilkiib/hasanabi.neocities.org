@@ -71,8 +71,8 @@ not versions - the page ships continuously to Neocities.
   325 collective's repression docs - marked for folding later
 - an action groups row follows it, opening with the hunt saboteurs
   association
-- soviet democracy joins the workers unions concept cluster, right
-  after the soviet (council) article it describes
+- soviet democracy joins the participatory row's democracy models,
+  after deliberative - glossed council democracy
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
 - spaces moves up above activism, heading the action block after the
