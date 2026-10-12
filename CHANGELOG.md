@@ -6,6 +6,10 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-12
 
 ### Split columns
+- the menu lists the 2-col family before the 3-col now: 1col · 2col ·
+  2col+v/e · 2row · 2col+e · 3col · 3col+v/e/s · 3col+v/e · 3col+e -
+  display order only, each entry still carries its level so ?split=,
+  saved opts and the wheel cycle are untouched
 - the mode names normalise to one terse scheme: 1col · 2col · 3col ·
   3col+v/e/s · 3col+v/e · 3col+e · 2col+v/e · 2row · 2col+e (v/e/s =
   video·emotes·stats), dropping the spelled-out/'vsplit' drift; the

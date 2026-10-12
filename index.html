@@ -10037,16 +10037,20 @@
     saveOpts();
   }
 
-  // the column button opens a menu of all eight modes like the font
-  // picker's; the wheel keeps cycling, and shift-click still steps back
-  splitMenu.innerHTML = SPLIT_NAMES.map((n, i) =>
-    `<button type="button" role="option" data-i="${i + 1}"><span class="sg">${splitGlyph(i + 1)}</span>${n}</button>`).join('');
+  // the column button opens a menu of all nine modes like the font
+  // picker's; the wheel keeps cycling, and shift-click still steps back.
+  // the menu lists the 2-col family before the 3-col, decoupled from
+  // the wheel's level order - each entry carries its level in data-i
+  const SPLIT_MENU_ORDER = [1, 2, 7, 8, 9, 3, 4, 5, 6];
+  splitMenu.innerHTML = SPLIT_MENU_ORDER.map((l) =>
+    `<button type="button" role="option" data-i="${l}"><span class="sg">${splitGlyph(l)}</span>${SPLIT_NAMES[l - 1]}</button>`).join('');
   const markSplitMenu = () => {
     const max = window.innerWidth > window.innerHeight ? 9 : 2;
-    splitMenu.querySelectorAll('button').forEach((b, j) => {
-      b.classList.toggle('on', j + 1 === splitLevel);
-      b.setAttribute('aria-selected', String(j + 1 === splitLevel));
-      b.disabled = j + 1 > max;
+    splitMenu.querySelectorAll('button').forEach((b) => {
+      const l = +b.dataset.i;
+      b.classList.toggle('on', l === splitLevel);
+      b.setAttribute('aria-selected', String(l === splitLevel));
+      b.disabled = l > max;
     });
   };
   const setSplitMenu = (open) => {
