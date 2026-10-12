@@ -303,6 +303,9 @@ not versions - the page ships continuously to Neocities.
   and the sort group, and wider seams split the chips into zoom /
   names / sort / filter / hold, with 'mix' gaining the same seam off
   the source tabs
+- a 'tip' chip after 'Aa' toggles the cell hover card - off, picker
+  cells stop popping the big preview while chat rows' emotes keep
+  theirs; saved through the standalone key, the bundle and ?eptips=
 - the option chips take the wheel: scrolling down steps the hovered
   chip forward, up steps it back - names, zoom sizes, sort (with its
   seen-only leg), age rows, re-sort motion and hold run their rings;
