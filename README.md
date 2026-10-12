@@ -232,7 +232,8 @@ no dependencies beyond CDN-hosted fonts.
   their still frames, and `↔` cycles how a re-sort moves: cells slide,
   slide in a cascading ripple or queue up to go one at a time, the
   rebuilt grid pops, un-blurs, page-turns or fades in, or reshuffles
-  draw with no motion at all.
+  draw with no motion at all. The wheel steps any option chip through
+  its states - down forward, up back.
 - The box resizes from its left and top edges (shading on hover) and
   drags by a dotted grip strip (both persist). It opens by default -
   only a deliberate close keeps it down next visit - and a `📌` pin
