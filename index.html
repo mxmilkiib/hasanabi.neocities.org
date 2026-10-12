@@ -677,6 +677,11 @@
   #rail #emoteGrid::-webkit-scrollbar-track, #rail #htabStats::-webkit-scrollbar-track, main.vgrid #emoteGrid::-webkit-scrollbar-track { background: transparent; }
   /* video floated or off: the picker and stats split the column evenly */
   #rail.novid #emotePick, #rail.novid #htabStats { flex: 1 1 0; }
+  /* stats gone (hidden or borrowed into help) leaves the picker the
+     rail's only grower - flex-grow under 1 would take just that share
+     of the free space, so the dragged seam ratio sits out until stats
+     returns rather than pinning the picker to a stub */
+  #rail.nostats > #emotePick { flex-grow: 1 !important; }
   /* the emotes/stats seam: an invisible grab strip centred on the
      picker's bottom border, so the drag starts right on the line */
   #railSplit { flex: none; height: 7px; margin: -4px 0 -3px; cursor: grab;
@@ -9967,9 +9972,12 @@
   // the seam only matters while both its panes sit docked in the rail
   function syncRailSplit() {
     const statsTab = document.getElementById('htabStats');
+    const statsOut = statsTab.parentNode !== railEl || statsTab.hidden;
+    // stats gone leaves the picker the rail's only grower - a dragged
+    // sub-1 share would pin it to a stub, so the rail flags the state
+    railEl.classList.toggle('nostats', statsOut);
     railSplitEl.hidden = railEl.hidden || emotePick.hidden ||
-      emotePick.parentNode !== railEl ||
-      statsTab.parentNode !== railEl || statsTab.hidden;
+      emotePick.parentNode !== railEl || statsOut;
   }
   // the seam drags like a popup edge - the panes trade the column
   // between them by flex proportion, so the split holds through any
@@ -13010,7 +13018,9 @@
   // a saved or bundled {w,h,left?,top?} box: size always applies, the
   // position clamps into the current viewport
   const applyEpickBox = (es) => {
-    if (!es) return;
+    // a docked picker follows the rail's flex, not float geometry - a
+    // saved box only means anything once it's floating again
+    if (!es || !railEl.hidden) return;
     if (es.w) emotePick.style.width = es.w + 'px';
     if (es.h) emotePick.style.height = es.h + 'px';
     if (es.left != null) {

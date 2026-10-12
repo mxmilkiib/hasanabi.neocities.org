@@ -45,6 +45,14 @@ not versions - the page ships continuously to Neocities.
   of the 4-6 pair's two - 7 docks video + emote picker (stats out), 8
   the same with stats back in; cycling, restoring and switching between
   them re-docks in place without re-dealing the column
+- a dragged emotes/stats seam no longer starves the picker in the
+  stats-less rail modes: the drag stamps a sub-1 flexGrow pair that
+  sums to the split, and with stats gone the picker was the only
+  grower, claiming just that share of the column and leaving the rest
+  dead - the rail flags the no-stats state and forces the picker to
+  full growth until stats returns, when the dragged ratio takes over
+  again. saved float geometry also stops stamping onto a docked picker
+  (a restore mid-dock could leave it a skinny strip down the rail)
 
 ### Rows & chat
 - a link's favicon and its host run move as one nowrap piece, so a
