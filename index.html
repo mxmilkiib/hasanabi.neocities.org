@@ -11843,13 +11843,12 @@
     saveOpts();
     emoteQ.focus();
   });
-  // re-sort motion cycles: 0 cells nudge to the next square or wrap
+  // re-sort motion cycles: 0 cells nudge a few slots over or wrap
   // off the near edge and back on from the left, 1 the rebuilt grid
   // fades back in, 2
   // reshuffles redraw with no motion at all, 3 the wraps ripple down
   // the grid, 4 the grid pops back to size, 5 it sharpens out of a
-  // blur, 6 it swings down like a page turn, 7 cells snap to their
-  // spots one at a time
+  // blur, 6 cells snap to their spots one at a time
   const EPICK_MOVE_KEY = 'hasan-epickmove';
   const MOVE_MODES = [
     'slide - cells nudge a few slots over or wrap off the edge',
