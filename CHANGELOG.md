@@ -282,7 +282,7 @@ not versions - the page ships continuously to Neocities.
 - the ladder picks up rungs at 150s, 210s and 270s, thinning the
   long 2m-5m stretch where cells used to bunch between far-apart
   squares - 130s/140s and 160s/170s then fill around the half-minute
-  marks, so that stretch also walks in tens, and 190s/200s/220s do
+  marks, so that stretch also walks in tens, and 190s/200s do
   the same for 3m-4m - and the sub-2m stretch
   becomes a ten-second walk -
   40s, 50s, 70s, 80s, 90s, 100s, 110s replacing the 45s/105s pair
