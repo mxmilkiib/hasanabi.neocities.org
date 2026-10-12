@@ -2328,9 +2328,10 @@
   /* the border is a dashed svg rect whose dashoffset marches - the
      classic processing-ants border; the rung's inline animation-delay
      is inherited so the marches stay staggered per rung */
-  /* the 1px inset keeps the stroke fully inside the cell - centered on a
-     path that sits ~0.4px in, the outer half-stroke used to clip at the
-     grid's left edge */
+  /* the 1px inset plus the rect's own 4% margin keep the stroke fully
+     inside the cell - the outer half-stroke clips whenever the path
+     sits under half a pixel from the svg edge, which a 1% margin hit
+     on every sub-50px square (bottom always, right on narrow cells) */
   #emoteGrid .eage .ants { position: absolute; top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
   #emoteGrid .eage .ants rect { fill: none; stroke: var(--line); stroke-width: 1;
     stroke-dasharray: 4 3; animation: eage-ants .9s linear infinite; animation-delay: inherit; }
@@ -12706,7 +12707,7 @@
     // the marching-ants border - an svg rect whose dashoffset animates;
     // the rung's inline animation-delay reaches it via inherit
     const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
-      '<rect x="1" y="1" width="98" height="98" rx="6" vector-effect="non-scaling-stroke"/></svg>';
+      '<rect x="4" y="4" width="92" height="92" rx="6" vector-effect="non-scaling-stroke"/></svg>';
     const lblOf = (mk) => mk.t >= 36e5 ? `${mk.t / 36e5}h` : mk.t < 3e5 && (mk.t < 6e4 || mk.t % 6e4) ? `${Math.round(mk.t / 1e3)}s` : `${mk.t / 6e4}m`;
     // a per-square negative delay starts each one mid-cycle, so the
     // marches stagger instead of beating in lockstep
