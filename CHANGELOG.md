@@ -66,6 +66,10 @@ not versions - the page ships continuously to Neocities.
   325 collective's repression docs - marked for folding later
 - an action groups row follows it, opening with the hunt saboteurs
   association
+- unruly subjects joins channels/streams: chenjerai kumanyika's weekly
+  politics show out of rowhome productions, carrying site, patreon,
+  ig and the buzzsprout feed - which rides deprogram's service column
+  like the other rare labels
 
 ### Help popup
 - a top-corner hover's resize glow was masked by the move glyph run
