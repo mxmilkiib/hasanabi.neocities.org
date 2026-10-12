@@ -258,6 +258,9 @@ not versions - the page ships continuously to Neocities.
 - the never-used tail opens on its own row in every age-rows mode: the
   first cell past each used->never seam wears a marker that the break
   css sends to column one
+- the option row breathes: 'still' moves left of 'anim' so the filter
+  pair runs still->anim->pause, and a wider seam splits the zoom group
+  from the sort group and the sort group from the filters
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever
