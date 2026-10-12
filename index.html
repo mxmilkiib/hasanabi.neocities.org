@@ -12566,9 +12566,12 @@
     const now = Date.now();
     const marks = AGES.map(([t, words]) => ({ t, words }));
     marks.sort((a, b) => a.t - b.t);
-    // rung depth as a 0-100% label tint - even across the ladder, since a
-    // linear share of the 12h ceiling would cluster the recent end at ~0
-    marks.forEach((mk, i) => mk.p = (i / (marks.length - 1) * 100).toFixed(0) + '%');
+    // rung depth as a 0-100% label tint - gold through a minute, violet
+    // from six minutes, rung-even steps between (a linear share of the
+    // span would bunch the seconds rungs down at ~0)
+    const pLo = marks.findIndex((mk) => mk.t >= 6e4);
+    const pHi = marks.findIndex((mk) => mk.t > 36e4) - 1;
+    marks.forEach((mk, i) => mk.p = (i <= pLo ? 0 : i >= pHi ? 100 : Math.round((i - pLo) / (pHi - pLo) * 100)) + '%');
     // a rung whose era reaches back into an 'away' window (socket
     // dropped or page closed) covers time chat wasn't logging - but a
     // sliver left over a quick reload shouldn't dim the ladder, so the

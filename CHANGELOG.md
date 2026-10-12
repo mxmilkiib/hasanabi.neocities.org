@@ -279,6 +279,9 @@ not versions - the page ships continuously to Neocities.
   square followed by another square never broke - the layout stayed
   merged while the centring math counted a break, and rows centred
   against phantom boundaries
+- the age-square tint no longer spans the whole ladder - the
+  gold-to-violet gradient now runs a minute to six minutes, so every
+  rung up to a minute stays full gold and six minutes on is full violet
 - the ladder picks up rungs at 150s, 210s and 270s, thinning the
   long 2m-5m stretch where cells used to bunch between far-apart
   squares - 130s/140s and 160s/170s then fill around the half-minute
