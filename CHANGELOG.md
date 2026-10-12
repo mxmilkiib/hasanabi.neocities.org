@@ -6,6 +6,11 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-12
 
 ### Split columns
+- the mode names normalise to one terse scheme: 1col · 2col · 3col ·
+  3col+v/e/s · 3col+v/e · 3col+e · 2col+v/e · 2row · 2col+e (v/e/s =
+  video·emotes·stats), dropping the spelled-out/'vsplit' drift; the
+  help row's list now derives from SPLIT_NAMES so the two can't
+  disagree again, and the readme's ?split doc gains modes 7-9
 - level 9 (▮☻) is mode 7 minus the video: one chat column beside a
   rail holding just the emote picker, which flexes to fill it through
   the same novid branch mode 6 uses - the video stays off and the ▶
