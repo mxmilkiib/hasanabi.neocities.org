@@ -314,16 +314,15 @@ not versions - the page ships continuously to Neocities.
   seen-only leg), age rows, re-sort motion and hold run their rings;
   the anim legs, source tabs and mix just toggle
 - a '↔' chip after the age-rows button cycles re-sort motion across
-  eight modes: cells shifting a square over nudge into place while
+  seven modes: cells shifting a square over nudge into place while
   only relocating emotes wrap off the nearer edge and back on from
   the left (the FLIP default) - before this split, every displaced
   cell took the wrap and whole rows marched off each re-sort - the
   grid fades back
   in, reshuffles draw with no motion, movers wrap in a cascading
-  ripple or snap to their spots one at a time, the rebuilt grid pops
-  back to size, sharpens out of a blur, or swings down like a page
-  turn - saved through the standalone key, the options bundle and
-  ?epmove= (0-7)
+  ripple or snap to their spots one at a time, and the rebuilt grid
+  pops back to size or sharpens out of a blur - saved through the
+  standalone key, the options bundle and ?epmove= (0-6)
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever

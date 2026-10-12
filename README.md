@@ -233,7 +233,7 @@ no dependencies beyond CDN-hosted fonts.
   a square over or wrap off the popup's edge and back on at their new
   spot, wrap in a cascading ripple or snap over one at a time, the
   rebuilt grid pops,
-  un-blurs, page-turns or fades in, or reshuffles draw with no motion
+  un-blurs or fades in, or reshuffles draw with no motion
   at all. The wheel steps any option chip through its states - down
   forward, up back.
 - The box resizes from its left and top edges (shading on hover) and
@@ -547,7 +547,7 @@ force off.
 | `epage` | `0`–`3` | picker age-square rows: inline / era rows / row ends at last square / centred |
 | `epmix` | `1` | picker merged provider grid |
 | `ephold` | `0`–`2` | picker reshuffle hold (2 = hold+, pauses animated cells) |
-| `epmove` | `0`–`6` | picker re-sort motion: slide / fade / off / ripple / zoom / blur / page |
+| `epmove` | `0`–`6` | picker re-sort motion: slide / fade / off / ripple / zoom / blur / queue |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
 | `epanim` | `anim`,`animf`,`still` | picker animation filter (`animf` = animated shown as stills) |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
