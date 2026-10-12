@@ -2109,8 +2109,10 @@
      tail - nothing follows them to break on */
   #emotePick.agerows #emoteGrid .eage + button { grid-column-start: 1; }
   /* agerows2 flows like inline mode except the last square on each
-     visual row ends it - the mark is measured on by paintAgeRows */
-  #emotePick.agerows2 #emoteGrid .eage.rowend + button { grid-column-start: 1; }
+     visual row ends it - the mark is measured on by paintAgeRows.
+     agerows3 breaks the same way, then centres each row */
+  #emotePick.agerows2 #emoteGrid .eage.rowend + button,
+  #emotePick.agerows3 #emoteGrid .eage.rowend + button { grid-column-start: 1; }
   /* the source tabs sit left, the option buttons right; a thin popup
      wraps .eopts onto its own line, still hugging the right edge */
   #emotePick .etabsrow { flex: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
@@ -2370,7 +2372,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤' gives each populated era its own row · '▥' flows rows inline ending at each last square</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤' gives each populated era its own row · '▥' flows rows inline ending at each last square · '▦' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -8005,7 +8007,7 @@
       if ((v = g(EPICK_NAMES_KEY)) !== null) o.epnames = v === '1' ? 1 : 0;
       if ((v = g(EPICK_ZOOM_KEY)) !== null) o.epzoom = v;
       if ((v = g(EPICK_SORT_KEY)) !== null) o.epsort = v;
-      if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = Math.min(2, +v || 0);
+      if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = Math.min(3, +v || 0);
       if ((v = g(EPICK_MIX_KEY)) !== null) o.epmix = v === '1' ? 1 : 0;
       if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '0' || v === '1' || v === '2' ? +v : 2;
       if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
@@ -11539,15 +11541,27 @@
   // age squares only exist under the use sort - the rows toggle stays
   // dimmed and unpressable otherwise
   const EPICK_AGE_KEY = 'hasan-epickage';
-  // 0 inline · 1 each era's own row · 2 a row ends at its last square
+  // 0 inline · 1 each era's own row · 2 a row ends at its last square ·
+  // 3 the same rows centred
   let epickAge = 0;
-  try { epickAge = Math.min(2, Math.max(0, +localStorage.getItem(EPICK_AGE_KEY) || 0)); } catch {}
+  try { epickAge = Math.min(3, Math.max(0, +localStorage.getItem(EPICK_AGE_KEY) || 0)); } catch {}
   const ageBtn = document.getElementById('emoteAgeRows');
   // mode 2's row-end marks: the last square on each visual row ends it.
   // measured off the rendered grid since css can't see wraps; the mark
   // itself moves layout, so it loops until stable
+  let ageRowsShifted = false;
   function paintAgeRows() {
-    if (!emotePick.classList.contains('agerows2')) return;
+    const centred = emotePick.classList.contains('agerows3');
+    if (!centred && !emotePick.classList.contains('agerows2')) {
+      // stepping out of the centred state strips its visual shifts
+      if (ageRowsShifted) {
+        ageRowsShifted = false;
+        for (const el of emoteGrid.children) el.style.translate = '';
+      }
+      return;
+    }
+    // stale pins come off first so the rows re-form from plain flow
+    for (const el of emoteGrid.children) { el.style.gridRowStart = ''; el.style.gridColumnStart = ''; }
     const sqs = [...emoteGrid.querySelectorAll('.eage')];
     for (let pass = 0; pass < 5; pass++) {
       const want = new Set();
@@ -11566,30 +11580,57 @@
         }
       if (!changed) break;
     }
+    // centred rows shift each cell right by half its row's slack - the
+    // translate property stays clear of the move animation's transform
+    // and of placement itself, so a rebuilt row can't mislead a pin
+    for (const el of emoteGrid.children) el.style.translate = '';
+    if (!centred) return;
+    // layout metrics only - a rect would read mid-move transforms as slack
+    const padR = parseFloat(getComputedStyle(emoteGrid).paddingRight) || 0;
+    const right = emoteGrid.offsetLeft + emoteGrid.clientWidth - padR;
+    let row = [], top = null;
+    const flush = () => {
+      // a full-width header has no slack to split
+      if (row.length && !row[0].classList.contains('ehead')) {
+        const last = row[row.length - 1];
+        const dx = Math.max(0, (right - last.offsetLeft - last.offsetWidth) / 2);
+        if (dx) for (const el of row) el.style.translate = dx + 'px 0';
+      }
+      row = [];
+    };
+    for (const el of emoteGrid.children) {
+      if (!el.offsetParent) continue; // display:none plays no part
+      const t = el.offsetTop;
+      if (top !== null && t !== top) flush();
+      top = t; row.push(el);
+    }
+    flush();
+    ageRowsShifted = true;
   }
   function paintAge() {
     ageBtn.disabled = epickSort !== 'use';
     setOn(ageBtn, epickAge > 0 && epickSort === 'use');
-    ageBtn.textContent = epickAge === 2 ? '▥' : '▤';
-    ageBtn.title = `age rows: ${['inline', 'each era its own row', 'each row ends at its last square'][epickAge]} - click cycles, use sort only`;
+    ageBtn.textContent = epickAge === 3 ? '▦' : epickAge === 2 ? '▥' : '▤';
+    ageBtn.title = `age rows: ${['inline', 'each era its own row', 'each row ends at its last square', 'each row ends at its last square, centred'][epickAge]} - click cycles, use sort only`;
     emotePick.classList.toggle('agerows', epickAge === 1 && epickSort === 'use');
     emotePick.classList.toggle('agerows2', epickAge === 2 && epickSort === 'use');
+    emotePick.classList.toggle('agerows3', epickAge === 3 && epickSort === 'use');
     paintAgeRows();
   }
   const setAge = (i) => {
-    epickAge = Math.max(0, Math.min(2, +i || 0));
+    epickAge = Math.max(0, Math.min(3, +i || 0));
     try { localStorage.setItem(EPICK_AGE_KEY, String(epickAge)); } catch {}
     paintAge();
   };
   ageBtn.addEventListener('click', () => {
-    setAge((epickAge + 1) % 3);
+    setAge((epickAge + 1) % 4);
     saveOpts();
     emoteQ.focus();
   });
   // wrapping reshuffles where rows end - re-mark on any grid resize
   let ageRowRaf = 0;
   new ResizeObserver(() => {
-    if (ageRowRaf || !emotePick.classList.contains('agerows2')) return;
+    if (ageRowRaf || !(emotePick.classList.contains('agerows2') || emotePick.classList.contains('agerows3'))) return;
     ageRowRaf = requestAnimationFrame(() => { ageRowRaf = 0; paintAgeRows(); });
   }).observe(emoteGrid);
   function paintSort() {

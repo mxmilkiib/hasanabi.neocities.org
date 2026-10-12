@@ -149,6 +149,11 @@ not versions - the page ships continuously to Neocities.
 - age-rows gains a third state '▥': cells flow inline but each visual
   row ends at its last square, measured off the rendered grid and
   re-cut on rebuilds and resizes
+- and a fourth: the same row-ending cut, then each row's cells shift
+  to centre the used width inside the grid - the shift rides the css
+  translate property so the flit move animation's transform and the
+  row measurement never collide, and slack is read off layout metrics
+  so a mid-move cell can't skew its own row's centring
 - hold engages across the whole cell grid including gaps, hold+ borrows
   the pause freeze rather than forcing the still filter, and the anim
   filter simplifies to show/hide with a separate pause chip for stills;
