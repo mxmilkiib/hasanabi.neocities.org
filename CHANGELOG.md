@@ -56,6 +56,13 @@ not versions - the page ships continuously to Neocities.
   column of 0, so every repin and card fill stamped --nx:0 and the
   tweet card came back flush-left - the measurement now declines
   unrendered rows and keeps the stamp they had
+- a counted sub chip can shade on a months gradient: ?subg= (or the sub
+  badge row's new off/on pair) climbs it teal → accent across a
+  120-month ceiling, each chip stamped with its --subp rung. counted
+  chips also tooltip the span as Yyr, Xm ('34' → '2yr, 10m'), so the
+  no-count dim now keys off the placeholder's title text instead of
+  [title] alone - restored-history chips backfill their stamp on a
+  mode switch or when the option turns on
 
 ### Resources
 - vimium joins extra links beside scroll anywhere - the
@@ -140,7 +147,7 @@ not versions - the page ships continuously to Neocities.
   names then a hardcoded descriptive pass. the generated list now
   carries the descriptive labels in cycle order and the duplicate
   tail is gone
-- 'stream status' claims its label column: the row's <b> sat empty
+- 'stream status' claims its label column: the row's `<b>` sat empty
   with the name inlined into the right-hand text - it now heads the
   left column, above the state dots that were already stacking there
 - the localStorage/PWA footnote gains an "&amp;c" heading, sitting as a
@@ -1284,7 +1291,7 @@ not versions - the page ships continuously to Neocities.
 - OBS overlay mode: ?overlay strips the page to live rows on a
   transparent background - header, chat bar, video, panes and popups
   all hide - ready to drop into a browser source
-- message permalinks: clicking a row's timestamp writes ?mid=<id> into
+- message permalinks: clicking a row's timestamp writes `?mid=<id>` into
   the url, and a link opened that way scrolls to and flashes the row
 - floating find-bar: ctrl+f, / or the ⌕ header button opens a search
   over the rendered scrollback - bare words match text, user:login the
@@ -1434,7 +1441,7 @@ not versions - the page ships continuously to Neocities.
   a page turn at one page of live rows; the older excess stays behind
   as ghosts of the page just turned
 - tweet video thumbs actually play on click now: video.twimg.com 403s
-  any request carrying a foreign Referer and <video> can't set
+  any request carrying a foreign Referer and `<video>` can't set
   referrerpolicy, so the click swap produced a dead element - the thumb
   now swaps for a srcdoc iframe whose meta forces no-referrer, sized
   exactly by the relay's new width/height payload (16:9 fallback)
@@ -1728,7 +1735,7 @@ not versions - the page ships continuously to Neocities.
 - a tweet video or youtube embed opened mid-session was saved into row
   history with its autoplay intact, so the next page load replayed it
   with no click - saves now strip yt iframes back to the ▶ toggle and
-  drop autoplay off <video>/<audio>, which restore paused but playable
+  drop autoplay off `<video>`/`<audio>`, which restore paused but playable
 - twitch login was dead everywhere, not just phones: the reachability
   preflight used fetch(), which neocities' connect-src 'self' csp always
   blocks, so the button could only ever say "connection problem". the
