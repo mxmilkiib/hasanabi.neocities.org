@@ -95,7 +95,8 @@ not versions - the page ships continuously to Neocities.
   fossil-fuel council/pension network) joins the divest row
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
-- spaces settles at the bottom of the resources page, after osint
+- spaces settles at the bottom of the resources page, after osint;
+  participatory rises to sit under dual power, before the theory sep
 - unruly subjects joins channels/streams: chenjerai kumanyika's weekly
   politics show out of rowhome productions, carrying site, patreon,
   ig and the buzzsprout feed - which rides deprogram's service column
