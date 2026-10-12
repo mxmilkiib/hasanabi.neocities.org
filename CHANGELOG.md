@@ -312,7 +312,7 @@ not versions - the page ships continuously to Neocities.
   the anim legs, source tabs and mix just toggle
 - a '↔' chip after the age-rows button cycles re-sort motion across
   eight modes: cells wrap off the nearer edge and back on from the
-  side nearest their new spot (the FLIP default), the grid fades back
+  left at their new spot (the FLIP default), the grid fades back
   in, reshuffles draw with no motion, movers wrap in a cascading
   ripple or snap to their spots one at a time, the rebuilt grid pops
   back to size, sharpens out of a blur, or swings down like a page

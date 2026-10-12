@@ -11832,14 +11832,14 @@
     emoteQ.focus();
   });
   // re-sort motion cycles: 0 cells wrap off the near edge and back on
-  // to their spots, 1 the rebuilt grid fades back in, 2
+  // from the left, 1 the rebuilt grid fades back in, 2
   // reshuffles redraw with no motion at all, 3 the wraps ripple down
   // the grid, 4 the grid pops back to size, 5 it sharpens out of a
   // blur, 6 it swings down like a page turn, 7 cells snap to their
   // spots one at a time
   const EPICK_MOVE_KEY = 'hasan-epickmove';
   const MOVE_MODES = [
-    'slide - cells wrap off the edge and back on',
+    'slide - cells wrap off the edge and back on from the left',
     'fade - the rebuilt grid fades back in',
     'off - reshuffles redraw instantly',
     'ripple - the wraps cascade down the grid',
@@ -12458,19 +12458,19 @@
             return;
           }
           // the wrap: out the nearer edge on the old row, an off-screen
-          // hop, then in from the edge nearer the destination - no
-          // whole-line traversal. twin-offset keyframes make the hop
-          // instant; ripple staggers by delay
+          // hop, then in from the left on the new one - one direction,
+          // like text wrapping, and no whole-line slide off. twin-
+          // offset keyframes make the hop instant; ripple staggers by
+          // delay
           const br = b.getBoundingClientRect();
           const mid = gR.left + gR.width / 2;
           const xR = dx + (gR.right - br.left) + 8;   // fully off right
           const xL = dx - (br.right - gR.left) - 8;   // fully off left
           const exitX = br.left + br.width / 2 >= mid ? xR : xL;
-          const enterX = br.left - dx + br.width / 2 >= mid ? xR : xL;
           b.animate([
             { transform: `translate(${dx}px, ${dy}px)` },
             { transform: `translate(${exitX}px, ${dy}px)`, offset: .45 },
-            { transform: `translate(${enterX}px, 0)`, offset: .45 },
+            { transform: `translate(${xL}px, 0)`, offset: .45 },
             { transform: 'translate(0px, 0px)' },
           ], { duration: 380, easing: 'ease', delay: epickMove === 3 ? Math.min(240, i * 9) : 0 });
           b.style.transform = '';
