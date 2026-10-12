@@ -224,6 +224,13 @@ not versions - the page ships continuously to Neocities.
   never landed heal off the archive instead - its records write
   synchronously at render, so the stretch between the blob's last write
   and the reload re-stamps once the emote sets land
+- the archive heal reaches the whole ladder now: it only scanned records
+  newer than the blob's last write, and its text field never carried
+  rendered emotes at all (img alts aren't text) - so a stamp lost before
+  that write, or a row past restored scrollback's reach, stayed dead.
+  records now carry their emote names in their own field, the first pass
+  scans the full 12h horizon, and restored rows' emoji re-touch the same
+  way since bare text is all they have
 - the merged grid's 'still to happen' squares flush after everything
   now - the parked emoji tail sat below the violet rungs, so cells
   printed under 'no items' squares that nothing should outrank

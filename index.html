@@ -4593,13 +4593,23 @@
       }
       // every rendered row archives flat fields for the archive search;
       // whispers never reach the log so they stay out of the index too
-      if (r.dataset.mid) archBuf.push({
-        mid: r.dataset.mid, ts: +r.dataset.ts || 0, ch: r.dataset.ch || '',
-        login: r.dataset.u || '',
-        kind: r.classList.contains('notice') ? 'notice' : 'msg',
-        name: (r.querySelector('.name') || {}).textContent || '',
-        text: (r.textContent || '').slice(0, 500),
-      });
+      if (r.dataset.mid) {
+        // textContent drops img alts, so the row's emote names ride in
+        // their own field - a text-only record can't heal a dead band
+        const ems = [];
+        for (const im of r.querySelectorAll('img.emote'))
+          if (im.alt && !im.closest('.reply,.aux')) ems.push(im.alt);
+        for (const t of (r.querySelector('.msg') || r).textContent.split(/\s+/))
+          if (EMOJI_SET.has(t)) ems.push(t);
+        archBuf.push({
+          mid: r.dataset.mid, ts: +r.dataset.ts || 0, ch: r.dataset.ch || '',
+          login: r.dataset.u || '',
+          kind: r.classList.contains('notice') ? 'notice' : 'msg',
+          name: (r.querySelector('.name') || {}).textContent || '',
+          text: (r.textContent || '').slice(0, 500),
+          ...(ems.length ? { em: ems } : {}),
+        });
+      }
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
       if (unfocused && r.classList.contains('kw') && !r.classList.contains('self')) {
@@ -12154,6 +12164,10 @@
         if (!im.alt || im.closest('.reply,.aux')) continue;
         if (rts > (useTs[im.alt] || 0)) { useTs[im.alt] = rts; healed = true; }
       }
+      // emoji ride as bare text, not imgs - same token scan the live
+      // stamp path runs
+      for (const t of (row.querySelector('.msg') || row).textContent.split(/\s+/))
+        if (EMOJI_SET.has(t) && rts > (useTs[t] || 0)) { useTs[t] = rts; healed = true; }
     }
     if (healed) saveUse();
   }
@@ -12162,25 +12176,38 @@
   // render, so it holds every use the dead band is missing. walk records
   // newer than the blob's last write and re-touch their stamps the same
   // way; runs once per emote-set pass since name resolution needs them
+  let archDeepHealed = false;
   function healUseArchive() {
-    if (!archDb || !savedUse.w || !(chanSets[CHANNEL] || twSets.length)) return;
+    if (!archDb || !(chanSets[CHANNEL] || twSets.length)) return;
     let healed = false;
     const twCodes = new Set();
     for (const s of twSets) for (const e of s.emoteList) twCodes.add(e.code);
+    // the first pass scans the whole ladder horizon - a stamp lost before
+    // the blob's last write can't resurface in a w-bound scan. reruns (as
+    // later sets land) only need the stretch past that write
+    const lo = archDeepHealed ? Math.max((savedUse.w || 0) + 1, useT0)
+      : Math.max(useT0, Date.now() - 43.2e6);
+    // a deep pass only counts once the channel's own set is in - earlier
+    // calls rerun it so late-landing providers still resolve their window
+    if (chanSets[CHANNEL]) archDeepHealed = true;
     try {
       const tx = archDb.transaction('msgs', 'readonly');
       tx.objectStore('msgs').index('ts')
-        .openCursor(IDBKeyRange.lowerBound(savedUse.w + 1)).onsuccess = (e) => {
+        .openCursor(IDBKeyRange.lowerBound(lo)).onsuccess = (e) => {
           const cur = e.target.result;
           if (!cur) return;
           const r = cur.value;
-          if (r.kind === 'msg' && r.ts >= useT0 && r.text)
-            for (const tok of r.text.split(/\s+/)) {
+          if (r.kind === 'msg' && r.ts >= useT0)
+            // records carry their emote names in .em - older records only
+            // have text, where rendered emotes never appear, so those
+            // scan for emoji and unrendered codes instead
+            for (const tok of r.em || (r.text || '').split(/\s+/)) {
               // the archived text is the whole row - the chatter's own
               // nick can coincide with an emote code, so skip name tokens
-              if (tok === r.name || tok === r.login) continue;
-              const en = emoteNameOf(r.ch || CHANNEL, tok);
-              const n = en || (twCodes.has(tok) || EMOJI_SET.has(tok) ? tok : null);
+              if (!r.em && (tok === r.name || tok === r.login)) continue;
+              const n = r.em ? tok
+                : (emoteNameOf(r.ch || CHANNEL, tok) ||
+                   (twCodes.has(tok) || EMOJI_SET.has(tok) ? tok : null));
               if (n && r.ts > (useTs[n] || 0)) { useTs[n] = r.ts; healed = true; }
             }
           cur.continue();
