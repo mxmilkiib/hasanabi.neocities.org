@@ -254,7 +254,7 @@ not versions - the page ships continuously to Neocities.
 - the ladder picks up rungs at 150s, 210s and 4½m, thinning the
   long 2m-5m stretch where cells used to bunch between far-apart
   squares, and the sub-2m stretch becomes a ten-second walk -
-  50s, 70s, 80s, 90s, 100s, 110s replacing the 45s/105s pair
+  40s, 50s, 70s, 80s, 90s, 100s, 110s replacing the 45s/105s pair
 - the never-used tail opens on its own row in every age-rows mode: the
   first cell past each used->never seam wears a marker that the break
   css sends to column one
