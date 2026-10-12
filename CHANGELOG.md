@@ -116,6 +116,8 @@ not versions - the page ships continuously to Neocities.
 - the header's rate graph and button row sit flush with the header
   edges after the vertical padding went away entirely, the pinned
   corner buttons and minimised-strip hover following suit
+- the site-updated bar admits the risk now: "warning: wip, maybe i've
+  broken something" sits between the notice and the ctrl-r pointer
 - ?reset performs the reset-all-settings wipe from a url: the button's
   routine moved into a shared resetOpts(), and the url path defers it
   past script init - the keep-list reads PEEK_KEY, which sits in TDZ
