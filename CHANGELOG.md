@@ -6,6 +6,12 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-12
 
 ### Split columns
+- level 8 trades the stacked rail for a vertical split: main becomes a
+  two-column grid, chat over the emote picker on the left, video over
+  stats in a rail spanning both rows. the left seam still drags the
+  column share (--railw moved to main so the grid track can read it),
+  the jdown pill centres over the chat cell, and saved splits 7-8
+  restore now (the clamp still stopped at 6)
 - the rail's left edge is a grab seam now: dragging it fixes the rail
   at a width (62% of the window at most) and the chat columns give up
   the room in equal shares; the width saves with the option bundle

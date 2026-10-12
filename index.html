@@ -665,14 +665,14 @@
   #rail #htabStats { flex: 2 1 0; min-height: 0; overflow-y: auto; padding: 0 10px; }
   /* rail panes keep their scrollbars pinned like .hp-scroll - a bar that
      only shows mid-gesture leaves the pane looking already bottomed out */
-  #rail #emoteGrid, #rail #htabStats { overflow-y: scroll;
+  #rail #emoteGrid, #rail #htabStats, main.vgrid #emoteGrid { overflow-y: scroll;
     scrollbar-width: auto; scrollbar-color: color-mix(in oklch, var(--panel), var(--text) 40%) transparent; }
-  #rail #emoteGrid::-webkit-scrollbar, #rail #htabStats::-webkit-scrollbar { width: 12px; }
-  #rail #emoteGrid::-webkit-scrollbar-thumb, #rail #htabStats::-webkit-scrollbar-thumb {
+  #rail #emoteGrid::-webkit-scrollbar, #rail #htabStats::-webkit-scrollbar, main.vgrid #emoteGrid::-webkit-scrollbar { width: 12px; }
+  #rail #emoteGrid::-webkit-scrollbar-thumb, #rail #htabStats::-webkit-scrollbar-thumb, main.vgrid #emoteGrid::-webkit-scrollbar-thumb {
     background: color-mix(in oklch, var(--panel), var(--text) 40%); border-radius: 6px; }
-  #rail #emoteGrid::-webkit-scrollbar-thumb:hover, #rail #htabStats::-webkit-scrollbar-thumb:hover {
+  #rail #emoteGrid::-webkit-scrollbar-thumb:hover, #rail #htabStats::-webkit-scrollbar-thumb:hover, main.vgrid #emoteGrid::-webkit-scrollbar-thumb:hover {
     background: color-mix(in oklch, var(--panel), var(--text) 55%); }
-  #rail #emoteGrid::-webkit-scrollbar-track, #rail #htabStats::-webkit-scrollbar-track { background: transparent; }
+  #rail #emoteGrid::-webkit-scrollbar-track, #rail #htabStats::-webkit-scrollbar-track, main.vgrid #emoteGrid::-webkit-scrollbar-track { background: transparent; }
   /* video floated or off: the picker and stats split the column evenly */
   #rail.novid #emotePick, #rail.novid #htabStats { flex: 1 1 0; }
   /* the emotes/stats seam: an invisible grab strip centred on the
@@ -696,6 +696,29 @@
      little else */
   #rail #htabStats.st-low #statsBody > .st-panel:not(.st-rate) { display: none; }
   #rail #htabStats.st-low #statsBody > .st-rate { order: -1; }
+  /* level 8's vertical split: chat over the emote picker in the left
+     column, video over stats in a rail that spans both rows. vid and
+     stats keep their rail resets; the picker takes the same resets as
+     a direct grid child of main */
+  main.vgrid { display: grid;
+    grid-template-columns: minmax(0, 1fr) min(var(--railw, 34%), 62%);
+    grid-template-rows: minmax(0, 3fr) minmax(0, 2fr); }
+  main.vgrid > * { min-width: 0; min-height: 0; }
+  main.vgrid #log { grid-column: 1; grid-row: 1; }
+  main.vgrid > #emotePick { grid-column: 1; grid-row: 2; position: static; transform: none;
+    width: auto; max-width: none; height: auto; max-height: none; border: 0; border-radius: 0;
+    border-top: 2px solid var(--line); box-shadow: none; }
+  main.vgrid > #emotePick .epick-handle, main.vgrid > #emotePick .ep-size { display: none; }
+  /* the rail's edge strip straddles the shared border like it does in flex */
+  main.vgrid #colSplit { grid-column: 2; grid-row: 1 / -1; justify-self: start; margin-left: -4px; }
+  /* width: auto - .fixed's width would resolve its 62% cap against the
+     track itself and shrink the rail inside its own cell */
+  main.vgrid #rail { grid-column: 2; grid-row: 1 / -1; width: auto; }
+  /* the pill and its flankers centre over the chat cell, not the grid */
+  main.vgrid #jdownLog, main.vgrid .jdc[data-for="jdownLog"] { bottom: calc(40% + 10px); }
+  main.vgrid #jdownLog { left: calc((100% - min(var(--railw, 34%), 62%)) / 2); }
+  main.vgrid .jdc[data-for="jdownLog"].l { left: calc((100% - min(var(--railw, 34%), 62%)) * .25); }
+  main.vgrid .jdc[data-for="jdownLog"].r { left: calc((100% - min(var(--railw, 34%), 62%)) * .75); }
   #rail #htabStats.st-min #statsBody > .st-trio { display: none; }
 
   .empty {
@@ -2340,7 +2363,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / right <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; the button's click lists every mode while the wheel cycles; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them, and its left edge drags the chat columns narrower or wider - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; the button's click lists every mode while the wheel cycles; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them, and its left edge drags the chat columns narrower or wider - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat; the last pair run one chat column instead, plain or a vertical split - emotes under the chat, stats under the video<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
@@ -7955,7 +7978,7 @@
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos,
       lbls: lblsOn ? 1 : 0,
       split: splitLevel,
-      railw: railEl.classList.contains('fixed') ? parseInt(railEl.style.getPropertyValue('--railw')) || 0 : 0,
+      railw: railEl.classList.contains('fixed') ? parseInt(mainEl.style.getPropertyValue('--railw')) || 0 : 0,
       rvid: vidRail,
       preset: curTheme,
     };
@@ -8092,9 +8115,9 @@
       try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
       if (o.epgeo.left != null) setPin(true);
     }
-    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 6) setSplit(o.split);
+    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 8) setSplit(o.split);
     railEl.classList.toggle('fixed', o.railw > 0);
-    if (o.railw > 0) railEl.style.setProperty('--railw', o.railw + 'px');
+    if (o.railw > 0) mainEl.style.setProperty('--railw', o.railw + 'px');
     // after the split so a rail exists to dock into; outside rail it just
     // stores the mode for the next dock. the boolean 'video' above only
     // spans shown/hidden - this carries dock/float too
@@ -9815,6 +9838,7 @@
   function syncRailSplit() {
     const statsTab = document.getElementById('htabStats');
     railSplitEl.hidden = railEl.hidden || emotePick.hidden ||
+      emotePick.parentNode !== railEl ||
       statsTab.parentNode !== railEl || statsTab.hidden;
   }
   // the seam drags like a popup edge - the panes trade the column
@@ -9843,7 +9867,7 @@
   colSplitEl.addEventListener('pointermove', (e) => {
     if (!colSplitEl.hasPointerCapture(e.pointerId)) return;
     railEl.classList.add('fixed');
-    railEl.style.setProperty('--railw',
+    mainEl.style.setProperty('--railw',
       Math.max(120, Math.round(railEl.getBoundingClientRect().right - e.clientX)) + 'px');
   });
   colSplitEl.addEventListener('pointerup', () => saveOpts());
@@ -9862,7 +9886,16 @@
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
     if (on) {
       if (!statsHome) statsHome = { parent: statsTab.parentNode, next: statsTab.nextSibling };
-      railEl.append(emotePick, railSplitEl, statsTab);
+      // level 8 grids main into two columns instead: the picker drops
+      // under the chat column while the rail spans both rows holding
+      // video over stats
+      mainEl.classList.toggle('vgrid', level === 8);
+      if (level === 8) {
+        mainEl.insertBefore(emotePick, colSplitEl);
+        railEl.append(railSplitEl, statsTab);
+      } else {
+        railEl.append(emotePick, railSplitEl, statsTab);
+      }
       emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
       statsTab.hidden = level !== 4 && level !== 8;
       if (statsLink.classList.contains('on')) switchTab('htabCfg');
@@ -9898,6 +9931,7 @@
       setTimeout(renderStats);
       syncRailSplit();
     } else {
+      mainEl.classList.remove('vgrid');
       // statsHome only exists after a dock - an undock before rail was
       // ever entered (or after a restore) just hides the tab pane
       if (statsHome) {
@@ -9922,8 +9956,8 @@
   // video+emotes in 5, emotes alone in 6 (video floats). 7 and 8 run
   // one chat column beside the rail instead - video+emotes, then the
   // same with stats back in
-  const SPLIT_NAMES = ['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', '2col+vid·emotes·stats'];
-  const splitGlyph = (l) => l === 1 ? '▮' : l === 8 ? '▮▯' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
+  const SPLIT_NAMES = ['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', 'vsplit: chat·emotes | vid·stats'];
+  const splitGlyph = (l) => l === 1 ? '▮' : l === 8 ? '⊞' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
     level = Math.max(1, Math.min(8, level));
@@ -13288,7 +13322,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes', '2col+vid·emotes', '2col+vid·emotes·stats'],
+    helpSub: SUB_MODES, helpEonly: EMOTE_MODES, helpSplit: ['1', '2', '3', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes', '2col+vid·emotes', 'vsplit: chat·emotes | vid·stats'],
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'],
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
