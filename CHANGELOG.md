@@ -83,6 +83,11 @@ not versions - the page ships continuously to Neocities.
   ellipsizes before the flanks do
 
 ### Misc
+- a staleness sweep: ?split=7-8 in a copied settings url no longer falls
+  back to two columns (the url path's clamp still stopped at 6 after the
+  saved-opts one went to 8), the spark's static label says 4 minutes like
+  the window it draws, and the age-rows button's markup title plus the
+  leftover grid-pin clearing from an earlier centred-rows draft went
 - nightshade stops pinning the quarter-size emote grid - the preset now
   names 1x, so a fresh profile and any nightshade apply both land on the
   normal cell size (a saved zoom pick still overrides)
