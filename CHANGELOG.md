@@ -71,6 +71,11 @@ not versions - the page ships continuously to Neocities.
   no-count dim now keys off the placeholder's title text instead of
   [title] alone - restored-history chips backfill their stamp on a
   mode switch or when the option turns on
+- the num-left sub chip's left edge holds still as the clock ticks:
+  the stamp now sets tabular digits so '1' stops running narrow in
+  proportional faces (21:57:10 used to sit tighter than 21:57:09),
+  and the 12h formats print a 2-digit hour so 9->10 and 12->1 no
+  longer grow the stamp a character twice a day
 - fossa's mid-line thanks - 'thank you sillybilly01 for the 11
   gifties' - gets the same treatment as the tail pattern: the name
   links in the thanked chatter's colour, and the gift count runs the

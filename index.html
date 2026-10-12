@@ -835,7 +835,11 @@
   #replyBar button { border: 0; background: none; color: var(--text-dim);
     font: inherit; cursor: pointer; padding: 0 2px; }
   #replyBar button:hover { color: var(--text); }
-  .time { color: var(--text-dim); margin-right: 5px; margin-left: 3px; }
+  .time { color: var(--text-dim); margin-right: 5px; margin-left: 3px;
+    /* tabular digits pin the stamp to a constant width as it ticks -
+       in a proportional face '1' runs narrow, which used to slide the
+       num-left sub chip's left edge a pixel or two every few seconds */
+    font-variant-numeric: tabular-nums; }
   /* a replayed line recovered over an outage carries a left bar like a
      highlighted row, but in the dim line shade and with no tint -
      visible without shifting any column. rows with their own bar
@@ -3751,8 +3755,11 @@
   // formatToParts so the seconds fragment - and its separator - can be
   // wrapped and hidden by the 'no seconds' mode regardless of locale
   const TIME_FMT = new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const TIME_FMT12 = new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-  const TIME_FMT12NS = new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit', hour12: true });
+  // 2-digit hour keeps the 12h stamp a fixed length too - a 'numeric'
+  // hour grows a char at 9->10 and 12->1, which would jog the row's
+  // leading edge (and the num-left sub chip with it) twice a day
+  const TIME_FMT12 = new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  const TIME_FMT12NS = new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', hour12: true });
   function fmtRowTime(when) {
     const fmt = timeIdx >= 4 ? TIME_FMT12 : timeIdx === 3 ? TIME_FMT12NS : TIME_FMT;
     const parts = fmt.formatToParts(when);
