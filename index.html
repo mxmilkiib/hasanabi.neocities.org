@@ -2203,8 +2203,6 @@
     from { background: color-mix(in srgb, var(--fc, var(--accent)) 95%, transparent); }
     45% { background: color-mix(in srgb, var(--fc, var(--accent)) 55%, transparent); }
   }
-  /* re-sort moves animate; set inline by the FLIP step in rebuildPicker */
-  #emoteGrid .emove { transition: transform .35s ease; }
   /* the whole-grid re-sort modes sweep the rebuilt grid back in off
      their own keyframes - each class is pulled and re-added so a new
      rebuild retriggers the animation */
@@ -2217,7 +2215,8 @@
   #emoteGrid.eflip { transform-origin: 50% 0; animation: eflipin .34s ease; }
   @keyframes eflipin { from { transform: perspective(700px) rotateX(-58deg); opacity: .25; } }
   #emoteGrid {
-    flex: 1; overflow-y: auto;
+    /* x clips so a wrapping mover can slide fully off the edge */
+    flex: 1; overflow-y: auto; overflow-x: hidden;
     display: grid; grid-template-columns: repeat(auto-fill, 40px);
     /* rows size to content so section heads don't sit in a 40px track */
     gap: 2px; align-content: start;
@@ -2237,7 +2236,7 @@
      and it stays put while the provider lists flow beneath */
   #emoteRecent {
     flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
-    max-height: 84px; overflow-y: auto; padding: 3px 4px;
+    max-height: 84px; overflow-y: auto; overflow-x: hidden; padding: 3px 4px;
     border-bottom: 1px solid var(--line);
     background: color-mix(in srgb, var(--line) 45%, transparent);
   }
@@ -2451,7 +2450,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells slide, ripple, or queue one at a time; the grid pops, blurs, page-turns, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells wrap off the edge and back on, ripple, or queue one at a time; the grid pops, blurs, page-turns, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -11810,17 +11809,18 @@
     saveOpts();
     emoteQ.focus();
   });
-  // re-sort motion cycles: 0 cells slide to their spots, 1 the rebuilt
-  // grid fades back in, 2 reshuffles redraw with no motion at all, 3
-  // the slide ripples down the grid, 4 the grid pops back to size,
-  // 5 it sharpens out of a blur, 6 it swings down like a page turn,
-  // 7 cells snap to their spots one at a time
+  // re-sort motion cycles: 0 cells wrap off one edge and back on the
+  // other to their spots, 1 the rebuilt grid fades back in, 2
+  // reshuffles redraw with no motion at all, 3 the wraps ripple down
+  // the grid, 4 the grid pops back to size, 5 it sharpens out of a
+  // blur, 6 it swings down like a page turn, 7 cells snap to their
+  // spots one at a time
   const EPICK_MOVE_KEY = 'hasan-epickmove';
   const MOVE_MODES = [
-    'slide - cells glide to their new spots',
+    'slide - cells wrap off one edge and on the other',
     'fade - the rebuilt grid fades back in',
     'off - reshuffles redraw instantly',
-    'ripple - movers glide in a top-down cascade',
+    'ripple - the wraps cascade down the grid',
     'zoom - the rebuilt grid pops back to size',
     'blur - the rebuilt grid sharpens back in',
     'page - the grid swings down like a page turn',
@@ -12387,8 +12387,8 @@
     }
   };
   // rebuild keeping the scroll spot and any flashes still fading; rows
-  // that moved in the re-sort get a brief FLIP slide so the change reads
-  // as a swap rather than a redraw
+  // that moved in the re-sort wrap off an edge and on the other so the
+  // change reads as a swap rather than a redraw
   const rebuildPicker = () => {
     const st = emoteGrid.scrollTop;
     // a name shows twice when it's both recent and in its home section -
@@ -12399,8 +12399,8 @@
     const flipSel = emotePick.classList.contains('agerows') ? 'button[data-ins]' : 'button[data-ins], .eage[data-age]';
     const flipKey = (b) => b.dataset.ins !== undefined ? 'i' + b.dataset.ins : 'a' + b.dataset.age;
     const before = new Map();
-    // slide, ripple and queue all fly the FLIP - they only differ in
-    // how each mover's transition is delayed
+    // slide, ripple and queue all ride the wrap FLIP - they only
+    // differ in how each mover is released
     const doFlip = !epickMove || epickMove === 3 || epickMove === 7;
     // layout metrics, not rects: a rect would read a cell's centre-shift
     // or a live emove as movement, and they batch into one layout pass
@@ -12423,26 +12423,31 @@
         const r0 = before.get(flipKey(b))?.shift();
         if (!r0) continue;
         const dx = r0[0] - b.offsetLeft, dy = r0[1] - b.offsetTop;
-        if (dx || dy) { b.style.transform = `translate(${dx}px,${dy}px)`; movers.push(b); }
+        if (dx || dy) { b.style.transform = `translate(${dx}px,${dy}px)`; movers.push([b, dx, dy]); }
       }
       if (movers.length) {
         void emoteGrid.offsetWidth;
-        movers.forEach((b, i) => {
+        const gR = emoteGrid.getBoundingClientRect();
+        movers.forEach(([b, dx, dy], i) => {
           if (epickMove === 7) {
             // queue snaps instead of gliding - each mover's offset lets
             // go on its own tick, so cells land instantly, one at a time
             setTimeout(() => { b.style.transform = ''; }, i * 40);
             return;
           }
-          b.classList.add('emove');
-          // ripple staggers each mover by its grid order, so the slide
-          // cascades down the picker instead of landing all at once
-          b.style.transitionDelay = epickMove === 3 ? Math.min(240, i * 9) + 'ms' : '';
+          // the wrap: off the right edge on the old row, an off-screen
+          // hop, then in from the left on the new one. twin-offset
+          // keyframes make the hop instant; ripple staggers by delay
+          const br = b.getBoundingClientRect();
+          const exitX = dx + (gR.right - br.left) + 8;
+          const enterX = dx - (br.right - gR.left) - 8;
+          b.animate([
+            { transform: `translate(${dx}px, ${dy}px)` },
+            { transform: `translate(${exitX}px, ${dy}px)`, offset: .45 },
+            { transform: `translate(${enterX}px, 0)`, offset: .45 },
+            { transform: 'translate(0px, 0px)' },
+          ], { duration: 380, easing: 'ease', delay: epickMove === 3 ? Math.min(240, i * 9) : 0 });
           b.style.transform = '';
-          b.addEventListener('transitionend', () => {
-            b.classList.remove('emove');
-            b.style.transitionDelay = '';
-          }, { once: true });
         });
       }
     }
