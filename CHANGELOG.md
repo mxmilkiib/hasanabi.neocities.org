@@ -56,6 +56,9 @@ not versions - the page ships continuously to Neocities.
 - the chappo trap house row gains an instagram link
 - the onion (us satire) caps extra links
 - free culture leads the libre page, promoted from seventh
+- a temp aid groups row lands under mutual aid: brighton abc, bristol
+  abc, the abcf federation and abc wien for prisoner support, plus the
+  325 collective's repression docs - marked for folding later
 
 ### Help popup
 - the localStorage/PWA footnote gains an "&amp;c" heading, sitting as a
