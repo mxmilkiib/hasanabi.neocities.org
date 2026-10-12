@@ -229,9 +229,10 @@ no dependencies beyond CDN-hosted fonts.
   `1⅓x`/`1½x`/`1⅔x`/`2x` buttons size the grid, `hold`/`hold+` freezes
   usage reshuffles while the pointer is over the grid - `hold+`, the
   default, also pauses animated cells - a pause chip swaps cells for
-  their still frames, and `↔` cycles how a re-sort moves: cells wrap
-  off the popup's edge and back on at their new spot, wrap in a
-  cascading ripple or snap over one at a time, the rebuilt grid pops,
+  their still frames, and `↔` cycles how a re-sort moves: cells nudge
+  a square over or wrap off the popup's edge and back on at their new
+  spot, wrap in a cascading ripple or snap over one at a time, the
+  rebuilt grid pops,
   un-blurs, page-turns or fades in, or reshuffles draw with no motion
   at all. The wheel steps any option chip through its states - down
   forward, up back.

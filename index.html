@@ -2203,6 +2203,9 @@
     from { background: color-mix(in srgb, var(--fc, var(--accent)) 95%, transparent); }
     45% { background: color-mix(in srgb, var(--fc, var(--accent)) 55%, transparent); }
   }
+  /* a mover stepping to the next square nudges over on a short slide -
+     only a farther relocation earns the edge wrap */
+  #emoteGrid .emove { transition: transform .2s ease; }
   /* the whole-grid re-sort modes sweep the rebuilt grid back in off
      their own keyframes - each class is pulled and re-added so a new
      rebuild retriggers the animation */
@@ -2450,7 +2453,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · 'tip' toggles the hover card · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells wrap off the edge and back on, ripple, or queue one at a time; the grid pops, blurs, page-turns, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · 'tip' toggles the hover card · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells nudge a square over or wrap off the edge and back on, ripple, or queue one at a time; the grid pops, blurs, page-turns, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -11831,15 +11834,16 @@
     saveOpts();
     emoteQ.focus();
   });
-  // re-sort motion cycles: 0 cells wrap off the near edge and back on
-  // from the left, 1 the rebuilt grid fades back in, 2
+  // re-sort motion cycles: 0 cells nudge to the next square or wrap
+  // off the near edge and back on from the left, 1 the rebuilt grid
+  // fades back in, 2
   // reshuffles redraw with no motion at all, 3 the wraps ripple down
   // the grid, 4 the grid pops back to size, 5 it sharpens out of a
   // blur, 6 it swings down like a page turn, 7 cells snap to their
   // spots one at a time
   const EPICK_MOVE_KEY = 'hasan-epickmove';
   const MOVE_MODES = [
-    'slide - cells wrap off the edge and back on from the left',
+    'slide - cells nudge a square over or wrap off the edge',
     'fade - the rebuilt grid fades back in',
     'off - reshuffles redraw instantly',
     'ripple - the wraps cascade down the grid',
@@ -12450,11 +12454,26 @@
       if (movers.length) {
         void emoteGrid.offsetWidth;
         const gR = emoteGrid.getBoundingClientRect();
+        const cs = getComputedStyle(emoteGrid);
+        const gapX = parseFloat(cs.columnGap) || 0, gapY = parseFloat(cs.rowGap) || 0;
         movers.forEach(([b, dx, dy], i) => {
           if (epickMove === 7) {
             // queue snaps instead of gliding - each mover's offset lets
             // go on its own tick, so cells land instantly, one at a time
             setTimeout(() => { b.style.transform = ''; }, i * 40);
+            return;
+          }
+          // a shift of one square in either axis is a nudge, not a wrap -
+          // the displaced cells step over while only the relocating
+          // emote takes the edge
+          if (Math.abs(dx) <= b.offsetWidth + gapX && Math.abs(dy) <= b.offsetHeight + gapY) {
+            b.classList.add('emove');
+            b.style.transitionDelay = epickMove === 3 ? Math.min(240, i * 9) + 'ms' : '';
+            b.style.transform = '';
+            b.addEventListener('transitionend', () => {
+              b.classList.remove('emove');
+              b.style.transitionDelay = '';
+            }, { once: true });
             return;
           }
           // the wrap: out the nearer edge on the old row, an off-screen
