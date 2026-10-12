@@ -63,6 +63,10 @@ not versions - the page ships continuously to Neocities.
   association
 
 ### Help popup
+- the sub-badge row listed the five modes twice - generated internal
+  names then a hardcoded descriptive pass. the generated list now
+  carries the descriptive labels in cycle order and the duplicate
+  tail is gone
 - the localStorage/PWA footnote gains an "&amp;c" heading, sitting as a
   titled row like stats / etc / blammobot
 - opening the help panel brings it forward over the emote picker, not
