@@ -229,6 +229,9 @@ not versions - the page ships continuously to Neocities.
   shared the ▤ glyph - and its tooltip spells the state out ('2 row
   ends - a row closes at its last square'), the help row and the
   readme's ?epage doc catching up to the fourth centred state too
+- centred age rows now bank the sub-minute era: a row holding the 45s
+  square ends at it even when later rungs or cells share the row, so
+  minute-plus eras always open on a fresh line
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever

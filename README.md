@@ -220,7 +220,9 @@ no dependencies beyond CDN-hosted fonts.
   this session turns gold, and the `▤`/`▥`/`▦` button - labelled with
   its mode number - cycles four states: squares flowing inline between
   cells (0), every era starting a fresh row (1), a row ending at its
-  last square (2), and those same rows centred (3).
+  last square (2), and those same rows centred - where the 45s square
+  always ends its row, so the sub-minute era closes before the
+  minute-plus rungs start (3).
 - Reshuffles animate emotes sliding to their new spots; a just-used
   emote flashes behind its cell, each use stepping the flash ~24° round
   the hue wheel so consecutive uses read as a spectral walk.
@@ -538,7 +540,7 @@ force off.
 | `epnames` | `0`–`2` | picker emote names: off / beside the art / below it |
 | `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
 | `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
-| `epage` | `0`–`3` | picker age-square rows: inline / era rows / row ends at last square / centred |
+| `epage` | `0`–`3` | picker age-square rows: inline / era rows / row ends at last square / centred, 45s closing a row |
 | `epmix` | `1` | picker merged provider grid |
 | `ephold` | `0`–`2` | picker reshuffle hold (2 = hold+, pauses animated cells) |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
