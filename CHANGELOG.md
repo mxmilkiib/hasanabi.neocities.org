@@ -89,6 +89,9 @@ not versions - the page ships continuously to Neocities.
   ig and the buzzsprout feed - which rides deprogram's service column
   like the other rare labels
 
+### Header
+- the rate graph canvas gains 1px of air above and below
+
 ### Sync strip
 - the barber poles' outer ends round off to 4px - the drain's
   retracting edge was cutting square while the track clip only
