@@ -242,6 +242,11 @@ not versions - the page ships continuously to Neocities.
   square ends at it even when later rungs or cells share the row, so
   minute-plus eras always open on a fresh line. the 90s and 3m squares
   got the same hard end, the fresh eras each closing their own row
+- and the row-end break fires on a square sibling now, not just a cell:
+  a dead stretch packs the 90s-8m rungs back-to-back, so a .rowend
+  square followed by another square never broke - the layout stayed
+  merged while the centring math counted a break, and rows centred
+  against phantom boundaries
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever

@@ -2138,13 +2138,17 @@
      the first cell past it opens the next row, so the ladder reads as
      rungs crossed on the way down rather than era nameplates */
   /* pending rungs with no cells after them still ride the last row's
-     tail - nothing follows them to break on */
-  #emotePick.agerows #emoteGrid .eage + button { grid-column-start: 1; }
+     tail - nothing follows them to break on. a dead stretch packs the
+     squares back-to-back, so the break has to fire on a square sibling
+     too, not only a cell */
+  #emotePick.agerows #emoteGrid .eage + :is(button, .eage) { grid-column-start: 1; }
   /* agerows2 flows like inline mode except the last square on each
      visual row ends it - the mark is measured on by paintAgeRows.
-     agerows3 breaks the same way, then centres each row */
-  #emotePick.agerows2 #emoteGrid .eage.rowend + button,
-  #emotePick.agerows3 #emoteGrid .eage.rowend + button { grid-column-start: 1; }
+     agerows3 breaks the same way, then centres each row - and its hard
+     breaks can land on a square whose follower is another square, so
+     the rowend break reads the same pair */
+  #emotePick.agerows2 #emoteGrid .eage.rowend + :is(button, .eage),
+  #emotePick.agerows3 #emoteGrid .eage.rowend + :is(button, .eage) { grid-column-start: 1; }
   /* the source tabs sit left, the option buttons right; a thin popup
      wraps .eopts onto its own line, still hugging the right edge */
   #emotePick .etabsrow { flex: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
