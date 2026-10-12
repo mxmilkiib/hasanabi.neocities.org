@@ -58,6 +58,8 @@ not versions - the page ships continuously to Neocities.
   unrendered rows and keeps the stamp they had
 
 ### Resources
+- relational dialectics joins the conduct row's communication
+  cluster, after radical authenticity
 - hckr news pairs with memeorandum in the us cluster - the hacker
   news timeline frontend
 - magazines get their own row: the left cluster (equator, jacobin,
