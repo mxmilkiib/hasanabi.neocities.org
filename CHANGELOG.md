@@ -60,8 +60,8 @@ not versions - the page ships continuously to Neocities.
 ### Resources
 - relational dialectics joins the conduct row's communication
   cluster, after radical authenticity
-- hckr news pairs with memeorandum in the us cluster - the hacker
-  news timeline frontend
+- the news row gains a tech cluster after south america: hacker news
+  proper, hckr news (the timeline frontend) and hackerweb (hn reader)
 - magazines get their own row: the left cluster (equator, jacobin,
   current affairs, monthly review, organise!, jewish currents, +972,
   scottish left review) plus a press & journals row for the
