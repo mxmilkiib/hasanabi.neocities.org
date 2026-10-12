@@ -2451,7 +2451,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells slide, ripple, the grid pops, blurs, page-turns, fades, or off</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells slide, ripple, or queue one at a time; the grid pops, blurs, page-turns, fades, or off</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -8131,7 +8131,7 @@
       if ((v = g(EPICK_ZOOM_KEY)) !== null) o.epzoom = v;
       if ((v = g(EPICK_SORT_KEY)) !== null) o.epsort = v;
       if ((v = g(EPICK_AGE_KEY)) !== null) o.epage = Math.min(3, +v || 0);
-      if ((v = g(EPICK_MOVE_KEY)) !== null) o.epmove = Math.min(6, +v || 0);
+      if ((v = g(EPICK_MOVE_KEY)) !== null) o.epmove = Math.min(7, +v || 0);
       if ((v = g(EPICK_MIX_KEY)) !== null) o.epmix = v === '1' ? 1 : 0;
       if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '0' || v === '1' || v === '2' ? +v : 2;
       if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
@@ -11813,7 +11813,8 @@
   // re-sort motion cycles: 0 cells slide to their spots, 1 the rebuilt
   // grid fades back in, 2 reshuffles redraw with no motion at all, 3
   // the slide ripples down the grid, 4 the grid pops back to size,
-  // 5 it sharpens out of a blur, 6 it swings down like a page turn
+  // 5 it sharpens out of a blur, 6 it swings down like a page turn,
+  // 7 the movers queue up and go one at a time
   const EPICK_MOVE_KEY = 'hasan-epickmove';
   const MOVE_MODES = [
     'slide - cells glide to their new spots',
@@ -11823,25 +11824,26 @@
     'zoom - the rebuilt grid pops back to size',
     'blur - the rebuilt grid sharpens back in',
     'page - the grid swings down like a page turn',
+    'queue - cells move one at a time',
   ];
   // the grid-level modes animate by class; each maps to its keyframe
   const GRID_FX = { 1: 'efade', 4: 'ezoom', 5: 'eblur', 6: 'eflip' };
   let epickMove = 0;
-  try { epickMove = Math.min(6, Math.max(0, +localStorage.getItem(EPICK_MOVE_KEY) || 0)); } catch {}
+  try { epickMove = Math.min(7, Math.max(0, +localStorage.getItem(EPICK_MOVE_KEY) || 0)); } catch {}
   const moveBtn = document.getElementById('emoteMove');
   function paintMove() {
     // the digit does the telling, like the age-rows glyph
     moveBtn.textContent = `↔${epickMove}`;
     setOn(moveBtn, epickMove !== 2);
-    moveBtn.title = `re-sort motion - ${epickMove} ${MOVE_MODES[epickMove]} - click cycles 0-6`;
+    moveBtn.title = `re-sort motion - ${epickMove} ${MOVE_MODES[epickMove]} - click cycles 0-7`;
   }
   const setMove = (i) => {
-    epickMove = Math.max(0, Math.min(6, +i || 0));
+    epickMove = Math.max(0, Math.min(7, +i || 0));
     try { localStorage.setItem(EPICK_MOVE_KEY, String(epickMove)); } catch {}
     paintMove();
   };
   moveBtn.addEventListener('click', () => {
-    setMove((epickMove + 1) % 7);
+    setMove((epickMove + 1) % 8);
     saveOpts();
     emoteQ.focus();
   });
@@ -12358,8 +12360,9 @@
     const flipSel = emotePick.classList.contains('agerows') ? 'button[data-ins]' : 'button[data-ins], .eage[data-age]';
     const flipKey = (b) => b.dataset.ins !== undefined ? 'i' + b.dataset.ins : 'a' + b.dataset.age;
     const before = new Map();
-    // slide and ripple both fly the FLIP - ripple just delays each mover
-    const doFlip = !epickMove || epickMove === 3;
+    // slide, ripple and queue all fly the FLIP - they only differ in
+    // how each mover's transition is delayed
+    const doFlip = !epickMove || epickMove === 3 || epickMove === 7;
     // layout metrics, not rects: a rect would read a cell's centre-shift
     // or a live emove as movement, and they batch into one layout pass
     if (doFlip)
@@ -12385,15 +12388,23 @@
       }
       if (movers.length) {
         void emoteGrid.offsetWidth;
+        // queue hands every mover the stage alone: a step each, so the
+        // last one waits out the whole chain - shortened on big
+        // re-sorts to keep the march under a couple of seconds
+        const qStep = epickMove === 7 ? Math.max(60, Math.min(200, 1800 / movers.length)) : 0;
         movers.forEach((b, i) => {
           b.classList.add('emove');
           // ripple staggers each mover by its grid order, so the slide
           // cascades down the picker instead of landing all at once
-          b.style.transitionDelay = epickMove === 3 ? Math.min(240, i * 9) + 'ms' : '';
+          b.style.transitionDelay =
+            epickMove === 3 ? Math.min(240, i * 9) + 'ms' :
+            epickMove === 7 ? Math.round(i * qStep) + 'ms' : '';
+          if (epickMove === 7) b.style.transitionDuration = qStep + 'ms';
           b.style.transform = '';
           b.addEventListener('transitionend', () => {
             b.classList.remove('emove');
             b.style.transitionDelay = '';
+            b.style.transitionDuration = '';
           }, { once: true });
         });
       }
@@ -13632,7 +13643,7 @@
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     if (q.has('rbp')) setRbwPal(+q.get('rbp'));
     // emote-picker options: ?epnames=0|1|2&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&
-    // epmix=1&ephold=0|1|2&epmove=0-6&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]&epopen=0|1
+    // epmix=1&ephold=0|1|2&epmove=0-7&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]&epopen=0|1
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(+q.get('epnames') || (flag('epnames') ? 1 : 0)); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
