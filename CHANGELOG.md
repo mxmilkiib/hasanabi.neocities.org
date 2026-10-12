@@ -303,6 +303,9 @@ not versions - the page ships continuously to Neocities.
   and the sort group, and wider seams split the chips into zoom /
   names / sort / filter / hold, with 'mix' gaining the same seam off
   the source tabs
+- the cell area sits back, greyed and held, while chat is still
+  syncing - the boot card, the sync strip and resyncs all keep it
+  dimmed until the backlog lands, with a soft fade as it lifts
 - a 'tip' chip after 'Aa' toggles the cell hover card - off, picker
   cells stop popping the big preview while chat rows' emotes keep
   theirs; saved through the standalone key, the bundle and ?eptips=

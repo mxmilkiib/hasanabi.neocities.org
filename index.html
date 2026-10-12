@@ -2217,6 +2217,11 @@
   @keyframes eblurin { from { filter: blur(9px); opacity: .45; } }
   #emoteGrid.eflip { transform-origin: 50% 0; animation: eflipin .34s ease; }
   @keyframes eflipin { from { transform: perspective(700px) rotateX(-58deg); opacity: .25; } }
+  /* while chat syncs - boot card, strip or resync - the cells sit back
+     greyed and held until the backlog lands */
+  #emoteGrid, #emoteRecent { transition: opacity .3s ease, filter .3s ease; }
+  #emotePick.syncing #emoteGrid, #emotePick.syncing #emoteRecent {
+    filter: grayscale(.55); opacity: .5; pointer-events: none; }
   #emoteGrid {
     /* x clips so a wrapping mover can slide fully off the edge */
     flex: 1; overflow-y: auto; overflow-x: hidden;
@@ -2788,6 +2793,9 @@
   // is what ends it, so the strip falls back to a timeout in case the
   // backlog comes back empty
   let syncTimer = 0, syncing = false;
+  // the picker's cells sit back, greyed and held, while the boot card,
+  // the sync strip or a resync is still catching chat up
+  const paintEpickSync = () => emotePick.classList.toggle('syncing', syncing || !!emptyEl || (!!loadBar && !loadBar.hidden));
   function syncShow(txt) {
     if (!loadBar) return;
     syncing = true;
@@ -2797,12 +2805,13 @@
     if (emptyEl) emptyLabel.textContent = txt;
     loadBar.hidden = !!emptyEl;
     clearTimeout(syncTimer);
-    syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; }, 8000);
+    syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; paintEpickSync(); }, 8000);
+    paintEpickSync();
   }
   function syncHide(ms) {
     if (!loadBar) return;
     clearTimeout(syncTimer);
-    syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; }, ms || 0);
+    syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; paintEpickSync(); }, ms || 0);
   }
   const chanLink = document.getElementById('channelName');
   chanLink.textContent = CHAN_LABEL;
@@ -4165,6 +4174,7 @@
     // the strip goes once real rows flow - a live resync keeps it until
     // its own hide beat so the 'syncing' text can actually be read
     if (!syncing) loadBar.hidden = true;
+    paintEpickSync();
     const nearBottom = stickBottom;
     let html = '';
     let whisHtml = ''; // whisper rows collect beside the log's own batch
@@ -10258,7 +10268,7 @@
       if (!Array.isArray(rows) || !rows.length) return;
       // restored rows mean the card's gone before it ever showed - the
       // strip takes over narrating whatever boot steps are left
-      if (emptyEl) { emptyEl.remove(); emptyEl = null; if (loadBar && loadPhase < LOAD_STEPS) loadBar.hidden = false; }
+      if (emptyEl) { emptyEl.remove(); emptyEl = null; if (loadBar && loadPhase < LOAD_STEPS) loadBar.hidden = false; paintEpickSync(); }
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
       // the one-shot sync wash is a render-time marker only - stripped
       // here so restored scrollback doesn't strobe on every load
@@ -11200,6 +11210,7 @@
   // toggle which groups show ----
   const emojiBtn = document.getElementById('emojiBtn');
   const emotePick = document.getElementById('emotePick');
+  paintEpickSync();
   const emoteQ = document.getElementById('emoteQ');
   const emoteGrid = document.getElementById('emoteGrid');
   const emoteRecent = document.getElementById('emoteRecent');
