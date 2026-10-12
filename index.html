@@ -2451,7 +2451,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells slide, ripple, the grid pops, blurs, page-turns, fades, or off</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells slide, ripple, the grid pops, blurs, page-turns, fades, or off</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -14358,7 +14358,7 @@
   epop.id = 'epop';
   epop.hidden = true;
   document.body.appendChild(epop);
-  let epopEl = null, epopT = 0;
+  let epopEl = null, epopT = 0, epopBelow = false;
   const ebig = (u) => u
     .replace(/(\/emote\/[^/]+\/)[12]x\.webp$/, '$14x.webp')  // 7tv
     .replace(/(\/emote\/[^/]+\/)[12]x$/, '$13x')             // bttv
@@ -14398,11 +14398,23 @@
       epop.appendChild(s);
     }
     epop.hidden = false;
-    // centered above the emote, clamped to the viewport
+    // centered on the emote's column, clamped to the viewport - above
+    // by default, below it once the wheel flips the bottom state
     const r = t.getBoundingClientRect();
     epop.style.left = Math.max(4, Math.min(innerWidth - epop.offsetWidth - 4, r.left + r.width / 2 - epop.offsetWidth / 2)) + 'px';
-    epop.style.top = Math.max(4, r.top - epop.offsetHeight - 8) + 'px';
+    epop.style.top = Math.max(4, Math.min(innerHeight - epop.offsetHeight - 4,
+      epopBelow ? r.bottom + 8 : r.top - epop.offsetHeight - 8)) + 'px';
   }
+  // wheel while the popup's up flips its perch: down puts it under the
+  // emote, up lifts it back above (once it lands the wheel scrolls on)
+  addEventListener('wheel', (e) => {
+    if (epop.hidden || !epopEl) return;
+    const below = e.deltaY > 0;
+    if (below === epopBelow) return;
+    epopBelow = below;
+    epopShow(epopEl);
+    e.preventDefault();
+  }, { passive: false });
   let epopOverX = -1, epopOverY = -1;
   document.addEventListener('mouseover', (e) => {
     // same layout-shift guard as peek: identical coords mean the content

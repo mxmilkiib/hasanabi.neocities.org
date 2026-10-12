@@ -279,6 +279,9 @@ not versions - the page ships continuously to Neocities.
   square followed by another square never broke - the layout stayed
   merged while the centring math counted a break, and rows centred
   against phantom boundaries
+- the emote hover preview gains a bottom state: scrolling down while
+  it's up perches the card under the emote, scrolling up lifts it back
+  above - handy when the hovered cell sits near the viewport top
 - the age-square tint no longer spans the whole ladder - the
   gold-to-violet gradient now runs a minute to six minutes, so every
   rung up to a minute stays full gold and six minutes on is full violet
