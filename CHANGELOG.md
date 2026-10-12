@@ -88,6 +88,8 @@ not versions - the page ships continuously to Neocities.
 - free culture moves below open source with a spacer under it; within
   it copyleft now leads public domain and the gnu fdl sits between
   them
+- the hn frontends fold into hacker news's parenthetical: hckr news
+  and hackerweb now sub-link inside its 'y combinator' note
 - gdpr.eu's 'what is gdpr' joins digital rights beside the ico
   portability link
 - open manufacturing drops its '(wikipedia)' tag, and open design
