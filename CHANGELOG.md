@@ -168,6 +168,9 @@ not versions - the page ships continuously to Neocities.
   donate / chapters cluster) shrink to the note face in firefox too -
   the wrap used surroundContents, which firefox refuses on ranges
   spanning elements; extractContents + insertNode lands the same tree
+- preview cards in nameless rows (notices, gap markers) get the name
+  column's indent too - they anchor on what leads after the time; a
+  sub-mode switch re-measures card rows, not just reply rows
 - the update bar's reload pair now stretch to fill their flanks, each
   pinned at a third of the bar minimum - the label ellipsizes before a
   button can

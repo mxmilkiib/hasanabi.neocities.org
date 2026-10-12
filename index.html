@@ -3930,7 +3930,10 @@
   // ...) render at x=0 and must not anchor, so the walk only accepts
   // elements with width
   function nameColX(r) {
-    const nm = r && r.querySelector('.name');
+    // nameless rows (notices, gap markers) anchor on whatever leads after
+    // the time - a notice label sits in the name's slot
+    const nm = r && (r.querySelector('.name') ||
+      (r.querySelector('.time') || {}).nextElementSibling);
     // a display:none row (a stale page under split, a linkview-hidden
     // row) measures all-zero - returning null keeps whatever stamp it
     // had instead of clobbering the card indent to flush-left
@@ -8676,6 +8679,9 @@
       // measured from the responder's leading edge, so re-indent it now
       rqIndent(row);
     });
+    // card rows without a reply quote get no rqIndent - their --nx stamps
+    // need the full re-measure or they keep the pre-move anchor
+    repin();
   }
 
   function stepSub(dir) {
