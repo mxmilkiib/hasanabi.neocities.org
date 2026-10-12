@@ -173,6 +173,14 @@ not versions - the page ships continuously to Neocities.
   can't float it), floored at the old 4/s for quiet streams - the
   empty-state text reports the live bar
 
+### Emote picker
+- the Aa names toggle becomes a three-state cycle: off → the code
+  beside the art → the code below it, the last stacking icon over
+  centred text in tighter 84px-min cells. the button lights accent on
+  the third state to tell it from beside's plain fill, and the mode
+  persists as 0/1/2 through the standalone key, the options bundle and
+  ?epnames=
+
 ### Misc
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls
   back to two columns (the url path's clamp still stopped at 6 after the
