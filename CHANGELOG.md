@@ -84,6 +84,11 @@ not versions - the page ships continuously to Neocities.
   ig and the buzzsprout feed - which rides deprogram's service column
   like the other rare labels
 
+### Sync strip
+- the barber poles' outer ends round off to 2px - the drain's
+  retracting edge was cutting square while the track clip only
+  rounded the label-side ends
+
 ### Update bar
 - the reload buttons hug the centred text now (10px each side at
   natural width) instead of hovering a third-of-a-gap wide at the

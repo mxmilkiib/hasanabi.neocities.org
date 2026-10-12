@@ -1536,7 +1536,8 @@
   #loadBar .loadbar i { width: 100%; background-color: #e8a33d; animation: barber 3s linear infinite, syncshrink 41.6s ease-in-out infinite; }
   /* Docking the left pole's fill to its inner end means the width drain
      eats the outer edge instead of the edge beside the text */
-  #loadBar .loadbar:first-child i { margin-left: auto; }
+  #loadBar .loadbar:first-child i { margin-left: auto; border-radius: 2px 0 0 2px; }
+  #loadBar .loadbar:last-child i { border-radius: 0 2px 2px 0; }
   /* The drain paces a hue drift too - gold at full width (the emote-age
      rungs' live-crossing #e8a33d), twitch's purple (#9146ff, the send
      button's outline) at the narrowest point */
