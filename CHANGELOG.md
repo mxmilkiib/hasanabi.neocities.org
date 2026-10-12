@@ -58,6 +58,8 @@ not versions - the page ships continuously to Neocities.
   unrendered rows and keeps the stamp they had
 
 ### Resources
+- vimium joins extra links beside scroll anywhere - the
+  vim-keybindings extension
 - relational dialectics joins the conduct row's communication
   cluster, after radical authenticity
 - the news row gains a tech cluster after south america: hacker news
