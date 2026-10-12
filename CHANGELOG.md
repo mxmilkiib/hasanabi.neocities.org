@@ -159,6 +159,13 @@ not versions - the page ships continuously to Neocities.
   translate property so the flit move animation's transform and the
   row measurement never collide, and slack is read off layout metrics
   so a mid-move cell can't skew its own row's centring
+- the use-sort rebuild costs a fraction of what it did: the row-end
+  marks are simulated in one pass from the uniform cell pitch instead
+  of measured off reflows, the flit animation snapshots layout metrics
+  rather than rects, a name->cells index replaces the per-use
+  querySelectorAll scans (poke, lit, unflash), a hidden picker skips
+  its lit writes entirely, and a use that doesn't take the sort lead
+  skips its rebuild outright - a glorp streak reorders nothing now
 - hold engages across the whole cell grid including gaps, hold+ borrows
   the pause freeze rather than forcing the still filter, and the anim
   filter simplifies to show/hide with a separate pause chip for stills;

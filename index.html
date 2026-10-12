@@ -11547,63 +11547,67 @@
   try { epickAge = Math.min(3, Math.max(0, +localStorage.getItem(EPICK_AGE_KEY) || 0)); } catch {}
   const ageBtn = document.getElementById('emoteAgeRows');
   // row-end marks for modes 2 and 3: the last square on each visual row
-  // ends it. measured off the rendered grid since css can't see wraps;
-  // the mark itself moves layout, so it loops until stable
-  let ageRowsShifted = false;
+  // ends it. the cells are uniform one-cell items, so the wrap can be
+  // simulated in one pass instead of measured: a row ends at its last
+  // square and whatever followed it spills into the next row; ehead
+  // takes its own row. marking by measurement reflowed the whole grid
+  // per pass; this needs no layout reads at all
+  let ageRowsShifted = null; // cells wearing a centre shift this paint
   function paintAgeRows() {
     const centred = emotePick.classList.contains('agerows3');
     if (!centred && !emotePick.classList.contains('agerows2')) {
       // stepping out of the centred state strips its visual shifts
       if (ageRowsShifted) {
-        ageRowsShifted = false;
-        for (const el of emoteGrid.children) el.style.translate = '';
+        for (const el of ageRowsShifted) el.style.translate = '';
+        ageRowsShifted = null;
       }
       return;
     }
-    const sqs = [...emoteGrid.querySelectorAll('.eage')];
-    for (let pass = 0; pass < 5; pass++) {
-      const want = new Set();
-      let prev = null, prevTop = 0;
-      for (const sq of sqs) {
-        const t = sq.offsetTop;
-        if (prev && t !== prevTop) want.add(prev);
-        prev = sq; prevTop = t;
+    const kids = emoteGrid.children;
+    const cs = getComputedStyle(emoteGrid);
+    const tracks = cs.gridTemplateColumns.split(' ');
+    const cols = tracks.length, cellW = parseFloat(tracks[0]) || 0;
+    const gap = parseFloat(cs.columnGap) || 0;
+    if (!cellW) return; // a hidden grid reports no tracks - nothing to lay out
+    const isHead = (el) => el.classList.contains('ehead');
+    const isSq = (el) => el.classList.contains('eage');
+    const want = new Set(), spans = []; // row spans, [start, end) kid indexes
+    const n = kids.length;
+    for (let i = 0; i < n;) {
+      if (isHead(kids[i])) { spans.push([i, ++i]); continue; }
+      let end = Math.min(i + cols, n);
+      for (let j = i; j < end; j++) if (isHead(kids[j])) { end = j; break; }
+      let lastSq = -1;
+      for (let j = i; j < end; j++) if (isSq(kids[j])) lastSq = j;
+      if (lastSq >= 0 && lastSq < end - 1) {
+        want.add(kids[lastSq]);
+        spans.push([i, lastSq + 1]);
+        i = lastSq + 1;
+      } else {
+        spans.push([i, end]);
+        i = end;
       }
-      if (prev) want.add(prev);
-      let changed = false;
-      for (const sq of sqs)
-        if (sq.classList.contains('rowend') !== want.has(sq)) {
-          sq.classList.toggle('rowend', want.has(sq));
-          changed = true;
-        }
-      if (!changed) break;
     }
+    for (const el of kids) if (isSq(el)) el.classList.toggle('rowend', want.has(el));
     // centred rows shift each cell right by half its row's slack - the
     // translate property stays clear of the move animation's transform
-    // and of placement itself, so a rebuilt row can't mislead a pin
-    for (const el of emoteGrid.children) el.style.translate = '';
-    if (!centred) return;
-    // layout metrics only - a rect would read mid-move transforms as slack
-    const padR = parseFloat(getComputedStyle(emoteGrid).paddingRight) || 0;
-    const right = emoteGrid.offsetLeft + emoteGrid.clientWidth - padR;
-    let row = [], top = null;
-    const flush = () => {
-      // a full-width header has no slack to split
-      if (row.length && !row[0].classList.contains('ehead')) {
-        const last = row[row.length - 1];
-        const dx = Math.max(0, (right - last.offsetLeft - last.offsetWidth) / 2);
-        if (dx) for (const el of row) el.style.translate = dx + 'px 0';
-      }
-      row = [];
-    };
-    for (const el of emoteGrid.children) {
-      if (!el.offsetParent) continue; // display:none plays no part
-      const t = el.offsetTop;
-      if (top !== null && t !== top) flush();
-      top = t; row.push(el);
+    // and of placement itself, so a rebuilt row can't mislead a pin.
+    // only the previously shifted cells need clearing, not the grid
+    if (ageRowsShifted) {
+      for (const el of ageRowsShifted) el.style.translate = '';
+      ageRowsShifted = null;
     }
-    flush();
-    ageRowsShifted = true;
+    if (!centred) return;
+    // a row's used width is its cells x pitch less the trailing gap -
+    // centred into the content box, still no layout reads
+    const contentW = emoteGrid.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+    const pitch = cellW + gap, shifted = [];
+    for (const [a, b] of spans) {
+      if (isHead(kids[a])) continue;
+      const dx = Math.max(0, (contentW - (b - a) * pitch + gap) / 2);
+      if (dx) for (let j = a; j < b; j++) { kids[j].style.translate = dx + 'px 0'; shifted.push(kids[j]); }
+    }
+    ageRowsShifted = shifted.length ? shifted : null;
   }
   function paintAge() {
     ageBtn.disabled = epickSort !== 'use';
@@ -11660,6 +11664,7 @@
     e.preventDefault();
     for (const k of Object.keys(useTs)) delete useTs[k];
     for (const k of Object.keys(liveUse)) delete liveUse[k];
+    useTop = null;
     useT0 = Date.now();
     // drop the stored copy so the save's cross-tab merge can't fold the
     // wiped stamps back in
@@ -12033,7 +12038,13 @@
     return flashHues.get(n);
   };
   const fcOf = (n) => `hsl(${hueFor(n)} 90% 62%)`;
+  // name -> its cells, rebuilt with each buildPicker so poke, litApply
+  // and unflash hit the index instead of re-scanning the whole picker
+  let insIdx = new Map();
   let resortTimer = 0;
+  // the stamp holder currently leading the use sort - a re-use of it
+  // reorders nothing, so those uses skip the rebuild entirely
+  let useTop = null;
   // a use within the last minute pins its button to the very top of the
   // scroll grid via the useTs sort; the recents band above keeps its own
   // MRU order
@@ -12043,7 +12054,7 @@
     // resume their dimming instead of renewing to full brightness
     const d = delay ? `-${Math.max(0, delay).toFixed(2)}s` : '';
     const fc = fcOf(name);
-    for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(name)}"]`)) {
+    for (const b of insIdx.get(name) || []) {
       b.style.animationDelay = d;
       b.style.setProperty('--fc', fc);
       b.classList.remove('justused');
@@ -12063,9 +12074,11 @@
     const flipSel = emotePick.classList.contains('agerows') ? 'button[data-ins]' : 'button[data-ins], .eage[data-age]';
     const flipKey = (b) => b.dataset.ins !== undefined ? 'i' + b.dataset.ins : 'a' + b.dataset.age;
     const before = new Map();
+    // layout metrics, not rects: a rect would read a cell's centre-shift
+    // or a live emove as movement, and they batch into one layout pass
     for (const b of emotePick.querySelectorAll(flipSel))
       (before.get(flipKey(b)) || before.set(flipKey(b), []).get(flipKey(b)))
-        .push(b.getBoundingClientRect());
+        .push([b.offsetLeft, b.offsetTop]);
     buildPicker();
     emoteGrid.scrollTop = st;
     // write all offsets first, reflow once, then release to 0 together -
@@ -12074,8 +12087,7 @@
     for (const b of emotePick.querySelectorAll(flipSel)) {
       const r0 = before.get(flipKey(b))?.shift();
       if (!r0) continue;
-      const r1 = b.getBoundingClientRect();
-      const dx = r0.left - r1.left, dy = r0.top - r1.top;
+      const dx = r0[0] - b.offsetLeft, dy = r0[1] - b.offsetTop;
       if (dx || dy) { b.style.transform = `translate(${dx}px,${dy}px)`; movers.push(b); }
     }
     if (movers.length) {
@@ -12094,8 +12106,7 @@
     flashT0.delete(n);
     // the hue outlives the flash while a visible row keeps the cell lit
     if (!litEms.has(n)) flashHues.delete(n);
-    for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`))
-      b.classList.remove('justused');
+    for (const b of insIdx.get(n) || []) b.classList.remove('justused');
   }
   function flashLater(n) {
     clearTimeout(flashTimers.get(n));
@@ -12136,8 +12147,16 @@
     flashHues.set(n, flashHueNext = (flashHueNext + 5) % 360);
     poke(n);
     flashLater(n);
-    if (epickSort === 'use' && !resortTimer)
-      resortTimer = setTimeout(() => { resortTimer = 0; heldOr(); }, 1500);
+    if (epickSort === 'use' && !resortTimer) {
+      // a stamp older than the leader (replay, catch-up) reorders nothing;
+      // only a use that actually takes the lead earns a rebuild
+      if (useTop === null) for (const k in useTs) if (useTop === null || useTs[k] > useTs[useTop]) useTop = k;
+      if (useTs[n] >= (useTs[useTop] || 0)) {
+        const moved = n !== useTop;
+        useTop = n;
+        if (moved) resortTimer = setTimeout(() => { resortTimer = 0; heldOr(); }, 1500);
+      }
+    }
   }
   // an emote stays 'lit' while any chat row carrying it is on screen -
   // the use-coloured wash on its picker cells only drops once every
@@ -12160,7 +12179,10 @@
     return s;
   };
   const litApply = (n, on) => {
-    for (const b of emotePick.querySelectorAll(`button[data-ins="${CSS.escape(n)}"]`)) {
+    // a hidden picker's cells get relit on open by buildPicker anyway -
+    // the visibility bookkeeping still runs, only the dom writes skip
+    if (emotePick.hidden) return;
+    for (const b of insIdx.get(n) || []) {
       b.classList.toggle('lit', on);
       // stamp --fc too so a grid rebuild restores the wash's hue rather
       // than falling back to accent; unlit cells are re-stamped on next use
@@ -12421,6 +12443,9 @@
         for (const mk of marks) if (mk.t > oldestAge) h += sqOf(mk, true);
     }
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
+    insIdx = new Map();
+    for (const b of emotePick.querySelectorAll('button[data-ins]'))
+      (insIdx.get(b.dataset.ins) || insIdx.set(b.dataset.ins, []).get(b.dataset.ins)).push(b);
     // rebuilt cells drop their classes - relight whatever is still on screen
     for (const n of litEms) litApply(n, true);
     paintAgeRows();
