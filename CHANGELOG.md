@@ -3,6 +3,19 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions - the page ships continuously to Neocities.
 
+## 2026-10-12
+
+### Split columns
+- the rail's left edge is a grab seam now: dragging it fixes the rail
+  at a width (62% of the window at most) and the chat columns give up
+  the room in equal shares; the width saves with the option bundle
+- the video↔emotes and emotes↔stats seams widen to 2px, easier to see
+  under the same invisible grab strip that centred on them
+- the column button's click opens a menu listing all eight modes with
+  their glyphs like the font picker does - the wheel still cycles and
+  shift-click still steps back; portrait-only levels sit disabled in
+  the list
+
 ## 2026-10-11
 
 ### Split columns

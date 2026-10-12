@@ -653,14 +653,14 @@
      static parent it would anchor to main and span the viewport */
   #rail #vid { position: relative; inset: auto; width: 100%; box-sizing: border-box;
     flex: none; z-index: auto;
-    border: 0; border-bottom: 1px solid var(--line); box-shadow: none; }
+    border: 0; border-bottom: 2px solid var(--line); box-shadow: none; }
   #rail #vid .vid-handle, #rail #vid .vid-size { display: none; }
   /* grow proportions rather than a % basis - a percentage basis on a
      column item can fall back to content height, and the grid's content
      is the whole emote set */
   #rail #emotePick { position: static; transform: none; width: auto; max-width: none;
     flex: 1 1 0; min-height: 0; height: auto; max-height: none; border: 0; border-radius: 0;
-    border-bottom: 1px solid var(--line); box-shadow: none; }
+    border-bottom: 2px solid var(--line); box-shadow: none; }
   #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
   #rail #htabStats { flex: 2 1 0; min-height: 0; overflow-y: auto; padding: 0 10px; }
   /* rail panes keep their scrollbars pinned like .hp-scroll - a bar that
@@ -681,6 +681,16 @@
     position: relative; z-index: 3; touch-action: none; }
   #railSplit:active { cursor: grabbing; }
   #railSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  /* the rail's left seam is the same grab strip standing upright -
+     dragging it fixes the rail's width, and the chat columns squeeze
+     together in equal flex:1 shares */
+  #colSplit { flex: none; width: 7px; margin: 0 -4px 0 -3px; cursor: grab;
+    position: relative; z-index: 3; touch-action: none; }
+  #colSplit:active { cursor: grabbing; }
+  #colSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  /* a dragged rail carries its own width; 62% caps it so the chat
+     columns always keep a readable share of the window */
+  #rail.fixed { flex: none; width: min(var(--railw, 320px), 62%); }
   /* a squeezed stats pane sheds its lower lists first - the rate graph
      climbs to the top of what remains, alone once the pane can fit
      little else */
@@ -2256,15 +2266,17 @@
     text-overflow: ellipsis; white-space: nowrap; }
   /* the menu pops fixed below the button on every viewport - living
      inside .hdr-side means unpositioned it would join the button row */
-  #fontMenu { position: fixed; z-index: 70; min-width: 180px; max-height: 65vh; overflow-y: auto;
+  #fontMenu, #splitMenu { position: fixed; z-index: 70; min-width: 180px; max-height: 65vh; overflow-y: auto;
     padding: 4px; background: var(--panel); border: 1px solid var(--popline); border-radius: 6px;
     box-shadow: 0 4px 16px rgba(0,0,0,.4); }
-  #fontMenu button { display: block; width: 100%; text-align: left; background: none; border: 0;
+  #fontMenu button, #splitMenu button { display: block; width: 100%; text-align: left; background: none; border: 0;
     border-radius: 4px; padding: 3px 9px; color: var(--text); font-size: 14px; line-height: 1.5;
-    cursor: pointer; }
-  #fontMenu button:hover, #fontMenu button:focus-visible { background: var(--line); }
-  #fontMenu button.on { color: var(--accent); font-weight: 700; }
-  body.hdrgraph #fontMenu { display: none; }
+    cursor: pointer; white-space: nowrap; }
+  #fontMenu button:hover, #splitMenu button:hover, #fontMenu button:focus-visible, #splitMenu button:focus-visible { background: var(--line); }
+  #fontMenu button.on, #splitMenu button.on { color: var(--accent); font-weight: 700; }
+  #splitMenu button[disabled] { opacity: .4; cursor: default; }
+  #splitMenu button .sg { display: inline-block; min-width: 2.6em; }
+  body.hdrgraph #fontMenu, body.hdrgraph #splitMenu { display: none; }
 
   /* narrow screens and touch devices: the header wraps onto a second row,
      controls get a larger touch target, and the spark canvas clamps so it
@@ -2298,7 +2310,7 @@
     <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
     <canvas id="spark" role="img" title="msgs/sec over the last 2 minutes - ticks every 10s" aria-label="msgs/sec over the last 2 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
-    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="colourBtn" title="Colour">◐</button><button class="hdr-btn" id="variantBtn" title="Variant">▢</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="inter">Inter</option><option value="sans">System Sans</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><div id="fontMenu" role="listbox" aria-label="Chat font" hidden></div><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
+    <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="colourBtn" title="Colour">◐</button><button class="hdr-btn" id="variantBtn" title="Variant">▢</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="inter">Inter</option><option value="sans">System Sans</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><div id="fontMenu" role="listbox" aria-label="Chat font" hidden></div><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.35)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back">⇄</button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back">▦</button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll">≡</button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-1px) scale(1.75)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back">Ⓢ</button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="splitBtn" title="Page-flip columns - click for menu · scroll cycles · ⇧click back" aria-haspopup="listbox" aria-expanded="false"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><div id="splitMenu" role="listbox" aria-label="Page-flip columns" hidden></div><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
   </header>
   <div id="titleBar" class="hbar" role="status" hidden><span class="hbar-txt" id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
@@ -2328,7 +2340,7 @@
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; cycles <a href="#" role="button" class="helpOpt helpSub" data-idx="2">before the badges</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="3">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="0">right edge</a> / right <a href="#" role="button" class="helpOpt helpSub" data-idx="1">compact</a> / <a href="#" role="button" class="helpOpt helpSub" data-idx="4">hidden</a><sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat<sup>†</sup></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; the button's click lists every mode while the wheel cycles; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them, and its left edge drags the chat columns narrower or wider - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
@@ -2473,7 +2485,7 @@
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
-  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
+  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><div id="chatWrap"><div id="chatHl" aria-hidden="true"></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" placeholder="chat" aria-label="message" rows="1"></textarea></div><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="each populated era starts its own row; empty stretches pack together - use sort only">▤</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
@@ -2584,6 +2596,8 @@
   const side2El = document.getElementById('side2');
   const railEl = document.getElementById('rail');
   const railSplitEl = document.getElementById('railSplit');
+  const colSplitEl = document.getElementById('colSplit');
+  const splitMenu = document.getElementById('splitMenu');
   let activeEl = logEl; // column currently receiving new rows
   let splitLevel = 1; // the applied column mode - 5/6 slim the rail
   // the visible columns in page-flip order; a row page-flips to the column
@@ -7206,9 +7220,11 @@
   });
   document.addEventListener('pointerdown', (e) => {
     if (!fontMenu.hidden && !fontMenu.contains(e.target) && e.target !== fontPick) setFontMenu(false);
+    if (!splitMenu.hidden && !splitMenu.contains(e.target) && e.target !== splitBtn) setSplitMenu(false);
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !fontMenu.hidden) { setFontMenu(false); fontPick.focus(); }
+    else if (e.key === 'Escape' && !splitMenu.hidden) { setSplitMenu(false); splitBtn.focus(); }
   });
   fontPick.addEventListener('wheel', (e) => {
     e.preventDefault();
@@ -7945,6 +7961,7 @@
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos,
       lbls: lblsOn ? 1 : 0,
       split: splitLevel,
+      railw: railEl.classList.contains('fixed') ? parseInt(railEl.style.getPropertyValue('--railw')) || 0 : 0,
       rvid: vidRail,
       preset: curTheme,
     };
@@ -8082,6 +8099,8 @@
       if (o.epgeo.left != null) setPin(true);
     }
     if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 6) setSplit(o.split);
+    railEl.classList.toggle('fixed', o.railw > 0);
+    if (o.railw > 0) railEl.style.setProperty('--railw', o.railw + 'px');
     // after the split so a rail exists to dock into; outside rail it just
     // stores the mode for the next dock. the boolean 'video' above only
     // spans shown/hidden - this carries dock/float too
@@ -9809,6 +9828,20 @@
     emotePick.style.flexGrow = f;
     statsTab.style.flexGrow = 1 - f;
   });
+  // the rail's left seam drags horizontally - the rail takes a fixed
+  // width (capped at 62% by the css) and the chat columns give up the
+  // room in equal shares; refitPages hears the column resize itself
+  colSplitEl.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    colSplitEl.setPointerCapture(e.pointerId);
+  });
+  colSplitEl.addEventListener('pointermove', (e) => {
+    if (!colSplitEl.hasPointerCapture(e.pointerId)) return;
+    railEl.classList.add('fixed');
+    railEl.style.setProperty('--railw',
+      Math.max(120, Math.round(railEl.getBoundingClientRect().right - e.clientX)) + 'px');
+  });
+  colSplitEl.addEventListener('pointerup', () => saveOpts());
   // the squeezed pane sheds its lower lists as it shrinks - the rate
   // graph climbs to the top of what remains, alone below ~160px
   new ResizeObserver(() => {
@@ -9819,6 +9852,7 @@
   }).observe(document.getElementById('htabStats'));
   function dockRail(level) {
     const on = level >= 4;
+    colSplitEl.hidden = !on;
     const statsTab = document.getElementById('htabStats');
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
     if (on) {
@@ -9883,6 +9917,8 @@
   // video+emotes in 5, emotes alone in 6 (video floats). 7 and 8 run
   // one chat column beside the rail instead - video+emotes, then the
   // same with stats back in
+  const SPLIT_NAMES = ['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', '2col+vid·emotes·stats'];
+  const splitGlyph = (l) => l === 8 ? '▮▯' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
     level = Math.max(1, Math.min(8, level));
@@ -9890,10 +9926,11 @@
     splitLevel = level;
     markHelp('helpSplit', level - 1);
     setOn(splitBtn, level > 1);
-    splitBtn.textContent = level === 8 ? '▮▯' : level === 7 ? '▮▶' : level === 6 ? '▮▮☻' : level === 5 ? '▮▮▶' : level === 4 ? '▮▮▯' : level === 3 ? '▮▮▮' : '▮▮';
+    splitBtn.textContent = splitGlyph(level);
     splitBtn.classList.toggle('tri', level >= 3 && level <= 6);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
-    splitBtn.title = `${level}/8 ${['one column', 'two page-flip columns', 'three page-flip columns', '3col+vid·emotes·stats', '3col+vid·emotes', '3col+emotes (video off, ▶ floats it)', '2col+vid·emotes', '2col+vid·emotes·stats'][level - 1]} - click/scroll · ⇧click back`;
+    splitBtn.title = `${level}/8 ${SPLIT_NAMES[level - 1]} - click for menu · scroll cycles · ⇧click back`;
+    if (!splitMenu.hidden) markSplitMenu();
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     // want counts chat columns only - the rail never figures in it. a
     // change that keeps the same chat-column count just re-docks the
@@ -9945,7 +9982,37 @@
     saveOpts();
   }
 
-  splitBtn.addEventListener('click', (e) => cycleSplit(e.shiftKey ? -1 : 1));
+  // the column button opens a menu of all eight modes like the font
+  // picker's; the wheel keeps cycling, and shift-click still steps back
+  splitMenu.innerHTML = SPLIT_NAMES.map((n, i) =>
+    `<button type="button" role="option" data-i="${i + 1}"><span class="sg">${splitGlyph(i + 1)}</span>${n}</button>`).join('');
+  const markSplitMenu = () => {
+    const max = window.innerWidth > window.innerHeight ? 8 : 2;
+    splitMenu.querySelectorAll('button').forEach((b, j) => {
+      b.classList.toggle('on', j + 1 === splitLevel);
+      b.setAttribute('aria-selected', String(j + 1 === splitLevel));
+      b.disabled = j + 1 > max;
+    });
+  };
+  const setSplitMenu = (open) => {
+    splitMenu.hidden = !open;
+    splitBtn.setAttribute('aria-expanded', String(open));
+    if (!open) return;
+    markSplitMenu();
+    const r = splitBtn.getBoundingClientRect();
+    splitMenu.style.left = Math.min(r.left, innerWidth - splitMenu.offsetWidth - 8) + 'px';
+    splitMenu.style.top = r.bottom + 3 + 'px';
+    splitMenu.querySelector('.on')?.scrollIntoView({ block: 'nearest' });
+  };
+  splitMenu.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    setSplit(+b.dataset.i); saveOpts(); setSplitMenu(false); splitBtn.focus();
+  });
+  splitBtn.addEventListener('click', (e) => {
+    if (e.shiftKey) { cycleSplit(-1); return; }
+    setSplitMenu(splitMenu.hidden);
+  });
   splitBtn.addEventListener('wheel', (e) => {
     e.preventDefault();
     cycleSplit(e.deltaY < 0 ? -1 : 1);
