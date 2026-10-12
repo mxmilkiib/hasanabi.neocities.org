@@ -171,6 +171,9 @@ not versions - the page ships continuously to Neocities.
   quarter marks of the bar
 
 ### Help popup
+- the stream-status legend's dots glue to their labels now - a line
+  wrap could strand a dot at a line's end with its description
+  opening the next (the offline grey dot, most often)
 - a top-corner hover's resize glow was masked by the move glyph run
   painted over the same band - the run now fades to a ghost while a
   top grip (or an edge-t drag) signals, on the help panel, the emote
