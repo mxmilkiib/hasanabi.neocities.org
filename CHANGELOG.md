@@ -49,6 +49,7 @@ not versions - the page ships continuously to Neocities.
   organising's reading group, which now takes the /library target
 - the chappo trap house row gains an instagram link
 - the onion (us satire) caps extra links
+- free culture leads the libre page, promoted from seventh
 
 ### Help popup
 - the emote picker's mix row owns up: the merged grid takes the active
