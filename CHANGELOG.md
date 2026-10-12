@@ -249,7 +249,7 @@ not versions - the page ships continuously to Neocities.
   against phantom boundaries
 - the ladder picks up half-minute rungs at 2½, 3½ and 4½, thinning the
   long 2m-5m stretch where cells used to bunch between far-apart
-  squares
+  squares, plus a 105s rung closing the 90s-2m gap
 
 ### Misc
 - tooltips break their clauses onto real lines now: ' - ' was only ever
