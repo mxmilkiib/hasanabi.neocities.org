@@ -240,8 +240,13 @@ not versions - the page ships continuously to Neocities.
   readme's ?epage doc catching up to the fourth centred state too
 - centred age rows now bank the sub-minute era: a row holding the 45s
   square ends at it even when later rungs or cells share the row, so
-  minute-plus eras always open on a fresh line. the 90s and 3m squares
-  got the same hard end, the fresh eras each closing their own row
+  minute-plus eras always open on a fresh line, and the 3m square got
+  the same hard end - the fresh eras each closing their own row
+- pending rungs past the record's horizon stop printing: a 'still to
+  happen' square only makes sense while a stamp could still age into
+  it, and nothing can out-age the tracking record's own start - so a
+  young record no longer tails off into violet 3h-12h squares it can
+  never reach
 - and the row-end break fires on a square sibling now, not just a cell:
   a dead stretch packs the 90s-8m rungs back-to-back, so a .rowend
   square followed by another square never broke - the layout stayed

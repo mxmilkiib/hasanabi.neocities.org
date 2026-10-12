@@ -2425,7 +2425,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows, the 45s/90s/3m squares always closing one</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - empty stretches pack together, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows, the 45s/3m squares always closing one</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -11672,7 +11672,7 @@
   let ageRowsShifted = null; // cells wearing a centre shift this paint
   // centred-mode hard row ends: the rung ages whose square always closes
   // its row, wherever the wrap would have put the break
-  const AGE_ROW_BREAKS = new Set([45e3, 9e4, 18e4]);
+  const AGE_ROW_BREAKS = new Set([45e3, 18e4]);
   function paintAgeRows() {
     const centred = emotePick.classList.contains('agerows3');
     if (!centred && !emotePick.classList.contains('agerows2')) {
@@ -11745,7 +11745,7 @@
       'inline - squares flow between cells',
       'era rows - every era starts a fresh row',
       'row ends - a row closes at its last square',
-      'centred - the same rows, centred, the 45s/90s/3m squares always closing one',
+      'centred - the same rows, centred, the 45s/3m squares always closing one',
     ][epickAge]} - click cycles 0-3`;
     emotePick.classList.toggle('agerows', epickAge === 1 && epickSort === 'use');
     emotePick.classList.toggle('agerows2', epickAge === 2 && epickSort === 'use');
@@ -12487,8 +12487,11 @@
         !away.some(([s, e]) => ct >= s && ct <= e);
     }
     // rungs beyond the oldest stamp are times still to happen; grouped
-    // mode emits them once at the grid's end rather than per section
+    // mode emits them once at the grid's end rather than per section.
+    // past the record's own horizon a rung can never be crossed - it
+    // drops out of the 'still to happen' tail entirely
     const oldestAge = now - Math.min(Infinity, ...Object.values(useTs));
+    const horizon = now - useT0;
     // the marching-ants border - an svg rect whose dashoffset animates;
     // the rung's inline animation-delay reaches it via inherit
     const ANTS = '<svg class="ants" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
@@ -12513,6 +12516,9 @@
         let m = '';
         while (next < marks.length && age >= marks[next].t) {
           const mk = marks[next++];
+          // past the record's horizon no stamp can ever be old enough -
+          // the rung is unreachable, not 'still to happen'
+          if (mk.t > horizon) continue;
           // deferPend keeps pending rungs for the shared tail flush so no
           // section parks violet squares ahead of later sections' used
           // cells; a never-cell tripping a rung some cell crossed
@@ -12530,8 +12536,9 @@
       }).join('');
       // rungs past the last cell print at the end as 'still to happen' -
       // seen-only mode hides the never-tail that would have tripped them.
-      // deferPend leaves them for the caller's single shared flush
-      if (!deferPend) while (next < marks.length) out += sqOf(marks[next++], true);
+      // deferPend leaves them for the caller's single shared flush;
+      // the horizon caps both flushes the same way
+      if (!deferPend) while (next < marks.length && marks[next].t <= horizon) out += sqOf(marks[next++], true);
       return out;
     };
     // third-party emotes grouped by provider
@@ -12643,7 +12650,7 @@
     // park violet squares ahead of later sections' used cells, and the
     // merged grid's parked emoji the same way
     if (epickSort === 'use')
-      for (const mk of marks) if (mk.t > oldestAge) h += sqOf(mk, true);
+      for (const mk of marks) if (mk.t > oldestAge && mk.t <= horizon) h += sqOf(mk, true);
     emoteGrid.innerHTML = h || '<div class="ehead">no matches</div>';
     insIdx = new Map();
     for (const b of emotePick.querySelectorAll('button[data-ins]'))
