@@ -110,6 +110,8 @@ not versions - the page ships continuously to Neocities.
   like the other rare labels
 
 ### Header
+- the wrapped button strip drops a text line below the top row -
+  1em of margin where only 4px of row-gap stood before
 - the rate graph canvas gains 1px of air above and below
 
 ### Sync strip
