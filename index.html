@@ -2272,6 +2272,10 @@
      it in tighter cells; .names.namesb outranks each zoom's pairing */
   #emotePick.names.namesb #emoteGrid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
   #emotePick.names.namesb #emoteGrid button { flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; height: auto; padding: 3px 2px; }
+  /* the 34px cap flattens wide emotes (KatTime, ppL, peepoRiot) into a
+     thin strip - the taller cells have the room, so let them stretch to
+     the cell's width instead. a picked zoom's own cap still wins */
+  #emotePick.names.namesb:not(.sm):not(.q):not(.th):not(.hf):not(.tw):not(.big) #emoteGrid button img { max-width: 100%; max-height: 42px; }
   #emotePick.names.namesb #emoteGrid .ename { text-align: center; }
   #emotePick.names.namesb #emoteGrid .eage { height: auto; }
   #emoteGrid .ehead { grid-column: 1 / -1; color: var(--text-dim); font-size: .8em; padding: 4px 2px 0; }

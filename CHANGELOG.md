@@ -197,6 +197,10 @@ not versions - the page ships continuously to Neocities.
   the third state to tell it from beside's plain fill, and the mode
   persists as 0/1/2 through the standalone key, the options bundle and
   ?epnames=
+- the name-below state stops flattening wide emotes: at default zoom
+  their images stretch to the cell's width (up to 42px tall) instead of
+  the stock 34px cap, so KatTime / ppL / peepoRiot stop reading as thin
+  strips. a picked zoom keeps its own cap
 
 ### Misc
 - a staleness sweep: ?split=7-8 in a copied settings url no longer falls
