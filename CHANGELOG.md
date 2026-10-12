@@ -85,6 +85,13 @@ not versions - the page ships continuously to Neocities.
   bare 'thanks for the N bits' just rainbows the number
 
 ### Resources
+- free culture moves below open source with a spacer under it; within
+  it copyleft now leads public domain and the gnu fdl sits between
+  them
+- gdpr.eu's 'what is gdpr' joins digital rights beside the ico
+  portability link
+- open manufacturing drops its '(wikipedia)' tag, and open design
+  gains a spacer under it
 - vimium joins extra links beside scroll anywhere - the
   vim-keybindings extension
 - relational dialectics joins the conduct row's communication
