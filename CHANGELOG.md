@@ -71,6 +71,8 @@ not versions - the page ships continuously to Neocities.
   325 collective's repression docs - marked for folding later
 - an action groups row follows it, opening with the hunt saboteurs
   association
+- soviet democracy joins the workers unions concept cluster, right
+  after the soviet (council) article it describes
 - unruly subjects joins channels/streams: chenjerai kumanyika's weekly
   politics show out of rowhome productions, carrying site, patreon,
   ig and the buzzsprout feed - which rides deprogram's service column
