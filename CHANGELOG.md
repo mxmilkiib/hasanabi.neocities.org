@@ -82,6 +82,11 @@ not versions - the page ships continuously to Neocities.
   ig and the buzzsprout feed - which rides deprogram's service column
   like the other rare labels
 
+### Update bar
+- the reload buttons hug the centred text now (10px each side at
+  natural width) instead of hovering a third-of-a-gap wide at the
+  quarter marks of the bar
+
 ### Help popup
 - a top-corner hover's resize glow was masked by the move glyph run
   painted over the same band - the run now fades to a ghost while a
