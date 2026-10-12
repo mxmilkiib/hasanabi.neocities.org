@@ -163,6 +163,10 @@ not versions - the page ships continuously to Neocities.
   ocean and sunset re-tint both - each banded palette keeps a mention's
   whole sweep inside its hue range, and the fixed strip rides a
   --rbwgrad var so one pick re-themes every rainbow at once
+- the theme/colour/variant/shade chip rows breathe when they wrap: the
+  boxed chips gain a 3px vertical margin - adjacent lines sat
+  line-height tight, and the selected ring's -5px reach now clears the
+  next line's box with a px to spare
 
 ### Sync & notice strips
 - the sync poles drift from the emote-rung gold at full width to twitch

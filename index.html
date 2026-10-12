@@ -1904,8 +1904,10 @@
   /* inline-block + nowrap keeps the chip atomic: an inline anchor that
      wraps between the name and the palette swatch fragments, and the
      selected ring's ::before then measures a first-to-last-fragment box
-     two lines tall instead of the chip */
-  #helpPanel a.helpColour, #helpPanel a.helpVariant, #helpPanel a.helpPreset, #helpPanel a.helpShade { position: relative; display: inline-block; white-space: nowrap; padding: 0 5px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
+     two lines tall instead of the chip. the 3px vertical margin gives a
+     wrapped second row air - boxes on adjacent lines sat line-height
+     tight, and the .on ring's -5px reach cleared it with a px spare */
+  #helpPanel a.helpColour, #helpPanel a.helpVariant, #helpPanel a.helpPreset, #helpPanel a.helpShade { position: relative; display: inline-block; white-space: nowrap; margin: 3px 0; padding: 0 5px; border-radius: 3px; border: 1px solid var(--pv-ln, var(--line)); background: var(--pv-bg); color: var(--pv-tx, var(--accent)); }
   /* the bar after a chip's name carries its accent · good · vip · wiki -
      the personality colours a bg/text pair alone doesn't show */
   #helpPanel a.helpColour::after, #helpPanel a.helpVariant::after, #helpPanel a.helpPreset::after, #helpPanel a.helpShade::after { content: ''; display: inline-block; width: 2em; height: .55em; margin-left: 5px; border-radius: 1px; background: linear-gradient(90deg, var(--pv-a, transparent) 0 25%, var(--pv-g, transparent) 25% 50%, var(--pv-v, transparent) 50% 75%, var(--pv-w, transparent) 75%); }
