@@ -204,6 +204,9 @@ not versions - the page ships continuously to Neocities.
 - and a lone time-ago rung keeps a cell-sized floor: an age box on a
   row with no emotes beside it collapsed to its label's text height -
   it now stretches with its row but never under 60px
+- and short cells centre their emote in the slot a tall one fills -
+  auto margins split the free space around the image, so the name lands
+  flush at the cell's foot, level with the row's other names
 - cell tooltips say what they are: 'KatTime - 7tv animated emote -
   click to add to the input' instead of a bare name - provider pair;
   emoji cells name their keywords and the click's effect too

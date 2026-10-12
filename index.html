@@ -2276,6 +2276,10 @@
      thin strip - the taller cells have the room, so let them stretch to
      the cell's width instead. a picked zoom's own cap still wins */
   #emotePick.names.namesb:not(.sm):not(.q):not(.th):not(.hf):not(.tw):not(.big) #emoteGrid button img { max-width: 100%; max-height: 42px; }
+  /* auto margins split a cell's free space around the image - a short
+     wide emote centres in the slot a taller one fills, and the name
+     lands flush at the cell's foot, level across the row */
+  #emotePick.names.namesb #emoteGrid button img { margin-block: auto; }
   #emotePick.names.namesb #emoteGrid .ename { text-align: center; }
   /* eage stretches to its grid row's height; a rung alone on a row (no
      emotes beside it) keeps a cell-sized floor instead of collapsing to
