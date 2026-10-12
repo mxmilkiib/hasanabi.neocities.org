@@ -11877,7 +11877,7 @@
     paintMove();
   };
   moveBtn.addEventListener('click', () => {
-    setMove((epickMove + 1) % 8);
+    setMove((epickMove + 1) % MOVE_MODES.length);
     saveOpts();
     emoteQ.focus();
   });
@@ -12158,7 +12158,7 @@
         break;
       }
       case 'emoteAgeRows': setAge((epickAge + d + 4) % 4); break;
-      case 'emoteMove': setMove((epickMove + d + 8) % 8); break;
+      case 'emoteMove': setMove((epickMove + d + MOVE_MODES.length) % MOVE_MODES.length); break;
       case 'emoteHold': setHold((epickHold + d + 3) % 3); break;
       default:
         // the anim legs, source tabs and mix are toggles - either wheel
