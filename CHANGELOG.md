@@ -73,6 +73,8 @@ not versions - the page ships continuously to Neocities.
   association
 - soviet democracy joins the participatory row's democracy models,
   after deliberative - glossed council democracy
+- organising's concept cluster gains community building before and
+  solidarity after community organizing
 - diggers & dreamers joins spaces beside intentional community - the
   uk communal-living guide and directory to the fellowship's
 - spaces moves up above activism, heading the action block after the
