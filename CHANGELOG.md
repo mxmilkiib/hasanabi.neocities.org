@@ -142,6 +142,9 @@ not versions - the page ships continuously to Neocities.
   like the other rare labels
 
 ### Header
+- helvetica joins the font picker, leading the system-face block
+  ahead of georgia and times - no webfont to ship; arial, liberation
+  and nimbus cover its metrics where a real helvetica never landed
 - the title bar's ✕ shrinks to a 20px square - the shared hbar
   button rule had it a 30px slab nearly filling the strip
 - the wrapped button strip sheds its breathing room - the header's
