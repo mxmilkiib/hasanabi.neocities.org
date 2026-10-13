@@ -2,84 +2,65 @@
 
 ![HasanAbi Chat Thing - a compact, customisable, one-page Twitch chat client](og.png)
 
-A compact, customizable Twitch chat page orientated around the
-[HasanAbi](https://www.twitch.tv/hasanabi) stream
-([Hasan Piker](https://en.wikipedia.org/wiki/Hasan_Piker)'s
-channel, aka the Piker Broadcasting Service - a play on the US
-[PBS](https://en.wikipedia.org/wiki/PBS))
+A customisable chat page centred on the
+[HasanAbi](https://www.twitch.tv/hasanabi) stream.
+[Hasan Piker](https://en.wikipedia.org/wiki/Hasan_Piker)'s channel is
+also known here as the Piker Broadcasting Service, a play on
+[PBS](https://en.wikipedia.org/wiki/PBS).
 
-It's a one page, alt-UX, second-screen/accessibility tool that's super customisable, with channel related resource links!
+The page works as an alternative chat view, a second screen and a hub
+for links related to the stream. It runs at
+<https://hasanabi.neocities.org/> on [Neocities](https://neocities.org/).
+See the [about page](https://hasanabi.neocities.org/about/) for more.
 
-Live at
-<https://hasanabi.neocities.org/> (on
-[Neocities](https://neocities.org/))
+The chat page:
 
-About at
-<https://hasanabi.neocities.org/about/>.
+- shows timestamps, badges, replies and notices alongside messages
+- catches up on messages missed while the tab was asleep or closed
+- graphs how fast messages arrive
+- displays Twitch emotes alongside [7TV](https://7tv.app/),
+  [BetterTTV](https://betterttv.com/) and
+  [FrankerFaceZ](https://www.frankerfacez.com/) emotes
+- lets one send messages and replies after an optional
+  [Twitch login](https://dev.twitch.tv/docs/authentication/)
 
-In wordier terms: it's the stream's chat, liberated from twitch.tv.
-A single self-contained page, running on a static host, that:
+The `?` popup has more than settings:
 
-- renders the chat log itself - timestamps, badges, replies, notice
-  rows and all
-- survives suspends, discards and reloads - backfilling whatever
-  was missed rather than opening on a gap
-- draws a live messages-per-second rate graph in the header
-- understands every major emote ecosystem - Twitch natives plus
-  [7TV](https://7tv.app/), [BetterTTV](https://betterttv.com/) and
-  [FrankerFaceZ](https://www.frankerfacez.com/)
-- after an optional [Twitch OAuth](https://dev.twitch.tv/docs/authentication/)
-  login, replies, `/me`s and chat-history walkbacks work like a real
-  [IRC](https://en.wikipedia.org/wiki/IRC) client
+- **Media:** clips, news, YouTube channels and Twitch streams.
+- **Left and libre:** political organising, free software and culture.
+- **Authors:** reading lists grouped by era.
 
-Beyond chat, the page doubles as a curated hub - the `?` help/conf
-popup also carries:
+The page can follow another Twitch channel. It can also combine chat
+from up to six channels:
 
-- media - clips, news outlets, youtube channels and sister twitch
-  streams
-- left / libre - organising and political links, free-culture
-  resources
-- authors - era-grouped reading lists
+- The first channel controls the stream video, status, chat destination
+  and saved channel data.
+- Each message has a channel label that one can click to focus on that
+  channel.
 
-Any other Twitch channel can be pointed at with `?channel=login`,
-and a comma list (`?channel=a,b,c`, up to 6) merges several rooms
-into one log:
-
-- the first channel stays focused - title, stream status, video,
-  chat target and storage all follow it
-- each row carries a `#chan` chip that refocuses on click
-
-Technically the project comes in two parts: the frontend
-([hasanabi.neocities.org](https://github.com/mxmilkiib/hasanabi.neocities.org),
-this repo - a single `index.html`) and the backend chat relay
-([twitch-chat-relay](https://github.com/mxmilkiib/twitch-chat-relay),
-also a single `index.html`, hosted on GitHub Pages).
+The project has two parts: this
+[frontend](https://github.com/mxmilkiib/hasanabi.neocities.org)
+and a separate [chat relay](https://github.com/mxmilkiib/twitch-chat-relay)
+on GitHub Pages.
 
 ## Why two parts?
 
-Neocities serves pages with a strict
+Neocities uses a strict
 [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP):
 
     connect-src 'self' data: blob:
 
-That blocks the
+This stops the page from opening its own
 [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
-connection to [Twitch IRC](https://dev.twitch.tv/docs/irc/)
-(`irc-ws.chat.twitch.tv`), so the official Twitch embed,
-[jChat](https://www.giambaj.it/twitch/jchat/), and any direct socket
-are all impossible. `frame-src` is unrestricted though, so the page
-embeds a hidden iframe relay hosted on [GitHub
-Pages](https://pages.github.com/) (which sends no CSP) and talks to
-it with
+to [Twitch chat](https://dev.twitch.tv/docs/irc/).
+The page can, however, load a hidden iframe from
+[GitHub Pages](https://pages.github.com/). That iframe runs the chat
+relay, which connects to Twitch and sends data back with
 [`postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage).
 
-The split is therefore by network privilege, not by concern: the frontend
-owns all presentation and state, while the relay owns every outbound
-connection. Because the relay learns its channels from the `join` message
-rather than anything hardcoded, it is channel-agnostic - any page on any
-CSP-locked host can embed the same iframe for any Twitch channel. The
-hasanabi specifics all live in this file; the relay could just as well
-serve a completely different channel page.
+The frontend handles the interface and saved settings. The relay
+handles connections to other services. The frontend tells the relay
+which channels to join, so the relay can also serve other channel pages.
 
 ## The Frontend - `index.html` (this repo, on Neocities)
 
@@ -88,467 +69,360 @@ no dependencies beyond CDN-hosted fonts.
 
 ### Chat log
 
-- Rows
-  - timestamps, linked names, real badge icons (mod, VIP, sub flair,
-    bits, founder…) with text chips as fallback
-  - `[sub N]` / `[bits]` / `[first]` chips; a counted sub chip
-    tooltips the span as `2yr, 10m` and can shade teal → accent with
-    tenure (`?subg`)
-  - in the left sub modes the sub chip keeps a fixed two-digit width
-    and the mod / bits / first chips follow the badge icons, so every
-    row's icons start at the same x and no column is reserved for
-    chips most chatters don't carry
-- Replies
-  - the full original is quoted in a ruled block above the line;
-    click it to jump back to the source row
-- Row styles
-  - `/me` actions, `!command` and `#tag` lines render in italics
-    (names, chips and timestamps stay upright)
-- Notices
-  - USERNOTICE subs/raids/gifts become dim italic notice rows;
-    CLEARCHAT/NOTICE events show timeouts, bans and channel notices
-  - a room-wide `/clear` wipes rendered rows, while a timeout or ban
-    ghosts that user's rows in place (struck-through but readable,
-    including own echoes)
-  - a timeout or ban on the logged-in user locks the chat input with a
-    live countdown until it expires
-- Name colours
-  - the chatter's own Twitch colour when set, a hash-derived palette
-    colour otherwise; either way the luminance is nudged so names stay
-    legible on the active theme (the console theme ignores chatter
-    colours for its phosphor-green palette)
-- Gap notices
-  - stretches the page wasn't watching (hidden tab, suspended timers,
-    page closed, socket dropped) get a
-    `· Nm gap · cause · start → end` row so lost context stays visible
-- Whispers
-  - `WHISPER` lines render in their own floating pane beside the log
-    (needs a login carrying whisper scopes)
-  - an unread count badges a `✉` header chip that opens it, and
-    `/w name text` replies through `#jtv` like other clients
-- Permalinks
-  - clicking a row's timestamp copies a `?mid=` link; opening it
-    scrolls to and flashes the row
+- **Messages**
+  - Each row shows a time, a linked name and any Twitch badges, such as
+    moderator, VIP, subscriber or founder. Text labels can appear
+    beside the badges for subscriptions, bits and first messages.
+  - Hover over a subscription label to see its duration in years and
+    months. An optional colour setting gradually changes the label
+    from teal to the theme's accent colour as the subscription gets
+    longer, up to ten years.
+  - In the modes that put subscription labels on the left, badge icons
+    start at the same position on each row. Moderator, bits and first
+    message labels follow the icons rather than leaving an empty gap
+    for people who do not have them.
+- **Replies**
+  - A reply shows the original message above it. Click the quote to
+    jump to that message in the chat log.
+- **Special messages**
+  - Actions written with `/me`, bot commands starting with `!` and
+    `#` tags appear in italics. Names, badges and times stay upright.
+  - Subscriptions, raids, gifts, timeouts, bans and other Twitch
+    notices have their own rows.
+  - A channel-wide `/clear` removes the visible messages. If someone
+    is timed out or banned, their messages remain visible but dimmed
+    and crossed out.
+  - If the logged-in user is timed out or banned, the message box
+    locks and shows when chatting will be available again.
+- **Names and gaps**
+  - Names use each chatter's Twitch colour when available. Otherwise
+    the page chooses a colour from their name. It adjusts either
+    colour for readability on the current theme.
+  - When the page could not watch chat, it adds a row showing the
+    length and cause of the gap. This includes closed tabs, sleeping
+    devices and lost connections.
+- **Whispers and message links**
+  - With the required Twitch login permissions, private messages
+    appear in a separate window. An unread count appears on the
+    envelope button, and `/w name text` sends a reply.
+  - Click a message's timestamp to copy a link to it. Opening that
+    link scrolls to and highlights the message.
 
 ### Emotes
 
-- Providers
-  - native Twitch `emotes` tags render as animated v2 images (static
-    fallback); cheermotes on bit messages
-  - 7TV, BTTV and FFZ sets including animated FFZ (the name → CDN URL
-    map comes from the relay)
-- Zero-width 7TV emotes stack onto the previous one.
-- Emote-only rows render large (mode configurable: inline / pinned
-  right / normal).
-- Hovering an emote - in a row or in the picker - pops a card with the
-  art at the provider's largest size plus the code and its source set
-  (emoji cells show the glyph with their search keywords). In the
-  picker the card is the `tip` option, off by default.
+- **In chat**
+  - The page displays Twitch, 7TV, BetterTTV and FrankerFaceZ emotes,
+    including animated ones. It also displays Twitch's animated
+    cheermotes in messages with bits.
+  - Some 7TV emotes sit on top of the preceding emote. Messages made
+    entirely of emotes can show them larger, at the right edge or at
+    their usual size.
+- **Preview cards**
+  - Hover over an emote in chat to see a larger image, its name and
+    where it comes from. Emoji previews also show search terms.
+  - The picker's preview card has a separate `tip` switch. It starts off.
 
 ### Emote picker
 
-- Grid
-  - `☻`, in the bottom left corner, opens a
-    [Chatterino](https://chatterino.com/)-style grid: 7TV / BTTV /
-    FFZ / Twitch / emoji (~600 glyphs) sections with search, a
-    `recent` row of the last 24 used, per-source tab toggles,
-    still/animated filters, and a `mix` toggle that merges every
-    enabled source into one flat grid
-  - cells dedupe across providers up to case - 7tv's `glorp` and
-    bttv's `Glorp` collapse to the first source scanned - and emoji
-    always trail the merged grid
-- Ordering
-  - alphabetical, or by usage - most recently used in chat first
-    (StreamElements chatstats via the relay seed lifetime counts for
-    tie-breaks; live session use updates both and persists across
-    reloads)
-  - in mix mode anything used in the last minute pins to the very top;
-    sectioned mode keeps recents atop their own section
-- Age squares (usage sort)
-  - dashed squares mark where emotes were last used over that long
-    ago, from ten-second rungs through a minute, minutes up to the
-    hour and whole hours to twelve - dim until recording has actually
-    covered that span, then bold and accent-bordered - plus a solid
-    accent square at the point recording began (everything below it
-    was never seen)
-  - a dead stretch of empty eras between two cells collapses to the
-    deepest square that bounds what sits below it; a square an emote
-    crossed this session turns gold
-  - the `▤`/`▥`/`▦` button, labelled with its mode number, cycles four
-    layouts: squares flowing inline between cells (0), every era
-    starting a fresh row (1), a row ending at its last square (2), and
-    those same rows centred (3)
-  - the `□` button, labelled the same way, cycles how many squares
-    print: none (0), a handful of landmarks (1: 1m 5m 15m 30m 1h 2h 3h
-    6h 12h), whole minutes and hours (2) or every rung (3, default)
-- Motion
-  - reshuffles animate emotes sliding to their new spots; a just-used
-    emote flashes behind its cell, each use stepping the flash ~24°
-    round the hue wheel so consecutive uses read as a spectral walk
-  - `↔` cycles how a re-sort moves: cells nudge a few slots over or
-    wrap off the popup's edge and back on at their new spot, wrap in a
-    cascading ripple or snap over one at a time, the rebuilt grid
-    pops, un-blurs or fades in, or reshuffles draw with no motion at
-    all
-- Options
-  - `Aa` cycles each emote's code - off, below the art, then beside it
-    (the button lights accent on the last)
-  - `½x`/`¾x`/`1x`/`1⅓x`/`1½x`/`1⅔x`/`2x` buttons size the grid
-  - `hold`/`hold+` freezes usage reshuffles while the pointer is over
-    the emotes - from the grid's top down to the bottom of its last
-    row of cells, so blank space a large picker leaves beneath lets go
-    - `hold+`, the default, also pauses animated cells
-  - a pause chip swaps cells for their still frames
-  - `tip` pops the big emote card over a cell; off by default
-  - the wheel steps any option chip through its states - down
-    forward, up back
-- Box
-  - resizes from its left and top edges (shading on hover) and drags
-    by a dotted grip strip (both persist)
-  - opens by default - only a deliberate close keeps it down next
-    visit - and a `📌` pin floats it free of the chat bar
-  - all display options - names, size, sort, age rows and squares,
-    mix, hold, tip, re-sort motion, tabs, anim filter, geometry - ride
-    the settings bundle, theme slots and copied URLs
-- Clicking inserts at the caret; `Esc` peels the topmost layer -
-  picker first, then the help panel.
+- **Finding an emote**
+  - Open the picker with `☻` beside the message box. It groups Twitch,
+    7TV, BetterTTV, FrankerFaceZ and emoji, with search and a strip of
+    the 24 most recently used items.
+  - Use the source buttons to show or hide providers. `mix` puts the
+    enabled providers in one grid. If providers share an emote name,
+    the grid shows one copy. Emoji appear last in the mixed grid.
+  - Click an emote to insert it where the cursor is in the message box.
+- **Ordering**
+  - Sort by name or by how recently chat used each emote. Earlier
+    channel use breaks ties. Use counts and last-use times survive
+    reloads.
+  - One can limit the usage sort to emotes seen since tracking began.
+    With `mix` on, emotes used in the past minute rise to the top;
+    otherwise they stay in their own provider's group.
+- **Time-ago squares**
+  - In usage order, a labelled square separates emotes last used more
+    than a given time ago. The labels run from seconds through minutes
+    to twelve hours. A square stays dim until tracking has covered
+    that time span. A square crossed while this page was open turns
+    gold. Long stretches without emotes use a single boundary square.
+  - The `▤` button chooses whether squares sit between emotes, start
+    new rows, end rows or centre those rows. The `□` button chooses
+    how many appear: none, a few landmarks, whole minutes and hours,
+    or all of them (the default).
+- **Appearance and motion**
+  - `Aa` shows emote names below or beside their images, or hides them.
+    The size buttons range from `½x` to `2x`.
+  - `↔` chooses how emotes move when they change position: sliding,
+    rippling, snapping, fading, zooming, sharpening from a blur or
+    moving instantly. Recently used emotes briefly flash in a changing
+    colour.
+  - `still` and `anim` filter static and animated emotes. `⏸`
+    shows still frames instead of moving emotes.
+- **Holding the grid**
+  - `hold` delays automatic rearrangement while the pointer is over
+    the emotes. It stops holding in the empty space below the last
+    emote row, so a large picker can update while the pointer rests
+    there.
+  - `hold+` is the default. It also pauses animated emotes while
+    holding. Manual searches, sorting and filters still take effect.
+- **Window and settings**
+  - The picker opens by default. If one closes it, it stays closed on
+    the next visit. Drag the top handle to move it or its edges to
+    resize it. The pin button keeps it open when the chat bar closes.
+  - Its settings, position and size can be saved or shared with the
+    other display settings. Scroll over an option button to change it;
+    `Esc` closes the picker before the help popup.
 
 ### Sending & the input bar
 
-- Login
-  - optional Twitch login (the Twitch button, implicit OAuth - no
-    secret ships in the page) enables a chat input bar; chat-scoped
-    tokens live in localStorage until logout
-  - a `➤` button sends for pointer/voice-only users; typing a
-    character anywhere jumps into the box
-- Commands
-  - `/me` is wrapped as a CTCP ACTION so it renders as a proper action
-    line; slash commands pass through as Twitch reads them
-    (`/timeout`, `/ban`, `/announce`, `/raid`…), dropping any pending
-    reply tag
-- Replies
-  - hovering a row shows `↩` to reply - the pending-reply bar above
-    the box quotes the target at the chat's own text size and cancels
-    on `Esc`; the send carries `reply-parent-msg-id`
-  - Twitch prepends the `@login` itself, so only the local echo spells
-    it out
-- Echoes
-  - local echoes render instantly and are adopted in place when the
-    real line replays through backfill; they persist across reloads so
-    a racing backlog can't eat a just-sent line
-- Names
-  - a plain click on a chatter's name opens the user card (see
-    Formatting extras); its `@mention` button types `@name ` at the
-    input caret, and modifier-clicks still open the profile
-- Completion
-  - `@` at a word boundary opens a narrowing pick of the joined
-    channels plus recently seen nicks (freshest first, each in its
-    chat colour) - tab/⇧tab walks it, enter or a click fills the name
-  - `:word`, or any bare word of 3+ letters followed by tab, completes
-    emote codes the same way, with a small preview beside each
-    candidate
-- The box
-  - a growing textarea - a wrapping draft gains a line at a time up to
-    five before scrolling; `enter` sends, shift or no
-  - a character count sits beside it - amber past ~200 chars (the
-    guessed [fossabot](https://fossabot.com/) long-message cutoff; the
-    real filter isn't public) and red near Twitch's 500 cap, with the
-    box border tinting to match
-- History
-  - readline-style: `↑`/`↓` in the input walk sent messages, stashing
-    the draft on the first `↑` and restoring it once `↓` walks back
-    past the newest entry; `↓` on a non-empty draft parks it as a
-    navigable slot under whatever is sent next
-  - the ring (100 deep, per channel) persists in `localStorage`, so
-    `↑` after a reload still reaches older sends like an IRC client
-- Channel rules
-  - applied server-side - slow mode counts down in the input after
-    each send (mods/VIPs exempt), and rejections arrive as ordinary
-    `[notice]` rows
+- **Sign in and send**
+  - Sign in with Twitch to enable the message box. The page does not
+    contain a client secret. It keeps the chat token in the browser
+    until logout.
+  - Press `➤` to send, or type in the box. Typing while the box is
+    closed brings the cursor into it.
+  - `/me` sends an action. Other slash commands, such as `/timeout`,
+    `/ban`, `/announce` and `/raid`, pass through to Twitch.
+- **Reply to a message**
+  - Hover over a chat row and click `↩`. A bar above the message box
+    shows the message being answered in the chat's font size.
+  - Press `Esc` to cancel. When one sends the reply, Twitch links it
+    to the original message. Only the local preview needs to add the
+    `@name` that Twitch normally supplies.
+- **Drafts and sent messages**
+  - The box grows as a draft wraps, up to five lines, then scrolls.
+    `Enter` sends the message.
+  - A counter warns near Twitch's 500-character limit. It turns
+    amber earlier, around 200 characters, for
+    [fossabot](https://fossabot.com/)'s possible long-message limit;
+    that limit is not public.
+  - Sent messages appear immediately. When the server returns the
+    same message, the page replaces the local copy instead of showing
+    it twice. A local copy can also survive a reload.
+  - `↑` and `↓` browse the last 100 messages sent in each channel.
+    The page saves both that history and a draft one was writing.
+- **Insert a name or emote**
+  - Click a chatter's name to open their card, then use `@mention` to
+    put their name in the message box. Modifier-click opens their
+    Twitch profile instead.
+  - Type `@` to choose from recent chatters and joined channels.
+    Type `:word`, or press Tab after a word of at least three letters,
+    to choose an emote. The list shows previews and narrows as one
+    types; Tab, Shift+Tab, Enter and a click select an item.
+- **Channel rules**
+  - The box shows a countdown when slow mode delays the next message.
+    Rejected messages appear as notices.
 
 ### Header & graph
 
-- Status
-  - stream status dot (live / idle-gold / offline); the SVG favicon is
-    rebuilt in the dot's computed colour so the tab icon tracks stream
-    state per theme
-  - uptime, viewers, title on hover; offline shows last-run info;
-    ROOMSTATE chat modes (slow, follow age, emote-only, subs-only,
-    r9k)
-- Size
-  - the `–` button cycles three sizes: full → reduced (option buttons
-    hide; `?`, `–` and the `▶` stream-play stay pinned at the right
-    edge at their full size) → minimised, a 10px strip carrying just
-    `–` that restores on click
-- Rate graph
-  - messages-per-second sparkline with 10s/minute ticks and
-    red-on-halo glorp/F bursts (the channel-cat emote and its
+- **Stream status**
+  - The dot shows whether the stream is live, idle or offline. The tab
+    icon changes colour to match it. Hover to see the stream title,
+    viewers and uptime, or details of the last stream when offline.
+  - The header also shows chat restrictions, such as slow mode,
+    follower-only, subscriber-only and emote-only mode.
+- **Header size**
+  - `–` cycles between the full header, a smaller header that leaves
+    room for the graph, and a thin strip. Click the strip to expand it.
+- **Message rate**
+  - The graph shows messages per second. It marks bursts of glorp and
     [F](https://knowyourmeme.com/memes/press-f-to-pay-respects)
-    chorus); dim bands shade spans the page wasn't watching
-    (suspended timers, reloads) instead of drawing them flat
-  - hovering reads the sample under the cursor - msgs/s (or the
-    band's cause on a gap), glorp count, wall-clock time
-  - it flexes to fill whatever header space is free (the whole bar in
-    reduced mode), re-rasterises to match its box so it stays sharp
-    through resizes, and persists across reloads
-- Update bar
-  - a deploy while the page is open raises a bar with a reload button
-    either side of the notice - kept clear of the text and twice the
-    old width - and a reminder that resetting all settings and/or
-    waiting fixes most breakage
+    messages. Dim bands mark periods when the page was not watching
+    chat, such as after a reload or a sleeping tab.
+  - Hover over the graph to see the time, message rate, glorp count or
+    the reason for a gap. The graph adjusts to the available width
+    and keeps its data across reloads.
+- **Site updates**
+  - If a new version arrives while the page is open, a notice offers
+    two reload buttons. If the page behaves strangely, the notice
+    suggests resetting saved settings or waiting for a fix.
 
 ### Display options
 
-- Colour
-  - style palettes (brightness-ordered, each with a designed shade
-    stop) plus a separate 9-stop shade axis (white → black, or
-    system-following auto); the `◐` cycle swaps hue family alone while
-    picking a chip also applies its shade
-- Typography
-  - font picker (incl. dyslexia-friendly faces), size, weight, line
-    height, graduated text shadow
-  - the popup's size list marks the size in use from the first paint,
-    default included
-- Rows
-  - zebra striping (highlighted rows keep their own colour), row
-    separator shades
-  - five timestamp modes (off / no seconds / seconds / 12-hour /
-    12-hour + seconds)
-  - five sub-chip modes (right / compact `[NN]` / before badges /
-    compact-left / hidden; a dim " -- " marks chatters Twitch
-    reported no month count for, skipped on the bots)
-- Split columns - eleven modes, in the menu's order
-  - one column: `1col`
-  - page-flip: `2col`, and `3col` in landscape - each column holds one
-    page that hands its overflow to the next while retired pages
-    archive into the log
-  - one chat column beside a rail:
-    - `2col+vid/emotes` - stream over the emote picker
-    - `2x2` - chat over emotes on the left, stream over stats on the
-      right
-    - `2col+emotes` - the picker alone; the stream stays off and the
-      `▶` floats it over the chat on demand
-    - `2col+vid/help` - stream over the help popup, docked in the rail
-  - two chat columns beside a rail:
-    - `3col+vid/emotes/stats` - stream, picker and stats pane; the
-      seam between the picker and the stats pane drags to share the
-      column, and a squeezed stats pane sheds its lists before its
-      rate graph
-    - `3col+vid/emotes` - stream and picker
-    - `3col+emotes` - the picker alone, stream floating as above
-    - `3col+vid/help` - stream over the docked help popup
-  - the rail's left edge drags to fix its width; while the help popup
-    is docked its drag handle and resize edges are off, stats stays a
-    tab inside it, and the emote picker floats as in the plain columns
-- Links
-  - `live?` in the media tab pings every linked Twitch channel through
-    the relay; live links gain a green dot and an
-    uptime/viewers/title tooltip, offline ones grey out
-- Stream video overlay
-  - draggable, resizable, opens by default (only a deliberate off
-    persists); in the rail modes it docks, floats or turns off (an
-    'off' revives docked on rail re-entry)
-  - it pauses while hidden so no audio leaks; when the stream goes
-    live a stale offline slate is rebuilt if a play() nudge doesn't
-    take
-  - its glyph goes green while the stream is live, red when a stopped
-    player exists and the stream is not
-- Tabbed help panel
-  - help/conf · stats · media · left · libre · authors, with its own
-    width and font-size controls
-  - resizes from its edges (the affected surfaces shading on hover)
-    and rests in a 9-spot dock until dragged; its section dividers are
-    blank spacers
-- Persistence
-  - everything persists in `localStorage`; every option answers to
-    click, shift+click (reverse) and the scroll wheel
-  - in the popup the style and preset links render as live swatches -
-    background, text colour and, for presets, the bundled font
-- Theme slots
-  - three **theme slots** under the copy-settings-URL button stash
-    whole option bundles - click recalls a filled slot (or stores the
-    current options into an empty one), ⇧click/right-click overwrites
-  - they sync across open tabs and clear with `reset all settings`
+- **Colours and text**
+  - Choose a colour palette and a separate light-to-dark shade. The
+    automatic shade follows the system theme. The colour chips show
+    the shade each palette was designed with.
+  - Choose a font, including fonts intended to make reading easier.
+    Adjust font size, weight, line height, letter spacing and shadow.
+    The help popup marks the size currently in use.
+- **Chat rows**
+  - Adjust alternating row colours and the lines between messages.
+  - Show or hide timestamps, include or omit seconds, and choose
+    twelve- or twenty-four-hour time.
+  - Put subscription labels on the left, right or out of view, with
+    full or compact text. If Twitch does not report a subscriber's
+    month count, the label shows a dim dash. Bots do not get that
+    placeholder.
+- **Chat columns**
+  - The split menu has eleven layouts:
+    - `1col` keeps one full-width chat column.
+    - `2col` and `3col` pass older messages to the next chat column.
+      Three chat columns need a landscape screen.
+    - `2col+vid/emotes` keeps one chat column on the left and puts
+      video above the emote picker on the right.
+    - `2x2` puts chat over emotes on the left and video over stats on
+      the right.
+    - `2col+emotes` puts chat beside the emote picker. Video starts
+      off; `▶` can float it over the chat.
+    - `2col+vid/help` puts chat beside video and the help popup.
+    - `3col+vid/emotes/stats` puts two chat columns beside a column
+      with video, emotes and stats.
+    - `3col+vid/emotes` puts two chat columns beside video and emotes.
+    - `3col+emotes` puts two chat columns beside the emote picker;
+      video can float above the chat.
+    - `3col+vid/help` puts two chat columns beside video and the help
+      popup.
+  - Drag the divider to change the side column's width. In layouts
+    with both emotes and stats, drag their divider to divide the
+    remaining height. When help fills the side column, its own move
+    and resize controls are disabled; stats remains a tab inside it.
+- **Video and live links**
+  - Drag and resize the video when it floats. It pauses when hidden.
+    In the side-column layouts it can dock, float or switch off.
+  - The `live?` button in the media tab checks linked Twitch channels.
+    Live channels gain a green dot and a tooltip with stream details;
+    offline channels appear dimmer.
+- **Help popup and saved settings**
+  - The popup has tabs for help and settings, stats, media, left,
+    libre and authors. Change its width and font size or drag it to
+    another position when it is floating.
+  - The page saves choices in the browser. Click or scroll over many
+    controls to cycle through options; Shift+click cycles backwards.
+  - The three theme slots save sets of display choices. Click an empty
+    slot to fill it, or a filled slot to restore it. Shift+click or
+    right-click replaces one. `reset all settings` clears them.
 
 ### Formatting extras
 
-- Mentions and filters
-  - mention highlighting - your own login joins the keyword set when
-    logged in; a block-words field does the inverse, hiding any
-    matching line outright
-  - `@name` mention text and reply-parent nicks render in the
-    mentioned chatter's own nick colour (their real Twitch colour once
-    seen, the palette hash otherwise)
-  - mentions landing while the page is unfocused queue on a clickable
-    `@N` chip in the header - click to jump to each, ⇧click clears; a
-    `♪` toggle in help/conf adds a soft ping for those lines
-- Bot and event styling
-  - GLORP/F red rows, channel-point tints, fossabot/blammobot name
-    shimmer (and the urls in their posts), game-line styling, braille
-    art restacking
-  - `[notice]` labels on event rows get a cycling rainbow wash
-- Embeds
-  - image/GIF/[Giphy](https://giphy.com/) embeds pinned right
-  - X/Twitter preview cards via
-    [fxtwitter](https://github.com/FixTweet/FxTwitter) rendered below
-    the whole message (text skipped when a bot like fossabot already
-    pasted it, video thumbs playable inline; profile links fall back
-    to [Bird.makeup](https://bird.makeup/) when nitter is down)
-- Links view
-  - `🔗` filters the log to rows carrying a URL and shows each link
-    only once (session-only, not saved)
-  - `✂` clean urls rewrites link text without the `https://`, `www.`
-    or a trailing `/index.htm`
-  - share-tracking parameters (`utm_*`, ig's `stkn`, yt's `si`, x's
-    `s`/`t` and friends) are stripped from the target itself on
-    render, so the clean form is also what stats tallies and dedupe
-    folds on
-- Find bar
-  - `ctrl+f` (a second tap hands off to the browser's own find), `/`
-    or the `⌕` button floats a search over the rendered scrollback:
-    bare words match text, `user:login` the chatter,
-    `kind:notice|mod|gap|action|emote|mention|kw|deleted|sub` the row
-    type
-  - `enter`/`⇧enter` step between matches with a counter, `only`
-    collapses non-matching rows
-  - `archive` searches the local
-    [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
-    store - every rendered row indexes flat fields per channel (30-day
-    retention, ~50MB cap) so search reaches past scrollback's edge;
-    hits that still render jump to the row
-- User hiding
-  - a comma list of logins in help/conf hides their rows in one of
-    three modes: `vanish` drops them, `stub` folds them into a running
-    count line, `ghost` strikes them dim like deleted rows; persisted
-    across visits
-- User card
-  - clicking a nick or @mention pins an inspector: colour, pronouns,
-    first-seen, session message count, the last few lines (each with
-    its timestamp), and profile / @mention / highlight / hide buttons
-  - `highlight` washes all of that chatter's rows in a soft tint of
-    their own nick colour - shown live, kept for new rows, restored
-    with history, and saved under its own key so a reset clears it;
-    mention and keyword rows still show their own colour over it
-  - where one's own USERSTATE flags mod, broadcaster or VIP privileges
-    the card also offers `timeout 10m`, `ban` and `delete msg`, each a
-    click-twice confirm sent through the relay as IRC commands
-  - `⇧`/`⌃`/`⌘`-click still opens the Twitch profile
-- Hover previews
-  - external links, nicks and @mentions pop a card: title and
-    description, where a shortened link really lands, a playable
-    video for instagram reels (resolved through
-    [kkclip](https://www.kkclip.com/)), x/twitter status cards
-    through fxtwitter anywhere outside chat rows, and for Twitch
-    profiles the live state, followers, chat modes and pronouns when
-    the chatter set them on [alejo.io](https://pronouns.alejo.io/)
-  - lookups run through the [linkpeek Cloudflare
-    worker](https://github.com/mxmilkiib/twitch-chat-relay/blob/main/linkpeek-worker.js);
-    a help/conf option scales the card down to text or off, and it's
-    skipped on touch screens
+- **Highlights and alerts**
+  - Highlight messages that contain chosen words or mention the
+    logged-in user. A separate blocked-words list hides matches.
+    Mentions and reply names use the named chatter's colour.
+  - While the page is out of focus, missed mentions add to a counter
+    in the header. Click it to visit them, or Shift+click to clear it.
+    An optional setting plays a quiet sound for mentions.
+- **Special styles and media**
+  - Glorp and F bursts, channel-point messages, some bot messages and
+    game lines have their own styles. Notice labels can carry a
+    moving rainbow colour.
+  - The page shows images, GIFs and [Giphy](https://giphy.com/) posts
+    beside chat messages. X/Twitter links can show a card below the
+    message with a playable video when available.
+- **Links and search**
+  - `🔗` shows only messages with links and removes repeated links
+    from that view. `✂` shortens the displayed link text and removes
+    common tracking codes from link destinations.
+  - Open search with Ctrl+F, `/` or `⌕`. Search message text, a
+    username with `user:login`, or a message kind with `kind:notice`
+    and similar terms. Enter and Shift+Enter step through matches;
+    `only` hides rows that do not match.
+  - `archive` searches messages no longer in the visible scrollback.
+    The browser keeps that searchable copy for up to 30 days, within
+    a storage limit. Matches still on screen can be opened directly.
+- **People**
+  - In help/conf, add usernames to the hide list. Choose whether their
+    messages disappear, become a count line, or remain visible but
+    dimmed and crossed out.
+  - Click a name or @mention to open a card with the user's colour,
+    pronouns when available, first-seen time, message count and recent
+    messages. The card has profile, @mention, highlight and hide
+    buttons. Modifier-click opens their Twitch profile directly.
+  - `highlight` gives all that person's messages a soft background
+    based on their name colour. It also affects new messages and
+    survives reloads; message highlights for mentions and keywords
+    take priority.
+  - When the logged-in account has permission in the channel, the
+    card also offers timeout, ban and delete actions. Those actions
+    ask for a second click before sending.
+- **Link previews**
+  - Hover over a link, name or @mention for a card with more details.
+    It can show where a shortened link leads, a video from an
+    Instagram reel, an X/Twitter post or Twitch profile details such
+    as live status and pronouns.
+  - The help/conf controls can limit previews to text or turn them
+    off. Hover previews do not run on touch screens.
 
 ### Keyboard & accessibility
 
-- Screen readers
-  - a hidden live region announces new lines (history replays
-    skipped); the columns are `feed` landmarks and the picker is a
-    labelled `dialog`
-- Keys
-  - with the chat bar up, `↑`/`↓` select a row (accent outline),
-    `r`/`enter` replies to it, `Esc` drops the pick, and typing jumps
-    into the input
-  - `Esc` peels layers in order - row pick, emote picker, help panel
-- Scrolling
-  - pause-on-hover option holds the scroll while a row is hovered
-  - scrolling follows new messages only while at the bottom; scrolling
-    up releases it and shows a jump-to-latest button with a count of
-    rows below the fold (one per column in split mode)
-- Motion
-  - `prefers-reduced-motion` honoured on shimmers, pulses and marker
-    animations
+- **Screen readers**
+  - New messages are announced. Chat columns and the emote picker have
+    labels so one can find them with assistive technology. Restored
+    history is not announced as new chat.
+- **Keyboard**
+  - When the message box is open, `↑` and `↓` can select a chat row.
+    Press `r` or Enter to reply, or `Esc` to leave row selection.
+  - `Esc` also closes the emote picker and then the help popup when
+    those are open.
+- **Following chat**
+  - The page follows new messages while one is at the bottom. Scroll
+    up to stop following; a button shows how many messages arrived
+    below and jumps back to the latest ones.
+  - An optional pause-on-hover setting stops the scroll while the
+    pointer rests over a row.
+- **Motion**
+  - The page reduces shimmers, pulses and other animation when the
+    device asks for reduced motion.
 
 ### Persistence, sync & channels
 
-- Scrollback
-  - the help/conf panel offers limits from 250 to 100,000 rows (5,000
-    by default); larger limits use more browser memory and may slow
-    long-running tabs
-  - at most the newest 1,000 rows (including gap notices) survive
-    reloads via
-    [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
-  - stream run history, graph samples, emote-use stats, per-day/hour
-    stats buckets, option bundles and picker geometry persist too
-- Multi-tab
-  - option changes and login/logout propagate to other open copies
-    through `storage` events
-  - sent-message echoes broadcast over a
-    [`BroadcastChannel`](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel)
-    so every copy renders them at once
-- Channels
-  - `?channel=login` points chat, stream embed and status at another
-    streamer for the visit; history, graph and tab-sync keys get a
-    per-channel suffix so streams don't bleed into each other, and the
-    OAuth round-trip carries the channel in `state`
-  - the media tab's twitch streams row links each streamer with a `*`
-    that switches to them
-- [PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
-  - installable (manifest + pass-through service worker); an
-    installed standalone window survives backgrounding better than a
-    tab
-  - on cold join, wake or reconnect the page asks the relay for missed
-    lines via recent-messages.robotty.de, so the log backfills rather
-    than opening empty or staying truncated
+- **Chat history**
+  - Set the visible message limit between 250 and 100,000 rows;
+    5,000 is the default. Higher limits can use more browser memory.
+  - The page keeps up to 1,000 of the newest rows across reloads.
+    It also saves stream history, graph data, emote use, statistics and
+    display choices in the browser.
+- **More than one tab**
+  - Display changes and login or logout carry across open copies of
+    the page. Messages one sends appear in every copy without waiting
+    for Twitch to send them back.
+- **Other channels**
+  - Choose another channel, or combine up to six. Each channel has
+    separate chat history, graph and saved data. The first channel
+    controls the stream and where messages are sent.
+  - In the media tab, click a stream's `*` link to switch to its chat.
+- **Installable page**
+  - The page can be installed as a
+    [web app](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps).
+    It asks the relay for recent messages when it opens or reconnects,
+    filling in messages missed while it was away.
 
 ### Help popup & resources
 
-- Six tabs, laid out in link columns whose count is capped by the
-  popup's own width via container queries
-  - help/conf
-  - stats - a session cell with chatter/message/badge counts and peak
-    viewers; a channel scope picker when several are joined; top
-    chatters and badges over all-time/24h/12h/6h/3h/1h windows folded
-    from per-day and per-hour buckets; top emotes by channel usage,
-    the same buckets, or StreamElements lifetime counts; top links
-    with favicons, fetched page titles and tweet previews; the rate
-    graph's loudest bursts (4+ msgs/s) and glorp peaks linked to that
-    day's [supa chat](https://tv.supa.sh/) log; and a storage cell
-    sizing the app's own footprint - localStorage keys, archive row
-    count, origin estimate
-  - media - re Hasan, clips, news, yt channels, twitch streams,
-    community
-  - left - usa pol, [dsa](https://www.dsausa.org/) chapters, left
-    parties, orgs, workers unions, worker centres, worker action,
-    tenants unions, activism (with its messaging and action groups),
-    boycott, divest, sanctions, organising, conduct,
-    [dual power](https://en.wikipedia.org/wiki/Dual_power),
-    reformism, participatory,
-    [mutual aid](https://en.wikipedia.org/wiki/Mutual_aid_(organization_theory)),
-    justice
-  - libre - free software, free culture, open hardware, open social,
-    open net, open knowledge, open gov, digital rights,
-    [osint](https://en.wikipedia.org/wiki/Open-source_intelligence)
-  - authors - era-grouped reading lists
-- Split rule between left/libre and authors
-  - people and their texts live in authors (`data-w` the work,
-    `data-g` the tagline's source); left/libre links concepts,
-    organisations and tools
-  - where a topic wants its texts in context they sit under a
-    **reading** row, and the author's name is an `a.au[data-au]` cite
-    that hops to the authors tab and flashes the entry - so a text
-    only appears in left/libre when its author has an entry
-- Size
-  - the popup resizes from its edges and offers widths from 480 to
-    1920px; its top row of width, font-size and position stops runs
-    up to 1360px wide
+- **Help and stats**
+  - **Help/conf** explains the controls and lets one change settings.
+  - **Stats** shows session totals, peak viewers, and the busiest
+    chatters, badges, emotes and links. Choose a joined channel and
+    compare all-time, daily or hourly ranges. The tab also shows the
+    busiest stretches of chat and how much browser storage the page
+    uses.
+- **Links**
+  - **Media** collects Hasan-related links, clips, news, YouTube
+    channels, other streams and community pages.
+  - **Left** collects parties and organisations, unions, tenant
+    groups, activism, boycotts, mutual aid, reformism, organising and
+    other political resources.
+  - **Libre** collects free software, open culture and design, open
+    research and government, digital rights and
+    [open-source intelligence](https://en.wikipedia.org/wiki/Open-source_intelligence).
+  - **Authors** lists thinkers and their work by era. A linked author
+    name in the left or libre tabs jumps to their entry here; links to
+    organisations, tools and ideas stay in their topic tabs.
+- **Layout**
+  - These six tabs use more link columns as the popup grows wider.
+    Resize the popup, choose a preset width or move it when floating.
+    The width choices run from 480px to 1920px.
 
 ### URL options
 
-Query params apply a configuration on top of (and into) the saved one,
-e.g. `?split&theme=dark&size=18&font=inter`. Booleans take `=0` to
-force off.
+Add these options to the page URL to set them for this visit and save
+the result. For example: `?split=2&size=18&font=inter`. For on/off
+options, `=0` means off. The controls described above work without
+editing a URL.
 
 | key | values | effect |
 |---|---|---|
-| `split` | `1`–`11` | column modes: `1col` · `2col`/`3col` page-flip (3 on landscape) · `3col+vid/emotes/stats` · `3col+vid/emotes` · `3col+emotes` · `2col+vid/emotes` · `2x2` (chat over emotes, video over stats) · `2col+emotes` · `3col+vid/help` · `2col+vid/help` — 6 & 9 keep the video off, ▶ floats it; 10 & 11 dock the help popup under the video |
+| `split` | `1`–`11` | layout, in the order listed under Chat columns above |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
 | `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |
@@ -557,7 +431,7 @@ force off.
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
-| `lw` | `300`–`700` | weight of entry links across the `?` popup - media, left/libre, authors, stats |
+| `lw` | `300`–`700` | boldness of links in the help popup |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
 | `hpfs` | px / `-1`…`-3` | help popup font size (negatives follow the chat font that many steps down) |
 | `hpw` | `480`–`1920` | help popup width |
@@ -570,9 +444,9 @@ force off.
 | `lines` | `0`–`3` | row separator shades |
 | `times` | `nosec`/`24h` / `24hsec` / `12h` / `12hsec` / `0` | timestamp mode |
 | `shadow` | `0`–`2` | text shadow level |
-| `video` | flag / `dock` / `float` / `off` | stream video overlay; rail placement in mode 4, shown/hidden in 5–6 |
+| `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
-| `subg` | `1` | sub-chip months gradient - teal → accent across 120 months |
+| `subg` | `1` | gradually shift subscription labels from teal to the theme's accent colour as the month count rises (up to 120 months) |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
 | `lbls` | flag | header button labels shown beside each header control - independent of the `?` cycle |
@@ -594,12 +468,12 @@ force off.
 | `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |
 | `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
 | `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
-| `epage` | `0`–`3` | picker age-square rows: inline / era rows / row ends at last square / centred |
-| `epsq` | `0`–`3` | picker age squares printed: none / landmarks / whole minutes and hours / every rung (default) |
+| `epage` | `0`–`3` | how time-ago squares divide or centre the rows |
+| `epsq` | `0`–`3` | how many time-ago squares appear: none / few / minutes and hours / all (default) |
 | `epmix` | `1` | picker merged provider grid |
-| `ephold` | `0`–`2` | picker reshuffle hold (2 = hold+, pauses animated cells) |
+| `ephold` | `0`–`2` | stop the picker from moving emotes under the pointer; 2 also pauses animation |
 | `eptips` | `1` | picker hover tip card on (off by default) |
-| `epmove` | `0`–`6` | picker re-sort motion: slide / fade / off / ripple / zoom / blur / queue |
+| `epmove` | `0`–`6` | how emotes move when the picker changes their order |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
 | `epanim` | `anim`,`animf`,`still` | picker animation filter (`animf` = animated shown as stills) |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
@@ -607,60 +481,49 @@ force off.
 | `overlay` | flag | [OBS](https://obsproject.com/) browser-source mode: transparent page, live rows only |
 | `mid` | a message id | scroll to and flash that row on load (set by timestamp clicks) |
 | `hw` | comma list | hide these logins' rows |
-| `hwm` | `vanish`/`stub`/`ghost` | how hidden users' rows render |
+| `hwm` | `vanish`/`stub`/`ghost` | remove hidden users' messages, replace them with a count or leave them crossed out |
 
-`theme` names a preset bundle of all display options:
+`theme=name` selects a preset that combines colours, fonts and other
+display choices. The presets are:
 
 - `old-default`, `compact`, `print`, `cosy`, `cinema`, `phosphor`,
   `dyslexic`, `midnight`, `solar`, `minimal`, `retro`, `irc`,
   `gohu`, `heather`, `nightshade`, `ft`, `ftdark`, `twitch`
 
-A first visit and a settings reset both land on `nightshade`;
-`old-default` stays a selectable preset like the rest, and the retired
-name `theme=default` still resolves to it.
+The initial preset and the one used after a settings reset is
+`nightshade`. `old-default` remains available. Some old preset names
+still work: `theme=default` chooses `old-default`, while `paper`,
+`mirc` and `console` choose their matching colour styles. `theme=dark`
+also selects a colour style rather than a full preset.
 
-A style name like `theme=dark`
-still selects just the palette, which is
-also what the retired preset names `paper`, `mirc` and `console` now
-resolve to. Presets never share a name with a style. Each preset also
-pins the header button labels: `old-default` keeps them on and every other
-preset runs the bare header (the `?` popup is unaffected either way).
-
-The copy-settings button builds this url for the current options; a set
-theme rides it as `?theme=name` and options still matching the preset
-drop their param, so only drifted settings spell out.
+The copy-settings button makes a URL with the current settings. When a
+preset is selected, the URL includes only options changed from that
+preset.
 
 ### Performance
 
-- Incoming lines queue and flush once per animation frame.
-- The log defaults to 5,000 rows, with higher optional caps up to
-  100,000; background message queues and saved reload history stay
-  bounded at 1,000 rows.
-- The Google Fonts stylesheet loads without blocking the first
-  render, capture-phase scroll listeners are passive, and the about
-  page's theme screenshots ship as WebP.
+- **Incoming chat:** the page groups messages before drawing them to
+  avoid redrawing after every line.
+- **Limits:** 5,000 visible rows by default; the user can raise the
+  limit. Pending messages and the recent rows kept for reloads have
+  separate limits so they cannot grow without bound.
+- **Loading:** fonts do not hold up the first display. The about page
+  uses smaller WebP screenshots.
 
 ## The Backend - `twitch-chat-relay` (GitHub Pages)
 
-Repo: <https://github.com/mxmilkiib/twitch-chat-relay> - also a single
-`index.html`, loaded as a hidden iframe from
-`https://mxmilkiib.github.io/twitch-chat-relay/`.
+The [relay repository](https://github.com/mxmilkiib/twitch-chat-relay)
+contains a single `index.html`. The chat page loads it as a hidden
+iframe from `https://mxmilkiib.github.io/twitch-chat-relay/`.
 
-Channel-agnostic by design: it takes the target channel from the embedder's
-`join` message and derives everything else from it. It does the network work
-the CSP forbids on Neocities:
+The frontend tells the relay which channels to watch. The relay:
 
-- Connects to Twitch IRC over WebSocket as an anonymous `justinfan`
-  user (Twitch's convention for read-only access without an
-  account), requests `tags` + `commands` capabilities, handles
-  PING/RECONNECT, and rejoins with exponential backoff.
-- Polls [DecAPI](https://decapi.me) every 60s for uptime, viewer count
-  and title (no auth needed).
-- Fetches [ivr.fi](https://api.ivr.fi) user info (`lastBroadcast`),
-  the [7TV](https://7tv.app/) / [BTTV](https://betterttv.com/) /
-  [FFZ](https://www.frankerfacez.com/) emote sets, and the latest
-  VOD via Twitch's public GraphQL endpoint for exact stream
-  start/end times.
+- connects to Twitch chat and reconnects when the connection drops
+- checks the stream's title, viewer count and uptime every minute
+- fetches Twitch badges, third-party emotes and recent stream details
+- sends messages and retrieves missed chat when the frontend asks
+
+The same relay can watch other Twitch channels without code changes.
 
 ### Message protocol
 
