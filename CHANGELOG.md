@@ -33,7 +33,8 @@ not versions - the page ships continuously to Neocities.
   further rows: committees gain tech and ecosocialist, publications
   gain the call, national lists the calendar / convention / discussion
   board / dsa fund, and caucuses cover marxist unity, bread and roses,
-  socialist majority, libertarian socialist and afrosocialists
+  socialist majority, libertarian socialist and afrosocialists. the
+  subsection runs the wider 30em columns
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
@@ -118,6 +119,9 @@ not versions - the page ships continuously to Neocities.
   alike; the menu lists it with the other 2-col modes
 
 ### Emote picker
+- nightshade pauses animated emotes by default: the preset pins
+  epanim=animf, so the ⏸ freeze lands on a fresh profile or a re-pick -
+  the chip is global, so chat rows still too
 - the ⏸ freeze actually stills twitch emotes now: it swapped /animated/
   for /default/, but the cdn serves the same file on both (as-uploaded,
   animation included) - the real still path is /static/. chat rows, the
