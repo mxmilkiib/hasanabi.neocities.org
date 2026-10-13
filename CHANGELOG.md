@@ -6,6 +6,14 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-13
 
 ### Rows
+- the nick-click card breathes: wider, more padding, nowrap 26px
+  buttons (hide user no longer wraps and clips), and the recent lines
+  show a dim timestamp beside the message text instead of the row's
+  run-together time + sub + name. a new highlight button toggles a soft
+  wash over all of that chatter's rows, tinted from their own nick
+  colour (--hlc, 16%) through --rowtint so mention and keyword rows
+  still win; the set persists under hasan-hlusers and re-syncs on
+  restored history
 - the left sub modes hold the badge icons' left edge still, like the sub
   chip's: the chip takes a two-digit tabular width, and the aux cluster
   (mod / bits / first) now follows the badge icons instead of leading

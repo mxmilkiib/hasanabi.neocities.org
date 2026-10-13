@@ -1101,6 +1101,9 @@
      reaches into its row's space from below */
   .auxr { position: relative; z-index: 3; }
   main.em-right .row.eonly .msg > .emote, main.em-right .row.eonly .msg > .estk { z-index: 4; }
+  /* a highlighted chatter's rows wear a soft wash of their own nick
+     colour (--hlc, stamped by hlRow) - ahead of mention/kw so those win */
+  .row.hl { --rowtint: linear-gradient(color-mix(in srgb, var(--hlc, var(--accent)) 16%, transparent) 0 0); }
   .row.mention {
     --rowtint: linear-gradient(rgba(232, 163, 61, .13) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -1188,26 +1191,28 @@
   /* the nick-click inspector: a peek-styled card that stays up until
      dismissed, carrying facts and the mod/quick-action rows */
   #ucard {
-    position: fixed; z-index: 55; width: 330px; max-width: 92vw;
+    position: fixed; z-index: 55; width: 370px; max-width: 92vw;
     background: var(--panel); color: var(--text);
     border: 1px solid var(--popline); border-radius: 6px;
-    padding: 8px 10px; font-size: var(--chat-font, 15px); line-height: 1.45;
+    padding: 12px 14px; font-size: var(--chat-font, 15px); line-height: 1.5;
     box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
   }
   #ucard[hidden] { display: none; }
-  #ucard .uc-name { font-weight: 700; font-size: 1.08em; }
-  #ucard .uc-login { color: var(--text-dim); font-size: .82em; }
-  #ucard .uc-facts { color: var(--text-dim); font-size: .82em; margin: 4px 0; }
-  #ucard .uc-msgs { margin: 6px 0 2px; max-height: 9em; overflow-y: auto;
-    border-top: 1px solid var(--line); padding-top: 4px; font-size: .82em;
+  #ucard .uc-name { font-weight: 700; font-size: 1.1em; }
+  #ucard .uc-login { color: var(--text-dim); font-size: .85em; margin-left: 4px; }
+  #ucard .uc-facts { color: var(--text-dim); font-size: .85em; margin: 6px 0 10px; line-height: 1.4; }
+  #ucard .uc-msgs { margin: 0 0 4px; max-height: 10.5em; overflow-y: auto;
+    border-top: 1px solid var(--line); padding-top: 8px; font-size: .85em;
     color: var(--text-dim); }
-  #ucard .uc-msgs div { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  #ucard .uc-btns { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px;
+  #ucard .uc-msgs div { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 1px 0; }
+  #ucard .uc-msgs .uc-t { opacity: .65; margin-right: 8px; font-variant-numeric: tabular-nums; }
+  #ucard .uc-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
     align-items: center; }
-  #ucard .uc-btns .hdr-btn { height: 22px; padding: 0 8px; font-size: .82em; }
-  #ucard .uc-mod { border-top: 1px solid var(--line); margin-top: 7px; padding-top: 5px; }
+  #ucard .uc-btns .hdr-btn { height: 26px; width: auto; padding: 0 10px; font-size: .85em;
+    white-space: nowrap; display: inline-flex; align-items: center; }
+  #ucard .uc-mod { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
   #ucard .uc-mod button[data-armed] { color: var(--danger); border-color: var(--danger); }
-  #ucardX { float: right; padding: 0 5px; }
+  #ucardX { float: right; padding: 0 6px; margin: -2px -4px 6px 10px; }
   /* the stats tab: headed sections, chatters and emotes in paired
      columns with tabular counts pinned right */
   /* display:flex - #helpPanel .htabpage > div's label grid must not
@@ -4630,6 +4635,7 @@
     // append lands after it in the right spot either way
     activeEl.append(tpl.content);
     dedupeLinks(newRows);
+    if (hlUsers.size) for (const r of newRows) hlRow(r);
     if (whisHtml) {
       whisLog.insertAdjacentHTML('beforeend', whisHtml);
       // the pane is a rolling dm history - bound it like the log but far
@@ -8017,6 +8023,25 @@
   // insert. The mod row shows only where own USERSTATE earns it ----
   const ucard = document.getElementById('ucard');
   let ucardLogin = '', ucardCh = '', ucardMid = '';
+  // chatters whose rows carry a soft wash of their own nick colour -
+  // the set lives under its own key so a reset clears it with the rest
+  const HLU_KEY = 'hasan-hlusers';
+  const hlUsers = new Set();
+  try { for (const u of JSON.parse(localStorage.getItem(HLU_KEY)) || []) hlUsers.add(String(u)); } catch {}
+  function hlRow(r) {
+    const lg = r.dataset.u;
+    if (!lg) return;
+    const on = hlUsers.has(lg.toLowerCase());
+    r.classList.toggle('hl', on);
+    // a shimmering nick carries no inline colour - the wash falls back to
+    // the accent through the css default
+    const nc = on && (r.querySelector('.name') || {}).style?.color;
+    if (nc) r.style.setProperty('--hlc', nc);
+    else r.style.removeProperty('--hlc');
+  }
+  function hlApply(lg) {
+    for (const c of cols()) for (const r of c.querySelectorAll(`.row[data-u${lg ? `="${CSS.escape(lg)}"` : ''}]`)) hlRow(r);
+  }
   const ucardHide = () => { ucard.hidden = true; ucardLogin = ''; };
   function ucardShow(login, ch, mid, x, y) {
     const lg = (login || '').toLowerCase();
@@ -8032,8 +8057,9 @@
     const rows = [];
     for (const c of cols()) for (const r of c.querySelectorAll(`.row[data-u="${CSS.escape(lg)}"]`)) rows.push(r);
     const recent = rows.slice(-5).map((r) => {
-      const t = (r.textContent || '').replace(/\s+/g, ' ').trim();
-      return `<div title="${escapeHTML(t)}">${escapeHTML(t.slice(0, 120))}</div>`;
+      const t = ((r.querySelector('.msg') || r).textContent || '').replace(/\s+/g, ' ').trim();
+      const tm = ((r.querySelector('.time') || {}).textContent || '').trim();
+      return `<div title="${escapeHTML(t)}"><span class="uc-t">${escapeHTML(tm)}</span>${escapeHTML(t.slice(0, 120))}</div>`;
     }).join('');
     const canMod = !!(auth && auth.login && selfExempts[ucardCh]) && lg !== auth.login.toLowerCase();
     ucard.innerHTML =
@@ -8046,6 +8072,7 @@
       `<div class="uc-btns">` +
         `<a class="hdr-btn" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(lg))}" target="_blank" rel="noopener noreferrer">profile ↗</a>` +
         (auth && auth.login ? `<button class="hdr-btn" data-uc="mention">@mention</button>` : '') +
+        `<button class="hdr-btn${hlUsers.has(lg) ? ' on' : ''}" data-uc="hl" title="wash all of this chatter's rows in a soft tint of their nick colour">${hlUsers.has(lg) ? 'highlighted' : 'highlight'}</button>` +
         `<button class="hdr-btn" data-uc="hide">hide user</button>` +
       `</div>` +
       (canMod ? `<div class="uc-btns uc-mod"><button class="hdr-btn" data-uc="to">timeout 10m</button>` +
@@ -8066,6 +8093,15 @@
       chatbarEl.hidden = false;
       growInput();
       chatInput.focus();
+      return;
+    }
+    if (act === 'hl') {
+      const on = !hlUsers.has(ucardLogin);
+      if (on) hlUsers.add(ucardLogin); else hlUsers.delete(ucardLogin);
+      try { localStorage.setItem(HLU_KEY, JSON.stringify([...hlUsers])); } catch {}
+      hlApply(ucardLogin);
+      b.classList.toggle('on', on);
+      b.textContent = on ? 'highlighted' : 'highlight';
       return;
     }
     if (act === 'hide') {
@@ -10352,6 +10388,8 @@
       // the one-shot sync wash is a render-time marker only - stripped
       // here so restored scrollback doesn't strobe on every load
       for (const el of logEl.querySelectorAll('.repflash')) el.classList.remove('repflash');
+      // saved rows carry the wash they had - re-sync it to the current set
+      hlApply();
       // notices saved before mid-dedup have no id and were duplicated by
       // each replay - collapse identical no-id rows on restore
       const seenRows = new Set();
