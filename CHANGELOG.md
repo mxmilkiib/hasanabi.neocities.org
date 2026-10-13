@@ -27,6 +27,9 @@ not versions - the page ships continuously to Neocities.
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
 ### Resources
+- i've had it: the hosts lead the notes - jennifer welch (her ig
+  kept) & angie 'pumps' sullivan - matching unruly subjects'
+  kumanyika layout
 - channels/streams: the streamers group sorts by viewership - mike
   from pa, maple takes, yugopnik, kaceytron, madeline pendleton, the
   serfs, frogan, leaping larry, comrade virgo, kneecoleslaw (off
