@@ -306,6 +306,9 @@ not versions - the page ships continuously to Neocities.
 - the split bounds are SPLIT_NAMES.length now - o.split, ?split and
   setSplit each hardcoded 11, which would lie about the top level the
   moment a twelfth mode lands
+- nightshade's font weight moves 400 → 500; like the lhv change it
+  lands on a fresh profile or a re-pick of the preset - a saved wv
+  keeps its pick
 - shared urls speak names instead of bare ints: ?split=2x2, ?upd=1h,
   ?peek=img, ?hpos=tr (compass codes tl..br), ?shade=dark,
   ?zebra=mild, ?lines=faint-dots, ?shadow=pitch, ?sview=minimal,
