@@ -9874,8 +9874,8 @@
   // deepens across its height and matches whatever depth it's beside.
   // The real rows archive as usual - the overlay is cosmetic only, so
   // nothing in the page bookkeeping ever sees it
-  const GHOST_LO = 0.12;  // opacity just under the wave edge
-  const GHOST_HI = 0.6;   // resting opacity at the page's newest rows
+  const GHOST_LO = 0.08;  // opacity just under the wave edge
+  const GHOST_HI = 0.45;  // resting opacity at the page's newest rows
   const GHOST_RAMP = 160; // px below the wave the fade eases over
   const ghostFade = (t) => GHOST_LO + (GHOST_HI - GHOST_LO) * (t * t * (3 - 2 * t));
   const ghostMask = (top, bot) =>

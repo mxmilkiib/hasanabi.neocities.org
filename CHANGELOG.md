@@ -51,6 +51,8 @@ not versions - the page ships continuously to Neocities.
   right the flag still heads the aux cluster
 
 ### Split columns
+- the page-flip wave's ghosted rows fade deeper: resting opacity .6 →
+  .45, and .12 → .08 just under the wave edge
 - the mode names spell out their parts: e is emotes, v is vid, h is
   help, s is stats, 2row becomes 2x2 (chat/emotes · vid/stats), and the
   floats note reads (vid off, ▶ floats) - 3col+vid/emotes/stats ·
