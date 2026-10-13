@@ -880,14 +880,11 @@
   /* in the left-positioned sub modes the chip is a direct row child sat
      flush after the time/channel tag - a hair of air keeps it off it */
   .row > .role.sub { margin-left: -1px; }
-  /* the left modes also hold the badge icons' left edge still: the aux
-     cluster (mod / bits / first chips) is a fixed-width slot, and a row
-     with no aux hands the first badge the same offset, so the icons
-     start at one x whatever chips a chatter carries. --auxw is set per
-     mode by applySubMode - sized for the 'md' chip or '[ mod. ]' */
-  .row > .aux:not(.auxr):not([hidden]) { display: inline-block; min-width: var(--auxw, 1.6em); }
+  /* the left modes hold the badge icons' left edge still: the sub chip
+     takes a fixed two-digit tabular width, and the aux cluster (mod /
+     bits / first chips) sits after the icons rather than ahead of them,
+     so it reserves no column for the rows without one */
   .row > .role.sub:not(.auxr):not([hidden]) { display: inline-block; min-width: 2ch; font-variant-numeric: tabular-nums; }
-  .row > .role.sub:not(.auxr):not([hidden]) + img.badge { margin-left: calc(var(--auxw, 1.6em) + 5px); }
   /* counted chips carry the Yyr, Xm tooltip now, so the no-count dim
      keys off the placeholder's exact title rather than [title] alone */
   .role.sub[title="No subscriber months reported"] { color: var(--text-dim); }
@@ -4610,7 +4607,7 @@
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
       html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${tags.bits ? ' bits' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
-              `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + auxHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${action ? '* ' : ''}` +
+              `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${msgHtml}</span>${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
@@ -8828,7 +8825,6 @@
   function applySubMode() {
     const mode = SUB_MODES[subMode];
     const left = mode.endsWith('left');
-    document.documentElement.style.setProperty('--auxw', mode.startsWith('num') ? '1.6em' : '5em');
     setOn(subBtn, mode !== 'hidden');
     subBtn.style.justifyContent = mode === 'hidden' ? 'center' : left ? 'flex-start' : 'flex-end';
     subBtn.style.padding = left ? '0 1px 0 2px' : mode.startsWith('num') ? '0 2px 0 1px' : mode === 'right' ? '0 2px 0 1px' : '0 1px';
@@ -8883,7 +8879,7 @@
         const months = (sub.title || sub.dataset.tt) === 'No subscriber months reported'
           ? ' -- ' : (sub.dataset.mo || sub.textContent.replace(/\D/g, ''));
         if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? '--' : '[sub --]')
-          : mode.startsWith('num') ? months.padStart(2, '0') : `[sub ${months}]`;
+          : mode.startsWith('num') ? months.padStart(2, '0') : `[sub ${months.padStart(2, '0')}]`;
         // the lead gap belongs to num-left rows only - clear it in other
         // modes or it holds the chip a few px off the right edge
         sub.style.marginRight = mode === 'num-left' ? '6px' : '';
@@ -8903,8 +8899,12 @@
       }
       if (left) {
         if (sub) row.insertBefore(sub, lead);
-        if (aux?.children.length) row.insertBefore(aux, lead);
-        else aux?.remove();
+        // the aux cluster follows the badge icons so it never holds a
+        // column open ahead of them on rows that have no aux
+        if (aux?.children.length) {
+          const lastBadge = [...row.querySelectorAll(':scope > img.badge')].pop();
+          row.insertBefore(aux, lastBadge ? lastBadge.nextSibling : lead);
+        } else aux?.remove();
       }
       // the chips just moved - the reply quote's name-column alignment is
       // measured from the responder's leading edge, so re-indent it now
