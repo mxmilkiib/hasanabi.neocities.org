@@ -22,7 +22,9 @@ not versions - the page ships continuously to Neocities.
   sticking once a view flip put them under the pointer
 ### Resources
 - channels/streams: streamers moves under home - the chat-switchable
-  group leads since the table doubles as a channel picker
+  group leads since the table doubles as a channel picker. alexei
+  sayle joins the podcasts tail (it was comedy's only entry, so the
+  group folds)
 - usa pol: the dsa tail becomes a real subsection - main row, then
   committees / publications / leadership rows; leadership adds the
   national political committee (npc)
