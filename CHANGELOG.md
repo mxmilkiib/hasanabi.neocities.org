@@ -51,6 +51,9 @@ not versions - the page ships continuously to Neocities.
   ('other' paints every mark but the @mention; off shifted to index 3):
   mentions, channel tags, Fear&, bits/first chips and notice labels
   paint only under 'all', the @mention alone under 'hasanabi'
+- the stream-status text length is now a persisted option on a new
+  'status' row in the ? popup - full / compact / minimal, saved as sview
+  and ?sview=; the wheel on the status block still cycles it
 - the stream-status legend's labels are explicit grid cells, so each
   dot stays opposite its own line - the stray <br> item had slid the
   grey dot down beside the favicon note

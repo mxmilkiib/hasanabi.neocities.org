@@ -2483,6 +2483,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times, a compact cut, or the bare word; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -5377,8 +5378,13 @@
   let lastVod = null;
   let lbEnd = null;
   // status info verbosity: 0 full, 1 compact, 2 minimal; wheel on the
-  // dot or info text cycles it
+  // dot or info text cycles it, the ? popup's status-length row sets it
   let statusView = 0;
+  function setStatusView(i) {
+    statusView = Math.max(0, Math.min(2, i | 0));
+    markHelp('helpSview', statusView);
+    updateHeader();
+  }
   function saveLastRun() {
     try { localStorage.setItem(LASTRUN_KEY, JSON.stringify(lastRun)); } catch {}
   }
@@ -5673,8 +5679,8 @@
     e.preventDefault();
     // don't let a minimised header's wheel-unminimise ride the same flick
     e.stopPropagation();
-    statusView = (statusView + (e.deltaY > 0 ? 1 : -1) + 3) % 3;
-    updateHeader();
+    setStatusView((statusView + (e.deltaY > 0 ? 1 : -1) + 3) % 3);
+    saveOpts();
   }, { passive: false });
 
   // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
@@ -5916,6 +5922,7 @@
     else if (a.classList.contains('helpYtem')) { setYtEmb(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpTitle')) { setTitleBar(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpModes')) { setModesOn(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpSview')) { setStatusView(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpUpd')) { setUpdMin(UPD_STOPS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpEpfz')) { setEpFz(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpFav')) { setLkIco(+a.dataset.idx === 1); saveOpts(); }
@@ -8294,7 +8301,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, upd: updMin,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
@@ -8466,6 +8473,7 @@
     if (o.yt !== undefined) setYtEmb(!!o.yt);
     if (o.stitle !== undefined) setTitleBar(!!o.stitle);
     if (o.cmodes !== undefined) setModesOn(!!o.cmodes);
+    if (o.sview !== undefined) setStatusView(+o.sview);
     if (o.upd !== undefined) setUpdMin(+o.upd);
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.pn !== undefined) setPronouns(!!o.pn);
@@ -9752,6 +9760,7 @@
     if (!ytEmbed) q.set('yt', '0');
     if (!titleBarOn) q.set('stitle', '0');
     if (!modesOn) q.set('cmodes', '0');
+    if (statusView) q.set('sview', String(statusView));
     if (updMin !== 60) q.set('upd', String(updMin));
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
@@ -14274,6 +14283,7 @@
     if (q.has('yt')) setYtEmb(flag('yt'));
     if (q.has('stitle')) setTitleBar(flag('stitle'));
     if (q.has('cmodes')) setModesOn(flag('cmodes'));
+    if (q.has('sview')) setStatusView(+q.get('sview'));
     if (q.has('upd')) setUpdMin(+q.get('upd'));
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
@@ -14366,7 +14376,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'on'], helpEonly: EMOTE_MODES, helpSplit: SPLIT_NAMES.map((n) => n.replace(/ \(.*$/, '')),
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpSview: ['full', 'compact', 'minimal'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
@@ -14436,6 +14446,7 @@
   markHelp('helpYtem', ytEmbed ? 1 : 0);
   markHelp('helpTitle', titleBarOn ? 1 : 0);
   markHelp('helpModes', modesOn ? 1 : 0);
+  markHelp('helpSview', statusView);
   markHelp('helpUpd', UPD_STOPS.indexOf(updMin));
   markHelp('helpEpfz', epFz);
   document.querySelectorAll('#updPoll [data-m]').forEach((b) => b.classList.toggle('on', +b.dataset.m === updMin));
