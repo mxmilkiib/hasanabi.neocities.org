@@ -89,6 +89,9 @@ not versions - the page ships continuously to Neocities.
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
+- the split menu's 2x2 entry closes the 2col family - it sits directly
+  above 3col now, after +emotes, instead of between the +vid/emotes
+  and +emotes picks
 ### Resources
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
