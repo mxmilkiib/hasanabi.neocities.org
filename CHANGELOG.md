@@ -47,7 +47,8 @@ not versions - the page ships continuously to Neocities.
   emote-picker (☻) entry instead of one running paragraph, and the
   emote-pause row moved to the block below it
 - the @hasanabi row splits off nick shimmer and gains a rainbow scope
-  pick - all / hasanabi / off decides which marks run the sweep:
+  pick - all / hasanabi / other / off decides which marks run the sweep
+  ('other' paints every mark but the @mention; off shifted to index 3):
   mentions, channel tags, Fear&, bits/first chips and notice labels
   paint only under 'all', the @mention alone under 'hasanabi'
 - the stream-status legend's labels are explicit grid cells, so each

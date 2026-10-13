@@ -475,7 +475,7 @@ editing a URL.
 | `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
 | `rbw` | `0`–`3` | rainbow motion: sweep / wave / hue cycle / random |
 | `rbp` | `0`–`4` | rainbow palette: classic / vivid / candy / ocean / sunset |
-| `rbws` | `0`–`2` | rainbow scope: all marks / @hasanabi only / off |
+| `rbws` | `0`–`3` | rainbow scope: all marks / @hasanabi only / all but @hasanabi / off |
 | `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |
 | `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
 | `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
