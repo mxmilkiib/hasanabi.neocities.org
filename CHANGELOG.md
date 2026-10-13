@@ -175,6 +175,12 @@ not versions - the page ships continuously to Neocities.
   badge icons - 07 md [icons] - but only on mod rows, so it opens no
   column for the rest; bits and first keep trailing the icons. on the
   right the flag still heads the aux cluster
+- the '--' no-count chip boxes to the same width as a real count now:
+  the chip's digits ride over a hidden ghost pair on one grid cell,
+  and the ghost is probed per font (--subghost) since faces without
+  tabular figures run pairs like roobert's '05' wider than '88' - the
+  badge edge holds for every row, bracket mode included, instead of
+  only for the counts that fit 2ch
 
 ### Split columns
 - a real glitch fix: refitPages judged idle-column overflow by

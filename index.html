@@ -891,6 +891,13 @@
      aux cluster (bits / first) sits after the icons rather than ahead of
      them - nothing reserves a column for the rows without one */
   .row > .role.sub:not(.auxr):not([hidden]) { display: inline-block; min-width: 2ch; font-variant-numeric: tabular-nums; }
+  /* the Count Slot: a hidden Digit Ghost (--subghost) sizes the Cell, so
+     '--' and any Count print one Width and hand the Badges one Edge even
+     where a Face's Glyphs run wider than 2ch; the visible Text overlays
+     the Ghost on the same Grid Cell and only a wider Print grows it */
+  .role.sub .smo { display: inline-grid; }
+  .role.sub .smo::before { content: var(--subghost, "88"); grid-area: 1 / 1; visibility: hidden; }
+  .role.sub .smo > span { grid-area: 1 / 1; }
   /* counted chips carry the Yyr, Xm tooltip now, so the no-count dim
      keys off the placeholder's exact title rather than [title] alone */
   .role.sub[title="No subscriber months reported"] { color: var(--text-dim); }
@@ -4533,8 +4540,9 @@
       const subSt = (subM ? `--subp:${Math.min(100, Math.round(+subM[1] / 120 * 100))}%` : '') +
         (SUB_MODES[subMode] === 'num-left' ? (subM ? ';' : '') + 'margin-right:6px' : '');
       // bots never carry a sub count - skip the placeholder chip entirely
+      const subCnt = !subM ? '--' : months;
       const subHtml = shimmer && !subM ? '' :
-        `<span class="role sub"${subM ? ` data-mo="${+subM[1]}" title="${subAgeTxt(+subM[1])}"` : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${subSt ? ` style="${subSt}"` : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
+        `<span class="role sub"${subM ? ` data-mo="${+subM[1]}" title="${subAgeTxt(+subM[1])}"` : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${subSt ? ` style="${subSt}"` : ''}>${SUB_MODES[subMode].startsWith('num') ? subSlot(subCnt) : `[sub ${subSlot(subCnt)}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits rbw">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first rbw">[first]</span>');
       // left modes lead with the chip ahead of the badge icons - 03 md -
@@ -7427,6 +7435,7 @@
     // property is inherited through body which doesn't use --chat-font -
     // resolve to px here so the same proportion reaches every element
     de.setProperty('--chat-ls', Math.round(fs * (parseFloat(cs.getPropertyValue('--chat-lse')) || 0) * 1000) / 1000 + 'px');
+    subWProbe();
   }
   function cycle(btn, list, idx, prop, label, unit, helpCls) {
     const apply = () => {
@@ -7518,6 +7527,7 @@
     fontPick.textContent = lbl;
     fontPick.title = `Font: ${lbl} - click for menu · scroll cycles`;
     markHelp('helpFontFam', fontSel.selectedIndex);
+    subWProbe();
     repin();
   }
 
@@ -9015,12 +9025,39 @@
   let subMode = 3;
   // a month count as a span: 7m under a year, 2yr, 10m past it
   const subAgeTxt = (m) => m >= 12 ? `${Math.floor(m / 12)}yr, ${m % 12}m` : `${m}m`;
+  // the Count Slot: the hidden --subghost Pair sizes the Cell so '--'
+  // and any Count print one Width; the visible Count rides the inner
+  // Span - bare textContent would tack the Ghost onto every readout
+  const subSlot = (txt) => `<span class="smo"><span>${txt}</span></span>`;
+  const subCountTxt = (sub) => (sub.querySelector('.smo > span') || sub).textContent;
+  // probes each Digit Pair in the live Chat Font and stamps the widest
+  // on --subghost - proportional Faces run e.g. '05' wider than '88', so
+  // the Ghost can't be a fixed Pair. runs from syncLh and applyFont,
+  // the two Funnels every Metric it reads travels through, and again on
+  // loadingdone for Webfonts that land late
+  function subWProbe() {
+    const probe = document.createElement('div');
+    probe.className = 'row';
+    probe.style.cssText = 'position:absolute;visibility:hidden';
+    probe.innerHTML = '<span class="role sub"><span></span></span>';
+    logEl.append(probe);
+    const t = probe.querySelector('.sub > span');
+    let ghost = '88', w = 0;
+    for (let i = 0; i < 10; i++) {
+      t.textContent = `${i}${i}`;
+      const pw = t.offsetWidth;
+      if (pw > w) { w = pw; ghost = t.textContent; }
+    }
+    probe.remove();
+    document.documentElement.style.setProperty('--subghost', `"${ghost}"`);
+  }
+  document.fonts.addEventListener('loadingdone', subWProbe);
   // stamps a counted chip's data-mo / tooltip / --subp rung - the render
   // path inlines them, this catches rows restored from saved html and
   // chips conjured without a count
   const subAgeStamp = (sub) => {
     if (sub.dataset.mo) return;
-    const mo = +sub.textContent.replace(/\D/g, '');
+    const mo = +subCountTxt(sub).replace(/\D/g, '');
     if (!mo) return;
     sub.dataset.mo = mo;
     sub.title = subAgeTxt(mo);
@@ -9096,9 +9133,9 @@
         subAgeStamp(sub);
         // restyle the chip text to match: [sub 12] vs compact 12
         const months = (sub.title || sub.dataset.tt) === 'No subscriber months reported'
-          ? ' -- ' : (sub.dataset.mo || sub.textContent.replace(/\D/g, ''));
-        if (months) sub.textContent = months === ' -- ' ? (mode.startsWith('num') ? '--' : '[sub --]')
-          : mode.startsWith('num') ? months.padStart(2, '0') : `[sub ${months.padStart(2, '0')}]`;
+          ? ' -- ' : (sub.dataset.mo || subCountTxt(sub).replace(/\D/g, ''));
+        if (months) sub.innerHTML = mode.startsWith('num') ? subSlot(months === ' -- ' ? '--' : months.padStart(2, '0'))
+          : `[sub ${subSlot(months === ' -- ' ? '--' : months.padStart(2, '0'))}]`;
         // the lead gap belongs to num-left rows only - clear it in other
         // modes or it holds the chip a few px off the right edge
         sub.style.marginRight = mode === 'num-left' ? '6px' : '';
