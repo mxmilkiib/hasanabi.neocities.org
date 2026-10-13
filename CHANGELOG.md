@@ -32,6 +32,8 @@ not versions - the page ships continuously to Neocities.
   twiiit, xcancel, bird.makeup, the embed fixers and the instance lists
 
 ### Rows & chat
+- the split/page ghost fade's faintest end - the sliver under the wave
+  edge, where the retired page's oldest rows sit - deepens 0.08 → 0.04
 - history restore died on reload: the empty-card removal painted the
   emote picker's sync state through a picker const that declares later
   in the file, so the whole restore try-block unwound before a single
