@@ -5,6 +5,15 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-13
 
+### Rows
+- the left sub modes hold the badge icons' left edge still, like the sub
+  chip's: the chip takes a two-digit tabular width, the aux cluster
+  (mod / bits / first) becomes a fixed slot (1.6em for the compact
+  modes, 5em for the bracketed ones, set as --auxw by applySubMode),
+  and a row with no aux hands its first badge the same offset. a
+  cluster wider than the slot, like mod + bits together, still pushes
+  that row's badges right
+
 ### Split columns
 - level 10 (3col+v/h, ▮▮?) pairs two chat columns with a rail holding
   the video over the help popup: the popup docks into the rail and
