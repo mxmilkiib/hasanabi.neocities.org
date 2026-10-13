@@ -92,6 +92,9 @@ not versions - the page ships continuously to Neocities.
 - the split menu's 2x2 entry closes the 2col family - it sits directly
   above 3col now, after +emotes, instead of between the +vid/emotes
   and +emotes picks
+- the split-columns help row seats the +vid/help chips under the +help
+  item rather than inside the column families, and the 2col list's
+  tail runs +emotes then 2x2 to match the menu order
 ### Resources
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
