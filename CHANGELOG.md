@@ -6,6 +6,10 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-13
 
 ### Emote picker
+- age rows mode 3 balances eras that wrap: a period outgrowing one
+  line splits its cells evenly across however many rows it needs
+  instead of filling the first and stranding the rest - continuation
+  rows open on column 1 via their own break mark
 - the ⏸ chip now owns a pause scope rather than a bare freeze - click
   cycles off → popup → all (shift-click jumps to all); 'popup' stills
   only the picker's cells, 'all' adds chat rows, the autocomplete and

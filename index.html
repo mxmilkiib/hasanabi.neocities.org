@@ -2197,6 +2197,10 @@
      the rowend break reads the same pair */
   #emotePick.agerows2 #emoteGrid .eage.rowend + :is(button, .eage),
   #emotePick.agerows3 #emoteGrid .eage.rowend + :is(button, .eage) { grid-column-start: 1; }
+  /* agerows3 balances a wrapped era across its rows - no square ends a
+     balanced continuation row, so the row's first cell carries the
+     break mark itself */
+  #emotePick.agerows3 #emoteGrid .agbrk { grid-column-start: 1; }
   /* the never-used tail opens on its own row - .enew marks the first
      cell past each used->never seam */
   #emotePick:where(.agerows,.agerows2,.agerows3) #emoteGrid button.enew { grid-column-start: 1; }
@@ -12182,10 +12186,33 @@
     if (!cellW) return; // a hidden grid reports no tracks - nothing to lay out
     const isHead = (el) => el.classList.contains('ehead');
     const isSq = (el) => el.classList.contains('eage');
-    const want = new Set(), spans = []; // row spans, [start, end) kid indexes
+    const want = new Set(), brk = new Set(), spans = []; // row spans, [start, end) kid indexes
     const n = kids.length;
     for (let i = 0; i < n;) {
       if (isHead(kids[i])) { spans.push([i, ++i]); continue; }
+      if (centred) {
+        // an era is its cells plus the trailing rung run - pending
+        // squares ride its last row rather than parking on their own.
+        // an era outgrowing a row splits evenly instead of filling the
+        // first and stranding the rest; centred rows make a
+        // full-then-short wrap read lopsided
+        let end = i;
+        while (end < n && !isHead(kids[end]) && !isSq(kids[end]) && !(end > i && kids[end].classList.contains('enew'))) end++;
+        while (end < n && isSq(kids[end])) end++;
+        const len = end - i, rows = Math.ceil(len / cols) || 1;
+        const base = Math.floor(len / rows), extra = len % rows;
+        for (let a = i, k = 0; k < rows; k++) {
+          const w = base + (k < extra ? 1 : 0);
+          spans.push([a, a + w]);
+          // no square ends a balanced continuation row - the mark opens
+          // it on column 1 itself
+          if (k) brk.add(kids[a]);
+          a += w;
+        }
+        if (isSq(kids[end - 1])) want.add(kids[end - 1]);
+        i = end;
+        continue;
+      }
       let end = Math.min(i + cols, n);
       for (let j = i; j < end; j++) if (isHead(kids[j]) || (j > i && kids[j].classList.contains('enew'))) { end = j; break; }
       let lastSq = -1;
@@ -12199,7 +12226,10 @@
         i = end;
       }
     }
-    for (const el of kids) if (isSq(el)) el.classList.toggle('rowend', want.has(el));
+    for (const el of kids) {
+      if (isSq(el)) el.classList.toggle('rowend', want.has(el));
+      el.classList.toggle('agbrk', brk.has(el));
+    }
     // centred rows shift each cell right by half its row's slack - the
     // translate property stays clear of the move animation's transform
     // and of placement itself, so a rebuilt row can't mislead a pin.
@@ -12229,7 +12259,7 @@
       'inline - squares flow between cells',
       'era rows - every era starts a fresh row',
       'row ends - a row closes at its last square',
-      'centred - the same rows, centred',
+      'centred - the same rows, balanced and centred',
     ][epickAge]} - click cycles 0-3`;
     emotePick.classList.toggle('agerows', epickAge === 1 && epickSort === 'use');
     emotePick.classList.toggle('agerows2', epickAge === 2 && epickSort === 'use');
