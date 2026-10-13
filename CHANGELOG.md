@@ -64,6 +64,10 @@ not versions - the page ships continuously to Neocities.
   (hasan-tountils), so the input re-locks with its countdown instead
   of reopening while twitch's ban still stands. expired entries are
   pruned on restore and dropped as they lapse
+- the split-columns help row seats the mode chips under their column
+  families - 1col beside modes, each +help level in its own column
+  item - instead of one long list under modes; the chips keep the
+  level index so the live mark still lands
 - the rail-docked help panel can't be hidden out from under the
   +help split levels: esc, the panel's X, an 'off' pick or a preset
   could zero the mode while docked, leaving the rail's lower half
