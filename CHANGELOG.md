@@ -43,6 +43,8 @@ not versions - the page ships continuously to Neocities.
 - the split menu seats each +vid/help level under its own column
   family - 2col+vid/help under 2col, 3col+vid/help under 3col; level
   numbers stay put, only the menu order moved
+- the split-columns help entry uses the same itemised columns as the
+  emote-picker (☻) entry instead of one running paragraph
 - the stream-status legend's labels are explicit grid cells, so each
   dot stays opposite its own line - the stray <br> item had slid the
   grey dot down beside the favicon note
