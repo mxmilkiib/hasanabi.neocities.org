@@ -1844,6 +1844,12 @@
   /* kind + service cells take the dim .85em face nested descriptors get */
   #helpPanel .linkcols.stbl .cc, #helpPanel .linkcols.stbl .cl {
     font-size: .85em; color: var(--text-dim); }
+  /* stbl group heads: hoisted out of their entry row onto a spanning
+     label row - the dim-italic underline look of the flowing heads,
+     minus the column-flow outdent the grid doesn't need */
+  #helpPanel .linkcols.stbl > b { font-size: .88em; color: var(--text-dim); font-style: italic;
+    text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px;
+    margin-top: .45em; }
   /* ml = an entry's own name link(s) - the weight pick, default bold;
      tl = the small bracketed descriptor/source links - text weight
      with tighter tracking to match the annotation face */
@@ -7067,6 +7073,17 @@
   if (stbl) for (const i of [...stbl.children]) {
     if (i.classList.contains('note')) continue;
     stblRow++;
+    // a leading <b> is the group label: hoist it into a full-width head
+    // row of its own. Left in place it isn't an <a>, so the name-cell
+    // sweep stalls and the label strands inside the link cells
+    const hd = i.firstElementChild;
+    if (hd && hd.tagName === 'B') {
+      hd.style.gridRow = stblRow;
+      hd.style.gridColumn = '1 / -1';
+      i.before(hd);
+      while (i.firstChild && i.firstChild.nodeType === 3 && !i.firstChild.data.trim()) i.firstChild.remove();
+      stblRow++;
+    }
     // nested-<i> descriptors flatten to the same text/anchor tail as
     // the top-level form before splitting
     for (const inner of [...i.querySelectorAll(':scope > i')])

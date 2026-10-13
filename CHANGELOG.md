@@ -157,10 +157,13 @@ not versions - the page ships continuously to Neocities.
 - channels/streams gains i've had it: youtube leads, with site, patreon,
   substack, tiktok and instagram links, jennifer welch's instagram and
   a wikipedia *
-- channels/streams reorders category-first under visible bold leads:
+- channels/streams reorders category-first under bold group heads:
   home, news & talk, podcasts, essays, streamers, comedy - the podcasts
   scattered at the tail rejoin chapo and left reckoning, and foreign
-  fridays, coffeezilla and more perfect union move up with the shows
+  fridays, coffeezilla and more perfect union move up with the shows.
+  the heads ride their own full-width table rows - left inside their
+  first entry's <i> they stalled the row transform's name-cell sweep
+  and stranded as stray text in the link cells
 
 ### Performance
 - the Google Fonts stylesheet loads without blocking the first render,
