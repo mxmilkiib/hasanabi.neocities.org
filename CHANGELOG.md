@@ -5,16 +5,10 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-13
 
-### Rows
-- the emote picker's hold only covers the emote space: it engages from
-  the grid's top down to the bottom of the last row of cells, and the
-  blank area a large picker leaves beneath that row lets go (after the
-  usual 200ms grace) so a queued reshuffle can land while the pointer
-  rests there. the check runs on pointermove as well as pointerover,
-  since moving from the cells into blank grid stays on one target
-- the emote picker's hover tip is off by default now: the standalone
-  key reads on only when it holds 1, and ?eptips=1 is the url form that
-  turns it on (the url writes the param only off its default)
+### Rows & chat
+- the pending-reply bar above the message box quotes its target at the
+  chat's full text size (it ran at .8em), and a long quote ellipsises
+  at the bar's edge
 - the nick-click card breathes: wider, more padding, nowrap 26px
   buttons (hide user no longer wraps and clips), and the recent lines
   show a dim timestamp beside the message text instead of the row's
@@ -48,6 +42,83 @@ not versions - the page ships continuously to Neocities.
   video up top right, the help popup filling the space below it. it
   shares level 10's dock, so the popup, stats tab and picker behave
   alike; the menu lists it with the other 2-col modes
+
+### Emote picker
+- the hold only covers the emote space: it engages from the grid's top
+  down to the bottom of the last row of cells, and the blank area a
+  large picker leaves beneath that row lets go (after the usual 200ms
+  grace) so a queued reshuffle can land while the pointer rests there.
+  the check runs on pointermove as well as pointerover, since moving
+  from the cells into blank grid stays on one target
+- the hover tip is off by default now: the standalone key reads on only
+  when it holds 1, and ?eptips=1 is the url form that turns it on (the
+  url writes the param only off its default). a saved bundle from the
+  old default keeps its tip until toggled or reset
+- a new □ button next to the age-rows ▤ sets how many age squares the
+  use sort prints: 0 none · 1 landmarks (1m 5m 15m 30m 1h 2h 3h 6h 12h)
+  · 2 whole minutes and hours · 3 every rung (default). the ladder is
+  thinned after the depth tints are set, so a surviving rung keeps its
+  colour; the level saves under hasan-epicksq and the settings bundle
+  (epsq), the wheel steps it, ?epsq= carries it off its default, and
+  like ▤ it only enables under the use sort
+
+### Update bar
+- the reload buttons sit 3rem clear of the notice and take double their
+  old width (11.2em); they still shrink into the room left beside the
+  text, and under 900px the gap falls back to 10px so they keep it
+- the notice ends "if broken, resetting all settings and/or wait.." -
+  a stale saved option was behind a missing-badges report that a full
+  reset cleared
+
+### Help popup
+- the section dividers become blank spacers: the base separator's
+  margin is 2px 0 (it was 9px 0 7px) and its dash is transparent and
+  unselectable, so it spaces without drawing; the media, left and
+  libre tabs keep their own 5px 0 3px
+- the top row of width, font-size and position stops may run 1360px
+  wide, up from 1300
+- the font-size list marks the size in use from the first paint: the
+  boot path skipped it on purpose (applying would stamp a px over the
+  css floor), so it now marks the live ladder rung without stamping
+- the bracketed links after dsa on the left tab are bold - their own
+  dsabw class, scoped to that row (an earlier pass reused .bw, which
+  other rows in the tab already carried, and bolded them too)
+- "(wikipedia)" text tags are dropped after the syndicalism, soviet
+  council, relational dialectics, 1977 nestlé boycott and coca-cola
+  criticism links
+
+### Resources
+- reformism joins left after dual power: concept (reformism, revisionism,
+  bernstein's evolutionary socialism, luxemburg's reform or revolution,
+  eurocommunism, non-reformist reform), municipal (sewer socialism,
+  municipal socialism, victor berger, daniel hoan), social democracy
+  (social democracy, democratic socialism, fabian society, the nordic
+  and rehn-meidner models, the new deal), progressive era (the era, the
+  settlement movement), electoral (justice democrats) and land (land
+  reform, community land trusts, land reform in scotland, community
+  land scotland)
+- organising gains conway's law; participatory gains leith chooses
+  (edinburgh) after participatory budgeting
+- activism gains a messaging group (agitprop, culture jamming) and
+  absorbs the old action groups block as a subsection, with a spacer
+  above it
+- striking is renamed worker action
+- boycott: the 1977 nestlé boycott entry drops its note and gains a
+  controversies link, and four groups arrive - concept (boycott,
+  political and ethical consumerism), historic (montgomery bus boycott,
+  delano grape strike, free produce movement, the anti-apartheid
+  movement, the sporting boycott and divestment from south africa),
+  corporate (killer coke, mclibel, ken saro-wiwa, criticism of amazon)
+  and guides (ethical consumer, goods unite us)
+- channels/streams gains i've had it: youtube leads, with site, patreon,
+  substack, tiktok and instagram links, jennifer welch's instagram and
+  a wikipedia *
+
+### Performance
+- the Google Fonts stylesheet loads without blocking the first render,
+  capture-phase scroll listeners are passive, the about page's theme
+  screenshots ship as WebP, and the unused InterMono and miniwi fonts
+  and stray backups are untracked
 
 ## 2026-10-12
 
