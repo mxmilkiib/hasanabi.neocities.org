@@ -6,6 +6,8 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-13
 
 ### Header
+- the sub badge button's Ⓢ drops to .8em - the circled glyph ran
+  bigger than its neighbours at the base size
 - the help button's ? goes gold against the dim chrome; the accent
   border still marks the panel open
 - the wheel cycles the stream info view anywhere on the channel block,
