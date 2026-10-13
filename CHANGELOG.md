@@ -6,7 +6,7 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-13
 
 ### Header
-- the update bar's copy reads 'site updated -- reload? -- ...' with the
+- the update bar's copy reads 'page updated, reload? -- ...' with the
   option pointer to the ? popup, and the update-notice option is now a
   poll-frequency pick - 5m / 15m / 30m / 1h / 3h / never. 'never' stops
   polling entirely; the bar's own 'never' button lands on the same stop.
