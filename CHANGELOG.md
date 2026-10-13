@@ -6,6 +6,12 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-13
 
 ### Rows
+- the emote picker's hold only covers the emote space: it engages from
+  the grid's top down to the bottom of the last row of cells, and the
+  blank area a large picker leaves beneath that row lets go (after the
+  usual 200ms grace) so a queued reshuffle can land while the pointer
+  rests there. the check runs on pointermove as well as pointerover,
+  since moving from the cells into blank grid stays on one target
 - the emote picker's hover tip is off by default now: the standalone
   key reads on only when it holds 1, and ?eptips=1 is the url form that
   turns it on (the url writes the param only off its default)
