@@ -11,8 +11,7 @@ This alternative chat view acts as a quality-of-life and accessibility tool,
 for general or second-screen use, and a hub for links related to the stream.
 
 It runs at
-<https://hasanabi.neocities.org/> on [Neocities](https://neocities.org/).
-See the [about page](https://hasanabi.neocities.org/about/) for more.
+<https://hasanabi.neocities.org/> on [Neocities](https://neocities.org/). See the [about page](https://hasanabi.neocities.org/about/) for more.
 
 The chat page:
 
@@ -314,6 +313,11 @@ no dependencies beyond CDN-hosted fonts.
   - `🔗` shows only messages with links and removes repeated links
     from that view. `✂` shortens the displayed link text and removes
     common tracking codes from link destinations.
+  - X/Twitter profile and post links open a live
+    [nitter](https://github.com/zedeus/nitter) mirror instead of the
+    x.com login wall. The relay verifies candidate instances through
+    the linkpeek worker; the fallbacks are twiiit's per-click redirect
+    and bird.makeup for profiles.
   - Open search with Ctrl+F, `/` or `⌕`. Search message text, a
     username with `user:login`, or a message kind with `kind:notice`
     and similar terms. Enter and Shift+Enter step through matches;
@@ -536,7 +540,7 @@ Parent → relay:
 | `{type: 'backfill'}` | ask for the recent-messages backlog (every joined channel, merged by timestamp) |
 | `{type: 'auth', token}` | log in (or `token: null` to log out) |
 | `{type: 'send', channel, text, replyTo}` | post a chat message once authenticated; `replyTo` attaches a `reply-parent-msg-id` tag |
-| `{type: 'tweet', id}` | fetch an X/Twitter preview via [fxtwitter](https://github.com/FixTweet/FxTwitter) |
+| `{type: 'tweet', id}` | fetch an X/Twitter preview via the [FixTweet](https://github.com/FixTweet/FxTwitter) api (fxtwitter, then vxtwitter) |
 | `{type: 'twsets', ids}` | fetch Twitch emote-set metadata via [ivr.fi](https://api.ivr.fi) |
 
 Relay → parent:
@@ -555,10 +559,11 @@ Relay → parent:
   ([StreamElements](https://streamelements.com/) chatstats) +
   animated-emote names, refetched every
   10 minutes (global sets are fetched once per cycle and merged in)
-- `{type: 'nitter', host}` - fastest healthy
-  [nitter](https://github.com/zedeus/nitter) instance from
-  [status.d420.de](https://status.d420.de/), rechecked every
-  15 minutes
+- `{type: 'nitter', host}` - a [nitter](https://github.com/zedeus/nitter)
+  instance verified live through the linkpeek worker; candidates are a
+  built-in list plus [status.d420.de](https://status.d420.de/) picks, and
+  [twiiit](https://twiiit.com/)'s per-click redirect answers when no
+  instance verifies. Rechecked every 15 minutes
 - `{type: 'wscause', code, reason}` - why the Twitch socket last closed,
   sent with each `reconnecting` status; the page shows it in the header
 - `{type: 'repo', stars, created, pushed}` - GitHub metadata for the

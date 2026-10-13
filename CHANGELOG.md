@@ -10,11 +10,21 @@ not versions - the page ships continuously to Neocities.
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
-- the emote picker's ⏸ actually stills twitch emotes now: the freeze
-  swapped /animated/ for /default/, but the cdn serves the same file on
-  both (as-uploaded, animation included) - the real still path is
-  /static/. chat rows, the hover card's size bump, the autocomplete
-  list and the stats emote icons follow
+### Links & previews
+- twitter/x links: the nitter pick is now verified through the linkpeek
+  worker (a real profile scrape answers site 'Nitter'; walls and parked
+  pages don't), over a built-in instance list plus whatever
+  status.d420.de still tracks - the tracker had thinned to nothing live.
+  with no verified instance the pick is twiiit, which redirects each
+  click to a live mirror, then bird.makeup for profiles. status links
+  route through the pick too instead of landing on the x login wall
+- tweet cards try the second FixTweet endpoint (api.vxtwitter.com) when
+  api.fxtwitter.com misses, and hovering an x profile link peeks the
+  nitter mirror instead of scraping the js wall
+- mirror domains (twiiit, xcancel, xnologin, xcopy, shitter, ...)
+  get the x favicon like the fx-family fixers already did
+- help resources gained an 'x mirrors' block: live nitter instances,
+  twiiit, xcancel, bird.makeup, the embed fixers and the instance lists
 
 ### Rows & chat
 - the pending-reply bar above the message box quotes its target at the
@@ -59,6 +69,11 @@ not versions - the page ships continuously to Neocities.
   alike; the menu lists it with the other 2-col modes
 
 ### Emote picker
+- the ⏸ freeze actually stills twitch emotes now: it swapped /animated/
+  for /default/, but the cdn serves the same file on both (as-uploaded,
+  animation included) - the real still path is /static/. chat rows, the
+  hover card's size bump, the autocomplete list and the stats emote
+  icons follow
 - the hold only covers the emote space: it engages from the grid's top
   down to the bottom of the last row of cells, and the blank area a
   large picker leaves beneath that row lets go (after the usual 200ms
