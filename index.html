@@ -7729,7 +7729,7 @@
   // link-preview hover card: off / text only / text + the page's image
   const PEEK_MODES = ['off', 'text', 'text + image', 'text + icons'];
   let peekMode = 2;
-  function setPeek(i) { peekMode = i; markHelp('helpPeek', i); }
+  function setPeek(i) { peekMode = Math.round(i); markHelp('helpPeek', peekMode); }
   // ytEmbed adds a click-to-play thumbnail card under youtube links;
   // lkIco leads each chat link with the site's favicon (via duckduckgo)
   let ytEmbed = true, lkIco = true;
@@ -8427,7 +8427,7 @@
       if (i >= 0 && i < list.length) ctl.set(i);
     });
     if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
-    if (o.lines != null) setLines(o.lines === true ? 3 : +o.lines || 0);
+    if (o.lines != null) { const v = o.lines === true ? 3 : +o.lines; if (Number.isFinite(v)) setLines(v); }
     // a saved bundle always carries both booleans, so an explicit false
     // restores the full header; presets leave the keys out and don't touch it
     if (o.hdrgraph) { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
@@ -8444,7 +8444,7 @@
     }
     if (o.subg !== undefined) setSubGrad(!!o.subg);
     if (o.ncol !== undefined) setNickCol(!!o.ncol);
-    if (o.zebra != null) setZebra(o.zebra === true ? 2 : +o.zebra || 0);
+    if (o.zebra != null) { const v = o.zebra === true ? 2 : +o.zebra; if (Number.isFinite(v)) setZebra(v); }
     if (typeof o.pause === 'boolean') setPause(o.pause);
     if (SCROLLBACK_SIZES.includes(o.scrollback)) setScrollback(o.scrollback);
     if (typeof o.rev === 'boolean') setRev(o.rev);
@@ -8477,9 +8477,11 @@
       try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
       if (o.epgeo.left != null) setPin(true);
     }
-    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= 11) setSplit(o.split);
-    railEl.classList.toggle('fixed', o.railw > 0);
-    if (o.railw > 0) mainEl.style.setProperty('--railw', o.railw + 'px');
+    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= SPLIT_NAMES.length) setSplit(o.split);
+    if (o.railw !== undefined) {
+      railEl.classList.toggle('fixed', o.railw > 0);
+      if (o.railw > 0) mainEl.style.setProperty('--railw', o.railw + 'px');
+    }
     // after the split so a rail exists to dock into; outside rail it just
     // stores the mode for the next dock. the boolean 'video' above only
     // spans shown/hidden - this carries dock/float too
@@ -8502,7 +8504,7 @@
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.pn !== undefined) setPronouns(!!o.pn);
     if (o.nbots !== undefined) setBotsHide(!!o.nbots);
-    if (o.anim !== undefined) setNickAnim(+o.anim);
+    if (Number.isFinite(+o.anim)) setNickAnim(+o.anim);
     if (o.rbws !== undefined) setRbwScope(+o.rbws);
     if (o.rbw !== undefined) setRbwStyle(+o.rbw);
     if (o.rbp !== undefined) setRbwPal(+o.rbp);
@@ -8523,7 +8525,8 @@
     if (o.epfz !== undefined) setEpFz(+o.epfz);
     if (epDirty) buildPicker();
     if (o.notify !== undefined) setNotify(!!o.notify, false);
-    const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
+    // a stale px (no longer offered) still lets the bare index through
+    const hw = Number.isInteger(o.hpwpx) && HELP_WIDTHS.includes(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
     if (Number.isInteger(hw) && hw >= 0 && hw < HELP_WIDTHS.length) { helpWIdx = hw; applyHelpW(); }
     // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
     // list, which maps +4 (7-10 were prepended)
@@ -8990,6 +8993,7 @@
   document.getElementById('helpLinesList').innerHTML = LINE_ORDER.map((i) =>
     `<a href="#" role="button" class="helpLines" data-idx="${i}" style="text-decoration: none; border-bottom: 1px ${LINE_SHADES[i][2] === 'dots' ? 'dotted' : 'solid'} ${LINE_SHADES[i][1]}">${LINE_SHADES[i][0]}</a>`).join(' / ');
   function setLines(level) {
+    level = Math.round(level);
     lineLevel = ((level % LINE_SHADES.length) + LINE_SHADES.length) % LINE_SHADES.length;
     mainEl.style.setProperty('--rowline', LINE_SHADES[lineLevel][1]);
     mainEl.classList.toggle('linedots', LINE_SHADES[lineLevel][2] === 'dots');
@@ -9267,6 +9271,7 @@
   ];
   let zebraLevel = 1;
   function setZebra(level) {
+    level = Math.round(level);
     zebraLevel = ((level % ZEBRA_SHADES.length) + ZEBRA_SHADES.length) % ZEBRA_SHADES.length;
     mainEl.classList.toggle('zebra', zebraLevel > 0);
     mainEl.style.setProperty('--zeba', ZEBRA_SHADES[zebraLevel][1]);
@@ -9347,7 +9352,7 @@
   const TIME_MODES = ['off', '24-hour', '24-hour + seconds', '12-hour', '12-hour + seconds'];
   let timeIdx = 2;
   function setTimes(idx) {
-    timeIdx = Math.max(0, Math.min(TIME_MODES.length - 1, idx));
+    timeIdx = Math.max(0, Math.min(TIME_MODES.length - 1, Math.round(idx)));
     mainEl.classList.toggle('notime', timeIdx === 0);
     mainEl.classList.toggle('nosec', timeIdx === 1 || timeIdx === 3);
     setOn(timeBtn, timeIdx > 0);
@@ -9497,7 +9502,7 @@
   const SHADOW_NAMES = ['off', 'subtle', 'medium', 'strong', 'black', 'pitch'];
   let shadLevel = 0;
   function setShadow(lv) {
-    shadLevel = Math.max(0, Math.min(SHADOW_LVLS.length - 1, lv));
+    shadLevel = Math.max(0, Math.min(SHADOW_LVLS.length - 1, Math.round(lv)));
     const on = shadLevel > 0;
     mainEl.classList.toggle('shadowed', on);
     mainEl.style.setProperty('--row-sh', SHADOW_LVLS[shadLevel]);
@@ -10596,7 +10601,7 @@
   const splitGlyph = (l) => l === 1 ? '▮' : l === 10 ? '▮▮?' : l === 11 ? '▮?' : l === 8 ? '⊞' : l === 9 ? '▮☻' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
-    level = Math.max(1, Math.min(11, level));
+    level = Math.max(1, Math.min(SPLIT_NAMES.length, level));
     const prevSplit = splitLevel;
     splitLevel = level;
     markHelp('helpSplit', level - 1);
@@ -13774,6 +13779,10 @@
       try { suppressSave = true; applyOpts(JSON.parse(e.newValue)); markPresets(); }
       catch {}
       finally { suppressSave = false; }
+    } else if (e.key === OPTS_KEY && e.newValue === null) {
+      // reset all settings wiped the bundle in another tab - follow it or
+      // this tab's next saveOpts would rewrite the old config back
+      location.reload();
     } else if (e.key === SLOTS_KEY) {
       readSlots(); // repaint slot fills written by another tab
       paintSlots();
@@ -14242,8 +14251,8 @@
     }
     if (q.has('shade')) {
       const v = q.get('shade');
-      shadeIdx = v === 'auto' ? null : Math.max(0, Math.min(SHADE_NAMES.length - 1, +v || 0));
-      applyShade();
+      if (v === 'auto') { shadeIdx = null; applyShade(); }
+      else if (v !== '' && Number.isFinite(+v)) { shadeIdx = Math.max(0, Math.min(SHADE_NAMES.length - 1, +v)); applyShade(); }
     }
     if (q.has('font') && FONT_STACKS[q.get('font')]) { fontSel.value = q.get('font'); applyFont(); }
     if (q.has('size')) { const i = FONT_SIZES.indexOf(+q.get('size')); if (i >= 0) fontCtl.set(i); }
@@ -14284,7 +14293,7 @@
     if (q.has('split')) {
       const n = q.get('split');
       const v = parseInt(n, 10);
-      if (n !== '0') setSplit(v >= 1 && v <= 11 ? v : 2);
+      if (n !== '0') setSplit(v >= 1 && v <= SPLIT_NAMES.length ? v : 2);
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
@@ -14303,16 +14312,17 @@
     if (q.has('clean')) setCleanUrls(flag('clean'));
     if (q.has('gifsafe')) setGifSafe(flag('gifsafe'));
     if (q.has('notify')) setNotify(flag('notify'), true);
-    if (q.has('peek') && +q.get('peek') >= 0 && +q.get('peek') < PEEK_MODES.length) setPeek(+q.get('peek'));
+    if (q.has('peek')) { const v = q.get('peek'); if (v === '') setPeek(2); else if (+v >= 0 && +v < PEEK_MODES.length) setPeek(+v); }
     if (q.has('yt')) setYtEmb(flag('yt'));
     if (q.has('stitle')) setTitleBar(flag('stitle'));
     if (q.has('cmodes')) setModesOn(flag('cmodes'));
     if (q.has('sview')) setStatusView(+q.get('sview'));
-    if (q.has('upd')) setUpdMin(+q.get('upd'));
+    if (q.has('upd') && q.get('upd') !== '') setUpdMin(+q.get('upd'));
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
     if (q.has('nbots')) setBotsHide(flag('nbots'));
-    if (q.has('anim')) setNickAnim(q.get('anim') === '' ? 2 : +q.get('anim'));
+    if (q.has('anim') && (q.get('anim') === '' || Number.isFinite(+q.get('anim'))))
+      setNickAnim(q.get('anim') === '' ? 2 : +q.get('anim'));
     if (q.has('rbws')) setRbwScope(+q.get('rbws'));
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     if (q.has('rbp')) setRbwPal(+q.get('rbp'));
@@ -14336,7 +14346,7 @@
       const [w, h] = wh.split('x').map(Number);
       if (w > 0) {
         const es = { w, h };
-        if (l !== undefined && t !== undefined) { es.left = +l; es.top = +t; }
+        if (l !== undefined && t !== undefined && Number.isFinite(+l) && Number.isFinite(+t)) { es.left = +l; es.top = +t; }
         applyEpickBox(es);
         try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(es)); } catch {}
         if (es.left != null) setPin(true);
@@ -14360,7 +14370,7 @@
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
     if (q.has('hpfs')) { const v = +q.get('hpfs'), i = v < 0 ? Math.max(Math.round(v), -4) : HDR_SIZES.indexOf(v); if (v < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
-    if (q.has('hpos')) { const i = +q.get('hpos'); if (i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
+    if (q.has('hpos') && q.get('hpos') !== '') { const i = +q.get('hpos'); if (Number.isInteger(i) && i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
     if (q.has('lbls')) setLbls(flag('lbls'));
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }

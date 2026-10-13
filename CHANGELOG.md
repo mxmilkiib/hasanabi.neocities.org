@@ -276,6 +276,32 @@ not versions - the page ships continuously to Neocities.
   screenshots ship as WebP, and the unused InterMono and miniwi fonts
   and stray backups are untracked
 
+### Options
+- a theme preset no longer resets the rail's dragged width: presets
+  carry no railw, but applyOpts unfixed the rail on every apply since
+  undefined > 0 reads false
+- a stale saved hpwpx (a width the picker no longer offers) used to
+  veto the whole help-width leg - a valid hpw index in the same bundle
+  was never consulted
+- fractional saved levels crashed the apply: lines: 2.5 made
+  setLines index LINE_SHADES[2.5] and throw, dropping every option
+  after it in the bundle. setLines, setZebra, setTimes, setShadow and
+  setPeek all round their input now, and a non-numeric lines / zebra /
+  anim in the bundle is skipped rather than coerced to off
+- reset all settings now follows through in other open tabs: the wipe
+  removes the bundle key, and a tab seeing that removal reloads
+  instead of holding stale opts whose next saveOpts would write the
+  old config straight back
+- url params reject garbage instead of landing somewhere odd:
+  ?shade=abc no longer paints the page white, ?anim=abc doesn't kill
+  animations, and bare ?upd / ?hpos flags keep the current poll and
+  panel position rather than reading as never / top-left. bare ?peek
+  means the default text+image, and ?epgeo= coords have to be finite
+  to pin
+- the split bounds are SPLIT_NAMES.length now - o.split, ?split and
+  setSplit each hardcoded 11, which would lie about the top level the
+  moment a twelfth mode lands
+
 ## 2026-10-12
 
 ### Split columns
