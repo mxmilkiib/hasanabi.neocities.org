@@ -16,7 +16,7 @@ export default [
         HTMLImageElement: 'readonly', Element: 'readonly', Node: 'readonly',
         CSS: 'readonly', URL: 'readonly', URLSearchParams: 'readonly',
         addEventListener: 'readonly', removeEventListener: 'readonly',
-        getComputedStyle: 'readonly', caches: 'readonly', alert: 'readonly',
+        getComputedStyle: 'readonly', getSelection: 'readonly', caches: 'readonly', alert: 'readonly',
         confirm: 'readonly', prompt: 'readonly', Twitch: 'readonly',
         TreeWalker: 'readonly', NodeFilter: 'readonly', Range: 'readonly',
         DOMParser: 'readonly', CustomEvent: 'readonly', KeyboardEvent: 'readonly',
