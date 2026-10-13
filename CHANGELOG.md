@@ -13,6 +13,10 @@ not versions - the page ships continuously to Neocities.
   closed to its floating place. stats stays a tab inside the popup and
   the emote picker floats as in the plain columns. the menu, wheel
   cycle, saved opts and ?split=10 all learn it
+- level 11 (2col+v/h, ▮?) is the same rail beside a single chat column:
+  video up top right, the help popup filling the space below it. it
+  shares level 10's dock, so the popup, stats tab and picker behave
+  alike; the menu lists it with the other 2-col modes
 
 ## 2026-10-12
 
