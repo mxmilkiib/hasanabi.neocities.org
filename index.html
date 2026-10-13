@@ -14465,7 +14465,7 @@
   document.addEventListener('mousemove', (e) => { if (peekUrl) { peekX = e.clientX; peekY = e.clientY; } });
   // relatedTarget null means the pointer left the window entirely
   document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) peekHide(); });
-  addEventListener('scroll', () => { if (performance.now() - autoScrollAt > 150) peekHide(); }, true);
+  addEventListener('scroll', () => { if (performance.now() - autoScrollAt > 150) peekHide(); }, { capture: true, passive: true });
   addEventListener('mousedown', (e) => { if (!peekEl.contains(e.target)) peekHide(); }, true);
   addEventListener('blur', peekHide);
   addEventListener('keydown', (e) => { if (e.key === 'Escape') peekHide(); });
@@ -14567,7 +14567,7 @@
   document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) epopHide(); });
   // the log's own autoscroll churns constantly under a hover - only a user
   // scroll (past the autoScrollAt window, same guard as peek) dismisses
-  addEventListener('scroll', () => { if (performance.now() - autoScrollAt > 150) epopHide(); }, true);
+  addEventListener('scroll', () => { if (performance.now() - autoScrollAt > 150) epopHide(); }, { capture: true, passive: true });
   addEventListener('mousedown', epopHide, true);
   addEventListener('blur', epopHide);
   addEventListener('keydown', (e) => { if (e.key === 'Escape') epopHide(); });
