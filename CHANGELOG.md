@@ -21,6 +21,8 @@ not versions - the page ships continuously to Neocities.
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
 ### Resources
+- channels/streams: streamers moves under home - the chat-switchable
+  group leads since the table doubles as a channel picker
 - usa pol: the dsa tail becomes a real subsection - main row, then
   committees / publications / leadership rows; leadership adds the
   national political committee (npc)
