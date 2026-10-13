@@ -7316,7 +7316,9 @@
     `<a href="#" role="button" class="helpLs" data-idx="${i}" style="letter-spacing:${v}em">${v}</a>`).join(' ');
   // no fontCtl set here: an apply would stamp px over the css floor, and the
   // floor is the default - only a real pick (click, wheel, saved px, preset
-  // or url param, all through set()/apply()) earns the stamp
+  // or url param, all through set()/apply()) earns the stamp - the list
+  // still marks the live size so the default rung shows as selected
+  markHelp('helpFont', FONT_SIZES.indexOf(Math.round(chatFontPx())));
   lhCtl.set(lhCtl.get());
   weightCtl.set(weightCtl.get());
   lsCtl.set(lsCtl.get());
