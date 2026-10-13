@@ -10946,8 +10946,16 @@
   }
 
   // timeout lock: the input is disabled with a countdown until it lapses.
-  // Keyed per channel - a timeout in one room leaves the others open
+  // Keyed per channel - a timeout in one room leaves the others open.
+  // The map persists - a reload forgets the lock but not twitch's ban,
+  // so still-running expiries come back to keep the input shut
   let toUntils = {}, toTimer = 0;
+  const TO_UNTILS_KEY = 'hasan-tountils';
+  const saveTos = () => { try { localStorage.setItem(TO_UNTILS_KEY, JSON.stringify(toUntils)); } catch {} };
+  try {
+    const s = JSON.parse(localStorage.getItem(TO_UNTILS_KEY));
+    if (s && typeof s === 'object') for (const [k, v] of Object.entries(s)) if (+v > Date.now()) toUntils[k] = +v;
+  } catch {}
   // slow mode: ROOMSTATE's seconds between messages, counted down on the
   // input after each send; mods/broadcasters/vips are exempt. The countdown
   // is per channel - sending in one room doesn't cool the others down
@@ -11232,6 +11240,7 @@
     const left = Math.ceil(((toUntils[tch] || 0) - Date.now()) / 1000);
     if (left <= 0) {
       delete toUntils[tch];
+      saveTos();
       if (!Object.keys(toUntils).length) { clearInterval(toTimer); toTimer = 0; }
       chatInput.disabled = false;
       updateSendUI();
@@ -11245,6 +11254,7 @@
     if (until <= Date.now()) return;
     ch = ch || CHANNEL;
     toUntils[ch] = Math.max(toUntils[ch] || 0, until);
+    saveTos();
     paintTimeout();
     if (!toTimer) toTimer = setInterval(paintTimeout, 1000);
   }
@@ -11277,7 +11287,10 @@
     chatInput.placeholder = on
       ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}`
       : pending ? 'finishing twitch login…' : 'log in to chat';
-    if (toUntils[sendTarget()]) paintTimeout();
+    if (toUntils[sendTarget()]) {
+      paintTimeout();
+      if (!toTimer) toTimer = setInterval(paintTimeout, 1000);
+    }
     paintChatPick();
     document.body.classList.toggle('chaton', on);
     // inline rather than clearReply(): that path refreshes this same UI.
