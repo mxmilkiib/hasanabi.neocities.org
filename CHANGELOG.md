@@ -43,7 +43,8 @@ not versions - the page ships continuously to Neocities.
 ### Resources
 - i've had it: the hosts lead the notes - jennifer welch (her ig
   kept) & angie 'pumps' sullivan - matching unruly subjects'
-  kumanyika layout
+  kumanyika layout. the pair reads as one notes cell now: a mid-name
+  anchor used to strand '& angie' inside the ig column
 - channels/streams: the streamers group sorts by viewership - mike
   from pa, maple takes, yugopnik, kaceytron, madeline pendleton, the
   serfs, frogan, leaping larry, comrade virgo, kneecoleslaw (off
