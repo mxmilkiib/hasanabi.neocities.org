@@ -5585,13 +5585,17 @@
     updateHeader();
   }
 
-  // scroll on the status dot or text cycles the stream info verbosity
-  for (const el of [dotEl, infoEl])
-    el.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      statusView = (statusView + (e.deltaY > 0 ? 1 : -1) + 3) % 3;
-      updateHeader();
-    }, { passive: false });
+  // scroll anywhere on the channel block cycles the stream info
+  // verbosity - the mode and chatter chips are siblings of the status
+  // text, so listening on the dot and text alone left dead spots the
+  // wheel landed on once a view flipped the chips visible under it
+  dotEl.parentElement.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    // don't let a minimised header's wheel-unminimise ride the same flick
+    e.stopPropagation();
+    statusView = (statusView + (e.deltaY > 0 ? 1 : -1) + 3) % 3;
+    updateHeader();
+  }, { passive: false });
 
   // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
   const modesEl = document.getElementById('chatModes');

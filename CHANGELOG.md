@@ -5,6 +5,12 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-13
 
+### Header
+- the wheel cycles the stream info view anywhere on the channel block,
+  not just the dot and status text - the mode and chatter chips are
+  siblings of the text, and the dead spot under them read as the wheel
+  sticking once a view flip put them under the pointer
+
 ### Rows & chat
 - the pending-reply bar above the message box quotes its target at the
   chat's full text size (it ran at .8em), and a long quote ellipsises
