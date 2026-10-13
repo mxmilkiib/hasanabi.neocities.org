@@ -234,8 +234,10 @@ no dependencies beyond CDN-hosted fonts.
     and keeps its data across reloads.
 - **Site updates**
   - If a new version arrives while the page is open, a notice offers
-    two reload buttons. If the page behaves strangely, the notice
-    suggests resetting saved settings or waiting for a fix.
+    two reload buttons plus the poll-frequency picks (5m-3h, never)
+    for changing how often the check runs. If the page behaves
+    strangely, the notice suggests resetting saved settings or
+    waiting for a fix.
 
 ### Display options
 
@@ -468,7 +470,7 @@ editing a URL.
 | `lkico` | `0` | link favicons off |
 | `pn` | `0` | pronoun lookups on profile cards off |
 | `cmodes` | `0` | active chat-mode display off (chips and status-line mode text) |
-| `upd` | `5`,`15`,`30`,`60`,`180`,`0` | update-check poll minutes (`0` = never; also the bar's 'never' button) |
+| `upd` | `5`,`15`,`30`,`60`,`180`,`0` | update-check poll minutes (`0` = never; also the bar's poll chips) |
 | `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
 | `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
 | `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |

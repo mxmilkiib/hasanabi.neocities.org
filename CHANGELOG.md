@@ -11,6 +11,9 @@ not versions - the page ships continuously to Neocities.
   poll-frequency pick - 5m / 15m / 30m / 1h / 3h / never. 'never' stops
   polling entirely; the bar's own 'never' button lands on the same stop.
   saved and url values migrate: off becomes never, on becomes 15m
+- the update bar now carries the poll chips itself - 'poll: 5m 15m 30m
+  1h 3h never' sits beside the dismiss button, the live stop lit, so
+  the frequency changes straight from the notice
 - the sub badge button's Ⓢ drops to .8em - the circled glyph ran
   bigger than its neighbours at the base size - and nudges 1px left;
   the timestamp button's ◷ rides 2px higher in its box

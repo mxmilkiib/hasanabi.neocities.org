@@ -1603,6 +1603,10 @@
   @media (max-width: 900px) { #updateBar .hbar-txt { gap: 0 10px; } }
   #updateBar .hdr-btn { width: auto; padding: 0 7px; font-size: .92em; font-weight: inherit; color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
   #updateBar .hdr-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 32%, transparent); border-color: var(--accent); }
+  #updPoll { display: flex; align-items: center; gap: 4px; }
+  #updPoll .upd-lbl { font-weight: 400; opacity: .75; }
+  #updPoll .hdr-btn { padding: 0 5px; }
+  #updPoll .hdr-btn.on { background: color-mix(in srgb, var(--accent) 32%, transparent); }
   /* a freshly replayed line washes --aux once then refades - distinct
      from the accent missflash so a backlog landing reads as sync, not
      as a jump-to-row highlight */
@@ -2629,7 +2633,7 @@
     </div>
     </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
-  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated, reload? -- warning: wip! -- if broken; wait for fix -- worse case; "reset all settings" -- reload message options in [?] popup</span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateOff" type="button" title="stop update notices - the option lives in the ? popup (update notice)">never</button><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
+  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated, reload? -- warning: wip! -- if broken; wait for fix -- worse case; "reset all settings"</span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">poll:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss - p.s. page autoplay audio permission allows unmuted stream on open/reload</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
@@ -7617,8 +7621,8 @@
     if (on && ask && window.Notification && Notification.permission === 'default') Notification.requestPermission();
   }
   // the ↻ reload bar when a deploy lands mid-session, and how often the
-  // page polls for one - 'never' (0) skips both. The bar's own 'never'
-  // button lands here too; its element is queried lazily since applyOpts
+  // page polls for one - 'never' (0) skips both. The bar's own poll
+  // chips land here too; they are queried lazily since applyOpts
   // can run before the const below lands
   const UPD_STOPS = [5, 15, 30, 60, 180, 0]; // minutes; 0 = never poll
   const UPD_NAMES = ['5m', '15m', '30m', '1h', '3h', 'never'];
@@ -7630,6 +7634,7 @@
   function setUpdMin(m) {
     updMin = UPD_STOPS.includes(+m) ? +m : 15;
     markHelp('helpUpd', UPD_STOPS.indexOf(updMin));
+    document.querySelectorAll('#updPoll [data-m]').forEach((b) => b.classList.toggle('on', +b.dataset.m === updMin));
     if (!updMin) document.getElementById('updateBar').hidden = true;
     armUpdTimer();
   }
@@ -14219,6 +14224,7 @@
   markHelp('helpTitle', titleBarOn ? 1 : 0);
   markHelp('helpModes', modesOn ? 1 : 0);
   markHelp('helpUpd', UPD_STOPS.indexOf(updMin));
+  document.querySelectorAll('#updPoll [data-m]').forEach((b) => b.classList.toggle('on', +b.dataset.m === updMin));
   markHelp('helpFav', lkIco ? 1 : 0);
   markHelp('helpPn', pronounsOn ? 1 : 0);
   markHelp('helpCopyHelp', copyHelp ? 1 : 0);
@@ -14256,7 +14262,7 @@
     location.replace(u); // a refresh, not a navigation - no dead history entry
   }));
   document.getElementById('updateX').addEventListener('click', () => { updateBar.hidden = true; });
-  document.getElementById('updateOff').addEventListener('click', () => { setUpdMin(0); saveOpts(); });
+  updateBar.querySelectorAll('#updPoll [data-m]').forEach((b) => b.addEventListener('click', () => { setUpdMin(+b.dataset.m); saveOpts(); }));
   // header controls are glyph-only: mirror each title into an aria-label so
   // screen readers announce them, and keep it in step as titles change
   const ariaSync = (el) => {
