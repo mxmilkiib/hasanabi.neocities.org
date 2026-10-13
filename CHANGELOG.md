@@ -32,6 +32,14 @@ not versions - the page ships continuously to Neocities.
   twiiit, xcancel, bird.makeup, the embed fixers and the instance lists
 
 ### Rows & chat
+- history restore died on reload: the empty-card removal painted the
+  emote picker's sync state through a picker const that declares later
+  in the file, so the whole restore try-block unwound before a single
+  row landed. the const moves up beside the other early element refs
+- rows now carry their raw badge tags on data-badges, and a rebadge
+  pass runs when a channel's badge sets land - rows drawn before the
+  sets arrived, and rows saved icon-less and restored, gain their
+  badge imgs after the fact instead of keeping the text chips forever
 - nightshade's chat line-height moves 1.4 → 1.5; the change lands on a
   fresh profile or a re-pick of the preset - a saved lhv keeps its pick
 - the pending-reply bar above the message box quotes its target at the

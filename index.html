@@ -2806,6 +2806,9 @@
   // restored rows, where there is no card to carry the text
   const loadBar = document.getElementById('loadBar');
   const loadTxt = document.getElementById('loadTxt');
+  // emotePick lives here, not with its wiring: paintEpickSync runs during
+  // history restore, well before the picker block would declare it
+  const emotePick = document.getElementById('emotePick');
   if (emptyEl) loadBar.hidden = true;
   let loadPhase = 0;
   function loadStep(n, txt) {
@@ -3351,6 +3354,41 @@
       }
       node.parentNode.replaceChild(frag, node);
     }
+  }
+
+  // Rows rendered or restored before a channel's badge sets landed carry
+  // the raw tag list on data-badges but no icons - once sets arrive the
+  // tokens resolve after the fact. Same heal retokenizeRows does for
+  // emote names; the text chips only existed as the no-icon fallback
+  function rebadgeRows(ch) {
+    let changed = false;
+    for (const row of mainEl.querySelectorAll('.row[data-badges]')) {
+      if ((row.dataset.ch || CHANNEL).replace(/^#/, '') !== ch) continue;
+      if (row.querySelector('img.badge')) continue;
+      const tpl = document.createElement('template');
+      tpl.innerHTML = row.dataset.badges.split(',').filter(Boolean).map((b) => {
+        const u = badgeUrl(b, ch);
+        return u ? `<img class="badge" src="${escapeHTML(u)}"` +
+                   ` title="${escapeHTML(BADGE_NAMES[b.split('/')[0]] || b.split('/')[0].replace(/-/g, ' '))}" alt="">` : '';
+      }).join('');
+      if (!tpl.content.childElementCount) continue;
+      for (const r of row.querySelectorAll(':scope > .role.host, :scope > .role.vip')) r.remove();
+      const anchor = row.querySelector('.aux') || row.querySelector('.name');
+      row.insertBefore(tpl.content, anchor);
+      // a moderator row may have rendered the flag chip already, but rows
+      // saved before the chip existed only have the tag - create it and
+      // let applySubMode position and restyle it for the current mode
+      if (row.dataset.badges.includes('moderator/') && !row.querySelector('.role.mod')) {
+        const m = document.createElement('span');
+        m.className = 'role mod';
+        m.textContent = 'md';
+        row.insertBefore(m, anchor);
+      }
+      changed = true;
+    }
+    // the new icons become the left-mode anchor - one sweep reorders the
+    // sub chip, the mod flag and the aux cluster to match fresh renders
+    if (changed) applySubMode();
   }
 
   // Escapes text, swapping whole-word third-party emote tokens for <img> tags
@@ -4629,7 +4667,7 @@
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
       html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${tags.bits ? ' bits' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
-              ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
+              ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${btags.length ? ` data-badges="${escapeHTML(tags.badges)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
@@ -11376,7 +11414,6 @@
   // globals when logged out), then a row of unicode emoji. Source tabs
   // toggle which groups show ----
   const emojiBtn = document.getElementById('emojiBtn');
-  const emotePick = document.getElementById('emotePick');
   paintEpickSync();
   const emoteQ = document.getElementById('emoteQ');
   const emoteGrid = document.getElementById('emoteGrid');
@@ -13782,6 +13819,9 @@
       emoteAnim = chanSets[ech].emoteAnim;
     }
     retokenizeRows();
+    // badge icons resolve the same way once this channel's sets land -
+    // covers rows drawn before the payload and rows saved without icons
+    rebadgeRows(ech);
     // a loaded set widens what the archive heal can resolve - idempotent,
     // so it just re-runs as more rooms' name maps land
     healUseArchive();
