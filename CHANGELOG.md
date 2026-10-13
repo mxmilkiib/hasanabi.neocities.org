@@ -6,6 +6,8 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-13
 
 ### Header
+- the help button's ? goes gold against the dim chrome; the accent
+  border still marks the panel open
 - the wheel cycles the stream info view anywhere on the channel block,
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel

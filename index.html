@@ -281,7 +281,9 @@
      .hdr-side wrap onto a second line the buttons stay put up top. top
      matches the header's padding so they line up with the flowing row */
   #helpBtn, #hdrMin { position: absolute; top: 0; }
-  #helpBtn { right: 8px; font-weight: 700; border-width: 2px; }
+  /* Gold ? against the dim chrome; the id rule holds it through :hover
+     and .on, whose accent border still marks the open state */
+  #helpBtn { right: 8px; font-weight: 700; border-width: 2px; color: #e8b73e; }
   #hdrMin { right: 44px; }
   body.hdrmin header {
     height: 10px;
