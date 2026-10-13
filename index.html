@@ -1581,12 +1581,15 @@
   /* deploy notice: aux ground with accent ink - a notice tone, not the
      alert loudness the accent ground carried */
   #updateBar { background: #000; color: var(--accent); font-weight: 600; padding-top: 2px; padding-bottom: 2px; }
-  #updateBar .hbar-txt { display: flex; align-items: center; gap: 0 10px; }
+  #updateBar .hbar-txt { display: flex; align-items: center; gap: 0 3rem; }
   #updateBar .hbar-txt > span:not(.updgap) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   #updateBar .updgap { flex: 1; display: flex; min-width: 0; }
   #updateBar .updgap:first-child { justify-content: flex-end; }
   #updateBar .updgap:last-child { justify-content: flex-start; }
-  #updateBar .hbar-txt .hdr-btn { flex: 0 1 auto; padding: 0 8px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  #updateBar .hbar-txt .hdr-btn { flex: 0 1 auto; width: 11.2em; padding: 0 8px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  /* the wide gap only fits a wide bar - narrow screens keep the tight one
+     so the buttons still get room beside the text */
+  @media (max-width: 900px) { #updateBar .hbar-txt { gap: 0 10px; } }
   #updateBar .hdr-btn { width: auto; padding: 0 7px; font-size: .92em; font-weight: inherit; color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
   #updateBar .hdr-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 32%, transparent); border-color: var(--accent); }
   /* a freshly replayed line washes --aux once then refades - distinct
