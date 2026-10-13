@@ -46,6 +46,10 @@ not versions - the page ships continuously to Neocities.
 - the split-columns help entry uses the same itemised columns as the
   emote-picker (☻) entry instead of one running paragraph, and the
   emote-pause row moved to the block below it
+- the @hasanabi row splits off nick shimmer and gains a rainbow scope
+  pick - all / hasanabi / off decides which marks run the sweep:
+  mentions, channel tags, Fear&, bits/first chips and notice labels
+  paint only under 'all', the @mention alone under 'hasanabi'
 - the stream-status legend's labels are explicit grid cells, so each
   dot stays opposite its own line - the stray <br> item had slid the
   grey dot down beside the favicon note

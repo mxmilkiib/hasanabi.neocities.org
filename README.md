@@ -473,7 +473,9 @@ editing a URL.
 | `cmodes` | `0` | active chat-mode display off (chips and status-line mode text) |
 | `upd` | `5`,`15`,`30`,`60`,`180`,`360`,`1440`,`0` | update-check poll minutes, default `60` (`0` = never; also the bar's update-check chips) |
 | `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
-| `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
+| `rbw` | `0`–`3` | rainbow motion: sweep / wave / hue cycle / random |
+| `rbp` | `0`–`4` | rainbow palette: classic / vivid / candy / ocean / sunset |
+| `rbws` | `0`–`2` | rainbow scope: all marks / @hasanabi only / off |
 | `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |
 | `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
 | `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
