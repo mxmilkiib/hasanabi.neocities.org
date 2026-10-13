@@ -5382,6 +5382,7 @@
   // status info verbosity: 0 full, 1 compact, 2 minimal; wheel on the
   // dot or info text cycles it, the ? popup's status-length row sets it
   let statusView = 0;
+  const SVIEW_NAMES = ['full', 'compact', 'minimal'];
   function setStatusView(i) {
     statusView = Math.max(0, Math.min(2, i | 0));
     markHelp('helpSview', statusView);
@@ -7728,6 +7729,7 @@
   function setCleanUrls(on) { cleanUrls = on; markHelp('helpClean', on ? 1 : 0); applyCleanUrls(); }
   // link-preview hover card: off / text only / text + the page's image
   const PEEK_MODES = ['off', 'text', 'text + image', 'text + icons'];
+  const PEEK_URL = ['off', 'text', 'img', 'icons'];
   let peekMode = 2;
   function setPeek(i) { peekMode = Math.round(i); markHelp('helpPeek', peekMode); }
   // ytEmbed adds a click-to-play thumbnail card under youtube links;
@@ -9395,6 +9397,7 @@
   // 2 slow / 3 super slow - the help list runs speed order, so its
   // indices map through ANIM_LVLS ----
   const ANIM_LVLS = [0, 3, 2, 1];
+  const ANIM_URL = ['off', 'quick', 'slow', 'vslow'];
   let nickAnim = 2;
   function setNickAnim(lvl) {
     nickAnim = Math.min(3, Math.max(0, lvl | 0));
@@ -9438,6 +9441,7 @@
   // the keyframes on the same clipped gradient while the rate option
   // above still stretches the period. Index into body classes ----
   const RBW_STYLES = ['', 'rbw-wave', 'rbw-hue', 'rbw-rand'];
+  const RBW_URL = ['sweep', 'wave', 'hue', 'rand'];
   // 'random' deals each mention a motion off its palette index - a given
   // chatter's @hasanabi keeps the same trick like it keeps its scheme
   const RBW_RAND = [
@@ -9653,6 +9657,8 @@
   // popup dock: the unmoved panel rests on a 3x3 screen anchor (corners,
   // mid-edges, centre). A drag takes over until a position or width chip
   // re-docks it
+  // compass codes for the 3x3 dock positions - hpos=tr beats hpos=2
+  const HPOS_URL = ['tl', 'tc', 'tr', 'ml', 'mc', 'mr', 'bl', 'bc', 'br'];
   let helpPos = DEF.hpos;
   function applyHelpPos() { markHelp('helpPos', helpPos); clampHelpPanel(); }
   // the popup must never sit past a screen edge: its intended size (the
@@ -9739,7 +9745,7 @@
     if (CHANNEL !== DEFAULT_CHANNEL || MULTI) q.set('channel', CHANNELS.join(','));
     if (colourMode !== 'gray') q.set('colour', colourMode);
     if (variantMode !== 'standard') q.set('variant', variantMode);
-    if (shadeIdx !== DEF.shade) q.set('shade', shadeIdx == null ? 'auto' : shadeIdx);
+    if (shadeIdx !== DEF.shade) q.set('shade', shadeIdx == null ? 'auto' : SHADE_NAMES[shadeIdx]);
     if (fontSel.value !== 'roobert') q.set('font', fontSel.value);
     // a pick on the floor rung still travels - 16px picked isn't 16px
     // floored for a recipient whose root size isn't 16
@@ -9748,33 +9754,33 @@
     if (weightCtl.get() !== DEF.weight) q.set('wght', WEIGHTS[weightCtl.get()]);
     if (lsCtl.get() !== DEF.ls) q.set('ls', LS_STEPS[lsCtl.get()]);
     if (linkW !== WEIGHTS.indexOf(400)) q.set('lw', WEIGHTS[linkW]);
-    if (zebraLevel !== 2) q.set('zebra', String(zebraLevel));
+    if (zebraLevel !== 2) q.set('zebra', ZEBRA_SHADES[zebraLevel][0]);
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 10000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
     if (barTop) q.set('bartop', '1');
     if (barAuto) q.set('bauto', String(barAuto));
-    if (lineLevel !== DEF.lines) q.set('lines', String(lineLevel));
+    if (lineLevel !== DEF.lines) q.set('lines', LINE_SHADES[lineLevel][0].replace(/ /g, '-'));
     if (timeIdx === 0) q.set('times', '0');
     else if (timeIdx === 1) q.set('times', 'nosec');
     else if (timeIdx === 3) q.set('times', '12h');
     else if (timeIdx === 4) q.set('times', '12hsec');
-    if (shadLevel) q.set('shadow', shadLevel);
+    if (shadLevel) q.set('shadow', SHADOW_NAMES[shadLevel]);
     if (SUB_MODES[subMode] !== 'num-left') q.set('sub', SUB_MODES[subMode]);
     if (subGrad) q.set('subg', '1');
     if (nickCol) q.set('ncol', '1');
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
-    else if (document.body.classList.contains('hdrmin')) q.set('min', '1');
+    else if (document.body.classList.contains('hdrmin')) q.set('min', '');
     if (!selfHl) q.set('self', '0');
-    if (splitLevel > 1) q.set('split', String(splitLevel));
+    if (splitLevel > 1) q.set('split', SPLIT_URL[splitLevel - 1]);
     // in rail mode the video state is vidRail (dock is the baseline);
     // outside it video=1 only when the box is shown. modes 5/6 own the
     // placement themselves - vidRail is stale there, so the url only
     // needs the param when the mode-forced video is actually hidden
-    if (splitLevel >= 5) { if (vidBox.hidden !== (splitLevel === 6)) q.set('video', vidBox.hidden ? '0' : '1'); }
-    else if (railEl.hidden) { if (!vidBox.hidden) q.set('video', '1'); }
-    else if (vidRail !== 'dock') q.set('video', vidRail === 'off' ? '0' : 'float');
+    if (splitLevel >= 5) { if (vidBox.hidden !== (splitLevel === 6)) q.set('video', vidBox.hidden ? 'off' : 'on'); }
+    else if (railEl.hidden) { if (!vidBox.hidden) q.set('video', 'on'); }
+    else if (vidRail !== 'dock') q.set('video', vidRail);
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
     if (bwInput.value.trim()) q.set('bw', bwInput.value.trim());
     if (hwInput.value.trim()) {
@@ -9785,32 +9791,32 @@
     if (!cleanUrls) q.set('clean', '0');
     if (gifSafe) q.set('gifsafe', '1');
     if (notifyOn) q.set('notify', '1');
-    if (peekMode !== 2) q.set('peek', peekMode);
+    if (peekMode !== 2) q.set('peek', PEEK_URL[peekMode]);
     if (!ytEmbed) q.set('yt', '0');
     if (!titleBarOn) q.set('stitle', '0');
     if (!modesOn) q.set('cmodes', '0');
-    if (statusView) q.set('sview', String(statusView));
-    if (updMin !== 60) q.set('upd', String(updMin));
+    if (statusView) q.set('sview', SVIEW_NAMES[statusView]);
+    if (updMin !== 60) q.set('upd', UPD_NAMES[UPD_STOPS.indexOf(updMin)]);
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
-    if (nickAnim !== 2) q.set('anim', nickAnim);
-    if (rbwStyle !== RBW_DEFAULT) q.set('rbw', rbwStyle);
-    if (rbwPal !== 0) q.set('rbp', rbwPal);
-    if (rbwScope !== 0) q.set('rbws', rbwScope);
+    if (nickAnim !== 2) q.set('anim', ANIM_URL[nickAnim]);
+    if (rbwStyle !== RBW_DEFAULT) q.set('rbw', RBW_URL[rbwStyle]);
+    if (rbwPal !== 0) q.set('rbp', RBW_PALS[rbwPal].n);
+    if (rbwScope !== 0) q.set('rbws', RBW_SCOPES[rbwScope]);
     // emote-picker options only enter the url off their defaults
-    if (emotePick.classList.contains('names')) q.set('epnames', emotePick.classList.contains('namesb') ? '1' : '2');
-    if (epickZoom) q.set('epzoom', epickZoom);
-    if (epickSort !== 'use' || epickSeen) q.set('epsort', epickSeen ? 'useseen' : epickSort);
-    if (epickAge) q.set('epage', String(epickAge));
-    if (epickSq !== 3) q.set('epsq', String(epickSq));
-    if (epickMove) q.set('epmove', String(epickMove));
+    if (emotePick.classList.contains('names')) q.set('epnames', emotePick.classList.contains('namesb') ? 'side' : 'only');
+    if (epickZoom) q.set('epzoom', EPZ_URL[epickZoom] || epickZoom);
+    if (epickSort !== 'use' || epickSeen) q.set('epsort', epickSeen ? 'seen' : epickSort);
+    if (epickAge) q.set('epage', EPAGE_URL[epickAge]);
+    if (epickSq !== 3) q.set('epsq', EPSQ_URL[epickSq]);
+    if (epickMove) q.set('epmove', MOVE_URL[epickMove]);
     if (!epickMerge) q.set('epmix', '0');
-    if (epickHold !== 2) q.set('ephold', String(epickHold));
+    if (epickHold !== 2) q.set('ephold', EPHOLD_URL[epickHold]);
     if (epickTips) q.set('eptips', '1');
     if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
     if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
-    if (epFz) q.set('epfz', String(epFz));
+    if (epFz) q.set('epfz', EP_FZ_NAMES[epFz]);
     try {
       const es = JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null');
       const dg = THEME_PRESETS['old-default'].epgeo;
@@ -9828,8 +9834,8 @@
       else if (localStorage.getItem(EPICK_OPEN_KEY) === '0') q.set('epopen', '0');
     } catch {}
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
-    if (helpFs !== -1) q.set('hpfs', helpFs < 0 ? helpFs : HDR_SIZES[helpFs]);
-    if (helpPos !== DEF.hpos) q.set('hpos', helpPos);
+    if (helpFs !== -1) q.set('hpfs', helpFs === -4 ? 'chat' : helpFs < 0 ? 'chat' + helpFs : HDR_SIZES[helpFs]);
+    if (helpPos !== DEF.hpos) q.set('hpos', HPOS_URL[helpPos]);
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
     if (lblsOn) q.set('lbls', '1');
     if (copyHelp) {
@@ -10598,6 +10604,9 @@
   // with stats back in, then emotes alone (video floats like 6). 10 is
   // two chat columns with the video over the help popup in the rail
   const SPLIT_NAMES = ['1col', '2col', '3col', '3col+vid/emotes/stats', '3col+vid/emotes', '3col+emotes (vid off, ▶ floats)', '2col+vid/emotes', '2x2 (chat/emotes · vid/stats)', '2col+emotes (vid off, ▶ floats)', '3col+vid/help', '2col+vid/help'];
+  // compact url aliases: level 1-3 are bare columns, then col +
+  // v(id) e(motes) s(tats) h(elp) - 2x2 is its own shape
+  const SPLIT_URL = ['1c', '2c', '3c', '3cves', '3cve', '3ce', '2cve', '2x2', '2ce', '3cvh', '2cvh'];
   const splitGlyph = (l) => l === 1 ? '▮' : l === 10 ? '▮▮?' : l === 11 ? '▮?' : l === 8 ? '⊞' : l === 9 ? '▮☻' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
@@ -12173,6 +12182,9 @@
   const EPICK_ZOOM_KEY = 'hasan-epickzoom';
   const zoomOneBtn = document.getElementById('emoteZoomOne');
   const zoomBtns = { big: document.getElementById('emoteZoom'), tw: document.getElementById('emoteZoomTw'), hf: document.getElementById('emoteZoomHf'), th: document.getElementById('emoteZoomTh'), q: document.getElementById('emoteZoomQ'), sm: document.getElementById('emoteZoomSm') };
+  // the url speaks the whole word; the short keys stay valid on parse
+  const EPZ_URL = { sm: 'small', q: 'quarter', th: 'third', hf: 'half', tw: 'tweet', big: 'big' };
+  const EPZ_INV = Object.fromEntries(Object.entries(EPZ_URL).map(([k, v]) => [v, k]));
   let epickZoom = '';
   try { epickZoom = localStorage.getItem(EPICK_ZOOM_KEY) || ''; } catch {}
   if (epickZoom === '1') epickZoom = 'big'; // the old boolean save
@@ -12218,6 +12230,7 @@
   // how many age squares the ladder prints: 0 none · 1 a handful of
   // landmarks · 2 whole minutes and hours · 3 every rung
   const EPICK_SQ_KEY = 'hasan-epicksq';
+  const EPSQ_URL = ['off', 'sparse', 'whole', 'all'];
   const SQ_MODES = [
     'off - no squares',
     'sparse - 1m 5m 15m 30m 1h 2h 3h 6h 12h',
@@ -12364,6 +12377,7 @@
     saveOpts();
     emoteQ.focus();
   });
+  const EPAGE_URL = ['inline', 'eras', 'ends', 'centre'];
   const setAge = (i) => {
     epickAge = Math.max(0, Math.min(3, +i || 0));
     try { localStorage.setItem(EPICK_AGE_KEY, String(epickAge)); } catch {}
@@ -12390,6 +12404,7 @@
     'blur - the rebuilt grid sharpens back in',
     'queue - cells snap to their spots one at a time',
   ];
+  const MOVE_URL = MOVE_MODES.map((m) => m.split(' ')[0]);
   // the grid-level modes animate by class; each maps to its keyframe
   const GRID_FX = { 1: 'efade', 4: 'ezoom', 5: 'eblur' };
   let epickMove = 0;
@@ -12490,6 +12505,7 @@
     holdBtn.textContent = epickHold === 2 ? 'hold+' : 'hold';
     holdBtn.title = `hold the grid still while the pointer is over the emotes (down to the last row of cells - blank space below lets go) - chat use won't reshuffle cells under the cursor; click cycles hold → hold+ (pauses animated cells while held) → off`;
   };
+  const EPHOLD_URL = ['off', 'hold', 'plus'];
   const setHold = (i) => {
     const st = animFrozen();
     epickHold = Math.max(0, Math.min(2, +i || 0));
@@ -14250,8 +14266,9 @@
       }
     }
     if (q.has('shade')) {
-      const v = q.get('shade');
-      if (v === 'auto') { shadeIdx = null; applyShade(); }
+      const v = q.get('shade'), i = SHADE_NAMES.indexOf(v);
+      // a fixed shade counts when it names a shade or is a real int in range
+      if (v === 'auto' || i >= 0) { shadeIdx = v === 'auto' ? null : i; applyShade(); }
       else if (v !== '' && Number.isFinite(+v)) { shadeIdx = Math.max(0, Math.min(SHADE_NAMES.length - 1, +v)); applyShade(); }
     }
     if (q.has('font') && FONT_STACKS[q.get('font')]) { fontSel.value = q.get('font'); applyFont(); }
@@ -14260,15 +14277,15 @@
     if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
     if (q.has('ls')) { const i = LS_STEPS.indexOf(+q.get('ls')); if (i >= 0) lsCtl.set(i); }
     if (q.has('lw')) { const i = WEIGHTS.indexOf(+q.get('lw')); if (i >= 0) setLinkW(i); }
-    if (q.has('zebra')) { const v = q.get('zebra'); setZebra(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 2)); }
+    if (q.has('zebra')) { const v = q.get('zebra'); const i = ZEBRA_SHADES.findIndex((z) => z[0] === v); setZebra(i >= 0 ? i : (v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || 2))); }
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
     if (q.has('bartop')) setBarTop(flag('bartop'));
     if (q.has('bauto')) setBarAuto(flag('bauto') ? (+q.get('bauto') || 1) : 0);
-    if (q.has('lines')) { const v = q.get('lines'); setLines(v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || DEF.lines)); }
+    if (q.has('lines')) { const v = q.get('lines'); const i = LINE_SHADES.findIndex((l) => l[0] === v.replace(/-/g, ' ')); setLines(i >= 0 ? i : (v === '0' || v === 'false' ? 0 : (parseInt(v, 10) || DEF.lines))); }
     if (q.has('times')) setTimes({ nosec: 1, '24h': 1, '24hsec': 2, '12h': 3, '12hsec': 4 }[q.get('times')] ?? (flag('times') ? 2 : 0));
-    if (q.has('shadow')) setShadow(+q.get('shadow') | 0);
+    if (q.has('shadow')) { const v = q.get('shadow'); const i = SHADOW_NAMES.indexOf(v); setShadow(i >= 0 ? i : (+v | 0)); }
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('subg')) setSubGrad(flag('subg'));
     if (q.has('ncol')) setNickCol(flag('ncol'));
@@ -14293,7 +14310,8 @@
     if (q.has('split')) {
       const n = q.get('split');
       const v = parseInt(n, 10);
-      if (n !== '0') setSplit(v >= 1 && v <= SPLIT_NAMES.length ? v : 2);
+      const ai = SPLIT_URL.indexOf(n);
+      if (n !== '0') setSplit(ai >= 0 ? ai + 1 : (v >= 1 && v <= SPLIT_NAMES.length ? v : 2));
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
@@ -14301,8 +14319,8 @@
     if (q.has('video')) {
       const v = q.get('video');
       // modes 5/6 own the video's placement - here the param just toggles it
-      if (splitLevel >= 5 || railEl.hidden) setVideo(flag('video'));
-      else setRailVid({ float: 'float', dock: 'dock', off: 'off' }[v] || (flag('video') ? 'dock' : 'off'));
+      if (splitLevel >= 5 || railEl.hidden) setVideo(v !== 'off' && flag('video'));
+      else setRailVid({ float: 'float', dock: 'dock', on: 'dock' }[v] || (v !== 'off' && flag('video') ? 'dock' : 'off'));
     }
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
     if (q.has('bw')) { bwInput.value = q.get('bw'); setBlocked(bwInput.value); }
@@ -14312,35 +14330,40 @@
     if (q.has('clean')) setCleanUrls(flag('clean'));
     if (q.has('gifsafe')) setGifSafe(flag('gifsafe'));
     if (q.has('notify')) setNotify(flag('notify'), true);
-    if (q.has('peek')) { const v = q.get('peek'); if (v === '') setPeek(2); else if (+v >= 0 && +v < PEEK_MODES.length) setPeek(+v); }
+    if (q.has('peek')) { const v = q.get('peek'); const i = PEEK_URL.indexOf(v); if (v === '') setPeek(2); else if (i >= 0) setPeek(i); else if (+v >= 0 && +v < PEEK_MODES.length) setPeek(+v); }
     if (q.has('yt')) setYtEmb(flag('yt'));
     if (q.has('stitle')) setTitleBar(flag('stitle'));
     if (q.has('cmodes')) setModesOn(flag('cmodes'));
-    if (q.has('sview')) setStatusView(+q.get('sview'));
-    if (q.has('upd') && q.get('upd') !== '') setUpdMin(+q.get('upd'));
+    if (q.has('sview')) { const v = q.get('sview'); const i = SVIEW_NAMES.indexOf(v); setStatusView(i >= 0 ? i : +v); }
+    if (q.has('upd') && q.get('upd') !== '') { const v = q.get('upd'); const i = UPD_NAMES.indexOf(v); setUpdMin(i >= 0 ? UPD_STOPS[i] : +v); }
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
     if (q.has('nbots')) setBotsHide(flag('nbots'));
-    if (q.has('anim') && (q.get('anim') === '' || Number.isFinite(+q.get('anim'))))
-      setNickAnim(q.get('anim') === '' ? 2 : +q.get('anim'));
-    if (q.has('rbws')) setRbwScope(+q.get('rbws'));
-    if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
-    if (q.has('rbp')) setRbwPal(+q.get('rbp'));
-    // emote-picker options: ?epnames=0|1|2&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&epsq=0-3&
-    // epmix=1&ephold=0|1|2&epmove=0-6&eptips=1&eptabs=7tv,bttv&epanim=anim|still&epfz=0|1|2&epgeo=WxH[,L,T]&epopen=0|1
+    if (q.has('anim')) {
+      const v = q.get('anim'), i = ANIM_URL.indexOf(v);
+      if (i >= 0) setNickAnim(i);
+      else if (v === '') setNickAnim(2);
+      else if (Number.isFinite(+v)) setNickAnim(+v);
+    }
+    if (q.has('rbws')) { const v = q.get('rbws'); const i = RBW_SCOPES.indexOf(v); setRbwScope(i >= 0 ? i : +v); }
+    if (q.has('rbw')) { const v = q.get('rbw'); const i = RBW_URL.indexOf(v); setRbwStyle(i >= 0 ? i : +v); }
+    if (q.has('rbp')) { const v = q.get('rbp'); const i = RBW_PALS.findIndex((p) => p.n === v); setRbwPal(i >= 0 ? i : +v); }
+    // emote-picker options: ?epnames=side|only&epzoom=small|quarter|third|half|tweet|big&epsort=az|use|seen&
+    // epage=inline|eras|ends|centre&epsq=off|sparse|whole|all&epmix=1&ephold=off|hold|plus&epmove=slide..queue&
+    // eptips=1&eptabs=7tv,bttv&epanim=anim,still&epfz=off|popup|all&epgeo=WxH[,L,T]&epopen=0|1 - ints still parse
     let epUrlDirty = false;
-    if (q.has('epnames')) { setNames(+q.get('epnames') || (flag('epnames') ? 1 : 0)); epUrlDirty = true; }
-    if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
-    if (q.has('epsort')) { setSort(q.get('epsort')); epUrlDirty = true; }
-    if (q.has('epage')) { setAge(+q.get('epage') || (flag('epage') ? 1 : 0)); epUrlDirty = true; }
-    if (q.has('epsq')) { setSq(q.get('epsq') === '' ? 3 : +q.get('epsq')); epUrlDirty = true; }
+    if (q.has('epnames')) { const v = q.get('epnames'); const i = ['side', 'only'].indexOf(v); setNames(i >= 0 ? i + 1 : +v || (flag('epnames') ? 1 : 0)); epUrlDirty = true; }
+    if (q.has('epzoom')) { setZoom(EPZ_INV[q.get('epzoom')] || q.get('epzoom')); epUrlDirty = true; }
+    if (q.has('epsort')) { setSort(q.get('epsort') === 'seen' ? 'useseen' : q.get('epsort')); epUrlDirty = true; }
+    if (q.has('epage')) { const v = q.get('epage'); const i = EPAGE_URL.indexOf(v); setAge(i >= 0 ? i : +v || (flag('epage') ? 1 : 0)); epUrlDirty = true; }
+    if (q.has('epsq')) { const v = q.get('epsq'); const i = EPSQ_URL.indexOf(v); setSq(i >= 0 ? i : v === '' ? 3 : +v); epUrlDirty = true; }
     if (q.has('epmix')) { setMix(flag('epmix')); epUrlDirty = true; }
     if (q.has('eptips')) setTips(flag('eptips'));
-    if (q.has('ephold')) setHold(q.get('ephold') === '' ? 1 : +q.get('ephold'));
-    if (q.has('epmove')) setMove(+q.get('epmove'));
+    if (q.has('ephold')) { const v = q.get('ephold'); const i = EPHOLD_URL.indexOf(v); setHold(i >= 0 ? i : v === '' ? 1 : +v); }
+    if (q.has('epmove')) { const v = q.get('epmove'); const i = MOVE_URL.indexOf(v); setMove(i >= 0 ? i : +v); }
     if (q.has('eptabs')) { setTabs(q.get('eptabs').split(',')); epUrlDirty = true; }
     if (q.has('epanim')) { setAnimFilter(q.get('epanim').split(',')); epUrlDirty = true; }
-    if (q.has('epfz')) { setEpFz(+q.get('epfz')); epUrlDirty = true; }
+    if (q.has('epfz')) { const v = q.get('epfz'); const i = EP_FZ_NAMES.indexOf(v); setEpFz(i >= 0 ? i : +v); epUrlDirty = true; }
     if (q.has('epgeo')) {
       const [wh, l, t] = q.get('epgeo').split(',');
       const [w, h] = wh.split('x').map(Number);
@@ -14368,9 +14391,16 @@
     // transparent background; not a saved option, it lives in the url alone
     if (flag('overlay')) document.body.classList.add('overlay');
     if (q.has('hpw')) { const i = HELP_WIDTHS.indexOf(+q.get('hpw')); if (i >= 0) { helpWIdx = i; applyHelpW(); } }
-    if (q.has('hpfs')) { const v = +q.get('hpfs'), i = v < 0 ? Math.max(Math.round(v), -4) : HDR_SIZES.indexOf(v); if (v < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
+    if (q.has('hpfs')) {
+      const v = q.get('hpfs');
+      // 'chat' names the chat font itself, 'chat-N' the N-below steps;
+      // negatives index them too, a positive value is the px size itself
+      if (v === 'chat') { helpFs = -4; applyHelpFs(); }
+      else if (/^chat-[1-3]$/.test(v)) { helpFs = -+v.slice(5); applyHelpFs(); }
+      else { const n = +v, i = n < 0 ? Math.max(Math.round(n), -4) : HDR_SIZES.indexOf(n); if (n < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
+    }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
-    if (q.has('hpos') && q.get('hpos') !== '') { const i = +q.get('hpos'); if (Number.isInteger(i) && i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
+    if (q.has('hpos') && q.get('hpos') !== '') { const v = q.get('hpos'); let i = HPOS_URL.indexOf(v); if (i < 0) i = +v; if (Number.isInteger(i) && i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
     if (q.has('lbls')) setLbls(flag('lbls'));
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
@@ -14410,7 +14440,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'on'], helpEonly: EMOTE_MODES, helpSplit: SPLIT_NAMES.map((n) => n.replace(/ \(.*$/, '')),
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpSview: ['full', 'compact', 'minimal'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpSview: SVIEW_NAMES, helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),

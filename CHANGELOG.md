@@ -301,6 +301,15 @@ not versions - the page ships continuously to Neocities.
 - the split bounds are SPLIT_NAMES.length now - o.split, ?split and
   setSplit each hardcoded 11, which would lie about the top level the
   moment a twelfth mode lands
+- shared urls speak names instead of bare ints: ?split=2x2, ?upd=1h,
+  ?peek=img, ?hpos=tr (compass codes tl..br), ?shade=dark,
+  ?zebra=mild, ?lines=faint-dots, ?shadow=pitch, ?sview=minimal,
+  ?anim=vslow, ?rbw=rand, ?rbp=sunset, ?rbws=other, ?video=off|on|
+  dock|float, bare ?min, ?hpfs=chat|-N, and the picker set
+  ?epnames=side|only, ?epzoom=small..big, ?epsort=seen, ?epage=inline|
+  eras|ends|centre, ?epsq=off|sparse|whole|all, ?epmove=slide..queue,
+  ?ephold=off|hold|plus, ?epfz=off|popup|all. every old numeric form
+  still parses - only what the page emits changed
 
 ## 2026-10-12
 
