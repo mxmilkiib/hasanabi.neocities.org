@@ -43,6 +43,9 @@ not versions - the page ships continuously to Neocities.
 - the split menu seats each +vid/help level under its own column
   family - 2col+vid/help under 2col, 3col+vid/help under 3col; level
   numbers stay put, only the menu order moved
+- the stream-status legend's labels are explicit grid cells, so each
+  dot stays opposite its own line - the stray <br> item had slid the
+  grey dot down beside the favicon note
 - the update check's default poll is now 1h (was 15m), and the stops
   gain 6h and 24h beside 5m / 15m / 30m / 1h / 3h / never on both the
   bar chips and the ? popup pick
