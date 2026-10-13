@@ -40,7 +40,8 @@ not versions - the page ships continuously to Neocities.
   ? button goes inert while docked (dimmed, aria-disabled, its own
   title) - hiding the column's own furniture. it wakes on any level
   without +help
-- the split menu pairs the +vid/help levels right under 3col - level
+- the split menu seats each +vid/help level under its own column
+  family - 2col+vid/help under 2col, 3col+vid/help under 3col; level
   numbers stay put, only the menu order moved
 - the update check's default poll is now 1h (was 15m), and the stops
   gain 6h and 24h beside 5m / 15m / 30m / 1h / 3h / never on both the

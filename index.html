@@ -10586,7 +10586,7 @@
   // picker's; the wheel keeps cycling, and shift-click still steps back.
   // the menu lists the 2-col family before the 3-col, decoupled from
   // the wheel's level order - each entry carries its level in data-i
-  const SPLIT_MENU_ORDER = [1, 2, 7, 8, 9, 3, 10, 11, 4, 5, 6];
+  const SPLIT_MENU_ORDER = [1, 2, 11, 7, 8, 9, 3, 10, 4, 5, 6];
   splitMenu.innerHTML = SPLIT_MENU_ORDER.map((l) =>
     `<button type="button" role="option" data-i="${l}"><span class="sg">${splitGlyph(l)}</span>${SPLIT_NAMES[l - 1]}</button>`).join('');
   const markSplitMenu = () => {
