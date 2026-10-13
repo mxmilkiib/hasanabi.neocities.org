@@ -85,6 +85,11 @@ not versions - the page ships continuously to Neocities.
   bare 'thanks for the N bits' just rainbows the number
 
 ### Resources
+- striking becomes its own row after worker centres: the strike intel
+  column moves over (payday report, ilr labor action tracker) beside a
+  wikipedia cluster (strike action, general, wildcat, sitdown, the
+  list) and new trackers - strikemap (uk/ireland picket map), bls work
+  stoppages (us stats) - plus uk guidance from gov.uk and acas
 - free culture moves below open source with a spacer under it; within
   it copyleft now leads public domain and the gnu fdl sits between
   them
