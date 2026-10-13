@@ -226,8 +226,8 @@ no dependencies beyond CDN-hosted fonts.
 - Reshuffles animate emotes sliding to their new spots; a just-used
   emote flashes behind its cell, each use stepping the flash ~24° round
   the hue wheel so consecutive uses read as a spectral walk.
-- `Aa` cycles each emote's code - off, beside the art, then below it in
-  tighter cells (the button lights accent on the last) - `½x`/`¾x`/`1x`/
+- `Aa` cycles each emote's code - off, below the art, then beside it
+  (the button lights accent on the last) - `½x`/`¾x`/`1x`/
   `1⅓x`/`1½x`/`1⅔x`/`2x` buttons size the grid, `hold`/`hold+` freezes
   usage reshuffles while the pointer is over the grid - `hold+`, the
   default, also pauses animated cells - a pause chip swaps cells for
@@ -543,7 +543,7 @@ force off.
 | `cmodes` | `0` | active chat-mode display off (chips and status-line mode text) |
 | `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
 | `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
-| `epnames` | `0`–`2` | picker emote names: off / beside the art / below it |
+| `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |
 | `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
 | `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
 | `epage` | `0`–`3` | picker age-square rows: inline / era rows / row ends at last square / centred |

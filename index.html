@@ -2303,7 +2303,7 @@
   #emotePick.big #emoteGrid button.eji { font-size: 40px; }
   #emotePick.big #emoteGrid .ename { font-size: 16px; }
   #emotePick.big #emoteGrid .eage { height: 78px; font-size: 1.4em; }
-  /* names below: the Aa cycle's third state - icon up top, name under
+  /* names below: the Aa cycle's second state - icon up top, name under
      it in tighter cells; .names.namesb outranks each zoom's pairing */
   #emotePick.names.namesb #emoteGrid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
   #emotePick.names.namesb #emoteGrid button { flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; height: auto; padding: 3px 2px; }
@@ -8110,7 +8110,7 @@
       help: helpMode,
       video: !vidBox.hidden,
       kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0,
-      epnames: emotePick.classList.contains('namesb') ? 2 : emotePick.classList.contains('names') ? 1 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
+      epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn],
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
@@ -9417,7 +9417,7 @@
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', rbwStyle);
     if (rbwPal !== 0) q.set('rbp', rbwPal);
     // emote-picker options only enter the url off their defaults
-    if (emotePick.classList.contains('names')) q.set('epnames', emotePick.classList.contains('namesb') ? '2' : '1');
+    if (emotePick.classList.contains('names')) q.set('epnames', emotePick.classList.contains('namesb') ? '1' : '2');
     if (epickZoom) q.set('epzoom', epickZoom);
     if (epickSort !== 'use' || epickSeen) q.set('epsort', epickSeen ? 'useseen' : epickSort);
     if (epickAge) q.set('epage', String(epickAge));
@@ -11664,19 +11664,19 @@
         relayFrame.contentWindow.postMessage({ type: 'twsets', ids: twSetsPending }, RELAY_ORIGIN);
     }, 3000);
   }
-  // names view cycles: off → the name beside the art → the name below it
+  // names view cycles: off → the name below the art → the name beside it
   const EPICK_NAMES_KEY = 'hasan-epicknames';
   const emoteNamesBtn = document.getElementById('emoteNames');
   const setNames = (m) => {
     m = Math.min(2, Math.max(0, +m || 0));
     emotePick.classList.toggle('names', m > 0);
-    emotePick.classList.toggle('namesb', m === 2);
+    emotePick.classList.toggle('namesb', m === 1);
     emoteNamesBtn.setAttribute('aria-pressed', String(m > 0));
     try { localStorage.setItem(EPICK_NAMES_KEY, String(m)); } catch {}
   };
   setNames(localStorage.getItem(EPICK_NAMES_KEY) || 0);
   emoteNamesBtn.addEventListener('click', () => {
-    const cur = emotePick.classList.contains('namesb') ? 2 : emotePick.classList.contains('names') ? 1 : 0;
+    const cur = emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0;
     setNames((cur + 1) % 3);
     saveOpts();
     emoteQ.focus();
@@ -12146,7 +12146,7 @@
     const d = e.deltaY > 0 ? 1 : -1;
     switch (b.id) {
       case 'emoteNames': {
-        const cur = emotePick.classList.contains('namesb') ? 2 : emotePick.classList.contains('names') ? 1 : 0;
+        const cur = emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0;
         setNames((cur + d + 3) % 3);
         break;
       }
