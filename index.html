@@ -284,6 +284,8 @@
   /* Gold ? against the dim chrome; the id rule holds it through :hover
      and .on, whose accent border still marks the open state */
   #helpBtn { right: 8px; font-weight: 700; border-width: 2px; color: #e8b73e; }
+  /* docked into a rail column the panel can't hide - the button shows it */
+  #helpBtn.docked { opacity: .55; cursor: not-allowed; }
   #hdrMin { right: 44px; }
   body.hdrmin header {
     height: 10px;
@@ -9370,10 +9372,17 @@
     document.body.classList.toggle('hdrlbl', lblsOn);
     // anchor below whatever height the header wraps to once labels are in
     if (showPanel) clampHelpPanel();
-    helpBtn.classList.toggle('on', helpMode !== 0);
-    helpBtn.setAttribute('aria-expanded', String(helpMode !== 0));
-    helpBtn.title = `Help: ${HELP_MODES[helpMode]} - click/scroll · ⇧click back`;
+    paintHelpBtn();
     markHelp('helpHelp', helpMode);
+  }
+
+  function paintHelpBtn() {
+    const docked = helpPanel.parentNode === railEl;
+    helpBtn.classList.toggle('on', helpMode !== 0);
+    helpBtn.classList.toggle('docked', docked);
+    helpBtn.setAttribute('aria-expanded', String(helpMode !== 0));
+    helpBtn.toggleAttribute('aria-disabled', docked);
+    helpBtn.title = docked ? 'Help: docked in a rail column - a split level without +help frees the ? cycle' : `Help: ${HELP_MODES[helpMode]} - click/scroll · ⇧click back`;
   }
 
   // header-button labels are standalone now - the popup's 'header
@@ -9386,6 +9395,9 @@
   }
 
   function stepHelp(dir) {
+    // a rail-docked panel is the split level's own furniture - the ? cycle
+    // holds until a level without +help hands it back
+    if (helpPanel.parentNode === railEl) return;
     helpForced = false;
     helpMode = (helpMode + dir + HELP_MODES.length) % HELP_MODES.length;
     applyHelp();
@@ -10271,6 +10283,7 @@
     applyHelp();
     helpHome.parent.insertBefore(helpPanel, helpHome.next);
     helpHome = null;
+    paintHelpBtn();
   }
   // level 10 keeps stats as the popup's own tab and the picker floating,
   // so anything an earlier rail level docked goes back out

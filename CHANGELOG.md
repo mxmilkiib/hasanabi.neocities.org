@@ -18,6 +18,10 @@ not versions - the page ships continuously to Neocities.
   border still marks the panel open
 - the help popup's [?] font size row breaks onto its own line under
   the popup width row instead of crowding the same line
+- split levels 10/11 dock the help panel into a rail column, so the
+  ? button goes inert while docked (dimmed, aria-disabled, its own
+  title) - hiding the column's own furniture. it wakes on any level
+  without +help
 - the wheel cycles the stream info view anywhere on the channel block,
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel
