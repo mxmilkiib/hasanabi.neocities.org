@@ -36,6 +36,8 @@ not versions - the page ships continuously to Neocities.
   ? button goes inert while docked (dimmed, aria-disabled, its own
   title) - hiding the column's own furniture. it wakes on any level
   without +help
+- the split menu pairs the +vid/help levels right under 3col - level
+  numbers stay put, only the menu order moved
 - the wheel cycles the stream info view anywhere on the channel block,
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel
