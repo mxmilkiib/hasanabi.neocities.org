@@ -12,6 +12,11 @@ not versions - the page ships continuously to Neocities.
   the stats list. the ? popup carries the same pick (emote pause), the
   picker's wheel cycles it, and an old animf save migrates to 'all'
 ### Header
+- live? only counts a parseable uptime as live - a decapi error reply
+  no longer lights a channel green; second-level uptimes parse too,
+  and the probe tooltip carries 'up Xm' so a lagged answer shows its
+  own staleness. decapi can still trail a just-ended stream for a
+  minute or two - the button's title says so
 - the update bar's copy reads 'page updated, reload? -- ...' with the
   option pointer to the ? popup, and the update-notice option is now a
   poll-frequency pick - 5m / 15m / 30m / 1h / 3h / never. 'never' stops
