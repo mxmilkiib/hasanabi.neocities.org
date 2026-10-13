@@ -27,6 +27,8 @@ not versions - the page ships continuously to Neocities.
   twiiit, xcancel, bird.makeup, the embed fixers and the instance lists
 
 ### Rows & chat
+- nightshade's chat line-height moves 1.4 → 1.5; the change lands on a
+  fresh profile or a re-pick of the preset - a saved lhv keeps its pick
 - the pending-reply bar above the message box quotes its target at the
   chat's full text size (it ran at .8em), and a long quote ellipsises
   at the bar's edge
