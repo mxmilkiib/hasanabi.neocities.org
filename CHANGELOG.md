@@ -143,6 +143,10 @@ not versions - the page ships continuously to Neocities.
 - channels/streams gains i've had it: youtube leads, with site, patreon,
   substack, tiktok and instagram links, jennifer welch's instagram and
   a wikipedia *
+- channels/streams reorders category-first under visible bold leads:
+  home, news & talk, podcasts, essays, streamers, comedy - the podcasts
+  scattered at the tail rejoin chapo and left reckoning, and foreign
+  fridays, coffeezilla and more perfect union move up with the shows
 
 ### Performance
 - the Google Fonts stylesheet loads without blocking the first render,
