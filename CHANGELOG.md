@@ -6,6 +6,9 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-13
 
 ### Rows
+- the emote picker's hover tip is off by default now: the standalone
+  key reads on only when it holds 1, and ?eptips=1 is the url form that
+  turns it on (the url writes the param only off its default)
 - the nick-click card breathes: wider, more padding, nowrap 26px
   buttons (hide user no longer wraps and clips), and the recent lines
   show a dim timestamp beside the message text instead of the row's
