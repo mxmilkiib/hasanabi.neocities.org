@@ -882,9 +882,10 @@
      flush after the time/channel tag - a hair of air keeps it off it */
   .row > .role.sub { margin-left: -1px; }
   /* the left modes hold the badge icons' left edge still: the sub chip
-     takes a fixed two-digit tabular width, and the aux cluster (mod /
-     bits / first chips) sits after the icons rather than ahead of them,
-     so it reserves no column for the rows without one */
+     takes a fixed two-digit tabular width, the mod flag is a chip of its
+     own that only mod rows carry ahead of the icons, and the rest of the
+     aux cluster (bits / first) sits after the icons rather than ahead of
+     them - nothing reserves a column for the rows without one */
   .row > .role.sub:not(.auxr):not([hidden]) { display: inline-block; min-width: 2ch; font-variant-numeric: tabular-nums; }
   /* counted chips carry the Yyr, Xm tooltip now, so the no-count dim
      keys off the placeholder's exact title rather than [title] alone */
@@ -4433,10 +4434,14 @@
         const gcs = perMap(glorpCountsPer, ch);
         gcs.set(sec, (gcs.get(sec) || 0) + 1);
       }
-      // auxiliary chips: mod flag, sub months (subject to Ⓢ mode), bits, first
+      // auxiliary chips: sub months (subject to Ⓢ mode), bits, first. The
+      // mod flag instead leads the badge icons in the left modes - a chip
+      // only mod rows carry, so it holds no column open for the rest -
+      // and heads the right-side aux cluster otherwise
       const aux = [];
-      if (md)
-        aux.push(`<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? 'md' : '[ mod. ]'}</span>`);
+      const modHtml = md ?
+        `<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? 'md' : '[ mod. ]'}</span>` : '';
+      if (modHtml && !SUB_MODES[subMode].endsWith('left')) aux.push(modHtml);
       const subM = (tags['badge-info'] || '').match(/subscriber\/(\d+)/);
       const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
       // a counted chip carries the months in data-mo, restates them as
@@ -4449,10 +4454,10 @@
         `<span class="role sub"${subM ? ` data-mo="${+subM[1]}" title="${subAgeTxt(+subM[1])}"` : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${subSt ? ` style="${subSt}"` : ''}>${!subM ? (SUB_MODES[subMode].startsWith('num') ? '--' : '[sub --]') : SUB_MODES[subMode].startsWith('num') ? months : `[sub ${months}]`}</span>`;
       if (tags.bits) aux.push(`<span class="role bits rbw">[bits ${escapeHTML(tags.bits)}]</span>`);
       if (tags['first-msg'] === '1') aux.push('<span class="role first rbw">[first]</span>');
-      // left modes lead with the chip ahead of the aux cluster and the
-      // badge icons - 03 md; right modes keep it inside the aux
-      // cluster at the row's right edge, outermost - [first]/[bits] sit to
-      // its left
+      // left modes lead with the chip ahead of the badge icons - 03 md -
+      // with the aux cluster trailing the icons; right modes keep it
+      // inside the aux cluster at the row's right edge, outermost -
+      // [first]/[bits] sit to its left
       if (subHtml && SUB_MODES[subMode] !== 'hidden' && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
       const auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode].endsWith('left') ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
       const pid = tags['reply-parent-msg-id'];
@@ -4613,7 +4618,7 @@
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
       html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${tags.bits ? ' bits' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
-              `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
+              `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${msgHtml}</span>${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
@@ -8867,24 +8872,29 @@
     subBtn.style.padding = left ? '0 1px 0 2px' : mode.startsWith('num') ? '0 2px 0 1px' : mode === 'right' ? '0 2px 0 1px' : '0 1px';
     subBtn.title = `Sub badge: ${mode} - click/scroll · ⇧click back`;
     markHelp('helpSub', subMode);
-    // adopt stray .mod chips from rows rendered before the chip joined the
-    // aux cluster (e.g. restored history)
-    document.querySelectorAll('.row > .role.mod').forEach((mod) => {
-      const row = mod.parentElement;
-      let aux = row.querySelector('.aux');
-      if (!aux) {
-        aux = document.createElement('span');
-        aux.className = 'aux';
-        row.insertBefore(aux, row.querySelector('.reply:not(.rq)') || row.querySelector('.name'));
-      }
-      aux.prepend(mod);
-    });
-    // move existing rows' aux clusters and sub chips to match the new
-    // mode: left modes detach the chip to lead the row ahead of the
-    // badge icons, right modes tuck it back inside the cluster
+    // move existing rows' aux clusters and chips to match the new mode:
+    // left modes detach the sub chip to lead the row ahead of the badge
+    // icons, with the mod flag as its own chip between the count and the
+    // icons; right modes tuck both back inside the cluster
     document.querySelectorAll('.row').forEach((row) => {
-      const aux = row.querySelector('.aux');
+      let aux = row.querySelector('.aux');
       let sub = row.querySelector('.sub');
+      // the flag rides ahead of the icons on the left and inside the aux
+      // cluster on the right - catch it in either spot, incl. direct row
+      // children left over from before it joined the cluster
+      const modChip = row.querySelector('.role.mod');
+      if (modChip) {
+        // the compact sub modes shrink the chip to match: [ mod. ] → md
+        modChip.textContent = mode.startsWith('num') ? 'md' : '[ mod. ]';
+        if (!left && modChip.parentElement !== aux) {
+          if (!aux) {
+            aux = document.createElement('span');
+            aux.className = 'aux';
+            row.insertBefore(aux, row.querySelector('.reply:not(.rq)') || row.querySelector('.name'));
+          }
+          aux.prepend(modChip);
+        }
+      }
       // bot rows render no chip; don't conjure one on a mode switch
       if (!sub && row.querySelector('.name') && !row.querySelector('.name.shimmer')) {
         sub = document.createElement('span');
@@ -8892,8 +8902,9 @@
         sub.title = 'No subscriber months reported';
         sub.textContent = '--';
       }
-      // the left-mode anchor: the sub chip leads, then aux, both ahead of
-      // the badge icons - matching the order new rows render with
+      // the left-mode anchor: the sub chip leads, then the mod flag, with
+      // the aux cluster trailing the badge icons - matching the order new
+      // rows render with
       const lead = row.querySelector('img.badge') || row.querySelector('.reply:not(.rq)') ||
                    row.querySelector('.name') || row.children[1];
       // the right-mode anchor: straight after the colon, where fresh rows
@@ -8927,15 +8938,15 @@
         }
       }
       if (aux) {
-        // the compact sub modes shrink the mod chip to match: [ mod. ] → md
-        const modChip = aux.querySelector('.mod');
-        if (modChip) modChip.textContent = mode.startsWith('num') ? 'md' : '[ mod. ]';
         aux.classList.toggle('auxr', !left);
         aux.hidden = mode === 'hidden' && aux.children.length === 1 && aux.firstElementChild === sub;
         if (!left) row.insertBefore(aux, rightAt());
       }
       if (left) {
         if (sub) row.insertBefore(sub, lead);
+        // the flag is a chip of its own between the count and the icons -
+        // carried by mod rows only, so it opens no column on the rest
+        if (modChip) row.insertBefore(modChip, lead);
         // the aux cluster follows the badge icons so it never holds a
         // column open ahead of them on rows that have no aux
         if (aux?.children.length) {

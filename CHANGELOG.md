@@ -18,12 +18,16 @@ not versions - the page ships continuously to Neocities.
   still win; the set persists under hasan-hlusers and re-syncs on
   restored history
 - the left sub modes hold the badge icons' left edge still, like the sub
-  chip's: the chip takes a two-digit tabular width, and the aux cluster
-  (mod / bits / first) now follows the badge icons instead of leading
-  them, so no row reserves a column for it. a first try gave the
-  cluster a fixed slot ahead of the icons, which wasted that width on
-  every non-mod row. the bracketed sub mode pads its count to two
-  digits on a mode switch, as fresh rows already did
+  chip's: the chip takes a two-digit tabular width, and the bits / first
+  chips follow the badge icons instead of leading them, so no row
+  reserves a column for them. a first try gave the cluster a fixed slot
+  ahead of the icons, which wasted that width on every non-mod row. the
+  bracketed sub mode pads its count to two digits on a mode switch, as
+  fresh rows already did
+- the mod flag is a chip of its own again, between the count and the
+  badge icons - 07 md [icons] - but only on mod rows, so it opens no
+  column for the rest; bits and first keep trailing the icons. on the
+  right the flag still heads the aux cluster
 
 ### Split columns
 - the mode names spell out their parts: e is emotes, v is vid, h is
