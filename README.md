@@ -483,7 +483,8 @@ editing a URL.
 | `eptips` | `1` | picker hover tip card on (off by default) |
 | `epmove` | `0`–`6` | how emotes move when the picker changes their order |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
-| `epanim` | `anim`,`animf`,`still` | picker animation filter (`animf` = animated shown as stills) |
+| `epanim` | `anim`,`still` | picker animation filter (which kinds show) |
+| `epfz` | `0`–`2` | emote pause scope: off / picker cells / everywhere |
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
 | `epopen` | flag | picker open state - the popup opens or stays closed |
 | `overlay` | flag | [OBS](https://obsproject.com/) browser-source mode: transparent page, live rows only |

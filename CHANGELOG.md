@@ -5,6 +5,12 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-13
 
+### Emote picker
+- the ⏸ chip now owns a pause scope rather than a bare freeze - click
+  cycles off → popup → all (shift-click jumps to all); 'popup' stills
+  only the picker's cells, 'all' adds chat rows, the autocomplete and
+  the stats list. the ? popup carries the same pick (emote pause), the
+  picker's wheel cycles it, and an old animf save migrates to 'all'
 ### Header
 - the update bar's copy reads 'page updated, reload? -- ...' with the
   option pointer to the ? popup, and the update-notice option is now a

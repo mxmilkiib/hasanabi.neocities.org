@@ -2485,6 +2485,7 @@
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription; months gradient: <span id="helpSubgList"></span> shades counted chips teal → accent as the count climbs to 120 months, and a counted chip's tooltip restates the span - say 2yr, 10m<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
+    <div><b>⏸</b> <span>emote pause: <span id="helpEpfzList"></span> - where animated emotes still: 'popup' freezes the picker's cells only, 'all' adds chat rows, the autocomplete and the stats list; the picker's ⏸ chip cycles the same stops<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span>split columns: <span id="helpSplitList"></span> - one fills top-to-bottom, then flips to the next; the button's click lists every mode while the wheel cycles; on a landscape screen a third column joins the cycle, then a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page - the line between its emotes and stats drags to resize them, and its left edge drags the chat columns narrower or wider - then two slimmer rails on the same columns: video + emotes, and emotes alone - the video stays off but the ▶ button floats it over the chat; the last trio run one chat column instead: video + emotes, a vertical split with emotes under the chat and stats under the video, or emotes alone - the video floats the same way - and last, the video over the help popup docked in the rail, beside two chat columns or one<sup>†</sup></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
@@ -2493,7 +2494,7 @@
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - a dead stretch between cells collapses to the deepest square that bounds it, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows · '□' cycles how many squares print - none, a few landmarks, whole minutes and hours, or every rung</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · 'tip' toggles the hover card · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' freezes animated cells to stills · '↔' cycles how a re-sort moves - cells nudge a few slots over or wrap off the edge and back on, ripple, or queue one at a time; the grid pops, blurs, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
+    <div><b>☻</b> <span class="linkcols ecfg"><i><b>box</b> drag/resize anywhere · 📌 pins it open past the chat bar · esc peels it first</i><i><b>recent</b> a fixed band above the lists counts picks plus emotes typed and sent</i><i><b>sort</b> 'use' by channel usage · 'a-z' alphabetical · a second 'use' click shows only seen emotes · middle-click forgets the recorded order</i><i><b>age squares</b> dashed squares mark eras since each emote's last use - a dead stretch between cells collapses to the deepest square that bounds it, squares an emote crossed this session turn gold, violet squares tail the list as eras no emote has reached yet · '▤0' flows squares inline between cells · '▤1' gives each populated era its own row · '▥2' ends a row at its last square · '▦3' centres those rows · '□' cycles how many squares print - none, a few landmarks, whole minutes and hours, or every rung</i><i><b>sources</b> 7tv/bttv/ffz/twitch/emoji tabs toggle providers · 'mix' merges them into one grid, ordered by the active sort</i><i><b>view</b> 'Aa' shows names · 'tip' toggles the hover card · ½x/¾x/1x/1⅓x/1½x/1⅔x/2x size the cells · 'anim'/'still' filter · '⏸' cycles the pause scope - off, popup cells, or everything incl. chat rows · '↔' cycles how a re-sort moves - cells nudge a few slots over or wrap off the edge and back on, ripple, or queue one at a time; the grid pops, blurs, fades, or off · the wheel steps any chip through its states</i><i><b>hold</b> keeps usage reshuffles from shuffling cells while the pointer is over the picker; 'hold+' pauses animated cells too, over the cell grid</i><i><b>cells</b> a used cell keeps its colour wash until every chat row carrying it has scrolled away · hovering a cell - or an emote in chat - pops a big preview with its source set; the wheel flips it under or over the emote</i></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too. <b class="rbw">@hasanabi</b> rainbow motion: <span id="helpRbwList"></span> · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
@@ -3351,7 +3352,7 @@
         if (url) {
           const img = document.createElement('img');
           img.className = 'emote';
-          img.src = stillUrl(url, setFor(rowCh.ch || CHANNEL).emoteAnim?.has(name));
+          img.src = chatStill(url, setFor(rowCh.ch || CHANNEL).emoteAnim?.has(name));
           img.alt = name;
         img.title = name + (es[name] ? ' - ' + es[name] : '');
           frag.appendChild(img);
@@ -3414,7 +3415,7 @@
       const url = name && em[name];
       if (url) {
         const alt = escapeHTML(name);
-        const img = `<img class="emote" src="${escapeHTML(stillUrl(url, ea.has(name)))}" alt="${alt}"` +
+        const img = `<img class="emote" src="${escapeHTML(chatStill(url, ea.has(name)))}" alt="${alt}"` +
                     ` title="${alt}${es[name] ? ' - ' + es[name] : ''}">`;
         if (zw.has(name) && lastEmote >= 0) {
           if (out[lastEmote].endsWith('</span>'))
@@ -3600,7 +3601,7 @@
       // and leave the fallback for emotes no set knows
       const tstat = twSets.some((s) => s.emoteList.some((x) =>
         (x.id == e.id || x.code === name) && x.assetType !== 'ANIMATED'));
-      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${animFrozen() ? 'static' : tstat ? 'default' : 'animated'}/${tone}/2.0"` +
+      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${chatFrozen() ? 'static' : tstat ? 'default' : 'animated'}/${tone}/2.0"` +
               ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${eid}/default/${tone}/2.0'"` +
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
@@ -5734,7 +5735,7 @@
     retro:    { colour: 'green',  variant: 'phosphor', shade: 7, font: 'terminus', px: 28, lhv: 1, lines: 1, zebra: false, times: 1, shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0, lbls: 0 },
     solar:    { colour: 'solarized',shade: 7,  font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
     twitch:   { colour: 'violet', shade: 7,    font: 'inter',      px: 14, lhv: 1.5, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  lhv: 1.5, wv: 400, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, split: 4, anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: '', epanim: ['animf'], help: 0, lbls: 0 },
+    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  lhv: 1.5, wv: 400, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, split: 4, anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: '', epfz: 1, help: 0, lbls: 0 },
     cinema:   { colour: 'gray',   variant: 'contrast', shade: 9, font: 'lexend', px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0, lbls: 0 },
     phosphor: { colour: 'ember',  variant: 'phosphor', shade: 9, font: 'vt323', px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
   };
@@ -5896,6 +5897,7 @@
     else if (a.classList.contains('helpTitle')) { setTitleBar(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpModes')) { setModesOn(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpUpd')) { setUpdMin(UPD_STOPS[+a.dataset.idx]); saveOpts(); }
+    else if (a.classList.contains('helpEpfz')) { setEpFz(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpFav')) { setLkIco(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPn')) { setPronouns(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
@@ -6334,7 +6336,7 @@
         // a unicode emoji rides the fixed slot like an emote image, so it
         // sits on the same optical line and the names' left edges still
         // align - the char itself is the code, so the name stays
-        const ic = url ? `<img class="emote" src="${escapeHTML(stillUrl(url, emoteAnim.has(en) || !!(set && set.assetType === 'ANIMATED')))}" alt="${escapeHTML(n)}">`
+        const ic = url ? `<img class="emote" src="${escapeHTML(chatStill(url, emoteAnim.has(en) || !!(set && set.assetType === 'ANIMATED')))}" alt="${escapeHTML(n)}">`
           : EMOJI_SET.has(en) ? `<span class="eme">${escapeHTML(en)}</span>` : '';
         return row(i + 1, escapeHTML(n), c.toLocaleString('en'),
           `<span class="ems">${ic}</span>`);
@@ -8267,7 +8269,7 @@
       kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, upd: updMin,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0,
-      eptabs: [...epickOn], epanim: [...epickAnimOn],
+      eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos,
@@ -8308,6 +8310,7 @@
       if ((v = g(EPICK_TIPS_KEY)) !== null) o.eptips = v === '1' ? 1 : 0;
       if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
       if ((v = g(EPICK_ANIM_KEY)) !== null) o.epanim = JSON.parse(v);
+      if ((v = g(EPICK_FZ_KEY)) !== null) o.epfz = Math.min(2, Math.max(0, +v || 0));
       if ((v = g(EPICK_SIZE_KEY)) !== null) o.epgeo = JSON.parse(v);
     } catch {}
     try {
@@ -8455,6 +8458,7 @@
     if (o.epmove !== undefined) setMove(o.epmove);
     if (Array.isArray(o.eptabs)) { setTabs(o.eptabs); epDirty = true; }
     if (Array.isArray(o.epanim)) { setAnimFilter(o.epanim); epDirty = true; }
+    if (o.epfz !== undefined) setEpFz(+o.epfz);
     if (epDirty) buildPicker();
     if (o.notify !== undefined) setNotify(!!o.notify, false);
     const hw = Number.isInteger(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
@@ -8500,7 +8504,7 @@
       subMode, eonly: emoteMode,
       split: splitLevel, hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
-      clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold, anim: nickAnim, epzoom: epickZoom,
+      clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold, anim: nickAnim, epzoom: epickZoom, epfz: epFz,
       hdrgraph: document.body.classList.contains('hdrgraph'),
     };
   }
@@ -9607,6 +9611,7 @@
     if (epickTips) q.set('eptips', '1');
     if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
     if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
+    if (epFz) q.set('epfz', String(epFz));
     try {
       const es = JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null');
       const dg = THEME_PRESETS['old-default'].epgeo;
@@ -9644,7 +9649,7 @@
     let qs = q;
     if (pin) {
       const p = THEME_PRESETS[pin], cmp = presetCmp();
-      const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls', anim: 'anim', epzoom: 'epzoom' };
+      const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls', anim: 'anim', epzoom: 'epzoom', epfz: 'epfz' };
       qs = new URLSearchParams();
       for (const [k, v] of q) {
         const f = PINNED[k];
@@ -10927,7 +10932,7 @@
     chatComp.innerHTML = compList.map((r, i) =>
       `<a class="cpick${i === compIdx ? ' on' : ''}" role="option" data-i="${i}" href="#" ` +
       `style="--cc:${escapeHTML(r.c || colorForName(r.n))}">` +
-      (r.img ? `<img src="${escapeHTML(stillUrl(r.img, emoteAnim.has(r.n) || twAnim(r.n)))}" alt="" loading="lazy">` : '') +
+      (r.img ? `<img src="${escapeHTML(chatStill(r.img, emoteAnim.has(r.n) || twAnim(r.n)))}" alt="" loading="lazy">` : '') +
       `${escapeHTML(r.n)}</a>`).join('');
     chatComp.hidden = !compList.length;
     if (compList.length) chatComp.style.left = (chatWrap.offsetLeft + chatInput.offsetLeft) + 'px';
@@ -12267,7 +12272,7 @@
     paintHold();
     gridHeld = false;
     holdBtn.classList.remove('held');
-    if (animFrozen() !== st) { paintAnim(); rebuildPicker(); restillEmotes(); }
+    if (animFrozen() !== st) { paintAnim(); rebuildPicker(); }
     else if (heldRebuild) { heldRebuild = false; rebuildPicker(); }
     else paintAnim();
   };
@@ -12290,8 +12295,8 @@
     gridHeld = on;
     holdBtn.classList.toggle('held', on);
     // hold+'s borrowed freeze flips the cells' stills - engaging or
-    // letting go wants a rebuild of its own, chat rows included
-    if (animFrozen() !== st) { paintAnim(); rebuildPicker(); restillEmotes(); }
+    // letting go wants a rebuild of its own; it never reaches chat rows
+    if (animFrozen() !== st) { paintAnim(); rebuildPicker(); }
     else if (!on && heldRebuild) { heldRebuild = false; rebuildPicker(); }
   };
   // the hold only covers the emote space: from the grid's top down to the
@@ -12315,18 +12320,29 @@
   emotePick.addEventListener('pointermove', holdAt);
   emotePick.addEventListener('pointerleave', () => setGridHeld(false));
   // animation filter: anim/still chips work like the source tabs -
-  // none lit means both, so a solo chip can't be turned into nothing
+  // none lit means both, so a solo chip can't be turned into nothing.
+  // the pause chip owns the scope stops instead: 0 off · 1 the picker's
+  // cells · 2 every emote surface - chat rows, autocomplete, stats
   const EPICK_ANIM_KEY = 'hasan-epickanim';
+  const EPICK_FZ_KEY = 'hasan-epickfz';
+  const EP_FZ_NAMES = ['off', 'popup', 'all'];
+  let epFz = 0;
+  try { const v = +localStorage.getItem(EPICK_FZ_KEY); if (v >= 0 && v <= 2) epFz = v; } catch {}
   let epickAnimOn = new Set();
-  try { epickAnimOn = new Set(JSON.parse(localStorage.getItem(EPICK_ANIM_KEY)) || []); } catch {}
-  // the anim chip is a plain leg toggle like 'still'; the pause chip
-  // owns the frozen state - 'animf' marks that leg in the saved/url list.
-  // hold+ borrows that freeze while the grid is held: playing cells
+  try {
+    const legs = JSON.parse(localStorage.getItem(EPICK_ANIM_KEY)) || [];
+    // 'animf' folded the freeze into the filter legs once - hoist a
+    // saved leg into the scope (its old reach was the universal stop)
+    if (legs.includes('animf') && !legs.includes('anim') && !localStorage.getItem(EPICK_FZ_KEY)) epFz = 2;
+    epickAnimOn = new Set(legs.filter((k) => k === 'anim' || k === 'still'));
+  } catch {}
+  // hold+ borrows the popup freeze while the grid is held: playing cells
   // still without the saved filter changing, and letting go releases it.
-  // it only lends to a set with animated cells actually playing
-  const holdFrozen = () => epickHold === 2 && gridHeld && (!epickAnimOn.size || epickAnimOn.has('anim'));
-  const animOk = (a) => !epickAnimOn.size || epickAnimOn.has(a ? 'anim' : 'still') || (a && epickAnimOn.has('animf'));
-  const animFrozen = () => (epickAnimOn.has('animf') && !epickAnimOn.has('anim')) || holdFrozen();
+  // it only lends to a scope-off set with animated cells actually playing
+  const holdFrozen = () => epickHold === 2 && gridHeld && !epFz && (!epickAnimOn.size || epickAnimOn.has('anim'));
+  const animOk = (a) => !epickAnimOn.size || epickAnimOn.has(a ? 'anim' : 'still');
+  const animFrozen = () => epFz >= 1 || holdFrozen();
+  const chatFrozen = () => epFz >= 2;
   const animState = () => animFrozen() ? 'frozen' : !epickAnimOn.size || epickAnimOn.has('anim') ? 'play' : 'off';
   const animBtns = { anim: document.getElementById('emoteAnim'), pause: document.getElementById('emoteAnimPause'), still: document.getElementById('emoteStill') };
   function paintAnim() {
@@ -12335,19 +12351,24 @@
     setOn(animBtns.pause, animFrozen());
     // a freeze borrowed by hold+ reads as lit-by-another: dotted, not solid
     animBtns.pause.classList.toggle('tmp', holdFrozen());
-    animBtns.pause.title = `pause animated emotes: ${animFrozen() ? 'stilled' : 'playing'} - click swaps play/stills, shift-click solos`;
+    animBtns.pause.innerHTML = epFz === 2 ? '⏸&#xFE0E;+' : '⏸&#xFE0E;';
+    animBtns.pause.title = `pause animated emotes: ${animFrozen() ? epFz === 2 ? 'stilled everywhere' : holdFrozen() && !epFz ? 'stilled while held (hold+)' : 'stilled in the popup' : 'playing'} - click cycles off → popup → all, ⇧click jumps to all`;
     setOn(animBtns.still, animOk(false));
   }
   paintAnim();
   // the freeze test picker cells and chat rows share: a provider-flagged
-  // emote, or an url that outs itself - /animated/ or a bare .gif
-  const stillUrl = (u, a) => animFrozen() && (a || /\/animated\/|\.gif(?:$|\?)/i.test(u || '')) ? freezeUrl(u) : u;
-  // chat rows follow the chip as well - twitch frames swap dirs,
+  // emote, or an url that outs itself - /animated/ or a bare .gif.
+  // stillUrl answers at the popup stop; chatStill covers chat rows, the
+  // autocomplete and the stats list, gated by the universal stop
+  const animUrl = (u, a) => a || /\/animated\/|\.gif(?:$|\?)/i.test(u || '');
+  const stillUrl = (u, a) => animFrozen() && animUrl(u, a) ? freezeUrl(u) : u;
+  const chatStill = (u, a) => chatFrozen() && animUrl(u, a) ? freezeUrl(u) : u;
+  // chat rows follow the 'all' stop - twitch frames swap dirs,
   // third-party rewrites through the same frozen urls as picker cells.
   // rows restored from history arrive pre-rendered, so the set runs
   // once at open too, not only on toggles
   const restillEmotes = () => {
-    const fz = animFrozen();
+    const fz = chatFrozen();
     for (const im of mainEl.querySelectorAll('.row img.emote')) {
       const u = im.getAttribute('src') || '';
       const tw = u.match(/(\/emoticons\/v2\/[^/]+\/)(animated|default|static)\//);
@@ -12364,12 +12385,24 @@
       const name = emoteNameOf(ch, im.alt);
       const base = name && emotesOf(ch)[name];
       if (!base) continue;
-      im.src = fz ? stillUrl(base, setFor(ch).emoteAnim?.has(name)) : base;
+      im.src = fz ? chatStill(base, setFor(ch).emoteAnim?.has(name)) : base;
     }
   };
-  if (animFrozen()) restillEmotes();
+  if (chatFrozen()) restillEmotes();
+  const setEpFz = (i) => {
+    const pk = animFrozen(), ch = chatFrozen();
+    epFz = Math.max(0, Math.min(2, +i || 0));
+    try { localStorage.setItem(EPICK_FZ_KEY, String(epFz)); } catch {}
+    markHelp('helpEpfz', epFz);
+    if (animFrozen() !== pk) rebuildPicker();
+    if (chatFrozen() !== ch) restillEmotes();
+    paintAnim();
+  };
   const setAnimFilter = (list) => {
-    epickAnimOn = new Set((list || []).filter((k) => k === 'anim' || k === 'animf' || k === 'still'));
+    // 'animf' rode in the legs before the scope existed - a saved or
+    // url-carried one hoists to the universal stop it used to mean
+    if (list && list.includes('animf') && !list.includes('anim') && !epFz) setEpFz(2);
+    epickAnimOn = new Set((list || []).filter((k) => k === 'anim' || k === 'still'));
     // anim-playing + still is the unrestricted default - stored as empty
     if (epickAnimOn.has('anim') && epickAnimOn.has('still')) epickAnimOn.clear();
     try { localStorage.setItem(EPICK_ANIM_KEY, JSON.stringify([...epickAnimOn])); } catch {}
@@ -12378,33 +12411,23 @@
   for (const [k, b] of Object.entries(animBtns)) b.addEventListener('click', (e) => {
     let next;
     if (k === 'pause') {
-      // pausing off while a hold+ freeze is up demotes hold+ to plain
-      // hold - it would only re-freeze on the next hold. a saved frozen
-      // leg, if there is one, still unfreezes as normal
-      if (!e.shiftKey && animFrozen() && epickHold === 2 && gridHeld) {
-        setHold(1);
-        if (epickAnimOn.has('animf')) setAnimFilter([...epickAnimOn].map((x) => x === 'animf' ? 'anim' : x));
-        saveOpts();
-        emoteQ.focus();
-        return;
-      }
-      // pause owns freezing: swap the playing leg for its still frame and
-      // back, or pull hidden animated cells back already stilled. the
-      // unrestricted set freezes as animf + still rather than empty,
-      // which would read as 'everything on'
-      if (e.shiftKey) next = ['animf'];
-      else if (animFrozen()) next = [...epickAnimOn].map((x) => x === 'animf' ? 'anim' : x);
-      else if (!epickAnimOn.size) next = ['animf', 'still'];
-      else if (epickAnimOn.has('anim')) next = [...epickAnimOn].map((x) => x === 'anim' ? 'animf' : x);
-      else next = [...epickAnimOn, 'animf'];
+      // the pause chip cycles its scope: off → popup → all. landing on
+      // off under an engaged hold+ demotes it to plain hold - the
+      // borrowed freeze would keep the cells stilled either way
+      const stop = e.shiftKey ? 2 : (epFz + 1) % 3;
+      if (stop === 0 && epickHold === 2 && gridHeld && (!epickAnimOn.size || epickAnimOn.has('anim'))) setHold(1);
+      setEpFz(stop);
+      saveOpts();
+      emoteQ.focus();
+      return;
     }
     else if (e.shiftKey) next = [k];
     else if (k === 'anim') {
       // a plain leg toggle: hides animated cells however they're
       // playing, or brings them back playing
       if (!epickAnimOn.size) next = ['still'];
-      else if (epickAnimOn.has('anim') || epickAnimOn.has('animf')) {
-        next = [...epickAnimOn].filter((x) => x !== 'anim' && x !== 'animf');
+      else if (epickAnimOn.has('anim')) {
+        next = [...epickAnimOn].filter((x) => x !== 'anim');
         if (!next.length) next = ['still'];
       }
       else next = [...epickAnimOn, 'anim'];
@@ -14071,7 +14094,7 @@
     if (q.has('rbw')) setRbwStyle(+q.get('rbw'));
     if (q.has('rbp')) setRbwPal(+q.get('rbp'));
     // emote-picker options: ?epnames=0|1|2&epzoom=sm|q|th|hf|tw|big&epsort=az|useseen&epage=1&epsq=0-3&
-    // epmix=1&ephold=0|1|2&epmove=0-6&eptips=1&eptabs=7tv,bttv&epanim=anim|animf|still&epgeo=WxH[,L,T]&epopen=0|1
+    // epmix=1&ephold=0|1|2&epmove=0-6&eptips=1&eptabs=7tv,bttv&epanim=anim|still&epfz=0|1|2&epgeo=WxH[,L,T]&epopen=0|1
     let epUrlDirty = false;
     if (q.has('epnames')) { setNames(+q.get('epnames') || (flag('epnames') ? 1 : 0)); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(q.get('epzoom')); epUrlDirty = true; }
@@ -14084,6 +14107,7 @@
     if (q.has('epmove')) setMove(+q.get('epmove'));
     if (q.has('eptabs')) { setTabs(q.get('eptabs').split(',')); epUrlDirty = true; }
     if (q.has('epanim')) { setAnimFilter(q.get('epanim').split(',')); epUrlDirty = true; }
+    if (q.has('epfz')) { setEpFz(+q.get('epfz')); epUrlDirty = true; }
     if (q.has('epgeo')) {
       const [wh, l, t] = q.get('epgeo').split(',');
       const [w, h] = wh.split('x').map(Number);
@@ -14153,7 +14177,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpEonly: EMOTE_MODES, helpSplit: SPLIT_NAMES.map((n) => n.replace(/ \(.*$/, '')),
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES,
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
@@ -14224,6 +14248,7 @@
   markHelp('helpTitle', titleBarOn ? 1 : 0);
   markHelp('helpModes', modesOn ? 1 : 0);
   markHelp('helpUpd', UPD_STOPS.indexOf(updMin));
+  markHelp('helpEpfz', epFz);
   document.querySelectorAll('#updPoll [data-m]').forEach((b) => b.classList.toggle('on', +b.dataset.m === updMin));
   markHelp('helpFav', lkIco ? 1 : 0);
   markHelp('helpPn', pronounsOn ? 1 : 0);
