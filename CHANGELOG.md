@@ -3,6 +3,17 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions - the page ships continuously to Neocities.
 
+## 2026-10-13
+
+### Split columns
+- level 10 (3col+v/h, ▮▮?) pairs two chat columns with a rail holding
+  the video over the help popup: the popup docks into the rail and
+  fills what the video leaves, its drag handle, grips and edge resize
+  are off while it sits there, and leaving the mode hands it back
+  closed to its floating place. stats stays a tab inside the popup and
+  the emote picker floats as in the plain columns. the menu, wheel
+  cycle, saved opts and ?split=10 all learn it
+
 ## 2026-10-12
 
 ### Split columns
