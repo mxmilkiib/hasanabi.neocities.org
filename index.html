@@ -14097,7 +14097,7 @@
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };
   addEventListener('online', netPaint); addEventListener('offline', netPaint); netPaint();
-  // update watch: a HEAD on the page every 5min and on tab-focus. the
+  // update watch: a HEAD on the page every 15min and on tab-focus. the
   // first poll seeds the baseline (the page just loaded, so the live
   // stamp is the running version) - a newer stamp on a later poll means
   // a deploy landed while the tab was open. document.lastModified isn't
@@ -14116,7 +14116,7 @@
       else if (lm > docStamp && lm !== updateSeen) { updateSeen = lm; updateBar.hidden = false; }
     } catch {}
   }
-  setInterval(() => { if (!document.hidden) updateCheck(); }, 5 * 60 * 1000);
+  setInterval(() => { if (!document.hidden) updateCheck(); }, 15 * 60 * 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) updateCheck(); });
   updateCheck();
   // the shell worker is network-first so a bare reload lands the deploy;
