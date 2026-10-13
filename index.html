@@ -8915,8 +8915,8 @@
   let helpParked = false; // help panel was open when the header minimised
   function minHeader() {
     // an open help panel would float over the strip; park it and reopen
-    // when the header comes back
-    helpParked = !helpPanel.hidden;
+    // when the header comes back - a rail-docked one isn't floating
+    helpParked = !helpPanel.hidden && helpPanel.parentNode !== railEl;
     if (helpParked) helpPanel.hidden = true;
     document.body.classList.remove('hdrgraph'); // the modes are exclusive
     document.body.classList.add('hdrmin');
@@ -9572,7 +9572,10 @@
       helpPanel.style.zIndex = 13;
       emotePick.style.zIndex = '';
     }
-    helpPanel.hidden = !showPanel && !helpForced;
+    // docked into the rail the panel is the level's own furniture -
+    // esc, the X, an 'off' pick or a preset can zero the mode, but the
+    // rail seat stays filled: a docked panel can't hide
+    helpPanel.hidden = helpPanel.parentNode !== railEl && !showPanel && !helpForced;
     // a borrowed stats pane follows the popup: back to the rail on close,
     // and re-borrowed if the panel reopens with stats as the live tab
     if (helpPanel.hidden) statsReturn();
@@ -10493,16 +10496,16 @@
     helpMode = 1;
     applyHelp();
   }
-  // the popup closes first, while it still sits in the rail, so the
-  // stats hand-off in applyHelp stays out of the way; it then returns to
-  // its floating place closed
+  // the popup leaves the rail before applyHelp runs: a docked panel
+  // can't hide, so the close has to land once it's floating again -
+  // it returns to its floating place closed
   function undockHelp() {
     if (!helpHome) return;
     helpForced = false;
     helpMode = 0;
-    applyHelp();
     helpHome.parent.insertBefore(helpPanel, helpHome.next);
     helpHome = null;
+    applyHelp();
     paintHelpBtn();
   }
   // level 10 keeps stats as the popup's own tab and the picker floating,

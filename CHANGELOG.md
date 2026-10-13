@@ -64,6 +64,12 @@ not versions - the page ships continuously to Neocities.
   (hasan-tountils), so the input re-locks with its countdown instead
   of reopening while twitch's ban still stands. expired entries are
   pruned on restore and dropped as they lapse
+- the rail-docked help panel can't be hidden out from under the
+  +help split levels: esc, the panel's X, an 'off' pick or a preset
+  could zero the mode while docked, leaving the rail's lower half
+  empty and the ? button inert until reload - applyHelp now treats a
+  docked panel as always shown, undock reparents before applying, and
+  minimising the header no longer parks it
 - the update check no longer fires early on tab returns: the
   visibilitychange catch-up ran updateCheck unconditionally, ignoring
   the poll interval - it now only runs when a full poll window has
