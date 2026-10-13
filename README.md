@@ -500,7 +500,7 @@ force off.
 
 | key | values | effect |
 |---|---|---|
-| `split` | `1`–`11` | column modes: `1col` · `2col`/`3col` page-flip (3 on landscape) · `3col+v/e/s` · `3col+v/e` · `3col+e` · `2col+v/e` · `2row` · `2col+e` · `3col+v/h` · `2col+v/h` — v/e/s/h = video·emotes·stats·help; 6 & 9 keep video off, ▶ floats it; 10 & 11 dock the help popup under the video |
+| `split` | `1`–`11` | column modes: `1col` · `2col`/`3col` page-flip (3 on landscape) · `3col+vid/emotes/s` · `3col+vid/emotes` · `3col+emotes` · `2col+vid/emotes` · `2row` · `2col+emotes` · `3col+vid/help` · `2col+vid/help` — s = stats; 6 & 9 keep the video off, ▶ floats it; 10 & 11 dock the help popup under the video |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
 | `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |

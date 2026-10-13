@@ -23,14 +23,18 @@ not versions - the page ships continuously to Neocities.
   digits on a mode switch, as fresh rows already did
 
 ### Split columns
-- level 10 (3col+v/h, ▮▮?) pairs two chat columns with a rail holding
+- the mode names spell out their parts: e is emotes, v is vid, h is
+  help, and the floats note reads (vid off, ▶ floats) - 3col+vid/emotes/s
+  · 3col+vid/emotes · 3col+emotes · 2col+vid/emotes · 2row ·
+  2col+emotes · 3col+vid/help · 2col+vid/help
+- level 10 (3col+vid/help, ▮▮?) pairs two chat columns with a rail holding
   the video over the help popup: the popup docks into the rail and
   fills what the video leaves, its drag handle, grips and edge resize
   are off while it sits there, and leaving the mode hands it back
   closed to its floating place. stats stays a tab inside the popup and
   the emote picker floats as in the plain columns. the menu, wheel
   cycle, saved opts and ?split=10 all learn it
-- level 11 (2col+v/h, ▮?) is the same rail beside a single chat column:
+- level 11 (2col+vid/help, ▮?) is the same rail beside a single chat column:
   video up top right, the help popup filling the space below it. it
   shares level 10's dock, so the popup, stats tab and picker behave
   alike; the menu lists it with the other 2-col modes
