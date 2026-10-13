@@ -454,6 +454,7 @@ editing a URL.
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `subg` | `1` | gradually shift subscription labels from teal to the theme's accent colour as the month count rises (up to 120 months) |
+| `ncol` | flag | nick column - every chatter's name lands on one left edge (the widest leading prefix in view sets the stop) |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
 | `lbls` | flag | header button labels shown beside each header control - independent of the `?` cycle |

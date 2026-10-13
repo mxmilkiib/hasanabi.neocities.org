@@ -38,6 +38,11 @@ not versions - the page ships continuously to Neocities.
   without +help
 - the split menu pairs the +vid/help levels right under 3col - level
   numbers stay put, only the menu order moved
+- new 'nick column' option beside the sub picks (?ncol): 'on' pads
+  every chatter's name up to the widest leading prefix in view (time,
+  channel tag, chips, badges) so all nicks share one left edge. a
+  settle pass re-verifies the written edges after fonts and badges
+  land, and a wider late prefix re-bases the column for every row
 - the wheel cycles the stream info view anywhere on the channel block,
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel
