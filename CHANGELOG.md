@@ -27,7 +27,11 @@ not versions - the page ships continuously to Neocities.
   group folds)
 - usa pol: the dsa tail becomes a real subsection - main row, then
   committees / publications / leadership rows; leadership adds the
-  national political committee (npc)
+  national political committee (npc) and the constitution &amp; bylaws.
+  further rows: committees gain tech and ecosocialist, publications
+  gain the call, national lists the calendar / convention / discussion
+  board / dsa fund, and caucuses cover marxist unity, bread and roses,
+  socialist majority, libertarian socialist and afrosocialists
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
