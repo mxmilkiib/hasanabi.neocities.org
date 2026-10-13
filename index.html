@@ -2641,7 +2641,7 @@
     </div>
     </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
-  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
+  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss - p.s. page autoplay audio permission allows unmuted stream on open/reload</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
@@ -7643,9 +7643,9 @@
   // page polls for one - 'never' (0) skips both. The bar's own poll
   // chips land here too; they are queried lazily since applyOpts
   // can run before the const below lands
-  const UPD_STOPS = [5, 15, 30, 60, 180, 0]; // minutes; 0 = never poll
-  const UPD_NAMES = ['5m', '15m', '30m', '1h', '3h', 'never'];
-  let updMin = 15, updTimer = 0, updAt = 0;
+  const UPD_STOPS = [5, 15, 30, 60, 180, 360, 1440, 0]; // minutes; 0 = never poll
+  const UPD_NAMES = ['5m', '15m', '30m', '1h', '3h', '6h', '24h', 'never'];
+  let updMin = 60, updTimer = 0, updAt = 0;
   function armUpdTimer() {
     clearInterval(updTimer);
     // a stop change restarts the whole cycle - the visibility catch-up
@@ -7654,7 +7654,7 @@
     if (updMin) updTimer = setInterval(() => { if (!document.hidden) updateCheck(); }, updMin * 60e3);
   }
   function setUpdMin(m) {
-    updMin = UPD_STOPS.includes(+m) ? +m : 15;
+    updMin = UPD_STOPS.includes(+m) ? +m : 60;
     markHelp('helpUpd', UPD_STOPS.indexOf(updMin));
     document.querySelectorAll('#updPoll [data-m]').forEach((b) => b.classList.toggle('on', +b.dataset.m === updMin));
     if (!updMin) document.getElementById('updateBar').hidden = true;
@@ -9711,7 +9711,7 @@
     if (!ytEmbed) q.set('yt', '0');
     if (!titleBarOn) q.set('stitle', '0');
     if (!modesOn) q.set('cmodes', '0');
-    if (updMin !== 15) q.set('upd', String(updMin));
+    if (updMin !== 60) q.set('upd', String(updMin));
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
@@ -14403,7 +14403,7 @@
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };
   addEventListener('online', netPaint); addEventListener('offline', netPaint); netPaint();
-  // update watch: a HEAD on the page every 15min and on tab-focus. the
+  // update watch: a HEAD on the page on the updMin interval. the
   // first poll seeds the baseline (the page just loaded, so the live
   // stamp is the running version) - a newer stamp on a later poll means
   // a deploy landed while the tab was open. document.lastModified isn't

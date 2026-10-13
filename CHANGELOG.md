@@ -42,6 +42,9 @@ not versions - the page ships continuously to Neocities.
   without +help
 - the split menu pairs the +vid/help levels right under 3col - level
   numbers stay put, only the menu order moved
+- the update check's default poll is now 1h (was 15m), and the stops
+  gain 6h and 24h beside 5m / 15m / 30m / 1h / 3h / never on both the
+  bar chips and the ? popup pick
 - the update check no longer fires early on tab returns: the
   visibilitychange catch-up ran updateCheck unconditionally, ignoring
   the poll interval - it now only runs when a full poll window has

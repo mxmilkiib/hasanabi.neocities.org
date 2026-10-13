@@ -471,7 +471,7 @@ editing a URL.
 | `lkico` | `0` | link favicons off |
 | `pn` | `0` | pronoun lookups on profile cards off |
 | `cmodes` | `0` | active chat-mode display off (chips and status-line mode text) |
-| `upd` | `5`,`15`,`30`,`60`,`180`,`0` | update-check poll minutes (`0` = never; also the bar's poll chips) |
+| `upd` | `5`,`15`,`30`,`60`,`180`,`360`,`1440`,`0` | update-check poll minutes, default `60` (`0` = never; also the bar's update-check chips) |
 | `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
 | `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
 | `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |
