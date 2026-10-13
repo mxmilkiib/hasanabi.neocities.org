@@ -2739,7 +2739,7 @@
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
   const SCROLLBACK_SIZES = [250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
-  let MAX_MESSAGES = 5000;
+  let MAX_MESSAGES = 10000;
   const BACKLOG_FLUSH = 1000;
   const HISTORY_SAVE_MAX = 5000;
   // '@channel' pings highlight per the row's own channel - cached per name
@@ -9723,7 +9723,7 @@
     if (linkW !== WEIGHTS.indexOf(400)) q.set('lw', WEIGHTS[linkW]);
     if (zebraLevel !== 2) q.set('zebra', String(zebraLevel));
     if (pauseOnText) q.set('pause', '1');
-    if (MAX_MESSAGES !== 5000) q.set('scrollback', MAX_MESSAGES);
+    if (MAX_MESSAGES !== 10000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
     if (barTop) q.set('bartop', '1');
     if (barAuto) q.set('bauto', String(barAuto));
