@@ -37,6 +37,8 @@ not versions - the page ships continuously to Neocities.
   twiiit, xcancel, bird.makeup, the embed fixers and the instance lists
 
 ### Rows & chat
+- own-message rows pop harder: the accent tint deepens 11% → 18% (the
+  zebra path scales to match) and the nick weights up like a mention
 - the split/page ghost fade's faintest end - the sliver under the wave
   edge, where the retired page's oldest rows sit - deepens 0.08 → 0.04
 - history restore died on reload: the empty-card removal painted the

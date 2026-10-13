@@ -964,7 +964,7 @@
     --rowtint: linear-gradient(rgba(128, 128, 128, var(--zeba, .07)) 0 0);
   }
   body.selfhl main.zebra .row.z.self {
-    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) calc(var(--zeba, .07) * 160%), transparent) 0 0); }
+    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) calc(var(--zeba, .07) * 260%), transparent) 0 0); }
   main.shadowed .row { text-shadow: var(--row-sh); }
   .row.glorp {
     --rowtint: linear-gradient(rgba(232, 93, 93, .13) 0 0);
@@ -1347,11 +1347,14 @@
      viewport, so a thin desktop column folds the same way */
   @container (max-width: 560px) { #statsBody .st-trio { grid-template-columns: 1fr 1fr; } }
   body.selfhl .row.self {
-    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0);
+    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
     margin-left: -8px;
     padding-left: 8px;
   }
+  /* own nick pops at the mention weight - the row already accents, the
+     heavier name is what catches the eye scanning a fast column */
+  body.selfhl .row.self a.name { font-weight: max(700, calc(var(--chat-w, 400) + 200)); }
   /* a fixed +200 step over the chat weight keeps mentions visibly heavier
      at any Font weight setting - b's relative 'bolder' collapses to the
      same glyph once --chat-w reaches 600-700 */
@@ -2500,7 +2503,7 @@
     <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a fact line on the twitch-profile hover card for chatters who set pronouns on alejo.io; looked up when a profile is previewed and cached for a month<sup>†</sup></span></div>
     <div><b>bots</b><span>hide blammobot + fossabot: <span id="helpBotsList"></span> - their chat rows vanish entirely, commands and all<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
+    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle glorp">red rows</b><span>GLORP / F</span><b class="rowstyle points">red tint</b><span>channel-point highlights</span><b class="rowstyle selfchip">accent rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row</div>
