@@ -81,74 +81,6 @@ CSP-locked host can embed the same iframe for any Twitch channel. The
 hasanabi specifics all live in this file; the relay could just as well
 serve a completely different channel page.
 
-## The Backend - `twitch-chat-relay` (GitHub Pages)
-
-Repo: <https://github.com/mxmilkiib/twitch-chat-relay> - also a single
-`index.html`, loaded as a hidden iframe from
-`https://mxmilkiib.github.io/twitch-chat-relay/`.
-
-Channel-agnostic by design: it takes the target channel from the embedder's
-`join` message and derives everything else from it. It does the network work
-the CSP forbids on Neocities:
-
-- Connects to Twitch IRC over WebSocket as an anonymous `justinfan`
-  user (Twitch's convention for read-only access without an
-  account), requests `tags` + `commands` capabilities, handles
-  PING/RECONNECT, and rejoins with exponential backoff.
-- Polls [DecAPI](https://decapi.me) every 60s for uptime, viewer count
-  and title (no auth needed).
-- Fetches [ivr.fi](https://api.ivr.fi) user info (`lastBroadcast`),
-  the [7TV](https://7tv.app/) / [BTTV](https://betterttv.com/) /
-  [FFZ](https://www.frankerfacez.com/) emote sets, and the latest
-  VOD via Twitch's public GraphQL endpoint for exact stream
-  start/end times.
-
-### Message protocol
-
-Parent → relay:
-
-| message | purpose |
-|---|---|
-| `{type: 'join', channels[]}` | set the channels to watch (a bare `channel` string still works); repeats diff JOIN/PART |
-| `{type: 'backfill'}` | ask for the recent-messages backlog (every joined channel, merged by timestamp) |
-| `{type: 'auth', token}` | log in (or `token: null` to log out) |
-| `{type: 'send', channel, text, replyTo}` | post a chat message once authenticated; `replyTo` attaches a `reply-parent-msg-id` tag |
-| `{type: 'tweet', id}` | fetch an X/Twitter preview via [fxtwitter](https://github.com/FixTweet/FxTwitter) |
-| `{type: 'twsets', ids}` | fetch Twitch emote-set metadata via [ivr.fi](https://api.ivr.fi) |
-
-Relay → parent:
-
-- `{type: 'status', state}` - connecting / connected / reconnecting
-- `{type: 'lines', lines[]}` - raw IRC lines, live or backfilled
-- `backfill` - on request, the relay fetches the backlog from
-  [recent-messages.robotty.de](https://recent-messages.robotty.de/)
-  (the same service [Chatterino](https://chatterino.com/) uses) and
-  forwards it as `lines`; the page skips already-rendered msg ids
-- `{type: 'stream', channel, uptime, viewers, title}` - decapi poll
-  result, per joined channel
-- `{type: 'emotes', channel, emotes, emoteSrc, zeroWidth, badges,
-  lastBroadcast, lastVod, emoteUse, emoteAnim}` - per-channel emote map +
-  sources + badge sets + stream history + per-emote channel usage counts
-  ([StreamElements](https://streamelements.com/) chatstats) +
-  animated-emote names, refetched every
-  10 minutes (global sets are fetched once per cycle and merged in)
-- `{type: 'nitter', host}` - fastest healthy
-  [nitter](https://github.com/zedeus/nitter) instance from
-  [status.d420.de](https://status.d420.de/), rechecked every
-  15 minutes
-- `{type: 'wscause', code, reason}` - why the Twitch socket last closed,
-  sent with each `reconnecting` status; the page shows it in the header
-- `{type: 'repo', stars, created, pushed}` - GitHub metadata for the
-  source row of the help popup
-- `{type: 'auth', login}` (or `{type: 'auth', error}`) - after `auth`, the
-  relay validates the token at
-  [id.twitch.tv](https://dev.twitch.tv/docs/authentication/),
-  reconnects the socket with
-  the user's credentials, and reports the resolved login
-- `{type: 'tweet', id, tweet}` - preview data for a tweet link
-- `{type: 'twsets', key, sets}` - the emote-set metadata reply (`key`
-  echoes the asked `ids`)
-
 ## The Frontend - `index.html` (this repo, on Neocities)
 
 Everything runs client-side in one file - no build step, no framework,
@@ -707,6 +639,74 @@ drop their param, so only drifted settings spell out.
 - The Google Fonts stylesheet loads without blocking the first
   render, capture-phase scroll listeners are passive, and the about
   page's theme screenshots ship as WebP.
+
+## The Backend - `twitch-chat-relay` (GitHub Pages)
+
+Repo: <https://github.com/mxmilkiib/twitch-chat-relay> - also a single
+`index.html`, loaded as a hidden iframe from
+`https://mxmilkiib.github.io/twitch-chat-relay/`.
+
+Channel-agnostic by design: it takes the target channel from the embedder's
+`join` message and derives everything else from it. It does the network work
+the CSP forbids on Neocities:
+
+- Connects to Twitch IRC over WebSocket as an anonymous `justinfan`
+  user (Twitch's convention for read-only access without an
+  account), requests `tags` + `commands` capabilities, handles
+  PING/RECONNECT, and rejoins with exponential backoff.
+- Polls [DecAPI](https://decapi.me) every 60s for uptime, viewer count
+  and title (no auth needed).
+- Fetches [ivr.fi](https://api.ivr.fi) user info (`lastBroadcast`),
+  the [7TV](https://7tv.app/) / [BTTV](https://betterttv.com/) /
+  [FFZ](https://www.frankerfacez.com/) emote sets, and the latest
+  VOD via Twitch's public GraphQL endpoint for exact stream
+  start/end times.
+
+### Message protocol
+
+Parent → relay:
+
+| message | purpose |
+|---|---|
+| `{type: 'join', channels[]}` | set the channels to watch (a bare `channel` string still works); repeats diff JOIN/PART |
+| `{type: 'backfill'}` | ask for the recent-messages backlog (every joined channel, merged by timestamp) |
+| `{type: 'auth', token}` | log in (or `token: null` to log out) |
+| `{type: 'send', channel, text, replyTo}` | post a chat message once authenticated; `replyTo` attaches a `reply-parent-msg-id` tag |
+| `{type: 'tweet', id}` | fetch an X/Twitter preview via [fxtwitter](https://github.com/FixTweet/FxTwitter) |
+| `{type: 'twsets', ids}` | fetch Twitch emote-set metadata via [ivr.fi](https://api.ivr.fi) |
+
+Relay → parent:
+
+- `{type: 'status', state}` - connecting / connected / reconnecting
+- `{type: 'lines', lines[]}` - raw IRC lines, live or backfilled
+- `backfill` - on request, the relay fetches the backlog from
+  [recent-messages.robotty.de](https://recent-messages.robotty.de/)
+  (the same service [Chatterino](https://chatterino.com/) uses) and
+  forwards it as `lines`; the page skips already-rendered msg ids
+- `{type: 'stream', channel, uptime, viewers, title}` - decapi poll
+  result, per joined channel
+- `{type: 'emotes', channel, emotes, emoteSrc, zeroWidth, badges,
+  lastBroadcast, lastVod, emoteUse, emoteAnim}` - per-channel emote map +
+  sources + badge sets + stream history + per-emote channel usage counts
+  ([StreamElements](https://streamelements.com/) chatstats) +
+  animated-emote names, refetched every
+  10 minutes (global sets are fetched once per cycle and merged in)
+- `{type: 'nitter', host}` - fastest healthy
+  [nitter](https://github.com/zedeus/nitter) instance from
+  [status.d420.de](https://status.d420.de/), rechecked every
+  15 minutes
+- `{type: 'wscause', code, reason}` - why the Twitch socket last closed,
+  sent with each `reconnecting` status; the page shows it in the header
+- `{type: 'repo', stars, created, pushed}` - GitHub metadata for the
+  source row of the help popup
+- `{type: 'auth', login}` (or `{type: 'auth', error}`) - after `auth`, the
+  relay validates the token at
+  [id.twitch.tv](https://dev.twitch.tv/docs/authentication/),
+  reconnects the socket with
+  the user's credentials, and reports the resolved login
+- `{type: 'tweet', id, tweet}` - preview data for a tweet link
+- `{type: 'twsets', key, sets}` - the emote-set metadata reply (`key`
+  echoes the asked `ids`)
 
 ## vs. other Twitch chat clients
 
