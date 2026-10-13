@@ -1862,6 +1862,9 @@
   /* kind + service cells take the dim .85em face nested descriptors get */
   #helpPanel .linkcols.stbl .cc, #helpPanel .linkcols.stbl .cl {
     font-size: .85em; color: var(--text-dim); }
+  /* zb stripes every other entry row - the cells stretch to their grid
+     area, so the wash covers each column but leaves the gaps */
+  #helpPanel .linkcols.stbl .zb { background: rgba(128, 128, 128, .06); }
   /* stbl group heads: hoisted out of their entry row onto a spanning
      label row - the dim-italic underline look of the flowing heads,
      minus the column-flow outdent the grid doesn't need */
@@ -7150,7 +7153,7 @@
   const stbl = document.querySelector('#htabRes .linkcols.stbl');
   const svcCells = [], extraCells = [];
   const svcCount = new Map();
-  let stblRow = 0;
+  let stblRow = 0, stblZeb = 0;
   if (stbl) for (const i of [...stbl.children]) {
     if (i.classList.contains('note')) continue;
     stblRow++;
@@ -7242,8 +7245,10 @@
       if (n.nodeType === 1 && n.dataset.col) cell.dataset.col = n.dataset.col;
     }
     // sparse service columns break auto-packing, so every cell pins its
-    // row; the column lands after all rows are read
-    for (const el of cells) el.style.gridRow = stblRow;
+    // row; the column lands after all rows are read. zb stripes every
+    // other entry row - heads and notes sit out of the count
+    for (const el of cells) { el.style.gridRow = stblRow; el.classList.toggle('zb', stblZeb & 1); }
+    stblZeb++;
     i.append(...cells);
   }
   // each Service gets its own Column so the same name lines up across
@@ -7263,11 +7268,11 @@
   // service column before the descriptor cells
   const ki = svcCols.indexOf('links');
   if (ki >= 0 && ki !== svcCols.length - 1) { svcCols.splice(ki, 1); svcCols.push('links'); }
-  // substack tucks two left of patreon
+  // substack tucks right after patreon
   const si = svcCols.indexOf('substack');
   if (si >= 0 && svcCols.includes('patreon')) {
     svcCols.splice(si, 1);
-    svcCols.splice(svcCols.indexOf('patreon') - 1, 0, 'substack');
+    svcCols.splice(svcCols.indexOf('patreon') + 1, 0, 'substack');
   }
   const colOf = new Map(svcCols.map((nm, k) => [nm, k + 3]));
   for (const el of svcCells) el.style.gridColumn = colOf.get(el.dataset.svc);

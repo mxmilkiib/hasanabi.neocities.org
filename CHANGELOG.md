@@ -76,6 +76,11 @@ not versions - the page ships continuously to Neocities.
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
 ### Resources
+- the channels/streams table gains a faint zebra wash - every other
+  entry row's cells carry a 6% grey through the new zb mark; group
+  heads and note rows stay out of the count
+- i've had it: the substack column now sits right after patreon
+  (was two seats left of it)
 - i've had it: the hosts lead the notes - jennifer welch (her ig
   kept) & angie 'pumps' sullivan - matching unruly subjects'
   kumanyika layout. the pair reads as one notes cell now: a mid-name
