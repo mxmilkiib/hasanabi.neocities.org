@@ -38,6 +38,12 @@ not versions - the page ships continuously to Neocities.
   without +help
 - the split menu pairs the +vid/help levels right under 3col - level
   numbers stay put, only the menu order moved
+- the update check no longer fires early on tab returns: the
+  visibilitychange catch-up ran updateCheck unconditionally, ignoring
+  the poll interval - it now only runs when a full poll window has
+  elapsed, and changing the stop re-arms both the timer and the
+  catch-up clock. the bar's chip row reads 'update check:' rather
+  than 'poll:'
 - new 'nick column' option beside the sub picks (?ncol): 'on' pads
   every chatter's name up to the widest leading prefix in view (time,
   channel tag, chips, badges) so all nicks share one left edge. a

@@ -2505,7 +2505,7 @@
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 5,000 are saved across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - fade ghosts the bar out, slim collapses it to a hairline; hovering the strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a system notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
-    <div><b>↻</b> <span>update notice: <span id="helpUpdList"></span> - the reload bar when a site update lands while the page is open, and how often the page polls for one; the bar's own 'never' button picks never here<sup>†</sup></span></div>
+    <div><b>↻</b> <span>update notice: <span id="helpUpdList"></span> - the reload bar when a site update lands while the page is open, and how often the page checks for one; the bar's own 'update check' chips pick the same stops<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
     <div><b>▶</b> <span>video embeds: <span id="helpYtemList"></span> - a watch, shorts or youtu.be link gets a ▶ glyph and an info card under the message (thumbnail, title, channel, views and date via the linkpeek worker); an instagram reel/post link gets a card the same way (poster, title, caption); clicking the glyph or the thumbnail unfolds the player under the row (a second click folds it) - nothing loads from google or facebook until then<sup>†</sup></span></div>
@@ -2637,7 +2637,7 @@
     </div>
     </div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
-  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">poll:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
+  <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>tip: click or scroll any header option to change it - click to dismiss - p.s. page autoplay audio permission allows unmuted stream on open/reload</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
@@ -7641,9 +7641,12 @@
   // can run before the const below lands
   const UPD_STOPS = [5, 15, 30, 60, 180, 0]; // minutes; 0 = never poll
   const UPD_NAMES = ['5m', '15m', '30m', '1h', '3h', 'never'];
-  let updMin = 15, updTimer = 0;
+  let updMin = 15, updTimer = 0, updAt = 0;
   function armUpdTimer() {
     clearInterval(updTimer);
+    // a stop change restarts the whole cycle - the visibility catch-up
+    // measures from the same re-arm, not the last actual check
+    updAt = Date.now();
     if (updMin) updTimer = setInterval(() => { if (!document.hidden) updateCheck(); }, updMin * 60e3);
   }
   function setUpdMin(m) {
@@ -14381,6 +14384,7 @@
   let docStamp = 0, updateSeen = 0;
   async function updateCheck() {
     if (!updMin || !updateBar.hidden) return;
+    updAt = Date.now();
     try {
       const r = await fetch('/', { method: 'HEAD', cache: 'no-store' });
       const lm = Date.parse(r.headers.get('last-modified') || '');
@@ -14390,7 +14394,10 @@
     } catch {}
   }
   armUpdTimer();
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) updateCheck(); });
+  // a tab return runs a check only if a full poll window passed - the
+  // interval can't fire while hidden, so this catches a missed tick
+  // without letting every focus hop poll early
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - updAt >= updMin * 60e3) updateCheck(); });
   updateCheck();
   // the shell worker is network-first so a bare reload lands the deploy;
   // the ?_=ts also shakes any http-cached copy of the document
