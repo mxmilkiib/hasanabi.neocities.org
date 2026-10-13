@@ -10,6 +10,11 @@ not versions - the page ships continuously to Neocities.
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
+- the emote picker's ⏸ actually stills twitch emotes now: the freeze
+  swapped /animated/ for /default/, but the cdn serves the same file on
+  both (as-uploaded, animation included) - the real still path is
+  /static/. chat rows, the hover card's size bump, the autocomplete
+  list and the stats emote icons follow
 
 ### Rows & chat
 - the pending-reply bar above the message box quotes its target at the

@@ -3535,13 +3535,14 @@
       const alt = escapeHTML(name);
       const eid = escapeHTML(e.id);
       const tone = lightMode ? 'light' : 'dark';
-      // frozen stills take the default frame outright. so do emotes
-      // the loaded sets know as static - the animated path 404s them
-      // (firefox shows the opaque-blocked error), so ask correctly and
-      // leave the fallback for emotes no set knows
+      // frozen stills take the static path outright - 'default' is
+      // as-uploaded and stays animated for animated emotes. emotes the
+      // loaded sets know as static take it too - the animated path 404s
+      // them (firefox shows the opaque-blocked error), so ask correctly
+      // and leave the fallback for emotes no set knows
       const tstat = twSets.some((s) => s.emoteList.some((x) =>
         (x.id == e.id || x.code === name) && x.assetType !== 'ANIMATED'));
-      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${animFrozen() || tstat ? 'default' : 'animated'}/${tone}/2.0"` +
+      html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${animFrozen() ? 'static' : tstat ? 'default' : 'animated'}/${tone}/2.0"` +
               ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${eid}/default/${tone}/2.0'"` +
               ` alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
@@ -6274,7 +6275,7 @@
         // a unicode emoji rides the fixed slot like an emote image, so it
         // sits on the same optical line and the names' left edges still
         // align - the char itself is the code, so the name stays
-        const ic = url ? `<img class="emote" src="${escapeHTML(url)}" alt="${escapeHTML(n)}">`
+        const ic = url ? `<img class="emote" src="${escapeHTML(stillUrl(url, emoteAnim.has(en) || !!(set && set.assetType === 'ANIMATED')))}" alt="${escapeHTML(n)}">`
           : EMOJI_SET.has(en) ? `<span class="eme">${escapeHTML(en)}</span>` : '';
         return row(i + 1, escapeHTML(n), c.toLocaleString('en'),
           `<span class="ems">${ic}</span>`);
@@ -10794,7 +10795,7 @@
     chatComp.innerHTML = compList.map((r, i) =>
       `<a class="cpick${i === compIdx ? ' on' : ''}" role="option" data-i="${i}" href="#" ` +
       `style="--cc:${escapeHTML(r.c || colorForName(r.n))}">` +
-      (r.img ? `<img src="${escapeHTML(r.img)}" alt="" loading="lazy">` : '') +
+      (r.img ? `<img src="${escapeHTML(stillUrl(r.img, emoteAnim.has(r.n) || twAnim(r.n)))}" alt="" loading="lazy">` : '') +
       `${escapeHTML(r.n)}</a>`).join('');
     chatComp.hidden = !compList.length;
     if (compList.length) chatComp.style.left = (chatWrap.offsetLeft + chatInput.offsetLeft) + 'px';
@@ -11757,11 +11758,13 @@
   };
   const twEmoteUrl = (id, anim) => `https://static-cdn.jtvnw.net/emoticons/v2/${id}/${anim ? 'animated' : 'default'}/${lightMode ? 'light' : 'dark'}/2.0`;
   // the anim chip's frozen state renders the still frame: 7tv ships a
-  // *_static variant and twitch a 'default' path; bttv/ffz-animated have
-  // none, so weserv serves their first frame (img-src is open)
+  // *_static variant and twitch a 'static' path - 'default' only means
+  // as-uploaded, and serves the animated file for animated emotes;
+  // bttv/ffz-animated have none, so weserv serves their first frame
+  // (img-src is open)
   const freezeUrl = (u) => {
     const v = u.replace(/(cdn\.7tv\.app\/emote\/[^/]+\/\dx)\.webp$/, '$1_static.webp')
-               .replace(/(\/emoticons\/v2\/[^/]+\/)animated\//, '$1default/');
+               .replace(/(\/emoticons\/v2\/[^/]+\/)(?:animated|default)\//, '$1static/');
     return v !== u ? v : `https://images.weserv.nl/?url=${u.replace(/^https?:\/\//, '')}&n=1`;
   };
   const twAnim = (code) => twSets.some((s) =>
@@ -12216,9 +12219,9 @@
     const fz = animFrozen();
     for (const im of mainEl.querySelectorAll('.row img.emote')) {
       const u = im.getAttribute('src') || '';
-      const tw = u.match(/(\/emoticons\/v2\/[^/]+\/)(animated|default)\//);
+      const tw = u.match(/(\/emoticons\/v2\/[^/]+\/)(animated|default|static)\//);
       if (tw) {
-        const v = u.replace(`/${tw[2]}/`, `/${fz ? 'default' : 'animated'}/`);
+        const v = u.replace(`/${tw[2]}/`, `/${fz ? 'static' : 'animated'}/`);
         if (v === u) continue;
         // heading back to playing hits animated/ first, which static
         // emotes 404 - re-arm the fallback a fresh render carries
@@ -14666,7 +14669,7 @@
     .replace(/(\/emote\/[^/]+\/)[12]x\.webp$/, '$14x.webp')  // 7tv
     .replace(/(\/emote\/[^/]+\/)[12]x$/, '$13x')             // bttv
     .replace(/(cdn\.frankerfacez\.com\/emote\/\d+\/)1$/, '$14')   // ffz
-    .replace(/(emoticons\/v2\/[^/]+\/(?:default|animated)\/(?:dark|light))\/2\.0$/, '$1/3.0'); // twitch
+    .replace(/(emoticons\/v2\/[^/]+\/(?:default|animated|static)\/(?:dark|light))\/2\.0$/, '$1/3.0'); // twitch
   const epopHide = () => { clearTimeout(epopT); epopT = 0; epopEl = null; epop.hidden = true; };
   // ' - ' is the clause separator every title string is written with;
   // the tooltip surfaces wrap on real linebreaks, so translate at display
