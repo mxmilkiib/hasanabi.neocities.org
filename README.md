@@ -2,14 +2,15 @@
 
 ![HasanAbi Chat Thing - a compact, customisable, one-page Twitch chat client](og.png)
 
-A customisable chat page centred on the
-[HasanAbi](https://www.twitch.tv/hasanabi) stream.
-[Hasan Piker](https://en.wikipedia.org/wiki/Hasan_Piker)'s channel is
-also known here as the Piker Broadcasting Service, a play on
-[PBS](https://en.wikipedia.org/wiki/PBS).
+A customisable Twitch chat page centred on the
+[HasanAbi](https://www.twitch.tv/hasanabi) stream,
+[Hasan Piker](https://en.wikipedia.org/wiki/Hasan_Piker)'s channel
+aka the Piker Broadcasting Service (a play on [PBS](https://en.wikipedia.org/wiki/PBS)).
 
-The page works as an alternative chat view, a second screen and a hub
-for links related to the stream. It runs at
+This alternative chat view acts as a quality-of-life and accessibility tool,
+for general or second-screen use, and a hub for links related to the stream.
+
+It runs at
 <https://hasanabi.neocities.org/> on [Neocities](https://neocities.org/).
 See the [about page](https://hasanabi.neocities.org/about/) for more.
 
