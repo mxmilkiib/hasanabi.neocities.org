@@ -1,4 +1,8 @@
 page-scan.js
+*.bak
+*.bak_*
+old/
+InterMono-*.woff2
 
 # instant-grep index
 .ig/
