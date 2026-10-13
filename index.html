@@ -7255,6 +7255,12 @@
   // service column before the descriptor cells
   const ki = svcCols.indexOf('links');
   if (ki >= 0 && ki !== svcCols.length - 1) { svcCols.splice(ki, 1); svcCols.push('links'); }
+  // substack tucks just left of patreon
+  const si = svcCols.indexOf('substack');
+  if (si >= 0 && svcCols.includes('patreon')) {
+    svcCols.splice(si, 1);
+    svcCols.splice(svcCols.indexOf('patreon'), 0, 'substack');
+  }
   const colOf = new Map(svcCols.map((nm, k) => [nm, k + 3]));
   for (const el of svcCells) el.style.gridColumn = colOf.get(el.dataset.svc);
   extraCells.forEach((el, k) => { el.style.gridColumn = 3 + svcCols.length + k; });
