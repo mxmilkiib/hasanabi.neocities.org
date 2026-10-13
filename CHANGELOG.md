@@ -107,6 +107,11 @@ not versions - the page ships continuously to Neocities.
 - the notice ends "if broken, resetting all settings and/or wait.." -
   a stale saved option was behind a missing-badges report that a full
   reset cleared
+- the bar gains a 'never' button that disables update notices for good,
+  and the help popup carries the matching 'update notice' on/off under
+  live alert (saved in the bundle, ?upd=0 on a copied url); while off a
+  new stamp is still tracked silently, so flicking it back on only flags
+  the next deploy
 
 ### Help popup
 - the section dividers become blank spacers: the base separator's

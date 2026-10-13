@@ -468,6 +468,7 @@ editing a URL.
 | `lkico` | `0` | link favicons off |
 | `pn` | `0` | pronoun lookups on profile cards off |
 | `cmodes` | `0` | active chat-mode display off (chips and status-line mode text) |
+| `upd` | `0` | update-notice bar off (also the bar's 'never' button) |
 | `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
 | `rbw` | `1`–`4` | @hasanabi rainbow: wave / hue cycle / pulse / flicker |
 | `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |
