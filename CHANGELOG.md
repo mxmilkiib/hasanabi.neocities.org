@@ -20,6 +20,11 @@ not versions - the page ships continuously to Neocities.
   not just the dot and status text - the mode and chatter chips are
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
+### Resources
+- usa pol: the dsa tail becomes a real subsection - main row, then
+  committees / publications / leadership rows; leadership adds the
+  national political committee (npc)
+
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
   worker (a real profile scrape answers site 'Nitter'; walls and parked
