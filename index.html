@@ -12305,7 +12305,7 @@
   }
   function paintSq() {
     sqBtn.disabled = epickSort !== 'use';
-    setOn(sqBtn, epickSq !== 3 && epickSort === 'use');
+    setOn(sqBtn, epickSq > 0 && epickSort === 'use');
     sqBtn.textContent = `□${epickSq}`;
     sqBtn.title = `age squares (use sort only) - ${epickSq} ${SQ_MODES[epickSq]} - click cycles 0-3`;
   }
