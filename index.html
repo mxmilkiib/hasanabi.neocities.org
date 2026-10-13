@@ -835,7 +835,8 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, .4); }
   body.bartop #emotePick { bottom: auto; top: 76px; }
   #replyBar { flex: 1 0 100%; display: flex; align-items: baseline; gap: 5px;
-    font-size: .8em; color: var(--text-dim); white-space: nowrap; overflow: hidden; }
+    font-size: 1em; color: var(--text-dim); white-space: nowrap; overflow: hidden; }
+  #replyBar > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   #replyBar[hidden] { display: none; }
   #replyBar b { color: var(--accent); }
   #replyBar button { border: 0; background: none; color: var(--text-dim);
