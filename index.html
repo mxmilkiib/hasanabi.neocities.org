@@ -7148,7 +7148,7 @@
   // '·'; entries without one list just the kind
   const stbl = document.querySelector('#htabRes .linkcols.stbl');
   const svcCells = [], extraCells = [];
-  const svcCount = new Map(), svcOrder = [];
+  const svcCount = new Map();
   let stblRow = 0;
   if (stbl) for (const i of [...stbl.children]) {
     if (i.classList.contains('note')) continue;
@@ -7222,17 +7222,17 @@
           // a data-svc on the anchor names its column outright (one row's
           // second ig parking in the discord slot), skipping the aliases
           let s = n.dataset.svc || lbl;
-          for (const cand of [].concat(n.dataset.svc ? [] : svcAliases[lbl] || [])) {
+          if (!n.dataset.svc) for (const cand of [].concat(svcAliases[lbl] || [])) {
             if (!rowSvc.has(cand) && !rowLbl.has(cand)) { s = cand; break; }
           }
           let dup = 2;
           while (rowSvc.has(s)) s = `${lbl}·${dup++}`;
           cell.dataset.svc = s;
           rowSvc.add(s);
-          if (!svcCount.has(cell.dataset.svc)) svcOrder.push(cell.dataset.svc);
           svcCount.set(cell.dataset.svc, (svcCount.get(cell.dataset.svc) || 0) + 1);
           svcCells.push(cell);
         } else extraCells.push(cell);
+
         cells.push(cell);
       }
       cell.appendChild(n);
@@ -7248,7 +7248,9 @@
   // each Service gets its own Column so the same name lines up across
   // rows - tw and yt pin leftmost, the rest most-used first
   const svcPin = { tw: -2, yt: -1 };
-  const svcCols = svcOrder.sort((a, b) =>
+  // the Map's own insertion order is the first-seen order, which a
+  // stable sort keeps for count ties
+  const svcCols = [...svcCount.keys()].sort((a, b) =>
     (svcPin[a] || 0) - (svcPin[b] || 0) || svcCount.get(b) - svcCount.get(a));
   // patreon and discord swap seats, and the lemmy spillover column
   // (rows carrying a real reddit link too) tucks right after reddit
@@ -7277,8 +7279,9 @@
       el.style.gridColumn = colKeys.get(k);
     } else el.style.gridColumn = 3 + svcCols.length + nextEx++;
   }
+  // nextEx counts the distinct trailing seats - keyed cells share one
   if (stbl) stbl.style.gridTemplateColumns =
-    `max-content max-content repeat(${svcCols.length + extraCells.length}, max-content)`;
+    `max-content max-content repeat(${svcCols.length + nextEx}, max-content)`;
   const authOrig = authSecs.innerHTML;
   helpPanel.addEventListener('click', (e) => {
     const a = e.target.closest('a[data-asort], a[data-ainfo]');
