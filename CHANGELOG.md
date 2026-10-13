@@ -23,6 +23,10 @@ not versions - the page ships continuously to Neocities.
   siblings of the text, and the dead spot under them read as the wheel
   sticking once a view flip put them under the pointer
 ### Resources
+- channels/streams: the streamers group sorts by viewership - mike
+  from pa, maple takes, yugopnik, kaceytron, madeline pendleton, the
+  serfs, frogan, leaping larry, comrade virgo, kneecoleslaw (off
+  twitchtracker 30-day averages)
 - channels/streams: streamers moves under home - the chat-switchable
   group leads since the table doubles as a channel picker. alexei
   sayle joins the podcasts tail (it was comedy's only entry, so the
