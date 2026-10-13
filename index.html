@@ -10034,25 +10034,43 @@
     const frag = document.createDocumentFragment();
     for (const r of chronoRows()) if (!r.classList.contains('stale')) frag.appendChild(r);
     cs[1].appendChild(frag);
-    const live = liveRows(cs[1]);
     const { room } = pageBox(cs[1]);
     const pages = []; // newest first
-    let page = [], end = null, k = live.length - 1;
-    for (; k >= 0; k--) {
-      const r = live[k];
-      // a display:none row has no rect - it rides with the row after it
-      if (!rowCollapsed(r)) {
-        const rc = r.getBoundingClientRect();
-        if (end === null) end = rc.bottom;
-        else if (end - rc.top > room) {
-          pages.push(page);
-          if (pages.length === cs.length) break;
-          page = []; end = rc.bottom;
+    let live = liveRows(cs[1]), page = [], end = null, k = live.length - 1;
+    const cut = () => {
+      for (; k >= 0; k--) {
+        const r = live[k];
+        // a display:none row has no rect - it rides with the row after it
+        if (!rowCollapsed(r)) {
+          const rc = r.getBoundingClientRect();
+          if (end === null) end = rc.bottom;
+          else if (end - rc.top > room) {
+            pages.push(page);
+            if (pages.length === cs.length) return;
+            page = []; end = rc.bottom;
+          }
         }
+        page.unshift(r);
       }
-      page.unshift(r);
+      if (page.length) { pages.push(page); page = []; }
+    };
+    cut();
+    // a thin live set would leave the front columns blank - pull the
+    // archive's newest rows back live and keep cutting until every
+    // column holds a page or history runs out
+    while (pages.length < cs.length) {
+      const arch = [...logEl.querySelectorAll(':scope > .stale')];
+      if (!arch.length) break;
+      const take = arch.slice(-(Math.ceil(room / 20) + 4));
+      for (const r of take) r.classList.remove('stale');
+      const pf = document.createDocumentFragment();
+      pf.append(...take);
+      cs[1].insertBefore(pf, cs[1].firstElementChild);
+      live = liveRows(cs[1]);
+      k = take.length - 1;
+      end = null;
+      cut();
     }
-    if (k < 0 && page.length) pages.push(page);
     for (let j = 0; j <= k; j++) live[j].classList.add('stale');
     // retired rows join the end of #log's archive, ahead of its live page
     const arch = document.createDocumentFragment();
@@ -10119,9 +10137,22 @@
   }
   // After a reflow (font swap, resize, a late image): an idle page that
   // outgrew its column re-deals, otherwise the live column's own spill
-  // just flips on - nothing else moves rows
-  const refitPages = () =>
-    cols().some((c) => c !== activeEl && c.scrollHeight > c.clientHeight + 1) ? deal() : flipCols();
+  // just flips on - nothing else moves rows. The check measures on the
+  // flip's own ruler - a row's bottom past the fold - because scrollHeight
+  // also counts floated media and margin overhang that never crossed the
+  // fold, and a phantom overflow re-dealt every page on each late image
+  const refitPages = () => {
+    for (const c of cols()) {
+      if (c === activeEl) continue;
+      const live = liveRows(c), { fold } = pageBox(c);
+      for (let j = live.length - 1; j >= 0; j--) {
+        if (rowCollapsed(live[j])) continue;
+        if (live[j].getBoundingClientRect().bottom > fold + 0.5) return deal();
+        break;
+      }
+    }
+    return flipCols();
+  };
   // Rev's drain: moves rows below the fold of `from` onto `to`. The scan
   // collects the moving run in one pass while nothing mutates - reading
   // a row's position right after moving it forced a layout per row

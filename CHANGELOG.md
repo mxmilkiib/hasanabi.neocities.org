@@ -90,6 +90,14 @@ not versions - the page ships continuously to Neocities.
   right the flag still heads the aux cluster
 
 ### Split columns
+- a real glitch fix: refitPages judged idle-column overflow by
+  scrollHeight, which also counts floated media, margin overhang and
+  clipped ghost content - none of which crossed the fold. every late
+  image or metric wobble re-dealt the whole layout, visibly shuffling
+  pages sideways and sometimes leaving the first column blank. the
+  check now measures on the flip's own ruler - a row's bottom past
+  the fold - and deal() back-fills a thin live set from the archive's
+  newest rows so a short history can't strand an empty column
 - the page-flip wave's ghosted rows fade deeper: resting opacity .6 →
   .45, and .12 → .08 just under the wave edge
 - the mode names spell out their parts: e is emotes, v is vid, h is
