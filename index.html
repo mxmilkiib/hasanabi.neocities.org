@@ -10245,7 +10245,7 @@
   // one chat column beside the rail instead - video+emotes, the same
   // with stats back in, then emotes alone (video floats like 6). 10 is
   // two chat columns with the video over the help popup in the rail
-  const SPLIT_NAMES = ['1col', '2col', '3col', '3col+vid/emotes/s', '3col+vid/emotes', '3col+emotes (vid off, ▶ floats)', '2col+vid/emotes', '2row', '2col+emotes (vid off, ▶ floats)', '3col+vid/help', '2col+vid/help'];
+  const SPLIT_NAMES = ['1col', '2col', '3col', '3col+vid/emotes/stats', '3col+vid/emotes', '3col+emotes (vid off, ▶ floats)', '2col+vid/emotes', '2x2 (chat/emotes · vid/stats)', '2col+emotes (vid off, ▶ floats)', '3col+vid/help', '2col+vid/help'];
   const splitGlyph = (l) => l === 1 ? '▮' : l === 10 ? '▮▮?' : l === 11 ? '▮?' : l === 8 ? '⊞' : l === 9 ? '▮☻' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);

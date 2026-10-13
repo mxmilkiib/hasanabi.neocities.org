@@ -24,8 +24,9 @@ not versions - the page ships continuously to Neocities.
 
 ### Split columns
 - the mode names spell out their parts: e is emotes, v is vid, h is
-  help, and the floats note reads (vid off, ▶ floats) - 3col+vid/emotes/s
-  · 3col+vid/emotes · 3col+emotes · 2col+vid/emotes · 2row ·
+  help, s is stats, 2row becomes 2x2 (chat/emotes · vid/stats), and the
+  floats note reads (vid off, ▶ floats) - 3col+vid/emotes/stats ·
+  3col+vid/emotes · 3col+emotes · 2col+vid/emotes · 2x2 ·
   2col+emotes · 3col+vid/help · 2col+vid/help
 - level 10 (3col+vid/help, ▮▮?) pairs two chat columns with a rail holding
   the video over the help popup: the popup docks into the rail and
