@@ -153,10 +153,10 @@ not versions - the page ships continuously to Neocities.
   (national wiki, national working groups) then fourteen caucuses -
   the five already listed plus 21st century socialism, caracol,
   communist caucus, emerge, groundwork, liberation, north star, red
-  star and reform & revolution. each caucus gains its tendency in the
-  descriptor, with caucus press linked where it exists: the call
-  (bread & roses), cosmonaut (marxist unity), the agitator
-  (socialist majority) and dualpower.app (libertarian socialist)
+  star and reform & revolution. each caucus gains a founding year and
+  tendency line, plus extra seats where they exist: caucus press (the
+  call, partisan, building up, cosmonaut, light & air, zenith, the
+  agitator, dualpower.app), program/points docs and join pages
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
