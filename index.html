@@ -10196,9 +10196,8 @@
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
     if (lblsOn) q.set('lbls', '1');
     if (copyHelp) {
-      // a picked page emits the panel open on it - ?htab alone would
-      // open it too, but help=panel states the intent
-      q.set('help', HELP_MODES[1]);
+      // a picked page emits the panel open on it - ?htab alone opens
+      // it too, so help=panel would just be noise
       q.set('htab', copyHelp);
     }
     // a theme rides as ?theme=name: an exact preset match is cleanest,
@@ -10209,16 +10208,15 @@
     let qs = q;
     if (pin) {
       const p = THEME_PRESETS[pin], cmp = presetCmp();
-      const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', help: 'help', lbls: 'lbls', anim: 'anim', epzoom: 'epzoom', epfz: 'epfz' };
+      const PINNED = { colour: 'colour', variant: 'variant', shade: 'shade', font: 'font', size: 'px', lh: 'lhv', wght: 'wv', ls: 'lsv', lw: 'lwv', lines: 'lines', zebra: 'zebra', times: 'times', shadow: 'shadow', sub: 'subMode', eonly: 'eonly', split: 'split', hpw: 'hpw', hfs: 'hfspx', hpfs: 'hpfs', self: 'self', lbls: 'lbls', anim: 'anim', epzoom: 'epzoom', epfz: 'epfz' };
       qs = new URLSearchParams();
       for (const [k, v] of q) {
         const f = PINNED[k];
         if (!f || !(f in p) || !presetFieldEq(p, f, cmp)) qs.append(k, v);
       }
-      // the default face needs no name: an untouched nightshade leaves a
-      // param-free url, and any real diff still earns theme=nightshade so
-      // the recipient lands on the same base
-      if (pin !== 'nightshade' || [...qs.keys()].length) qs = new URLSearchParams([['theme', pin], ...qs]);
+      // the default face needs no name - nightshade is the base a
+      // recipient's first visit already lands on, so it earns no param
+      if (pin !== 'nightshade') qs = new URLSearchParams([['theme', pin], ...qs]);
     }
     return location.origin + location.pathname + ([...qs.keys()].length ? '?' + qs : '');
   }
