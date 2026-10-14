@@ -32,6 +32,8 @@ not versions - the page ships continuously to Neocities.
   store-level campaign) after pacbi
 
 ### Help popup
+- the layout section seats each level's chip beside its own
+  description bullet instead of bunching them after the family head
 - the config tab reads help/⚙ - a settings cog in place of 'conf'
 - tail descriptors in a long resources row no longer render at full
   size: the (…) note-face wrap re-walked the row per bracket under a
