@@ -79,10 +79,19 @@
     border-radius: 8px; padding: 1.1em 1.3em; color: var(--dim); font-size: .92em;
   }
   .how code { color: var(--text); background: rgba(255,255,255,.06); padding: .1em .35em; border-radius: 4px; font-size: .92em; }
+  .laysec {
+    display: grid; grid-template-columns: 9em 1fr; gap: 0 14px;
+    margin: 14px 0;
+  }
+  .laysec > b {
+    color: #b9a5f0; font-weight: 700; padding-top: .45em;
+  }
+  @media (max-width: 560px) { .laysec { grid-template-columns: 1fr; } .laysec > b { padding-top: 0; } }
   .shots {
     display: flex; flex-wrap: wrap; justify-content: center;
     align-items: stretch; gap: 12px;
   }
+  .laysec .shots { justify-content: flex-start; padding-top: .1em; }
   .shots a {
     display: block; flex: 1 1 210px; max-width: 260px;
     border: 1px solid var(--line); border-radius: 8px;
@@ -177,22 +186,28 @@
   </div>
 
   <h2>layouts</h2>
-  <div class="shots">
+  <div class="laysec"><b>1col</b><div class="shots">
     <a href="https://hasanabi.neocities.org/?split=1c"><img src="shots/split-1c.webp" alt="the 1col chat layout" loading="lazy"><span>1col chat</span></a>
     <a href="https://hasanabi.neocities.org/?split=1ch"><img src="shots/split-1ch.webp" alt="the 1col help layout" loading="lazy"><span>1col help</span></a>
+  </div></div>
+  <div class="laysec"><b>2col</b><div class="shots">
     <a href="https://hasanabi.neocities.org/?split=2c"><img src="shots/split-2c.webp" alt="the 2col chat layout" loading="lazy"><span>2col chat</span></a>
     <a href="https://hasanabi.neocities.org/?split=2ch"><img src="shots/split-2ch.webp" alt="the 2col chat help layout" loading="lazy"><span>2col chat help</span></a>
     <a href="https://hasanabi.neocities.org/?split=2cvh"><img src="shots/split-2cvh.webp" alt="the 2col chat vid/help layout" loading="lazy"><span>2col chat vid/help</span></a>
     <a href="https://hasanabi.neocities.org/?split=2cve"><img src="shots/split-2cve.webp" alt="the 2col chat vid/emotes layout" loading="lazy"><span>2col chat vid/emotes</span></a>
     <a href="https://hasanabi.neocities.org/?split=2ce"><img src="shots/split-2ce.webp" alt="the 2col chat emotes layout" loading="lazy"><span>2col chat emotes</span></a>
+  </div></div>
+  <div class="laysec"><b>2x2</b><div class="shots">
     <a href="https://hasanabi.neocities.org/?split=2x2"><img src="shots/split-2x2.webp" alt="the 2x2 layout" loading="lazy"><span>2x2</span></a>
+  </div></div>
+  <div class="laysec"><b>3col</b><div class="shots">
     <a href="https://hasanabi.neocities.org/?split=3c"><img src="shots/split-3c.webp" alt="the 3col chat layout" loading="lazy"><span>3col chat</span></a>
     <a href="https://hasanabi.neocities.org/?split=3ch"><img src="shots/split-3ch.webp" alt="the 3col chat help layout" loading="lazy"><span>3col chat help</span></a>
     <a href="https://hasanabi.neocities.org/?split=3cvh"><img src="shots/split-3cvh.webp" alt="the 3col chat vid/help layout" loading="lazy"><span>3col chat vid/help</span></a>
     <a href="https://hasanabi.neocities.org/?split=3cves"><img src="shots/split-3cves.webp" alt="the 3col chat vid/emotes/stats layout" loading="lazy"><span>3col chat vid/emotes/stats</span></a>
     <a href="https://hasanabi.neocities.org/?split=3cve"><img src="shots/split-3cve.webp" alt="the 3col chat vid/emotes layout" loading="lazy"><span>3col chat vid/emotes</span></a>
     <a href="https://hasanabi.neocities.org/?split=3ce"><img src="shots/split-3ce.webp" alt="the 3col chat emotes layout" loading="lazy"><span>3col chat emotes</span></a>
-  </div>
+  </div></div>
 
   <h2>resources</h2>
   <ul class="cols">
