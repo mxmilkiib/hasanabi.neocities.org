@@ -103,6 +103,9 @@ not versions - the page ships continuously to Neocities.
 - level 13, 3col+help: the same rail-docked popup beside two chat
   columns, seated right under 3col in the menu and ?split=3ch. the
   level-10 glyph gains its ▶ the same way - ▮▮▶? over ▮▮?
+- the update bar's poll chips moved into the centre run, seated
+  between the message and the right reload button - part of the
+  message cluster now rather than a separate block beside the ✕
 ### Resources
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
