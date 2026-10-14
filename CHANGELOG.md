@@ -20,6 +20,9 @@ not versions - the page ships continuously to Neocities.
   numbers and the help list's layout chips index the menu top to
   bottom, and a saved layout stores its short alias (`2cve`…) so a
   later reshuffle can't move it
+- `2x2` flips its quadrants: the left column runs the emote picker
+  over stats, and the right column stacks the video over the chat -
+  hiding the video hands the chat the full height
 - the youtube, twitter and instagram inline preview cards hang at
   quarter depth off the row indent instead of half
 - the user card's buttons sit directly under the name as a two-column
