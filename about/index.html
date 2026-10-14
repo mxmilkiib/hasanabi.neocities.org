@@ -84,14 +84,26 @@
     margin: 14px 0;
   }
   .laysec > b {
-    color: #b9a5f0; font-weight: 700; padding-top: .45em;
+    color: var(--accent); font-weight: 700; padding-top: .45em;
   }
   @media (max-width: 560px) { .laysec { grid-template-columns: 1fr; } .laysec > b { padding-top: 0; } }
   .shots {
     display: flex; flex-wrap: wrap; justify-content: center;
     align-items: stretch; gap: 12px;
   }
-  .laysec .shots { justify-content: flex-start; padding-top: .1em; }
+  .laysec .shots { padding-top: .1em; }
+  .cmpwrap { overflow-x: auto; }
+  .cmp { border-collapse: collapse; margin: 0 auto; font-size: .8em; }
+  .cmp th, .cmp td { text-align: left; padding: .45em .9em; border-bottom: 1px solid var(--line); }
+  .cmp tr:last-child td { border-bottom: 0; }
+  .cmp th {
+    color: var(--accent); font-size: .85em; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .14em;
+    border-bottom-color: var(--accent-dim);
+  }
+  .cmp td:first-child { font-weight: 700; white-space: nowrap; }
+  .cmp tr.us td { color: var(--accent); }
+  .cmp tr.us a { color: var(--accent); }
   .shots a {
     display: block; flex: 1 1 210px; max-width: 260px;
     border: 1px solid var(--line); border-radius: 8px;
@@ -145,6 +157,14 @@
         <li>bots on a switch <i>blammobot &amp; fossabot vanish entirely</i></li>
       </ul>
     </li>
+    <li><b>marks &amp; mods</b>
+      <ul>
+        <li>mod actions inline <i>timeouts, bans, /clear - the struck rows ghost</i></li>
+        <li>channel-point highlights <i>glorp/F glows violet, mentions go amber</i></li>
+        <li>?mid permalinks <i>click a timestamp to copy a link to that line</i></li>
+        <li>gap seams <i>silent stretches get a cause-tagged marker row</i></li>
+      </ul>
+    </li>
   </ul>
 
   <h2>extras</h2>
@@ -171,7 +191,35 @@
         <li>update notice <i>a reload bar when a new build lands</i></li>
       </ul>
     </li>
+    <li><b>the chrome</b>
+      <ul>
+        <li>title ticker <i>the stream's title runs under the header</i></li>
+        <li>status line <i>live since, uptime, viewers, chat-mode requirements</i></li>
+        <li>msgs/sec meter <i>a live rate plus sparkline in the header</i></li>
+        <li>pull-to-refresh <i>drag the header down to reload</i></li>
+      </ul>
+    </li>
   </ul>
+
+  <h2>alt twitch chat</h2>
+  <div class="cmpwrap"><table class="cmp">
+    <tr><th>client</th><th>runs on</th><th>3rd-party emotes</th><th>send</th><th>the angle</th></tr>
+    <tr class="us"><td>this page</td><td>web</td><td>7tv·bttv·ffz</td><td>yes</td><td>14 layouts, stats, resources &amp; reading lists baked in</td></tr>
+    <tr><td><a href="https://chatterino.com/">chatterino</a></td><td>win·lin·mac</td><td>7tv·bttv·ffz</td><td>yes</td><td>the standard - splits for multi-channel</td></tr>
+    <tr><td><a href="https://github.com/SevenTV/chatterino7">chatterino7</a></td><td>win·lin·mac</td><td>7tv·bttv·ffz</td><td>yes</td><td>chatterino with the 7tv paints</td></tr>
+    <tr><td><a href="https://chatty.github.io/">chatty</a></td><td>win·lin·mac</td><td>7tv·bttv·ffz</td><td>yes</td><td>java, built for moderating many rooms</td></tr>
+    <tr><td><a href="https://chatsen.app/">chatsen</a></td><td>ios·android</td><td>7tv·bttv·ffz</td><td>yes</td><td>chat-first, badge library</td></tr>
+    <tr><td><a href="https://www.frostyapp.io/">frosty</a></td><td>ios·android</td><td>7tv·bttv·ffz</td><td>yes</td><td>full client - browse, watch, chat</td></tr>
+    <tr><td><a href="https://github.com/flex3r/DankChat">dankchat</a></td><td>android</td><td>7tv·bttv·ffz</td><td>yes</td><td>chat only, many rooms</td></tr>
+    <tr><td><a href="https://github.com/crackededed/Xtra">xtra</a></td><td>android</td><td>7tv·bttv·ffz</td><td>yes</td><td>full client, vod downloads</td></tr>
+    <tr><td><a href="https://www.giambaj.it/twitch/jchat/">jchat</a></td><td>web</td><td>7tv·bttv·ffz</td><td>no</td><td>obs browser-source overlay</td></tr>
+    <tr><td><a href="https://nightdev.com/kapchat/">kapchat</a></td><td>web</td><td>bttv·ffz</td><td>no</td><td>nightdev's classic overlay</td></tr>
+    <tr><td><a href="https://raftchat.com/">raftchat</a></td><td>web</td><td>7tv·bttv·ffz</td><td>no</td><td>multi-chat grid</td></tr>
+    <tr><td><a href="https://github.com/Xithrius/twitch-tui">twitch-tui</a></td><td>terminal</td><td>names only</td><td>yes</td><td>rust tui</td></tr>
+    <tr><td><a href="https://github.com/fgl27/smarttv-twitch">smarttv client</a></td><td>tv</td><td>shows them</td><td>-</td><td>tizen + android tv</td></tr>
+    <tr><td><a href="https://github.com/S0und/S0undTV">s0undtv</a></td><td>tv</td><td>shows them</td><td>-</td><td>android tv</td></tr>
+    <tr><td><a href="https://www.twitch.tv/popout/hasanabi/chat">twitch popout</a></td><td>web</td><td>twitch only</td><td>yes</td><td>the official bare chat</td></tr>
+  </table></div>
 
   <h2>themes</h2>
   <div class="shots">
