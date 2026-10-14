@@ -24,6 +24,8 @@ not versions - the page ships continuously to Neocities.
   dead corner
 
 ### Resources
+- the channels/streams table heads its columns: channel · kind, then
+  each service column wearing its name (tw, yt, reddit…)
 - the usa pol dsa row's parens gain reddit (r/dsa) and twitter
   (@demsocialists)
 - workers unions: ewoc gains its wikipedia * in the start-a-union
