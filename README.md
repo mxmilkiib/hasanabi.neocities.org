@@ -258,28 +258,30 @@ no dependencies beyond CDN-hosted fonts.
     placeholder.
 - **Chat columns**
   - The layout menu has fourteen layouts:
-    - `1col` keeps one full-width chat column.
+    - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup fills the
       row, centred between two mirrored edge grips.
-    - `2col` and `3col` pass older messages to the next chat column.
-      Three chat columns need a landscape screen.
-    - `2col help` docks the help popup in the rail beside one chat
-      column - no video over it; `▶` floats it like `2col emotes`.
-    - `2col vid/emotes` keeps one chat column on the left and puts
+    - `2col chat` and `3col chat` pass older messages to the next chat
+      column. Three chat columns need a landscape screen.
+    - `2col chat help` docks the help popup in the rail beside one
+      chat column - no video over it; `▶` floats it like `2col chat emotes`.
+    - `2col chat vid/emotes` keeps one chat column on the left and puts
       video above the emote picker on the right.
     - `2x2` puts chat over emotes on the left and video over stats on
       the right.
-    - `2col emotes` puts chat beside the emote picker. Video starts
+    - `2col chat emotes` puts chat beside the emote picker. Video starts
       off; `▶` can float it over the chat.
-    - `2col vid/help` puts chat beside video and the help popup.
-    - `3col help` docks the same popup rail beside two chat columns.
-    - `3col vid/emotes/stats` puts two chat columns beside a column
-      with video, emotes and stats.
-    - `3col vid/emotes` puts two chat columns beside video and emotes.
-    - `3col emotes` puts two chat columns beside the emote picker;
+    - `2col chat vid/help` puts chat beside video and the help popup.
+    - `3col chat help` docks the same popup rail beside two chat
+      columns.
+    - `3col chat vid/emotes/stats` puts two chat columns beside a
+      column with video, emotes and stats.
+    - `3col chat vid/emotes` puts two chat columns beside video and
+      emotes.
+    - `3col chat emotes` puts two chat columns beside the emote picker;
       video can float above the chat.
-    - `3col vid/help` puts two chat columns beside video and the help
-      popup.
+    - `3col chat vid/help` puts two chat columns beside video and the
+      help popup.
   - Drag the divider to change the side column's width. In layouts
     with both emotes and stats, drag their divider to divide the
     remaining height. When help fills the side column, its own move
