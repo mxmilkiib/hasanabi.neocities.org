@@ -2518,7 +2518,7 @@
   </header>
   <div id="ptr" aria-hidden="true"><span>↻</span></div>
   <div id="titleBar" class="hbar" role="status" hidden><span class="hbar-txt" id="titleTxt"></span><button class="hdr-btn" id="titleX" type="button" title="hide the stream title - it returns when the title changes or the stream restarts"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
-  <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move"></div><div class="hp-scroll">
+  <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move · double-click to maximise"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">help/⚙</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
     <div class="wide one" style="max-width: 1360px; margin-inline: auto"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><br><span>[?] font size: <span id="helpFsList"></span><sup>†</sup></span><br><span>[?] position: <span id="helpPosList"></span><sup>†</sup></span></div>
@@ -14992,6 +14992,7 @@
     helpPanel.style.left = r.left + 'px'; helpPanel.style.top = r.top + 'px';
     helpPanel.style.right = 'auto';
     const move = (ev) => {
+      hpMaxRect = null; // a dragged edge ends the maximised state
       if (edge.includes('l')) {
         const w = Math.round(Math.max(280, Math.min(innerWidth - 24, r.right - ev.clientX)));
         helpPanel.style.left = (r.right - w) + 'px';
@@ -15033,7 +15034,31 @@
   });
 
   // the dotted strip drags the panel; the corner glyphs resize with the
-  // opposite corner anchored - same idiom as the stream overlay
+  // opposite corner anchored - same idiom as the stream overlay.
+  // double-clicking the strip maximises: the widest tallest box that
+  // fits under the header; a second double-click puts the old box back
+  let hpMaxRect = null;
+  helpPanel.querySelector('.hp-handle').addEventListener('dblclick', (e) => {
+    if (helpPanel.hidden || helpPanel.parentNode === railEl) return;
+    e.preventDefault();
+    if (hpMaxRect) {
+      const m = hpMaxRect;
+      hpMaxRect = null;
+      helpPanel.style.left = m.l + 'px'; helpPanel.style.top = m.t + 'px';
+      helpPanel.style.width = helpPanel.style.maxWidth = m.w + 'px';
+      helpPanel.style.height = m.h + 'px'; helpPanel.style.maxHeight = 'none';
+    } else {
+      const r = helpPanel.getBoundingClientRect();
+      hpMaxRect = { l: r.left, t: r.top, w: r.width, h: r.height };
+      const t = headerEl.getBoundingClientRect().bottom + 4;
+      helpPanel.style.right = 'auto';
+      helpPanel.style.left = '8px'; helpPanel.style.top = t + 'px';
+      helpPanel.style.width = helpPanel.style.maxWidth = (innerWidth - 16) + 'px';
+      helpPanel.style.height = (innerHeight - t - 8) + 'px';
+      helpPanel.style.maxHeight = 'none';
+    }
+    saveHsize('lrtb');
+  });
   helpPanel.querySelector('.hp-handle').addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || helpPanel.hidden) return;
     e.preventDefault(); e.stopPropagation();
@@ -15043,6 +15068,7 @@
     const r = helpPanel.getBoundingClientRect();
     const ox = e.clientX - r.left, oy = e.clientY - r.top;
     const move = (ev) => {
+      hpMaxRect = null; // moving by hand un-maximises
       helpPanel.style.right = 'auto';
       helpPanel.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
       helpPanel.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
@@ -15076,6 +15102,7 @@
       const ay = topEdge ? r.bottom : r.top;
       const htop = headerEl.getBoundingClientRect().bottom + 4;
       const move = (ev) => {
+        hpMaxRect = null; // a grip drag ends the maximised state
         if (leftEdge || rightEdge) {
           // cap the grown edge at the screen it faces, but never below the
           // minimum - a cap under 280 on a narrow screen must not collapse it

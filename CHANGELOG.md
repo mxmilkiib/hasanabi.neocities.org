@@ -6,6 +6,12 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-14
 
 ### Header
+- stream-status length gains a `blank` stop - the space beside the
+  dot empties entirely (no status text, no chat-mode chips);
+  `?sview=blank` or the wheel past `minimal`
+- double-click the floating help popup's top strip to maximise it to
+  the largest box under the header - again to restore, and any manual
+  move or resize drops the maximised state
 - the ⇄ letter-spacing, ▦ zebra and ≡ row-separator glyphs scale up
   a size (1.3×) to sit level with their neighbours
 - pull-to-refresh: a downward drag on the header grows a ↻ strip
