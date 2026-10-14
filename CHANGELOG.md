@@ -13,6 +13,7 @@ not versions - the page ships continuously to Neocities.
   standalone has no native pull gesture to catch
 - the chat font list moves system sans above inter and helvetica
   below hack
+- the line-height ↕ and timestamp ◷ glyphs come down half a pixel
 - the status length cycle gains 'stats' between full and compact:
   the full run of times and counts without the chat-modes tail (no
   'chat follow req…') - the mode chips pick up the slack unless
