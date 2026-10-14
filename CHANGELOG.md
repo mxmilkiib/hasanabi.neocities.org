@@ -139,8 +139,9 @@ not versions - the page ships continuously to Neocities.
   punished fredda, mikefrompa & yugopnik's anti-fascist show, hosts
   column like the other ensemble podcasts; unruly subjects moves above
   pod save america
-- news & talk gains philip defranco at the tail, and essays gains
-  benn jordan (music tech)
+- news & talk gains philip defranco at the tail with reese waters
+  under him (news, comedy), and essays gains benn jordan (music tech);
+  podcasts seats josh johnson (comedy) above alexei sayle
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
