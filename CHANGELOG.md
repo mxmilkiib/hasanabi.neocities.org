@@ -128,7 +128,9 @@ not versions - the page ships continuously to Neocities.
   intro and motions table pair seat in organising's parliamentary run
   after robert's rules. dsa resources fills out with the zendesk help
   center and an org tools run - openslides (site + repo), solidarity
-  tech (site + connector profile), short.io, and the portal root
+  tech (site + connector profile), short.io, and the portal root.
+  organising's reading run gains foster's 1926 organize the
+  unorganized beside rules for radicals
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
   heads and note rows stay out of the count
