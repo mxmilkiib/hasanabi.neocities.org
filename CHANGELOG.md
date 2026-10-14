@@ -112,6 +112,13 @@ not versions - the page ships continuously to Neocities.
   flat 50-pass guard, which workers unions' start-a-union run had
   outgrown - the guard now scales with the row's own paren count
 
+### About page
+- a layouts gallery sits under the call-to-action: all fourteen
+  `?split=` layouts as live-stream screenshot cards, each linking to
+  the page opened in that layout
+- the theme shots are re-taken over the live stream rather than the
+  old canned-chat stub
+
 ## 2026-10-13
 
 ### Emote picker
