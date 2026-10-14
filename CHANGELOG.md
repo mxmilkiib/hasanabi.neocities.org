@@ -11,6 +11,8 @@ not versions - the page ships continuously to Neocities.
 - pull-to-refresh: a downward drag on the header grows a ↻ strip
   that reloads past its arm point - the page never scrolls, so PWA
   standalone has no native pull gesture to catch
+- the chat font list moves system sans above inter and helvetica
+  below hack
 - a wrapped header lets the button strip reach under the pinned ?/–:
   the corner reserve only matters on the line they pin, so on the
   strip's own line a negative margin mirrors the left pad - wrapped
