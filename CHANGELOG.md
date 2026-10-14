@@ -120,6 +120,11 @@ not versions - the page ships continuously to Neocities.
   the tab the url opens the popup on. the `help/⚙` tab shortens to
   `help`, and `?htab=` emits `help` for it (`config` still resolves)
 - the theme slots sit under the copy-settings button
+- an `alt twitch chat` section lands above the about footer,
+  subsectioned by platform: web (jchat, kapchat, raftchat,
+  multitwitch, the official popout), desktop (chatterino + its 7tv
+  fork, chatty), mobile (chatsen, frosty, dankchat, xtra), terminal
+  (twitch-tui, twitch's own irc) and tv (smarttv client, s0undtv)
 - tail descriptors in a long resources row no longer render at full
   size: the (…) note-face wrap re-walked the row per bracket under a
   flat 50-pass guard, which workers unions' start-a-union run had
