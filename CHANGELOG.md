@@ -164,7 +164,9 @@ not versions - the page ships continuously to Neocities.
   and tİp + dem; and new asia (jcp, jvp + npp, cpi(m), cpn-uml,
   hadash, makabayan), africa (eff, sacp, sudanese communist -
   wiki, underground) and oceania (victorian socialists, socialist
-  alliance, aotearoa greens) runs close the map
+  alliance, aotearoa greens) runs close the map. the acronym
+  labels read as full names - psl, ndp, pcf, tİp et al spelled
+  out, the universal handles (kke, akel, jvp) kept in parens
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
   heads and note rows stay out of the count
