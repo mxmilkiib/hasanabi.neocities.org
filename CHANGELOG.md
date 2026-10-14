@@ -118,6 +118,11 @@ not versions - the page ships continuously to Neocities.
   between the message and the right reload button - part of the
   message cluster now rather than a separate block beside the ✕
 ### Resources
+- the caucuses table gains a news column between press and join:
+  north star's blog rekeys there (it's a feed, not an organ), and
+  six feeds join it - marxist unity's latest, r&r's news & analysis,
+  emerge and liberation's articles pages, caracol's posts and red
+  star's newsletter tag
 - the caucuses sort chips ride the indexes row in the descriptions
   column - the topmost cell of column 3, so they hover over the text
   they order rather than the header's left or right. they sit inside
