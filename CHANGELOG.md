@@ -9,6 +9,9 @@ not versions - the page ships continuously to Neocities.
 - stream-status length gains a `blank` stop - the space beside the
   dot empties entirely (no status text, no chat-mode chips);
   `?sview=blank` or the wheel past `minimal`
+- header button glyphs hold their seat whatever chat font is picked -
+  they run the base sans face now; the font picker's own button still
+  wears the picked font, that's its point
 - the chat font-size wheel runs inverted - scroll down shrinks, up
   grows
 - the layout button's wheel cycles the menu's display order (2-col

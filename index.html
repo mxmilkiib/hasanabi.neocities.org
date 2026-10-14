@@ -2480,6 +2480,9 @@
      width follows the label, capped so a long name can't stretch the row */
   #fontPick { width: auto; padding: 0 8px; max-width: 118px; overflow: hidden;
     text-overflow: ellipsis; white-space: nowrap; }
+  /* the header's other buttons keep the base sans face, so each glyph
+     holds its metrics and seat whatever chat font is picked */
+  header .hdr-btn:not(#fontPick) { font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif; }
   /* the menu pops fixed below the button on every viewport - living
      inside .hdr-side means unpositioned it would join the button row */
   #fontMenu, #splitMenu { position: fixed; z-index: 70; min-width: 180px; max-height: 65vh; overflow-y: auto;
