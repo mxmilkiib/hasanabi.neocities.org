@@ -83,6 +83,9 @@ not versions - the page ships continuously to Neocities.
   run, and union organizer joins the concepts run after soviet; the
   boycott run gains no appetite for apartheid (na4a.org, the
   store-level campaign) after pacbi
+- extra links: the internationale (dsa anthem) joins after bella
+  ciao, and go west (pet shop boys) before hootie frutti; the
+  section's youtube links all run the youtu.be share form
 
 ### Help popup
 - the stats tab's storage rows run in wider 26em columns
