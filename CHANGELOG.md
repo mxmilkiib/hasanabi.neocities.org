@@ -24,6 +24,9 @@ not versions - the page ships continuously to Neocities.
   dead corner
 
 ### Resources
+- usa pol's link columns widen to 40em
+- the caucuses index link moves to the name column, heading the
+  caucus rows below it
 - the channels/streams table heads its columns: channel · kind, then
   each service column wearing its name (tw, yt, reddit…)
 - the usa pol dsa row's parens gain reddit (r/dsa) and twitter
