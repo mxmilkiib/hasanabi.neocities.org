@@ -14044,7 +14044,9 @@
   // yt-channel entries already get from their nested <i> - a range wrap also
   // covers parens holding their own links, since only elements can be whole
   for (const el of helpPanel.querySelectorAll('#htabRes div, #htabLib div, #htabLbr div, #htabAuth div, #htabCfg .cmds')) {
-    for (let guard = 0; guard < 50; guard++) {
+    // each pass wraps one (…) run - a flat bound once left a long row's
+    // tail unwrapped, so cap passes at the row's own paren count
+    for (let guard = 0, need = (el.textContent.match(/\(/g) || []).length; guard < need; guard++) {
       const texts = [];
       const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       let t;
