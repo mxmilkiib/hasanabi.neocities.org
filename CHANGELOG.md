@@ -67,6 +67,9 @@ not versions - the page ships continuously to Neocities.
   dead corner
 
 ### Resources
+- the left tab's four dsa sections - usa pol, chapters, caucuses and
+  resources - move to their own `dsa` tab, seated left of `left`;
+  `?htab=dsa` and the copy-settings popup pick both reach it
 - the caucuses table gains the two seat-holders it was missing:
   springs of revolution (4 npc, the second-biggest bloc) and
   carnation (1 npc); the listed caucuses' npc figures verify

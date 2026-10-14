@@ -469,7 +469,7 @@ editing a URL.
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
 | `lbls` | flag | header button labels shown beside each header control - independent of the `?` cycle |
-| `htab` | `help`/`media`/`left`/`libre`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`config`, `resources` and `liberatory` still resolve to `help`/`media`/`libre`) |
+| `htab` | `help`/`media`/`dsa`/`left`/`libre`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`config`, `resources` and `liberatory` still resolve to `help`/`media`/`libre`) |
 | `kw` | comma list | keyword highlights (green edge) |
 | `bw` | comma list | block words - matching lines hidden |
 | `ping` | flag | mention ping sound |
