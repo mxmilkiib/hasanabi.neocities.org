@@ -183,6 +183,12 @@ not versions - the page ships continuously to Neocities.
   structure' - the word system was being eaten by a client-side icon
   substitution. the caucus index link 'national wiki' relabels as
   triangle dsa wiki - it's the nc chapter's, not a national organ
+- dsa caucuses gains a bylaws column for the five caucuses that
+  publish a governing doc - literal bylaws for reform & revolution and
+  libertarian socialist, rules for marxist unity, and conduct pages
+  for emerge and caracol, each labelled by what it actually is. the
+  other nine publish nothing beyond the program/points already
+  linked, so their seats stay empty rather than link a lie
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
