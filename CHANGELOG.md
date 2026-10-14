@@ -95,6 +95,11 @@ not versions - the page ships continuously to Neocities.
 - the split-columns help row seats the +vid/help chips under the +help
   item rather than inside the column families, and the 2col list's
   tail runs +emotes then 2x2 to match the menu order
+- new split level 12, 2col+help: the help popup docks in the rail
+  beside one chat column with no video over it (▶ floats it like the
+  emote-only modes). the wheel, ?split=2ch and the menu all reach it -
+  it sits right under 2col there - and the level-11 glyph gains its ▶
+  now that help-alone would wear the same ▮? mark
 ### Resources
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
