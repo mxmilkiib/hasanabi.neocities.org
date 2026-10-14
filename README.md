@@ -257,31 +257,31 @@ no dependencies beyond CDN-hosted fonts.
     month count, the label shows a dim dash. Bots do not get that
     placeholder.
 - **Chat columns**
-  - The layout menu has fourteen layouts:
+  - The layout menu has fourteen layouts, listed in menu order:
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup fills the
       row, centred between two mirrored edge grips.
-    - `2col chat` and `3col chat` pass older messages to the next chat
-      column. Three chat columns need a landscape screen.
+    - `2col chat` passes older messages to a second chat column.
     - `2col chat help` docks the help popup in the rail beside one
       chat column - no video over it; `▶` floats it like `2col chat emotes`.
+    - `2col chat vid/help` puts chat beside video and the help popup.
     - `2col chat vid/emotes` keeps one chat column on the left and puts
       video above the emote picker on the right.
-    - `2x2` puts chat over emotes on the left and video over stats on
-      the right.
     - `2col chat emotes` puts chat beside the emote picker. Video starts
       off; `▶` can float it over the chat.
-    - `2col chat vid/help` puts chat beside video and the help popup.
+    - `2x2` puts chat over emotes on the left and video over stats on
+      the right.
+    - `3col chat` runs three chat columns - a landscape screen only.
     - `3col chat help` docks the same popup rail beside two chat
       columns.
+    - `3col chat vid/help` puts two chat columns beside video and the
+      help popup.
     - `3col chat vid/emotes/stats` puts two chat columns beside a
       column with video, emotes and stats.
     - `3col chat vid/emotes` puts two chat columns beside video and
       emotes.
     - `3col chat emotes` puts two chat columns beside the emote picker;
       video can float above the chat.
-    - `3col chat vid/help` puts two chat columns beside video and the
-      help popup.
   - Drag the divider to change the side column's width. In layouts
     with both emotes and stats, drag their divider to divide the
     remaining height. When help fills the side column, its own move
@@ -430,7 +430,7 @@ no dependencies beyond CDN-hosted fonts.
 ### URL options
 
 Add these options to the page URL to set them for this visit and save
-the result. For example: `?split=2&size=18&font=inter`. For on/off
+the result. For example: `?split=3&size=18&font=inter`. For on/off
 options, `=0` means off. The controls described above work without
 editing a URL.
 

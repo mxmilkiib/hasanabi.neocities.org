@@ -664,7 +664,7 @@
   .ghostpage { position: absolute; inset: 0; box-sizing: border-box; padding: inherit;
     overflow: hidden; z-index: 5; }
   #side, #side2 { border-left: 1px solid var(--line); }
-  /* split level 4's rail: a third column holding the floating panels
+  /* the rail: a side column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
      the picker at a third of the height, stats filling the rest. The
      floating chrome (handles, grips, shadows, fixed geometry) is
@@ -685,9 +685,9 @@
     flex: 1 1 0; min-height: 0; height: auto; max-height: none; border: 0; border-radius: 0;
     border-bottom: 2px solid var(--line); box-shadow: none; }
   #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
-  /* split levels 10-13: the help popup docks in the rail - under the
-     video on 10/11, alone on 12/13 - and takes the rest of the rail;
-     its dragged or preset geometry is overridden */
+  /* the help-dock layouts (2/4/5/10/11): the help popup docks in the
+     rail - under the video on 5/11, alone on 2/4/10 - and takes the
+     rest of the rail; its dragged or preset geometry is overridden */
   #rail #helpPanel { position: static; transform: none; width: auto !important; max-width: none !important;
     height: auto !important; max-height: none !important; flex: 1 1 0; min-height: 0;
     border: 0; border-radius: 0; box-shadow: none; z-index: auto !important; }
@@ -718,7 +718,7 @@
   #railSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
   /* the rail's left seam is the same grab strip standing upright -
      dragging it fixes the rail's width, and the chat columns squeeze
-     together in equal flex:1 shares. level 14 twins it with a right-
+     together in equal flex:1 shares. level 2 twins it with a right-
      edge strip: either seam then drags the centred page's width while
      the far edge mirrors it */
   #colSplit, #colSplitR { flex: none; width: 7px; margin: 0 -4px 0 -3px; cursor: grab;
@@ -729,7 +729,7 @@
   /* a dragged rail carries its own width; 62% caps it so the chat
      columns always keep a readable share of the window */
   #rail.fixed { flex: none; width: min(var(--railw, 320px), 62%); }
-  /* level 14 leaves no chat column to spare room for: an undragged
+  /* level 2 leaves no chat column to spare room for: an undragged
      rail still fills the row, a dragged one keeps its width centred
      between the two edge grips */
   #rail.fixed.solo { flex: none; width: min(var(--railw, 320px), 100%); }
@@ -2562,7 +2562,7 @@
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> multiple layouts of the page are available via this menu. the column layouts offer a new reading experience, where the chat in one column lingers until the chat another column reaches it's end, after which the older chat in a column is grayed out until the new chat reaches it<ul><li><span class="splitSeat" data-split="0"></span> a column fills top-to-bottom, then flips to the next<sup>†</sup></li><li>the button's click lists every layout while the wheel cycles</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="1"></span> two chat columns - the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> video + emotes</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the chat and stats under the video</li><li><span class="splitSeat" data-split="8"></span> emotes alone - the video floats the same way</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="2"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="3"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="4"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="5"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li></ul></i><i><b>+help</b><ul><li><span class="splitSeat" data-split="13"></span> the help popup filling the row by itself</li><li><span class="splitSeat" data-split="11"></span> docked beside one chat column</li><li><span class="splitSeat" data-split="12"></span> or two</li><li><span class="splitSeat" data-split="10"></span> or under the video</li><li><span class="splitSeat" data-split="9"></span> under the video on the rail</li></ul></i></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> multiple layouts of the page are available via this menu. the column layouts offer a new reading experience, where the chat in one column lingers until the chat another column reaches it's end, after which the older chat in a column is grayed out until the new chat reaches it<ul><li><span class="splitSeat" data-split="0"></span> a column fills top-to-bottom, then flips to the next<sup>†</sup></li><li>the button's click lists every layout while the wheel cycles</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - the rest of the family runs one</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the chat and stats under the video</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li></ul></i><i><b>+help</b><ul><li><span class="splitSeat" data-split="1"></span> the help popup filling the row by itself</li><li><span class="splitSeat" data-split="3"></span> docked beside one chat column</li><li><span class="splitSeat" data-split="9"></span> or two</li><li><span class="splitSeat" data-split="4"></span> or under the video</li><li><span class="splitSeat" data-split="10"></span> under the video on the rail</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
@@ -2839,7 +2839,7 @@
   const colSplitREl = document.getElementById('colSplitR');
   const splitMenu = document.getElementById('splitMenu');
   let activeEl = logEl; // column currently receiving new rows
-  let splitLevel = 1; // the applied column mode - 5/6 slim the rail
+  let splitLevel = 1; // the applied layout - a level in menu order
   // the visible columns in page-flip order; a row page-flips to the column
   // after the active one, so the column after it holds the oldest rows
   const cols = () => [logEl, sideEl, side2El].slice(0, 1 + !sideEl.hidden + !side2El.hidden);
@@ -5824,20 +5824,20 @@
   const THEME_PRESETS = {
     'old-default': { colour: 'gray', shade: 7, font: 'roobert',   px: 14, lhv: 1.3, wv: 400, lwv: 400, lines: 4, zebra: 2,     times: 2,  shadow: 0, subMode: 3, eonly: 0, hpw: 7, hfspx: 14, self: 1, help: 0, lbls: 0, clean: true, epmix: 1, ephold: 2, epgeo: { w: 876, h: 625, left: 646, top: 173 } },
     irc:      { colour: 'mirc',   shade: 0,    font: 'fixedsys',   px: 24, lhv: 1, wv: 300, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
-    print:    { colour: 'cream',  shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: 2, help: 0, lbls: 0 },
-    ft:       { colour: 'salmon', shade: 1,    font: 'georgia',    px: 16, lhv: 1.5, lines: 1, zebra: false, times: 2, shadow: 0, subMode: 3, eonly: 1, split: 4, help: 0, lbls: 0 },
-    ftdark:   { colour: 'salmon', shade: 7,    font: 'georgia',    px: 16, lhv: 1.5, lines: 1, zebra: false, times: 2, shadow: 0, subMode: 3, eonly: 1, split: 4, help: 0, lbls: 0 },
-    cosy:     { colour: 'sepia',  variant: 'grain', shade: 2, font: 'sans', px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
+    print:    { colour: 'cream',  shade: 0,    font: 'sans',       px: 18, lhv: 1, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 4, eonly: 1, split: '2c', help: 0, lbls: 0 },
+    ft:       { colour: 'salmon', shade: 1,    font: 'georgia',    px: 16, lhv: 1.5, lines: 1, zebra: false, times: 2, shadow: 0, subMode: 3, eonly: 1, split: '3cves', help: 0, lbls: 0 },
+    ftdark:   { colour: 'salmon', shade: 7,    font: 'georgia',    px: 16, lhv: 1.5, lines: 1, zebra: false, times: 2, shadow: 0, subMode: 3, eonly: 1, split: '3cves', help: 0, lbls: 0 },
+    cosy:     { colour: 'sepia',  variant: 'grain', shade: 2, font: 'sans', px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: '3c', help: 0, lbls: 0 },
     dyslexic: { colour: 'lavender',shade: 2,   font: 'dyslexic',   px: 20, lhv: 2, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
     minimal:  { colour: 'mirc',   shade: 2,    font: 'lexend',     px: 16, lhv: 1, wv: 300, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: false, hfspx: -1, help: 0, lbls: 0 },
     heather:  { colour: 'lavender',shade: 2,   font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
     gohu:     { colour: 'lavender',shade: 6,   font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15, help: 0, lbls: 0 },
     midnight: { colour: 'nord',   shade: 6,    font: 'inter',      px: 14, lhv: 1.65, lines: 2, zebra: false, times: 2,  shadow: 1, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    compact:  { colour: 'gray',   shade: 7,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: 3, help: 0, lbls: 0 },
+    compact:  { colour: 'gray',   shade: 7,    font: 'mono',       px: 15, lhv: 0.8, lines: 1, zebra: true,  times: 0, shadow: 0, subMode: 0, eonly: 0, split: '3c', help: 0, lbls: 0 },
     retro:    { colour: 'green',  variant: 'phosphor', shade: 7, font: 'terminus', px: 28, lhv: 1, lines: 1, zebra: false, times: 1, shadow: 2, subMode: 0, eonly: 0, hfspx: 18, help: 0, lbls: 0 },
     solar:    { colour: 'solarized',shade: 7,  font: 'mono',  px: 16, lhv: 1.3, lines: 2, zebra: false, times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
     twitch:   { colour: 'violet', shade: 7,    font: 'inter',      px: 14, lhv: 1.5, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
-    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  lhv: 1.5, wv: 500, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, split: 4, anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: '', epfz: 1, help: 0, lbls: 0 },
+    nightshade: { colour: 'lavender', variant: 'contrast', shade: 7, font: 'roobert',  lhv: 1.5, wv: 500, lines: 0, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 0, split: '3cves', anim: 3, hpw: 7, hfspx: 13, hpfs: -2, epzoom: '', epfz: 1, help: 0, lbls: 0 },
     cinema:   { colour: 'gray',   variant: 'contrast', shade: 9, font: 'lexend', px: 28, lhv: 1.5, lines: 2, zebra: false, times: 0, shadow: 2, subMode: 2, eonly: 1, help: 0, lbls: 0 },
     phosphor: { colour: 'ember',  variant: 'phosphor', shade: 9, font: 'vt323', px: 18, lhv: 1.3, lines: 0, zebra: false, times: 2,  shadow: 0, subMode: 2, eonly: 0, help: 0, lbls: 0 },
   };
@@ -8543,7 +8543,7 @@
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
       hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos,
       lbls: lblsOn ? 1 : 0,
-      split: splitLevel,
+      split: SPLIT_URL[splitLevel - 1],
       railw: railEl.classList.contains('fixed') ? parseInt(mainEl.style.getPropertyValue('--railw')) || 0 : 0,
       rvid: vidRail,
       preset: curTheme,
@@ -8688,7 +8688,10 @@
       try { localStorage.setItem(EPICK_SIZE_KEY, JSON.stringify(o.epgeo)); } catch {}
       if (o.epgeo.left != null) setPin(true);
     }
-    if (Number.isInteger(o.split) && o.split >= 1 && o.split <= SPLIT_NAMES.length) setSplit(o.split);
+    // a saved layout is its url alias - stable across reordering; a bare
+    // int is a level id from before ids ran in menu order
+    const sl = typeof o.split === 'string' ? SPLIT_URL.indexOf(o.split) + 1 : LVL_LEGACY[o.split] || 0;
+    if (sl >= 1 && sl <= SPLIT_NAMES.length) setSplit(sl);
     if (o.railw !== undefined) {
       railEl.classList.toggle('fixed', o.railw > 0);
       if (o.railw > 0) mainEl.style.setProperty('--railw', o.railw + 'px');
@@ -8696,9 +8699,9 @@
     // after the split so a rail exists to dock into; outside rail it just
     // stores the mode for the next dock. the boolean 'video' above only
     // spans shown/hidden - this carries dock/float too
-    // the 5/6 splits own their video placement - the saved rail mode
-    // just waits for the next dock rather than rearranging the mode
-    if (['dock', 'float', 'off'].includes(o.rvid)) { vidRail = o.rvid; if (splitLevel < 5) setRailVid(o.rvid); }
+    // layouts that pin the video own its placement - the saved rail
+    // mode just waits for the next dock rather than rearranging it
+    if (['dock', 'float', 'off'].includes(o.rvid)) { vidRail = o.rvid; if (LVL_NORAIL.has(splitLevel) || splitLevel === 12) setRailVid(o.rvid); }
     if (typeof o.kw === 'string') { kwInput.value = o.kw; setKeywords(o.kw); }
     if (typeof o.bw === 'string') { bwInput.value = o.bw; setBlocked(o.bw); }
     if (typeof o.hw === 'string') { hwInput.value = o.hw; setHideList(o.hw); }
@@ -8778,7 +8781,7 @@
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
-      split: splitLevel, hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
+      split: SPLIT_URL[splitLevel - 1], hpw: helpWIdx, self: selfHl ? 1 : 0, lbls: lblsOn ? 1 : 0,
       hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs], hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs],
       clean: cleanUrls, epmix: epickMerge ? 1 : 0, ephold: epickHold, anim: nickAnim, epzoom: epickZoom, epfz: epFz,
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -9013,8 +9016,8 @@
     setVideo(mode !== 'off');
   }
   const vidNext = () => {
-    // modes 5/6 own the video's placement - the button only toggles it
-    if (railEl.hidden || splitLevel >= 5) setVideo(vidBox.hidden);
+    // layouts that pin the video own its placement - the button only toggles it
+    if (railEl.hidden || LVL_VIDRAIL.has(splitLevel) || LVL_VIDFLOAT.has(splitLevel)) setVideo(vidBox.hidden);
     else setRailVid(vidRail === 'dock' ? 'float' : vidRail === 'float' ? 'off' : 'dock');
   };
   vidBtn.addEventListener('click', () => { vidNext(); saveOpts(); });
@@ -10003,7 +10006,7 @@
   window.addEventListener('resize', () => {
     clampHelpPanel();
     // the third pane only exists in landscape; dropping to portrait folds it
-    if ((!side2El.hidden || !railEl.hidden) && window.innerWidth <= window.innerHeight) setSplit(2);
+    if ((!side2El.hidden || !railEl.hidden) && window.innerWidth <= window.innerHeight) setSplit(3);
     if (document.body.classList.contains('hdrgraph')) sparkSize();
     // rotating or shrinking the window mustn't strand a dragged panel off-screen
     [vidBox, emotePick].forEach((el) => {
@@ -10063,10 +10066,10 @@
     if (!selfHl) q.set('self', '0');
     if (splitLevel > 1) q.set('split', SPLIT_URL[splitLevel - 1]);
     // in rail mode the video state is vidRail (dock is the baseline);
-    // outside it video=1 only when the box is shown. modes 5/6 own the
-    // placement themselves - vidRail is stale there, so the url only
-    // needs the param when the mode-forced video is actually hidden
-    if (splitLevel >= 5) { if (vidBox.hidden !== (splitLevel === 6)) q.set('video', vidBox.hidden ? 'off' : 'on'); }
+    // outside it video=1 only when the box is shown. layouts that pin
+    // the video own its placement - vidRail is stale there, so the url
+    // only needs the param when the pinned video is actually hidden
+    if (LVL_VIDRAIL.has(splitLevel) || LVL_VIDFLOAT.has(splitLevel)) { if (vidBox.hidden !== (splitLevel === 14)) q.set('video', vidBox.hidden ? 'off' : 'on'); }
     else if (railEl.hidden) { if (!vidBox.hidden) q.set('video', 'on'); }
     else if (vidRail !== 'dock') q.set('video', vidRail);
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
@@ -10693,7 +10696,7 @@
     return moved;
   }
 
-  // level 4's rail deals no rows - it re-parents the floating panels:
+  // the rail deals no rows - it re-parents the floating panels:
   // video on top, the emote picker at a third of the column height, and
   // the help panel's stats page filling the rest. Their parked float
   // geometry is inline style, cleared on the way in and re-applied from
@@ -10713,7 +10716,7 @@
     const statsTab = document.getElementById('htabStats');
     if (railEl.hidden || helpPanel.parentNode === railEl || !helpPanel.contains(statsTab)) return;
     railEl.appendChild(statsTab);
-    statsTab.hidden = splitLevel >= 5 && splitLevel !== 8;
+    statsTab.hidden = !LVL_NORAIL.has(splitLevel) && !LVL_STATSRAIL.has(splitLevel);
     syncRailSplit();
   }
   // the seam only matters while both its panes sit docked in the rail
@@ -10779,8 +10782,8 @@
     statsTab.classList.toggle('st-low', h > 0 && h < 240);
     statsTab.classList.toggle('st-min', h > 0 && h < 160);
   }).observe(document.getElementById('htabStats'));
-  // level 10 parks the help popup in the rail under the video - it
-  // remembers where the popup lived so any other level can hand it back
+  // the help-dock layouts park the popup in the rail - helpHome
+  // remembers where it lived so any other level can hand it back
   let helpHome = null;
   function dockHelp() {
     if (helpPanel.parentNode !== railEl) {
@@ -10803,8 +10806,8 @@
     applyHelp();
     paintHelpBtn();
   }
-  // level 10 keeps stats as the popup's own tab and the picker floating,
-  // so anything an earlier rail level docked goes back out
+  // the help-dock layouts keep stats as the popup's own tab and the
+  // picker floating, so anything an earlier level docked goes back out
   function releasePanes() {
     const statsTab = document.getElementById('htabStats');
     if (statsHome) {
@@ -10819,16 +10822,16 @@
     }
   }
   function dockRail(level) {
-    const on = level >= 4;
+    const on = level !== 0;
     colSplitEl.hidden = !on;
-    colSplitREl.hidden = level !== 14;
-    railEl.classList.toggle('solo', level === 14);
-    mainEl.classList.toggle('hcenter', level === 14);
-    colSplitEl.title = level === 14 ? 'drag to resize the centred page'
+    colSplitREl.hidden = level !== 2;
+    railEl.classList.toggle('solo', level === 2);
+    mainEl.classList.toggle('hcenter', level === 2);
+    colSplitEl.title = level === 2 ? 'drag to resize the centred page'
       : 'drag to resize the chat columns and rail';
     const statsTab = document.getElementById('htabStats');
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
-    const helpDock = level >= 10;
+    const helpDock = LVL_HELPRAIL.has(level);
     if (on && helpDock) {
       mainEl.classList.remove('vgrid');
       releasePanes();
@@ -10850,10 +10853,10 @@
           railEl.append(emotePick, railSplitEl, statsTab);
         }
         emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
-        statsTab.hidden = level !== 4 && level !== 8;
+        statsTab.hidden = !LVL_STATSRAIL.has(level);
         if (statsLink.classList.contains('on')) switchTab('htabCfg');
       }
-      if (level === 5 || level === 7 || level === 8 || level === 10 || level === 11) {
+      if (LVL_VIDRAIL.has(level)) {
         // docked at the rail's top for the mode only - the saved rail
         // placement is untouched
         railEl.classList.remove('novid');
@@ -10861,7 +10864,7 @@
         vidBox.style.left = vidBox.style.top = vidBox.style.right =
           vidBox.style.bottom = vidBox.style.width = '';
         setVideo(true);
-      } else if (level === 6 || level === 9 || level === 12 || level === 13 || level === 14) {
+      } else if (LVL_VIDFLOAT.has(level)) {
         // no video by default - it sits floated out of the rail at its
         // saved geometry, so enabling it pops up over the chat
         railEl.classList.add('novid');
@@ -10904,48 +10907,53 @@
   // the rail's stats keep ticking while they're docked
   setInterval(() => { if (!railEl.hidden) renderStats(); }, 8000);
 
-  // Sets the pane count (1..9); a third column only exists in landscape,
-  // where it's actually wider than it is tall enough to be readable.
-  // Levels 4-6 pair two chat columns with the docked rail - stats in 4,
-  // video+emotes in 5, emotes alone in 6 (video floats). 7-9 run
-  // one chat column beside the rail instead - video+emotes, the same
-  // with stats back in, then emotes alone (video floats like 6). 10 is
-  // two chat columns with the video over the help popup in the rail,
-  // 11 the same beside one chat column, 12/13 the popup alone beside
-  // one chat column or two, and 14 the popup alone filling the row -
-  // no chat column at all
-  const SPLIT_NAMES = ['1col chat', '2col chat', '3col chat', '3col chat vid/emotes/stats', '3col chat vid/emotes', '3col chat emotes', '2col chat vid/emotes', '2x2', '2col chat emotes', '3col chat vid/help', '2col chat vid/help', '2col chat help', '3col chat help', '1col help'];
-  // compact url aliases: level 1-3 are bare columns, then col +
-  // v(id) e(motes) s(tats) h(elp) - 2x2 is its own shape
-  const SPLIT_URL = ['1c', '2c', '3c', '3cves', '3cve', '3ce', '2cve', '2x2', '2ce', '3cvh', '2cvh', '2ch', '3ch', '1ch'];
-  // the menu's display order - 2-col family before 3-col, +help last -
-  // which the wheel steps through too, decoupled from raw level ids
-  const SPLIT_MENU_ORDER = [1, 14, 2, 12, 11, 7, 9, 8, 3, 13, 10, 4, 5, 6];
-  const splitGlyph = (l) => l === 14 ? '?' : l === 1 ? '▮' : l === 10 ? '▮▮▶?' : l === 11 ? '▮▶?' : l === 12 ? '▮?' : l === 13 ? '▮▮?' : l === 8 ? '⊞' : l === 9 ? '▮☻' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
+  // Sets the layout - level ids run 1-14 in menu order. A third chat
+  // column only exists in landscape, where it's actually wider than it
+  // is tall enough to be readable. 1/3/9 run bare chat columns; the
+  // rest dock a side rail - help at 2/4/5/10/11 (2 filling the row
+  // solo), stats at 8/12, the video at 5/6/8/11/13 (2/4/7/10/14 float
+  // it instead, 12 leaves it to the rail video setting) and the emote
+  // picker under every rail that doesn't hold help
+  const SPLIT_NAMES = ['1col chat', '1col help', '2col chat', '2col chat help', '2col chat vid/help', '2col chat vid/emotes', '2col chat emotes', '2x2', '3col chat', '3col chat help', '3col chat vid/help', '3col chat vid/emotes/stats', '3col chat vid/emotes', '3col chat emotes'];
+  // compact url aliases: col + v(id) e(motes) s(tats) h(elp) - 2x2 is its own shape
+  const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce'];
+  const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻'];
+  const splitGlyph = (l) => SPLIT_GLYPHS[l - 1];
+  // the level families - menu order scatters the semantic ranges
+  const LVL_NORAIL = new Set([1, 3, 9]);           // bare chat columns
+  const LVL_HELPRAIL = new Set([2, 4, 5, 10, 11]); // help docked in the rail
+  const LVL_STATSRAIL = new Set([8, 12]);          // the stats pane in the rail
+  const LVL_VIDRAIL = new Set([5, 6, 8, 11, 13]);  // video docked atop the rail
+  const LVL_VIDFLOAT = new Set([2, 4, 7, 10, 14]); // rail on, the video floats
+  const LVL_PORTRAIT = new Set([1, 3]);            // levels portrait can keep
+  // level ids used to run in declaration order; a stored int from then
+  // remaps to the menu-order id of the same layout
+  const LVL_LEGACY = [0, 1, 3, 9, 12, 13, 14, 6, 8, 7, 11, 5, 4, 10, 2];
   function setSplit(level) {
-    if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
+    if (window.innerWidth <= window.innerHeight) level = level === 1 ? 1 : 3;
     level = Math.max(1, Math.min(SPLIT_NAMES.length, level));
     const prevSplit = splitLevel;
     splitLevel = level;
     markHelp('helpSplit', level - 1);
     setOn(splitBtn, level > 1);
     splitBtn.textContent = splitGlyph(level);
-    splitBtn.classList.toggle('tri', (level >= 3 && level <= 6) || level === 10 || level === 13);
+    splitBtn.classList.toggle('tri', level >= 9);
     document.getElementById('helpSplitIcon').textContent = splitBtn.textContent;
     splitBtn.title = `layout ${level}/${SPLIT_NAMES.length} ${SPLIT_NAMES[level - 1]} - click for menu · scroll cycles · ⇧click back`;
     if (!splitMenu.hidden) markSplitMenu();
     const cur = 1 + !sideEl.hidden + !side2El.hidden;
     // want counts chat columns only - the rail never figures in it. a
     // change that keeps the same chat-column count just re-docks the
-    // rail: 2↔4-6 and 1↔7-9 alike. the rail modes share one visible
+    // rail: 3↔10-14 and 1↔4-8 alike. the rail modes share one visible
     // rail, so level changes must still re-dock; only a true no-op
     // exits early
-    const want = level <= 3 ? level : level <= 6 || level === 10 || level === 13 ? 2 : level === 14 ? 0 : 1;
+    const want = level === 2 ? 0 : level === 9 ? 3 : level === 3 || level >= 10 ? 2 : 1;
+    const noRail = LVL_NORAIL.has(level);
     if (want === cur) {
-      if (railEl.hidden === (level < 4) && prevSplit === level) return;
+      if (railEl.hidden === noRail && prevSplit === level) return;
       logEl.hidden = want < 1;
-      railEl.hidden = level < 4;
-      dockRail(level >= 4 ? level : 0);
+      railEl.hidden = noRail;
+      dockRail(noRail ? 0 : level);
       // the rail resizes the chat columns - refit the pages
       repin();
       return;
@@ -10955,12 +10963,12 @@
     logEl.hidden = want < 1;
     sideEl.hidden = want < 2;
     side2El.hidden = want !== 3;
-    railEl.hidden = level < 4;
+    railEl.hidden = noRail;
     mainEl.classList.toggle('split', want >= 2);
     mainEl.classList.toggle('split3', want >= 3);
     jdownSet(jdownSide, sideEl, true);
     jdownSet(jdownSide2, side2El, true);
-    dockRail(level >= 4 ? level : 0);
+    dockRail(noRail ? 0 : level);
     if (want === 0) return; // help fills the row - no column to deal
     if (want === 1) {
       // columns widen on rejoin - re-pin the live column if it was following
@@ -10983,24 +10991,24 @@
   }
 
   function cycleSplit(dir) {
-    const max = window.innerWidth > window.innerHeight ? SPLIT_NAMES.length : 2;
-    const seq = SPLIT_MENU_ORDER.filter((l) => l <= max);
+    const landscape = window.innerWidth > window.innerHeight;
+    const seq = SPLIT_NAMES.map((_, i) => i + 1).filter((l) => landscape || LVL_PORTRAIT.has(l));
     setSplit(seq[(seq.indexOf(splitLevel) + dir + seq.length) % seq.length]);
     saveOpts();
   }
 
   // the layout button opens a menu of every level like the font
-  // picker's; the wheel steps the same display order, and shift-click
-  // still steps back - each entry carries its level in data-i
-  splitMenu.innerHTML = SPLIT_MENU_ORDER.map((l) =>
-    `<button type="button" role="option" data-i="${l}"><span class="sg">${splitGlyph(l)}</span>${SPLIT_NAMES[l - 1]}</button>`).join('');
+  // picker's; the wheel steps the same order, and shift-click still
+  // steps back - each entry carries its level in data-i
+  splitMenu.innerHTML = SPLIT_NAMES.map((n, i) =>
+    `<button type="button" role="option" data-i="${i + 1}"><span class="sg">${SPLIT_GLYPHS[i]}</span>${n}</button>`).join('');
   const markSplitMenu = () => {
-    const max = window.innerWidth > window.innerHeight ? SPLIT_NAMES.length : 2;
+    const landscape = window.innerWidth > window.innerHeight;
     splitMenu.querySelectorAll('button').forEach((b) => {
       const l = +b.dataset.i;
       b.classList.toggle('on', l === splitLevel);
       b.setAttribute('aria-selected', String(l === splitLevel));
-      b.disabled = l > max;
+      b.disabled = !landscape && !LVL_PORTRAIT.has(l);
     });
   };
   const setSplitMenu = (open) => {
@@ -11704,7 +11712,7 @@
     if (auth && auth.token) {
       if (e.shiftKey) { logout(); return; }
       chatbarEl.hidden = !chatbarEl.hidden;
-      if (chatbarEl.hidden && !epickPinned && (splitLevel < 5 || splitLevel >= 10)) closePicker(true);
+      if (chatbarEl.hidden && !epickPinned && (LVL_NORAIL.has(splitLevel) || splitLevel === 12 || LVL_HELPRAIL.has(splitLevel))) closePicker(true);
       else if (!chatbarEl.hidden) chatInput.focus();
     } else {
       // preflight id.twitch.tv before handing the tab to oauth - a stalled
@@ -14695,15 +14703,15 @@
       const n = q.get('split');
       const v = parseInt(n, 10);
       const ai = SPLIT_URL.indexOf(n);
-      if (n !== '0') setSplit(ai >= 0 ? ai + 1 : (v >= 1 && v <= SPLIT_NAMES.length ? v : 2));
+      if (n !== '0') setSplit(ai >= 0 ? ai + 1 : (v >= 1 && v <= SPLIT_NAMES.length ? v : 3));
     }
     if (q.get('min') === 'graph') { document.body.classList.remove('hdrmin'); document.body.classList.add('hdrgraph'); requestAnimationFrame(sparkSize); }
     else if (flag('min')) minHeader();
     if (q.has('self')) setSelfHl(flag('self'));
     if (q.has('video')) {
       const v = q.get('video');
-      // modes 5/6 own the video's placement - here the param just toggles it
-      if (splitLevel >= 5 || railEl.hidden) setVideo(v !== 'off' && flag('video'));
+      // the rail layouts own the video's placement - here the param just toggles it
+      if (LVL_VIDRAIL.has(splitLevel) || LVL_VIDFLOAT.has(splitLevel) || railEl.hidden) setVideo(v !== 'off' && flag('video'));
       else setRailVid({ float: 'float', dock: 'dock', on: 'dock' }[v] || (v !== 'off' && flag('video') ? 'dock' : 'off'));
     }
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }

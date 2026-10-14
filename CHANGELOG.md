@@ -16,6 +16,10 @@ not versions - the page ships continuously to Neocities.
   grows
 - the layout button's wheel cycles the menu's display order (2-col
   family, then 3-col, then +help) rather than raw level ids
+- the layout level ids now run in that same menu order: `?split=`
+  numbers and the help list's layout chips index the menu top to
+  bottom, and a saved layout stores its short alias (`2cve`…) so a
+  later reshuffle can't move it
 - the youtube, twitter and instagram inline preview cards hang at
   quarter depth off the row indent instead of half
 - the user card's buttons sit directly under the name as a two-column
