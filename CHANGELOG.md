@@ -198,6 +198,9 @@ not versions - the page ships continuously to Neocities.
   (shared data/tech co-op for progressive orgs), and co-ops gains
   the british co-operative movement history, cooperatives europe,
   and the uk co-operative party with its get-involved movement page
+- organising gains a parliamentary run at its tail: robert's rules
+  of order (the revised text at robertsrules.org + wikipedia), and
+  two intro videos - training 101 and procedure basics
 - dsa caucuses: the sort chips float right in the section head, and
   the grid packs single-use services - a link its row alone carries
   borrows the row's first free dedicated column instead of growing a
