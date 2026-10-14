@@ -92,7 +92,9 @@
     align-items: stretch; gap: 12px;
   }
   .laysec .shots { padding-top: .1em; }
-  .cmpwrap { overflow-x: auto; }
+  /* the table claims the viewport width main can't give it - up to the
+     body's 20px padding - then scrolls only past that */
+  .cmpwrap { overflow-x: auto; margin: 0 min(0px, calc((1080px - 100vw) / 2)); }
   .cmp { border-collapse: collapse; margin: 0 auto; font-size: .8em; }
   .cmp th, .cmp td { text-align: left; padding: .45em .9em; border-bottom: 1px solid var(--line); }
   .cmp tr:last-child td { border-bottom: 0; }
