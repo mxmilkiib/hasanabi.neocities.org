@@ -5,6 +5,10 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-14
 
+### Header
+- the ⇄ letter-spacing, ▦ zebra and ≡ row-separator glyphs scale up
+  a size (1.3×) to sit level with their neighbours
+
 ### Resources
 - the usa pol dsa row's parens gain reddit (r/dsa) and twitter
   (@demsocialists)
