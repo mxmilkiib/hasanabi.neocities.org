@@ -1373,10 +1373,12 @@
   #statsBody .st-row .eme { font-size: 1.3em; vertical-align: -0.18em; }
   /* usageDetails' per-api split indents under the origin estimate */
   #statsBody .st-sub { padding-left: 1.4em; }
-  /* storage runs two columns; a group keeps a row's sub-list attached
-     to its parent across the column gap */
-  #statsBody #stStore { columns: 26em; column-gap: 22px; }
+  /* storage runs labelled groups in flowing columns; a group keeps its
+     header and a row's sub-list attached across the column gap */
+  #statsBody #stStore { columns: 22em; column-gap: 22px; }
   #statsBody #stStore .st-grp { break-inside: avoid; }
+  #statsBody #stStore .st-gh { color: var(--accent); font-size: .82em;
+    font-weight: 600; margin-bottom: 1px; }
   #statsBody .st-sub .nm { color: var(--text-dim); font-size: .88em; }
   /* the fixed-width image slot lines up the names' left edges whether a
      row carries an emote image or not - a direct flex child so the row
@@ -6715,7 +6717,7 @@
   // per api underneath when the browser reports usageDetails. the db
   // count and estimate answer asynchronously, so they fill in on a slow
   // cadence while the localStorage row measures fresh on every render
-  let stIdbHtml = '', stEstHtml = '', stStoreAt = 0, stKeysHtml = '', stExtraHtml = '';
+  let stIdbHtml = '', stEstHtml = '', stStoreAt = 0, stKeysHtml = '', stKeysAllHtml = '', stExtraHtml = '';
   function updateStorageStats(el) {
     const box = el.querySelector('#stStore');
     if (!box) return;
@@ -6735,13 +6737,17 @@
         sizes.push([k.slice(6), sz]);
       }
     } catch {}
-    // each grp is one column-safe block - a row keeps its sub-list
+    // each grp is one labelled column-safe block - a row keeps its
+    // header and sub-list attached
     const grp = (s) => `<div class="st-grp">${s}</div>`;
-    box.innerHTML = grp(srow('localstorage', `${keys} keys · ${fmtB(bytes * 2)} · ${Math.round(bytes * 2 / 5242880 * 100)}% of ~5mb`) + stKeysHtml) +
-      grp(srow('scrollback', `${mainEl.querySelectorAll('.row[data-ts]').length} / ${MAX_MESSAGES} rows`)) +
+    const sgh = (t) => `<div class="st-gh">${t}</div>`;
+    box.innerHTML =
+      grp(sgh('localstorage') + srow('app keys', `${keys} keys · ${fmtB(bytes * 2)} · ${Math.round(bytes * 2 / 5242880 * 100)}% of ~5mb`) + stKeysHtml) +
+      (stKeysAllHtml ? grp(stKeysAllHtml) : '') +
+      grp(sgh('rendered') + srow('chat rows', `${mainEl.querySelectorAll('.row[data-ts]').length} / ${MAX_MESSAGES} in the dom`)) +
       stExtraHtml +
-      grp(stIdbHtml || srow('chat archive', archDb ? 'counting…' : 'not open')) +
-      grp(stEstHtml || ((navigator.storage && navigator.storage.estimate) ? srow('origin estimate', 'measuring…') : ''));
+      grp(sgh('indexeddb') + (stIdbHtml || srow('chat archive', archDb ? 'counting…' : 'not open'))) +
+      grp(sgh('origin estimate') + (stEstHtml || srow('usage', (navigator.storage && navigator.storage.estimate) ? 'measuring…' : 'not reported')));
     if (Date.now() - stStoreAt < 15000) return;
     stStoreAt = Date.now();
     // per-key sizes and the in-memory spans recompute on the slow cadence
@@ -6774,10 +6780,10 @@
       }
       saverRows += srow(nm, fmtB((k.length + raw.length) * 2) + age);
     }
-    stExtraHtml += `<div class="st-grp">${saverRows}</div>`;
+    stExtraHtml += `<div class="st-grp">${sgh('saves')}${saverRows}</div>`;
     // the in-memory side: tracked emote stamps drive the picker's age
     // ladder, the unlogged spans paint its 'missed' rungs
-    stExtraHtml += `<div class="st-grp">` +
+    stExtraHtml += `<div class="st-grp">${sgh('in memory')}` +
       srow('emotes tracked', `${Object.keys(useTs).length.toLocaleString('en')} with use stamps`) +
       srow('peek cache', `${peekCache.size.toLocaleString('en')} urls`) +
       srow('gif cache', `${Object.keys(gifStore).length.toLocaleString('en')} lookups`) +
@@ -6786,14 +6792,15 @@
     // the full key list rides under a details - open state persists
     // across re-renders through the same data-more tracking as the
     // badge sets
-    if (sizes.length > 5)
-      stExtraHtml += `<div class="st-grp"><details class="st-badge st-more" data-more><summary>all ${sizes.length} keys</summary>` +
-        sizes.map(([k, sz]) => ssub(k, fmtB(sz * 2))).join('') + `</details></div>`;
+    stKeysAllHtml = sizes.length > 5
+      ? `<details class="st-badge st-more" data-more><summary>all ${sizes.length} keys</summary>` +
+        sizes.map(([k, sz]) => ssub(k, fmtB(sz * 2))).join('') + `</details>` : '';
     let dLo = Infinity, dHi = 0;
     for (const bag of [useDay, nickDay, badgeDay, urlDay])
       for (const e of Object.values(bag))
         for (const d of Object.keys(e)) { if (+d < dLo) dLo = +d; if (+d > dHi) dHi = +d; }
-    if (dHi) stExtraHtml += `<div class="st-grp">${srow('stats history', `${(dHi - dLo + 1).toLocaleString('en')} days`)}</div>`;
+    let histRows = '';
+    if (dHi) histRows += srow('stats history', `${(dHi - dLo + 1).toLocaleString('en')} days`);
     let ecN = 0, ecOld = 0;
     try {
       for (let i = 0; i < localStorage.length; i++) {
@@ -6804,9 +6811,10 @@
         if (t && (!ecOld || t < ecOld)) ecOld = t;
       }
     } catch {}
-    if (ecN) stExtraHtml += `<div class="st-grp">${srow('emote cache', `${ecN} sets · oldest ${fmtSpan(Date.now() - ecOld)}`)}</div>`;
+    if (ecN) histRows += srow('emote cache', `${ecN} sets · oldest ${fmtSpan(Date.now() - ecOld)}`);
     if (rateHistT.length > 1)
-      stExtraHtml += `<div class="st-grp">${srow('rate history', fmtSpan(rateHistT[rateHistT.length - 1] - rateHistT[0]))}</div>`;
+      histRows += srow('rate history', fmtSpan(rateHistT[rateHistT.length - 1] - rateHistT[0]));
+    if (histRows) stExtraHtml += `<div class="st-grp">${sgh('history')}${histRows}</div>`;
     if (archDb) {
       try {
         const rq = archDb.transaction('msgs').objectStore('msgs').count();
@@ -6819,7 +6827,7 @@
     } else stIdbHtml = srow('chat archive', 'not open');
     if (navigator.storage && navigator.storage.estimate)
       navigator.storage.estimate().then((e) => {
-        stEstHtml = srow('origin estimate', `${fmtB(e.usage || 0)} of ${fmtB(e.quota || 0)}${e.quota ? ` · ${Math.round((e.usage || 0) / e.quota * 100)}%` : ''}`);
+        stEstHtml = srow('usage', `${fmtB(e.usage || 0)} of ${fmtB(e.quota || 0)}${e.quota ? ` · ${Math.round((e.usage || 0) / e.quota * 100)}%` : ''}`);
         // usageDetails (chromium) splits the lump per api - indexeddb,
         // caches, service workers. whatever the split doesn't name rides
         // as 'unattributed'; localstorage sits in it, having no key
