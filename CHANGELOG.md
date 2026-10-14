@@ -189,6 +189,11 @@ not versions - the page ships continuously to Neocities.
   for emerge and caracol, each labelled by what it actually is. the
   other nine publish nothing beyond the program/points already
   linked, so their seats stay empty rather than link a lie
+- the dsa row gains help center (demsocialists.zendesk, the member
+  support portal), organising's infra gains movement cooperative
+  (shared data/tech co-op for progressive orgs), and co-ops gains
+  the british co-operative movement history, cooperatives europe,
+  and the uk co-operative party with its get-involved movement page
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
