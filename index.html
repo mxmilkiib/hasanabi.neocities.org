@@ -7646,8 +7646,9 @@
     saveOpts();
   });
   document.getElementById('helpWgList').innerHTML = WEIGHT_NAMES.map((n, i) =>
-    // each weight chip renders at the weight it picks
-    `<a href="#" role="button" class="helpOpt helpWg" data-idx="${i}" style="font-weight:${WEIGHTS[i]}">${n}</a>`).join(' ');
+    // each weight chip previews its rung in roobert - the one bundled face
+    // shipping all five weights, so the pick isn't a synthetic rendering
+    `<a href="#" role="button" class="helpOpt helpWg" data-idx="${i}" style="font-family:Roobert;font-weight:${WEIGHTS[i]}">${n}</a>`).join(' ');
   // the help descriptions embed the same option lists as clickable links
   document.getElementById('helpFontList').innerHTML = FONT_SIZES.map((px, i) =>
     `<a href="#" role="button" class="helpFont" data-idx="${i}">${px}</a>`).join(' ');
