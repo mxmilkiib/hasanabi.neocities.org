@@ -126,7 +126,9 @@ not versions - the page ships continuously to Neocities.
   dsa wiki moves to it; the caucuses table's indexes row now links the
   wiki's own caucuses index page where the wiki sat. the wiki's ronr
   intro and motions table pair seat in organising's parliamentary run
-  after robert's rules
+  after robert's rules. dsa resources fills out with the zendesk help
+  center and an org tools run - openslides (site + repo), solidarity
+  tech (site + connector profile), short.io, and the portal root
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
   heads and note rows stay out of the count
