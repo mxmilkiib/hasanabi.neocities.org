@@ -165,6 +165,13 @@ not versions - the page ships continuously to Neocities.
   section runs the stbl grid like channels/streams - name | year |
   docs | press | join | info - so the table builder now walks every
   linkcols.stbl in the panel, not just the resources one
+- dsa caucuses reseats its descriptions right of the dates and adds a
+  stat per row - 2025 convention delegate counts, plus npc seats where
+  the caucus won one (per the rose garden factions primer, now linked
+  from indexes). the head gains sort chips - wing (the primer's
+  right-to-left order, and the new default), size, age and a-z - built
+  on a data-pre front column and a captured-source re-render in the
+  stbl builder
 - workers unions drops its striking item - worker action already
   carries the strike content, so the three links it was missing
   (picket line, right to strike, strike pay) moved into its run.
