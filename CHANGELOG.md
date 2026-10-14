@@ -118,6 +118,9 @@ not versions - the page ships continuously to Neocities.
   between the message and the right reload button - part of the
   message cluster now rather than a separate block beside the ✕
 ### Resources
+- a dsa resources section seats under dsa caucuses, and the triangle
+  dsa wiki moves to it; the caucuses table's indexes row now links the
+  wiki's own caucuses index page where the wiki sat
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
   heads and note rows stay out of the count
