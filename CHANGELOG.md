@@ -149,10 +149,14 @@ not versions - the page ships continuously to Neocities.
   global left and dean withers; essays takes adam conover, gattsu and
   geopold, then fd signifier, joris unpacks and marxism today
 - dsa caucuses gets its own section under dsa chapters, leaving the
-  usa pol tail: an indexes row (national wiki, national working
-  groups) then fourteen caucuses - the five already listed plus 21st
-  century socialism, caracol, communist caucus, emerge, groundwork,
-  liberation, north star, red star and reform & revolution
+  usa pol tail and running the wider 30em columns: an indexes row
+  (national wiki, national working groups) then fourteen caucuses -
+  the five already listed plus 21st century socialism, caracol,
+  communist caucus, emerge, groundwork, liberation, north star, red
+  star and reform & revolution. each caucus gains its tendency in the
+  descriptor, with caucus press linked where it exists: the call
+  (bread & roses), cosmonaut (marxist unity), the agitator
+  (socialist majority) and dualpower.app (libertarian socialist)
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
