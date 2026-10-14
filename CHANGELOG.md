@@ -87,6 +87,7 @@ not versions - the page ships continuously to Neocities.
   (the internationale joins after bella ciao, go west before hootie
   frutti - all yt links on the youtu.be share form) and kalahavivāda,
   scroll anywhere, vimium and the onion stay behind under extra links
+- open social's peertube entry gains the ngi impact story link
 
 ### Help popup
 - the stats tab's storage rows run in wider 26em columns
