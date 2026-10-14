@@ -34,6 +34,9 @@ not versions - the page ships continuously to Neocities.
 ### Help popup
 - the emote picker's sources note links out to 7tv, bttv, ffz and
   twitch
+- a few words in the help text print as their channel emotes: the
+  live alert's system, the scrollback SAVED, the stats glorp, and
+  the user card's mods + timeout
 - the remaining em dashes read as hyphens (meta description, help
   separators, the empty 'seen' stamp)
 - the layout section seats each level's chip beside its own
