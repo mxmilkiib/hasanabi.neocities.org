@@ -8,6 +8,11 @@ not versions - the page ships continuously to Neocities.
 ### Header
 - the ⇄ letter-spacing, ▦ zebra and ≡ row-separator glyphs scale up
   a size (1.3×) to sit level with their neighbours
+- a wrapped header lets the button strip reach under the pinned ?/–:
+  the corner reserve only matters on the line they pin, so on the
+  strip's own line a negative margin mirrors the left pad - wrapped
+  buttons fill to the symmetric inset instead of stranding under a
+  dead corner
 
 ### Resources
 - the usa pol dsa row's parens gain reddit (r/dsa) and twitter

@@ -259,10 +259,13 @@
     /* a bare gap: shorthand would also widen the row gap; keep them apart */
     column-gap: 12px;
     row-gap: 4px;
-    padding: 0 18px;
+    padding: 0 var(--hdrpad, 18px);
     /* ? and – live at the absolute top-right corner whatever the wrap
-       state; padding-right keeps flowing content clear of them */
-    padding-right: 84px;
+       state; padding-right keeps flowing content clear of them - the
+       two vars let a wrapped .hdr-side reclaim the space below them */
+    --hdrpad: 18px;
+    --hdrres: 84px;
+    padding-right: var(--hdrres);
     font-size: var(--hdr-fs, var(--chat-font, 15px));
     font-family: var(--chat-ff, inherit);
     background: var(--panel);
@@ -276,7 +279,7 @@
   .hdr-lbl.c-help { right: 40px; }
   .hdr-lbl.c-hdr { right: 112px; }
   body.hdrlbl:not(.hdrgraph):not(.hdrmin) #hdrMin { right: 80px; }
-  body.hdrlbl:not(.hdrgraph):not(.hdrmin) header { padding-right: 172px; }
+  body.hdrlbl:not(.hdrgraph):not(.hdrmin) header { --hdrres: 172px; }
   /* pinned to the first header line, not the box centre - when labels make
      .hdr-side wrap onto a second line the buttons stay put up top. top
      matches the header's padding so they line up with the flowing row */
@@ -308,15 +311,18 @@
      full-mode size instead of shrinking or overlapping the bottom edge */
   body.hdrgraph header { min-height: 26px; }
   /* the pinned ▶ sits at right:80 - outside the 84px reserve, so reserve more */
-  body.hdrgraph header { padding-right: 118px; }
+  body.hdrgraph header { --hdrres: 118px; }
   /* the stream play button stays reachable too, pinned left of the -;
      the .hdr-side .hdr-btn chain matches the hide rule's specificity so
      this later rule wins */
   body.hdrgraph .hdr-side .hdr-btn#vidBtn { display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); right: 80px; }
   /* when the header wraps, centre the icon strip on its own line -
-     a hairline's separation from the row above */
+     a hairline's separation from the row above, and let it reach
+     under the pinned corner pair: the reserve only matters on the
+     line they pin, so on theirs the strip runs to the left pad's
+     mirror inset */
   header.hdrwrap { row-gap: 1px; }
-  header.hdrwrap .hdr-side { margin-inline: auto; }
+  header.hdrwrap .hdr-side { margin-inline: auto; margin-right: calc(var(--hdrpad, 18px) - var(--hdrres, 84px)); }
   #hint {
     flex: none;
     padding: 2px 18px;
@@ -2464,7 +2470,7 @@
   @media (max-width: 720px), (pointer: coarse) and (max-width: 1080px) {
     /* tapping rows shouldn't arm the browser's double-tap zoom */
     body { touch-action: manipulation; }
-    header { padding: 0 8px; padding-right: 92px; column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
+    header { padding: 0 8px; --hdrpad: 8px; --hdrres: 92px; padding-right: var(--hdrres); column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
     #helpBtn { right: 6px; }
     #hdrMin { right: 48px; }
     body.hdrmin #hdrMin { right: 48px; }
@@ -2472,7 +2478,7 @@
     .hdr-btn { height: 32px; }
     button.hdr-btn { width: 38px; }
     #spark { max-width: 70px; }
-    body.hdrgraph header { padding-right: 130px; min-height: 32px; } /* fits the 32px buttons */
+    body.hdrgraph header { --hdrres: 130px; min-height: 32px; } /* fits the 32px buttons */
     #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; max-height: 70dvh; }
     /* the channels/streams service grid can run wider than a phone
        panel - let it slide sideways instead of clipping */
