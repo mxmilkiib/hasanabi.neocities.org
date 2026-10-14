@@ -2529,7 +2529,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
-    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times, the same minus the chat-modes tail, a compact cut, or the bare word; scrolling there cycles the same stops<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times, the same minus the chat-modes tail, a compact cut, the bare word, or an empty space; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -5435,10 +5435,10 @@
   // status info verbosity: 0 full, 1 compact, 2 minimal; wheel on the
   // dot or info text cycles it, the ? popup's status-length row sets it
   let statusView = 0;
-  const SVIEW_NAMES = ['full', 'compact', 'minimal', 'stats'];
+  const SVIEW_NAMES = ['full', 'compact', 'minimal', 'stats', 'blank'];
   // wheel order seats stats beside full - it is full minus the
   // chat-mode tail; array order keeps saved numeric ids stable
-  const SVIEW_CYCLE = [0, 3, 1, 2];
+  const SVIEW_CYCLE = [0, 3, 1, 2, 4];
   function setStatusView(i) {
     statusView = Math.max(0, Math.min(SVIEW_NAMES.length - 1, i | 0));
     markHelp('helpSview', statusView);
@@ -5647,7 +5647,7 @@
                   : 'connecting to chat';
     // the full status line already carries the mode phrases; the chips span
     // only earns its place in the shorter views, stats included
-    modesEl.hidden = statusView === 0 || !modesOn;
+    modesEl.hidden = statusView === 0 || statusView === 4 || !modesOn;
     if (!stream) {
       if (streamDead) {
         // Relay never reported stream status (stale cache or blocked API):
@@ -5655,7 +5655,7 @@
         setDot(chatState);
         dotEl.title = `stream status unavailable · ${chatTxt}`;
         dotEl.setAttribute('aria-label', dotEl.title);
-        infoEl.innerHTML = chatState === 'connected' ? '' : `<b>${chatTxt}</b>`;
+        infoEl.innerHTML = statusView === 4 || chatState === 'connected' ? '' : `<b>${chatTxt}</b>`;
         document.title = CHAN_TITLE;
       } else {
         setDot('connecting');
@@ -5698,7 +5698,7 @@
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
       dotEl.setAttribute('aria-label', dotEl.title);
-      infoEl.innerHTML = '<b>offline</b>' +
+      infoEl.innerHTML = statusView === 4 ? '' : '<b>offline</b>' +
         (statusView === 0 || statusView === 3 ? ranTxt + (chatState === 'connected' ? '' : ` · ${chatTxt}`)
          : statusView === 1 && ago ? ` · ended <b>${ago}</b>`
          : statusView === 1 && startTs ? ` · live <b>${fmtTime(startTs)}${dayTag(startTs)}</b>` : '');
@@ -5713,7 +5713,8 @@
     // a dropped socket under a live stream still shows on the dot (and so
     // the favicon) - green stays honest only while chat is up too
     setDot(chatState === 'connected' ? 'connected' : chatState || 'reconnecting');
-    infoEl.innerHTML = statusView === 2 ? '<b>live</b>'
+    infoEl.innerHTML = statusView === 4 ? ''
+      : statusView === 2 ? '<b>live</b>'
       : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
       : (since ? `<b>live</b> since <b>${since}</b>, up <b>${up}</b>` : '<b>live</b>') +
