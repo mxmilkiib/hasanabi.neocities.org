@@ -17,6 +17,10 @@ not versions - the page ships continuously to Neocities.
 - the left parties names now note the acronym each party actually
   runs under (psl, cpusa, ndp, ptb-pvda, bsw, lfi, pcp, sv, jcp,
   cpn-uml, eff, sacp and so on)
+- every floating popup resizes from any point on any edge - the inside
+  band now reads all four sides, and an 8px ring outside the border
+  covers the spots it can't (the stream overlay's iframe, the help
+  panel's scrollbar, the drag handles' top strip)
 - the status length cycle gains 'stats' between full and compact:
   the full run of times and counts without the chat-modes tail (no
   'chat follow req…') - the mode chips pick up the slack unless

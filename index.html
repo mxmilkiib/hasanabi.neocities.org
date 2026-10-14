@@ -1696,16 +1696,16 @@
      --egx carries the left/right inset, --egy top/bottom, so a corner
      lights both inner surfaces at once */
   #helpPanel, #emotePick, #vid { --egc: color-mix(in srgb, var(--text-dim) 55%, transparent); }
-  :is(#helpPanel, #emotePick).edge-l, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.l, .tl, .bl):hover) { --egx: inset 10px 0 8px -6px var(--egc); }
-  :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.r, .tr, .br):hover) { --egx: inset -10px 0 8px -6px var(--egc); }
-  :is(#helpPanel, #emotePick).edge-b, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.b, .bl, .br):hover) { --egy: inset 0 -10px 8px -6px var(--egc); }
-  :is(#helpPanel, #emotePick).edge-t, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.tl, .tr):hover) { --egy: inset 0 10px 8px -6px var(--egc); }
+  :is(#helpPanel, #emotePick, #vid).edge-l, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.l, .tl, .bl):hover) { --egx: inset 10px 0 8px -6px var(--egc); }
+  :is(#helpPanel, #emotePick, #vid).edge-r, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.r, .tr, .br):hover) { --egx: inset -10px 0 8px -6px var(--egc); }
+  :is(#helpPanel, #emotePick, #vid).edge-b, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.b, .bl, .br):hover) { --egy: inset 0 -10px 8px -6px var(--egc); }
+  :is(#helpPanel, #emotePick, #vid).edge-t, :is(#helpPanel, #emotePick, #vid):has(> :is(.hp-size, .ep-size, .vid-size):is(.tl, .tr):hover) { --egy: inset 0 10px 8px -6px var(--egc); }
   /* the top-edge glow sits under the move glyph run - fade the run
      while a top grip (or an edge-t drag) is signalling, so the
      highlight reads through */
   #helpPanel:is(.edge-t, :has(> .hp-size:is(.tl, .tr):hover)) .hp-handle,
   #emotePick:is(.edge-t, :has(> .ep-size:is(.tl, .tr):hover)) .epick-handle,
-  #vid:has(> .vid-size:is(.tl, .tr):hover) .vid-handle { opacity: .35; }
+  #vid:is(.edge-t, :has(> .vid-size:is(.tl, .tr):hover)) .vid-handle { opacity: .35; }
   #helpPanel[hidden] { display: none; }
   /* split-4's rail takes the top-right dock spot, so an unmoved popup
      centers instead; --hcx carries the clamp's centered x. a dragged
@@ -2561,10 +2561,10 @@
     <div><b class="rbw rbwh">@hasanabi</b> <span>rainbow: <span id="helpRbwSList"></span> - which marks run the sweep; 'hasanabi' keeps only the @mention, 'other' all but it, 'off' paints none · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
     <div><b>≈</b> <span>rainbow motion: <span id="helpRbwList"></span> - the sweep's animation; 'random' deals each mark its own off its palette index · the shimmer's slow stops stretch its period<sup>†</sup></span></div>
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
-    <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or @you line lands while the page isn't focused<sup>†</sup></span></div>
+    <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or "@you" line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 5,000 are <img class="emote" src="https://cdn.betterttv.net/emote/6093042039b5010444d0c44b/2x.gif" alt="SAVED"> across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
     <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - fade ghosts the bar out, slim collapses it to a hairline; hovering the strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
-    <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a <img class="emote" src="https://cdn.betterttv.net/emote/5f34967cb2efd65d77e7c9bc/2x.gif" alt="System"> notification when the stream goes live or a keyword or @you line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
+    <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a <img class="emote" src="https://cdn.betterttv.net/emote/5f34967cb2efd65d77e7c9bc/2x.gif" alt="System"> notification when the stream goes live or a keyword or "@you" line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>↻</b> <span>update notice: <span id="helpUpdList"></span> - the reload bar when a site update lands while the page is open, and how often the page checks for one; the bar's own 'update check' chips pick the same stops<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
     <div><b>⧉</b> <span>link previews: <span id="helpPeekList"></span> - hovering an external link, a nick or an @mention shows a card - title and description, where a shortened link really lands, and for twitch channels the live state, followers and chat modes; instagram reels get a playable video in the card (resolved through kkclip, controls on click); looked up through a Cloudflare worker, so the linked address leaves this page; the image and icon load from the linked site; not shown on touch screens<sup>†</sup></span></div>
@@ -9059,6 +9059,43 @@
     });
   });
 
+  // the same resize, for the ring dispatcher: the iframe swallows events
+  // inside the box, so an outside band does the grabbing - same anchors
+  // and aspect lock as the grips
+  const vidEdgeDrag = (edge, e) => {
+    e.preventDefault();
+    try { vidBox.setPointerCapture(e.pointerId); } catch {}
+    vidBox.classList.add('dragging');
+    vidBox.style.cursor = HS_CURS[edge];
+    const r = vidBox.getBoundingClientRect();
+    const leftEdge = edge.includes('l'), rightEdge = edge.includes('r');
+    const topEdge = edge.includes('t'), botEdge = edge.includes('b');
+    const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner/edge
+    const ay = topEdge ? r.bottom : r.top;
+    const yOnly = !leftEdge && !rightEdge && (topEdge || botEdge);
+    const move = (ev) => {
+      const maxW = Math.min(leftEdge ? ax : innerWidth - ax,
+        (topEdge ? ay : innerHeight - ay) * vidRatio) - 4;
+      const w = Math.max(180, Math.min(maxW,
+        yOnly ? Math.abs(ev.clientY - ay) * vidRatio : Math.abs(ev.clientX - ax)));
+      vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
+      vidBox.style.width = w + 'px';
+      vidBox.style.left = (leftEdge ? ax - w : ax) + 'px';
+      vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, topEdge ? ay - w / vidRatio : ay) + 'px';
+    };
+    const drop = () => {
+      vidBox.classList.remove('dragging', 'edge-l', 'edge-r', 'edge-t', 'edge-b');
+      vidBox.style.cursor = '';
+      vidBox.removeEventListener('pointermove', move);
+      vidBox.removeEventListener('pointerup', drop);
+      vidBox.removeEventListener('pointercancel', drop);
+      saveVidBox();
+    };
+    vidBox.addEventListener('pointermove', move);
+    vidBox.addEventListener('pointerup', drop);
+    vidBox.addEventListener('pointercancel', drop);
+  };
+
   // ---- header collapse: button shrinks it to a thin strip, clicking the
   // strip restores it ----
   const hdrMinBtn = document.getElementById('hdrMin');
@@ -13927,25 +13964,27 @@
     });
   });
 
-  const EPICK_CURS = { l: 'ew-resize', t: 'ns-resize', tl: 'nwse-resize' };
+  const EPICK_CURS = { l: 'ew-resize', r: 'ew-resize', t: 'ns-resize', b: 'ns-resize',
+    tl: 'nwse-resize', br: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize' };
   const epickEdge = (e) => {
     if (emotePick.parentElement === railEl) return ''; // docked in the rail - no edges
     const r = emotePick.getBoundingClientRect();
-    const l = e.clientX - r.left < EPICK_EDGE, t = e.clientY - r.top < EPICK_EDGE;
-    return l && t ? 'tl' : l ? 'l' : t ? 't' : '';
+    const l = e.clientX - r.left < EPICK_EDGE, rr = r.right - e.clientX < EPICK_EDGE;
+    const t = e.clientY - r.top < EPICK_EDGE, b = r.bottom - e.clientY < EPICK_EDGE;
+    return (t ? 't' : '') + (b ? 'b' : '') + (l ? 'l' : '') + (rr ? 'r' : '');
   };
   emotePick.addEventListener('pointermove', (e) => {
     if (e.buttons) return; // a drag keeps its lit edge
     const edge = e.target.closest('.epick-handle, .ep-size') ? '' : epickEdge(e);
     emotePick.style.cursor = EPICK_CURS[edge] || '';
     emotePick.classList.toggle('edge-l', edge.includes('l'));
+    emotePick.classList.toggle('edge-r', edge.includes('r'));
     emotePick.classList.toggle('edge-t', edge.includes('t'));
+    emotePick.classList.toggle('edge-b', edge.includes('b'));
   });
-  emotePick.addEventListener('pointerleave', (e) => { if (!e.buttons) emotePick.classList.remove('edge-l', 'edge-t'); });
-  emotePick.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || emotePick.hidden) return;
-    const edge = epickEdge(e);
-    if (!edge) return;
+  emotePick.addEventListener('pointerleave', (e) => { if (!e.buttons) emotePick.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b'); });
+  // the drag itself, callable from the inside zone or the outside ring
+  const epEdgeDrag = (edge, e) => {
     e.preventDefault();
     try { emotePick.setPointerCapture(e.pointerId); } catch {}
     emotePick.style.cursor = EPICK_CURS[edge];
@@ -13961,9 +14000,17 @@
         emotePick.style.left = (r.right - w) + 'px';
         emotePick.style.width = w + 'px';
       }
+      if (edge.includes('r')) {
+        const w = Math.round(Math.max(220, Math.min(innerWidth - r.left - 4, ev.clientX - r.left)));
+        emotePick.style.width = w + 'px';
+      }
       if (edge.includes('t')) {
         const h = Math.round(Math.max(160, Math.min(r.bottom - 8, r.bottom - ev.clientY)));
         emotePick.style.top = Math.max(headerEl.getBoundingClientRect().bottom, r.bottom - h) + 'px';
+        emotePick.style.height = h + 'px';
+      }
+      if (edge.includes('b')) {
+        const h = Math.round(Math.max(160, Math.min(epickFloor() - r.top - 4, ev.clientY - r.top)));
         emotePick.style.height = h + 'px';
       }
     };
@@ -13972,11 +14019,18 @@
       emotePick.removeEventListener('pointerup', drop);
       emotePick.removeEventListener('pointercancel', drop);
       emotePick.style.cursor = '';
+      emotePick.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b');
       saveEpickBox();
     };
     emotePick.addEventListener('pointermove', move);
     emotePick.addEventListener('pointerup', drop);
     emotePick.addEventListener('pointercancel', drop);
+  };
+  emotePick.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || emotePick.hidden) return;
+    const edge = epickEdge(e);
+    if (!edge) return;
+    epEdgeDrag(edge, e);
   });
   // a saved or bundled {w,h,left?,top?} box: size always applies, the
   // position clamps into the current viewport
@@ -14869,28 +14923,33 @@
   markPresets();
   previewSwatches();
 
-  // ---- edge resize: the last EDGE_PX of the left and bottom edges drag
-  // the panel wider/taller; the corner does both. The zones sit inside the
-  // panel's padding so links stay clickable. A dragged size persists and
-  // overrides the width presets until one is picked again ----
+  // ---- edge resize: the last EDGE_PX of each edge drags that side, the
+  // corners drag both. The zones sit inside the panel's padding so links
+  // stay clickable; the top band is the drag handle's, and the outside
+  // ring covers the scrollbar's. A dragged size persists and overrides
+  // the width presets until one is picked again ----
   const HSIZE_KEY = 'hasan-hsize';
   const EDGE_PX = 8;
   const readHsize = () => { try { return JSON.parse(localStorage.getItem(HSIZE_KEY)) || {}; } catch { return {}; } };
   const writeHsize = (s) => { try { localStorage.setItem(HSIZE_KEY, JSON.stringify(s)); } catch {} };
-  const HS_CURS = { l: 'ew-resize', b: 'ns-resize', bl: 'nesw-resize' };
+  const HS_CURS = { l: 'ew-resize', r: 'ew-resize', t: 'ns-resize', b: 'ns-resize',
+    tl: 'nwse-resize', br: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize' };
   const edgeAt = (e) => {
     const r = helpPanel.getBoundingClientRect();
-    const l = e.clientX - r.left < EDGE_PX, b = r.bottom - e.clientY < EDGE_PX;
-    return l && b ? 'bl' : l ? 'l' : b ? 'b' : '';
+    const l = e.clientX - r.left < EDGE_PX, rr = r.right - e.clientX < EDGE_PX;
+    const t = e.clientY - r.top < EDGE_PX, b = r.bottom - e.clientY < EDGE_PX;
+    return (t ? 't' : '') + (b ? 'b' : '') + (l ? 'l' : '') + (rr ? 'r' : '');
   };
   helpPanel.addEventListener('pointermove', (e) => {
     if (e.buttons || helpPanel.parentNode === railEl) return; // a drag keeps its lit edge
     const edge = e.target.closest('.hp-handle, .hp-size') ? '' : edgeAt(e);
     helpPanel.style.cursor = HS_CURS[edge] || '';
     helpPanel.classList.toggle('edge-l', edge.includes('l'));
+    helpPanel.classList.toggle('edge-r', edge.includes('r'));
+    helpPanel.classList.toggle('edge-t', edge.includes('t'));
     helpPanel.classList.toggle('edge-b', edge.includes('b'));
   });
-  helpPanel.addEventListener('pointerleave', (e) => { if (!e.buttons) helpPanel.classList.remove('edge-l', 'edge-b'); });
+  helpPanel.addEventListener('pointerleave', (e) => { if (!e.buttons) helpPanel.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b'); });
   // w/h and position live in the same key; a width that lands on a
   // preset re-marks the preset button instead of storing the px
   const saveHsize = (edges) => {
@@ -14917,14 +14976,13 @@
       top.style.zIndex = 13;
       low.style.zIndex = '';
     });
-  helpPanel.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || helpPanel.hidden || helpPanel.parentNode === railEl) return;
-    const edge = edgeAt(e);
-    if (!edge) return;
+  // the drag itself, callable from the inside zone or the outside ring
+  const hpEdgeDrag = (edge, e) => {
     e.preventDefault();
-    helpPanel.setPointerCapture(e.pointerId);
+    try { helpPanel.setPointerCapture(e.pointerId); } catch {}
     const r = helpPanel.getBoundingClientRect();
     helpPanel.style.cursor = HS_CURS[edge];
+    const htop = headerEl.getBoundingClientRect().bottom + 4;
     // re-anchor to left/top so the dragged edges stay put under the
     // pointer regardless of how the panel was previously positioned
     helpPanel.style.left = r.left + 'px'; helpPanel.style.top = r.top + 'px';
@@ -14934,6 +14992,16 @@
         const w = Math.round(Math.max(280, Math.min(innerWidth - 24, r.right - ev.clientX)));
         helpPanel.style.left = (r.right - w) + 'px';
         helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
+      }
+      if (edge.includes('r')) {
+        const w = Math.round(Math.max(280, Math.min(innerWidth - r.left - 24, ev.clientX - r.left)));
+        helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
+      }
+      if (edge.includes('t')) {
+        const h = Math.round(Math.max(120, Math.min(r.bottom - htop, r.bottom - ev.clientY)));
+        helpPanel.style.top = (r.bottom - h) + 'px';
+        helpPanel.style.height = h + 'px';
+        helpPanel.style.maxHeight = 'none';
       }
       if (edge.includes('b')) {
         const h = Math.round(Math.max(120, Math.min(innerHeight - r.top - 8, ev.clientY - r.top)));
@@ -14946,11 +15014,18 @@
       helpPanel.removeEventListener('pointerup', drop);
       helpPanel.removeEventListener('pointercancel', drop);
       helpPanel.style.cursor = '';
+      helpPanel.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b');
       saveHsize(edge);
     };
     helpPanel.addEventListener('pointermove', move);
     helpPanel.addEventListener('pointerup', drop);
     helpPanel.addEventListener('pointercancel', drop);
+  };
+  helpPanel.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || helpPanel.hidden || helpPanel.parentNode === railEl) return;
+    const edge = edgeAt(e);
+    if (!edge) return;
+    hpEdgeDrag(edge, e);
   });
 
   // the dotted strip drags the panel; the corner glyphs resize with the
@@ -15022,6 +15097,55 @@
       grip.addEventListener('pointerup', drop);
       grip.addEventListener('pointercancel', drop);
     });
+  });
+  // ---- edge rings: the RING_PX band outside a floating popup's border
+  // resizes it too, so every point on the edge is grabbable - the stream
+  // overlay's iframe swallows inside events so it lives here, and the
+  // ring covers the spots each panel's inside band can't, like the
+  // scrollbar's right edge. pointerdown inside a popup still belongs to
+  // its own zones and grips ----
+  const RING_PX = 8;
+  const ringPops = [vidBox, emotePick, helpPanel]; // topmost first
+  const ringFloats = (el) => !el.hidden && el.parentElement === document.body;
+  const ringEdge = (el, e) => {
+    const r = el.getBoundingClientRect();
+    const x = e.clientX, y = e.clientY;
+    if (x < r.left - RING_PX || x > r.right + RING_PX || y < r.top - RING_PX || y > r.bottom + RING_PX) return '';
+    const l = Math.abs(x - r.left) < RING_PX, rr = Math.abs(x - r.right) < RING_PX;
+    const t = Math.abs(y - r.top) < RING_PX, b = Math.abs(y - r.bottom) < RING_PX;
+    return (t ? 't' : '') + (b ? 'b' : '') + (l ? 'l' : '') + (rr ? 'r' : '');
+  };
+  const ringHit = (e) => {
+    for (const el of ringPops) {
+      if (!ringFloats(el) || el.contains(e.target)) continue;
+      const edge = ringEdge(el, e);
+      if (edge) return [el, edge];
+    }
+    return null;
+  };
+  document.addEventListener('pointermove', (e) => {
+    if (e.buttons) return; // an active drag keeps its own cursor and glow
+    const hit = ringHit(e);
+    if (!hit) {
+      if (ringPops.some((el) => el.contains(e.target))) return; // inside zones own their marks
+      document.body.style.cursor = '';
+      for (const el of ringPops) el.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b');
+      return;
+    }
+    document.body.style.cursor = HS_CURS[hit[1]];
+    const [el, edge] = hit;
+    el.classList.toggle('edge-l', edge.includes('l'));
+    el.classList.toggle('edge-r', edge.includes('r'));
+    el.classList.toggle('edge-t', edge.includes('t'));
+    el.classList.toggle('edge-b', edge.includes('b'));
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    const hit = ringHit(e);
+    if (!hit) return;
+    if (hit[0] === vidBox) vidEdgeDrag(hit[1], e);
+    else if (hit[0] === emotePick) epEdgeDrag(hit[1], e);
+    else hpEdgeDrag(hit[1], e);
   });
   // restore a dragged size once saved options and url params have settled;
   // an explicit ?hpw= beats a stored width, ?hpos= a stored drag spot
