@@ -148,6 +148,11 @@ not versions - the page ships continuously to Neocities.
   news & talk takes brenna perez, don lemon, rebecca watson, india &
   global left and dean withers; essays takes adam conover, gattsu and
   geopold, then fd signifier, joris unpacks and marxism today
+- dsa caucuses gets its own section under dsa chapters, leaving the
+  usa pol tail: an indexes row (national wiki, national working
+  groups) then fourteen caucuses - the five already listed plus 21st
+  century socialism, caracol, communist caucus, emerge, groundwork,
+  liberation, north star, red star and reform & revolution
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
