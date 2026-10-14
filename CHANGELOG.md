@@ -88,6 +88,8 @@ not versions - the page ships continuously to Neocities.
   frutti - all yt links on the youtu.be share form) and kalahavivāda,
   scroll anywhere, vimium and the onion stay behind under extra links
 - open social's peertube entry gains the ngi impact story link
+- extra links gains no gods no masters 1-5 - the anarchism history
+  doc parts on kolektiva, numbered links under the sutta
 
 ### Help popup
 - the stats tab's storage rows run in wider 26em columns
