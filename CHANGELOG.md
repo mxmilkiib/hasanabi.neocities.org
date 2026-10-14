@@ -140,7 +140,9 @@ not versions - the page ships continuously to Neocities.
   intro and motions table pair seat in organising's parliamentary run
   after robert's rules. dsa resources fills out with the zendesk help
   center and an org tools run - openslides (site + repo), solidarity
-  tech (site + connector profile), short.io, and the portal root.
+  tech (site + connector profile), short.io, and the portal root - then
+  rose garden (the factions newsletter home), the discussion-forum
+  opt-in, the org structure page and the 2025 convention rules.
   organising's reading run gains foster's 1926 organize the
   unorganized beside rules for radicals
 - the channels/streams table gains a faint zebra wash - every other
