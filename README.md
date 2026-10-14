@@ -453,6 +453,7 @@ editing a URL.
 | `pause` | flag | hold the scroll while hovering a row |
 | `scrollback` | `250`…`100000` | row cap |
 | `rev` | flag | reverse flow - new messages cascade down from the top |
+| `wrap` | flag | page wrap - a full page retires to a faded layer the new one writes down over, like the multi-column layouts |
 | `bartop` | flag | dock the chat input under the header instead of at the bottom |
 | `bauto` | `0`–`2` | chat-bar autohide: off / fade / slim |
 | `mnl` | `0`–`3` | msg new line: off / body on its own line / plus a blank line below / blank line above, body inline |

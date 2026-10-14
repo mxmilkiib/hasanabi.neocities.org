@@ -656,9 +656,10 @@
   /* page-flip columns show only their current page: retired pages wait
      hidden in #log's archive until the split folds back to one column.
      No scrollbar either - a page never overflows, and a bar blinking in
-     for the instant before a flip reflowed every row */
-  main.split:not(.rev) .col > .stale { display: none; }
-  main.split:not(.rev) .col { scrollbar-width: none; }
+     for the instant before a flip reflowed every row. Wrap pages the
+     lone column the same way */
+  main.split:not(.rev) .col > .stale, main.wrap:not(.rev) .col > .stale { display: none; }
+  main.split:not(.rev) .col, main.wrap:not(.rev) .col { scrollbar-width: none; }
   /* a retired page's clones linger over their column, swept as the live
      page writes over them - the real rows archive on the same flip */
   .ghostpage { position: absolute; inset: 0; box-sizing: border-box; padding: inherit;
@@ -2597,7 +2598,7 @@
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or "@you" line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 5,000 are <img class="emote" src="https://cdn.betterttv.net/emote/6093042039b5010444d0c44b/2x.gif" alt="SAVED"> across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
-    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>↵</b> <span>msg new line: <span id="helpNlList"></span> - the message body drops to its own line under the time and nick, the third stop leaves a blank line below it, and the fourth keeps the body inline but opens a blank line above each row<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - fade ghosts the bar out, slim collapses it to a hairline; hovering the strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
+    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>⇓</b> <span>page wrap: <span id="helpWrapList"></span> - a full page retires to a faded layer that new messages write down over from the top, as the multi-column layouts already do - dormant while ⇵ runs newest-at-top<sup>†</sup></span><b>↵</b> <span>msg new line: <span id="helpNlList"></span> - the message body drops to its own line under the time and nick, the third stop leaves a blank line below it, and the fourth keeps the body inline but opens a blank line above each row<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - fade ghosts the bar out, slim collapses it to a hairline; hovering the strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a <img class="emote" src="https://cdn.betterttv.net/emote/5f34967cb2efd65d77e7c9bc/2x.gif" alt="System"> notification when the stream goes live or a keyword or "@you" line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>↻</b> <span>update notice: <span id="helpUpdList"></span> - the reload bar when a site update lands while the page is open, and how often the page checks for one; the bar's own 'update check' chips pick the same stops<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
@@ -3735,14 +3736,19 @@
   // is unchanged - only scroll geometry differs. The live edge reads as
   // a negative scrollTop, so all follow math routes through these two
   let revFlow = false;
+  // wrap pages the lone column like the split ones do - dormant under
+  // rev (the top-pinned flow is its own geometry) and under split,
+  // where the columns already page this way
+  let wrapFlow = false;
   const liveDist = (col) => revFlow
     ? col.scrollTop + col.scrollHeight - col.clientHeight
     : col.scrollHeight - col.scrollTop - col.clientHeight;
   // the scroll event from a follow pin is programmatic, not a user scroll -
   // the peek card ignores it or every new row would drop an open preview
   let autoScrollAt = 0;
-  // split pages anchor at their top edge; single-column flow at the bottom
-  const snapLive = (col) => { autoScrollAt = performance.now(); col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : isSplit() ? 0 : col.scrollHeight; };
+  // paged columns (split, or wrap on the lone column) anchor at their
+  // top edge; a scrolling single column anchors at the bottom
+  const snapLive = (col) => { autoScrollAt = performance.now(); col.scrollTop = revFlow ? col.clientHeight - col.scrollHeight : (isSplit() || wrapFlow) ? 0 : col.scrollHeight; };
   // IRC "id" tag → row element, so reply chips can jump to their parent.
   const rowById = new Map();
   // mid → raw message text, so quoting a row uses the real text rather
@@ -3916,6 +3922,7 @@
       // page-flip columns never scroll - a late image growing a row past
       // the fold flips the spill on, or re-deals if it was an idle page
       if (isSplit() && !revFlow) { refitPages(); return; }
+      if (wrapFlow && !revFlow) { wrapPage(); sweepGhosts(logEl); return; }
       if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       if (sideBottom && !sideEl.hidden && !pausedCols.has(sideEl)) snapLive(sideEl);
       if (side2Bottom && !side2El.hidden && !pausedCols.has(side2El)) snapLive(side2El);
@@ -4177,7 +4184,7 @@
     // 'first post' and hide the live row that really carries it. a row
     // chat can't show (stale under split, or collapsed by a hide) is no
     // first post either - its link's reposts get to stand in for it
-    const unseen = (r) => rowCollapsed(r) || (r.classList.contains('stale') && isSplit() && !revFlow);
+    const unseen = (r) => rowCollapsed(r) || (r.classList.contains('stale') && (isSplit() || wrapFlow) && !revFlow);
     for (const r of rows || [logEl, sideEl, side2El].flatMap((col) => [...col.querySelectorAll(':scope > .row:not([data-lks])')])) {
       if (unseen(r)) continue;
       r.dataset.lks = '1';
@@ -4866,6 +4873,7 @@
     if (missed.length > 50) missed.splice(0, missed.length - 50);
     if (unfocused) updateMissedBadge();
     if (isSplit()) { flipCols(); if (!revFlow) sweepGhosts(activeEl); }
+    else if (wrapFlow && !revFlow) wrapPage();
     trimScrollback();
     // evicted rows leave their ids behind - drop only the disconnected
     if (rowById.size > MAX_MESSAGES + 1000)
@@ -6016,6 +6024,7 @@
     else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpWrap')) { setWrap(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpNl')) { setMsgNl(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpBar')) { setBarTop(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpAuto')) { setBarAuto(+a.dataset.idx); saveOpts(); }
@@ -7559,6 +7568,7 @@
       // outgrew its column - re-cutting on every wobble shuffled whole
       // pages sideways and read as a second backfill landing late
       if (isSplit()) { if (revFlow) flipCols(); else refitPages(); }
+      else if (wrapFlow && !revFlow) { wrapPage(); sweepGhosts(logEl); }
       else if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
       // font/metric changes move the name column in px - the reply quote
       // indents and the cards' --nx stamps cached there go stale, so
@@ -8544,6 +8554,7 @@
       pause: pauseOnText,
       scrollback: MAX_MESSAGES,
       rev: revFlow,
+      wrap: wrapFlow,
       bartop: barTop,
       bauto: barAuto,
       mnl: msgNl,
@@ -8675,6 +8686,7 @@
     if (typeof o.pause === 'boolean') setPause(o.pause);
     if (SCROLLBACK_SIZES.includes(o.scrollback)) setScrollback(o.scrollback);
     if (typeof o.rev === 'boolean') setRev(o.rev);
+    if (typeof o.wrap === 'boolean') setWrap(o.wrap);
     if (typeof o.bartop === 'boolean') setBarTop(o.bartop);
     if (o.bauto !== undefined) setBarAuto(o.bauto);
     if (o.mnl !== undefined) setMsgNl(+o.mnl);
@@ -9591,12 +9603,31 @@
     mergeCols();
     revFlow = on;
     mainEl.classList.toggle('rev', on);
+    // wrap holds no page bookkeeping of its own - it re-engages when the
+    // live edge comes back to the bottom
+    mainEl.classList.toggle('wrap', wrapFlow && !on);
     if (isSplit()) {
       if (on) flipCols(); // rev drains #log's tail into the next column
       else { const cs = cols(); activeEl = cs[cs.length - 1]; deal(); }
     }
+    else if (!on && wrapFlow) wrapDeal();
     for (const col of [logEl, sideEl, side2El]) if (!col.hidden) snapLive(col);
     markHelp('helpFlow', on ? 1 : 0);
+  }
+
+  // ---- page wrap: the lone column pages like the split columns do ----
+  // once the live page fills, it retires to a faded layer that new rows
+  // write down over from the top - the column flip landing back on the
+  // same column
+  function setWrap(on) {
+    wrapFlow = on;
+    mainEl.classList.toggle('wrap', on && !revFlow);
+    if (!isSplit() && !revFlow) {
+      if (on) wrapDeal();
+      else mergeCols(); // unfold the archive back into scrollable flow
+      snapLive(logEl);
+    }
+    markHelp('helpWrap', on ? 1 : 0);
   }
 
   // ---- chat box location: bottom default; top docks it under the ----
@@ -9635,6 +9666,7 @@
     // hidden rows collapse out of the page math - re-deal so the columns
     // pack the shown links instead of holding empty slots
     if (isSplit() && !revFlow) deal();
+    else if (wrapFlow && !revFlow) wrapDeal();
     setOn(linkBtn, on);
     linkBtn.title = `Links view: ${on ? 'on' : 'off'} - click toggles`;
     markHelp('helpLinks', on ? 1 : 0);
@@ -10070,6 +10102,7 @@
     if (pauseOnText) q.set('pause', '1');
     if (MAX_MESSAGES !== 10000) q.set('scrollback', MAX_MESSAGES);
     if (revFlow) q.set('rev', '1');
+    if (wrapFlow) q.set('wrap', '1');
     if (barTop) q.set('bartop', '1');
     if (barAuto) q.set('bauto', String(barAuto));
     if (msgNl) q.set('mnl', String(msgNl));
@@ -10500,9 +10533,8 @@
   const ghostMask = (top, bot) =>
     `linear-gradient(to bottom, rgba(0,0,0,${top.toFixed(3)}), rgba(0,0,0,${bot.toFixed(3)}))`;
   const ghostShade = (el, top, bot) => { el.style.webkitMaskImage = el.style.maskImage = ghostMask(top, bot); };
-  function ghostify(col) {
+  function ghostify(col, page = liveRows(col)) {
     clearGhosts(col);
-    const page = liveRows(col);
     if (!page.length) return;
     const ov = document.createElement('div');
     ov.className = 'ghostpage';
@@ -10714,6 +10746,74 @@
     }
     if (frag) to.appendChild(frag);
     return moved;
+  }
+
+  // The lone column's own flip, run on each flush under wrap: once the
+  // live page's tail crosses the fold the outgoing page ghosts and
+  // retires to the archive, and the spill rows open a fresh page at the
+  // top that layers down over it - the column wrapping onto itself
+  function wrapPage() {
+    const live = liveRows(logEl);
+    const { room, fold } = pageBox(logEl);
+    let k = live.length;
+    for (let j = live.length - 1; j > 0; j--) {
+      if (rowCollapsed(live[j])) continue;
+      if (live[j].getBoundingClientRect().bottom <= fold + 0.5) break;
+      k = j;
+    }
+    if (k === live.length) return;
+    const staying = live.slice(0, k), moving = live.slice(k);
+    // a spill taller than a page (a backfill burst) keeps only its
+    // newest page-worth live - the rest archives with the outgoing page
+    let end = null, cut = 0;
+    for (let j = moving.length - 1; j >= 0; j--) {
+      const r = moving[j];
+      if (rowCollapsed(r)) continue;
+      const rc = r.getBoundingClientRect();
+      if (end === null) { end = rc.bottom; cut = j; continue; }
+      if (end - rc.top > room) break;
+      cut = j;
+    }
+    // the ghost snapshots the page that was on screen - the burst's
+    // excess rows never showed, so they archive uncloned
+    ghostify(logEl, staying);
+    for (const r of staying) r.classList.add('stale');
+    for (let j = 0; j < cut; j++) moving[j].classList.add('stale');
+    autoScrollAt = performance.now();
+    logEl.scrollTop = 0;
+    sweepGhosts(logEl);
+    redupeIfLinkview();
+  }
+  // (Re)cuts the wrap column to its newest page - on the toggle, on a
+  // return to one column, on a linkview re-hide. A live set that doesn't
+  // reach the fold pulls the archive's newest rows back live until it
+  // does - the same loan deal() takes
+  function wrapDeal() {
+    clearGhosts(logEl); // a re-cut makes any lingering overlay moot
+    const { room, fold } = pageBox(logEl);
+    let end = null, k = 0;
+    const live = liveRows(logEl);
+    for (let j = live.length - 1; j >= 0; j--) {
+      const r = live[j];
+      if (rowCollapsed(r)) continue;
+      const rc = r.getBoundingClientRect();
+      if (end === null) { end = rc.bottom; continue; }
+      if (end - rc.top > room) { k = j + 1; break; }
+    }
+    for (let j = 0; j < k; j++) live[j].classList.add('stale');
+    for (;;) {
+      const lv = liveRows(logEl);
+      let bottom = 0;
+      for (let j = lv.length - 1; j >= 0; j--)
+        if (!rowCollapsed(lv[j])) { bottom = lv[j].getBoundingClientRect().bottom; break; }
+      if (bottom >= fold - 1) break;
+      const arch = logEl.querySelectorAll(':scope > .stale');
+      if (!arch.length) break;
+      for (const r of [...arch].slice(-(Math.ceil(room / 20) + 4))) r.classList.remove('stale');
+    }
+    autoScrollAt = performance.now();
+    logEl.scrollTop = 0;
+    redupeIfLinkview();
   }
 
   // the rail deals no rows - it re-parents the floating panels:
@@ -11020,7 +11120,7 @@
     if (want === 0) return; // help fills the row - no column to deal
     if (want === 1) {
       // columns widen on rejoin - re-pin the live column if it was following
-      requestAnimationFrame(() => { if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); });
+      requestAnimationFrame(() => { if (wrapFlow && !revFlow) wrapDeal(); if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); });
     } else if (revFlow) {
       // rev never rotates: the first column stays live, its spill page
       // lands in the next
@@ -14720,6 +14820,7 @@
     if (q.has('pause')) setPause(flag('pause'));
     if (q.has('scrollback')) setScrollback(+q.get('scrollback'));
     if (q.has('rev')) setRev(flag('rev'));
+    if (q.has('wrap')) setWrap(flag('wrap'));
     if (q.has('bartop')) setBarTop(flag('bartop'));
     if (q.has('bauto')) setBarAuto(flag('bauto') ? (+q.get('bauto') || 1) : 0);
     if (q.has('mnl')) setMsgNl(flag('mnl') ? (+q.get('mnl') || 1) : 0);
@@ -14878,7 +14979,7 @@
   }
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
-    helpFlow: ['newest at bottom', 'newest at top'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'on'], helpEonly: EMOTE_MODES,
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
