@@ -126,6 +126,9 @@ not versions - the page ships continuously to Neocities.
 - the caucuses stat splits into two columns - dlg and npc each get
   their own seat, so the npc counts line up instead of ragged
   mid-cell
+- a wing column joins the caucuses table between the description
+  and the delegate count - the data-w band each row sorts by made
+  visible: right, ctr-right, centre, ctr-left, left, non-tend
 - the caucuses table gains a news column between press and join:
   north star's blog rekeys there (it's a feed, not an organ), and
   six feeds join it - marxist unity's latest, r&r's news & analysis,
