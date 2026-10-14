@@ -336,7 +336,7 @@ no dependencies beyond CDN-hosted fonts.
     The browser keeps that searchable copy for up to 30 days, within
     a storage limit. Matches still on screen can be opened directly.
 - **People**
-  - In help/⚙, add usernames to the hide list. Choose whether their
+  - In help, add usernames to the hide list. Choose whether their
     messages disappear, become a count line, or remain visible but
     dimmed and crossed out.
   - Click a name or @mention to open a card with the user's colour,
@@ -355,7 +355,7 @@ no dependencies beyond CDN-hosted fonts.
     It can show where a shortened link leads, a video from an
     Instagram reel, an X/Twitter post or Twitch profile details such
     as live status and pronouns.
-  - The help/⚙ controls can limit previews to text or turn them
+  - The help controls can limit previews to text or turn them
     off. Hover previews do not run on touch screens.
 
 ### Keyboard & accessibility
@@ -521,13 +521,14 @@ also selects a colour style rather than a full preset.
 
 The copy-settings button makes a URL with the current settings. When a
 preset is selected, the URL includes only options changed from that
-preset.
+preset. A pick beside it can also open the `?` popup on a chosen page
+(`?help=panel&htab=`…).
 
 ### Performance
 
 - **Incoming chat:** the page groups messages before drawing them to
   avoid redrawing after every line.
-- **Limits:** 5,000 visible rows by default; the user can raise the
+- **Limits:** 10,000 visible rows by default; the user can raise the
   limit. Pending messages and the recent rows kept for reloads have
   separate limits so they cannot grow without bound.
 - **Loading:** fonts do not hold up the first display. The about page
