@@ -138,6 +138,8 @@ not versions - the page ships continuously to Neocities.
 - podcasts: the reaction cast joins the tail - punished fredda,
   mikefrompa & yugopnik's anti-fascist show, hosts column like the
   other ensemble podcasts
+- news & talk gains philip defranco at the tail, and essays gains
+  benn jordan (music tech)
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
