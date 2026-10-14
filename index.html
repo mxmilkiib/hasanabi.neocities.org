@@ -7295,13 +7295,13 @@
         cell = document.createElement('span');
         cell.className = 'cl';
         if (svc) {
-          // locals rides the discord column; lemmy, site and forum the
-          // reddit one; and every podcast name rides the extras column -
+          // locals rides the discord column; site and forum the reddit
+          // one; and every podcast name rides the extras column -
           // near-roles share a slot, saving sparse columns. an alias
           // falls through its list when earlier picks are taken (forum
-          // denied reddit lands in lemmy's spillover); if none are free
-          // the link keeps its own name, so two links never layer
-          const svcAliases = { lemmy: 'reddit', locals: 'discord', site: 'reddit', forum: ['reddit', 'lemmy'],
+          // denied reddit lands on lemmy); if none are free the link
+          // keeps its own name, so two links never layer
+          const svcAliases = { locals: 'discord', site: 'reddit', forum: ['reddit', 'lemmy'],
             links: 'extras', feed: 'extras', 'even more news': 'extras', 'kill james bond': 'extras', 'krystal kyle & friends': 'extras' };
           const lbl = n.textContent.trim();
           // a data-svc on the anchor names its column outright (one row's
