@@ -103,7 +103,7 @@ not versions - the page ships continuously to Neocities.
 - the layout section seats each level's chip beside its own
   description bullet instead of bunching them after the family head
 - the config tab reads help/⚙ - a settings cog in place of 'conf'
-- the copy-url row's popup-state toggle becomes a page select: off, or
+- the copy-url row's popup-state toggle becomes a page pick: off, or
   the tab the url opens the popup on. the `help/⚙` tab shortens to
   `help`, and `?htab=` emits `help` for it (`config` still resolves)
 - the theme slots sit under the copy-settings button

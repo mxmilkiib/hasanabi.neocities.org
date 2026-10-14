@@ -2612,7 +2612,7 @@
     <div style="margin-top: 8px"><b>safe gifs</b><span>limit giphy lookups for gif posts to a PG-13 rating: <span id="helpGifList"></span><sup>†</sup></span></div>
     <div class="sep">⸻</div>
     <div class="wide" style="margin-top: 20px"><span id="copyUrlPrev" style="display: block; text-align: center; word-break: break-all; font-size: .78em; opacity: .65; user-select: all" title="the url the button below copies"></span></div>
-    <div class="wide" style="margin-top: 4px; font-size: .85em"><span>the copied url also opens this popup on a page (?help/?htab): <select id="copyHelpSel" class="hdr-btn" style="height: auto; padding: 0 4px; font-size: 1em"><option value="">off</option><option value="media">media</option><option value="left">left</option><option value="libre">libre</option><option value="authors">authors</option><option value="stats">stats</option><option value="help">help</option></select></span></div>
+    <div class="wide" style="margin-top: 4px; font-size: .85em"><span>the copied url also opens this popup on a page (?help/?htab): <span id="helpCopyHelpList"></span></span></div>
     <button id="copyUrl" class="hdr-btn" style="margin-top: 2px; width: 100%; height: 26px">copy settings url</button>
     <div style="margin-top: 8px; align-items: center"><b>theme slots</b><div id="slotRow" style="display: flex; gap: 6px; align-items: center">
       <button class="hdr-btn slot" data-i="0">➊</button>
@@ -6042,6 +6042,7 @@
     else if (a.classList.contains('helpRbwPal')) { setRbwPal(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpHide')) { setHideMode(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpNoLbl')) { setLbls(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx ? COPYHELP_TABS[+a.dataset.idx - 1] : '');
   });
   // anchors only fire on enter natively, and only when href'd - the
   // role=button and tab picks answer space, plus enter on the bare ones
@@ -10022,20 +10023,19 @@
   // whether the copied settings url also opens the ? popup, and on
   // which page - a copy-side choice, not a chat option
   const COPYHELP_KEY = 'hasan-copyhelp';
-  const copyHelpSel = document.getElementById('copyHelpSel');
+  const COPYHELP_TABS = ['media', 'left', 'libre', 'authors', 'stats', 'help'];
   let copyHelp = '';
   try {
     const v = localStorage.getItem(COPYHELP_KEY);
     // a legacy '1' emitted the tab in view - nearly always this one
-    copyHelp = v === '1' ? 'help' : (v && copyHelpSel.querySelector(`option[value="${v}"]`) ? v : '');
+    copyHelp = v === '1' ? 'help' : (COPYHELP_TABS.includes(v) ? v : '');
   } catch {}
-  copyHelpSel.value = copyHelp;
   function setCopyHelp(v) {
-    copyHelp = v;
-    try { localStorage.setItem(COPYHELP_KEY, v || '0'); } catch {}
+    copyHelp = COPYHELP_TABS.includes(v) ? v : '';
+    try { localStorage.setItem(COPYHELP_KEY, copyHelp || '0'); } catch {}
+    markHelp('helpCopyHelp', copyHelp ? COPYHELP_TABS.indexOf(copyHelp) + 1 : 0);
     updateUrlPrev();
   }
-  copyHelpSel.addEventListener('change', () => setCopyHelp(copyHelpSel.value));
   // builds a ?param url from the current non-default options
   // builds the settings url exactly as a copy emits it - the preview row
   // above the button renders this, refreshed wherever options can change
@@ -14850,6 +14850,7 @@
     helpNoLbl: ['off', 'on'],
     helpRbw: ['sweep', 'wave', 'hue cycle', 'random'],
     helpRbwPal: RBW_PALS.map((p) => p.n), helpRbwS: RBW_SCOPES,
+    helpCopyHelp: ['off'].concat(COPYHELP_TABS),
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
@@ -14923,6 +14924,7 @@
   markHelp('helpFav', lkIco ? 1 : 0);
   markHelp('helpPn', pronounsOn ? 1 : 0);
   markHelp('helpNl', msgNl);
+  markHelp('helpCopyHelp', copyHelp ? COPYHELP_TABS.indexOf(copyHelp) + 1 : 0);
   // offline banner: the browser's own online/offline signal
   const offBar = document.getElementById('offBar');
   const netPaint = () => { offBar.hidden = navigator.onLine; };
