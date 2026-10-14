@@ -110,6 +110,10 @@ not versions - the page ships continuously to Neocities.
   and the help row's 'modes' head all agree
 - the layout help row's descriptions run as bullet lists instead of
   paragraphs - each family's clauses become - points under its chips
+- level 14 fills the row even with a resized rail: a fixed rail caps
+  at min(saved width, 62%) to leave chat room, which level 14 has no
+  use for - a solo class drops the cap so the docked popup spans the
+  window again
 - the update bar's poll chips moved into the centre run, seated
   between the message and the right reload button - part of the
   message cluster now rather than a separate block beside the ✕

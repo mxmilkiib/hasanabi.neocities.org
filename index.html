@@ -709,6 +709,9 @@
   /* a dragged rail carries its own width; 62% caps it so the chat
      columns always keep a readable share of the window */
   #rail.fixed { flex: none; width: min(var(--railw, 320px), 62%); }
+  /* level 14 leaves no chat column to spare room for, so a solo rail
+     drops the fixed-width cap and fills the row */
+  #rail.fixed.solo { flex: 1; width: auto; }
   /* a squeezed stats pane sheds its lower lists first - the rate graph
      climbs to the top of what remains, alone once the pane can fit
      little else */
@@ -10626,6 +10629,7 @@
   function dockRail(level) {
     const on = level >= 4;
     colSplitEl.hidden = !on || level === 14;
+    railEl.classList.toggle('solo', level === 14);
     const statsTab = document.getElementById('htabStats');
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
     const helpDock = level >= 10;
