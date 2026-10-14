@@ -34,6 +34,8 @@ not versions - the page ships continuously to Neocities.
 ### Help popup
 - the emote picker's sources note links out to 7tv, bttv, ffz and
   twitch
+- the remaining em dashes read as hyphens (meta description, help
+  separators, the empty 'seen' stamp)
 - the layout section seats each level's chip beside its own
   description bullet instead of bunching them after the family head
 - the config tab reads help/⚙ - a settings cog in place of 'conf'
