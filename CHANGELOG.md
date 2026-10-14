@@ -142,9 +142,11 @@ not versions - the page ships continuously to Neocities.
   center and an org tools run - openslides (site + repo), solidarity
   tech (site + connector profile), short.io, and the portal root - then
   rose garden (the factions newsletter home), the discussion-forum
-  opt-in, the org structure page and the 2025 convention rules. the
-  triangle wiki's row grows into a chapter wikis run - nyc, sf,
-  boston and austin join it (twin cities has one but it's 500ing).
+  opt-in (later folded into usa pol's dsa national run beside the
+  board itself), the org structure page and the 2025 convention
+  rules. the triangle wiki's row grows into a chapter wikis run -
+  nyc, sf, boston and austin join it (twin cities has one but it's
+  500ing).
   organising's reading run gains foster's 1926 organize the
   unorganized beside rules for radicals
 - the channels/streams table gains a faint zebra wash - every other
