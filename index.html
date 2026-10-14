@@ -13695,7 +13695,7 @@
     if (!silent) try { localStorage.setItem(EPICK_OPEN_KEY, '0'); } catch {}
   }
   emotePin.addEventListener('click', () => { setPin(!epickPinned); saveOpts(); });
-  document.getElementById('emoteX').addEventListener('click', closePicker);
+  document.getElementById('emoteX').addEventListener('click', () => closePicker());
   // the picker's lower bound is the chat bar's top edge when the bar is
   // up - same idea as the header clamp above it
   // the picker's lower bound is the chat bar's top edge when the bar is

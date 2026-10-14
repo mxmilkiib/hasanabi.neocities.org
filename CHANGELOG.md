@@ -15,6 +15,9 @@ not versions - the page ships continuously to Neocities.
   only the picker's cells, 'all' adds chat rows, the autocomplete and
   the stats list. the ? popup carries the same pick (emote pause), the
   picker's wheel cycles it, and an old animf save migrates to 'all'
+- the picker's × close now stamps the '0' deliberate-close pref -
+  it was passed the click event into closePicker's silent arg, so
+  the stamp never wrote and every reload popped the picker back up
 ### Header
 - live? only counts a parseable uptime as live - a decapi error reply
   no longer lights a channel green; second-level uptimes parse too,
