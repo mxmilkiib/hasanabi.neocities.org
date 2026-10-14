@@ -150,7 +150,7 @@ not versions - the page ships continuously to Neocities.
   geopold, then fd signifier, joris unpacks and marxism today
 - dsa caucuses gets its own section under dsa chapters, leaving the
   usa pol tail and running the wider 30em columns: an indexes row
-  (national wiki, national working groups) then fourteen caucuses -
+  (triangle dsa wiki, national working groups) then fourteen caucuses -
   the five already listed plus 21st century socialism, caracol,
   communist caucus, emerge, groundwork, liberation, north star, red
   star and reform & revolution. each caucus gains a founding year and
@@ -160,6 +160,13 @@ not versions - the page ships continuously to Neocities.
   section runs the stbl grid like channels/streams - name | year |
   docs | press | join | info - so the table builder now walks every
   linkcols.stbl in the panel, not just the resources one
+- workers unions drops its striking item - worker action already
+  carries the strike content, so the three links it was missing
+  (picket line, right to strike, strike pay) moved into its run.
+  conway's law rewords its note to 'designs mirror the org's comms
+  structure' - the word system was being eaten by a client-side icon
+  substitution. the caucus index link 'national wiki' relabels as
+  triangle dsa wiki - it's the nc chapter's, not a national organ
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
