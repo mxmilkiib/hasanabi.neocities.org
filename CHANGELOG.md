@@ -149,6 +149,18 @@ not versions - the page ships continuously to Neocities.
   500ing).
   organising's reading run gains foster's 1926 organize the
   unorganized beside rules for radicals
+- left parties goes wider and roughly doubles: the us run gains
+  cpusa, socialist alternative, socialist party usa and working
+  families, canada its greens; libre (honduras), frente amplio
+  (chile), mas-ipsp (wiki - site down), revolución ciudadana
+  (ecuador), pacto histórico (colombia) and psuv (venezuela, http
+  only) fill south america; europe gains people before profit,
+  pcf + npa, bsw, sumar + iu, pcp + livre, sf, sv, kke, akel, kpö,
+  vinstri græn, déi lénk, sinistra italiana + potere al popolo,
+  and tİp + dem; and new asia (jcp, jvp + npp, cpi(m), cpn-uml,
+  hadash, makabayan), africa (eff, sacp, sudanese communist -
+  wiki, underground) and oceania (victorian socialists, socialist
+  alliance, aotearoa greens) runs close the map
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
   heads and note rows stay out of the count
