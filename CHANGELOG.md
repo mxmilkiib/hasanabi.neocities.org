@@ -136,6 +136,10 @@ not versions - the page ships continuously to Neocities.
   the page opened in that layout
 - the theme shots are re-taken over the live stream rather than the
   old canned-chat stub
+- chat and extras grow to four groups each ('marks & mods', 'the
+  chrome'), an `alt twitch chat` comparison table lines this page up
+  against fifteen other clients, the layout subsection titles go gold
+  and the shots centre under them
 
 ## 2026-10-13
 
