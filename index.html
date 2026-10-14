@@ -7594,7 +7594,7 @@
     de.setProperty('--chat-ls', Math.round(fs * (parseFloat(cs.getPropertyValue('--chat-lse')) || 0) * 1000) / 1000 + 'px');
     subWProbe();
   }
-  function cycle(btn, list, idx, prop, label, unit, helpCls) {
+  function cycle(btn, list, idx, prop, label, unit, helpCls, wdir) {
     const apply = () => {
       document.documentElement.style.setProperty(prop, list[idx] + unit);
       syncLh();
@@ -7606,7 +7606,7 @@
     btn.addEventListener('click', (e) => { idx = (idx + (e.shiftKey ? -1 : 1) + list.length) % list.length; apply(); });
     btn.addEventListener('wheel', (e) => {
       e.preventDefault();
-      idx = (idx + (e.deltaY > 0 ? 1 : -1) + list.length) % list.length;
+      idx = (idx + (e.deltaY > 0 ? 1 : -1) * (wdir || 1) + list.length) % list.length;
       apply();
     }, { passive: false });
     return { set: (i) => { idx = i; apply(); }, get: () => idx, seat: (i) => { idx = i; } };
@@ -7615,7 +7615,8 @@
   // the Ladder starts on the live Font size so a raised mobile floor
   // steps up from there instead of from an unrelated rung
   const fsNow = chatFontPx();
-  const fontCtl = cycle(fontBtn, FONT_SIZES, FONT_SIZES.indexOf(fsNow) >= 0 ? FONT_SIZES.indexOf(fsNow) : DEF.size, '--chat-font', 'Font size', 'px', 'helpFont');
+  // the size wheel runs inverted - down shrinks, up grows
+  const fontCtl = cycle(fontBtn, FONT_SIZES, FONT_SIZES.indexOf(fsNow) >= 0 ? FONT_SIZES.indexOf(fsNow) : DEF.size, '--chat-font', 'Font size', 'px', 'helpFont', -1);
   const lhCtl = cycle(lhBtn, LINE_HEIGHTS, DEF.lh, '--chat-lh', 'Line height', '', 'helpLh');
   const WEIGHTS = [300, 400, 500, 600, 700];
   const WEIGHT_NAMES = ['light', 'regular', 'medium', 'semibold', 'bold'];
