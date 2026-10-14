@@ -34,11 +34,16 @@ not versions - the page ships continuously to Neocities.
 ### Resources
 - the caucuses table gains the two seat-holders it was missing:
   springs of revolution (4 npc, the second-biggest bloc) and
-  carnation (1 npc); the listed caucuses' dlg/npc figures verify
+  carnation (1 npc); the listed caucuses' npc figures verify
   against the 2025 convention results
+- the caucuses dlg column drops out - dsa publishes no per-caucus
+  delegate or membership figures, so the size sort becomes npc and
+  orders by the one official tally
+- the caucuses indexes row moves beneath the table with a references
+  row: convention site, npc elections and newsletter, delegate
+  elections, dsa structure, keywiki, edgechat, and the rocdsa and
+  r&r convention accounts
 - usa pol's link columns widen to 40em
-- the caucuses index link moves to the name column, heading the
-  caucus rows below it
 - the channels/streams table heads its columns: channel · kind, then
   each service column wearing its name (tw, yt, reddit…)
 - the usa pol dsa row's parens gain reddit (r/dsa) and twitter

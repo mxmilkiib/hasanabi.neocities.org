@@ -1,0 +1,56 @@
+<!doctype html><meta charset=utf8><body>
+<iframe id=f src="http://127.0.0.1:8877/index.html" style="width:1100px;height:700px"></iframe>
+<pre id=out></pre>
+<script>
+const out = (s) => document.getElementById('out').textContent += s + '\n';
+const f = document.getElementById('f');
+f.onload = () => {
+  const w = f.contentWindow, d = w.document;
+  setTimeout(() => {
+    const hp = d.getElementById('helpPanel');
+    const vid = d.getElementById('vid');
+    // force the panel open floating
+    hp.hidden = false;
+    hp.style.left = '300px'; hp.style.top = '100px'; hp.style.right = 'auto';
+    hp.style.width = '500px'; hp.style.maxWidth = '500px'; hp.style.height = '300px';
+    const ev = (x, y, type, tgt) => {
+      const e = new w.PointerEvent(type, { clientX: x, clientY: y, bubbles: true, button: 0, buttons: 0, pointerId: 9 });
+      (tgt || d.elementFromPoint(x, y) || d.body).dispatchEvent(e);
+      return e;
+    };
+    const r = hp.getBoundingClientRect();
+    // hover just OUTSIDE the right edge - the ring should light edge-r
+    ev(r.right + 4, r.top + r.height / 2, 'pointermove');
+    out('ring r: cursor=' + d.body.style.cursor + ' edge-r=' + hp.classList.contains('edge-r'));
+    // inside the panel near the right edge - inside band should answer instead
+    const inTgt = d.elementFromPoint(r.right - 4, r.top + r.height / 2);
+    ev(r.right - 4, r.top + r.height / 2, 'pointermove', inTgt);
+    out('inside r: tgt=' + (inTgt && (inTgt.className || inTgt.id || inTgt.tagName)) + ' cursor=' + hp.style.cursor + ' edge-r=' + hp.classList.contains('edge-r'));
+    // top edge inside = handle territory -> no resize cursor
+    ev(r.left + r.width / 2, r.top + 4, 'pointermove');
+    out('inside t: cursor=' + hp.style.cursor + ' edge-t=' + hp.classList.contains('edge-t'));
+    // outside top -> ring t
+    ev(r.left + r.width / 2, r.top - 4, 'pointermove');
+    out('ring t: cursor=' + d.body.style.cursor + ' edge-t=' + hp.classList.contains('edge-t'));
+    // pointerdown just outside right edge -> resize drag
+    const down = new w.PointerEvent('pointerdown', { clientX: r.right + 4, clientY: r.top + r.height / 2, bubbles: true, button: 0, buttons: 1, pointerId: 9 });
+    (d.elementFromPoint(r.right + 4, r.top + r.height / 2) || d.body).dispatchEvent(down);
+    const mv = new w.PointerEvent('pointermove', { clientX: r.right + 60, clientY: r.top + r.height / 2, bubbles: true, buttons: 1, pointerId: 9 });
+    hp.dispatchEvent(mv);
+    out('after drag w=' + Math.round(hp.getBoundingClientRect().width) + ' (was 500)');
+    // vid ring: force float - reparent out of a possible rail dock
+    d.body.appendChild(vid);
+    vid.hidden = false;
+    vid.style.left = '600px'; vid.style.top = '300px'; vid.style.width = '320px';
+    vid.style.right = 'auto'; vid.style.bottom = 'auto';
+    out('vid parent: ' + vid.parentElement.tagName);
+    const vr = vid.getBoundingClientRect();
+    ev(vr.right + 4, vr.top + vr.height / 2, 'pointermove');
+    out('vid ring r: cursor=' + d.body.style.cursor + ' edge-r=' + vid.classList.contains('edge-r'));
+    const vdown = new w.PointerEvent('pointerdown', { clientX: vr.right + 4, clientY: vr.top + vr.height / 2, bubbles: true, button: 0, buttons: 1, pointerId: 9 });
+    (d.elementFromPoint(vr.right + 4, vr.top + vr.height / 2) || d.body).dispatchEvent(vdown);
+    vid.dispatchEvent(new w.PointerEvent('pointermove', { clientX: vr.right + 80, clientY: vr.top + vr.height / 2, bubbles: true, buttons: 1, pointerId: 9 }));
+    out('vid after drag w=' + Math.round(vid.getBoundingClientRect().width) + ' (was ' + Math.round(vr.width) + ')');
+  }, 600);
+};
+</script>
