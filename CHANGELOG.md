@@ -118,6 +118,10 @@ not versions - the page ships continuously to Neocities.
   between the message and the right reload button - part of the
   message cluster now rather than a separate block beside the ✕
 ### Resources
+- the caucuses sort chips ride the indexes row in the descriptions
+  column - the topmost cell of column 3, so they hover over the text
+  they order rather than the header's left or right. they sit inside
+  the rebuilt region now, so a sort re-lights the chip that drove it
 - a dsa resources section seats under dsa caucuses, and the triangle
   dsa wiki moves to it; the caucuses table's indexes row now links the
   wiki's own caucuses index page where the wiki sat. the wiki's ronr
