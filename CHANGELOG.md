@@ -118,10 +118,11 @@ not versions - the page ships continuously to Neocities.
   between the message and the right reload button - part of the
   message cluster now rather than a separate block beside the ✕
 ### Resources
-- the caucuses join column fills to 12 of 14: smc and red star gain
+- the caucuses join column fills to 13 of 14: smc and red star gain
   apply links, marxist unity, caracol (google form) and libertarian
-  socialist gain join links, and 21cs's join points at the bit.ly
-  interest form. liberation and afrosocialists publish no signup
+  socialist gain join links, 21cs's join points at the bit.ly
+  interest form, and afrosocialists gains the afrosoc commission's
+  action network application. only liberation publishes no signup
 - the caucuses stat splits into two columns - dlg and npc each get
   their own seat, so the npc counts line up instead of ragged
   mid-cell
