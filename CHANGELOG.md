@@ -141,7 +141,10 @@ not versions - the page ships continuously to Neocities.
   pod save america
 - news & talk gains philip defranco at the tail with reese waters
   under him (news, comedy), and essays gains benn jordan (music tech);
-  podcasts seats josh johnson (comedy) above alexei sayle
+  podcasts seats josh johnson (comedy) above alexei sayle. more joins:
+  news & talk takes brenna perez, don lemon, rebecca watson, india &
+  global left and dean withers; essays takes adam conover, gattsu and
+  geopold
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
