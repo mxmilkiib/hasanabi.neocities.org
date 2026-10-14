@@ -7416,7 +7416,7 @@
   // the two fixed cells take their names from the attribute while each
   // service column wears its own svc name
   if (stbl.dataset.head != null) {
-    for (const el of stbl.querySelectorAll('[style*="grid-row"]'))
+    for (const el of stbl.querySelectorAll('[style*="grid-"]'))
       el.style.gridRow = +el.style.gridRow + 1;
     const names = stbl.dataset.head.split(',');
     [names[0] || '', names[1] || '', ...preKeys, ...finCols].forEach((t, k) => {
