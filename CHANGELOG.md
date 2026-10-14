@@ -144,7 +144,7 @@ not versions - the page ships continuously to Neocities.
   podcasts seats josh johnson (comedy) above alexei sayle. more joins:
   news & talk takes brenna perez, don lemon, rebecca watson, india &
   global left and dean withers; essays takes adam conover, gattsu and
-  geopold
+  geopold, then fd signifier, joris unpacks and marxism today
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
