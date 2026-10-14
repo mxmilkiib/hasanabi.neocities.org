@@ -9,6 +9,8 @@ not versions - the page ships continuously to Neocities.
 - stream-status length gains a `blank` stop - the space beside the
   dot empties entirely (no status text, no chat-mode chips);
   `?sview=blank` or the wheel past `minimal`
+- the layout button's wheel cycles the menu's display order (2-col
+  family, then 3-col, then +help) rather than raw level ids
 - the youtube, twitter and instagram inline preview cards hang at
   quarter depth off the row indent instead of half
 - the user card's buttons sit directly under the name as a two-column

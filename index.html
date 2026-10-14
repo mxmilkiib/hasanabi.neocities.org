@@ -10914,6 +10914,9 @@
   // compact url aliases: level 1-3 are bare columns, then col +
   // v(id) e(motes) s(tats) h(elp) - 2x2 is its own shape
   const SPLIT_URL = ['1c', '2c', '3c', '3cves', '3cve', '3ce', '2cve', '2x2', '2ce', '3cvh', '2cvh', '2ch', '3ch', '1ch'];
+  // the menu's display order - 2-col family before 3-col, +help last -
+  // which the wheel steps through too, decoupled from raw level ids
+  const SPLIT_MENU_ORDER = [1, 14, 2, 12, 11, 7, 9, 8, 3, 13, 10, 4, 5, 6];
   const splitGlyph = (l) => l === 14 ? '?' : l === 1 ? '▮' : l === 10 ? '▮▮▶?' : l === 11 ? '▮▶?' : l === 12 ? '▮?' : l === 13 ? '▮▮?' : l === 8 ? '⊞' : l === 9 ? '▮☻' : l === 7 ? '▮▶' : l === 6 ? '▮▮☻' : l === 5 ? '▮▮▶' : l === 4 ? '▮▮▯' : l === 3 ? '▮▮▮' : '▮▮';
   function setSplit(level) {
     if (window.innerWidth <= window.innerHeight) level = Math.min(level, 2);
@@ -10977,15 +10980,14 @@
 
   function cycleSplit(dir) {
     const max = window.innerWidth > window.innerHeight ? SPLIT_NAMES.length : 2;
-    setSplit(((splitLevel + dir - 1) % max + max) % max + 1);
+    const seq = SPLIT_MENU_ORDER.filter((l) => l <= max);
+    setSplit(seq[(seq.indexOf(splitLevel) + dir + seq.length) % seq.length]);
     saveOpts();
   }
 
   // the layout button opens a menu of every level like the font
-  // picker's; the wheel keeps cycling, and shift-click still steps back.
-  // the menu lists the 2-col family before the 3-col, decoupled from
-  // the wheel's level order - each entry carries its level in data-i
-  const SPLIT_MENU_ORDER = [1, 14, 2, 12, 11, 7, 9, 8, 3, 13, 10, 4, 5, 6];
+  // picker's; the wheel steps the same display order, and shift-click
+  // still steps back - each entry carries its level in data-i
   splitMenu.innerHTML = SPLIT_MENU_ORDER.map((l) =>
     `<button type="button" role="option" data-i="${l}"><span class="sg">${splitGlyph(l)}</span>${SPLIT_NAMES[l - 1]}</button>`).join('');
   const markSplitMenu = () => {
