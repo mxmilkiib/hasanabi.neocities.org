@@ -2518,11 +2518,11 @@
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>stream status</b><span>the dot mirrors the stream status:</span><span class="dot connecting"></span><span>accent-pulsing while checking,</span><span class="dot connected"></span><span>green while live,</span><span class="dot reconnecting"></span><span>red-pulsing if the chat socket drops under a live stream,</span><span class="dot idle"></span><span>steady accent while the stream is off but chat is connected,</span><span class="dot offline"></span><span>grey while it is down;</span><span style="grid-column:2">page favicon (tab icon) repaints in the dot's own colour; hover for uptime, viewers and chat state; scroll trims the text beside it between full, compact and minimal</span></div>
+    <div><b>stream status</b><span>the dot mirrors the stream status:</span><span class="dot connecting"></span><span>accent-pulsing while checking,</span><span class="dot connected"></span><span>green while live,</span><span class="dot reconnecting"></span><span>red-pulsing if the chat socket drops under a live stream,</span><span class="dot idle"></span><span>steady accent while the stream is off but chat is connected,</span><span class="dot offline"></span><span>grey while it is down;</span><span style="grid-column:2">page favicon (tab icon) repaints in the dot's own colour; hover for uptime, viewers and chat state; scroll trims the text beside it between full, stats, compact and minimal</span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
-    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times, a compact cut, or the bare word; scrolling there cycles the same stops<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times, the same minus the chat-modes tail, a compact cut, or the bare word; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; underline marks an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -5425,9 +5425,12 @@
   // status info verbosity: 0 full, 1 compact, 2 minimal; wheel on the
   // dot or info text cycles it, the ? popup's status-length row sets it
   let statusView = 0;
-  const SVIEW_NAMES = ['full', 'compact', 'minimal'];
+  const SVIEW_NAMES = ['full', 'compact', 'minimal', 'stats'];
+  // wheel order seats stats beside full - it is full minus the
+  // chat-mode tail; array order keeps saved numeric ids stable
+  const SVIEW_CYCLE = [0, 3, 1, 2];
   function setStatusView(i) {
-    statusView = Math.max(0, Math.min(2, i | 0));
+    statusView = Math.max(0, Math.min(SVIEW_NAMES.length - 1, i | 0));
     markHelp('helpSview', statusView);
     updateHeader();
   }
@@ -5633,7 +5636,7 @@
                   : chatState === 'reconnecting' ? `chat reconnecting${wsCause ? ` (${wsCause})` : ''}`
                   : 'connecting to chat';
     // the full status line already carries the mode phrases; the chips span
-    // only earns its place in the two compact views
+    // only earns its place in the shorter views, stats included
     modesEl.hidden = statusView === 0 || !modesOn;
     if (!stream) {
       if (streamDead) {
@@ -5686,7 +5689,7 @@
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
       dotEl.setAttribute('aria-label', dotEl.title);
       infoEl.innerHTML = '<b>offline</b>' +
-        (statusView === 0 ? ranTxt + (chatState === 'connected' ? '' : ` · ${chatTxt}`)
+        (statusView === 0 || statusView === 3 ? ranTxt + (chatState === 'connected' ? '' : ` · ${chatTxt}`)
          : statusView === 1 && ago ? ` · ended <b>${ago}</b>`
          : statusView === 1 && startTs ? ` · live <b>${fmtTime(startTs)}${dayTag(startTs)}</b>` : '');
       document.title = CHAN_TITLE;
@@ -5705,7 +5708,7 @@
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
       : (since ? `<b>live</b> since <b>${since}</b>, up <b>${up}</b>` : '<b>live</b>') +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '') +
-        (chatState === 'connected' ? ` · ${modesOn && chatModesTxt ? chatModesTxt : 'chat'}` : chatSuffix);
+        (chatState === 'connected' ? ` · ${statusView === 0 && modesOn && chatModesTxt ? chatModesTxt : 'chat'}` : chatSuffix);
     infoEl.title = stream.title || '';
     dotEl.title = `${CHANNEL} is live${since ? ` - started ${since}` : ''}${up ? `, up ${up}` : ''}${viewers} · ${chatTxt}`;
     dotEl.setAttribute('aria-label', dotEl.title);
@@ -5725,7 +5728,8 @@
     e.preventDefault();
     // don't let a minimised header's wheel-unminimise ride the same flick
     e.stopPropagation();
-    setStatusView((statusView + (e.deltaY > 0 ? 1 : -1) + 3) % 3);
+    const i = SVIEW_CYCLE.indexOf(statusView);
+    setStatusView(SVIEW_CYCLE[(i + (e.deltaY > 0 ? 1 : -1) + SVIEW_CYCLE.length) % SVIEW_CYCLE.length]);
     saveOpts();
   }, { passive: false });
 
@@ -14674,7 +14678,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
     helpFlow: ['newest at bottom', 'newest at top'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'on'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpSview: SVIEW_NAMES, helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
@@ -14701,6 +14705,9 @@
     document.getElementById(id).innerHTML = idxs.map((i) =>
       `<a href="#" role="button" class="helpOpt helpSplit" data-idx="${i}"><span class="chipName">${SPLIT_NAMES[i].replace(/ \(.*$/, '')}</span></a>`)
       .join(' / ');
+  // status lengths list in wheel order, carrying their stable ids
+  document.getElementById('helpSviewList').innerHTML = SVIEW_CYCLE.map((i) =>
+    `<a href="#" role="button" class="helpOpt helpSview" data-idx="${i}"><span class="chipName">${SVIEW_NAMES[i]}</span></a>`).join(' / ');
   // shade chips list in cycle order but carry their stable ids, so murk
   // and twilight show mid-cycle while answering as shades 10 and 11
   document.getElementById('helpShadeList').innerHTML = SHADE_ORDER.map((i) =>

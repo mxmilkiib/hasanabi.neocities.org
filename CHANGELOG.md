@@ -13,6 +13,10 @@ not versions - the page ships continuously to Neocities.
   standalone has no native pull gesture to catch
 - the chat font list moves system sans above inter and helvetica
   below hack
+- the status length cycle gains 'stats' between full and compact:
+  the full run of times and counts without the chat-modes tail (no
+  'chat follow req…') - the mode chips pick up the slack unless
+  they're toggled off
 - a wrapped header lets the button strip reach under the pinned ?/–:
   the corner reserve only matters on the line they pin, so on the
   strip's own line a negative margin mirrors the left pad - wrapped
