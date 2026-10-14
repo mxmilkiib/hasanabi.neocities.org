@@ -32,6 +32,7 @@ not versions - the page ships continuously to Neocities.
   store-level campaign) after pacbi
 
 ### Help popup
+- the stats tab's storage rows run in wider 26em columns
 - the emote picker's sources note links out to 7tv, bttv, ffz and
   twitch
 - a few words in the help text print as their channel emotes: the
