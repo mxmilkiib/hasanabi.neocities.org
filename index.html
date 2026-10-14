@@ -1258,10 +1258,16 @@
     color: var(--text-dim); }
   #ucard .uc-msgs div { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 1px 0; }
   #ucard .uc-msgs .uc-t { opacity: .65; margin-right: 8px; font-variant-numeric: tabular-nums; }
-  #ucard .uc-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
-    align-items: center; }
+  #ucard .uc-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  /* a lone last button - hide user logged out, delete msg for mods -
+     spans the row rather than sitting half-width off to the left */
+  #ucard .uc-btns > :last-child:nth-child(odd) { grid-column: 1 / -1; }
   #ucard .uc-btns .hdr-btn { height: 26px; width: auto; padding: 0 10px; font-size: .85em;
-    white-space: nowrap; display: inline-flex; align-items: center; }
+    white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
+  /* .uc-hover mirrors the cursor-hover channel card: title, provider
+     facts (live state, followers, modes) and the description */
+  #ucard .uc-hover { font-size: .85em; color: var(--text-dim); margin-top: 8px; line-height: 1.4; }
+  #ucard .uc-hover .uc-ht { color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
   #ucard .uc-mod { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
   #ucard .uc-mod button[data-armed] { color: var(--danger); border-color: var(--danger); }
   #ucardX { float: right; padding: 0 6px; margin: -2px -4px 6px 10px; }
@@ -2586,7 +2592,7 @@
     <div class="sep">&nbsp;</div>
     <div><b>stats</b> the tab beside this one: session top chatters, <img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts (3x the channel's median rate, 4+ msgs/s floor)</div>
     <div style="margin-top: 17px"><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
-    <div><b>etc</b> <span class="linkcols ecfg"><i><b>names</b> link to twitch profiles · hovering one (or an @mention in the text) previews the channel · a plain click pins a user card · ⇧/⌃/⌘-click opens the profile</i><i><b>user card</b> pronouns, first-seen, session count, recent lines and profile / @mention / hide buttons - <img class="emote" src="https://cdn.betterttv.net/emote/651b9622fc204fb5a94cd4da/2x.gif" alt="MODS"> get <img class="emote" src="https://cdn.betterttv.net/emote/65114f0ae1a04f2c77076b77/2x.gif" alt="Timeout"> · ban · delete there, each a click-twice confirm</i><i><b>shimmer</b> fossabot + blammobot names shimmer, as do urls they post · @ostonox mentions too · @hasanabi mentions get a rainbow sweep hashed per author · merged-view #room tags run the same sweep per channel · the ✦ row switches these styles off</i><i><b>embeds</b> urls are clickable · images and gifs embed pinned right</i></span></div>
+    <div><b>etc</b> <span class="linkcols ecfg"><i><b>names</b> link to twitch profiles · hovering one (or an @mention in the text) previews the channel · a plain click pins a user card · ⇧/⌃/⌘-click opens the profile</i><i><b>user card</b> @mention / profile / highlight / hide buttons under the name, then the hover card's channel info (title, live state, followers, modes, description), pronouns, first-seen, session count and recent lines - <img class="emote" src="https://cdn.betterttv.net/emote/651b9622fc204fb5a94cd4da/2x.gif" alt="MODS"> get <img class="emote" src="https://cdn.betterttv.net/emote/65114f0ae1a04f2c77076b77/2x.gif" alt="Timeout"> · ban · delete there, each a click-twice confirm</i><i><b>shimmer</b> fossabot + blammobot names shimmer, as do urls they post · @ostonox mentions too · @hasanabi mentions get a rainbow sweep hashed per author · merged-view #room tags run the same sweep per channel · the ✦ row switches these styles off</i><i><b>embeds</b> urls are clickable · images and gifs embed pinned right</i></span></div>
     <div><b>&amp;c</b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
     <div class="sep">⸻</div>
     <div><b>Blammobot</b><span class="linkcols wider cmds"><i><b>games</b><nw>!roulette <i>[amount|all]</i> (gamble points on red/black)</nw> · <nw>!trivia (answer questions for points)</nw> · <nw>!scramble (unscramble the word)</nw></i><i><b>points</b><nw>!points (check balance)</nw> · <nw>!top <i>[count]</i> (leaderboard)</nw></i></span></div>
@@ -8370,7 +8376,35 @@
   function hlApply(lg) {
     for (const c of cols()) for (const r of c.querySelectorAll(`.row[data-u${lg ? `="${CSS.escape(lg)}"` : ''}]`)) hlRow(r);
   }
-  const ucardHide = () => { ucard.hidden = true; ucardLogin = ''; };
+  const ucardHide = () => { ucard.hidden = true; ucardLogin = ''; ucardPeekUrl = ''; };
+  let ucardPeekUrl = '';
+  // the channel-info block mirrors what hovering the nick's link shows:
+  // title, the provider's fact chips (live state, followers, modes) and
+  // the channel description, filled from the peek cache or when the
+  // worker answer lands while the card is up
+  function ucardFillPeek() {
+    const el = ucard.querySelector('.uc-hover');
+    if (!el || !ucardPeekUrl) return;
+    const e = peekCache.get(ucardPeekUrl);
+    const p = e && Date.now() - e.t < peekTtlOf(e.p) ? e.p : null;
+    if (!p) {
+      el.innerHTML = peekAsk(ucardPeekUrl) ? '…' : '';
+      el.hidden = !el.innerHTML;
+      return;
+    }
+    const by = [p.author && 'by ' + p.author, p.views, p.published && peekAge(p.published)].filter(Boolean).join(' · ');
+    el.innerHTML =
+      (p.title ? `<div class="uc-ht">${escapeHTML(p.title)}</div>` : '') +
+      (by ? `<div>${escapeHTML(by)}</div>` : '') +
+      (p.facts && p.facts.length ? `<div>${escapeHTML(p.facts.join(' · '))}</div>` : '') +
+      (p.description ? `<div>${escapeHTML(p.description)}</div>` : '');
+    el.hidden = !el.innerHTML;
+    // the arriving info can grow an already-placed card past the window
+    // floor - pull it back up inside the same bounds the open used
+    const r = ucard.getBoundingClientRect();
+    if (r.bottom > innerHeight - 4)
+      ucard.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, innerHeight - r.height - 4) + 'px';
+  }
   function ucardShow(login, ch, mid, x, y) {
     const lg = (login || '').toLowerCase();
     if (!lg) return;
@@ -8394,18 +8428,21 @@
       `<button class="hdr-btn" id="ucardX" title="close">✕</button>` +
       `<span class="uc-name" style="color:${escapeHTML(col)}">${escapeHTML(name)}</span>` +
       (name.toLowerCase() !== lg ? ` <span class="uc-login">@${escapeHTML(lg)}</span>` : '') +
-      `<div class="uc-facts">${pron ? escapeHTML(pron) + ' · ' : ''}` +
-      `seen ${first ? fmtRowTime(new Date(first)) : '-'} · ${count} msg${count === 1 ? '' : 's'} this session</div>` +
-      (recent ? `<div class="uc-msgs">${recent}</div>` : '') +
       `<div class="uc-btns">` +
-        `<a class="hdr-btn" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(lg))}" target="_blank" rel="noopener noreferrer">profile ↗</a>` +
         (auth && auth.login ? `<button class="hdr-btn" data-uc="mention">@mention</button>` : '') +
+        `<a class="hdr-btn" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(lg))}" target="_blank" rel="noopener noreferrer">profile ↗</a>` +
         `<button class="hdr-btn${hlUsers.has(lg) ? ' on' : ''}" data-uc="hl" title="wash all of this chatter's rows in a soft tint of their nick colour">${hlUsers.has(lg) ? 'highlighted' : 'highlight'}</button>` +
         `<button class="hdr-btn" data-uc="hide">hide user</button>` +
       `</div>` +
+      `<div class="uc-hover" hidden></div>` +
+      `<div class="uc-facts">${pron ? escapeHTML(pron) + ' · ' : ''}` +
+      `seen ${first ? fmtRowTime(new Date(first)) : '-'} · ${count} msg${count === 1 ? '' : 's'} this session</div>` +
+      (recent ? `<div class="uc-msgs">${recent}</div>` : '') +
       (canMod ? `<div class="uc-btns uc-mod"><button class="hdr-btn" data-uc="to">timeout 10m</button>` +
         `<button class="hdr-btn" data-uc="ban">ban</button>` +
         (ucardMid ? `<button class="hdr-btn" data-uc="del">delete msg</button>` : '') + `</div>` : '');
+    ucardPeekUrl = 'https://twitch.tv/' + lg;
+    ucardFillPeek();
     ucard.hidden = false;
     const w = ucard.offsetWidth, h = ucard.offsetHeight;
     ucard.style.left = Math.max(4, Math.min(innerWidth - w - 4, x - 20)) + 'px';
@@ -15324,6 +15361,8 @@
     }
     // refresh the card only while its link is still hovered
     if (peekUrl === url && !peekEl.hidden) peekShow(p, url, false);
+    // a pinned user card mirrors the same answer while it waits on one
+    if (ucardPeekUrl === url && !ucard.hidden) ucardFillPeek();
   }
   // a tweetCache entry re-shaped as a worker peek for the hover card:
   // the author titles and bylines it, the text bodies it, a photo (else

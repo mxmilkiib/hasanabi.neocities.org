@@ -9,6 +9,11 @@ not versions - the page ships continuously to Neocities.
 - stream-status length gains a `blank` stop - the space beside the
   dot empties entirely (no status text, no chat-mode chips);
   `?sview=blank` or the wheel past `minimal`
+- the user card's buttons sit directly under the name as a two-column
+  grid - @mention top-left, profile beside it, a lone last button
+  spanning full width - and the block below them carries the same
+  channel info the cursor-hover card shows (title, live state,
+  followers, modes, description)
 - `msg new line` (under chat flow in ?): the message body drops to
   its own line under the time and nick, the third stop adds a blank
   line below the body, and the fourth keeps the body inline but
