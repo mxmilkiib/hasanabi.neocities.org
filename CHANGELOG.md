@@ -24,6 +24,10 @@ not versions - the page ships continuously to Neocities.
   dead corner
 
 ### Resources
+- the caucuses table gains the two seat-holders it was missing:
+  springs of revolution (4 npc, the second-biggest bloc) and
+  carnation (1 npc); the listed caucuses' dlg/npc figures verify
+  against the 2025 convention results
 - usa pol's link columns widen to 40em
 - the caucuses index link moves to the name column, heading the
   caucus rows below it
