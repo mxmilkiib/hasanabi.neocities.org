@@ -120,8 +120,9 @@ not versions - the page ships continuously to Neocities.
 ### Resources
 - a dsa resources section seats under dsa caucuses, and the triangle
   dsa wiki moves to it; the caucuses table's indexes row now links the
-  wiki's own caucuses index page where the wiki sat. dsa resources
-  also gains the wiki's ronr intro and motions table pair
+  wiki's own caucuses index page where the wiki sat. the wiki's ronr
+  intro and motions table pair seat in organising's parliamentary run
+  after robert's rules
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
   heads and note rows stay out of the count
