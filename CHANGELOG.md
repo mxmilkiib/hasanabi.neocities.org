@@ -3,6 +3,22 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions - the page ships continuously to Neocities.
 
+## 2026-10-14
+
+### Resources
+- the usa pol dsa row's parens gain reddit (r/dsa) and twitter
+  (@demsocialists)
+- workers unions: ewoc gains its wikipedia * in the start-a-union
+  run, and union organizer joins the concepts run after soviet; the
+  boycott run gains no appetite for apartheid (na4a.org, the
+  store-level campaign) after pacbi
+
+### Help popup
+- tail descriptors in a long resources row no longer render at full
+  size: the (…) note-face wrap re-walked the row per bracket under a
+  flat 50-pass guard, which workers unions' start-a-union run had
+  outgrown - the guard now scales with the row's own paren count
+
 ## 2026-10-13
 
 ### Emote picker
