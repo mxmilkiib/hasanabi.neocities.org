@@ -11020,14 +11020,14 @@
         applyVidPos();
         setVideo(false);
       } else setRailVid(vidRail === 'off' && !suppressSave ? 'dock' : vidRail); // an offed video revives on rail re-entry, not on restore
-      // '0' means the picker was deliberately closed - the rail honours
-      // that instead of reopening it on every entry
-      let epClosed = helpDock;
-      try { epClosed = epClosed || localStorage.getItem(EPICK_OPEN_KEY) === '0'; } catch {}
-      if (emotePick.hidden && !epClosed) {
+      // a rail layout that hosts the picker needs it up - '0' (a
+      // deliberate close) only suppresses the floating popup, not the
+      // rail's own pane, so docking re-shows it and re-stamps '1'
+      if (emotePick.hidden && !helpDock) {
         emotePick.hidden = false;
         emojiBtn.classList.add('on');
         emojiBtn.setAttribute('aria-expanded', 'true');
+        try { localStorage.setItem(EPICK_OPEN_KEY, '1'); } catch {}
         if (!twSetsKey) loadTwitchSets('');
         buildPicker();
       }
