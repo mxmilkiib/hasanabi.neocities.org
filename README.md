@@ -335,7 +335,7 @@ no dependencies beyond CDN-hosted fonts.
     The browser keeps that searchable copy for up to 30 days, within
     a storage limit. Matches still on screen can be opened directly.
 - **People**
-  - In help/conf, add usernames to the hide list. Choose whether their
+  - In help/⚙, add usernames to the hide list. Choose whether their
     messages disappear, become a count line, or remain visible but
     dimmed and crossed out.
   - Click a name or @mention to open a card with the user's colour,
@@ -354,7 +354,7 @@ no dependencies beyond CDN-hosted fonts.
     It can show where a shortened link leads, a video from an
     Instagram reel, an X/Twitter post or Twitch profile details such
     as live status and pronouns.
-  - The help/conf controls can limit previews to text or turn them
+  - The help/⚙ controls can limit previews to text or turn them
     off. Hover previews do not run on touch screens.
 
 ### Keyboard & accessibility
@@ -404,7 +404,7 @@ no dependencies beyond CDN-hosted fonts.
 ### Help popup & resources
 
 - **Help and stats**
-  - **Help/conf** explains the controls and lets one change settings.
+  - **Help/⚙** explains the controls and lets one change settings.
   - **Stats** shows session totals, peak viewers, and the busiest
     chatters, badges, emotes and links. Choose a joined channel and
     compare all-time, daily or hourly ranges. The tab also shows the

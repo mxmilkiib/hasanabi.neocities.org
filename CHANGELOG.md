@@ -18,6 +18,7 @@ not versions - the page ships continuously to Neocities.
   store-level campaign) after pacbi
 
 ### Help popup
+- the config tab reads help/⚙ - a settings cog in place of 'conf'
 - tail descriptors in a long resources row no longer render at full
   size: the (…) note-face wrap re-walked the row per bracket under a
   flat 50-pass guard, which workers unions' start-a-union run had
