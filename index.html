@@ -1142,9 +1142,11 @@
   /* .msg wraps the message body so deleted rows can strike it alone -
      the gif link lives inside it now, hence descendant not child */
   /* msg new line: the body drops to its own line under the meta run;
-     the third stop leaves a blank line of air below it */
+     the third stop leaves a blank line of air below it; the fourth
+     keeps the body inline and opens a blank line above each row */
   body.msgnl .row > .msg, body.msgnlb .row > .msg { display: block; }
   body.msgnlb .row > .msg { margin-bottom: var(--chat-lhpx, 1.5em); }
+  body.msgnlt .row { margin-top: calc(var(--chat-lhm, 0px) + var(--chat-lhpx, 1.5em)); }
   .row .gifq:has(.gifimg) { float: right; margin-left: 6px; position: relative; z-index: 2; }
   .gifq .gifimg { margin-top: -4em; max-width: 60%; }
   /* a right-pinned sub chip or emote stack stays above a gif that
@@ -2567,7 +2569,7 @@
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count<sup>†</sup></span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or "@you" line lands while the page isn't focused<sup>†</sup></span></div>
     <div><b>history</b> <span>scrollback rows: <span id="helpScrollbackList"></span> - up to 100,000 in this tab; at most the newest 5,000 are <img class="emote" src="https://cdn.betterttv.net/emote/6093042039b5010444d0c44b/2x.gif" alt="SAVED"> across reloads, and any media an opened embed was playing saves paused so nothing runs on restore. Large values use more memory<sup>†</sup></span></div>
-    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>↵</b> <span>msg new line: <span id="helpNlList"></span> - the message body drops to its own line under the time and nick; the third stop leaves a blank line below it<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - fade ghosts the bar out, slim collapses it to a hairline; hovering the strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
+    <div><b>⇵</b> <span>chat flow: <span id="helpFlowList"></span> - where new messages land in a column; the ↕ button and page-flip follow the live edge either way<sup>†</sup></span><b>↵</b> <span>msg new line: <span id="helpNlList"></span> - the message body drops to its own line under the time and nick, the third stop leaves a blank line below it, and the fourth keeps the body inline but opens a blank line above each row<sup>†</sup></span><b>⌨</b> <span>chat box: <span id="helpBarList"></span> - where the message input docks; on top the completions and emote picker open below it<sup>†</sup></span><b>▁</b> <span>autohide: <span id="helpAutoList"></span> - fade ghosts the bar out, slim collapses it to a hairline; hovering the strip, typing or an open emote picker bring it back<sup>†</sup></span></div>
     <div><b>◉</b> <span>live alert: <span id="helpNotifyList"></span> - a <img class="emote" src="https://cdn.betterttv.net/emote/5f34967cb2efd65d77e7c9bc/2x.gif" alt="System"> notification when the stream goes live or a keyword or "@you" line lands while the page is hidden; asks permission when turned on<sup>†</sup></span></div>
     <div><b>↻</b> <span>update notice: <span id="helpUpdList"></span> - the reload bar when a site update lands while the page is open, and how often the page checks for one; the bar's own 'update check' chips pick the same stops<sup>†</sup></span></div>
     <div><b>✂</b> <span>clean urls: <span id="helpCleanList"></span> - link text in chat drops the https://, a www. prefix and a trailing / or /index.htm; the target is unchanged<sup>†</sup></span></div>
@@ -9554,12 +9556,14 @@
     markHelp('helpAuto', barAuto);
   }
   // msg new line: the message body drops to its own line under the meta
-  // run; the third stop adds a blank line of air below the body too
+  // run; the third stop adds a blank line of air below the body too,
+  // and the fourth keeps the body inline but gaps each row above
   let msgNl = 0;
   function setMsgNl(mode) {
-    msgNl = Math.min(2, Math.max(0, +mode || 0));
+    msgNl = Math.min(3, Math.max(0, +mode || 0));
     document.body.classList.toggle('msgnl', msgNl === 1);
     document.body.classList.toggle('msgnlb', msgNl === 2);
+    document.body.classList.toggle('msgnlt', msgNl === 3);
     markHelp('helpNl', msgNl);
   }
 
@@ -14775,7 +14779,7 @@
   }
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
-    helpFlow: ['newest at bottom', 'newest at top'], helpNl: ['off', 'on', 'on + blank'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
+    helpFlow: ['newest at bottom', 'newest at top'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'on'], helpEonly: EMOTE_MODES,
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),

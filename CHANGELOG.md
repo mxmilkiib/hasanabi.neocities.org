@@ -10,8 +10,9 @@ not versions - the page ships continuously to Neocities.
   dot empties entirely (no status text, no chat-mode chips);
   `?sview=blank` or the wheel past `minimal`
 - `msg new line` (under chat flow in ?): the message body drops to
-  its own line under the time and nick; the third stop adds a blank
-  line below the body - saved as `?mnl=`
+  its own line under the time and nick, the third stop adds a blank
+  line below the body, and the fourth keeps the body inline but
+  opens a blank line above each row - saved as `?mnl=`
 - double-click the floating help popup's top strip to maximise it to
   the largest box under the header - again to restore, and any manual
   move or resize drops the maximised state

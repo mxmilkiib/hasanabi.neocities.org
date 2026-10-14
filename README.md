@@ -454,7 +454,7 @@ editing a URL.
 | `rev` | flag | reverse flow - new messages cascade down from the top |
 | `bartop` | flag | dock the chat input under the header instead of at the bottom |
 | `bauto` | `0`–`2` | chat-bar autohide: off / fade / slim |
-| `mnl` | `0`–`2` | msg new line: off / body on its own line / plus a blank line below |
+| `mnl` | `0`–`3` | msg new line: off / body on its own line / plus a blank line below / blank line above, body inline |
 | `channel` | a twitch login | point the whole page at another channel |
 | `zebra` | `0`–`4` / flag | zebra stripe contrast (0=off, 1=faint, 2=mild, 3=strong, 4=heavy; a bare flag = mild) |
 | `lines` | `0`–`3` | row separator shades |
