@@ -270,6 +270,12 @@ not versions - the page ships continuously to Neocities.
   only for the counts that fit 2ch
 
 ### Split columns
+- level 14 (1col+help) centres its page between two seam grips: the
+  left strip comes back and a twin rides the right edge, and a drag on
+  either moves the far edge to match - the centred column narrows and
+  widens about the window's middle. the width still lands on the
+  shared --railw, so other levels keep their rail sizing and leaving
+  the mode drops the centring
 - a real glitch fix: refitPages judged idle-column overflow by
   scrollHeight, which also counts floated media, margin overhang and
   clipped ghost content - none of which crossed the fold. every late

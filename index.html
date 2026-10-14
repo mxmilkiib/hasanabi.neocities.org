@@ -701,17 +701,22 @@
   #railSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
   /* the rail's left seam is the same grab strip standing upright -
      dragging it fixes the rail's width, and the chat columns squeeze
-     together in equal flex:1 shares */
-  #colSplit { flex: none; width: 7px; margin: 0 -4px 0 -3px; cursor: grab;
+     together in equal flex:1 shares. level 14 twins it with a right-
+     edge strip: either seam then drags the centred page's width while
+     the far edge mirrors it */
+  #colSplit, #colSplitR { flex: none; width: 7px; margin: 0 -4px 0 -3px; cursor: grab;
     position: relative; z-index: 3; touch-action: none; }
-  #colSplit:active { cursor: grabbing; }
-  #colSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  #colSplitR { margin: 0 -3px 0 -4px; }
+  #colSplit:active, #colSplitR:active { cursor: grabbing; }
+  #colSplit:hover, #colSplitR:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
   /* a dragged rail carries its own width; 62% caps it so the chat
      columns always keep a readable share of the window */
   #rail.fixed { flex: none; width: min(var(--railw, 320px), 62%); }
-  /* level 14 leaves no chat column to spare room for, so a solo rail
-     drops the fixed-width cap and fills the row */
-  #rail.fixed.solo { flex: 1; width: auto; }
+  /* level 14 leaves no chat column to spare room for: an undragged
+     rail still fills the row, a dragged one keeps its width centred
+     between the two edge grips */
+  #rail.fixed.solo { flex: none; width: min(var(--railw, 320px), 100%); }
+  main.hcenter { justify-content: center; }
   /* a squeezed stats pane sheds its lower lists first - the rate graph
      climbs to the top of what remains, alone once the pane can fit
      little else */
@@ -2675,7 +2680,7 @@
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
-  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
+  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><div id="colSplitR" hidden title="drag to resize the centred page"></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><div id="chatWrap"><div id="chatHl" aria-hidden="true"></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" placeholder="chat" aria-label="message" rows="1"></textarea></div><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteTips" type="button" title="hover tooltip - pops the big emote card over a cell">tip</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="age rows cycle - use sort only">▤</button><button class="hdr-btn esort" id="emoteAgeSq" type="button" title="age squares cycle - use sort only">□</button><button class="hdr-btn esort on" id="emoteMove" type="button" title="re-sort motion cycle">↔</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
@@ -2787,6 +2792,7 @@
   const railEl = document.getElementById('rail');
   const railSplitEl = document.getElementById('railSplit');
   const colSplitEl = document.getElementById('colSplit');
+  const colSplitREl = document.getElementById('colSplitR');
   const splitMenu = document.getElementById('splitMenu');
   let activeEl = logEl; // column currently receiving new rows
   let splitLevel = 1; // the applied column mode - 5/6 slim the rail
@@ -10586,7 +10592,11 @@
   });
   // the rail's left seam drags horizontally - the rail takes a fixed
   // width (capped at 62% by the css) and the chat columns give up the
-  // room in equal shares; refitPages hears the column resize itself
+  // room in equal shares; refitPages hears the column resize itself.
+  // on the solo level the far seam mirrors the dragged one instead,
+  // so the centred page's width is twice the drag's distance from mid
+  const mainMid = () => { const r = mainEl.getBoundingClientRect(); return r.left + r.width / 2; };
+  const soloW = (x) => Math.max(120, Math.round(2 * Math.abs(x - mainMid()))) + 'px';
   colSplitEl.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     colSplitEl.setPointerCapture(e.pointerId);
@@ -10595,9 +10605,20 @@
     if (!colSplitEl.hasPointerCapture(e.pointerId)) return;
     railEl.classList.add('fixed');
     mainEl.style.setProperty('--railw',
-      Math.max(120, Math.round(railEl.getBoundingClientRect().right - e.clientX)) + 'px');
+      railEl.classList.contains('solo') ? soloW(e.clientX)
+        : Math.max(120, Math.round(railEl.getBoundingClientRect().right - e.clientX)) + 'px');
   });
   colSplitEl.addEventListener('pointerup', () => saveOpts());
+  colSplitREl.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    colSplitREl.setPointerCapture(e.pointerId);
+  });
+  colSplitREl.addEventListener('pointermove', (e) => {
+    if (!colSplitREl.hasPointerCapture(e.pointerId)) return;
+    railEl.classList.add('fixed');
+    mainEl.style.setProperty('--railw', soloW(e.clientX));
+  });
+  colSplitREl.addEventListener('pointerup', () => saveOpts());
   // the squeezed pane sheds its lower lists as it shrinks - the rate
   // graph climbs to the top of what remains, alone below ~160px
   new ResizeObserver(() => {
@@ -10647,8 +10668,12 @@
   }
   function dockRail(level) {
     const on = level >= 4;
-    colSplitEl.hidden = !on || level === 14;
+    colSplitEl.hidden = !on;
+    colSplitREl.hidden = level !== 14;
     railEl.classList.toggle('solo', level === 14);
+    mainEl.classList.toggle('hcenter', level === 14);
+    colSplitEl.title = level === 14 ? 'drag to resize the centred page'
+      : 'drag to resize the chat columns and rail';
     const statsTab = document.getElementById('htabStats');
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
     const helpDock = level >= 10;
