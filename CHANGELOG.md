@@ -174,7 +174,9 @@ not versions - the page ships continuously to Neocities.
   stbl builder
 - workers unions drops its striking item - worker action already
   carries the strike content, so the three links it was missing
-  (picket line, right to strike, strike pay) moved into its run.
+  (picket line, right to strike, strike pay) moved into its run; the
+  rent strike wikipedia link re-seats in tenants unions' intl group
+  where it's on-topic
   conway's law rewords its note to 'designs mirror the org's comms
   structure' - the word system was being eaten by a client-side icon
   substitution. the caucus index link 'national wiki' relabels as
