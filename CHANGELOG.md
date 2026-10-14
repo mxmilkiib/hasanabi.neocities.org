@@ -121,6 +121,12 @@ not versions - the page ships continuously to Neocities.
   board / dsa fund, and caucuses cover marxist unity, bread and roses,
   socialist majority, libertarian socialist and afrosocialists. the
   subsection runs the wider 30em columns
+- the channels/streams zebra wash now covers the whole row: a striped
+  row's zb mark moved off the cells onto a band spanning 1/-1 beneath
+  them, so empty service slots and the column gaps carry the grey
+  instead of leaving islands. the name and descriptor cells pin their
+  columns outright - auto-placed past the full-width band they'd have
+  overflowed into implicit tracks
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek

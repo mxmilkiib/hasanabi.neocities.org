@@ -1869,8 +1869,9 @@
   /* kind + service cells take the dim .85em face nested descriptors get */
   #helpPanel .linkcols.stbl .cc, #helpPanel .linkcols.stbl .cl {
     font-size: .85em; color: var(--text-dim); }
-  /* zb stripes every other entry row - the cells stretch to their grid
-     area, so the wash covers each column but leaves the gaps */
+  /* zb stripes every other entry row - the Band spans the full Row
+     under the Cells, so the wash carries across a Row's empty Service
+     slots and the Column Gaps, not just the Cells it fills */
   #helpPanel .linkcols.stbl .zb { background: rgba(128, 128, 128, .06); }
   /* stbl group heads: hoisted out of their entry row onto a spanning
      label row - the dim-italic underline look of the flowing heads,
@@ -7254,8 +7255,19 @@
     }
     // sparse service columns break auto-packing, so every cell pins its
     // row; the column lands after all rows are read. zb stripes every
-    // other entry row - heads and notes sit out of the count
-    for (const el of cells) { el.style.gridRow = stblRow; el.classList.toggle('zb', stblZeb & 1); }
+    // other entry row - heads and notes sit out of the count. the Band
+    // seats first so it layers under the Cells, and cn/cc pin their
+    // Columns too - auto-placed they'd overflow to implicit Tracks
+    // past the Band's 1/-1 span
+    cells[0].style.gridColumn = 1; cells[1].style.gridColumn = 2;
+    for (const el of cells) el.style.gridRow = stblRow;
+    if (stblZeb & 1) {
+      const band = document.createElement('span');
+      band.className = 'zb';
+      band.style.gridRow = stblRow;
+      band.style.gridColumn = '1 / -1';
+      i.append(band);
+    }
     stblZeb++;
     i.append(...cells);
   }
