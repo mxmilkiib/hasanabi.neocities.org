@@ -30,7 +30,10 @@
   }
   main { max-width: 1040px; margin: 0 auto; }
   .card {
-    background: #2b2b3a; border: 1px solid var(--accent);
+    border: 1px solid transparent;
+    background:
+      linear-gradient(#2b2b3a, #2b2b3a) padding-box,
+      linear-gradient(135deg, var(--accent), #b9a5f0) border-box;
     border-radius: 10px; overflow: hidden; margin-bottom: 42px;
     box-shadow: 0 8px 40px rgba(0,0,0,.45), 0 0 22px rgba(232,163,61,.25);
   }
