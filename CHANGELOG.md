@@ -108,6 +108,8 @@ not versions - the page ships continuously to Neocities.
   and right under 1col in the menu). the layout picker gets a front
   name now: 'layout' - the menu label, button title, header-label map
   and the help row's 'modes' head all agree
+- the layout help row's descriptions run as bullet lists instead of
+  paragraphs - each family's clauses become - points under its chips
 - the update bar's poll chips moved into the centre run, seated
   between the message and the right reload button - part of the
   message cluster now rather than a separate block beside the ✕
