@@ -156,7 +156,10 @@ not versions - the page ships continuously to Neocities.
   star and reform & revolution. each caucus gains a founding year and
   tendency line, plus extra seats where they exist: caucus press (the
   call, partisan, building up, cosmonaut, light & air, zenith, the
-  agitator, dualpower.app), program/points docs and join pages
+  agitator, dualpower.app), program/points docs and join pages. the
+  section runs the stbl grid like channels/streams - name | year |
+  docs | press | join | info - so the table builder now walks every
+  linkcols.stbl in the panel, not just the resources one
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
