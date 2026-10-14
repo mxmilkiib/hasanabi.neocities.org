@@ -100,6 +100,9 @@ not versions - the page ships continuously to Neocities.
   emote-only modes). the wheel, ?split=2ch and the menu all reach it -
   it sits right under 2col there - and the level-11 glyph gains its ▶
   now that help-alone would wear the same ▮? mark
+- level 13, 3col+help: the same rail-docked popup beside two chat
+  columns, seated right under 3col in the menu and ?split=3ch. the
+  level-10 glyph gains its ▶ the same way - ▮▮▶? over ▮▮?
 ### Resources
 - the channels/streams table gains a faint zebra wash - every other
   entry row's cells carry a 6% grey through the new zb mark; group
