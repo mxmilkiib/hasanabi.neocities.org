@@ -9,6 +9,8 @@ not versions - the page ships continuously to Neocities.
 - stream-status length gains a `blank` stop - the space beside the
   dot empties entirely (no status text, no chat-mode chips);
   `?sview=blank` or the wheel past `minimal`
+- the youtube, twitter and instagram inline preview cards hang at
+  quarter depth off the row indent instead of half
 - the user card's buttons sit directly under the name as a two-column
   grid - @mention top-left, profile beside it, a lone last button
   spanning full width - and the block below them carries the same
