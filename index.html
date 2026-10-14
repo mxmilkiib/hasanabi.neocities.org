@@ -772,12 +772,6 @@
   main.vgrid .jdc[data-for="jdownLog"].r { left: calc(min(var(--railw, 34%), 62%) + (100% - min(var(--railw, 34%), 62%)) * .75); }
   #rail #htabStats.st-min #statsBody > .st-trio { display: none; }
 
-  .empty {
-    color: var(--text-dim);
-    padding: 24px 4px;
-    font-size: 14px;
-    font-family: inherit;
-  }
   .loadbar {
     width: min(240px, 55%);
     height: 3px;
@@ -1087,8 +1081,7 @@
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
   .row.stale { opacity: .7; }
-  /* no separator above the first row of a column (the .empty placeholder
-     is removed once rows land, so this matches in every column) */
+  /* no separator above the first row of a column */
   .col > .row:first-child { --rowline: transparent; }
   .row.notice.raid { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 0 0); }
   .twcard {
@@ -1625,11 +1618,11 @@
   #titleX { width: 20px; height: 20px; }
   #titleTxt.fin { animation: tfin .5s ease-out; }
   @keyframes tfin { from { opacity: 0; } }
-  /* boot/sync strip: narrates the load phases as the empty-state bar
-     does, then returns to flag resyncs after a drop or wake; the fill
-     stretches the strip so progress reads at a glance. docked over the
-     column tops rather than in flow - it floats in for its beat and
-     leaves without shoving the chat down */
+  /* boot/sync strip: narrates the load phases out of the gate, then
+     returns to flag resyncs after a drop or wake; the fill stretches
+     the strip so progress reads at a glance. docked over the column
+     tops rather than in flow - it floats in for its beat and leaves
+     without shoving the chat down */
   #loadBar { position: absolute; top: 0; left: 0; right: 0; z-index: 6; gap: 10px; padding: 2px 10px; color: var(--text-dim); justify-content: center; }
   /* rail modes keep the video/picker populated beside the strip's span -
      a resync still has to narrate over them and the mode-6 float */
@@ -2739,7 +2732,7 @@
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
-  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"><div class="empty" id="emptyState"><span id="emptyLabel" aria-live="polite">loading relay…</span><div class="loadbar"><i></i></div></div></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><div id="colSplitR" hidden title="drag to resize the centred page"></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
+  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes and stats" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><div id="colSplitR" hidden title="drag to resize the centred page"></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><div id="chatWrap"><div id="chatHl" aria-hidden="true"></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" placeholder="chat" aria-label="message" rows="1"></textarea></div><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteTips" type="button" title="hover tooltip - pops the big emote card over a cell">tip</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="age rows cycle - use sort only">▤</button><button class="hdr-btn esort" id="emoteAgeSq" type="button" title="age squares cycle - use sort only">□</button><button class="hdr-btn esort on" id="emoteMove" type="button" title="re-sort motion cycle">↔</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
@@ -2902,50 +2895,36 @@
   // of the accessibility tree
   for (const el of document.querySelectorAll('.hp-handle, .epick-handle, .vid-handle, .hp-size, .ep-size, .vid-size'))
     el.setAttribute('aria-hidden', 'true');
-  let emptyEl = document.getElementById('emptyState');
   // Boot progress: a stepped bar over the real load phases - relay iframe,
   // socket connect, metadata, first lines. Nothing fake-percent; the bar only
   // moves when an actual milestone arrives, so a stall visibly points at the
   // phase that's stuck.
   const LOAD_STEPS = 4;
-  const emptyLabel = document.getElementById('emptyLabel');
-  // the under-header strip narrates the same steps the empty-state bar
-  // does - one or the other, never both: while the card is up it owns
-  // boot, and the strip returns for resyncs and for boots that already
-  // restored rows, where there is no card to carry the text
+  // the under-header strip narrates boot and resyncs - the chat column
+  // itself stays empty until rows land
   const loadBar = document.getElementById('loadBar');
   const loadTxt = document.getElementById('loadTxt');
   // emotePick lives here, not with its wiring: paintEpickSync runs during
   // history restore, well before the picker block would declare it
   const emotePick = document.getElementById('emotePick');
-  if (emptyEl) loadBar.hidden = true;
   let loadPhase = 0;
   function loadStep(n, txt) {
     if (n <= loadPhase) return;
     loadPhase = n;
-    const w = (n / LOAD_STEPS * 100) + '%';
-    const fill = emptyEl && emptyEl.querySelector('.loadbar i');
-    if (fill) fill.style.width = w;
-    if (txt != null) {
-      if (emptyEl) emptyLabel.textContent = txt;
-      if (loadTxt) loadTxt.textContent = txt;
-    }
+    if (txt != null && loadTxt) loadTxt.textContent = txt;
   }
   // a resync can't clock its own completion - the replay batch's arrival
   // is what ends it, so the strip falls back to a timeout in case the
   // backlog comes back empty
   let syncTimer = 0, syncing = false;
-  // the picker's cells sit back, greyed and held, while the boot card,
-  // the sync strip or a resync is still catching chat up
-  const paintEpickSync = () => emotePick.classList.toggle('syncing', syncing || !!emptyEl || (!!loadBar && !loadBar.hidden));
+  // the picker's cells sit back, greyed and held, while the sync strip
+  // or a resync is still catching chat up
+  const paintEpickSync = () => emotePick.classList.toggle('syncing', syncing || (!!loadBar && !loadBar.hidden));
   function syncShow(txt) {
     if (!loadBar) return;
     syncing = true;
     loadTxt.textContent = txt;
-    // sync text goes to whichever narrator is showing - a mid-boot
-    // resync surfaces in the card rather than doubling the bars
-    if (emptyEl) emptyLabel.textContent = txt;
-    loadBar.hidden = !!emptyEl;
+    loadBar.hidden = false;
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; paintEpickSync(); }, 8000);
     paintEpickSync();
@@ -3437,7 +3416,7 @@
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
     for (const node of nodes) {
-      if (node.parentElement.closest('.time,.reply,.aux,a')) continue;
+      if (node.parentElement.closest('.time,.reply,.aux,a,.hbar')) continue;
       const rowEl = node.parentElement.closest('.row');
       const rowCh = (rowEl || {}).dataset || {};
       const em = emotesOf(rowCh.ch || CHANNEL), eml = emotesLcOf(rowCh.ch || CHANNEL);
@@ -4350,15 +4329,7 @@
     hiddenFlush = 0;
     flushFrame = 0;
     if (document.hidden) hiddenFlushAt = Date.now();
-    if (emptyEl) {
-      // show the bar at 100% for a beat before the rows take over
-      loadStep(LOAD_STEPS, null);
-      const e = emptyEl;
-      emptyEl = null;
-      e.style.transition = 'opacity .3s';
-      e.style.opacity = '0';
-      setTimeout(() => e.remove(), 350);
-    }
+    loadStep(LOAD_STEPS, null);
     // the strip goes once real rows flow - a live resync keeps it until
     // its own hide beat so the 'syncing' text can actually be read
     if (!syncing) loadBar.hidden = true;
@@ -11219,9 +11190,10 @@
     try {
       const rows = JSON.parse(localStorage.getItem(HISTORY_KEY));
       if (!Array.isArray(rows) || !rows.length) return;
-      // restored rows mean the card's gone before it ever showed - the
-      // strip takes over narrating whatever boot steps are left
-      if (emptyEl) { emptyEl.remove(); emptyEl = null; if (loadBar && loadPhase < LOAD_STEPS) loadBar.hidden = false; paintEpickSync(); }
+      // restored rows land straight in the column - the strip narrates
+      // whatever boot steps are still left to run
+      if (loadBar && loadPhase < LOAD_STEPS) loadBar.hidden = false;
+      paintEpickSync();
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
       // the one-shot sync wash is a render-time marker only - stripped
       // here so restored scrollback doesn't strobe on every load
@@ -11332,13 +11304,11 @@
   const joinTimer = setInterval(() => { if (!joined) join(); }, 3000);
 
   // If nothing's arrived by now, say why it might be stuck rather than
-  // leaving the bar mid-flight forever - the card or the strip, whoever
-  // is narrating
+  // leaving the bar mid-flight forever - quiet chat gets its own note
+  // on the strip, and the strip stays up while the column sits empty
   setTimeout(() => {
-    if (joined) { if (emptyEl) emptyLabel.textContent = 'connected - the chat is just quiet right now'; return; }
-    const stuck = 'nothing arriving - a privacy or adblock extension may be blocking the relay iframe';
-    if (emptyEl) emptyLabel.textContent = stuck;
-    else if (loadBar && !syncing) loadTxt.textContent = stuck;
+    if (joined) { if (!logEl.firstElementChild) { loadTxt.textContent = 'connected - the chat is just quiet right now'; loadBar.hidden = false; paintEpickSync(); } return; }
+    if (!syncing) { loadTxt.textContent = 'nothing arriving - a privacy or adblock extension may be blocking the relay iframe'; loadBar.hidden = false; paintEpickSync(); }
   }, 12000);
 
   // If the relay never reports stream status, give up waiting for it.
@@ -14515,17 +14485,15 @@
         tweetWait.forEach((id) =>
           relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN));
       } else if (wasJoined && !downAt) downAt = Date.now();
-      if (emptyEl) {
-        if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
-        else if (d.state === 'reconnecting') emptyLabel.textContent = 'socket dropped - retrying…';
-      }
+      if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
+      else if (d.state === 'reconnecting' && !joined) loadTxt.textContent = 'socket dropped - retrying…';
       // a dropped socket only interrupts once a join was live - relay
       // socket churn ahead of the first connect is the boot's own noise
       if (d.state === 'reconnecting' && wasJoined) syncShow('socket dropped - retrying…');
     } else if (d.type === 'wscause') {
       wsCause = `${d.code}${d.reason ? ' ' + d.reason : ''}`;
-      if (emptyEl) emptyLabel.textContent = `socket closed (${wsCause}) - retrying…`;
       if (joined || downAt) syncShow(`socket closed (${wsCause}) - retrying…`);
+      else loadTxt.textContent = `socket closed (${wsCause}) - retrying…`;
       updateHeader();
     } else if (d.type === 'lines') {
       // a replay batch is what settles a deferred gap marker

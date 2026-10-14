@@ -65,6 +65,12 @@ not versions - the page ships continuously to Neocities.
   strip's own line a negative margin mirrors the left pad - wrapped
   buttons fill to the symmetric inset instead of stranding under a
   dead corner
+- the under-header strip narrates boot from the first paint - the
+  in-column empty-state card is gone, so a cold boot reads its load
+  phases from the same barber-pole strip the resyncs use; the quiet
+  channel and relay-blocked notes land there too, and the emote
+  retokeniser leaves the strip's text alone (no more `Waiting` emote
+  where the word should be)
 
 ### Resources
 - the left tab's four dsa sections - usa pol, chapters, caucuses and
