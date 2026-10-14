@@ -118,6 +118,9 @@ not versions - the page ships continuously to Neocities.
   between the message and the right reload button - part of the
   message cluster now rather than a separate block beside the ✕
 ### Resources
+- the caucuses stat splits into two columns - dlg and npc each get
+  their own seat, so the npc counts line up instead of ragged
+  mid-cell
 - the caucuses table gains a news column between press and join:
   north star's blog rekeys there (it's a feed, not an organ), and
   six feeds join it - marxist unity's latest, r&r's news & analysis,
