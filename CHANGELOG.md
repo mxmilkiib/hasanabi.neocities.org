@@ -60,7 +60,7 @@ not versions - the page ships continuously to Neocities.
   title) - hiding the column's own furniture. it wakes on any level
   without +help
 - the split menu seats each +vid/help level under its own column
-  family - 2col+vid/help under 2col, 3col+vid/help under 3col; level
+  family - 2col vid/help under 2col, 3col vid/help under 3col; level
   numbers stay put, only the menu order moved
 - the split-columns help entry uses the same itemised columns as the
   emote-picker (☻) entry instead of one running paragraph, and the
@@ -114,15 +114,15 @@ not versions - the page ships continuously to Neocities.
 - the split-columns help row seats the +vid/help chips under the +help
   item rather than inside the column families, and the 2col list's
   tail runs +emotes then 2x2 to match the menu order
-- new split level 12, 2col+help: the help popup docks in the rail
+- new split level 12, 2col help: the help popup docks in the rail
   beside one chat column with no video over it (▶ floats it like the
   emote-only modes). the wheel, ?split=2ch and the menu all reach it -
   it sits right under 2col there - and the level-11 glyph gains its ▶
   now that help-alone would wear the same ▮? mark
-- level 13, 3col+help: the same rail-docked popup beside two chat
+- level 13, 3col help: the same rail-docked popup beside two chat
   columns, seated right under 3col in the menu and ?split=3ch. the
   level-10 glyph gains its ▶ the same way - ▮▮▶? over ▮▮?
-- split: new level 14, 1col+help - the docked popup alone filling the
+- split: new level 14, 1col help - the docked popup alone filling the
   row, no chat column (glyph ?; url alias 1ch; seats first under +help
   and right under 1col in the menu). the layout picker gets a front
   name now: 'layout' - the menu label, button title, header-label map
@@ -338,7 +338,7 @@ not versions - the page ships continuously to Neocities.
   only for the counts that fit 2ch
 
 ### Split columns
-- level 14 (1col+help) centres its page between two seam grips: the
+- level 14 (1col help) centres its page between two seam grips: the
   left strip comes back and a twin rides the right edge, and a drag on
   either moves the far edge to match - the centred column narrows and
   widens about the window's middle. the width still lands on the
@@ -354,19 +354,19 @@ not versions - the page ships continuously to Neocities.
   newest rows so a short history can't strand an empty column
 - the page-flip wave's ghosted rows fade deeper: resting opacity .6 →
   .45, and .12 → .08 just under the wave edge
-- the mode names spell out their parts: e is emotes, v is vid, h is
-  help, s is stats, 2row becomes 2x2 (chat/emotes · vid/stats), and the
-  floats note reads (vid off, ▶ floats) - 3col+vid/emotes/stats ·
-  3col+vid/emotes · 3col+emotes · 2col+vid/emotes · 2x2 ·
-  2col+emotes · 3col+vid/help · 2col+vid/help
-- level 10 (3col+vid/help, ▮▮?) pairs two chat columns with a rail holding
+- the mode names spell out their parts, space-joined: e is emotes,
+  v is vid, h is help, s is stats, 2row becomes 2x2 - 3col
+  vid/emotes/stats · 3col vid/emotes · 3col emotes · 2col vid/emotes
+  · 2x2 · 2col emotes · 3col vid/help · 2col vid/help · 2col help ·
+  3col help · 1col help
+- level 10 (3col vid/help, ▮▮?) pairs two chat columns with a rail holding
   the video over the help popup: the popup docks into the rail and
   fills what the video leaves, its drag handle, grips and edge resize
   are off while it sits there, and leaving the mode hands it back
   closed to its floating place. stats stays a tab inside the popup and
   the emote picker floats as in the plain columns. the menu, wheel
   cycle, saved opts and ?split=10 all learn it
-- level 11 (2col+vid/help, ▮?) is the same rail beside a single chat column:
+- level 11 (2col vid/help, ▮?) is the same rail beside a single chat column:
   video up top right, the help popup filling the space below it. it
   shares level 10's dock, so the popup, stats tab and picker behave
   alike; the menu lists it with the other 2-col modes
