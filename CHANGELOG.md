@@ -135,6 +135,9 @@ not versions - the page ships continuously to Neocities.
   instead of leaving islands. the name and descriptor cells pin their
   columns outright - auto-placed past the full-width band they'd have
   overflowed into implicit tracks
+- podcasts: the reaction cast joins the tail - punished fredda,
+  mikefrompa & yugopnik's anti-fascist show, hosts column like the
+  other ensemble podcasts
 
 ### Links & previews
 - twitter/x links: the nitter pick is now verified through the linkpeek
