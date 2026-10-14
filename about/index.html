@@ -47,6 +47,12 @@
   li::before { content: '·'; position: absolute; left: .3em; color: var(--accent); font-weight: 700; }
   li b { color: var(--accent); font-weight: 700; }
   li i { color: var(--dim); font-style: normal; }
+  .cols { columns: 2; column-gap: 2.4em; }
+  .cols > li { break-inside: avoid; }
+  li ul { margin: .15em 0 .5em; }
+  li li { padding-top: .12em; padding-bottom: .12em; font-size: .92em; }
+  li li::before { content: '–'; color: var(--dim); }
+  @media (max-width: 720px) { .cols { columns: 1; } }
   .cta {
     display: table; margin: 1.2em auto 0; padding: .7em 1.6em;
     background: var(--accent); color: #1a1206; border: 0; border-radius: 6px;
@@ -74,11 +80,12 @@
   }
   .how code { color: var(--text); background: rgba(255,255,255,.06); padding: .1em .35em; border-radius: 4px; font-size: .92em; }
   .shots {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 12px;
+    display: flex; flex-wrap: wrap; justify-content: center;
+    align-items: stretch; gap: 12px;
   }
   .shots a {
-    display: block; border: 1px solid var(--line); border-radius: 8px;
+    display: block; flex: 1 1 210px; max-width: 260px;
+    border: 1px solid var(--line); border-radius: 8px;
     overflow: hidden; background: var(--panel);
   }
   .shots a:hover { border-color: var(--accent-dim); }
@@ -103,6 +110,72 @@
   <a class="cta" href="https://hasanabi.neocities.org/"><svg class="dash" aria-hidden="true"><rect/></svg>open the chat thing →</a>
   <br>
 
+  <h2>chat</h2>
+  <ul class="cols">
+    <li><b>the feed</b>
+      <ul>
+        <li>every emote ecosystem <i><a href="https://7tv.app/">7TV</a>, <a href="https://betterttv.com/">BTTV</a>, <a href="https://www.frankerfacez.com/">FFZ</a>, animated &amp; zero-width</i></li>
+        <li>real badges, replies, /me <i>quoted reply blocks with jump-back</i></li>
+        <li>multi-channel <i>?channel=a,b,c merges rooms</i></li>
+        <li>gap notices &amp; backfill <i>lost spans marked with cause and span, missed chat re-fetched</i></li>
+      </ul>
+    </li>
+    <li><b>reading the flow</b>
+      <ul>
+        <li>page-flip columns &amp; page wrap <i>the layouts below</i></li>
+        <li>reverse flow, msg new line, zebra, separators, timestamp modes</li>
+        <li>find bar + archive search <i>user:/kind: filters, 30-day <a href="https://medium.com/@khouloud.haddad/understanding-indexeddb-a-beginners-guide-to-client-side-databases-febd140e30fd">IndexedDB</a> store</i></li>
+        <li>scroll pause on hover, jump-to-live chip, scrollback to 100k</li>
+      </ul>
+    </li>
+    <li><b>presence</b>
+      <ul>
+        <li>send, reply &amp; whisper <i>optional twitch login, input history, drafts</i></li>
+        <li>mention ping + live notification <i>when the page is away</i></li>
+        <li>highlight / block / hide <i>keywords, words, users (vanish, stub or ghost)</i></li>
+        <li>bots on a switch <i>blammobot &amp; fossabot vanish entirely</i></li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>extras</h2>
+  <ul class="cols">
+    <li><b>stream &amp; media</b>
+      <ul>
+        <li>video embed <i>draggable, dockable per layout, or off</i></li>
+        <li>link cards <i>hover previews, titles, tweet cards, yt &amp; insta embeds</i></li>
+        <li>link favicons + clean urls <i>icons lead, chrome-free text</i></li>
+      </ul>
+    </li>
+    <li><b>stats</b>
+      <ul>
+        <li>msgs/sec sparkline <i>hover reads each second; glorp spikes glow</i></li>
+        <li>top chatters, badges, emotes &amp; links <i>over time windows</i></li>
+        <li>storage audit <i>what the page keeps and where</i></li>
+      </ul>
+    </li>
+    <li><b>the rest</b>
+      <ul>
+        <li>emote picker <i>searchable grid, usage sort, age marks, zoom</i></li>
+        <li>user cards <i>pronouns, history, mod quick-actions</i></li>
+        <li>shareable settings url <i>every option is a param; theme slots &amp; copy-settings</i></li>
+        <li>update notice <i>a reload bar when a new build lands</i></li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>themes</h2>
+  <div class="shots">
+    <a href="https://hasanabi.neocities.org/?theme=default&split=1c"><img src="shots/default.webp" alt="the default theme in the 1col chat layout" loading="lazy"><span>default</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=phosphor&split=2c"><img src="shots/phosphor.webp" alt="the phosphor theme in the 2col chat layout" loading="lazy"><span>phosphor</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=midnight&split=2x2"><img src="shots/midnight.webp" alt="the midnight theme in the 2x2 layout" loading="lazy"><span>midnight</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=solar&split=3c"><img src="shots/solar.webp" alt="the solar theme in the 3col chat layout" loading="lazy"><span>solar</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=cosy&split=2cvh"><img src="shots/cosy.webp" alt="the cosy theme in the 2col chat vid/help layout" loading="lazy"><span>cosy</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=print&split=2ch"><img src="shots/print.webp" alt="the print theme in the 2col chat help layout" loading="lazy"><span>print</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=retro&split=3cve"><img src="shots/retro.webp" alt="the retro theme in the 3col chat vid/emotes layout" loading="lazy"><span>retro</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=irc&split=3ce"><img src="shots/irc.webp" alt="the irc theme in the 3col chat emotes layout" loading="lazy"><span>irc</span></a>
+  </div>
+
   <h2>layouts</h2>
   <div class="shots">
     <a href="https://hasanabi.neocities.org/?split=1c"><img src="shots/split-1c.webp" alt="the 1col chat layout" loading="lazy"><span>1col chat</span></a>
@@ -121,44 +194,22 @@
     <a href="https://hasanabi.neocities.org/?split=3ce"><img src="shots/split-3ce.webp" alt="the 3col chat emotes layout" loading="lazy"><span>3col chat emotes</span></a>
   </div>
 
-  <h2>chat</h2>
-  <ul>
-    <li><b>every emote ecosystem</b> <i><a href="https://7tv.app/">7TV</a>, <a href="https://betterttv.com/">BTTV</a>, <a href="https://www.frankerfacez.com/">FFZ</a>, animated &amp; zero-width</i></li>
-    <li><b>real badges, replies, /me</b> <i>quoted reply blocks with jump-back</i></li>
-    <li><b>send &amp; reply</b> <i>optional twitch login, readline history, drafts</i></li>
-    <li><b>whispers</b> <i>own pane, unread chip, /w replies</i></li>
-    <li><b>gap notices</b> <i>lost spans marked with cause and span</i></li>
-    <li><b>find bar + archive search</b> <i>user:/kind: filters, 30-day <a href="https://medium.com/@khouloud.haddad/understanding-indexeddb-a-beginners-guide-to-client-side-databases-febd140e30fd">IndexedDB</a> store</i></li>
-    <li><b>multi-channel</b> <i>?channel=a,b,c merges rooms</i></li>
-  </ul>
-
-  <h2>extras</h2>
-  <ul>
-    <li><b>stream embed</b> <i>draggable popup</i></li>
-    <li><b>emote picker</b> <i>searchable grid, usage sort, age marks</i></li>
-    <li><b>msgs/sec sparkline</b> <i>hover reads each second; glorp spikes glow</i></li>
-    <li><b>stats tab</b> <i>top chatters, badges, emotes &amp; links over time windows</i></li>
-    <li><b>link cards</b> <i>hover previews, titles, tweet cards, video embeds</i></li>
-    <li><b>user cards</b> <i>pronouns, history, mod quick-actions</i></li>
-  </ul>
-
-  <h2>themes</h2>
-  <div class="shots">
-    <a href="https://hasanabi.neocities.org/?theme=default"><img src="shots/default.webp" alt="the default theme" loading="lazy"><span>default</span></a>
-    <a href="https://hasanabi.neocities.org/?theme=phosphor"><img src="shots/phosphor.webp" alt="the phosphor theme" loading="lazy"><span>phosphor</span></a>
-    <a href="https://hasanabi.neocities.org/?theme=midnight"><img src="shots/midnight.webp" alt="the midnight theme" loading="lazy"><span>midnight</span></a>
-    <a href="https://hasanabi.neocities.org/?theme=solar"><img src="shots/solar.webp" alt="the solar theme" loading="lazy"><span>solar</span></a>
-    <a href="https://hasanabi.neocities.org/?theme=cosy"><img src="shots/cosy.webp" alt="the cosy theme" loading="lazy"><span>cosy</span></a>
-    <a href="https://hasanabi.neocities.org/?theme=print"><img src="shots/print.webp" alt="the print theme" loading="lazy"><span>print</span></a>
-    <a href="https://hasanabi.neocities.org/?theme=retro"><img src="shots/retro.webp" alt="the retro theme" loading="lazy"><span>retro</span></a>
-    <a href="https://hasanabi.neocities.org/?theme=irc"><img src="shots/irc.webp" alt="the irc theme" loading="lazy"><span>irc</span></a>
-  </div>
-
   <h2>resources</h2>
-  <ul>
-    <li><b>resources</b> <i>re Hasan, news, live tv, usa pol, organising, mutual aid, free software, open culture</i></li>
-    <li><b>authors</b> <i>era-grouped reading lists with links to the source texts</i></li>
-    <li><b>accessibility</b> <i>palettes × shade axis, dyslexia fonts, screen-reader live region, reduced motion</i></li>
+  <ul class="cols">
+    <li><b>inside the page</b>
+      <ul>
+        <li>resources tab <i>re Hasan, news, live tv, usa pol, organising, mutual aid</i></li>
+        <li>libre tab <i>free software, free culture, open data</i></li>
+        <li>authors tab <i>era-grouped reading lists, links to the source texts</i></li>
+      </ul>
+    </li>
+    <li><b>accessibility</b>
+      <ul>
+        <li>palettes × shade axis <i>the themes above</i></li>
+        <li>dyslexia fonts, weight, spacing &amp; tracking controls</li>
+        <li>screen-reader live region, reduced motion honoured</li>
+      </ul>
+    </li>
   </ul>
 
   <h2>backend</h2>
