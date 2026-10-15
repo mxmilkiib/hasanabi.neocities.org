@@ -6,6 +6,7 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-15
 
 ### Header
+- middle-clicking the ? button opens the about page in a new tab
 - boot-phase socket churn stops flapping the progress strip -
   pre-first-connect retries all read `socket connecting - retrying…`
   instead of cycling dropped/closed/connected phrasings, and once a
