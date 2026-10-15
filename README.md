@@ -259,8 +259,8 @@ no dependencies beyond CDN-hosted fonts.
 - **Chat columns**
   - The layout menu has fifteen layouts, listed in menu order:
     - `1col chat` keeps one full-width chat column.
-    - `1col help` drops even that - the docked help popup fills the
-      row, centred between two mirrored edge grips.
+    - `1col help` drops even that - the docked help popup starts at
+      two-thirds of the screen, centred between two mirrored edge grips.
     - `2col chat` passes older messages to a second chat column.
     - `2col chat help` docks the help popup in the rail beside one
       chat column - no video over it; `▶` floats it like `2col chat emotes`.
@@ -287,8 +287,9 @@ no dependencies beyond CDN-hosted fonts.
       over the single chat column.
   - Drag the divider to change the side column's width. In layouts
     with both emotes and stats, drag their divider to divide the
-    remaining height. When help fills the side column, its own move
-    and resize controls are disabled; stats remains a tab inside it.
+    remaining height. Help keeps a 280px minimum, capped by the
+    screen. When help fills the side column, its own move and resize
+    controls are disabled; stats remains a tab inside it.
 - **Video and live links**
   - Drag and resize the video when it floats. It pauses when hidden.
     In the side-column layouts it can dock, float or switch off.
