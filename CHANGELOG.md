@@ -43,8 +43,8 @@ not versions - the page ships continuously to Neocities.
 - music: radiolise webradio joins, the wikipedia socialist-songs list
   heads the row and the archive.org socialist and labor songs
   songbook follows it
-- extra links: saṁghasāmaggīsutta (iti 19, sujato) joins the suttas
-  before no gods no masters
+- extra links: the suttas before no gods no masters use syllabified
+  titles
 - the magazines row takes the wider 30em columns
 
 ### Help popup
