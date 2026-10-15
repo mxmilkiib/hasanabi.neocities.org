@@ -5,6 +5,13 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-15
 
+### Resources
+- every channels/streams entry now carries a short description -
+  daily progressive talk show, soviet history educator, anti-imperial
+  essays and friends, instead of bare news/commentary/essays tags
+- lady izdihar joins the essays group - soviet history educator with
+  site, ig, tiktok, x and patreon links
+
 ### Header
 - middle-clicking the ? button opens the about page in a new tab
 - boot-phase socket churn stops flapping the progress strip -
