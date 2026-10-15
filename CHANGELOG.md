@@ -28,8 +28,8 @@ not versions - the page ships continuously to Neocities.
 - left: the parties list fills several country gaps, worker
   organising and left orgs gain tighter subsections and
   descriptions, and wellbeing sits above activism
-- libre: open data and open government gain additional civic and
-  national portals
+- left: open data and open gov cross over from libre to sit under
+  reformism
 - dsa: the resources row seats above chapters, and the caucuses
   `sort:` label rides the table's top row inline, directly left of
   the wing/npc/age/a-z chips
