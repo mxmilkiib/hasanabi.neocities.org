@@ -28,6 +28,8 @@ not versions - the page ships continuously to Neocities.
   results desk and the house handicappers - while electoral tools
   moves up beside dsa resources, and caucuses and labor & campaigns
   now sit above chapters
+- media: froggy tonic's `the news man` hasan intro edit joins the re
+  hasan row, before hasan is streaming
 - media: data.gov.uk joins political data's uk/eu row
 - dsa: primers and why-join essays join the opening row
 - media: daily dose's two similarly named accounts sit beside each
