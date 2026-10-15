@@ -11074,11 +11074,16 @@
   function syncRailSplit() {
     const statsTab = document.getElementById('htabStats');
     const statsOut = statsTab.parentNode !== railEl || statsTab.hidden;
+    // level 16 seats the seam between picker and docked help - the
+    // stats tab never rides this rail, so help plays the lower pane
+    const helpSeam = LVL_HELPEMOTES.has(splitLevel) && helpPanel.parentNode === railEl;
     // stats gone leaves the picker the rail's only grower - a dragged
     // sub-1 share would pin it to a stub, so the rail flags the state
-    railEl.classList.toggle('nostats', statsOut);
+    railEl.classList.toggle('nostats', statsOut && !helpSeam);
     railSplitEl.hidden = railEl.hidden || emotePick.hidden ||
-      emotePick.parentNode !== railEl || statsOut;
+      emotePick.parentNode !== railEl || (statsOut && !helpSeam);
+    railSplitEl.title = helpSeam ?
+      'drag to resize the emote and help panes' : 'drag to resize the emote and stats panes';
   }
   // the seam drags like a popup edge - the panes trade the column
   // between them by flex proportion, so the split holds through any
@@ -11090,14 +11095,16 @@
   railSplitEl.addEventListener('pointermove', (e) => {
     if (!railSplitEl.hasPointerCapture(e.pointerId)) return;
     const statsTab = document.getElementById('htabStats');
-    // 2x2 stacks stats over emotes, so measure whichever pane is on top
-    const er = emotePick.getBoundingClientRect(), sr = statsTab.getBoundingClientRect();
+    // 2x2 stacks stats over emotes, so measure whichever pane is on
+    // top; on 16 the seam's lower pane is the docked help panel
+    const mate = LVL_HELPEMOTES.has(splitLevel) && helpPanel.parentNode === railEl ? helpPanel : statsTab;
+    const er = emotePick.getBoundingClientRect(), sr = mate.getBoundingClientRect();
     const top = Math.min(er.top, sr.top);
     const f = Math.min(.92, Math.max(.08,
       (e.clientY - top) / (Math.max(er.bottom, sr.bottom) - top)));
-    const topEl = er.top <= sr.top ? emotePick : statsTab;
+    const topEl = er.top <= sr.top ? emotePick : mate;
     topEl.style.flexGrow = f;
-    (topEl === emotePick ? statsTab : emotePick).style.flexGrow = 1 - f;
+    (topEl === emotePick ? mate : emotePick).style.flexGrow = 1 - f;
   });
   // the rail's left seam drags horizontally - the rail takes a fixed
   // width (capped at 62% by the css) and the chat columns give up the
@@ -11278,8 +11285,8 @@
         applyVidPos();
         setVideo(false);
       } else setRailVid(vidRail === 'off' && !suppressSave ? 'dock' : vidRail); // an offed video revives on rail re-entry, not on restore
-      // 16 stacks video, picker and help in the rail; the stats seam
-      // parks hidden between picker and help while stats stays a tab
+      // 16 stacks video, picker and help in the rail; the seam sits
+      // live between picker and help while stats stays a tab
       if (helpEmotes) {
         railEl.insertBefore(emotePick, helpPanel);
         railEl.insertBefore(railSplitEl, helpPanel);
