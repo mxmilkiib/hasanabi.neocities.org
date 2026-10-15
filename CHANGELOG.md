@@ -6,6 +6,8 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-15
 
 ### Header
+- the first-time tips bar takes the theme's green (`--good`)
+  background
 - new layout level 16, `3col chat vid/emotes/help`: two chat columns
   beside a rail stacking the stream, the emote picker and the help
   popup (▮▮▯?, `?split=3cveh`) - the first help-dock level to keep the
