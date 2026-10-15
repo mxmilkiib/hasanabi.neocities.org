@@ -89,6 +89,8 @@ not versions - the page ships continuously to Neocities.
   re-pick - a saved zebra level keeps its pick
 
 ### About page
+- the themes grid picks up the layouts section's rail label -
+  `click to try` sits in the left gutter beside the cards
 - the theme cards sit on a responsive three-column grid, with twitch
   joining as the twelfth shot
 - a note under the theme cards points out the three local slots and
