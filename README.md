@@ -269,9 +269,9 @@ no dependencies beyond CDN-hosted fonts.
       video above the emote picker on the right.
     - `2col chat emotes` puts chat beside the emote picker. Video starts
       off; `▶` can float it over the chat.
-    - `2x2` puts the emote picker over stats on the left and the video
-      over the chat on the right; hiding the video gives the chat the
-      full height.
+    - `2x2` puts the stats pane over the emote picker on the left and
+      the video over the chat on the right; hiding the video gives the
+      chat the full height.
     - `3col chat` runs three chat columns - a landscape screen only.
     - `3col chat help` docks the same popup rail beside two chat
       columns.

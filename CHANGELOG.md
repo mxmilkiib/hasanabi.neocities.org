@@ -6,6 +6,8 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-15
 
 ### Header
+- 2x2 swaps its left rail - the stats pane now sits over the emote
+  picker, keeping the same proportions
 - the first-time tips bar takes the theme's green (`--good`)
   background
 - new layout level 16, `3col chat vid/emotes/help`: two chat columns

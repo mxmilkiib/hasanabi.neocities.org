@@ -694,6 +694,10 @@
     flex: 1 1 0; min-height: 0; height: auto; max-height: none; border: 0; border-radius: 0;
     border-bottom: 2px solid var(--line); box-shadow: none; }
   #rail #emotePick .epick-handle, #rail #emotePick .ep-size { display: none; }
+  /* 2x2 flips the rail stack - stats over the picker - so the seam
+     line rides the stats pane's bottom edge instead of the picker's */
+  #rail.statstop > #emotePick { border-bottom: 0; }
+  #rail.statstop > #htabStats { border-bottom: 2px solid var(--line); }
   /* the help-dock layouts (2/4/5/10/11/16): the help popup docks in the
      rail - under the video on 5/11, under the picker on 16, alone on
      2/4/10 - and takes or shares the free rail height; its dragged or
@@ -729,7 +733,7 @@
      returns rather than pinning the picker to a stub */
   #rail.nostats > #emotePick { flex-grow: 1 !important; }
   /* the emotes/stats seam: an invisible grab strip centred on the
-     picker's bottom border, so the drag starts right on the line */
+     top pane's bottom border, so the drag starts right on the line */
   #railSplit { flex: none; height: 7px; margin: -4px 0 -3px; cursor: grab;
     position: relative; z-index: 3; touch-action: none; }
   #railSplit:active { cursor: grabbing; }
@@ -763,9 +767,10 @@
      little else */
   #rail #htabStats.st-low #statsBody > .st-panel:not(.st-rate) { display: none; }
   #rail #htabStats.st-low #statsBody > .st-rate { order: -1; }
-  /* level 8's 2x2: the rail runs on the left holding the emote picker
-     over stats, and the right column is the video over the chat. The
-     video docks as a grid child with the same resets the rail gives it */
+  /* level 8's 2x2: the rail runs on the left holding the stats pane
+     over the emote picker, and the right column is the video over the
+     chat. The video docks as a grid child with the same resets the
+     rail gives it */
   main.vgrid { display: grid;
     grid-template-columns: min(var(--railw, 34%), 62%) minmax(0, 1fr);
     grid-template-rows: minmax(0, 2fr) minmax(0, 3fr); }
@@ -11019,8 +11024,8 @@
   }
 
   // the rail deals no rows - it re-parents the floating panels:
-  // video on top, the emote picker at a third of the column height, and
-  // the help panel's stats page filling the rest. Their parked float
+  // video on top, the emote picker and the help panel's stats page
+  // sharing the rest (swapped on 8 - stats over emotes). Their parked float
   // geometry is inline style, cleared on the way in and re-applied from
   // the position saves on the way out
   let statsHome = null;
@@ -11037,7 +11042,9 @@
   function statsReturn() {
     const statsTab = document.getElementById('htabStats');
     if (railEl.hidden || helpPanel.parentNode === railEl || !statsHome || !helpPanel.contains(statsTab)) return;
-    railEl.appendChild(statsTab);
+    // 2x2 docks stats back at the rail's top, ahead of the seam
+    if (splitLevel === 8) railEl.insertBefore(statsTab, railSplitEl);
+    else railEl.appendChild(statsTab);
     statsTab.hidden = !LVL_NORAIL.has(splitLevel) && !LVL_STATSRAIL.has(splitLevel);
     syncRailSplit();
   }
@@ -11061,11 +11068,14 @@
   railSplitEl.addEventListener('pointermove', (e) => {
     if (!railSplitEl.hasPointerCapture(e.pointerId)) return;
     const statsTab = document.getElementById('htabStats');
-    const top = emotePick.getBoundingClientRect().top;
+    // 2x2 stacks stats over emotes, so measure whichever pane is on top
+    const er = emotePick.getBoundingClientRect(), sr = statsTab.getBoundingClientRect();
+    const top = Math.min(er.top, sr.top);
     const f = Math.min(.92, Math.max(.08,
-      (e.clientY - top) / (statsTab.getBoundingClientRect().bottom - top)));
-    emotePick.style.flexGrow = f;
-    statsTab.style.flexGrow = 1 - f;
+      (e.clientY - top) / (Math.max(er.bottom, sr.bottom) - top)));
+    const topEl = er.top <= sr.top ? emotePick : statsTab;
+    topEl.style.flexGrow = f;
+    (topEl === emotePick ? statsTab : emotePick).style.flexGrow = 1 - f;
   });
   // the rail's left seam drags horizontally - the rail takes a fixed
   // width (capped at 62% by the css) and the chat columns give up the
@@ -11206,6 +11216,7 @@
     const helpDock = LVL_HELPRAIL.has(level);
     const helpEmotes = LVL_HELPEMOTES.has(level);
     railEl.classList.toggle('help', on && helpDock);
+    railEl.classList.toggle('statstop', level === 8);
     if (on && helpDock) {
       mainEl.classList.remove('vgrid', 'vstack');
       releasePanes();
@@ -11217,10 +11228,12 @@
       if (!helpDock) {
         if (!statsHome) statsHome = { parent: statsTab.parentNode, next: statsTab.nextSibling };
         // level 8 grids main instead: the rail runs on the left holding
-        // the picker over stats; the right column is video over chat
+        // stats over the picker; the right column is video over chat
         mainEl.classList.toggle('vgrid', level === 8);
         mainEl.classList.remove('vstack');
-        railEl.append(emotePick, railSplitEl, statsTab);
+        // 2x2 runs the rail stats-over-emotes; every other rail
+        // level stacks the picker on top
+        railEl.append(...(level === 8 ? [statsTab, railSplitEl, emotePick] : [emotePick, railSplitEl, statsTab]));
         emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
         statsTab.hidden = !LVL_STATSRAIL.has(level);
         if (statsLink.classList.contains('on')) switchTab('htabCfg');
