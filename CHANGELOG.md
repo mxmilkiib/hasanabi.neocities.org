@@ -13,6 +13,12 @@ not versions - the page ships continuously to Neocities.
   site, ig, tiktok, x and patreon links
 - democracy docket joins the dsa tab's electoral tools - marc elias'
   voting-rights litigation tracker
+- the midterms 2026 table grows from 8 congressional primaries to the
+  full 92-race dsa-tied slate - congressional, state-legislative and
+  city/county/school groups in primary order, winners and losses,
+  with 'fell short' and nov 3 general notes below. a `contain:
+  inline-size` on the note rows keeps their unwrapped text out of the
+  grid's track sizing
 
 ### Header
 - the user card pins a twitch avatar beside the name, drops the
