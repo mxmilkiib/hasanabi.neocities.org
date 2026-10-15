@@ -980,9 +980,10 @@
   /* counted chips carry the Yyr, Xm tooltip now, so the no-count dim
      keys off the placeholder's exact title rather than [title] alone */
   .role.sub[title="No subscriber months reported"] { color: var(--text-dim); }
-  /* ?subg: a counted chip climbs teal → accent on --subp, its month
-     count as a % of the 120-month ceiling */
-  body.subgrad .role.sub[data-mo] { color: color-mix(in srgb, #4fbecd, var(--accent) var(--subp, 0%)); }
+  /* ?subg: a counted chip sweeps teal → violet → hot red on --subp,
+     its month count as a % of the 120-month ceiling; the longer-hue
+     oklch path arcs through the accent's violet on the way up */
+  body.subgrad .role.sub[data-mo] { color: color-mix(in oklch longer hue, #4fbecd, #f43f5e var(--subp, 0%)); }
   /* the bits chip and first-time poster celebrate in the shared rainbow
      sweep - their role colours would hide the transparent-clipped
      gradient otherwise */
@@ -2641,7 +2642,7 @@
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription<sup>†</sup></span></div>
-    <div><b>months</b> <span>gradient: <span id="helpSubgList"></span> - shades counted chips teal → accent as the count climbs to 120 months; a counted chip's tooltip restates the span - say 2yr, 10m<sup>†</sup></span></div>
+    <div><b>months</b> <span>gradient: <span id="helpSubgList"></span> - shades counted chips teal → violet → red as the count climbs to 120 months; a counted chip's tooltip restates the span - say 2yr, 10m<sup>†</sup></span></div>
     <div><b>nick alignment</b> <span><span id="helpNickcolList"></span> - drops every nick's edge on one stop - the widest leading prefix in view (time, channel tag, chips, badges) sets it and each name pads up to it; left-edge aligns the names' starts, right-edge the ends so message text columns up after them<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -9545,8 +9546,8 @@
     sub.title = subAgeTxt(mo);
     sub.style.setProperty('--subp', `${Math.min(100, Math.round(mo / 120 * 100))}%`);
   };
-  // subg: counted chips shade teal → accent with the month count
-  let subGrad = false;
+  // subg: counted chips shade teal → violet → red with the month count
+  let subGrad = true;
   function setSubGrad(on) {
     subGrad = !!on;
     document.body.classList.toggle('subgrad', subGrad);
@@ -10359,7 +10360,7 @@
     else if (timeIdx === 4) q.set('times', '12hsec');
     if (shadLevel) q.set('shadow', SHADOW_NAMES[shadLevel]);
     if (SUB_MODES[subMode] !== 'num-left') q.set('sub', SUB_MODES[subMode]);
-    if (subGrad) q.set('subg', '1');
+    if (!subGrad) q.set('subg', '0');
     if (nickCol) q.set('ncol', nickCol === 2 ? 'right' : 'left');
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
@@ -15441,6 +15442,8 @@
   markHelp('helpTimes', timeIdx);
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
+  // subg defaults on; a saved 0 already unset the flag via loadOpts
+  document.body.classList.toggle('subgrad', subGrad);
   markHelp('helpSubg', subGrad ? 1 : 0);
   markHelp('helpNickcol', nickCol);
   markHelp('helpEonly', emoteMode);
