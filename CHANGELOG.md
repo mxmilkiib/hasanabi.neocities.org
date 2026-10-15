@@ -51,6 +51,8 @@ not versions - the page ships continuously to Neocities.
   dim styling for the regular text size and colour
 
 ### Themes
+- variants stop imposing their colour's designed shade - contrast keeps
+  the current shade, while phosphor still lands on black
 - nightshade's zebra drops mild → faint on a fresh profile or preset
   re-pick - a saved zebra level keeps its pick
 

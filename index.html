@@ -5926,9 +5926,9 @@
   // ordered by each colour's designed shade stop, darkest → lightest
   const COLOURS = ['violet', 'gray', 'red', 'wine', 'green', 'ember', 'solarized', 'nord', 'lavender', 'sepia', 'salmon', 'ice', 'cream', 'mirc'];
   const VARIANTS = ['standard', 'phosphor', 'grain', 'contrast'];
-  // each colour's designed shade: swatch previews, popup clicks and the
-  // header cycles all land on it; a variant can overrule (phosphor
-  // designs at the black stop), else the colour's own stop applies
+  // each colour's designed shade: swatch previews, colour clicks and the
+  // header colour cycle all land on it; a variant only changes shade
+  // when it has its own stop (phosphor designs at black)
   const COLOUR_SHADE = { violet: 8, gray: 7, red: 7, wine: 7, green: 7, ember: 7, solarized: 7, nord: 6, lavender: 2, sepia: 2, salmon: 1, ice: 2, cream: 1, mirc: 0 };
   const VARIANT_SHADE = { phosphor: 9 };
   const designedShade = (c, v) => VARIANT_SHADE[v] ?? COLOUR_SHADE[c];
@@ -6010,8 +6010,9 @@
     saveOpts();
   }
 
-  // stepping an axis lands its designed shade - the header buttons take
-  // the same action as the popup's chips do
+  // stepping colour lands its designed shade; a variant only does so
+  // when it owns one - the header buttons take the same action as the
+  // popup's chips do
   function stepColour(dir) {
     const cur = colourMode === 'auto' ? (lightMQ.matches ? 'cream' : 'gray') : colourMode;
     colourMode = COLOURS[(COLOURS.indexOf(cur) + dir + COLOURS.length) % COLOURS.length];
@@ -6023,7 +6024,7 @@
   function stepVariant(dir) {
     variantMode = VARIANTS[(VARIANTS.indexOf(variantMode) + dir + VARIANTS.length) % VARIANTS.length];
     applyVariant();
-    const ds = designedShade(colourMode, variantMode);
+    const ds = VARIANT_SHADE[variantMode];
     if (ds != null) { shadeIdx = ds; applyShade(); }
     saveOpts();
   }
@@ -6056,7 +6057,7 @@
     }
     else if (a.classList.contains('helpVariant')) {
       variantMode = a.dataset.variant; applyVariant();
-      const ds = designedShade(colourMode, variantMode);
+      const ds = VARIANT_SHADE[variantMode];
       if (ds != null) { shadeIdx = ds; applyShade(); markPresets(); }
       saveOpts();
     }
@@ -8754,12 +8755,13 @@
     if (typeof o.variant === 'string' && VARIANTS.includes(o.variant)) {
       variantMode = o.variant; applyVariant();
     }
-    // a bare colour/legacy style with no shade lands on its designed stop
+    // a bare colour/legacy style with no shade lands on its designed stop;
+    // a variant alone only overrides when it owns one
     if (o.shade === undefined) {
       let ds;
       if (typeof o.theme === 'string' && LEGACY_SHADE[o.theme] != null) ds = LEGACY_SHADE[o.theme];
-      else if (typeof o.colour === 'string' || typeof o.theme === 'string' || o.variant !== undefined)
-        ds = designedShade(colourMode, variantMode);
+      else if (VARIANT_SHADE[variantMode] != null && o.variant !== undefined) ds = VARIANT_SHADE[variantMode];
+      else if (typeof o.colour === 'string' || typeof o.theme === 'string') ds = designedShade(colourMode, variantMode);
       if (ds != null) { shadeIdx = ds; applyShade(); }
     }
     // saved bundles carry the stop's name beside its index, so widening the
@@ -8999,7 +9001,7 @@
         paintPal(a, paletteOf(a.dataset.colour === 'auto' ? null : a.dataset.colour, variantMode, designedShade(a.dataset.colour, variantMode) ?? shadeIdx));
       });
       helpPanel.querySelectorAll('a.helpVariant').forEach((a) => {
-        paintPal(a, paletteOf(colourMode === 'auto' ? null : colourMode, a.dataset.variant, designedShade(colourMode, a.dataset.variant) ?? shadeIdx));
+        paintPal(a, paletteOf(colourMode === 'auto' ? null : colourMode, a.dataset.variant, VARIANT_SHADE[a.dataset.variant] ?? shadeIdx));
       });
       helpPanel.querySelectorAll('a.helpPreset').forEach((a) => {
         const p = THEME_PRESETS[a.dataset.preset];
@@ -15013,7 +15015,7 @@
       if (leg) {
         [colourMode, variantMode = 'standard'] = leg; applyColour(); applyVariant();
         // a named colour or legacy style in the url lands its designed stop
-        if (!q.has('shade') && !q.has('variant')) {
+        if (!q.has('shade')) {
           const ds = LEGACY_SHADE[tq] ?? designedShade(colourMode, variantMode);
           if (ds != null) { shadeIdx = ds; applyShade(); }
         }
@@ -15022,7 +15024,7 @@
     if (q.has('variant') && VARIANTS.includes(q.get('variant'))) {
       variantMode = q.get('variant'); applyVariant();
       if (!q.has('shade')) {
-        const ds = designedShade(colourMode, variantMode);
+        const ds = VARIANT_SHADE[variantMode];
         if (ds != null) { shadeIdx = ds; applyShade(); }
       }
     }
