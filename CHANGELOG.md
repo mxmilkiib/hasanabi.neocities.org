@@ -114,6 +114,11 @@ not versions - the page ships continuously to Neocities.
   cells mark green, and the table bleeds to viewport width before
   scrolling
 
+### Rows & chat
+- nick column gains a third stop: `right-edge` aligns the names' far
+  sides so message bodies column up after them; `on` is now
+  `left-edge` (`?ncol=left` / `?ncol=right`)
+
 ## 2026-10-14
 
 ### Header
