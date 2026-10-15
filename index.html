@@ -1209,6 +1209,19 @@
   /* a highlighted chatter's rows wear a soft wash of their own nick
      colour (--hlc, stamped by hlRow) - ahead of mention/kw so those win */
   .row.hl { --rowtint: linear-gradient(color-mix(in srgb, var(--hlc, var(--accent)) 16%, transparent) 0 0); }
+  /* while the user card inspects a login, every instance of their name -
+     author nicks and @mentions alike - flips to an accent chip. The mark
+     outranks inline nick colours and the shimmer/rbw text fills, so both
+     colour and background need the flag; clip resets the text-fill clip
+     shimmer nicks carry */
+  .row .ucsel {
+    color: var(--bg) !important;
+    background: var(--accent) !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px var(--accent);
+  }
   .row.mention {
     --rowtint: linear-gradient(rgba(232, 163, 61, .13) 0 0);
     --rowbar: linear-gradient(var(--accent) 0 0);
@@ -1303,12 +1316,15 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
   }
   #ucard[hidden] { display: none; }
+  #ucard .uc-head { display: flex; align-items: center; gap: 9px; margin-bottom: 2px; }
+  #ucard .uc-avi { width: 38px; height: 38px; border-radius: 6px; flex: none; }
+  #ucard .uc-avi[hidden] { display: none; }
   #ucard .uc-name { font-weight: 700; font-size: 1.1em; }
   #ucard .uc-login { color: var(--text-dim); font-size: .85em; margin-left: 4px; }
   #ucard .uc-facts { color: var(--text-dim); font-size: .85em; margin: 6px 0 10px; line-height: 1.4; }
   #ucard .uc-msgs { margin: 0 0 4px; max-height: 10.5em; overflow-y: auto;
     border-top: 1px solid var(--line); padding-top: 8px; font-size: .85em;
-    color: var(--text-dim); }
+    color: var(--text); }
   #ucard .uc-msgs div { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 1px 0; }
   #ucard .uc-msgs .uc-t { opacity: .65; margin-right: 8px; font-variant-numeric: tabular-nums; }
   #ucard .uc-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
@@ -4901,6 +4917,7 @@
     activeEl.append(tpl.content);
     dedupeLinks(newRows);
     if (hlUsers.size) for (const r of newRows) hlRow(r);
+    if (ucardLogin) for (const r of newRows) ucardMark(r);
     if (whisHtml) {
       whisLog.insertAdjacentHTML('beforeend', whisHtml);
       // the pane is a rolling dm history - bound it like the log but far
@@ -8582,7 +8599,20 @@
   function hlApply(lg) {
     for (const c of cols()) for (const r of c.querySelectorAll(`.row[data-u${lg ? `="${CSS.escape(lg)}"` : ''}]`)) hlRow(r);
   }
-  const ucardHide = () => { ucard.hidden = true; ucardLogin = ''; ucardPeekUrl = ''; };
+  // while the card is up, every .name on the inspected user's rows and
+  // every @mention chip naming them flips to the accent .ucsel chip -
+  // cleared when the card closes or re-points at another login
+  function ucardMark(r) {
+    if (r.dataset.u === ucardLogin) r.querySelector('.name')?.classList.add('ucsel');
+    for (const a of r.querySelectorAll('.at'))
+      if (a.textContent.trim().toLowerCase() === '@' + ucardLogin) a.classList.add('ucsel');
+    for (const b of r.querySelectorAll('.rqt b'))
+      if (b.textContent.trim().toLowerCase() === ucardLogin) b.classList.add('ucsel');
+  }
+  function ucardUnmark() {
+    for (const el of document.querySelectorAll('.ucsel')) el.classList.remove('ucsel');
+  }
+  const ucardHide = () => { ucard.hidden = true; ucardLogin = ''; ucardPeekUrl = ''; ucardUnmark(); };
   let ucardPeekUrl = '';
   // the channel-info block mirrors what hovering the nick's link shows:
   // title, the provider's fact chips (live state, followers, modes) and
@@ -8593,14 +8623,24 @@
     if (!el || !ucardPeekUrl) return;
     const e = peekCache.get(ucardPeekUrl);
     const p = e && Date.now() - e.t < peekTtlOf(e.p) ? e.p : null;
+    // the channel peek carries the twitch avatar as its image
+    const av = ucard.querySelector('.uc-avi');
+    if (av) {
+      if (p && p.image) { av.src = p.image; av.hidden = false; }
+      else av.hidden = true;
+    }
     if (!p) {
       el.innerHTML = peekAsk(ucardPeekUrl) ? '…' : '';
       el.hidden = !el.innerHTML;
       return;
     }
+    // the worker titles a channel peek with the display name - when it
+    // just repeats the card's own name line it drops out of the block
+    const nm = ((ucard.querySelector('.uc-name') || {}).textContent || '').trim().toLowerCase();
+    const dupT = !!p.title && [ucardLogin, nm].includes(p.title.trim().toLowerCase());
     const by = [p.author && 'by ' + p.author, p.views, p.published && peekAge(p.published)].filter(Boolean).join(' · ');
     el.innerHTML =
-      (p.title ? `<div class="uc-ht">${escapeHTML(p.title)}</div>` : '') +
+      (p.title && !dupT ? `<div class="uc-ht">${escapeHTML(p.title)}</div>` : '') +
       (by ? `<div>${escapeHTML(by)}</div>` : '') +
       (p.facts && p.facts.length ? `<div>${escapeHTML(p.facts.join(' · '))}</div>` : '') +
       (p.description ? `<div>${escapeHTML(p.description)}</div>` : '');
@@ -8632,8 +8672,10 @@
     const canMod = !!(auth && auth.login && selfExempts[ucardCh]) && lg !== auth.login.toLowerCase();
     ucard.innerHTML =
       `<button class="hdr-btn" id="ucardX" title="close">✕</button>` +
-      `<span class="uc-name" style="color:${escapeHTML(col)}">${escapeHTML(name)}</span>` +
+      `<div class="uc-head"><img class="uc-avi" alt="" referrerpolicy="no-referrer" hidden>` +
+      `<span><span class="uc-name" style="color:${escapeHTML(col)}">${escapeHTML(name)}</span>` +
       (name.toLowerCase() !== lg ? ` <span class="uc-login">@${escapeHTML(lg)}</span>` : '') +
+      `</span></div>` +
       `<div class="uc-btns">` +
         (auth && auth.login ? `<button class="hdr-btn" data-uc="mention">@mention</button>` : '') +
         `<a class="hdr-btn" href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(lg))}" target="_blank" rel="noopener noreferrer">profile ↗</a>` +
@@ -8650,6 +8692,8 @@
     ucardPeekUrl = 'https://twitch.tv/' + lg;
     ucardFillPeek();
     ucard.hidden = false;
+    ucardUnmark();
+    for (const r of document.querySelectorAll('.row')) ucardMark(r);
     const w = ucard.offsetWidth, h = ucard.offsetHeight;
     ucard.style.left = Math.max(4, Math.min(innerWidth - w - 4, x - 20)) + 'px';
     ucard.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - h - 4, y - 10)) + 'px';
