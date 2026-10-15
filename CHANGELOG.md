@@ -28,6 +28,12 @@ not versions - the page ships continuously to Neocities.
   results desk and the house handicappers - while electoral tools
   moves up beside dsa resources, and caucuses and labor & campaigns
   now sit above chapters
+- dsa: midterms gains a full slate table in primary order - rabb
+  (pa-03, may 19), vang and gonzales-torres (ca-07/ca-34, jun 2
+  top-two), valdez and avila chevalier (ny-07/ny-13, jun 23), kiros
+  (co-01, jun 30), tlaib and mckinney (mi-12/mi-13, aug 4) - with
+  race pages and candidate links, plus a note on the michigan senate
+  race
 - media: froggy tonic's `the news man` hasan intro edit joins the re
   hasan row, before hasan is streaming
 - media: data.gov.uk joins political data's uk/eu row
