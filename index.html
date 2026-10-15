@@ -2596,7 +2596,7 @@
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move · double-click to maximise"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabDsa" data-htab="htabDsa">dsa</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">help/⚙&#xFE0E;</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel · middle-click recentres it"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
-    <div class="wide one" style="max-width: 1360px; margin-inline: auto"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><br><span>[?] font size: <span id="helpFsList"></span><sup>†</sup></span><br><span>[?] position: <span id="helpPosList"></span><sup>†</sup></span></div>
+    <div class="wide one" style="max-width: 1360px; margin-inline: auto"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><br><span>[?] font size: <span id="helpFsList"></span><sup>†</sup></span><br><span>[?] position: <span id="helpPosList"></span><sup>†</sup></span><br><span>[?] sticky position: <span id="helpStickList"></span> - a resize keeps the popup's spot pinned: centred stays centred, a docked corner keeps its corner, a dragged panel its centre<sup>†</sup></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
@@ -6131,6 +6131,7 @@
     else if (a.classList.contains('helpHelp')) { helpForced = !helpPanel.hidden; helpMode = +a.dataset.idx; applyHelp(); saveOpts(); }
     else if (a.classList.contains('helpW')) { helpWIdx = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; applyHelpW(); const s = readHsize(); delete s.w; delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a width pick re-docks the panel to the position pref
     else if (a.classList.contains('helpPos')) { helpPos = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; applyHelpPos(); const s = readHsize(); delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a position pick undoes a drag
+    else if (a.classList.contains('helpStick')) { helpStick = +a.dataset.idx === 1; markHelp('helpStick', helpStick ? 1 : 0); saveOpts(); }
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
     else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i <= 2 ? i - 3 : i === 3 ? -4 : i - 4; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
@@ -8702,7 +8703,7 @@
       eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
-      hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos,
+      hpfs: helpFs < 0 ? helpFs : HDR_SIZES[helpFs], hpos: helpPos, hstick: helpStick ? 1 : 0,
       lbls: lblsOn ? 1 : 0,
       split: SPLIT_URL[splitLevel - 1],
       railw: railEl.classList.contains('fixed') ? parseInt(mainEl.style.getPropertyValue('--railw')) || 0 : 0,
@@ -8923,6 +8924,7 @@
       applyHelpFs();
     }
     if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
+    if (o.hstick !== undefined) { helpStick = !!o.hstick; markHelp('helpStick', helpStick ? 1 : 0); }
     // a saved bundle carries the applied preset's name for copy-url
     // attribution - no re-apply, the concrete fields already rode along
     if (typeof o.preset === 'string' && presetByName(o.preset)) curTheme = presetName(o.preset);
@@ -10208,6 +10210,9 @@
   const HPOS_URL = ['tl', 'tc', 'tr', 'ml', 'mc', 'mr', 'bl', 'bc', 'br'];
   let helpPos = DEF.hpos;
   function applyHelpPos() { markHelp('helpPos', helpPos); clampHelpPanel(); }
+  // sticky position: a resize holds the popup's spot - the docked cell's
+  // own anchor (centre, mid-edge or corner), or a dragged panel's centre
+  let helpStick = false;
   // the popup must never sit past a screen edge: its intended size (the
   // preset or a dragged px) goes inside a viewport-capped min() so a
   // smaller window shrinks it and a bigger one grows it back, and a
@@ -10391,6 +10396,7 @@
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
     if (helpFs !== -1) q.set('hpfs', helpFs === -4 ? 'chat' : helpFs < 0 ? 'chat' + helpFs : HDR_SIZES[helpFs]);
     if (helpPos !== DEF.hpos) q.set('hpos', HPOS_URL[helpPos]);
+    if (helpStick) q.set('hstick', '1');
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
     if (lblsOn) q.set('lbls', '1');
     if (copyHelp) {
@@ -15205,6 +15211,7 @@
     }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
     if (q.has('hpos') && q.get('hpos') !== '') { const v = q.get('hpos'); let i = HPOS_URL.indexOf(v); if (i < 0) i = +v; if (Number.isInteger(i) && i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
+    if (q.has('hstick')) { helpStick = flag('hstick'); markHelp('helpStick', helpStick ? 1 : 0); }
     if (q.has('lbls')) setLbls(flag('lbls'));
     if ([...q.keys()].length) saveOpts(); // params act as the saved config
   }
@@ -15247,6 +15254,7 @@
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
+    helpStick: ['off', 'on'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpFs: ['chat −3', 'chat −2', 'chat −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
@@ -15404,6 +15412,7 @@
   markHelp('helpFontFam', fontSel.selectedIndex);
   markHelp('helpW', helpWIdx);
   markHelp('helpPos', helpPos);
+  markHelp('helpStick', helpStick ? 1 : 0);
   markHfs();
   markHelpFs();
   markHelp('helpSelf', selfHl ? 1 : 0);
@@ -15476,10 +15485,33 @@
     const htop = headerEl.getBoundingClientRect().bottom + 4;
     // re-anchor to left/top so the dragged edges stay put under the
     // pointer regardless of how the panel was previously positioned
+    const hpDocked = !helpPanel.style.left;
     helpPanel.style.left = r.left + 'px'; helpPanel.style.top = r.top + 'px';
     helpPanel.style.right = 'auto';
+    // sticky: the dock cell's own point on the panel (corner, mid-edge or
+    // centre) stays pinned while it resizes; a dragged panel keeps its
+    // centre. An edge that is itself the anchor won't stretch the panel
+    const sax = helpStick ? (hpDocked ? (helpPos % 3) / 2 : .5) : 0;
+    const say = helpStick ? (hpDocked ? ((helpPos / 3) | 0) / 2 : .5) : 0;
+    const spx = r.left + sax * r.width, spy = r.top + say * r.height;
     const move = (ev) => {
       hpMaxRect = null; // a dragged edge ends the maximised state
+      if (helpStick) {
+        if ((edge.includes('l') && sax > 0) || (edge.includes('r') && sax < 1)) {
+          const w = Math.round(Math.max(HELP_MIN_W, Math.min(innerWidth - 24,
+            (edge.includes('l') ? spx - ev.clientX : ev.clientX - spx) / (edge.includes('l') ? sax : 1 - sax))));
+          helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
+          helpPanel.style.left = Math.max(0, Math.min(innerWidth - w, spx - sax * w)) + 'px';
+        }
+        if ((edge.includes('t') && say > 0) || (edge.includes('b') && say < 1)) {
+          const h = Math.round(Math.max(120, Math.min(innerHeight - htop - 8,
+            (edge.includes('t') ? spy - ev.clientY : ev.clientY - spy) / (edge.includes('t') ? say : 1 - say))));
+          helpPanel.style.height = h + 'px';
+          helpPanel.style.maxHeight = 'none';
+          helpPanel.style.top = Math.max(htop, Math.min(innerHeight - h, spy - say * h)) + 'px';
+        }
+        return;
+      }
       if (edge.includes('l')) {
         const w = Math.round(Math.max(HELP_MIN_W, Math.min(innerWidth - 24, r.right - ev.clientX)));
         helpPanel.style.left = (r.right - w) + 'px';
@@ -15507,6 +15539,13 @@
       helpPanel.removeEventListener('pointercancel', drop);
       helpPanel.style.cursor = '';
       helpPanel.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b');
+      // sticky kept a docked panel on its spot - hand it back to the
+      // dock rather than let the resize count as a drag-off
+      if (helpStick && hpDocked) {
+        helpPanel.style.left = ''; helpPanel.style.right = '';
+        clampHelpPanel();
+        const s = readHsize(); delete s.x; delete s.y; writeHsize(s);
+      }
       saveHsize(edge);
     };
     helpPanel.addEventListener('pointermove', move);
@@ -15579,6 +15618,7 @@
       grip.setPointerCapture(e.pointerId);
       helpPanel.classList.add('dragging');
       const r = helpPanel.getBoundingClientRect();
+      const hpDocked = !helpPanel.style.left;
       helpPanel.style.left = r.left + 'px'; helpPanel.style.top = r.top + 'px';
       helpPanel.style.right = 'auto';
       const leftEdge = grip.classList.contains('tl') || grip.classList.contains('bl') || grip.classList.contains('l');
@@ -15588,8 +15628,30 @@
       const ax = leftEdge ? r.right : r.left;   // anchor = opposite corner/edge
       const ay = topEdge ? r.bottom : r.top;
       const htop = headerEl.getBoundingClientRect().bottom + 4;
+      // sticky: pin the dock cell's point on the panel instead - a
+      // centred panel keeps its centre, a corner-docked one its corner,
+      // a dragged panel its centre
+      const sax = helpStick ? (hpDocked ? (helpPos % 3) / 2 : .5) : 0;
+      const say = helpStick ? (hpDocked ? ((helpPos / 3) | 0) / 2 : .5) : 0;
+      const spx = r.left + sax * r.width, spy = r.top + say * r.height;
       const move = (ev) => {
         hpMaxRect = null; // a grip drag ends the maximised state
+        if (helpStick) {
+          if ((leftEdge && sax > 0) || (rightEdge && sax < 1)) {
+            const w = Math.round(Math.max(HELP_MIN_W, Math.min(innerWidth - 24,
+              (leftEdge ? spx - ev.clientX : ev.clientX - spx) / (leftEdge ? sax : 1 - sax))));
+            helpPanel.style.width = helpPanel.style.maxWidth = w + 'px';
+            helpPanel.style.left = Math.max(0, Math.min(innerWidth - w, spx - sax * w)) + 'px';
+          }
+          if ((topEdge && say > 0) || (botEdge && say < 1)) {
+            const h = Math.round(Math.max(120, Math.min(innerHeight - htop - 8,
+              (topEdge ? spy - ev.clientY : ev.clientY - spy) / (topEdge ? say : 1 - say))));
+            helpPanel.style.height = h + 'px';
+            helpPanel.style.maxHeight = 'none';
+            helpPanel.style.top = Math.max(htop, Math.min(innerHeight - h, spy - say * h)) + 'px';
+          }
+          return;
+        }
         if (leftEdge || rightEdge) {
           // cap the grown edge at the screen it faces, but never below the
           // minimum - a cap under 280px on a narrow screen must not collapse it
@@ -15609,6 +15671,13 @@
         grip.removeEventListener('pointermove', move);
         grip.removeEventListener('pointerup', drop);
         grip.removeEventListener('pointercancel', drop);
+        // sticky kept a docked panel on its spot - re-dock it so the
+        // resize doesn't count as a drag-off
+        if (helpStick && hpDocked) {
+          helpPanel.style.left = ''; helpPanel.style.right = '';
+          clampHelpPanel();
+          const s = readHsize(); delete s.x; delete s.y; writeHsize(s);
+        }
         saveHsize((leftEdge ? 'l' : rightEdge ? 'r' : '') + (topEdge ? 't' : botEdge ? 'b' : ''));
       };
       grip.addEventListener('pointermove', move);
