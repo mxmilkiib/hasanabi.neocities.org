@@ -772,20 +772,30 @@
   main.vgrid .jdc[data-for="jdownLog"].r { left: calc(min(var(--railw, 34%), 62%) + (100% - min(var(--railw, 34%), 62%)) * .75); }
   #rail #htabStats.st-min #statsBody > .st-trio { display: none; }
   /* level 15's 1cv: the video tops the single column keeping its
-     floating frame's border like the docked panels - centred, capped
-     at 720px so the chat keeps the rest of the column */
+     floating frame's border like the docked panels - centred, starting
+     at 720px until the seam or its side gutters resize it */
   main.vstack { display: grid; grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr); }
+    grid-template-rows: auto auto minmax(0, 1fr); }
   main.vstack > * { min-width: 0; min-height: 0; }
   main.vstack > #vid { grid-column: 1; grid-row: 1; position: relative; inset: auto;
-    justify-self: center; width: min(100%, 720px); height: auto;
+    justify-self: center; width: min(100%, var(--vidw, 720px)); height: auto;
     box-sizing: border-box; z-index: auto; margin: 6px 0;
     border: 1px solid var(--popline); }
   main.vstack > #vid .vid-handle, main.vstack > #vid .vid-size { display: none; }
+  /* the video/chat seam works like the rail's own strip: invisible until
+     hover, negative margins keeping it centred on the video's border */
+  main.vstack > #vidSplit { grid-column: 1; grid-row: 2; height: 7px;
+    margin: -4px 0 -3px; cursor: grab; position: relative; z-index: 3;
+    touch-action: none; }
+  main.vstack > #vidSplit:active { cursor: grabbing; }
+  main.vstack > #vidSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  main.vstack:has(> #vidSplit:hover) > #vid { --egy: inset 0 -10px 8px -6px var(--egc); }
+  /* bare gutters either side of the centred video start the same vertical drag */
+  main.vstack.vgut { cursor: ns-resize; }
   /* a hidden video leaves its cell empty - collapse the row so the
      chat takes the whole column */
-  main.vstack:has(> #vid[hidden]) { grid-template-rows: 0 minmax(0, 1fr); }
-  main.vstack > #log { grid-column: 1; grid-row: 2; }
+  main.vstack:has(> #vid[hidden]) { grid-template-rows: 0 0 minmax(0, 1fr); }
+  main.vstack > #log { grid-column: 1; grid-row: 3; }
 
   .loadbar {
     width: min(240px, 55%);
@@ -2754,6 +2764,7 @@
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>first-time tips: click/scroll header buttons to change some option settings -- page audio autoplay permission allows unmuted stream on open/reload -- click to dismiss</div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
+  <div id="vidSplit" aria-hidden="true" hidden title="drag to resize the video and chat"></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
@@ -2881,6 +2892,7 @@
   const railSplitEl = document.getElementById('railSplit');
   const colSplitEl = document.getElementById('colSplit');
   const colSplitREl = document.getElementById('colSplitR');
+  const vidSplitEl = document.getElementById('vidSplit');
   const splitMenu = document.getElementById('splitMenu');
   let activeEl = logEl; // column currently receiving new rows
   let splitLevel = 1; // the applied layout - a level in menu order
@@ -8634,6 +8646,7 @@
       lbls: lblsOn ? 1 : 0,
       split: SPLIT_URL[splitLevel - 1],
       railw: railEl.classList.contains('fixed') ? parseInt(mainEl.style.getPropertyValue('--railw')) || 0 : 0,
+      vidw: vidStackW || undefined,
       rvid: vidRail,
       preset: curTheme,
     };
@@ -8786,6 +8799,7 @@
       railEl.classList.toggle('fixed', o.railw > 0);
       if (o.railw > 0) mainEl.style.setProperty('--railw', o.railw + 'px');
     }
+    if (o.vidw !== undefined) setVidStackW(+o.vidw);
     // after the split so a rail exists to dock into; outside rail it just
     // stores the mode for the next dock. the boolean 'video' above only
     // spans shown/hidden - this carries dock/float too
@@ -8982,6 +8996,19 @@
   const VOL_KEY = 'hasan-vidvol';
   let vidPlayer = null;
   let vidRatio = 16 / 9; // replaces the css default once stats report the real resolution
+  // level 15 stores its centred frame width; the aspect ratio turns that into
+  // the seam's height, so a vertical drag resizes without letterboxing
+  const VID_STACK_W = 720, VID_STACK_MIN = 180, VID_CHAT_MIN = 160;
+  let vidStackW = 0;
+  const vidStackMax = () => Math.max(VID_STACK_MIN,
+    Math.min(mainEl.clientWidth, (mainEl.clientHeight - VID_CHAT_MIN - 14) * vidRatio));
+  const paintVidStackW = () => mainEl.style.setProperty('--vidw',
+    Math.min(vidStackW || VID_STACK_W, vidStackMax()) + 'px');
+  const setVidStackW = (w) => {
+    vidStackW = Number.isFinite(w) && w > 0 ? Math.max(VID_STACK_MIN, Math.round(w)) : 0;
+    paintVidStackW();
+  };
+  const syncVidSplit = () => { vidSplitEl.hidden = splitLevel !== 15 || vidBox.hidden; };
   function loadPlayer() {
     if (loadPlayer.done) return;
     loadPlayer.done = true;
@@ -9030,6 +9057,7 @@
           if (vw > 0 && vh > 0 && Math.abs(vw / vh - vidRatio) > .001) {
             vidRatio = vw / vh;
             vidBox.style.aspectRatio = vw + ' / ' + vh;
+            paintVidStackW();
             const r = vidBox.getBoundingClientRect();
             if (r.bottom > innerHeight) // a top-anchored box grew past the fold
               vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, innerHeight - r.height) + 'px';
@@ -9070,6 +9098,7 @@
     vidBtn.setAttribute('aria-expanded', String(!!on));
     vidBtn.title = `Stream video: ${on ? 'on' : 'off'}${railEl.hidden ? '' : ` · rail: ${vidRail}`} - click/scroll${railEl.hidden ? '' : ' cycles dock · float · off'}\nuse the pause button in the video to stop the stream`;
     markHelp('helpVideo', on ? 1 : 0);
+    syncVidSplit();
     if (!on) vidState();
   }
   // rail mode gives the video a third placement axis: docked in the
@@ -9242,6 +9271,39 @@
     vidBox.addEventListener('pointerup', drop);
     vidBox.addEventListener('pointercancel', drop);
   };
+
+  // level 15's seam and side gutters resize the centred video by width;
+  // aspect-ratio translates that into the vertical split under it
+  let vidStackDragId = null;
+  const vidStackDrag = (e, dragEl) => {
+    e.preventDefault();
+    try { dragEl.setPointerCapture(e.pointerId); } catch {}
+    vidStackDragId = e.pointerId;
+    vidBox.classList.add('dragging', 'edge-b');
+    document.body.style.cursor = 'ns-resize';
+    const r = vidBox.getBoundingClientRect();
+    const oy = e.clientY, w0 = r.width;
+    const move = (ev) => {
+      setVidStackW(Math.min(vidStackMax(), Math.round(w0 + (ev.clientY - oy) * vidRatio)));
+    };
+    const drop = () => {
+      vidStackDragId = null;
+      vidBox.classList.remove('dragging', 'edge-b');
+      mainEl.classList.remove('vgut');
+      document.body.style.cursor = '';
+      dragEl.removeEventListener('pointermove', move);
+      dragEl.removeEventListener('pointerup', drop);
+      dragEl.removeEventListener('pointercancel', drop);
+      saveOpts();
+    };
+    dragEl.addEventListener('pointermove', move);
+    dragEl.addEventListener('pointerup', drop);
+    dragEl.addEventListener('pointercancel', drop);
+  };
+  vidSplitEl.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || splitLevel !== 15 || vidBox.hidden) return;
+    vidStackDrag(e, vidSplitEl);
+  });
 
   // ---- header collapse: button shrinks it to a thin strip, clicking the
   // strip restores it ----
@@ -10137,6 +10199,7 @@
       el.style.left = Math.max(0, Math.min(innerWidth - r.width, r.left)) + 'px';
       if (el.style.top) el.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - r.height, r.top)) + 'px';
     });
+    paintVidStackW();
   });
   // whether the copied settings url also opens the ? popup, and on
   // which page - a copy-side choice, not a chat option
@@ -10968,17 +11031,33 @@
     mainEl.style.setProperty('--railw', soloW(e.clientX));
   });
   colSplitREl.addEventListener('pointerup', () => saveOpts());
-  // 1col help: the gutters either side of the centred page wear an
-  // arrow cursor pointing in at the panel, and a horizontal drag on
-  // one resizes the page like the edge seams do - bare mainEl only
+  // bare gutters drive the centred pane in the no-rail layouts: 1col help
+  // drags horizontally to resize the page, 1cv drags vertically to resize
+  // the video like its bottom seam does
   let gutDrag = null;
   mainEl.addEventListener('pointerdown', (e) => {
-    if (e.target !== mainEl || splitLevel !== 2) return;
-    e.preventDefault();
-    gutDrag = e.pointerId;
-    mainEl.setPointerCapture(gutDrag);
+    if (e.target !== mainEl) return;
+    if (splitLevel === 2) {
+      e.preventDefault();
+      gutDrag = e.pointerId;
+      mainEl.setPointerCapture(gutDrag);
+      return;
+    }
+    if (splitLevel !== 15 || vidBox.hidden) return;
+    const r = vidBox.getBoundingClientRect();
+    if (e.clientY < r.top || e.clientY > r.bottom || (e.clientX >= r.left && e.clientX <= r.right)) return;
+    vidStackDrag(e, mainEl);
   });
   mainEl.addEventListener('pointermove', (e) => {
+    if (splitLevel === 15) {
+      if (e.pointerId === vidStackDragId) return;
+      const r = vidBox.getBoundingClientRect();
+      const gut = !vidBox.hidden && e.target === mainEl && e.clientY >= r.top && e.clientY <= r.bottom &&
+        (e.clientX < r.left || e.clientX > r.right);
+      mainEl.classList.toggle('vgut', gut);
+      return;
+    }
+    mainEl.classList.remove('vgut');
     if (splitLevel !== 2 || (e.target !== mainEl && e.pointerId !== gutDrag)) {
       mainEl.classList.remove('arw-l', 'arw-r');
       return;
@@ -10996,7 +11075,7 @@
     if (gutDrag !== null) { gutDrag = null; saveOpts(); }
   });
   mainEl.addEventListener('pointercancel', () => { gutDrag = null; });
-  mainEl.addEventListener('pointerleave', () => mainEl.classList.remove('arw-l', 'arw-r'));
+  mainEl.addEventListener('pointerleave', () => mainEl.classList.remove('arw-l', 'arw-r', 'vgut'));
   // the squeezed pane sheds its lower lists as it shrinks - the rate
   // graph climbs to the top of what remains, alone below ~160px
   new ResizeObserver(() => {
@@ -11047,6 +11126,7 @@
   function dockRail(level) {
     const on = level !== 0 && !LVL_NORAIL.has(level);
     colSplitEl.hidden = !on;
+    vidSplitEl.hidden = level !== 15 || vidBox.hidden;
     colSplitREl.hidden = level !== 2;
     railEl.classList.toggle('solo', level === 2);
     mainEl.classList.toggle('hcenter', level === 2);
@@ -11122,9 +11202,10 @@
       statsLink.hidden = false;
       railEl.classList.remove('novid');
       if (level === 15) {
-        logEl.before(vidBox);
+        logEl.before(vidBox, vidSplitEl);
         vidBox.style.left = vidBox.style.top = vidBox.style.right =
           vidBox.style.bottom = vidBox.style.width = '';
+        paintVidStackW();
         setVideo(true);
       } else {
         mainEl.before(vidBox);
