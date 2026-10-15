@@ -35,6 +35,9 @@ not versions - the page ships continuously to Neocities.
   spacer row above dsa resources
 - the results table now runs newest-first: the nov 3 general ballot
   leads, then each primary group lists latest results down to feb
+- the slate splits into two tables - 'primary results' (past) and
+  'nov 3 general ballot' (future) - and the state/locale tag breaks
+  out of the race cell into its own accent column
 
 ### Header
 - the user card pins a twitch avatar beside the name, drops the
