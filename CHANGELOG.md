@@ -28,6 +28,9 @@ not versions - the page ships continuously to Neocities.
   results desk and the house handicappers - while electoral tools
   moves up beside dsa resources, and caucuses and labor & campaigns
   now sit above chapters
+- dsa: the main org link goes red with a glow, a rose logo sits in
+  the tab's top-right corner, and the selected help tab's name gets
+  a text shadow so it reads as pressed-in
 - dsa: midterms gains a full slate table in primary order - rabb
   (pa-03, may 19), vang and gonzales-torres (ca-07/ca-34, jun 2
   top-two), valdez and avila chevalier (ny-07/ny-13, jun 23), kiros
