@@ -64,6 +64,9 @@
     position: relative;
   }
   .cta:hover { background: #f5b455; }
+  .livestate { margin: .8em auto 0; text-align: center; font-size: .82em; color: var(--dim); }
+  .livestate.live { color: var(--good); }
+  .livestate.err { color: #d66; }
   .cta .dash {
     position: absolute; left: -6px; top: -6px;
     width: calc(100% + 12px); height: calc(100% + 12px);
@@ -137,6 +140,7 @@
 
   <br>
   <a class="cta" href="https://hasanabi.neocities.org/"><svg class="dash" aria-hidden="true"><rect/></svg>open the chat thing →</a>
+  <p id="liveState" class="livestate" role="status" aria-live="polite" hidden></p>
   <br>
 
   <h2>chat</h2>
@@ -318,5 +322,61 @@
     <a href="https://milkii.neocities.org/">fan</a>-made, not affiliated
   </footer>
 </main>
+<script>
+(() => {
+  const liveState = document.getElementById('liveState');
+  const RELAY_ORIGIN = 'https://mxmilkiib.github.io';
+  const frame = document.createElement('iframe');
+  let done = false;
+  liveState.hidden = false;
+  liveState.textContent = 'checking stream status…';
+  frame.style.display = 'none';
+  frame.setAttribute('aria-hidden', 'true');
+  frame.src = RELAY_ORIGIN + '/twitch-chat-relay/live.html';
+
+  const finish = () => { done = true; clearTimeout(timer); frame.remove(); };
+  const fail = () => {
+    if (done) return;
+    liveState.className = 'livestate err';
+    liveState.textContent = 'stream status unavailable';
+    finish();
+  };
+  const timer = setTimeout(fail, 10000);
+  const uptimeShort = (text) => {
+    const h = /(\d+)\s*hours?/i.exec(text);
+    const m = /(\d+)\s*minutes?/i.exec(text);
+    const s = /(\d+)\s*seconds?/i.exec(text);
+    return h ? `${h[1]}h${m ? ' ' + m[1] + 'm' : ''}` : m ? `${m[1]}m` : s ? `${s[1]}s` : '';
+  };
+
+  frame.addEventListener('load', () => {
+    frame.contentWindow.postMessage({ type: 'streamprobe', channels: ['hasanabi'] }, RELAY_ORIGIN);
+  });
+  window.addEventListener('message', (event) => {
+    if (done || event.origin !== RELAY_ORIGIN || event.source !== frame.contentWindow) return;
+    const d = event.data || {};
+    if (d.type !== 'stream' || d.channel !== 'hasanabi') return;
+    if (d.error) { fail(); return; }
+    const uptime = typeof d.uptime === 'string' ? d.uptime.trim() : '';
+    const live = /\d+\s*(?:day|hour|minute|second)s?/i.test(uptime)
+      && !/offline|not streaming|not live|not online/i.test(uptime);
+    if (live) {
+      const viewers = parseInt(String(d.viewers || '').replace(/[^\d]/g, ''), 10);
+      const bits = ['hasan is live'];
+      if (Number.isFinite(viewers)) bits.push(viewers.toLocaleString('en') + ' watching');
+      const up = uptimeShort(uptime);
+      if (up) bits.push('for ' + up);
+      liveState.className = 'livestate live';
+      liveState.textContent = bits.join(' · ');
+      if (d.title) liveState.title = d.title;
+    } else {
+      liveState.className = 'livestate';
+      liveState.textContent = 'hasan is offline';
+    }
+    finish();
+  });
+  document.body.append(frame);
+})();
+</script>
 </body>
 </html>
