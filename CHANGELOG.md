@@ -53,6 +53,8 @@ not versions - the page ships continuously to Neocities.
 ### Themes
 - variants stop imposing their colour's designed shade - contrast keeps
   the current shade, while phosphor still lands on black
+- lavender's dark shades lift the accent set, keeping nightshade's
+  buttons, links and status marks readable
 - nightshade's zebra drops mild → faint on a fresh profile or preset
   re-pick - a saved zebra level keeps its pick
 

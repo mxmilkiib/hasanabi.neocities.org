@@ -184,6 +184,10 @@
      the shade axis, so every one spans light and dark stops */
   :root[data-colour="cream"]    { --ph: 80;  --pc: .012; --ptc: .02;  --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; --wiki: #3368b0; }
   :root[data-colour="lavender"] { --ph: 300; --pc: .035; --ptc: .05;  --accent: #7a5fb5; --good: #4a8a5a; --danger: #b5455f; --vip: #b8457a; --wiki: #3a6fa8; }
+  /* Lavender's accents tune for its pale stop; the dark stops lift them
+     toward the nightshade set */
+  :root[data-colour="lavender"]:is([data-shade="6"], [data-shade="7"], [data-shade="8"], [data-shade="9"], [data-shade="10"], [data-shade="11"]) {
+    --accent: #c4b5fd; --good: #7fd08a; --danger: #ff9c9c; --vip: #ff9dc8; --wiki: #9cc4ff; }
   :root[data-colour="mirc"]     { --ph: 230; --pc: .004; --ptc: .004; --accent: #0000cc; --good: #007a00; --danger: #cc0000; --vip: #a000a0; --wiki: #008080; }
   :root[data-colour="sepia"]    { --ph: 75;  --pc: .05;  --ptc: .05;  --accent: #9a6b12; --good: #2e7d46; --danger: #b04040; --vip: #a03060; --wiki: #3a6a8a; }
   /* financial times: the #fff1e5 paper pink (oklch .966 .022 63), near-
