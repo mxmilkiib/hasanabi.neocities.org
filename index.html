@@ -5581,6 +5581,10 @@
     return found ? total : null;
   }
 
+  // decapi answers upstream failures with an error sentence instead of
+  // a status - matched here so one never reads as stream data
+  const apiErr = (s) => /error|too many|try again|unavailable|bad gateway|timed out|not found/i.test(String(s || ''));
+
   function fmtTime(ts) {
     return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
@@ -5622,7 +5626,16 @@
     // only a parseable uptime counts as live - an error page or empty
     // decapi reply would otherwise read as a green light
     const mins = parseUptimeMinutes(uptime);
-    if (/offline|not streaming|not live|not online/i.test(uptime) || mins == null) {
+    // an unparseable, non-offline uptime means the probe failed (decapi
+    // answers upstream hiccups with an error sentence) - the last
+    // verdict stands instead of flapping the dot offline
+    if (mins == null && !/offline|not streaming|not live|not online/i.test(uptime)) {
+      if (!streamStates[sch]) streamStates[sch] = { live: false };
+      paintChTags(sch);
+      paintProbe();
+      return;
+    }
+    if (mins == null) {
       st = { live: false };
     } else {
       const viewers = parseInt((d.viewers || '').replace(/[^\d]/g, ''), 10);
@@ -5630,7 +5643,7 @@
         live: true,
         startedAt: mins != null ? Date.now() - mins * 60000 : null,
         viewers: Number.isFinite(viewers) ? viewers : null,
-        title: d.title || '',
+        title: apiErr(d.title) ? '' : d.title || '',
       };
     }
     const prevSt = streamStates[sch];
@@ -14809,14 +14822,17 @@
           relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN));
       } else if (wasJoined && !downAt) downAt = Date.now();
       if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
-      else if (d.state === 'reconnecting' && !joined) loadSay('socket dropped - retrying…');
-      // a dropped socket only interrupts once a join was live - relay
-      // socket churn ahead of the first connect is the boot's own noise
+      // churn ahead of the first connect is the boot's own noise: one
+      // steady 'connecting' line for it, so a flaky handshake can't
+      // flap the bar between dropped/closed/connected phrasings
+      else if (d.state === 'reconnecting' && !joined)
+        loadSay(downAt ? 'socket dropped - retrying…' : 'socket connecting - retrying…');
+      // a dropped socket only interrupts once a join was live
       if (d.state === 'reconnecting' && wasJoined) syncShow('socket dropped - retrying…');
     } else if (d.type === 'wscause') {
       wsCause = `${d.code}${d.reason ? ' ' + d.reason : ''}`;
       if (joined || downAt) syncShow(`socket closed (${wsCause}) - retrying…`);
-      else loadSay(`socket closed (${wsCause}) - retrying…`);
+      else loadSay('socket connecting - retrying…');
       updateHeader();
     } else if (d.type === 'lines') {
       // a replay batch is what settles a deferred gap marker
