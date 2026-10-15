@@ -344,7 +344,9 @@
     font-size: 14px;
     font-weight: 700;
     color: var(--text-dim);
-    background: var(--good);
+    /* deep green - the theme's green cut with black, so the hue stays
+       green while the drifting violet text keeps its contrast */
+    background: color-mix(in oklch, var(--good) 35%, black);
     border-bottom: 1px solid var(--line);
     cursor: pointer;
     text-align: center;
