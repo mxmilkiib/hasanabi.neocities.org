@@ -15,6 +15,11 @@ not versions - the page ships continuously to Neocities.
   voting-rights litigation tracker
 
 ### Header
+- the user card pins a twitch avatar beside the name, drops the
+  peek's title line when it just repeats the display name, and
+  shows its recent-message snippets in standard text colour;
+  while it's open every instance of that chatter's name - nicks,
+  @mentions, quoted names - flips to an accent chip in chat
 - middle-clicking the ? button opens the about page in a new tab
 - boot-phase socket churn stops flapping the progress strip -
   pre-first-connect retries all read `socket connecting - retrying…`
