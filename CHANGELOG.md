@@ -60,6 +60,8 @@ not versions - the page ships continuously to Neocities.
   re-pick - a saved zebra level keeps its pick
 
 ### About page
+- a note under the theme cards points out the three local slots and
+  settings url
 - the about and social-card copy broadens the description to the
   general and multi-stream tool
 - the theme cards now lead with nightshade as the default, rename
