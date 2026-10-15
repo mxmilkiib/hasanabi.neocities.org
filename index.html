@@ -1695,7 +1695,8 @@
   @keyframes syncshrink { 50% { width: 12%; background-color: #9146ff; } }
   /* the label inks in the page colour on an accent chip - dim text on
      the panel ground read as decoration next to the poles */
-  #loadTxt { color: var(--text-dim); padding: 0 7px; min-width: 0; max-width: 36%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+  #loadTxt { color: var(--text-dim); padding: 0 7px; min-width: 0; max-width: 36%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; transition: opacity .18s ease; }
+  #loadTxt.fading { opacity: 0; }
   /* deploy notice: aux ground with accent ink - a notice tone, not the
      alert loudness the accent ground carried */
   #updateBar { background: #000; color: var(--accent); font-weight: 600; padding-top: 2px; padding-bottom: 2px; }
@@ -2996,10 +2997,17 @@
   // history restore, well before the picker block would declare it
   const emotePick = document.getElementById('emotePick');
   let loadPhase = 0;
+  // status text crossfades rather than swapping mid-read
+  function loadSay(txt) {
+    if (loadTxt.textContent === txt) return;
+    if (loadTxt.classList.contains('fading')) { loadTxt.textContent = txt; return; }
+    loadTxt.classList.add('fading');
+    setTimeout(() => { loadTxt.textContent = txt; loadTxt.classList.remove('fading'); }, 180);
+  }
   function loadStep(n, txt) {
     if (n <= loadPhase) return;
     loadPhase = n;
-    if (txt != null && loadTxt) loadTxt.textContent = txt;
+    if (txt != null && loadTxt) loadSay(txt);
   }
   // a resync can't clock its own completion - the replay batch's arrival
   // is what ends it, so the strip falls back to a timeout in case the
@@ -3011,7 +3019,7 @@
   function syncShow(txt) {
     if (!loadBar) return;
     syncing = true;
-    loadTxt.textContent = txt;
+    loadSay(txt);
     loadBar.hidden = false;
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => { syncing = false; loadBar.hidden = true; paintEpickSync(); }, 8000);
@@ -11607,8 +11615,8 @@
   // leaving the bar mid-flight forever - quiet chat gets its own note
   // on the strip, and the strip stays up while the column sits empty
   setTimeout(() => {
-    if (joined) { if (!logEl.firstElementChild) { loadTxt.textContent = 'connected - the chat is just quiet right now'; loadBar.hidden = false; paintEpickSync(); } return; }
-    if (!syncing) { loadTxt.textContent = 'nothing arriving - a privacy or adblock extension may be blocking the relay iframe'; loadBar.hidden = false; paintEpickSync(); }
+    if (joined) { if (!logEl.firstElementChild) { loadSay('connected - the chat is just quiet right now'); loadBar.hidden = false; paintEpickSync(); } return; }
+    if (!syncing) { loadSay('nothing arriving - a privacy or adblock extension may be blocking the relay iframe'); loadBar.hidden = false; paintEpickSync(); }
   }, 12000);
 
   // If the relay never reports stream status, give up waiting for it.
@@ -14791,14 +14799,14 @@
           relayFrame.contentWindow.postMessage({ type: 'tweet', id }, RELAY_ORIGIN));
       } else if (wasJoined && !downAt) downAt = Date.now();
       if (d.state === 'connected') loadStep(2, 'socket connected - waiting for messages…');
-      else if (d.state === 'reconnecting' && !joined) loadTxt.textContent = 'socket dropped - retrying…';
+      else if (d.state === 'reconnecting' && !joined) loadSay('socket dropped - retrying…');
       // a dropped socket only interrupts once a join was live - relay
       // socket churn ahead of the first connect is the boot's own noise
       if (d.state === 'reconnecting' && wasJoined) syncShow('socket dropped - retrying…');
     } else if (d.type === 'wscause') {
       wsCause = `${d.code}${d.reason ? ' ' + d.reason : ''}`;
       if (joined || downAt) syncShow(`socket closed (${wsCause}) - retrying…`);
-      else loadTxt.textContent = `socket closed (${wsCause}) - retrying…`;
+      else loadSay(`socket closed (${wsCause}) - retrying…`);
       updateHeader();
     } else if (d.type === 'lines') {
       // a replay batch is what settles a deferred gap marker
