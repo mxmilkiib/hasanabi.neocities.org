@@ -31,7 +31,10 @@ not versions - the page ships continuously to Neocities.
   initiatives, sourced from the nec's election-night airtable.
   corrections from the same source: anthony bryson's long beach race
   is still live, tim denson lost his june athens mayor bid
-- padding below the dsa banner link in the tab's head
+- padding below the dsa banner link in the tab's head, plus a blank
+  spacer row above dsa resources
+- the results table now runs newest-first: the nov 3 general ballot
+  leads, then each primary group lists latest results down to feb
 
 ### Header
 - the user card pins a twitch avatar beside the name, drops the
