@@ -12,6 +12,18 @@ not versions - the page ships continuously to Neocities.
   collapses the row so chat takes everything
 
 ### Resources
+- media: daily dose's two similarly named accounts sit beside each
+  other as `yt · main` and `tiktok · yt · inactive`; news gains
+  regional and political-data coverage, with live tv split into
+  clearer regional groups
+- dsa: chapter outlets group by northeast/south/midwest/west,
+  chapter links order within each state, electeds separate former
+  officeholders, and the caucus table opens oldest-first by year
+- left: the parties list fills several country gaps, worker
+  organising and left orgs gain tighter subsections and
+  descriptions, and wellbeing sits above activism
+- libre: open data and open government gain additional civic and
+  national portals
 - dsa: the resources row seats above chapters, and the caucuses
   `sort:` label rides the table's top row inline, directly left of
   the wing/npc/age/a-z chips
@@ -28,6 +40,7 @@ not versions - the page ships continuously to Neocities.
 - the magazines row takes the wider 30em columns
 
 ### Help popup
+- the footer about link opens in a new tab
 - middle-clicking the popup's ✕ re-docks a moved or maximised panel
   to the centre position
 - the layout section regains its subsectioned group form - a
@@ -36,6 +49,8 @@ not versions - the page ships continuously to Neocities.
   dim styling for the regular text size and colour
 
 ### About page
+- the theme cards now lead with nightshade as the default, rename
+  the former default to old-default, and add ft and ftdark shots
 - the banner card wears a gold-to-purple gradient border over a
   darker #1d1d27 fill
 - resources seats below extras and alt twitch chat below layouts
