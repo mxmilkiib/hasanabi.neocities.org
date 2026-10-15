@@ -8,8 +8,8 @@ not versions - the page ships continuously to Neocities.
 ### Header
 - 2x2 swaps its left rail - the stats pane now sits over the emote
   picker, keeping the same proportions
-- the first-time tips bar takes the theme's green (`--good`)
-  background
+- the first-time tips bar takes a deep green background - the theme's
+  `--good` pulled toward the page bg for contrast with the text
 - new layout level 16, `3col chat vid/emotes/help`: two chat columns
   beside a rail stacking the stream, the emote picker and the help
   popup (▮▮▯?, `?split=3cveh`) - the first help-dock level to keep the
@@ -61,6 +61,10 @@ not versions - the page ships continuously to Neocities.
 - the magazines row takes the wider 30em columns
 
 ### Help popup
+- new `sticky position` option (`?hstick`): a floating popup resizes
+  about its own spot - a centred panel keeps its centre pinned, a
+  corner dock its corner, a dragged panel its centre
+- the repo footer's stray separator dot before `started:` goes
 - the layout list's `1col chat` bullet described the multi-column
   page-flip; that text moves to `2col chat` where it belongs, and
   `1col chat` reads as the single full-width column
