@@ -54,6 +54,9 @@ not versions - the page ships continuously to Neocities.
 - the magazines row takes the wider 30em columns
 
 ### Help popup
+- the layout list's `1col chat` bullet described the multi-column
+  page-flip; that text moves to `2col chat` where it belongs, and
+  `1col chat` reads as the single full-width column
 - the footer gains a blank spacer and puts repo dates under the
   github star button
 - each tab keeps its own scroll position while switching pages
