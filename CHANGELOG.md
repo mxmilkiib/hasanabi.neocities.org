@@ -21,6 +21,11 @@ not versions - the page ships continuously to Neocities.
   and enlarged-header states
 
 ### Resources
+- dsa: a `midterms 2026` section lands under electoral tools - nec
+  endorsements, ballotpedia's endorsement tracker, the election-night
+  results desk and the house handicappers - while electoral tools
+  moves up beside dsa resources, and caucuses and labor & campaigns
+  now sit above chapters
 - media: data.gov.uk joins political data's uk/eu row
 - dsa: primers and why-join essays join the opening row
 - media: daily dose's two similarly named accounts sit beside each
