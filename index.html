@@ -3338,8 +3338,12 @@
   // tweetCache holds the fetched tweet (text, author, media html), tweetWait
   // dedupes in-flight asks
   const tweetCache = new Map();
-  // cards collect while a row's tokens render, then land under the message
+  // cards collect while a row's tokens render, then land under the message;
+  // pendingKeys dedupes a url repeated in the same message to one preview
   const pendingTw = [];
+  const pendingKeys = new Set();
+  const queueCard = (key, html) => { if (!pendingKeys.has(key)) { pendingKeys.add(key); pendingTw.push(html); } };
+  const drainCards = () => { pendingKeys.clear(); return pendingTw.splice(0); };
   const twNorm = (s) => s.toLowerCase().replace(/https?:\/\/\S+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
   // compact age for a card stamp: 45m / 3h / 12d / 7mo / 4y ago
   const fmtAgo = (ts) => {
@@ -3685,8 +3689,8 @@
         const href = nitterHost && (prof || st) ? `${nitterHost}${path}`
           : prof ? `https://bird.makeup/users/${prof[1]}` : `https://x.com${path}`;
         if (st) {
-          if (tweetCache.has(st[1])) pendingTw.push(twCard(tweetCache.get(st[1]), text, st[1]));
-          else { reqTweet(st[1]); pendingTw.push(`<span class="twprev" data-twid="${st[1]}"></span>`); }
+          if (tweetCache.has(st[1])) queueCard(`tw:${st[1]}`, twCard(tweetCache.get(st[1]), text, st[1]));
+          else { reqTweet(st[1]); queueCard(`tw:${st[1]}`, `<span class="twprev" data-twid="${st[1]}"></span>`); }
         }
         const twDisp = `twitter.com${path}`;
         // the icon always asks for x.com: profile hrefs reroute to nitter
@@ -3730,10 +3734,10 @@
             // canonical key collapses /reels/ variants and cplk params
             const ipk = igKeyOf(ig.id);
             const ce = peekCache.get(ipk);
-            if (ce && peekGood(ce.p)) pendingTw.push(igInfoCard(ce.p, u, ipk));
+            if (ce && peekGood(ce.p)) queueCard(`ig:${ipk}`, igInfoCard(ce.p, u, ipk));
             else {
               peekAsk(ipk);
-              pendingTw.push(`<span class="igprev" data-igu="${escapeHTML(ipk)}" data-ighref="${u}"></span>`);
+              queueCard(`ig:${ipk}`, `<span class="igprev" data-igu="${escapeHTML(ipk)}" data-ighref="${u}"></span>`);
             }
           }
           if (yt) {
@@ -3745,11 +3749,11 @@
             const ypk = ytKeyOf(yt.id);
             const ce = peekCache.get(ypk);
             if (ce && peekGood(ce.p)) {
-              if (!(fossa && ytFossaHide(ce.p))) pendingTw.push(ytInfoCard(ce.p, u, yt.id, yt.start));
+              if (!(fossa && ytFossaHide(ce.p))) queueCard(`yt:${ypk}`, ytInfoCard(ce.p, u, yt.id, yt.start));
             }
             else {
               peekAsk(ypk);
-              pendingTw.push(`<span class="ytprev${fossa ? ' foss' : ''}" data-ytu="${escapeHTML(ypk)}" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} data-href="${u}"></span>`);
+              queueCard(`yt:${ypk}`, `<span class="ytprev${fossa ? ' foss' : ''}" data-ytu="${escapeHTML(ypk)}" data-ytid="${yt.id}"${yt.start ? ` data-ytt="${yt.start}"` : ''} data-href="${u}"></span>`);
             }
           }
           out.push(escapeHTML(pre) + `<a${icer || md ? ' class="rbw"' : home || shiny ? ' class="shimmer"' : ''} href="${u}" target="_blank" rel="noopener noreferrer" data-u="${escapeHTML(url)}">${lkIcoGrp(ico, cleanUrls ? cleanUrlDisp(url) : url)}</a>` + ytgl + escapeHTML(post));
@@ -4589,7 +4593,7 @@
         const sysHtml = linkifyEsc(escapeHTML(sysText))
           .replace(/\b(watched\s+)(\d[\d,]*)(\s+consecutive\s+streams?\b)/i, '$1<b class="rbw">$2</b>$3');
         html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}${mid}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}<b class="notice-label">[notice]</b> ${whoLink} ` +
-                `${sysHtml}${message ? (sysText ? ' - ' : '') + renderMessageHTML(message, tags.emotes, false, ch).html + pendingTw.splice(0).join('') : ''}</div>`;
+                `${sysHtml}${message ? (sysText ? ' - ' : '') + renderMessageHTML(message, tags.emotes, false, ch).html + drainCards().join('') : ''}</div>`;
         continue;
       }
       if (kind === 'NOTICE') {
@@ -4796,7 +4800,7 @@
           ? { html: '<br>' + message.split(' ').map((w) => linkifyEsc(escapeHTML(w))).join('<br>'), names: new Set() }
           : renderMessageHTML(message, tags.emotes, !!tags.bits, ch, shimmer, fossa, md);
       let msgHtml = rendered.html;
-      const twTail = pendingTw.splice(0).join('');
+      const twTail = drainCards().join('');
       // chatterino-style: messages made of only emotes render them bigger
       const mtoks = message.trim().split(/\s+/).filter(Boolean);
       // usage-age stats share one record across channels - the *Per bags
@@ -8282,7 +8286,7 @@
     const color = monoNames ? colorForName(name) : (ensureLegible(tags.color) || colorForName(name));
     if (login) { noteNick(login, name, color); pronSeen(login); }
     const rendered = renderMessageHTML(rawMsg, tags.emotes, false, CHANNEL);
-    const twTail = pendingTw.splice(0).join('');
+    const twTail = drainCards().join('');
     whisSeen = true;
     if (live) {
       if (whisEl.hidden) whisUnread++;
@@ -8303,7 +8307,7 @@
     const wname = me['display-name'] || (auth && auth.login) || 'you';
     const color = monoNames ? colorForName(wname) : (ensureLegible(me.color) || colorForName(wname));
     const rendered = renderMessageHTML(msg, me.emotes, false, CHANNEL);
-    pendingTw.splice(0);
+    drainCards();
     whisSeen = true;
     whisLog.insertAdjacentHTML('beforeend',
       `<div role="article" class="row whisper out"><span class="time">${fmtRowTime(new Date())}</span>` +

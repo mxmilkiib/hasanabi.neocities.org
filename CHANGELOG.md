@@ -70,6 +70,11 @@ not versions - the page ships continuously to Neocities.
 - header content centres within each wrapped row, including narrow
   and enlarged-header states
 
+### Chat
+- a url repeated in the same message queues only one preview card -
+  tweet, youtube and instagram placeholders dedupe per row on the
+  canonical key
+
 ### Resources
 - dsa: a `midterms 2026` section lands under electoral tools - nec
   endorsements, ballotpedia's endorsement tracker, the election-night
