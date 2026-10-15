@@ -2594,6 +2594,9 @@
     cursor: pointer; white-space: nowrap; }
   #fontMenu button:hover, #splitMenu button:hover, #fontMenu button:focus-visible, #splitMenu button:focus-visible { background: var(--line); }
   #fontMenu button.on, #splitMenu button.on { color: var(--accent); font-weight: 700; }
+  #splitMenu button.on { background: var(--line);
+    box-shadow: inset 2px 0 0 var(--accent);
+    text-shadow: 0 0 7px color-mix(in srgb, var(--accent) 55%, transparent); }
   #splitMenu button[disabled] { opacity: .4; cursor: default; }
   #splitMenu button .sg { display: inline-block; min-width: 2.6em; }
   body.hdrgraph #fontMenu, body.hdrgraph #splitMenu { display: none; }
