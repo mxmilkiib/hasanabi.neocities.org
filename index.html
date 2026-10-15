@@ -2633,7 +2633,7 @@
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription<sup>†</sup></span></div>
     <div><b>months</b> <span>gradient: <span id="helpSubgList"></span> - shades counted chips teal → accent as the count climbs to 120 months; a counted chip's tooltip restates the span - say 2yr, 10m<sup>†</sup></span></div>
-    <div><b>nick column</b> <span><span id="helpNickcolList"></span> - 'on' drops every nick's left edge on one stop - the widest leading prefix in view (time, channel tag, chips, badges) sets it and each name pads up to it<sup>†</sup></span></div>
+    <div><b>nick column</b> <span><span id="helpNickcolList"></span> - drops every nick's edge on one stop - the widest leading prefix in view (time, channel tag, chips, badges) sets it and each name pads up to it; left-edge aligns the names' starts, right-edge the ends so message text columns up after them<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
@@ -4328,8 +4328,9 @@
     // had instead of clobbering the card indent to flush-left
     if (!nm || !nm.offsetWidth) return null;
     // the nick column pads every name to one x - quotes and cards anchor
-    // on the padded name itself, not the badge cluster's leading edge
-    if (nickCol) return nm.offsetLeft;
+    // on the padded name itself, not the badge cluster's leading edge.
+    // under right-edge the shared edge is the name's trailing side
+    if (nickCol) return nm.offsetLeft + (nickCol === 2 ? nm.offsetWidth : 0);
     let anchor = nm;
     for (let el = nm.previousElementSibling; el; el = el.previousElementSibling) {
       if (!el.matches('img.badge, .role, .aux')) break;
@@ -6120,7 +6121,7 @@
     else if (a.classList.contains('helpShadow')) { setShadow(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpSub')) { subMode = +a.dataset.idx; applySubMode(); saveOpts(); }
     else if (a.classList.contains('helpSubg')) { setSubGrad(+a.dataset.idx === 1); saveOpts(); }
-    else if (a.classList.contains('helpNickcol')) { setNickCol(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpNickcol')) { setNickCol(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpEonly')) { emoteMode = +a.dataset.idx; applyEmoteMode(); saveOpts(); }
     else if (a.classList.contains('helpSplit')) { setSplit(+a.dataset.idx + 1); saveOpts(); }
     else if (a.classList.contains('helpVideo')) { const v = +a.dataset.idx === 1; railEl.hidden ? setVideo(v) : setRailVid(v ? 'dock' : 'off'); saveOpts(); }
@@ -8686,7 +8687,7 @@
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
-      subMode, subg: subGrad ? 1 : 0, ncol: nickCol ? 1 : 0,
+      subMode, subg: subGrad ? 1 : 0, ncol: nickCol,
       zebra: zebraLevel,
       pause: pauseOnText,
       scrollback: MAX_MESSAGES,
@@ -8820,7 +8821,7 @@
       applySubMode();
     }
     if (o.subg !== undefined) setSubGrad(!!o.subg);
-    if (o.ncol !== undefined) setNickCol(!!o.ncol);
+    if (o.ncol !== undefined) setNickCol(Math.min(2, +o.ncol || 0));
     if (o.zebra != null) { const v = o.zebra === true ? 2 : +o.zebra; if (Number.isFinite(v)) setZebra(v); }
     if (typeof o.pause === 'boolean') setPause(o.pause);
     if (SCROLLBACK_SIZES.includes(o.scrollback)) setScrollback(o.scrollback);
@@ -9623,17 +9624,18 @@
     repin();
   }
 
-  // ---- nick column: every chatter's name lands on one left edge ----
-  // the widest leading prefix in view (time, channel tag, chips, badges)
-  // sets the stop; each name carries margin-left topping its own prefix
-  // up to it, so the badges stay put and the nick slides right. off
-  // leaves stamped pads dead under the main:not(.nickcol) guard - no
-  // sweep needed - and rows measure flat again
-  let nickCol = false;
+  // ---- nick column: every chatter's name lands on one edge ----
+  // left-edge pads each name's margin-left so names start on the widest
+  // leading prefix in view (time, channel tag, chips, badges); right-edge
+  // aligns the names' far sides so the message bodies column up after
+  // them. off leaves stamped pads dead under the main:not(.nickcol)
+  // guard - no sweep needed - and rows measure flat again
+  let nickCol = 0;
   let ncwPx = 0;
   const nickQ = new Set();
   let nickQd = false;
-  // a row's natural nick edge - offsetLeft minus the pad already
+  // a row's natural nick edge - its name's leading edge under left-edge,
+  // its trailing edge under right-edge, either way minus the pad already
   // stamped. hidden rows (stale split pages, filter-collapsed) read 0
   // and keep their pad rather than dragging the stop down
   function nickNat(r) {
@@ -9641,7 +9643,8 @@
     if (!nm || !nm.offsetWidth) return null;
     // rect.left carries sub-pixel offsetLeft loses - int pads left the
     // edges wobbling a pixel either side of the stop
-    return nm.getBoundingClientRect().left - r.getBoundingClientRect().left - (parseFloat(nm.style.marginLeft) || 0);
+    const rc = nm.getBoundingClientRect();
+    return (nickCol === 2 ? rc.right : rc.left) - r.getBoundingClientRect().left - (parseFloat(nm.style.marginLeft) || 0);
   }
   // writes one row's pad up to `stop`; moved rows collect for a re-pin
   // pass that runs after all writes, so rqIndent's reads land on the
@@ -9668,7 +9671,9 @@
   function nickSettle(rows) {
     const edges = rows.map((r) => {
       const nm = r.querySelector(':scope > .name');
-      return nm && nm.offsetWidth ? [nm, nm.getBoundingClientRect().left - r.getBoundingClientRect().left] : null;
+      if (!nm || !nm.offsetWidth) return null;
+      const rc = nm.getBoundingClientRect();
+      return [nm, (nickCol === 2 ? rc.right : rc.left) - r.getBoundingClientRect().left];
     }).filter(Boolean);
     if (!edges.length) return;
     const mx = Math.max(...edges.map((e) => e[1]));
@@ -9707,17 +9712,17 @@
       nickSettle(rows);
     });
   }
-  function setNickCol(on) {
-    nickCol = !!on;
+  function setNickCol(mode) {
+    nickCol = mode;
     ncwPx = 0;
-    mainEl.classList.toggle('nickcol', nickCol);
+    mainEl.classList.toggle('nickcol', !!nickCol);
     if (nickCol) {
       nickFitAll();
       // webfonts shift every prefix a pixel or two when they land - one
       // late re-fit settles the stop on the loaded metrics
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (nickCol) nickFitAll(); });
     }
-    markHelp('helpNickcol', nickCol ? 1 : 0);
+    markHelp('helpNickcol', nickCol);
   }
 
   function stepSub(dir) {
@@ -10331,7 +10336,7 @@
     if (shadLevel) q.set('shadow', SHADOW_NAMES[shadLevel]);
     if (SUB_MODES[subMode] !== 'num-left') q.set('sub', SUB_MODES[subMode]);
     if (subGrad) q.set('subg', '1');
-    if (nickCol) q.set('ncol', '1');
+    if (nickCol) q.set('ncol', nickCol === 2 ? 'right' : 'left');
     if (EMOTE_MODES[emoteMode] !== 'inline') q.set('eonly', EMOTE_MODES[emoteMode]);
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
     else if (document.body.classList.contains('hdrmin')) q.set('min', '');
@@ -15101,7 +15106,7 @@
     if (q.has('shadow')) { const v = q.get('shadow'); const i = SHADOW_NAMES.indexOf(v); setShadow(i >= 0 ? i : (+v | 0)); }
     if (q.has('sub')) { const i = SUB_MODES.indexOf(q.get('sub')); if (i >= 0) { subMode = i; applySubMode(); } }
     if (q.has('subg')) setSubGrad(flag('subg'));
-    if (q.has('ncol')) setNickCol(flag('ncol'));
+    if (q.has('ncol')) setNickCol(['right', 'right-edge', '2'].includes(q.get('ncol')) ? 2 : flag('ncol') ? 1 : 0);
     if (q.has('eonly')) { const i = EMOTE_MODES.indexOf(q.get('eonly')); if (i >= 0) { emoteMode = i; applyEmoteMode(); } }
     if (q.has('help')) {
       const v = q.get('help'), i = HELP_MODES.indexOf(v);
@@ -15253,7 +15258,7 @@
   const HELP_LISTS = {
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
-    helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'on'], helpEonly: EMOTE_MODES,
+    helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
@@ -15403,7 +15408,7 @@
   markHelp('helpShadow', shadLevel);
   markHelp('helpSub', subMode);
   markHelp('helpSubg', subGrad ? 1 : 0);
-  markHelp('helpNickcol', nickCol ? 1 : 0);
+  markHelp('helpNickcol', nickCol);
   markHelp('helpEonly', emoteMode);
   markHelp('helpSplit', splitLevel - 1);
   markHelp('helpVideo', vidBox.hidden ? 0 : 1);
