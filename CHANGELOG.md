@@ -3690,5 +3690,5 @@ Initial import (synced from hasan.html) plus a same-day feature burst:
   status.d420.de
 - Font picker with JetBrains Mono, Roobert, Terminus and more; URL
   params for shareable configurations
-- README covering frontend + relay; AGPL-3.0 licensed; repo files kept
+- README covering frontend + relay; AGPL-3.0-or-later licensed; repo files kept
   off the deployed site via .neocitiesignore
