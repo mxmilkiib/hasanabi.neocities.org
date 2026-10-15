@@ -18,5 +18,5 @@
 <text x="350" y="392" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">a second-screen/accessibility web tool with</text>
 <text x="350" y="430" font-family="JetBrains Mono" font-size="28" fill="#9a9aa5">organizing info, media links, and other extras</text>
 <text x="350" y="486" font-family="JetBrains Mono" font-size="27" fill="#6a6a75" xml:space="preserve"><tspan fill="#e8a33d">hasanabi.neocities.org</tspan><tspan fill="#a9a9b4"> for </tspan><tspan fill="#b9a5f0">twitch.tv/hasanabi</tspan></text>
-<rect x="350" y="520" width="728" height="4" fill="url(#ruleGrad)"/>
+<rect x="350" y="520" width="698" height="4" fill="url(#ruleGrad)"/>
 </svg>
