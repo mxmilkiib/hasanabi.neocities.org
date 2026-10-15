@@ -48,6 +48,10 @@ not versions - the page ships continuously to Neocities.
   head - and the etc, layout and ☻ subsection bodies drop the small
   dim styling for the regular text size and colour
 
+### Themes
+- nightshade's zebra drops mild → faint on a fresh profile or preset
+  re-pick - a saved zebra level keeps its pick
+
 ### About page
 - the theme cards now lead with nightshade as the default, rename
   the former default to old-default, and add ft and ftdark shots
