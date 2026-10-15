@@ -472,7 +472,7 @@ editing a URL.
 | `shadow` | `0`–`2` | text shadow level |
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
-| `subg` | flag / `0` | subscription labels sweep teal → violet → red as the month count rises (up to 120 months); on by default, `0` disables |
+| `subg` | flag / `0` | subscription labels sweep teal → violet → red as the month count rises (up to 84 months); on by default, `0` disables |
 | `ncol` | flag / `left` / `right` | nick alignment - every chatter's name lands on one edge (the widest leading prefix in view sets the stop); `left` aligns the names' starts, `right` the ends so message text columns up after them |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |

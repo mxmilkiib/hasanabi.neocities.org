@@ -981,7 +981,7 @@
      keys off the placeholder's exact title rather than [title] alone */
   .role.sub[title="No subscriber months reported"] { color: var(--text-dim); }
   /* ?subg: a counted chip sweeps teal → violet → hot red on --subp,
-     its month count as a % of the 120-month ceiling; the longer-hue
+     its month count as a % of the 84-month ceiling; the longer-hue
      oklch path arcs through the accent's violet on the way up */
   body.subgrad .role.sub[data-mo] { color: color-mix(in oklch longer hue, #4fbecd, #f43f5e var(--subp, 0%)); }
   /* the bits chip and first-time poster celebrate in the shared rainbow
@@ -2667,7 +2667,7 @@
     <div><b>≡</b> <span>row separator shades: <span id="helpLinesList"></span><sup>†</sup></span></div>
     <div><b>◷</b> <span>message timestamps: <span id="helpTimesList"></span><sup>†</sup></span></div>
     <div><b><span style="font-size:.8em">Ⓢ</span></b> <span>sub badge: <span id="helpSubList"></span> - the chip shows reported subscriber months; dim -- / [sub --] means no count was reported, not confirmed zero subscription<sup>†</sup></span></div>
-    <div><b>months</b> <span>gradient: <span id="helpSubgList"></span> - shades counted chips teal → violet → red as the count climbs to 120 months; a counted chip's tooltip restates the span - say 2yr, 10m<sup>†</sup></span></div>
+    <div><b>months</b> <span>gradient: <span id="helpSubgList"></span> - shades counted chips teal → violet → red as the count climbs to 84 months; a counted chip's tooltip restates the span - say 2yr, 10m<sup>†</sup></span></div>
     <div><b>nick alignment</b> <span><span id="helpNickcolList"></span> - drops every nick's edge on one stop - the widest leading prefix in view (time, channel tag, chips, badges) sets it and each name pads up to it; left-edge aligns the names' starts, right-edge the ends so message text columns up after them<sup>†</sup></span></div>
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -4723,8 +4723,8 @@
       const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
       // a counted chip carries the months in data-mo, restates them as
       // Yyr, Xm on the tooltip, and stamps --subp (the count as a % of
-      // the 120-month ceiling) for the subg gradient to read
-      const subSt = (subM ? `--subp:${Math.min(100, Math.round(+subM[1] / 120 * 100))}%` : '') +
+      // the 84-month ceiling) for the subg gradient to read
+      const subSt = (subM ? `--subp:${Math.min(100, Math.round(+subM[1] / 84 * 100))}%` : '') +
         (SUB_MODES[subMode] === 'num-left' ? (subM ? ';' : '') + 'margin-right:6px' : '');
       // bots never carry a sub count - skip the placeholder chip entirely
       const subCnt = !subM ? '--' : months;
@@ -9598,7 +9598,7 @@
     if (!mo) return;
     sub.dataset.mo = mo;
     sub.title = subAgeTxt(mo);
-    sub.style.setProperty('--subp', `${Math.min(100, Math.round(mo / 120 * 100))}%`);
+    sub.style.setProperty('--subp', `${Math.min(100, Math.round(mo / 84 * 100))}%`);
   };
   // subg: counted chips shade teal → violet → red with the month count
   let subGrad = true;

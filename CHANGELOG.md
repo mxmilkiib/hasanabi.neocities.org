@@ -107,8 +107,8 @@ not versions - the page ships continuously to Neocities.
   corner dock its corner, a dragged panel its centre
 - the months gradient turns on by default (`?subg=0` to disable) and
   now sweeps teal → violet → red on a longer-hue oklch arc - the
-  longer path passes through the theme accent's violet band and the
-  high end lands on hot red
+  longer path passes through the theme accent's violet band, and the
+  high end caps at full red by 7 years (84 months)
 - the repo footer's stray separator dot before `started:` goes
 - the layout list's `1col chat` bullet described the multi-column
   page-flip; that text moves to `2col chat` where it belongs, and
