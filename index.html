@@ -6145,8 +6145,12 @@
     row.classList.remove('jump'); void row.offsetWidth; row.classList.add('jump');
   });
   // tabs split the panel into config/help / resources / authors pages
+  const helpScroll = helpPanel.querySelector('.hp-scroll');
+  const htabScroll = new Map();
   function switchTab(id) {
     const statsTab = document.getElementById('htabStats');
+    const curTab = helpPanel.querySelector('.htabpage:not([hidden])')?.id;
+    if (curTab) htabScroll.set(curTab, helpScroll.scrollTop);
     // stats docks out of the panel in rail mode - its tab stays live and
     // borrowing floats the same node over the rail; a closed panel (or
     // anything still asking pre-dock) lands on config instead
@@ -6160,6 +6164,7 @@
       a.setAttribute('aria-selected', String(on));
     });
     helpPanel.querySelectorAll('.htabpage').forEach((p) => p.hidden = p.id !== id);
+    helpScroll.scrollTop = htabScroll.get(id) || 0;
     if (id !== 'htabStats') statsReturn();
     if (id === 'htabStats') setTimeout(renderStats); // the maps it reads init below; defer past the first pass
     try { localStorage.setItem('hasan-htab', id); } catch {}
