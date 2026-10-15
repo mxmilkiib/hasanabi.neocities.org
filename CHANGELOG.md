@@ -36,8 +36,20 @@ not versions - the page ships continuously to Neocities.
 - the results table now runs newest-first: the nov 3 general ballot
   leads, then each primary group lists latest results down to feb
 - the slate splits into two tables - 'primary results' (past) and
-  'nov 3 general ballot' (future) - and the state/locale tag breaks
-  out of the race cell into its own accent column
+  'nov 3 general ballot' (future) - and the packed location tag
+  breaks out into two columns: an accent 'state' column holding the
+  bare 2-letter code, and a 'loc' column for the district or
+  locality ('07', 'ann arbor', 'chittenden 16'); legislative races
+  shed their district to loc so race reads as the office alone
+  ('house 8b duluth' -> mn | 8b duluth | house). la city council
+  rows gain proper ca/los angeles tags and the columbus charter
+  amendment files under oh/columbus
+- dsa resources picks up my.dsa (member portal), the merch store,
+  the npec political-education hub, and the member-gated metro dc
+  and denver wikis; dsa chapters becomes a sortable table - one row
+  per chapter (123) with region and state columns, a pinned chapter
+  map row carrying region/st/a-z sort chips, and mid-missouri's
+  domain-squatted note preserved as tail text
 
 ### Header
 - the user card pins a twitch avatar beside the name, drops the
