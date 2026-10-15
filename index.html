@@ -3464,9 +3464,9 @@
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
     for (const node of nodes) {
-      if (node.parentElement.closest('.time,.reply,.aux,a,.hbar')) continue;
       const rowEl = node.parentElement.closest('.row');
-      const rowCh = (rowEl || {}).dataset || {};
+      if (!rowEl || node.parentElement.closest('.time,.reply,.aux,a,.hbar')) continue;
+      const rowCh = rowEl.dataset;
       const em = emotesOf(rowCh.ch || CHANNEL), eml = emotesLcOf(rowCh.ch || CHANNEL);
       const parts = node.nodeValue.split(/(\s+)/);
       if (!parts.some((t) => em[t] || eml[t.toLowerCase()])) continue;
