@@ -348,7 +348,16 @@
     border-bottom: 1px solid var(--line);
     cursor: pointer;
     text-align: center;
+    animation: hint-shade 9s ease-in-out infinite;
   }
+  /* first-time tips drift through muted violets without leaving the
+     theme's readable text range */
+  @keyframes hint-shade {
+    0%, 100% { color: color-mix(in oklch, var(--text-dim) 62%, #6f6a88 38%); }
+    34% { color: color-mix(in oklch, var(--text) 52%, #a08cff 48%); }
+    67% { color: color-mix(in oklch, var(--text-dim) 45%, #9b93ad 55%); }
+  }
+  @media (prefers-reduced-motion: reduce) { #hint { animation: none; } }
   body.hdrmin #hint { display: none; }
   /* the minimised strip carries just the –, pinned at the right end */
   body.hdrmin header { justify-content: flex-end; gap: 4px; padding: 0 4px; }

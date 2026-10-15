@@ -10,6 +10,7 @@ not versions - the page ships continuously to Neocities.
   floating look stacked over the single chat column (▶▮, `?split=1cv`)
   - the first rail-less level to own the video, and hiding it
   collapses the row so chat takes everything
+- the first-time tips bar breathes through muted purple-grays
 
 ### Resources
 - media: daily dose's two similarly named accounts sit beside each
