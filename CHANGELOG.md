@@ -60,6 +60,8 @@ not versions - the page ships continuously to Neocities.
   re-pick - a saved zebra level keeps its pick
 
 ### About page
+- the about and social-card copy broadens the description to the
+  general and multi-stream tool
 - the theme cards now lead with nightshade as the default, rename
   the former default to old-default, and add ft and ftdark shots
 - the banner card wears a gold-to-purple gradient border over a
