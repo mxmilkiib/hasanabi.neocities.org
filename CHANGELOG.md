@@ -44,7 +44,7 @@ not versions - the page ships continuously to Neocities.
   heads the row and the archive.org socialist and labor songs
   songbook follows it
 - extra links: the suttas before no gods no masters use syllabified
-  titles
+  titles, with mn 22's raft simile joining them
 - the magazines row takes the wider 30em columns
 
 ### Help popup
