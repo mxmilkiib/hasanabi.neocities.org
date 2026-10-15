@@ -61,6 +61,7 @@ not versions - the page ships continuously to Neocities.
 - the magazines row takes the wider 30em columns
 
 ### Help popup
+- the tab names go orange - the amber the footer links wear
 - new `sticky position` option (`?hstick`): a floating popup resizes
   about its own spot - a centred panel keeps its centre pinned, a
   corner dock its corner, a dragged panel its centre
