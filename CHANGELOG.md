@@ -3,6 +3,52 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions - the page ships continuously to Neocities.
 
+## 2026-10-15
+
+### Header
+- new layout level 15, `1col vid/chat`: the stream keeps its framed
+  floating look stacked over the single chat column (▶▮, `?split=1cv`)
+  - the first rail-less level to own the video, and hiding it
+  collapses the row so chat takes everything
+
+### Resources
+- dsa: the resources row seats above chapters, and the caucuses
+  `sort:` label rides the table's top row inline, directly left of
+  the wing/npc/age/a-z chips
+- the channels/streams column heads stop overlapping the first row -
+  the step-down selector looked for `grid-row` but a set gridRow +
+  gridColumn serialises as `grid-area`, so nothing stepped; lemmy
+  links also claim their own column pinned after reddit instead of
+  aliasing into it
+- music: radiolise webradio joins, the wikipedia socialist-songs list
+  heads the row and the archive.org socialist and labor songs
+  songbook follows it
+- extra links: saṁghasāmaggīsutta (iti 19, sujato) joins the suttas
+  before no gods no masters
+- the magazines row takes the wider 30em columns
+
+### Help popup
+- middle-clicking the popup's ✕ re-docks a moved or maximised panel
+  to the centre position
+- the layout section regains its subsectioned group form - a
+  how-the-columns-read intro, then a bullet list under each family
+  head - and the etc, layout and ☻ subsection bodies drop the small
+  dim styling for the regular text size and colour
+
+### About page
+- the banner card wears a gold-to-purple gradient border over a
+  darker #1d1d27 fill
+- resources seats below extras and alt twitch chat below layouts
+- the comparison table transposes - clients head the columns,
+  features the rows - gaining irc and the official app as clients and
+  a stack of feature rows: kind, watch, multi-chan, foss, notifs,
+  search, custom, emote picker, reply/threads, archive, link
+  previews, mod tools, stats, badges, paints, browse, vods,
+  resources, layouts, obs overlay, autocomplete, chat replay,
+  filters, backfill, user cards, pronouns, plugins and ads; yes
+  cells mark green, and the table bleeds to viewport width before
+  scrolling
+
 ## 2026-10-14
 
 ### Header
@@ -103,23 +149,70 @@ not versions - the page ships continuously to Neocities.
 - open social's peertube entry gains the ngi impact story link
 - extra links gains no gods no masters 1-5 - the anarchism history
   doc parts on kolektiva, numbered links under the sutta
+- the sanctions row swaps its palestine-only links for real trackers
+  plus uk/us statutes and israel measures; psc and uscpr move to
+  boycott
+- news: declassified uk gets its own line and the repeated
+  intercept/novara/drop-site trio drops out
+- tenants unions seats a wikipedia entry above intl, the rent strike
+  link joining it; the media unblock row takes the wider link
+  columns
+- usa pol's dsa sub-links get their own headed row
+- rose garden links its caucus factions primer from the dsa resources
+  row, and afrosocialists gains a 100 days of socialism article link
+- the dsa tab spells its name link out as democratic socialists of
+  america and gains electeds, labor & campaigns, ydsa and governance
+  sections
+- media gains eight more left essay channels
+- libre opens on the commons row - it gains shared work and shared
+  knowledge groups (omnia sunt communia, global + digital commons,
+  freedom of information) while the means gain open system, open
+  collaboration, peer production, mass collaboration, public
+  copyright license and free license (moved over from free culture);
+  open standards seats below free culture with open api, a
+  standards-bodies cluster and vendor lock-in as the foil; free
+  software gains foss, the open-source license and the open-source
+  software movement; open design gains open innovation; shared
+  knowledge gains open weights
+- the left tab reshuffles: spaces returns from libre below co-ops and
+  gains land (common land, community forestry, gardening), an
+  intentional community subsection (ic.org, diggers & dreamers,
+  christiania) and affinity space; the co-ops row clusters into
+  concepts, models, finance, history, federations, orgs and platform -
+  cooperative and co-op forms lead it, cooperative banking and the
+  credit unions fill finance, movement history joins history, and
+  the federation concept plus the ica head federations; conduct
+  opens with openness and prosocial behavior, nonviolent
+  communication getting its own cluster; organising gains radical
+  transparency and occupy hand signals; reformism and participatory
+  seat under left parties (participatory culture leads, participatory
+  media joins), dual power, mutual aid and aid groups chain under
+  participatory, and left orgs closes the unions block below
+  organising; blank dashed seps split the blocks here and in libre
+- channels/streams loses its home head, the deprogram service column
+  renames to extras, and i've had it's substack link joins that
+  column
 
 ### Help popup
 - the stats tab's storage rows run in wider 26em columns
 - the emote picker's sources note links out to 7tv, bttv, ffz and
   twitch
-- a few words in the help text print as their channel emotes: the
-  live alert's system, the scrollback SAVED, the stats glorp, and
-  the user card's mods + timeout
+- the stats tab's glorp tally prints the word as its channel emote
 - the remaining em dashes read as hyphens (meta description, help
   separators, the empty 'seen' stamp)
 - the layout section seats each level's chip beside its own
   description bullet instead of bunching them after the family head
-- the config tab reads help/⚙ - a settings cog in place of 'conf'
+- the config tab reads help/⚙ - a monochrome settings cog in place
+  of 'conf'
 - the copy-url row's popup-state toggle becomes a page pick: off, or
-  the tab the url opens the popup on. the `help/⚙` tab shortens to
-  `help`, and `?htab=` emits `help` for it (`config` still resolves)
+  the tab the url opens the popup on - `?htab=` emits `help` for the
+  config tab (`config` still resolves), and a copied url drops the
+  params that restate defaults (no theme=nightshade, no help=panel
+  beside an htab)
 - the theme slots sit under the copy-settings button
+- the tab's dashed separator rows print a three-em dash again in the
+  base text colour, with air above and below - a bare nbsp stays a
+  blank spacer
 - an `alt twitch chat` section lands above the about footer,
   subsectioned by platform: web (jchat, kapchat, raftchat,
   multitwitch, the official popout), desktop (chatterino + its 7tv
@@ -138,7 +231,7 @@ not versions - the page ships continuously to Neocities.
   old canned-chat stub
 - chat and extras grow to four groups each ('marks & mods', 'the
   chrome'), an `alt twitch chat` comparison table lines this page up
-  against fifteen other clients, the layout subsection titles go gold
+  against sixteen other clients, the layout subsection titles go gold
   and the shots centre under them
 
 ## 2026-10-13
