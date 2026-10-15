@@ -13,6 +13,7 @@ not versions - the page ships continuously to Neocities.
 - the first-time tips bar breathes through muted purple-grays
 
 ### Resources
+- media: data.gov.uk joins political data's uk/eu row
 - media: daily dose's two similarly named accounts sit beside each
   other as `yt · main` and `tiktok · yt · inactive`; news gains
   regional and political-data coverage, with live tv split into
