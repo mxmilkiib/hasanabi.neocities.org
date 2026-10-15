@@ -6,6 +6,14 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-15
 
 ### Header
+- boot-phase socket churn stops flapping the progress strip -
+  pre-first-connect retries all read `socket connecting - retrying…`
+  instead of cycling dropped/closed/connected phrasings, and once a
+  join was live a drop still narrates as before
+- a failed decapi poll no longer flaps the stream offline or leaks
+  its error sentence as the title - an unparseable uptime keeps the
+  last verdict and an error-body title renders blank until the next
+  good poll
 - 2x2 swaps its left rail - the stats pane now sits over the emote
   picker, keeping the same proportions
 - the first-time tips bar takes a deep green background - the theme's
