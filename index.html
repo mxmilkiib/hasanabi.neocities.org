@@ -258,6 +258,7 @@
     flex: none;
     display: flex;
     align-items: center;
+    align-content: center;
     justify-content: space-between;
     flex-wrap: wrap;
     /* a bare gap: shorthand would also widen the row gap; keep them apart */
@@ -279,15 +280,14 @@
   }
   /* the corner pair is out of flow, so in labels mode their labels anchor
      beside them by hand; – slides left to make room for the help label */
-  .hdr-lbl.corner { position: absolute; top: 0; line-height: 26px; }
+  .hdr-lbl.corner { position: absolute; top: 1px; line-height: 26px; }
   .hdr-lbl.c-help { right: 40px; }
   .hdr-lbl.c-hdr { right: 112px; }
   body.hdrlbl:not(.hdrgraph):not(.hdrmin) #hdrMin { right: 80px; }
   body.hdrlbl:not(.hdrgraph):not(.hdrmin) header { --hdrres: 172px; }
-  /* pinned to the first header line, not the box centre - when labels make
-     .hdr-side wrap onto a second line the buttons stay put up top. top
-     matches the header's padding so they line up with the flowing row */
-  #helpBtn, #hdrMin { position: absolute; top: 0; }
+  /* the corner pair anchors to the first flex line's centre rather than
+     the whole wrapped header */
+  #helpBtn, #hdrMin { position: absolute; top: 1px; }
   /* Gold ? against the dim chrome; the id rule holds it through :hover
      and .on, whose accent border still marks the open state */
   #helpBtn { right: 8px; font-weight: 700; border-width: 2px; color: #e8b73e; }
@@ -390,11 +390,6 @@
     font-size: 1.27em;
     font-weight: 600;
     min-width: 0;
-    /* pin to the line top like the buttons - centring against the line
-       box left the channel block sitting visibly lower than them; the
-       2px nudge restores its old offset under the 3px header padding */
-    align-self: flex-start;
-    margin-top: 2px;
   }
   #channelName { color: inherit; text-decoration: none; }
   #channelName:hover { text-decoration: underline; }
@@ -1553,10 +1548,9 @@
   .reply.rq .up { font-style: normal; }
   .row.jump, #htabAuth .linkcols > i.jump { animation: jumpflash 1.4s ease-out; }
   @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
-  /* align-self flex-start pins the cluster to the line's top so the
-     buttons level with the absolute ?/- pair instead of centring
-     against a taller line (big header font, wrapped labels) */
-  .hdr-side { display: flex; align-items: center; gap: 6px; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; align-self: flex-start; }
+  /* the control cluster centres in its own flex line too, including
+     wrapped narrow and enlarged-header states */
+  .hdr-side { display: flex; align-items: center; align-content: center; gap: 6px; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; }
   .hdr-btn {
     background: none;
     border: 1px solid var(--line);
@@ -2560,6 +2554,12 @@
     header { padding: 0 8px; --hdrpad: 8px; --hdrres: 92px; padding-right: var(--hdrres); column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
     #helpBtn { right: 6px; }
     #hdrMin { right: 48px; }
+    /* labels keep their 2px lead-in beside the wider touch buttons */
+    .hdr-lbl.c-help { right: 46px; }
+    .hdr-lbl.c-hdr { right: 120px; }
+    /* 32px touch targets overhang the 28px first line by 2px each way */
+    #helpBtn, #hdrMin { top: -2px; }
+    body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { top: 0; }
     body.hdrmin #hdrMin { right: 48px; }
     .hdr-side { gap: 4px; }
     .hdr-btn { height: 32px; }

@@ -11,6 +11,8 @@ not versions - the page ships continuously to Neocities.
   - the first rail-less level to own the video, and hiding it
   collapses the row so chat takes everything
 - the first-time tips bar breathes through muted purple-grays
+- header content centres within each wrapped row, including narrow
+  and enlarged-header states
 
 ### Resources
 - media: data.gov.uk joins political data's uk/eu row
