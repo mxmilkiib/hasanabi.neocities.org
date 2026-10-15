@@ -16,6 +16,7 @@ not versions - the page ships continuously to Neocities.
 
 ### Resources
 - media: data.gov.uk joins political data's uk/eu row
+- dsa: primers and why-join essays join the opening row
 - media: daily dose's two similarly named accounts sit beside each
   other as `yt · main` and `tiktok · yt · inactive`; news gains
   regional and political-data coverage, with live tv split into
