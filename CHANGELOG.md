@@ -26,6 +26,12 @@ not versions - the page ships continuously to Neocities.
   races accent - lifts each race's state tag bold, and grows a camp
   column of verified campaign sites; a 'for candidates' row links the
   nec endorsement process and chapter resources
+- the slate table gains the nov 3 general ballot - 63 endorsed
+  candidates (congress, state leg, municipal, school) plus 26 ballot
+  initiatives, sourced from the nec's election-night airtable.
+  corrections from the same source: anthony bryson's long beach race
+  is still live, tim denson lost his june athens mayor bid
+- padding below the dsa banner link in the tab's head
 
 ### Header
 - the user card pins a twitch avatar beside the name, drops the
