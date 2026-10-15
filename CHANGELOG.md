@@ -11,6 +11,9 @@ not versions - the page ships continuously to Neocities.
   essays and friends, instead of bare news/commentary/essays tags
 - lady izdihar joins the essays group - soviet history educator with
   site, ig, tiktok, x and patreon links
+- the adam friedland show joins podcasts - the ex-cum town celebrity
+  interview show with site, patreon, ig, tiktok, x, bsky and a clips
+  channel
 - democracy docket joins the dsa tab's electoral tools - marc elias'
   voting-rights litigation tracker
 - the midterms 2026 table grows from 8 congressional primaries to the
