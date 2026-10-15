@@ -18,7 +18,8 @@ not versions - the page ships continuously to Neocities.
   clearer regional groups
 - dsa: chapter outlets group by northeast/south/midwest/west,
   chapter links order within each state, electeds separate former
-  officeholders, and the caucus table opens oldest-first by year
+  officeholders, and the caucus table opens oldest-first by year;
+  the main org link also sizes up a step
 - left: the parties list fills several country gaps, worker
   organising and left orgs gain tighter subsections and
   descriptions, and wellbeing sits above activism
