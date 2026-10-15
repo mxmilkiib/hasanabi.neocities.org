@@ -2594,7 +2594,8 @@
     <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> multiple layouts of the page are available via this menu. the column layouts offer a new reading experience, where the chat in one column lingers until the chat another column reaches it's end, after which the older chat in a column is grayed out until the new chat reaches it<ul><li><span class="splitSeat" data-split="0"></span> a column fills top-to-bottom, then flips to the next<sup>†</sup></li><li>the button's click lists every layout while the wheel cycles</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - the rest of the family runs one</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="7"></span> a vertical split with stats under the emotes and the chat under the video</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li></ul></i><i><b>+help</b><ul><li><span class="splitSeat" data-split="1"></span> the help popup filling the row by itself</li><li><span class="splitSeat" data-split="3"></span> docked beside one chat column</li><li><span class="splitSeat" data-split="9"></span> or two</li><li><span class="splitSeat" data-split="4"></span> or under the video</li><li><span class="splitSeat" data-split="10"></span> under the video on the rail</li></ul></i><i><b>+vid</b><ul><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video overlay: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
-    <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback (30 days, ~50MB)</div>
+    <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback</div>
+    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. <span id="archiveStatus" role="status"></span></span></div>
     <div><b>–</b> header size cycles: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span> - middle-clicking its ✕ recentres a moved panel<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -2806,10 +2807,20 @@
   // visit; history/rate/last-run/emote-use/tab-sync keys get a suffix so
   // streams don't bleed
   const DEFAULT_CHANNEL = 'hasanabi';
+  const oauthFrag = new URLSearchParams(location.hash.slice(1));
+  let oauthReturn = null;
+  if (oauthFrag.has('access_token') || oauthFrag.has('error')) {
+    try {
+      oauthReturn = JSON.parse(sessionStorage.getItem('hasan-oauth-state'));
+      sessionStorage.removeItem('hasan-oauth-state');
+    } catch {}
+    if (!oauthReturn || !oauthReturn.state || oauthFrag.get('state') !== oauthReturn.state) oauthReturn = null;
+    history.replaceState(null, '', location.pathname + location.search);
+  }
   // ?channel=a,b,c watches several chats in one merged log; the first is
   // focused (title, stream status, video, chat target, storage keys)
   const CHANNELS = (new URLSearchParams(location.search).get('channel') ||
-    new URLSearchParams(location.hash.slice(1)).get('state') || '')
+    (oauthReturn && oauthReturn.channels) || '')
     .toLowerCase().split(',')
     .map((c) => c.replace(/[^a-z0-9_]/g, '').slice(0, 25))
     .filter(Boolean).slice(0, 6);
@@ -4835,7 +4846,7 @@
       }
       // every rendered row archives flat fields for the archive search;
       // whispers never reach the log so they stay out of the index too
-      if (r.dataset.mid) {
+      if (archAvailable && r.dataset.mid) {
         // textContent drops img alts, so the row's emote names ride in
         // their own field - a text-only record can't heal a dead band
         const ems = [];
@@ -4851,6 +4862,10 @@
           text: (r.textContent || '').slice(0, 500),
           ...(ems.length ? { em: ems } : {}),
         });
+        if (archBuf.length > ARCH_BUF_MAX) {
+          archBuf.shift();
+          archiveStatusEl.textContent = 'archive delayed - oldest unsaved rows were dropped';
+        }
       }
       // kw rows = own login (when authed) plus chosen keywords; skip own
       // messages and @hasanabi mentions, which aren't pings for the user
@@ -6021,6 +6036,7 @@
     else if (a.classList.contains('helpPn')) { setPronouns(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpPeek')) { setPeek(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpScrollback')) { setScrollback(SCROLLBACK_SIZES[+a.dataset.idx]); saveOpts(); }
+    else if (a.classList.contains('helpArchive')) setArchiveUnlimited(+a.dataset.idx === 1);
     else if (a.classList.contains('helpFlow')) { setRev(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpWrap')) { setWrap(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpNl')) { setMsgNl(+a.dataset.idx); saveOpts(); }
@@ -8272,31 +8288,54 @@
   });
 
   // ---- chat archive: every rendered row indexes flat fields into
-  // IndexedDB so the find-bar can reach past scrollback's edge. Kept 30
-  // days, capped near 50MB (estimating total origin usage - the archive
-  // dwarfs everything else this page stores). Whispers stay out of it ----
-  const ARCH_MAX_AGE = 30 * 864e5, ARCH_CAP = 50e6;
-  let archDb = null, archBuf = [];
-  if (window.indexedDB) {
-    const req = indexedDB.open('hasan-archive' + CHAN_SFX, 1);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains('msgs')) {
-        const st = db.createObjectStore('msgs', { keyPath: 'mid' });
-        st.createIndex('ts', 'ts');
-        st.createIndex('ch', 'ch');
-      }
-    };
-    req.onsuccess = () => {
-      archDb = req.result;
-      document.getElementById('findArch').hidden = false;
-      archPrune();
-      healUseArchive();
-    };
-    req.onerror = () => { archDb = null; };
+  // IndexedDB so the find-bar can reach past scrollback's edge. Bounded
+  // mode keeps 30 days and trims near 50MB of origin usage; unlimited
+  // skips both app limits. Whispers stay out of it ----
+  const ARCH_MAX_AGE = 30 * 864e5, ARCH_CAP = 50e6, ARCH_BUF_MAX = 5000;
+  const ARCH_OPT_KEY = 'hasan-archive-unlimited';
+  const archiveStatusEl = document.getElementById('archiveStatus');
+  let archDb = null, archBuf = [], archAvailable = !!window.indexedDB, archFailures = 0;
+  let archiveUnlimited = false;
+  try { archiveUnlimited = localStorage.getItem(ARCH_OPT_KEY) === '1'; } catch {}
+  function setArchiveUnlimited(on, persist = true) {
+    archiveUnlimited = on;
+    markHelp('helpArchive', on ? 1 : 0);
+    if (persist) try { localStorage.setItem(ARCH_OPT_KEY, on ? '1' : '0'); }
+    catch { archiveStatusEl.textContent = 'archive preference could not be saved'; }
   }
+  if (archAvailable) {
+    try {
+      const req = indexedDB.open('hasan-archive' + CHAN_SFX, 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('msgs')) {
+          const st = db.createObjectStore('msgs', { keyPath: 'mid' });
+          st.createIndex('ts', 'ts');
+          st.createIndex('ch', 'ch');
+        }
+      };
+      req.onsuccess = () => {
+        archDb = req.result;
+        document.getElementById('findArch').hidden = false;
+        archiveStatusEl.textContent = '';
+        archPrune();
+        healUseArchive();
+        archFlush();
+      };
+      req.onerror = () => {
+        archAvailable = false; archBuf = [];
+        archiveStatusEl.textContent = 'archive unavailable - browser storage could not open';
+        console.warn('chat archive unavailable', req.error);
+      };
+      req.onblocked = () => { archiveStatusEl.textContent = 'archive waiting for another tab to close its database'; };
+    } catch (err) {
+      archAvailable = false;
+      archiveStatusEl.textContent = 'archive unavailable - browser storage could not open';
+      console.warn('chat archive unavailable', err);
+    }
+  } else archiveStatusEl.textContent = 'archive unavailable in this browser';
   function archPrune() {
-    if (!archDb) return;
+    if (!archDb || archiveUnlimited) return;
     // age first, size second: over-cap trims the oldest ~15% and leaves
     // the rest regardless of how young it is
     try {
@@ -8309,7 +8348,7 @@
       };
       if (navigator.storage && navigator.storage.estimate) {
         navigator.storage.estimate().then((est) => {
-          if (!est || (est.usage || 0) < ARCH_CAP) return;
+          if (archiveUnlimited || !est || (est.usage || 0) < ARCH_CAP) return;
           // ~15% of a 30-day window is 4.5 days - delete by age, not count
           const hi = Date.now() - ARCH_MAX_AGE * .15;
           const tx2 = archDb.transaction('msgs', 'readwrite');
@@ -8323,14 +8362,35 @@
     } catch {}
   }
   function archFlush() {
-    if (!archDb || !archBuf.length) return;
+    if (!archDb || !archBuf.length || !archAvailable) return;
     const buf = archBuf;
     archBuf = [];
+    const retry = (err) => {
+      archBuf = buf.concat(archBuf).slice(-ARCH_BUF_MAX);
+      if (++archFailures < 3) {
+        archiveStatusEl.textContent = 'archive write failed - retrying';
+        setTimeout(archFlush, 1000 * archFailures);
+      } else {
+        archAvailable = false;
+        archBuf = [];
+        archiveStatusEl.textContent = err && err.name === 'QuotaExceededError'
+          ? 'browser storage full - archiving paused; free space and reload to retry'
+          : 'archive writes stopped - reload to retry';
+        queueMessage({ tags: {}, login: null, kind: 'NOTICE', message: archiveStatusEl.textContent }, false);
+        console.warn('chat archive writes stopped', err);
+      }
+    };
+    let tx;
     try {
-      const tx = archDb.transaction('msgs', 'readwrite');
+      tx = archDb.transaction('msgs', 'readwrite');
+      tx.oncomplete = () => { archFailures = 0; archiveStatusEl.textContent = ''; };
+      tx.onabort = () => retry(tx.error);
       const st = tx.objectStore('msgs');
       for (const rec of buf) st.put(rec);
-    } catch {}
+    } catch (err) {
+      if (tx) tx.onabort = null;
+      retry(err);
+    }
   }
   // the same tokens the find-bar parses, run against stored rows - a
   // cursor walks newest-first and stops once 300 hits are collected
@@ -11344,12 +11404,14 @@
   }
 
   relayFrame.addEventListener('load', () => {
+    if (joined && !downAt) downAt = Date.now();
+    joined = false;
     join();
     loadStep(1, 'relay loaded - joining chat…');
   });
   // Resend join until the relay reports connected, in case the first message
   // raced the iframe's script or the relay was mid-reconnect.
-  const joinTimer = setInterval(() => { if (!joined) join(); }, 3000);
+  setInterval(() => { if (!joined) join(); }, 3000);
 
   // If nothing's arrived by now, say why it might be stuck rather than
   // leaving the bar mid-flight forever - quiet chat gets its own note
@@ -11424,8 +11486,7 @@
   // own badges/colour from USERSTATE/GLOBALUSERSTATE live in selfTagsPer
   // (keyed per channel, defined near the send UI)
   try { auth = JSON.parse(localStorage.getItem(AUTH_KEY)); } catch {}
-  const oauthFrag = new URLSearchParams(location.hash.slice(1));
-  if (oauthFrag.get('access_token')) {
+  if (oauthReturn && oauthFrag.get('access_token')) {
     auth = { token: oauthFrag.get('access_token'), login: null };
     try { localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); } catch {}
     // keep a non-default channel in the url after the token comes back
@@ -11893,17 +11954,21 @@
       sendBtn.classList.remove('err');
       sendBtn.classList.add('busy');
       sendBtn.title = 'connecting to twitch…';
-      const loginFail = () => {
+      const loginFail = (reason = "can't reach twitch - connection problem; click to retry") => {
         sendBtn.classList.remove('busy');
         sendBtn.classList.add('err');
-        sendBtn.title = "can't reach twitch - connection problem; click to retry";
+        sendBtn.title = reason;
         setTimeout(() => sendBtn.classList.remove('err'), 6000);
       };
       const loginGo = () => {
+        let state;
+        try {
+          state = window.crypto.randomUUID();
+          sessionStorage.setItem('hasan-oauth-state', JSON.stringify({ state, channels: CHANNELS.join(',') }));
+        } catch { loginFail('browser session storage unavailable - allow it to sign in'); return; }
         location.href = 'https://id.twitch.tv/oauth2/authorize?client_id=' + TW_CLIENT_ID +
           '&redirect_uri=' + encodeURIComponent(location.origin + location.pathname) +
-          (CHANNEL !== DEFAULT_CHANNEL || MULTI ? '&state=' + encodeURIComponent(CHANNELS.join(',')) : '') +
-          '&response_type=token&scope=' +
+          '&state=' + encodeURIComponent(state) + '&response_type=token&scope=' +
           encodeURIComponent('chat:read chat:edit user:read:chat user:write:chat whispers:read user:read:whispers');
         // if the navigation never commits, unstick the button anyway
         setTimeout(() => sendBtn.classList.remove('busy'), 12000);
@@ -14326,6 +14391,8 @@
     } else if (e.key === SLOTS_KEY) {
       readSlots(); // repaint slot fills written by another tab
       paintSlots();
+    } else if (e.key === ARCH_OPT_KEY) {
+      setArchiveUnlimited(e.newValue === '1', false);
     } else if (e.key === AUTH_KEY) {
       if (e.newValue) {
         let a = null;
@@ -14525,7 +14592,7 @@
           markAway(downAt, Date.now(), 'socket dropped');
           downAt = 0;
         }
-        clearInterval(joinTimer); backfill(wasDown);
+        backfill(wasDown);
         // robotty ingests on its own lag - a silent trailing pass catches
         // lines (own sent messages) that missed the first snapshot
         setTimeout(() => backfill(false), 45000);
@@ -14998,7 +15065,7 @@
     markPresets();
   }
   const HELP_LISTS = {
-    helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')),
+    helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'on'], helpEonly: EMOTE_MODES,
     helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
@@ -15048,6 +15115,7 @@
     `<a href="#" role="button" class="helpOpt helpFontFam" data-idx="${i}" style="font-family:${FONT_STACKS[o.value].replace(/"/g, "'")}">${o.text}</a>`).join(' · ');
   // the hide-mode default (stub) is set by no setter at boot - mark it
   markHelp('helpHide', hideMode);
+  markHelp('helpArchive', archiveUnlimited ? 1 : 0);
   // bold each leading 'name:' in the description cells - whether it sits
   // in a <span> or a bare text node beside the row's <b> label
   helpPanel.querySelectorAll('div').forEach((d) => {
