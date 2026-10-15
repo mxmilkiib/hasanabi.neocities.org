@@ -48,6 +48,8 @@ not versions - the page ships continuously to Neocities.
 - the magazines row takes the wider 30em columns
 
 ### Help popup
+- the footer gains a blank spacer and puts repo dates under the
+  github star button
 - each tab keeps its own scroll position while switching pages
 - the footer about link opens in a new tab
 - middle-clicking the popup's ✕ re-docks a moved or maximised panel
