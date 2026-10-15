@@ -11,6 +11,8 @@ not versions - the page ships continuously to Neocities.
   essays and friends, instead of bare news/commentary/essays tags
 - lady izdihar joins the essays group - soviet history educator with
   site, ig, tiktok, x and patreon links
+- democracy docket joins the dsa tab's electoral tools - marc elias'
+  voting-rights litigation tracker
 
 ### Header
 - middle-clicking the ? button opens the about page in a new tab
