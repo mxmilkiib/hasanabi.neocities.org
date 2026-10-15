@@ -30,6 +30,8 @@ not versions - the page ships continuously to Neocities.
   descriptions, and wellbeing sits above activism
 - left: open data and open gov cross over from libre to sit under
   reformism
+- left: participatory budgeting gains major examples, spaces gains
+  social centres, and organising gains radical-transparency models
 - dsa: the resources row seats above chapters, and the caucuses
   `sort:` label rides the table's top row inline, directly left of
   the wing/npc/age/a-z chips
