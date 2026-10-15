@@ -257,7 +257,7 @@ no dependencies beyond CDN-hosted fonts.
     month count, the label shows a dim dash. Bots do not get that
     placeholder.
 - **Chat columns**
-  - The layout menu has fifteen layouts, listed in menu order:
+  - The layout menu has sixteen layouts, listed in menu order:
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
@@ -285,11 +285,13 @@ no dependencies beyond CDN-hosted fonts.
       video can float above the chat.
     - `1col vid/chat` stacks the video in its framed floating style
       over the single chat column.
+    - `3col chat vid/emotes/help` puts two chat columns beside a rail
+      with video, the emote picker and the help popup.
   - Drag the divider to change the side column's width. In layouts
     with both emotes and stats, drag their divider to divide the
     remaining height. Help keeps a 280px minimum, capped by the
-    screen. When help fills the side column, its own move and resize
-    controls are disabled; stats remains a tab inside it.
+    screen. When help is docked in the side column, its own move and
+    resize controls are disabled; stats remains a tab inside it.
 - **Video and live links**
   - Drag and resize the video when it floats. It pauses when hidden.
     In the side-column layouts it can dock, float or switch off.
@@ -442,7 +444,7 @@ editing a URL.
 
 | key | values | effect |
 |---|---|---|
-| `split` | `1`–`15` or a short name (`2ch`, `3cvh`…) | layout, in the order listed under Chat columns above |
+| `split` | `1`–`16` or a short name (`2ch`, `3cveh`…) | layout, in the order listed under Chat columns above |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
 | `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |

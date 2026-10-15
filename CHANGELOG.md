@@ -6,6 +6,10 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-15
 
 ### Header
+- new layout level 16, `3col chat vid/emotes/help`: two chat columns
+  beside a rail stacking the stream, the emote picker and the help
+  popup (▮▮▯?, `?split=3cveh`) - the first help-dock level to keep the
+  picker in the rail, with stats staying a tab inside the popup
 - new layout level 15, `1col vid/chat`: the stream keeps its framed
   floating look stacked over the single chat column (▶▮, `?split=1cv`)
   - the first rail-less level to own the video, and hiding it
