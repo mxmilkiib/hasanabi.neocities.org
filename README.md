@@ -335,8 +335,10 @@ no dependencies beyond CDN-hosted fonts.
     and similar terms. Enter and Shift+Enter step through matches;
     `only` hides rows that do not match.
   - `archive` searches messages no longer in the visible scrollback.
-    The browser keeps that searchable copy for up to 30 days, within
-    a storage limit. Matches still on screen can be opened directly.
+    The help panel offers bounded retention (30 days, trimming when
+    origin usage passes about 50 MB) or unlimited retention without
+    app-imposed age or size limits. Browser storage quotas still apply.
+    Matches still on screen can be opened directly.
 - **People**
   - In help, add usernames to the hide list. Choose whether their
     messages disappear, become a count line, or remain visible but
