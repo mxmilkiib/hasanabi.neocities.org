@@ -32,9 +32,9 @@ not versions - the page ships continuously to Neocities.
   reformism
 - left: participatory budgeting gains major examples, spaces gains
   social centres, and organising gains radical-transparency models
-- dsa: the resources row seats above chapters, and the caucuses
-  `sort:` label rides the table's top row inline, directly left of
-  the wing/npc/age/a-z chips
+- dsa: resources sits directly under the intro row and chapters
+  precede media; the caucuses `sort:` label rides the table's top
+  row inline, directly left of the wing/npc/age/a-z chips
 - the channels/streams column heads stop overlapping the first row -
   the step-down selector looked for `grid-row` but a set gridRow +
   gridColumn serialises as `grid-area`, so nothing stepped; lemmy
