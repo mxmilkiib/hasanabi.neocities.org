@@ -11339,6 +11339,8 @@
     relayFrame.contentWindow.postMessage({ type: 'join', channels: CHANNELS }, RELAY_ORIGIN);
     if (auth && auth.token)
       relayFrame.contentWindow.postMessage({ type: 'auth', token: auth.token }, RELAY_ORIGIN);
+    const me = localStorage.getItem('me');
+    if (me) relayFrame.contentWindow.postMessage({ type: 'me', me }, RELAY_ORIGIN);
   }
 
   relayFrame.addEventListener('load', () => {
