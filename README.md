@@ -616,12 +616,15 @@ Where this sits relative to the usual suspects:
 | runs on strict-CSP static hosts | ✅ (relay iframe) | n/a | embed-domain rules | n/a | n/a | partial | n/a | n/a |
 | send chat (login) | ✅ implicit OAuth | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (+whispers) | ✅ |
 | replies | quoted block, jump-back | ✅ threads | collapsed thread | ✅ | ✅ | ❌ | ✅ | ✅ |
+| message permalinks | ✅ `?mid=` scroll + flash | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| chat search | ✅ text, `user:`, `kind:`, archive | partial | ❌ | ✅ | ✅ | ❌ | partial | ❌ |
+| mute / hide users | ✅ hide·dim·count modes | block only | ❌ | ✅ ignores | ✅ | ❌ | ✅ | ✅ |
 | polls / predictions / points | ❌ | ✅ | ❌ | partial | ❌ | ❌ | ✅ | partial |
 | 7TV / BTTV / FFZ | ✅ animated, zero-width stacks | ❌ (extensions) | native only | ✅ | ✅ | partial | ✅ | ✅ |
 | backfill after suspend/resume | ✅ (robotty) | recent only | ❌ | ✅ | ❌ | ❌ | history search | ❌ |
 | msgs/sec graph, gap & burst marks | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | theming / accessibility fonts | palettes × 9-stop shade axis | light/dark | light/dark | extensive | extensive | CSS params | accent palettes | ✅ |
-| multi-channel | `?channel=` per tab | per page | per embed | tabs/splits | tabs | URL param | tabs | ✅ |
+| multi-channel | ✅ up to 6 merged + per-tab | per page | per embed | tabs/splits | tabs | URL param | tabs | ✅ |
 | second-screen / PWA install | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | emote picker | ✅ usage stats + era marks | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
 | nick / emote completion | ✅ @nicks + :/tab codes | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
@@ -629,13 +632,22 @@ Where this sits relative to the usual suspects:
 | keyword / block-word filters | ✅ kw + bw | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
 | mention alerts | ✅ chip + opt. ping | partial | partial | ✅ sound/toast | ✅ | partial | ✅ | ✅ |
 | link / media cards | ✅ x-cards, gifs, imgs, link/emote hovers | partial | partial | ✅ hover previews | partial | ❌ | ❌ | ❌ |
+| x/twitter mirror | ✅ nitter via worker | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| link tools | ✅ links-only view, tracking strip | ❌ | ❌ | partial | partial | ❌ | ❌ | ❌ |
+| pronouns | ✅ card + hovers | ❌ (ext.) | ❌ | ✅ | partial | ❌ | ✅ | ✅ |
 | emote-only enlargement | ✅ 3 modes | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | gap notices (missed spans) | ✅ timed + cause | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | scrollback limit | ✅ 250–100k | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| scrollback persists | ✅ 1k rows + archive store | ❌ | ❌ | partial | ✅ logs | ❌ | ❌ | ❌ |
+| cross-tab sync | ✅ opts + sent msgs | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| archive search | ✅ bounded or unbounded store | ❌ | ❌ | ❌ | partial logs | ❌ | ❌ | ❌ |
 | draft length warn | ✅ fossa + 500 cap | ❌ | ❌ | ❌ | ❌ | n/a | ❌ | ❌ |
-| usercard / mod UI | ✅ inspector + highlight + timeout/ban/delete | ✅ | partial | ✅ | ✅ | ❌ | ✅ | partial |
+| usercard / mod UI | ✅ inspector + avatar + name chips + timeout/ban/delete | ✅ | partial | ✅ | ✅ | ❌ | ✅ | partial |
 | whispers | ✅ pane + unread chip | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ |
 | stream stats line | ✅ uptime·viewers·chatters | viewers/uptime | ❌ | partial | ✅ | ❌ | partial | partial |
+| session stats tab | ✅ chatters/emotes/bursts/storage | ❌ | ❌ | ❌ | partial logs | ❌ | ❌ | ❌ |
+| pause scroll on hover | ✅ opt-in | partial | ❌ | ✅ | ✅ | ❌ | partial | ❌ |
+| resource tabs | ✅ media·left·libre·authors·dsa | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | stream video alongside | ✅ drag/resize overlay | ✅ | ❌ | ❌ | partial ext. | ❌ | ❌ | ❌ |
 | multi-column log | ✅ 2-3 page-flip + rail layouts | ❌ | ❌ | ✅ splits | partial | ❌ | ❌ | ❌ |
 | screen-reader landmarks | ✅ live region + feeds | partial | partial | ❌ | ❌ | ❌ | partial | partial |
