@@ -14915,7 +14915,7 @@
       const rs = document.getElementById('repoStars');
       if (rs) rs.textContent = Number.isFinite(d.stars) ? d.stars.toLocaleString('en') : '';
       document.getElementById('repoStats').innerHTML =
-        ` · <b>started:</b> ${ymd(d.created)}, <b>updated:</b> ${ymd(d.pushed)}`;
+        `<b>started:</b> ${ymd(d.created)}, <b>updated:</b> ${ymd(d.pushed)}`;
     }
   });
 
