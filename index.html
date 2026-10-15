@@ -4497,8 +4497,14 @@
         continue;
       }
       if (kind === 'NOTICE') {
+        const noticeBody = rawMsg.startsWith('[notice]') ? rawMsg.slice(8) : rawMsg;
+        const lead = noticeBody.match(/^\s*/)[0];
+        const timeout = noticeBody.trim().match(/^you are timed out for (\d+) more seconds\.?$/i);
+        const noticeHtml = timeout
+          ? `${lead}You are timed out for <b class="rbw">${fmtSecsLong(+timeout[1])}</b>.`
+          : linkifyEsc(escapeHTML(noticeBody));
         html += `<div data-new role="article" class="row notice${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${ts}" data-ch="${escapeHTML(ch)}"${dedupKey ? ` data-mid="${escapeHTML(dedupKey)}"` : ''}><span class="time">${timeStr}</span>${chTag}` +
-                `${rawMsg.startsWith('[notice]') ? '<b class="notice-label">[notice]</b>' + linkifyEsc(escapeHTML(rawMsg.slice(8))) : linkifyEsc(escapeHTML(rawMsg))}</div>`;
+                `${rawMsg.startsWith('[notice]') ? '<b class="notice-label">[notice]</b>' : ''}${noticeHtml}</div>`;
         continue;
       }
       if (kind === 'CLEARCHAT') {
@@ -5525,6 +5531,17 @@
   function fmtDur(mins) {
     const h = (mins / 60) | 0;
     return h ? `${h}h ${mins % 60}m` : `${mins}m`;
+  }
+
+  function fmtSecsLong(secs) {
+    const parts = [];
+    for (const [n, u] of [[86400, 'day'], [3600, 'hour'], [60, 'minute'], [1, 'second']]) {
+      const v = Math.floor(secs / n);
+      if (!v) continue;
+      secs -= v * n;
+      parts.push(`${v} ${u}${v === 1 ? '' : 's'}`);
+    }
+    return parts.join(', ') || '0 seconds';
   }
 
   // calendar-day tag for bare times: ' yesterday', ' N days ago', or ''
