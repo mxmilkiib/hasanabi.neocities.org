@@ -115,6 +115,8 @@
     border-bottom-color: var(--accent-dim);
   }
   .cmp td:first-child { font-weight: 700; white-space: nowrap; }
+  /* stripes ride td so the us column accent stays readable on top */
+  .cmp tr:nth-child(odd) td { background: var(--panel); }
   .cmp .us, .cmp .us a { color: var(--accent); }
   .cmp td.ok { color: var(--good); }
   .cmpnote { font-size: .75em; color: var(--dim); margin-top: .6em; }
