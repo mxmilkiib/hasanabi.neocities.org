@@ -68,6 +68,8 @@ not versions - the page ships continuously to Neocities.
   re-pick - a saved zebra level keeps its pick
 
 ### About page
+- the theme cards sit on a responsive three-column grid, with twitch
+  joining as the twelfth shot
 - a note under the theme cards points out the three local slots and
   settings url
 - the about and social-card copy broadens the description to the

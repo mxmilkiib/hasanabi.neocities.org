@@ -98,6 +98,10 @@
     display: flex; flex-wrap: wrap; justify-content: center;
     align-items: stretch; gap: 12px;
   }
+  .theme-shots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .theme-shots a { max-width: none; }
+  @media (max-width: 720px) { .theme-shots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 460px) { .theme-shots { grid-template-columns: 1fr; } }
   .laysec .shots { padding-top: .1em; }
   /* the table claims the viewport width main can't give it - up to the
      body's 20px padding - then scrolls only past that */
@@ -232,7 +236,7 @@
   </ul>
 
   <h2>themes</h2>
-  <div class="shots">
+  <div class="shots theme-shots">
     <a href="https://hasanabi.neocities.org/?theme=nightshade&split=3cves"><img src="shots/nightshade.webp" alt="the nightshade theme in the 3col chat vid/emotes/stats layout" loading="lazy"><span>nightshade</span></a>
     <a href="https://hasanabi.neocities.org/?theme=old-default&split=1c"><img src="shots/default.webp" alt="the old default theme in the 1col chat layout" loading="lazy"><span>old-default</span></a>
     <a href="https://hasanabi.neocities.org/?theme=ft&split=3cves"><img src="shots/ft.webp" alt="the ft theme in the 3col chat vid/emotes/stats layout" loading="lazy"><span>ft</span></a>
@@ -244,6 +248,7 @@
     <a href="https://hasanabi.neocities.org/?theme=print&split=2ch"><img src="shots/print.webp" alt="the print theme in the 2col chat help layout" loading="lazy"><span>print</span></a>
     <a href="https://hasanabi.neocities.org/?theme=retro&split=3cve"><img src="shots/retro.webp" alt="the retro theme in the 3col chat vid/emotes layout" loading="lazy"><span>retro</span></a>
     <a href="https://hasanabi.neocities.org/?theme=irc&split=3ce"><img src="shots/irc.webp" alt="the irc theme in the 3col chat emotes layout" loading="lazy"><span>irc</span></a>
+    <a href="https://hasanabi.neocities.org/?theme=twitch&split=3ce"><img src="shots/twitch.webp" alt="the twitch theme in the 3col chat emotes layout" loading="lazy"><span>twitch</span></a>
   </div>
   <p>three local theme slots available, copy settings to url for everything</p>
 
