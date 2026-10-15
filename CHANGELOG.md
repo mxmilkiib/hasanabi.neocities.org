@@ -22,6 +22,10 @@ not versions - the page ships continuously to Neocities.
   with 'fell short' and nov 3 general notes below. a `contain:
   inline-size` on the note rows keeps their unwrapped text out of the
   grid's track sizing
+- the slate table tints outcomes - wins green, losses red, still-live
+  races accent - lifts each race's state tag bold, and grows a camp
+  column of verified campaign sites; a 'for candidates' row links the
+  nec endorsement process and chapter resources
 
 ### Header
 - the user card pins a twitch avatar beside the name, drops the
