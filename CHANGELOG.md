@@ -138,9 +138,9 @@ not versions - the page ships continuously to Neocities.
   centred rail rather than filling it - its edge drags trade width
   with the help below, so shrinking the frame widens the help and
   stretching it narrows the help back while the pair's total holds
-- `1col danmaku` defaults its frame to the largest the space fits
-  (min of column width and height through the aspect ratio); a drag
-  or saved pick still overrides it
+- `1col video` and `1col danmaku` default their frame to the largest
+  the space fits (min of column width and height through the aspect
+  ratio); a drag or saved pick still overrides it
 - `1col danmaku` (level 19, `?split=1cdan`) joins the 1col group -
   the centred frame alone with the bullet overlay switched on at
   select. danmaku now belongs to that layout alone: every other
