@@ -346,11 +346,18 @@ no dependencies beyond CDN-hosted fonts.
     same store backs the "load earlier chat" seam at the top of the log:
     click it or just scroll into it, and batches of older history page
     in while it stays in view (shift-click loads eight pages at once).
-    `?mid=` permalinks and reply-chip jumps also restore their target
-    from the archive when it has left the rendered scrollback - folded
-    column layouts return to one scrolling column for the jump, since
-    paged layouts hide the restored rows. Where a restore skips a
-    stretch, a "skipped" marker counts the gap and fills it on click.
+    A `date:YYYY-MM-DD` (optionally `HH:MM`) in the find bar jumps to
+    that moment instead of searching. `?mid=` permalinks and reply-chip
+    jumps also restore their target from the archive when it has left
+    the rendered scrollback. Paged column layouts hide the restored
+    rows but keep the seam visible - a click there folds back to one
+    scrolling column and loads. Where a restore skips a stretch, a
+    "skipped" marker counts the gap and fills it on click. The help
+    panel's import link reads a downloaded log dump (raw IRC lines or
+    `[timestamp] #chan nick: text`) into the same store - raw lines
+    keep their real ids, badges, emote positions and reply links, so
+    they re-render like live rows. Cards under hydrated links fetch
+    lazily as they scroll into view rather than at restore time.
 - **People**
   - In help, add usernames to the hide list. Choose whether their
     messages disappear, become a count line, or remain visible but
