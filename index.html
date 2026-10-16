@@ -1368,6 +1368,9 @@
      ems, split the space), then storage on its own last row */
   #statsBody .st-trio { display: flex; flex: 0 0 100%; gap: 0 22px; align-items: flex-start; }
   #statsBody .st-trio .st-panel { flex: 1 1 0; min-width: 0; }
+  /* the popup trio's last gutter runs tighter - glorps' short rows
+     don't need the session panel's full 22px of breathing room */
+  #helpPanel #statsBody .st-trio > .st-panel:last-child { margin-left: -10px; }
   /* session rows run longer than bursts/glorps entries, so it takes a
      wider share of the trio than an equal third */
   #statsBody .st-trio .st-panel:first-child { flex: 1.4 1 0; }
@@ -6910,7 +6913,7 @@
     // bt0/bt1 frame the event on the session graph: the first qualifying
     // window's start through the last one's end
     const bursts = bEvents.sort((a, b) => b.r - a.r).slice(0, 5).map(({ r, t0, t1 }) =>
-      `<div class="st-row" data-bt0="${t0 - 5000}" data-bt1="${t1}"><span class="n">·</span><span class="nm">${r.toFixed(1)} msgs/s at ` +
+      `<div class="st-row" data-bt0="${t0 - 5000}" data-bt1="${t1}"><span class="nm">${r.toFixed(1)} msgs/s at ` +
         `<a class="at" href="https://tv.supa.sh/logs?c=${encodeURIComponent(sc || CHANNEL)}&d=${logDay(t0)}" target="_blank" rel="noopener" title="this day in the supa logs">${fmtRowTime(new Date(t0))}</a></span></div>`).join('');
     // badge reference: the channel's own sets lead, then the badges that
     // actually turn up in chat, then every remaining global set a-z; each

@@ -83,6 +83,8 @@ not versions - the page ships continuously to Neocities.
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps
+- the stats trio claws back width in the popup: burst rows drop their
+  bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
   tooltip is quoting - text colour at soft alpha, snapped to the grid
 - the archload seam shrinks to footnote size in the paged column
