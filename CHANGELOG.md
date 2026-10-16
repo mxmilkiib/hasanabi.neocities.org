@@ -80,6 +80,9 @@ not versions - the page ships continuously to Neocities.
 - the midterms block gains a "get involved" row - the nec hub,
   national phonebank rsvp, the endorsed slate, socialist cash
   donations and the chapter finder
+- the layout menu reorders chat-emotes under chat-help in each
+  column family - the wheel follows the same order, and levels keep
+  their stable ids so no saved setting or ?split= url remaps
 
 ## 2026-10-15
 

@@ -12309,6 +12309,10 @@
   const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce', '1cv', '3cveh'];
   const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻', '▶▮', '▮▮▯?'];
   const splitGlyph = (l) => SPLIT_GLYPHS[l - 1];
+  // menu + wheel order rides this over stable declaration-order ids, so
+  // a rearrangement never remaps a stored level - chat-emotes sits right
+  // under chat-help in each column family
+  const SPLIT_ORDER = [0, 1, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 14, 15];
   // the level families - menu order scatters the semantic ranges
   const LVL_NORAIL = new Set([1, 3, 9, 15]);       // bare chat columns - 15 docks the video above them instead
   const LVL_HELPRAIL = new Set([2, 4, 5, 10, 11, 16]); // help docked in the rail
@@ -12383,7 +12387,7 @@
 
   function cycleSplit(dir) {
     const landscape = window.innerWidth > window.innerHeight;
-    const seq = SPLIT_NAMES.map((_, i) => i + 1).filter((l) => landscape || LVL_PORTRAIT.has(l));
+    const seq = SPLIT_ORDER.map((i) => i + 1).filter((l) => landscape || LVL_PORTRAIT.has(l));
     setSplit(seq[(seq.indexOf(splitLevel) + dir + seq.length) % seq.length]);
     saveOpts();
   }
@@ -12391,8 +12395,8 @@
   // the layout button opens a menu of every level like the font
   // picker's; the wheel steps the same order, and shift-click still
   // steps back - each entry carries its level in data-i
-  splitMenu.innerHTML = SPLIT_NAMES.map((n, i) =>
-    `<button type="button" role="option" data-i="${i + 1}"><span class="sg">${SPLIT_GLYPHS[i]}</span>${n}</button>`).join('');
+  splitMenu.innerHTML = SPLIT_ORDER.map((i) =>
+    `<button type="button" role="option" data-i="${i + 1}"><span class="sg">${SPLIT_GLYPHS[i]}</span>${SPLIT_NAMES[i]}</button>`).join('');
   const markSplitMenu = () => {
     const landscape = window.innerWidth > window.innerHeight;
     splitMenu.querySelectorAll('button').forEach((b) => {
