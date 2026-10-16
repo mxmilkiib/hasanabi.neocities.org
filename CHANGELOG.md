@@ -174,7 +174,9 @@ not versions - the page ships continuously to Neocities.
   segments, each emote sharing a cached Image at ~1.4x the bullet
   font height; one still loading (or dead) falls back to its code
   until it resolves, and the lane math re-measures the true width
-  each frame as images land
+  each frame as images land. a per-bullet magnifier lottery rides
+  every emote in the message - half fly normal, others on 1.5x, 2x
+  or 2.6x rungs, capped at two lane pitches
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
