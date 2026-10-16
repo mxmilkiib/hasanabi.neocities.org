@@ -2708,6 +2708,9 @@
     /* the channels/streams service grid can run wider than a phone
        panel - let it slide sideways instead of clipping */
     #helpPanel .hp-scroll { overflow-x: auto; }
+    /* the rose drops its dsamain-aligned inset and hugs the corner -
+       on a narrow panel the inset would land it on top of the links */
+    #helpPanel .dsalogo { right: 8px; }
     .col { padding: 6px 10px 6px 6px; }
   }
   /* phones: cap the header type so a large header size can't eat a third of the screen */

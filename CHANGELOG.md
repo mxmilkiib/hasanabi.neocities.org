@@ -32,6 +32,8 @@ not versions - the page ships continuously to Neocities.
   race-tinted midterms heads keep their type colours
 - the dsa banner link, the corner rose and the active tab title gain
   a softer upward shadow to match their bottom edges
+- on narrow and touch screens the dsa rose drops its banner-aligned
+  inset and hugs the top-right corner instead of landing on the links
 - the spacer row under the dsa banner loses its residual line height
 - the corner rose becomes the official dsa mark's own rose - the
   emoji glyph swapped for the logo's vector, cropped off the clasped
