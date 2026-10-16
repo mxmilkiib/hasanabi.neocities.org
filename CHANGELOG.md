@@ -27,7 +27,7 @@ not versions - the page ships continuously to Neocities.
   24 names verified against the youtube.fandom api, gluing beside
   the wikipedia `*` where both exist; the mark wears the palette's
   danger red
-- subsection titles across the help pages take a muted sage - group
+- subsection titles across the help pages take a grayed jade - group
   heads, column heads and the flowing lists' <i><b> titles; the
   race-tinted midterms heads keep their type colours
 - the dsa banner link, the corner rose and the active tab title gain
