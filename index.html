@@ -841,6 +841,9 @@
      chat takes the whole column */
   main.vstack:has(> #vid[hidden]) { grid-template-rows: 0 0 minmax(0, 1fr); }
   main.vstack > #log { grid-column: 1; grid-row: 3; }
+  /* 1col video hides the chat - the frame and its seam centre in the
+     space instead of topping an empty row */
+  main.vstack.vidonly { grid-template-rows: auto auto; align-content: center; }
 
   .loadbar {
     width: min(240px, 55%);
@@ -2822,7 +2825,7 @@
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li><li><span class="splitSeat" data-split="16"></span> the framed stream alone, centred</li><li><span class="splitSeat" data-split="17"></span> the stream over the docked help popup, centred like 1col help</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour; needs the video on, live messages only<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
@@ -10160,14 +10163,14 @@
   const VID_STACK_W = 720, VID_STACK_MIN = 180, VID_CHAT_MIN = 160;
   let vidStackW = 0;
   const vidStackMax = () => Math.max(VID_STACK_MIN,
-    Math.min(mainEl.clientWidth, (mainEl.clientHeight - VID_CHAT_MIN - 14) * vidRatio));
+    Math.min(mainEl.clientWidth, (mainEl.clientHeight - (splitLevel === 17 ? 0 : VID_CHAT_MIN) - 14) * vidRatio));
   const paintVidStackW = () => mainEl.style.setProperty('--vidw',
     Math.min(vidStackW || VID_STACK_W, vidStackMax()) + 'px');
   const setVidStackW = (w) => {
     vidStackW = Number.isFinite(w) && w > 0 ? Math.max(VID_STACK_MIN, Math.round(w)) : 0;
     paintVidStackW();
   };
-  const syncVidSplit = () => { vidSplitEl.hidden = splitLevel !== 15 || vidBox.hidden; };
+  const syncVidSplit = () => { vidSplitEl.hidden = !LVL_VIDSTACK.has(splitLevel) || vidBox.hidden; };
   function loadPlayer() {
     if (loadPlayer.done) return;
     loadPlayer.done = true;
@@ -10549,8 +10552,8 @@
     vidBox.addEventListener('pointercancel', drop);
   };
 
-  // level 15's seam and side gutters resize the centred video by width;
-  // aspect-ratio translates that into the vertical split under it
+  // the stack levels' seam and side gutters resize the centred video by
+  // width; aspect-ratio translates that into the vertical split under it
   let vidStackDragId = null;
   const vidStackDrag = (e, dragEl) => {
     e.preventDefault();
@@ -10578,7 +10581,7 @@
     dragEl.addEventListener('pointercancel', drop);
   };
   vidSplitEl.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || splitLevel !== 15 || vidBox.hidden) return;
+    if (e.button !== 0 || !LVL_VIDSTACK.has(splitLevel) || vidBox.hidden) return;
     vidStackDrag(e, vidSplitEl);
   });
 
@@ -12365,25 +12368,25 @@
     mainEl.style.setProperty('--railw', soloW(e.clientX));
   });
   colSplitREl.addEventListener('pointerup', () => saveOpts());
-  // bare gutters drive the centred pane in the no-rail layouts: 1col help
-  // drags horizontally to resize the page, 1cv drags vertically to resize
-  // the video like its bottom seam does
+  // bare gutters drive the centred panes in the chatless layouts: the
+  // solo rail drags horizontally to resize the page, the framed video
+  // drags vertically to resize like its bottom seam does
   let gutDrag = null;
   mainEl.addEventListener('pointerdown', (e) => {
     if (e.target !== mainEl) return;
-    if (splitLevel === 2) {
+    if (LVL_SOLO.has(splitLevel)) {
       e.preventDefault();
       gutDrag = e.pointerId;
       mainEl.setPointerCapture(gutDrag);
       return;
     }
-    if (splitLevel !== 15 || vidBox.hidden) return;
+    if (!LVL_VIDSTACK.has(splitLevel) || vidBox.hidden) return;
     const r = vidBox.getBoundingClientRect();
     if (e.clientY < r.top || e.clientY > r.bottom || (e.clientX >= r.left && e.clientX <= r.right)) return;
     vidStackDrag(e, mainEl);
   });
   mainEl.addEventListener('pointermove', (e) => {
-    if (splitLevel === 15) {
+    if (LVL_VIDSTACK.has(splitLevel)) {
       if (e.pointerId === vidStackDragId) return;
       const r = vidBox.getBoundingClientRect();
       const gut = !vidBox.hidden && e.target === mainEl && e.clientY >= r.top && e.clientY <= r.bottom &&
@@ -12392,7 +12395,7 @@
       return;
     }
     mainEl.classList.remove('vgut');
-    if (splitLevel !== 2 || (e.target !== mainEl && e.pointerId !== gutDrag)) {
+    if (!LVL_SOLO.has(splitLevel) || (e.target !== mainEl && e.pointerId !== gutDrag)) {
       mainEl.classList.remove('arw-l', 'arw-r');
       return;
     }
@@ -12460,12 +12463,14 @@
   function dockRail(level) {
     const on = level !== 0 && !LVL_NORAIL.has(level);
     colSplitEl.hidden = !on;
-    vidSplitEl.hidden = level !== 15 || vidBox.hidden;
-    colSplitREl.hidden = level !== 2;
-    railEl.classList.toggle('solo', level === 2);
-    mainEl.classList.toggle('hcenter', level === 2);
-    colSplitEl.title = level === 2 ? 'drag to resize the centred page'
+    vidSplitEl.hidden = !LVL_VIDSTACK.has(level) || vidBox.hidden;
+    colSplitREl.hidden = !LVL_SOLO.has(level);
+    railEl.classList.toggle('solo', LVL_SOLO.has(level));
+    mainEl.classList.toggle('hcenter', LVL_SOLO.has(level));
+    mainEl.classList.toggle('vidonly', level === 17);
+    colSplitEl.title = LVL_SOLO.has(level) ? 'drag to resize the centred page'
       : 'drag to resize the chat columns and rail';
+    vidSplitEl.title = level === 17 ? 'drag to resize the video' : 'drag to resize the video and chat';
     const statsTab = document.getElementById('htabStats');
     const statsLink = helpPanel.querySelector('a[data-htab="htabStats"]');
     const helpDock = LVL_HELPRAIL.has(level);
@@ -12536,9 +12541,10 @@
       syncRailSplit();
     } else {
       mainEl.classList.remove('vgrid');
-      // level 15's 1cv: the video heads the lone column wearing its
-      // floating frame - docked in the flow, not the rail and not floating
-      mainEl.classList.toggle('vstack', level === 15);
+      // the 1cv/1col-video stack: the video heads the lone column (or
+      // floats alone over a hidden one) wearing its floating frame -
+      // docked in the flow, not the rail and not floating
+      mainEl.classList.toggle('vstack', LVL_VIDSTACK.has(level));
       // statsHome only exists after a dock - an undock before rail was
       // ever entered (or after a restore) just hides the tab pane
       if (statsHome) {
@@ -12548,7 +12554,7 @@
       statsTab.hidden = true;
       statsLink.hidden = false;
       railEl.classList.remove('novid');
-      if (level === 15) {
+      if (LVL_VIDSTACK.has(level)) {
         logEl.before(vidBox, vidSplitEl);
         vidBox.style.left = vidBox.style.top = vidBox.style.right =
           vidBox.style.bottom = vidBox.style.width = '';
@@ -12567,27 +12573,31 @@
 
   // Sets the layout - level ids run 1-16 in menu order. A third chat
   // column only exists in landscape, where it's actually wider than it
-  // is tall enough to be readable. 1/3/9 run bare chat columns, 15 the
-  // same with the video framed on top; the rest dock a side rail -
-  // help at 2/4/5/10/11/16 (2 filling the row solo), stats at 8/12,
-  // the video at 5/6/8/11/13/16 (2/4/7/10/14 float it instead, 12
-  // leaves it to the rail video setting) and the emote picker under
-  // every rail that doesn't hold help - and above help on 16
-  const SPLIT_NAMES = ['1col chat', '1col help', '2col chat', '2col chat help', '2col chat vid/help', '2col chat vid/emotes', '2col chat emotes', '2x2', '3col chat', '3col chat help', '3col chat vid/help', '3col chat vid/emotes/stats', '3col chat vid/emotes', '3col chat emotes', '1col vid/chat', '3col chat vid/emotes/help'];
+  // is tall enough to be readable. 1/3/9 run bare chat columns, 15 and
+  // 17 frame the video over them - 17 drops the chat entirely; the
+  // rest dock a side rail - help at 2/4/5/10/11/16/18 (2 and 18 fill
+  // the row solo), stats at 8/12, the video at 5/6/8/11/13/16/18
+  // (2/4/7/10/14 float it instead, 12 leaves it to the rail video
+  // setting) and the emote picker under every rail that doesn't hold
+  // help - and above help on 16
+  const SPLIT_NAMES = ['1col chat', '1col help', '2col chat', '2col chat help', '2col chat vid/help', '2col chat vid/emotes', '2col chat emotes', '2x2', '3col chat', '3col chat help', '3col chat vid/help', '3col chat vid/emotes/stats', '3col chat vid/emotes', '3col chat emotes', '1col vid/chat', '3col chat vid/emotes/help', '1col video', '1col video/help'];
   // compact url aliases: col + v(id) e(motes) s(tats) h(elp) - 2x2 is its own shape
-  const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce', '1cv', '3cveh'];
-  const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻', '▶▮', '▮▮▯?'];
+  const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce', '1cv', '3cveh', '1cvid', '1cvh'];
+  const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻', '▶▮', '▮▮▯?', '▶', '▶?'];
   const splitGlyph = (l) => SPLIT_GLYPHS[l - 1];
   // menu + wheel order rides this over stable declaration-order ids, so
   // a rearrangement never remaps a stored level - chat-emotes sits right
-  // under chat-help in each column family
-  const SPLIT_ORDER = [0, 1, 14, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
+  // under chat-help in each column family, and the 1col variants follow
+  // 1col help
+  const SPLIT_ORDER = [0, 1, 14, 16, 17, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
   // the level families - menu order scatters the semantic ranges
-  const LVL_NORAIL = new Set([1, 3, 9, 15]);       // bare chat columns - 15 docks the video above them instead
-  const LVL_HELPRAIL = new Set([2, 4, 5, 10, 11, 16]); // help docked in the rail
+  const LVL_NORAIL = new Set([1, 3, 9, 15, 17]);   // bare chat columns - 15/17 dock the video above them instead
+  const LVL_VIDSTACK = new Set([15, 17]);          // the framed stack - 17 hides the column leaving the video solo
+  const LVL_SOLO = new Set([2, 18]);               // no chat: the centred rail fills the row - help, or video over help
+  const LVL_HELPRAIL = new Set([2, 4, 5, 10, 11, 16, 18]); // help docked in the rail
   const LVL_HELPEMOTES = new Set([16]);            // help shares this rail with the picker
   const LVL_STATSRAIL = new Set([8, 12]);          // the stats pane in the rail
-  const LVL_VIDRAIL = new Set([5, 6, 8, 11, 13, 16]);  // video docked for the level - atop the rail, or over 8's chat
+  const LVL_VIDRAIL = new Set([5, 6, 8, 11, 13, 16, 18]);  // video docked for the level - atop the rail, or over 8's chat
   const LVL_VIDFLOAT = new Set([2, 4, 7, 10, 14]); // rail on, the video floats
   const LVL_PORTRAIT = new Set([1, 3, 15]);        // levels portrait can keep
   // level ids used to run in declaration order; a stored int from then
@@ -12611,7 +12621,7 @@
     // rail: 3↔10-14 and 1↔4-8 alike. the rail modes share one visible
     // rail, so level changes must still re-dock; only a true no-op
     // exits early
-    const want = level === 2 ? 0 : level === 9 ? 3 : level === 3 || (level >= 10 && level <= 14) || level === 16 ? 2 : 1;
+    const want = level === 2 || level >= 17 ? 0 : level === 9 ? 3 : level === 3 || (level >= 10 && level <= 14) || level === 16 ? 2 : 1;
     const noRail = LVL_NORAIL.has(level);
     if (want === cur) {
       if (railEl.hidden === noRail && prevSplit === level) return;

@@ -105,6 +105,12 @@ not versions - the page ships continuously to Neocities.
   their stable ids so no saved setting or ?split= url remaps;
   1col vid/chat moves up under 1col help to match how the help page
   already groups it
+- two layouts join the 1col group: `1col video` (level 17) centres
+  the framed stream alone - the seam and gutters still drag its width,
+  and with no chat below it the frame keeps the row's full height;
+  `1col video/help` (level 18) fills the centred solo rail with the
+  video over the docked help popup, like 1col help with the stream
+  on top
 - dsa electeds refresh: the four nyc council socialists, diana
   moreno (mamdani's assembly seat), soren stevenson + aurin
   chowdhury (minneapolis), nithya raman (la) and janeese lewis
