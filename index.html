@@ -1984,7 +1984,7 @@
   #htabRes a.at.livoff { opacity: .5; }
   /* channels/streams renders as a table: name+switch controls, then
      the kind, then the community links; the legend row spans all three */
-  #helpPanel .linkcols.stbl { display: grid; column-gap: .9em; }
+  #helpPanel .linkcols.stbl { display: grid; column-gap: .9em; align-items: center; line-height: 1.7; }
   #helpPanel .linkcols.stbl > i { display: contents; }
   /* size the note out of track sizing - its unwrapped max-content would
      otherwise distribute across every column it spans */
@@ -1998,7 +1998,7 @@
   /* zb stripes every other entry row - the Band spans the full Row
      under the Cells, so the wash carries across a Row's empty Service
      slots and the Column Gaps, not just the Cells it fills */
-  #helpPanel .linkcols.stbl .zb { background: rgba(128, 128, 128, .06); }
+  #helpPanel .linkcols.stbl .zb { background: rgba(128, 128, 128, .06); align-self: stretch; }
   /* stbl group heads: hoisted out of their entry row onto a spanning
      label row - the dim-italic underline look of the flowing heads,
      minus the column-flow outdent the grid doesn't need */

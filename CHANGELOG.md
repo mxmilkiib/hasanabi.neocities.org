@@ -44,6 +44,11 @@ not versions - the page ships continuously to Neocities.
   ('house 8b duluth' -> mn | 8b duluth | house). la city council
   rows gain proper ca/los angeles tags and the columbus charter
   amendment files under oh/columbus
+- stbl tables (midterms slate, chapters, caucuses, channels) get a
+  1.7 line-height and cells centre vertically in their row - wrapped
+  note text no longer leaves single-line cells hugging the top; the
+  zebra band stretches explicitly so the centre alignment doesn't
+  collapse it
 - dsa resources picks up my.dsa (member portal), the merch store,
   the npec political-education hub, and the member-gated metro dc
   and denver wikis; dsa chapters becomes a sortable table - one row
