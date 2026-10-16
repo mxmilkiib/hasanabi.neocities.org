@@ -166,9 +166,10 @@ no dependencies beyond CDN-hosted fonts.
   - `hold+` is the default. It also pauses animated emotes while
     holding. Manual searches, sorting and filters still take effect.
 - **Window and settings**
-  - The picker opens by default. If one closes it, it stays closed on
-    the next visit. Drag the top handle to move it or its edges to
-    resize it. The pin button keeps it open when the chat bar closes.
+  - The picker starts closed. Opening it with ☻ keeps it open across
+    layouts and visits; closing it keeps it closed everywhere too.
+    Drag the top handle to move it or its edges to resize it. The pin
+    button keeps it open when the chat bar closes.
   - Its settings, position and size can be saved or shared with the
     other display settings. Scroll over an option button to change it;
     `Esc` closes the picker before the help popup.

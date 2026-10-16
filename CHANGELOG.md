@@ -107,6 +107,10 @@ not versions - the page ships continuously to Neocities.
 - the [?] popup's font-size option reaches three rungs lower - 'chat
   −6' down to 'c −1' beside 'chat', the first entry spelling 'chat'
   out and the rest shortening to 'c'; ?hpfs=chat-4..chat-6 work too
+- the emote picker no longer opens by default or re-opens on layout
+  switches - its saved open/closed state governs on every layout, so
+  a closed picker stays closed docked or floating and an open one
+  stays open; copied urls carry epopen for the open state too
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps;

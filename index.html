@@ -11843,7 +11843,7 @@
     // docked rail an open picker is implied (the rail reopens it unless
     // that '0' vetoes it), so only the deliberate close is worth a param
     try {
-      if (!emotePick.hidden && railEl.hidden) q.set('epopen', '1');
+      if (!emotePick.hidden) q.set('epopen', '1');
       else if (localStorage.getItem(EPICK_OPEN_KEY) === '0') q.set('epopen', '0');
     } catch {}
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
@@ -12750,17 +12750,10 @@
         emotePick.style.left = emotePick.style.top = emotePick.style.width = emotePick.style.height = emotePick.style.transform = '';
         emotePick.style.flexGrow = '';
       }
-      // a rail layout that hosts the picker needs it up - '0' (a
-      // deliberate close) only suppresses the floating popup, not the
-      // rail's own pane, so docking re-shows it and re-stamps '1'
-      if (emotePick.hidden && (!helpDock || helpEmotes)) {
-        emotePick.hidden = false;
-        emojiBtn.classList.add('on');
-        emojiBtn.setAttribute('aria-expanded', 'true');
-        try { localStorage.setItem(EPICK_OPEN_KEY, '1'); } catch {}
-        if (!twSetsKey) loadTwitchSets('');
-        buildPicker();
-      }
+      // a closed picker stays closed when docked - the saved '0'/'1'
+      // governs the rail pane just like the floating popup, so a
+      // layout switch never overrides the choice
+      if (!emotePick.hidden && !twSetsKey) loadTwitchSets('');
       // dockRail can run inside loadOpts, before the maps renderStats
       // reads have initialized - defer past the first eval pass
       setTimeout(renderStats);
@@ -16051,10 +16044,10 @@
     }
   };
   try { applyEpickBox(JSON.parse(localStorage.getItem(EPICK_SIZE_KEY))); } catch {}
-  // the picker opens by default - only a deliberate × close (the '0'
-  // pref) keeps it down; a pinned one restores its stashed position
+  // the picker starts closed - a saved '1' (left open last visit)
+  // re-opens it; a pinned one restores its stashed position
   try {
-    if (localStorage.getItem(EPICK_OPEN_KEY) !== '0') {
+    if (localStorage.getItem(EPICK_OPEN_KEY) === '1') {
       if (localStorage.getItem(EPICK_PIN_KEY) === '1') setPin(true);
       emotePick.hidden = false;
       emojiBtn.classList.add('on');
