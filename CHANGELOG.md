@@ -83,6 +83,10 @@ not versions - the page ships continuously to Neocities.
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps
+- the status-length ladder sheds parts in order: follow-req goes
+  first (the mode chips that made 'stats' look identical to 'full'
+  are retired from the line), the chatter tally survives one more
+  stop at the new 'notally' view, then compact, minimal, blank
 - the header's buttons get a 1px pad above and below on every stop -
   on touch sizes the pinned pair used to sit at top:-2 and overhang
   the bar's top edge; the graph and hover-expand min-heights grow
