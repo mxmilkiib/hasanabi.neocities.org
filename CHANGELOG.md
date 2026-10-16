@@ -6,6 +6,8 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-16
 
 ### Resources
+- the dsa banner link, the corner rose and the active tab title gain
+  a softer upward shadow to match their bottom edges
 - the caucus description, the chapters' region and the midterms loc
   tag lift a step off the dim grey to one shared brighter shade
 - every federal candidate across the midterms tables gains an `fec`
