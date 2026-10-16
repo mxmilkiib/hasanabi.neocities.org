@@ -1995,7 +1995,7 @@
   #helpPanel .linkcols > i.colstart { break-before: column; }
   /* the dsamain banner rides full-width across the columns, so the
      subsection heads under it (dsa links, overview) top-align */
-  #helpPanel .linkcols.dsabw > i:has(> a.dsamain) { column-span: all; padding-bottom: .5em; }
+  #helpPanel .linkcols.dsabw > i:has(> a.dsamain) { column-span: all; padding-bottom: .5em; padding-right: 4.5em; }
   #helpPanel .linkcols.dsabw > i.bsp { column-span: all; margin: 0; line-height: 0; }
   /* the emote picker's cheat-sheet: small dim items in at most two
      columns rather than the link lists' denser spread */
@@ -2106,7 +2106,7 @@
   /* the rose rides the tab's top-right corner, inset to mirror the
      heading's left offset - the rows' 9em label column plus its 13px
      gap, expressed in the logo's own 2.4em font */
-  #helpPanel #htabDsa { position: relative; }
+  #helpPanel #htabDsa { position: relative; container-type: inline-size; }
   #helpPanel .dsalogo { position: absolute; top: 8px; right: calc(3.75em + 13px);
     font-size: 2.4em; line-height: 1; text-decoration: none; }
   /* the official mark's rose, lifted from the hands by the viewBox crop;
@@ -2114,6 +2114,12 @@
   #helpPanel .dsalogo svg { display: block; height: 1em; width: auto; fill: #ec1f27;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .7)) drop-shadow(0 -1px 2px rgba(0, 0, 0, .5)) drop-shadow(0 0 12px rgba(236, 31, 39, .4)); }
   #helpPanel .dsalogo:hover svg { fill: #ff5257; }
+  /* the mirrored inset floats the rose over the links column once the
+     panel itself narrows - the tabpage is the container, so this fires
+     on popup width rather than viewport width */
+  @container (max-width: 600px) {
+    #helpPanel .dsalogo { right: 8px; }
+  }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
   /* author entries run longest (name + work + dates + tagline), so
      the widest columns there */
@@ -2708,9 +2714,6 @@
     /* the channels/streams service grid can run wider than a phone
        panel - let it slide sideways instead of clipping */
     #helpPanel .hp-scroll { overflow-x: auto; }
-    /* the rose drops its dsamain-aligned inset and hugs the corner -
-       on a narrow panel the inset would land it on top of the links */
-    #helpPanel .dsalogo { right: 8px; }
     .col { padding: 6px 10px 6px 6px; }
   }
   /* phones: cap the header type so a large header size can't eat a third of the screen */

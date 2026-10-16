@@ -33,7 +33,10 @@ not versions - the page ships continuously to Neocities.
 - the dsa banner link, the corner rose and the active tab title gain
   a softer upward shadow to match their bottom edges
 - on narrow and touch screens the dsa rose drops its banner-aligned
-  inset and hugs the top-right corner instead of landing on the links
+  inset and hugs the top-right corner instead of landing on the links;
+  the inset now keys off the panel's own width via a container query
+  (a dragged-narrow popup counts too), and the banner row keeps a
+  4.5em right pad so its text can't slide under the rose
 - the stream title bar's lake-drift sheen calms down - the violet
   bands run at a third of their old strength on a slower 26s pass
 - the sub-months gradient tops out sooner - five years now reads as
