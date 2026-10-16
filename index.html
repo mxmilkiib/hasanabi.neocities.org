@@ -573,6 +573,10 @@
   #epop .epemo { font-size: 64px; line-height: 1.1; margin: 0; max-width: none; max-height: none; }
   #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; white-space: pre-line; }
   #vid #vidFrame { position: absolute; inset: 0; }
+  /* danmaku bullets paint above the video surface but under the drag
+     and resize chrome (handle z2, grips z3) */
+  #vid #danmaku { position: absolute; inset: 0; width: 100%; height: 100%;
+    z-index: 1; pointer-events: none; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
@@ -2805,6 +2809,7 @@
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
+    <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour; needs the video on, live messages only<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
     <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top - scrolling to it pages more in on its own, and ⇧click loads eight pages at once - or by clicking a find hit, a reply chip, or a ?mid= link; restored rows carry the dimmed stale look and count toward the scrollback cap. A date (date:YYYY-MM-DD) in the find bar jumps straight to its moment. Where a restore leaves a stored stretch unrendered, a "skipped" marker counts it and fills on click. The paged column layouts hide stale rows but keep the seam - clicking it folds back to one scrolling column first. <a href="#" role="button" id="archImport" title="read a downloaded log dump into the archive - raw irc lines or [timestamp] #chan nick: text">import</a> back-fills the store from a log file.<input type="file" id="archFile" accept=".txt,.log,.irc,text/plain" hidden> <span id="archiveStatus" role="status"></span></span></div>
@@ -2978,7 +2983,7 @@
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>first-time tips: click/scroll header buttons to change some option settings -- page audio autoplay permission allows unmuted stream on open/reload -- click to dismiss</div>
-  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
+  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><canvas id="danmaku" hidden></canvas><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div></div>
   <div id="vidSplit" aria-hidden="true" hidden title="drag to resize the video and chat"></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice · date:YYYY-MM-DD" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback - a date jumps to it" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
@@ -5087,6 +5092,13 @@
     dedupeLinks(newRows);
     if (hlUsers.size) for (const r of newRows) hlRow(r);
     if (ucardLogin) for (const r of newRows) ucardMark(r);
+    // bullets fly only rows that rendered live - backlog restores,
+    // blocked rows and the hidden bots stay out of the stream
+    if (danmakuOn) for (const r of newRows) {
+      if (r.classList.contains('replay') || r.classList.contains('blk')) continue;
+      if (hideBots && (r.dataset.u === 'fossabot' || r.dataset.u === 'blammobot')) continue;
+      danmakuPush(r);
+    }
     if (whisHtml) {
       whisLog.insertAdjacentHTML('beforeend', whisHtml);
       // the pane is a rolling dm history - bound it like the log but far
@@ -6369,6 +6381,7 @@
     else if (a.classList.contains('helpGif')) { setGifSafe(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpYtem')) { setYtEmb(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpTitle')) { setTitleBar(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpDan')) { setDanmaku(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpModes')) { setModesOn(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpSview')) { setStatusView(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpUpd')) { setUpdMin(UPD_STOPS[+a.dataset.idx]); saveOpts(); }
@@ -9669,7 +9682,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0, eprow: epickRowOff ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
@@ -9857,6 +9870,7 @@
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
     if (o.pn !== undefined) setPronouns(!!o.pn);
     if (o.nbots !== undefined) setBotsHide(!!o.nbots);
+    if (o.dan !== undefined) setDanmaku(!!o.dan);
     if (Number.isFinite(+o.anim)) setNickAnim(+o.anim);
     if (o.rbws !== undefined) setRbwScope(+o.rbws);
     if (o.rbw !== undefined) setRbwStyle(+o.rbw);
@@ -10182,6 +10196,120 @@
     vidNext();
     saveOpts();
   }, { passive: false });
+
+  // ---- danmaku: niconico-style bullets streaming right-to-left over
+  //      the video. canvas rather than DOM - a hype train's worth of
+  //      animated spans would melt the compositor. crossing time is
+  //      fixed per bullet, so a longer message flies faster - the
+  //      authentic east-net pacing - with a little per-bullet jitter ----
+  const danCv = document.getElementById('danmaku');
+  const danCtx = danCv.getContext('2d');
+  let danmakuOn = false;      // config toggle, default off
+  const danBullets = [];      // live { txt, col, x, w, v, y, lane }
+  const danQueue = [];        // pushed rows waiting for a free lane
+  const DAN_CAP = 42, DAN_QCAP = 60, DAN_DUR = 5200;
+  let danLanes = 0, danFontPx = 16, danNextLane = 0;
+  let danRaf = 0, danLast = 0, danFf = 'sans-serif';
+  function danFit() {
+    const w = vidBox.clientWidth, h = vidBox.clientHeight;
+    if (!w || !h) return;
+    const nw = Math.round(w * DPR), nh = Math.round(h * DPR);
+    if (danCv.width !== nw || danCv.height !== nh) {
+      danCv.width = nw; danCv.height = nh;
+    }
+    danCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    danFontPx = Math.max(12, Math.min(24, Math.round(h * 0.055)));
+    danLanes = Math.max(1, Math.min(10, Math.floor(h / (danFontPx * 1.5))));
+    danFf = getComputedStyle(logEl).fontFamily;
+  }
+  // a hidden->shown box refits here and danKick resumes any bullets
+  // that were mid-flight when the video folded away
+  new ResizeObserver(() => { danFit(); danKick(); }).observe(vidBox);
+  // the feed rebuilds plain text with emote imgs reading as their codes,
+  // so an emote-only post doesn't fly as a blank bullet
+  function danmakuPush(row) {
+    if (!danmakuOn || vidBox.hidden) return;
+    const m = row.querySelector('.msg');
+    if (!m) return;
+    const walk = (el) => { let s = '';
+      for (const n of el.childNodes)
+        s += n.nodeType === 3 ? n.textContent : n.tagName === 'IMG' ? (n.alt || '') + ' ' : walk(n);
+      return s; };
+    let txt = walk(m).replace(/\s+/g, ' ').trim();
+    if (!txt) return;
+    if (txt.length > 60) txt = txt.slice(0, 59) + '…';
+    const lg = row.dataset.u;
+    const rec = lg && seenNicks.get(lg);
+    danQueue.push({ txt, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x') });
+    if (danQueue.length > DAN_QCAP) danQueue.splice(0, danQueue.length - DAN_QCAP);
+    danKick();
+  }
+  // a lane is free once its last bullet's tail is inside the frame and
+  // the newcomer can't run it down before it exits off the left edge
+  function danSpawn(W) {
+    while (danBullets.length < DAN_CAP && danQueue.length) {
+      const q = danQueue[0];
+      danCtx.font = `600 ${danFontPx}px ${danFf}`;
+      const w = Math.ceil(danCtx.measureText(q.txt).width) + 6;
+      const v = (W + w) / (DAN_DUR * (0.85 + Math.random() * 0.3));
+      let lane = -1;
+      for (let k = 0; k < danLanes; k++) {
+        const L = (danNextLane + k) % danLanes;
+        let ok = true;
+        for (const b of danBullets) {
+          if (b.lane !== L) continue;
+          if (b.x + b.w > W - 8) { ok = false; break; }
+          if (v > b.v && (W - b.x - b.w) / (v - b.v) < (b.x + b.w) / b.v) { ok = false; break; }
+        }
+        if (ok) { lane = L; break; }
+      }
+      if (lane < 0) return; // every lane backed up - wait for next frame
+      danQueue.shift();
+      danNextLane = (lane + 1) % danLanes;
+      danBullets.push({ txt: q.txt, col: q.col, x: W, w, v, lane,
+        y: lane * danFontPx * 1.5 + danFontPx });
+    }
+  }
+  function danDraw(now) {
+    const dt = Math.min(80, now - danLast) / 1000; danLast = now;
+    const W = danCv.width / DPR, H = danCv.height / DPR;
+    danSpawn(W);
+    danCtx.clearRect(0, 0, W, H);
+    danCtx.font = `600 ${danFontPx}px ${danFf}`;
+    danCtx.textBaseline = 'middle';
+    danCtx.lineJoin = 'round';
+    danCtx.strokeStyle = 'rgba(0,0,0,.8)';
+    danCtx.lineWidth = Math.max(2, danFontPx * 0.18);
+    for (let i = danBullets.length - 1; i >= 0; i--) {
+      const b = danBullets[i];
+      b.x -= b.v * dt;
+      if (b.x + b.w < 0) { danBullets.splice(i, 1); continue; }
+      danCtx.strokeText(b.txt, b.x, b.y);
+      danCtx.fillStyle = b.col;
+      danCtx.fillText(b.txt, b.x, b.y);
+    }
+    // spin only while something's flying or waiting - an idle video
+    // costs nothing
+    danRaf = (danmakuOn && !vidBox.hidden && (danBullets.length || danQueue.length))
+      ? requestAnimationFrame(danDraw) : 0;
+  }
+  function danKick() {
+    if (danRaf || !danmakuOn || vidBox.hidden) return;
+    if (!danLanes) danFit();
+    if (!danLanes) return;
+    danLast = performance.now();
+    danRaf = requestAnimationFrame(danDraw);
+  }
+  function setDanmaku(on) {
+    danmakuOn = on;
+    markHelp('helpDan', on ? 1 : 0);
+    danCv.hidden = !on;
+    if (on) { danFit(); danKick(); }
+    else {
+      danQueue.length = danBullets.length = 0;
+      danCtx.clearRect(0, 0, danCv.width, danCv.height);
+    }
+  }
 
   // dragging: pointer capture keeps move events flowing to the handle even
   // when the pointer crosses over the iframe, which would eat them otherwise
@@ -11348,6 +11476,7 @@
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
+    if (danmakuOn) q.set('dan', '1');
     if (nickAnim !== 2) q.set('anim', ANIM_URL[nickAnim]);
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', RBW_URL[rbwStyle]);
     if (rbwPal !== 0) q.set('rbp', RBW_PALS[rbwPal].n);
@@ -16182,6 +16311,7 @@
     if (q.has('lkico')) setLkIco(flag('lkico'));
     if (q.has('pn')) setPronouns(flag('pn'));
     if (q.has('nbots')) setBotsHide(flag('nbots'));
+    if (q.has('dan')) setDanmaku(flag('dan'));
     if (q.has('anim')) {
       const v = q.get('anim'), i = ANIM_URL.indexOf(v);
       if (i >= 0) setNickAnim(i);
@@ -16298,7 +16428,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpDan: ['off', 'on'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
@@ -16378,6 +16508,7 @@
   markHelp('helpPeek', peekMode);
   markHelp('helpYtem', ytEmbed ? 1 : 0);
   markHelp('helpTitle', titleBarOn ? 1 : 0);
+  markHelp('helpDan', danmakuOn ? 1 : 0);
   markHelp('helpModes', modesOn ? 1 : 0);
   markHelp('helpSview', statusView);
   markHelp('helpUpd', UPD_STOPS.indexOf(updMin));

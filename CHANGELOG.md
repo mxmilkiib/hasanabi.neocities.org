@@ -83,6 +83,11 @@ not versions - the page ships continuously to Neocities.
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps
+- danmaku mode: a canvas overlay on the video streams live chat
+  bullets right-to-left across stacked lanes, niconico-style - fixed
+  crossing time so longer messages fly faster, nick-coloured with a
+  dark outline, lane-collision-checked, capped under load; toggles
+  from the help row or ?dan=1
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
