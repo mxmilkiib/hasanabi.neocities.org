@@ -6502,7 +6502,7 @@
     else if (a.classList.contains('helpPos')) { helpPos = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; applyHelpPos(); const s = readHsize(); delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a position pick undoes a drag
     else if (a.classList.contains('helpStick')) { helpStick = +a.dataset.idx === 1; markHelp('helpStick', helpStick ? 1 : 0); saveOpts(); }
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
-    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i <= 2 ? i - 3 : i === 3 ? -4 : i - 4; applyHelpFs(); }
+    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i <= 2 ? i - 7 : i <= 5 ? i - 6 : i === 6 ? -4 : i - 7; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbwS')) { setRbwScope(+a.dataset.idx); saveOpts(); }
@@ -8265,6 +8265,9 @@
     de.setProperty('--help-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 1)] : Math.max(7, fs - 1)) + 'px');
     de.setProperty('--help-font2', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 2)] : Math.max(7, fs - 2)) + 'px');
     de.setProperty('--help-font3', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 3)] : Math.max(7, fs - 3)) + 'px');
+    de.setProperty('--help-font4', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 4)] : Math.max(7, fs - 4)) + 'px');
+    de.setProperty('--help-font5', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 5)] : Math.max(7, fs - 5)) + 'px');
+    de.setProperty('--help-font6', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 6)] : Math.max(7, fs - 6)) + 'px');
     // tracking travels as an em step so it scales with the font, but the
     // property is inherited through body which doesn't use --chat-font -
     // resolve to px here so the same proportion reaches every element
@@ -10072,7 +10075,7 @@
     }
     if (Number.isInteger(o.hpfs)) {
       helpFs = o.hpfs < 0 ? o.hpfs : HDR_SIZES.indexOf(o.hpfs);
-      if (helpFs < -4) helpFs = -1; // a px no longer offered falls back to follow
+      if (helpFs < -7) helpFs = -1; // a px no longer offered falls back to follow
       applyHelpFs();
     }
     if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
@@ -11690,13 +11693,14 @@
   }
   // a dragged width isn't one of the stops - note it in brackets
   const markHelpW = (w) => { helpWCur.textContent = w ? ` (${w}px)` : ''; };
-  // popup font size: -4/-1/-2/-3 follow the chat font that many ladder steps
-  // down (-4 = no step, chat itself), else a px pick from the same stops
+  // popup font size: negatives follow the chat font down the ladder -
+  // -1/-2/-3 map to --help-font/2/3, -5/-6/-7 to --help-font4/5/6, and
+  // -4 is no step (chat itself) - else a px pick from the same stops
   // the header size uses
   let helpFs = -1;
   function applyHelpFs() {
     if (helpFs === -4) helpPanel.style.fontSize = 'var(--chat-font)';
-    else if (helpFs < 0) helpPanel.style.fontSize = helpFs === -1 ? '' : `var(--help-font${-helpFs})`;
+    else if (helpFs < 0) helpPanel.style.fontSize = helpFs === -1 ? '' : `var(--help-font${helpFs <= -5 ? -helpFs - 1 : -helpFs})`;
     else helpPanel.style.fontSize = HDR_SIZES[helpFs] + 'px';
     markHelpFs();
     saveOpts();
@@ -11704,10 +11708,10 @@
   // a chat-relative pick resolves to a px stop too - light that up as well
   // so the row shows what 'chat −N' currently means
   function markHelpFs() {
-    markHelp('helpFs', helpFs === -4 ? 3 : helpFs < 0 ? helpFs + 3 : helpFs + 4);
+    markHelp('helpFs', helpFs === -4 ? 6 : helpFs <= -5 ? helpFs + 7 : helpFs < 0 ? helpFs + 6 : helpFs + 7);
     if (helpFs >= 0) return;
     const i = HDR_SIZES.indexOf(Math.round(parseFloat(getComputedStyle(helpPanel).fontSize)));
-    const eq = i >= 0 && helpPanel.querySelector(`a.helpFs[data-idx="${i + 4}"]`);
+    const eq = i >= 0 && helpPanel.querySelector(`a.helpFs[data-idx="${i + 7}"]`);
     if (eq) setOn(eq, true);
   }
   // header height changes with width when the controls wrap - re-anchor
@@ -11843,7 +11847,7 @@
       else if (localStorage.getItem(EPICK_OPEN_KEY) === '0') q.set('epopen', '0');
     } catch {}
     if (helpWIdx !== DEF.hpw) q.set('hpw', HELP_WIDTHS[helpWIdx]);
-    if (helpFs !== -1) q.set('hpfs', helpFs === -4 ? 'chat' : helpFs < 0 ? 'chat' + helpFs : HDR_SIZES[helpFs]);
+    if (helpFs !== -1) q.set('hpfs', helpFs === -4 ? 'chat' : helpFs < 0 ? 'chat-' + (helpFs <= -5 ? -helpFs - 1 : -helpFs) : HDR_SIZES[helpFs]);
     if (helpPos !== DEF.hpos) q.set('hpos', HPOS_URL[helpPos]);
     if (helpStick) q.set('hstick', '1');
     if (hdrFs !== DEF.hfs) q.set('hfs', hdrFs < 0 ? 'auto' : HDR_SIZES[hdrFs]);
@@ -16720,8 +16724,8 @@
       // 'chat' names the chat font itself, 'chat-N' the N-below steps;
       // negatives index them too, a positive value is the px size itself
       if (v === 'chat') { helpFs = -4; applyHelpFs(); }
-      else if (/^chat-[1-3]$/.test(v)) { helpFs = -+v.slice(5); applyHelpFs(); }
-      else { const n = +v, i = n < 0 ? Math.max(Math.round(n), -4) : HDR_SIZES.indexOf(n); if (n < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
+      else if (/^chat-[1-6]$/.test(v)) { const n = +v.slice(5); helpFs = n <= 3 ? -n : -n - 1; applyHelpFs(); }
+      else { const n = +v, i = n < 0 ? Math.max(Math.round(n), -7) : HDR_SIZES.indexOf(n); if (n < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
     if (q.has('hpos') && q.get('hpos') !== '') { const v = q.get('hpos'); let i = HPOS_URL.indexOf(v); if (i < 0) i = +v; if (Number.isInteger(i) && i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
@@ -16783,7 +16787,7 @@
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
-    helpFs: ['chat −3', 'chat −2', 'chat −1', 'chat'].concat(HDR_SIZES),
+    helpFs: ['chat −6', 'c −5', 'c −4', 'c −3', 'c −2', 'c −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'quicker'],
     helpHide: HIDE_MODES,

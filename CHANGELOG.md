@@ -104,6 +104,9 @@ not versions - the page ships continuously to Neocities.
   beside 'dsa' (?htab=vote works); the rows stay .vote-marked in the
   dsa markup and lift onto the page at init so the election data
   remains one editable block
+- the [?] popup's font-size option reaches three rungs lower - 'chat
+  −6' down to 'c −1' beside 'chat', the first entry spelling 'chat'
+  out and the rest shortening to 'c'; ?hpfs=chat-4..chat-6 work too
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps;
