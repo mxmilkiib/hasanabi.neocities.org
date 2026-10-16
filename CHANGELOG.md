@@ -34,6 +34,8 @@ not versions - the page ships continuously to Neocities.
   a softer upward shadow to match their bottom edges
 - on narrow and touch screens the dsa rose drops its banner-aligned
   inset and hugs the top-right corner instead of landing on the links
+- the stream title bar's lake-drift sheen calms down - the violet
+  bands run at half their old strength on a slower 22s pass
 - the spacer row under the dsa banner loses its residual line height
 - the corner rose becomes the official dsa mark's own rose - the
   emoji glyph swapped for the logo's vector, cropped off the clasped
