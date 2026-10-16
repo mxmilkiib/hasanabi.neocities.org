@@ -143,7 +143,10 @@ not versions - the page ships continuously to Neocities.
   bullets so rows don't stack
 - danmaku bullets wear the live chat font - the family was cached at
   refit, so a mid-session font swap left the stream in the old face;
-  the bullet text cap rises 60 → 160 chars
+  the bullet text cap rises 60 → 160 chars. and the family is read
+  off :root's --chat-ff itself - #log never carries the font (it only
+  lives on .row), so its computed family was the page's UI sans all
+  along
 - danmaku draws emotes as images inline in the bullet instead of
   flying their codes as text - the row walks into text/emote
   segments, each emote sharing a cached Image at ~1.4x the bullet

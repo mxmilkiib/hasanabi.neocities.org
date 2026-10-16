@@ -10339,9 +10339,13 @@
   const DAN_CAP = 42, DAN_QCAP = 60, DAN_DUR = 5200;
   let danLanes = 0, danFontPx = 16, danNextLane = 0;
   let danRaf = 0, danLast = 0;
-  // bullets wear the live chat font - read fresh at paint time so a
-  // font swap takes effect on the very next frame, not the next refit
-  const danFontFam = () => getComputedStyle(logEl).fontFamily;
+  // bullets wear the live chat font - the --chat-ff var on :root, which
+  // is what .row consumes; #log itself never carries it (it only lives
+  // on .row), so its computed family is the page's UI sans instead.
+  // read fresh each paint so a font swap lands on the next frame
+  const danFontFam = () =>
+    getComputedStyle(document.documentElement).getPropertyValue('--chat-ff').trim()
+    || 'ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace';
   function danFit() {
     const w = vidBox.clientWidth, h = vidBox.clientHeight;
     if (!w || !h) return;
