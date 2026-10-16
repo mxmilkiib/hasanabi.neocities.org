@@ -105,6 +105,10 @@ not versions - the page ships continuously to Neocities.
   canonical key
 
 ### Resources
+- dsa: the chapters table splits across two columns - the builder's
+  new `data-split` mode pairs plain entries left/right, with the
+  pinned map-and-sort row and headers keeping their seats; a hairline
+  divides the halves and zebra stripes still span the row
 - dsa: a `midterms 2026` section lands under electoral tools - nec
   endorsements, ballotpedia's endorsement tracker, the election-night
   results desk and the house handicappers - while electoral tools
