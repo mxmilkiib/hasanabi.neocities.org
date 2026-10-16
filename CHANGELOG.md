@@ -97,7 +97,9 @@ not versions - the page ships continuously to Neocities.
   remains one editable block
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
-  their stable ids so no saved setting or ?split= url remaps
+  their stable ids so no saved setting or ?split= url remaps;
+  1col vid/chat moves up under 1col help to match how the help page
+  already groups it
 - dsa electeds refresh: the four nyc council socialists, diana
   moreno (mamdani's assembly seat), soren stevenson + aurin
   chowdhury (minneapolis), nithya raman (la) and janeese lewis

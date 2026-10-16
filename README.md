@@ -261,6 +261,8 @@ no dependencies beyond CDN-hosted fonts.
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
+    - `1col vid/chat` stacks the video in its framed floating style
+      over the single chat column.
     - `2col chat` passes older messages to a second chat column.
     - `2col chat help` docks the help popup in the rail beside one
       chat column - no video over it; `▶` floats it like `2col chat emotes`.
@@ -283,8 +285,6 @@ no dependencies beyond CDN-hosted fonts.
       emotes.
     - `3col chat emotes` puts two chat columns beside the emote picker;
       video can float above the chat.
-    - `1col vid/chat` stacks the video in its framed floating style
-      over the single chat column.
     - `3col chat vid/emotes/help` puts two chat columns beside a rail
       with video, the emote picker and the help popup.
   - Drag the divider to change the side column's width. In layouts
