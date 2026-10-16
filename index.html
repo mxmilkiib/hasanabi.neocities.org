@@ -1135,7 +1135,7 @@
   .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); }
   /* outgoing page-flip contents linger faded until pushed below the fold */
   .row { transition: opacity .3s; }
-  .row.stale { opacity: .7; }
+  .row.stale, .row.arch { opacity: .7; }
   /* no separator above the first row of a column */
   .col > .row:first-child { --rowline: transparent; }
   .row.notice.raid { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 0 0); }
@@ -2657,9 +2657,9 @@
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
     <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle points">violet tint</b><span>channel-point highlights</span><b class="rowstyle glorp">red rows</b><span><img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> <a>glorp / F</a></span><b class="rowstyle selfchip">accent rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
-    <div><b>↩ chip</b> reply context; click to jump to the original message</div>
+    <div><b>↩ chip</b> reply context; click to jump to the original message - past the rendered edge it restores the parent (and its neighbours) from the archive</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
-    <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row</div>
+    <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row, restoring it from the archive first when it has left the log</div>
     <div class="sep">&nbsp;</div>
     <div><b>stats</b> the tab beside this one: session top chatters, <img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"><span class="aux">glorp tally and top glorpers, top emotes by channel usage, the rate graph's loudest bursts (3x the channel's median rate, 4+ msgs/s floor)</span></div>
     <div style="margin-top: 17px"><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
@@ -2694,7 +2694,7 @@
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
-    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top, or by clicking a find hit - restored rows carry the dimmed stale look and count toward the scrollback cap. <span id="archiveStatus" role="status"></span></span></div>
+    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top - scrolling to it pages more in on its own - or by clicking a find hit, a reply chip, or a ?mid= link; restored rows carry the dimmed stale look and count toward the scrollback cap. The paged column layouts hide stale rows, so restoring folds back to one scrolling column. <span id="archiveStatus" role="status"></span></span></div>
     <div><b>–</b> header size: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span> - middle-clicking the ? opens the about page, middle-clicking its ✕ recentres a moved panel<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -4371,6 +4371,8 @@
       row.remove();
       total--;
     }
+    // the archive edge moved - the load seam's count may be stale
+    if (archDb) archTopCheck();
     redupeIfLinkview(); // evicted first posts free their link's reposts
   }
   function setScrollback(n) {
@@ -4638,11 +4640,15 @@
             for (const r of rowById) if ((r[1].dataset || {}).ch === ch) rowById.delete(r[0]);
             html = html.replace(new RegExp(`<div [^>]*data-ch="${ch}"[^>]*>[^]*?</div>`, 'g'), '');
             histDirty = true;
+            if (archDb) archTopCheck(true);
           } else {
             html = '';
             for (const c of cols()) c.textContent = '';
             rowById.clear();
             histDirty = true;
+            // the wipe takes the load seam with it - re-seat it at the
+            // empty log's edge
+            if (archDb) { logEl.prepend(archTop); archTopCheck(true); }
           }
         }
         const dur = +tags['ban-duration'] || 0;
@@ -8672,17 +8678,21 @@
   };
   // old records glue time, name and furniture into .text - recover the
   // body by cutting at the stored display name, then strip the reply
-  // glyph and the notice label
+  // glyph and the notice label. Emote-only rows glue to furniture only;
+  // their emote names ride in .em and rebuild the body from scratch
   function archBody(r) {
     if (r.msg != null) return r.msg;
     const t = r.text || '', i = r.name ? t.indexOf(r.name) : -1;
     let b = i < 0 ? t.replace(/^[\d:]+(?:\s?[AP]M)?/i, '') : t.slice(i + r.name.length);
     b = b.replace(/^\s*:?\s*/, '');
     if (r.kind === 'notice') b = b.replace(/^\[notice\]\s?/i, '');
-    return b.replace(/\s*↩$/, '');
+    b = b.replace(/\s*↩$/, '');
+    if (!b.trim() && r.em && r.em.length) b = r.em.join(' ');
+    return b;
   }
   // records carrying .cls replay their flags verbatim; older ones re-mark
-  // against the live mention and keyword sets
+  // against the live mention and keyword sets - a '*' before the display
+  // name means the line was a /me action
   function archCls(r, body) {
     if (r.cls != null) return r.cls;
     const f = [];
@@ -8690,14 +8700,16 @@
     if (kwMatch(body)) f.push('kw');
     if (bwMatch(body)) f.push('blk');
     if (GLORP_RE.test(body) || F_RE.test(body.trim())) f.push('glorp');
+    const ni = r.name ? (r.text || '').indexOf(r.name) : -1;
+    if (ni > 0 && (r.text || '').slice(0, ni).trimEnd().endsWith('*')) f.push('action');
     if (auth && r.login && r.login === auth.login) f.push('self');
     return f.join(' ');
   }
   function archRowHTML(r) {
     const ch = r.ch || CHANNEL, login = r.login || '', name = r.name || login || '?';
-    const body = archBody(r), cls = archCls(r, body);
+    const body = archBody(r);
+    let cls = archCls(r, body);
     const notice = r.kind === 'notice';
-    const action = cls.split(' ').includes('action');
     const fossa = /^(fossabot|blammobot)$/i.test(login || name);
     const shiny = fossa || /^(hasanabi|ostonox)$/i.test(login || name);
     const md = (r.b || '').includes('moderator/');
@@ -8738,14 +8750,22 @@
       `<a class="name${shiny ? ' shimmer' : ''}"${shiny ? '' : ` style="color:${escapeHTML(ncol)}"`} ` +
       `href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(login || name.toLowerCase()))}" ` +
       `target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>`;
-    const msgHtml = renderMessageHTML(body, r.et || '', /\bbits\b/.test(cls), ch, shiny, fossa, md).html;
+    const rendered = renderMessageHTML(body, r.et || '', /\bbits\b/.test(cls), ch, shiny, fossa, md);
+    // old records have no .cls - recompute the emote-only flag the same
+    // way the live builder does, off the rendered name set
+    if (r.cls == null && !notice) {
+      const mtoks = body.trim().split(/\s+/).filter(Boolean);
+      if (mtoks.length && mtoks.every((t) => rendered.names.has(t) || emoteNameOf(ch, t) || zwOf(ch).has(t)))
+        cls = cls ? cls + ' eonly' : 'eonly';
+    }
+    const action = cls.split(' ').includes('action');
     return `<div role="article" class="row arch${notice ? ' notice' : ''}${cls ? ' ' + cls : ''}" data-ts="${r.ts}" ` +
       `data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''} data-mid="${escapeHTML(r.mid)}"` +
       `${r.b ? ` data-badges="${escapeHTML(r.b)}"` : ''} title="from the local archive">` +
       `${rq}<span class="time">${fmtRowTime(new Date(r.ts))}</span>${chTag}` +
       `${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}` +
       `${badges}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}${who}${notice || action ? ' ' : '<span class="colon">: </span>'}` +
-      `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${msgHtml}</span>${drainCards().join('')}` +
+      `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${rendered.html}</span>${drainCards().join('')}` +
       `<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
   }
   // ts-sorted records splice into #log's row order - each lands stale
@@ -8812,8 +8832,10 @@
     } catch { cb(recs); }
   }
   // a hit's window: records on each side of its timestamp, both walks
-  // merged oldest-first for a single insert pass
+  // merged oldest-first for a single insert pass. The window stays under
+  // the scrollback cap so the hit keeps its neighbours on both sides
   function archAround(ts, cb) {
+    const ctx = Math.min(ARCH_CTX, MAX_MESSAGES >> 1);
     const before = [], after = [];
     let done = 0;
     const fin = () => {
@@ -8825,7 +8847,7 @@
       archDb.transaction('msgs').objectStore('msgs').index('ts')
         .openCursor(IDBKeyRange.upperBound(ts), 'prev').onsuccess = (e) => {
           const cur = e.target.result;
-          if (!cur || before.length >= ARCH_CTX) return fin();
+          if (!cur || before.length >= ctx) return fin();
           before.push(cur.value);
           cur.continue();
         };
@@ -8834,25 +8856,53 @@
       archDb.transaction('msgs').objectStore('msgs').index('ts')
         .openCursor(IDBKeyRange.lowerBound(ts, true), 'next').onsuccess = (e) => {
           const cur = e.target.result;
-          if (!cur || after.length >= ARCH_CTX) return fin();
+          if (!cur || after.length >= ctx) return fin();
           after.push(cur.value);
           cur.continue();
         };
     } catch { fin(); }
   }
+  // stale rows only render in the scrolling flows - fold a paged layout
+  // back to one column before restoring, so the rows land visible
+  const archReveal = () => {
+    if (revFlow) return;
+    if (isSplit()) setSplit(1);
+    if (wrapFlow) setWrap(false);
+  };
+  // look a mid up in the store and restore its window - the path for
+  // permalinks and reply chips, which know the id but not the timestamp
+  function archSeekMid(mid, cb) {
+    if (!archDb || !mid) return;
+    try {
+      archDb.transaction('msgs').objectStore('msgs').get(mid).onsuccess = (e) => {
+        const r = e.target.result;
+        if (!r) return;
+        archReveal();
+        archAround(r.ts, cb);
+      };
+    } catch {}
+  }
   // the chip only earns its spot when the store holds rows older than the
-  // log's edge - the count label tells how deep the well goes
-  function archTopCheck() {
+  // log's edge - the count label tells how deep the well goes. Trims and
+  // clears re-run it often, so unforced calls skip a fresh count made
+  // moments ago
+  let archTopAt = 0;
+  function archTopCheck(force) {
     if (!archDb) { archTop.hidden = true; return; }
+    const now = Date.now();
+    if (!force && now - archTopAt < 1500) return;
+    archTopAt = now;
     try {
       const req = archDb.transaction('msgs').objectStore('msgs').index('ts')
         .count(IDBKeyRange.upperBound(archEdge(), true));
       req.onsuccess = () => {
         const n = req.result;
         archTop.hidden = !n;
+        if (!n) archTop.textContent = 'load earlier chat';
         if (n) {
+          const page = Math.min(n, ARCH_PAGE, MAX_MESSAGES);
           archTop.textContent = `load earlier chat - ${n.toLocaleString()} in archive`;
-          archTop.title = `${n.toLocaleString()} archived messages older than the log - click to load ${Math.min(n, ARCH_PAGE)}`;
+          archTop.title = `${n.toLocaleString()} archived messages older than the log - click or scroll up to load ${page}`;
         }
       };
       req.onerror = () => { archTop.hidden = true; };
@@ -8862,13 +8912,26 @@
     if (archBusy) return;
     archBusy = true;
     archTop.textContent = 'loading earlier chat…';
-    archOlder(archEdge(), ARCH_PAGE, (recs) => {
+    archOlder(archEdge(), Math.min(ARCH_PAGE, MAX_MESSAGES), (recs) => {
       archBusy = false;
       archInsert(recs.reverse());
       if (!recs.length) archTop.textContent = 'no earlier rows archived';
-      archTopCheck();
+      archTopCheck(true);
+      // while the seam stays in view keep paging - a parked top edge
+      // scrolls back through the store without more gestures. At the
+      // scrollback cap each batch would trim itself - manual clicks only
+      const rows = cols().reduce((n, col) => n + col.children.length, 0);
+      if (archPinned && recs.length && rows < MAX_MESSAGES) setTimeout(archLoad, 250);
     });
   };
+  // the seam doubles as a scroll sentinel: root it to the column and the
+  // observer fires only where .stale renders - split and wrap hide it, so
+  // they never auto-load. Batches chain while it stays pinned
+  let archPinned = false;
+  new IntersectionObserver((es) => {
+    archPinned = es[es.length - 1].isIntersecting;
+    if (archPinned) archLoad();
+  }, { root: logEl, rootMargin: '240px' }).observe(archTop);
   archTop.addEventListener('click', archLoad);
   archTop.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); archLoad(); }
@@ -8899,7 +8962,14 @@
       void r.offsetWidth;
       r.classList.add('jump');
     };
-    if (document.querySelector(sel)) return jump();
+    const vis = document.querySelector(sel);
+    // a stale row in the dom is still invisible under split and wrap -
+    // fold back to the scrolling column before jumping to it
+    if (vis) {
+      if (!vis.getClientRects().length) archReveal();
+      return jump();
+    }
+    archReveal();
     archAround(+fr.dataset.ts, jump);
   });
 
@@ -11096,11 +11166,26 @@
     const chip = e.target.closest('.reply');
     if (!chip || e.target.closest('a')) return;
     const target = rowById.get(chip.dataset.pid);
-    if (!target || !target.isConnected) { rowById.delete(chip.dataset.pid); return; }
-    target.scrollIntoView({ block: 'center' });
-    target.classList.remove('jump');
-    void target.offsetWidth;
-    target.classList.add('jump');
+    if (target && target.isConnected) {
+      // rendered but stale-hidden under split/wrap folds to reveal it
+      if (!target.getClientRects().length) archReveal();
+      target.scrollIntoView({ block: 'center' });
+      target.classList.remove('jump');
+      void target.offsetWidth;
+      target.classList.add('jump');
+      return;
+    }
+    rowById.delete(chip.dataset.pid);
+    // the parent may sit in the archive past the rendered edge - hydrate
+    // its window, then take the same jump
+    archSeekMid(chip.dataset.pid, () => {
+      const t = rowById.get(chip.dataset.pid);
+      if (!t || !t.isConnected) return;
+      t.scrollIntoView({ block: 'center' });
+      t.classList.remove('jump');
+      void t.offsetWidth;
+      t.classList.add('jump');
+    });
   });
 
 
@@ -15654,19 +15739,27 @@
   }
 
   // ?mid=<id> - a copied permalink: scroll to and flash the row once
-  // ingest or the restored history lands it; give up quietly if the row
-  // is older than scrollback/history reach
+  // ingest or the restored history lands it; a miss falls through to the
+  // archive, which hydrates a window around the record and retries
   {
     const mid = new URLSearchParams(location.search).get('mid');
     if (mid && /^[a-z0-9:-]{4,80}$/i.test(mid)) {
-      let tries = 48;
+      let tries = 48, arched = false;
       const seek = setInterval(() => {
         const r = document.querySelector(`.row[data-mid="${CSS.escape(mid)}"]`);
         if (r && r.isConnected) {
           clearInterval(seek);
+          // a stale row hidden by the page layouts folds back out first
+          if (!r.getClientRects().length) archReveal();
           r.scrollIntoView({ block: 'center' });
           r.classList.add('jump');
-        } else if (!--tries) clearInterval(seek);
+          return;
+        }
+        if (tries > 0) {
+          // the dom polls run out first - one archive lookup, and a found
+          // record buys a few more ticks for its window to land
+          if (!--tries && !arched) { arched = true; archSeekMid(mid, () => { tries = 4; }); }
+        } else clearInterval(seek);
       }, 250);
     }
   }

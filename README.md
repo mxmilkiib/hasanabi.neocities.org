@@ -343,8 +343,12 @@ no dependencies beyond CDN-hosted fonts.
     app-imposed age or size limits. Browser storage quotas still apply.
     Matches still on screen can be opened directly; trimmed ones are
     rehydrated into the log along with their surrounding context. The
-    same store backs the "load earlier chat" seam at the top of the log,
-    which pages older history in 500-row batches.
+    same store backs the "load earlier chat" seam at the top of the log:
+    click it or just scroll into it, and batches of older history page
+    in while it stays in view. `?mid=` permalinks and reply-chip jumps
+    also restore their target from the archive when it has left the
+    rendered scrollback - folded column layouts return to one scrolling
+    column for the jump, since paged layouts hide the restored rows.
 - **People**
   - In help, add usernames to the hide list. Choose whether their
     messages disappear, become a count line, or remain visible but
