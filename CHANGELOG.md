@@ -36,6 +36,8 @@ not versions - the page ships continuously to Neocities.
   inset and hugs the top-right corner instead of landing on the links
 - the stream title bar's lake-drift sheen calms down - the violet
   bands run at a third of their old strength on a slower 26s pass
+- the sub-months gradient tops out sooner - five years now reads as
+  the full red instead of seven
 - the spacer row under the dsa banner loses its residual line height
 - the corner rose becomes the official dsa mark's own rose - the
   emoji glyph swapped for the logo's vector, cropped off the clasped
