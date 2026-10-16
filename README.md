@@ -262,6 +262,8 @@ no dependencies beyond CDN-hosted fonts.
       its own edges drag their side, and any bare-floor grab pulls the
       frame wider in the dragged direction - outward grows, inward
       shrinks.
+    - `1col danmaku` is `1col video` with the bullet overlay armed -
+      the centred frame alone, chat comments flying across it.
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
@@ -271,8 +273,6 @@ no dependencies beyond CDN-hosted fonts.
       docked help popup - the frame keeps its own width inside the
       page, and dragging its edges trades width with the help below
       while the page's edge grips size the pair.
-    - `1col danmaku` is `1col video` with the bullet overlay armed -
-      the centred frame alone, chat comments flying across it.
     - `2col chat` passes older messages to a second chat column.
     - `2col chat help` docks the help popup in the rail beside one
       chat column - no video over it; `▶` floats it like `2col chat emotes`.

@@ -108,7 +108,8 @@ not versions - the page ships continuously to Neocities.
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps;
   1col vid/chat moves up under 1col help to match how the help page
-  already groups it, and 1col video leads the menu above 1col chat
+  already groups it, 1col video leads the menu above 1col chat with
+  1col danmaku directly under it
 - two layouts join the 1col group: `1col video` (level 17) centres
   the framed stream alone - the seam and gutters still drag its width,
   and with no chat below it the frame keeps the row's full height;
