@@ -941,6 +941,9 @@
   }
   /* mIRC-style read marker between last-seen and unseen rows */
   .redbar { border-top: 1.5px solid #e04040; margin: 2px 0; }
+  /* the archive's load-earlier seam pinned to the top of #log */
+  .archload { text-align: center; color: var(--text-dim); padding: 3px 0; cursor: pointer; user-select: none; }
+  .archload:hover { color: var(--text); }
   main.notime .time { display: none; }
   main.nosec .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
@@ -2690,8 +2693,8 @@
     <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
-    <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback</div>
-    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. <span id="archiveStatus" role="status"></span></span></div>
+    <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
+    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top, or by clicking a find hit - restored rows carry the dimmed stale look and count toward the scrollback cap. <span id="archiveStatus" role="status"></span></span></div>
     <div><b>–</b> header size: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span> - middle-clicking the ? opens the about page, middle-clicking its ✕ recentres a moved panel<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -3896,6 +3899,9 @@
   // than textContent - which glues furniture glyphs (the ▶ play button,
   // chip labels, card text) into the quoted body
   const rowBody = new Map();
+  // mid → extra tag fields the archive record keeps for re-rendering -
+  // outlives the queue loop, which is where the flat record is built
+  const archMeta = new Map();
   // every msg id already handled, so replayed backfill lines can't duplicate
   // rows - bounded, since the backfill window is small anyway
   const seenIds = new Set();
@@ -4930,6 +4936,13 @@
       if (tags.id) {
         rowBody.set(tags.id, message.slice(0, 500));
         if (rowBody.size > MAX_MESSAGES + 1000) rowBody.delete(rowBody.keys().next().value);
+        const am = {};
+        if (tags.emotes) am.et = tags.emotes;
+        if (tags['badge-info']) am.bi = tags['badge-info'];
+        if (tags.bits) am.bt = tags.bits;
+        if (tags['first-msg'] === '1') am.f = 1;
+        if (Object.keys(am).length) archMeta.set(tags.id, am);
+        if (archMeta.size > MAX_MESSAGES + 1000) archMeta.delete(archMeta.keys().next().value);
       }
     } catch (err) {
       console.error('chat line dropped:', err, rawMsg);
@@ -4986,12 +4999,30 @@
           if (im.alt && !im.closest('.reply,.aux')) ems.push(im.alt);
         for (const t of (r.querySelector('.msg') || r).textContent.split(/\s+/))
           if (EMOJI_SET.has(t)) ems.push(t);
+        // hydrated rows rebuild from these fields: the raw body re-renders
+        // emotes, links and cards, while classes, badges, reply quotes and
+        // nick colour keep the row's look. Old records only carry .text
+        const am = archMeta.get(r.dataset.mid);
+        const archBody0 = rowBody.get(r.dataset.mid) || (r.querySelector('.msg') || {}).textContent;
+        const archRq = r.querySelector('.reply.rq');
+        const archCl = [...r.classList].filter((c) => ARCH_CLS.has(c)).join(' ');
+        const archNc = ((r.querySelector('.name') || {}).style || {}).color;
         archBuf.push({
           mid: r.dataset.mid, ts: +r.dataset.ts || 0, ch: r.dataset.ch || '',
           login: r.dataset.u || '',
           kind: r.classList.contains('notice') ? 'notice' : 'msg',
           name: (r.querySelector('.name') || {}).textContent || '',
-          text: (r.textContent || '').slice(0, 500),
+          ...(archBody0 ? { msg: archBody0.slice(0, 500) } : { text: (r.textContent || '').slice(0, 500) }),
+          ...(am && am.et ? { et: am.et } : {}),
+          ...(r.dataset.badges ? { b: r.dataset.badges } : {}),
+          ...(am && am.bi ? { bi: am.bi } : {}),
+          ...(am && am.bt ? { bt: am.bt } : {}),
+          ...(am && am.f ? { f: 1 } : {}),
+          ...(archNc ? { c: archNc } : {}),
+          ...(archCl ? { cls: archCl } : {}),
+          ...(archRq ? { rq: [(archRq.querySelector('.rqt b') || {}).textContent || '',
+                             (archRq.querySelector('.rqt i') || {}).textContent || '',
+                             archRq.dataset.pid || ''] } : {}),
           ...(ems.length ? { em: ems } : {}),
         });
         if (archBuf.length > ARCH_BUF_MAX) {
@@ -8523,6 +8554,8 @@
         archDb = req.result;
         document.getElementById('findArch').hidden = false;
         archiveStatusEl.textContent = '';
+        logEl.prepend(archTop);
+        archTopCheck();
         archPrune();
         healUseArchive();
         archFlush();
@@ -8611,7 +8644,7 @@
         const ok = toks.every(([k, v]) => {
           if (k === 'user') return (r.login + '|' + r.name).toLowerCase().includes(v);
           if (k === 'kind') return v === 'notice' ? r.kind === 'notice' : r.kind === 'msg' || r.kind === v;
-          return (r.text || '').toLowerCase().includes(v);
+          return (r.msg || r.text || '').toLowerCase().includes(v);
         });
         if (ok) hits.push(r);
         cur.continue();
@@ -8619,6 +8652,227 @@
       tx.onerror = () => cb(hits);
     } catch { cb(hits); }
   }
+  // ---- archive hydration: records re-render as regular rows and merge
+  // into #log's stale block in ts order - the archload chip pages back in
+  // batches, a find-hit restores a window around itself. Hydrated rows
+  // never re-enter the write buffer ----
+  const ARCH_CLS = new Set('mention kw blk points bits glorp htag action eonly self mod selfmod deleted local'.split(' '));
+  const ARCH_PAGE = 500, ARCH_CTX = 300;
+  const archTop = document.createElement('div');
+  archTop.className = 'stale archload';
+  archTop.hidden = true;
+  archTop.setAttribute('role', 'button');
+  archTop.tabIndex = 0;
+  let archBusy = false;
+  // the oldest rendered row stamps the edge between the dom log and the
+  // indexed store - an empty log pages back from now
+  const archEdge = () => {
+    const r = logEl.querySelector(':scope > .row');
+    return r ? +r.dataset.ts || Date.now() : Date.now();
+  };
+  // old records glue time, name and furniture into .text - recover the
+  // body by cutting at the stored display name, then strip the reply
+  // glyph and the notice label
+  function archBody(r) {
+    if (r.msg != null) return r.msg;
+    const t = r.text || '', i = r.name ? t.indexOf(r.name) : -1;
+    let b = i < 0 ? t.replace(/^[\d:]+(?:\s?[AP]M)?/i, '') : t.slice(i + r.name.length);
+    b = b.replace(/^\s*:?\s*/, '');
+    if (r.kind === 'notice') b = b.replace(/^\[notice\]\s?/i, '');
+    return b.replace(/\s*↩$/, '');
+  }
+  // records carrying .cls replay their flags verbatim; older ones re-mark
+  // against the live mention and keyword sets
+  function archCls(r, body) {
+    if (r.cls != null) return r.cls;
+    const f = [];
+    if (mentionRe(r.ch || CHANNEL).test(body)) f.push('mention');
+    if (kwMatch(body)) f.push('kw');
+    if (bwMatch(body)) f.push('blk');
+    if (GLORP_RE.test(body) || F_RE.test(body.trim())) f.push('glorp');
+    if (auth && r.login && r.login === auth.login) f.push('self');
+    return f.join(' ');
+  }
+  function archRowHTML(r) {
+    const ch = r.ch || CHANNEL, login = r.login || '', name = r.name || login || '?';
+    const body = archBody(r), cls = archCls(r, body);
+    const notice = r.kind === 'notice';
+    const action = cls.split(' ').includes('action');
+    const fossa = /^(fossabot|blammobot)$/i.test(login || name);
+    const shiny = fossa || /^(hasanabi|ostonox)$/i.test(login || name);
+    const md = (r.b || '').includes('moderator/');
+    const chTag = MULTI
+      ? `<a class="chtag rbw${streamStates[ch] && streamStates[ch].live ? ' live' : ''}" data-ch="${escapeHTML(ch)}" ` +
+        `style="--chc:${chColor(ch)}" ` +
+        `href="?channel=${escapeHTML([ch, ...CHANNELS.filter((c) => c !== ch)].join(','))}" ` +
+        `title="from #${escapeHTML(ch)} - click to focus that channel">#${escapeHTML(ch)}</a>`
+      : '';
+    const badges = (r.b || '').split(',').filter(Boolean).map((b) => {
+      const u = badgeUrl(b, ch);
+      return u ? `<img class="badge" src="${escapeHTML(u)}"` +
+        ` title="${escapeHTML(BADGE_NAMES[b.split('/')[0]] || b.split('/')[0].replace(/-/g, ' '))}" alt="">` : '';
+    }).join('');
+    const role = badges ? '' : roleTag({ badges: r.b || '' });
+    // aux chips mirror the live builder: mod lead, bits, first, then the
+    // sub count where the mode wants it - notices carry none of it
+    let auxHtml = '', subHtml = '', modHtml = '';
+    if (!notice) {
+      const aux = [];
+      modHtml = md ? `<span class="role mod">${SUB_MODES[subMode].startsWith('num') ? 'md' : '[ mod. ]'}</span>` : '';
+      if (modHtml && !SUB_MODES[subMode].endsWith('left')) aux.push(modHtml);
+      const subM = (r.bi || '').match(/subscriber\/(\d+)/);
+      const months = subM ? (+subM[1]).toString().padStart(2, '0') : ' -- ';
+      const subSt = subM ? `--subp:${Math.min(100, Math.round(+subM[1] / 84 * 100))}%` : '';
+      subHtml = fossa && !subM ? '' :
+        `<span class="role sub"${subM ? ` data-mo="${+subM[1]}" title="${subAgeTxt(+subM[1])}"` : ' title="No subscriber months reported"'}${SUB_MODES[subMode] === 'hidden' ? ' hidden' : ''}${subSt ? ` style="${subSt}"` : ''}>${SUB_MODES[subMode].startsWith('num') ? subSlot(subM ? months : '--') : `[sub ${subSlot(subM ? months : '--')}]`}</span>`;
+      if (r.bt) aux.push(`<span class="role bits rbw">[bits ${escapeHTML(r.bt)}]</span>`);
+      if (r.f) aux.push('<span class="role first rbw">[first]</span>');
+      if (subHtml && SUB_MODES[subMode] !== 'hidden' && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
+      auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode].endsWith('left') ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
+    }
+    const rq = r.rq ? `<span class="reply rq"${r.rq[2] ? ` data-pid="${escapeHTML(r.rq[2])}"` : ''} title="jump to the original message">` +
+      `${chTag}<span class="rqt"><b style="color:${mentionCol(r.rq[0])}">${escapeHTML(r.rq[0])}</b>: ` +
+      `<i>${linkifyEsc(escapeHTML(r.rq[1]).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'))}</i><span class="rarr">↩</span></span></span>` : '';
+    const ncol = monoNames ? colorForName(login || name) : (r.c || colorForName(login || name));
+    const who = notice ? '<b class="notice-label">[notice]</b>' :
+      `<a class="name${shiny ? ' shimmer' : ''}"${shiny ? '' : ` style="color:${escapeHTML(ncol)}"`} ` +
+      `href="https://www.twitch.tv/${escapeHTML(encodeURIComponent(login || name.toLowerCase()))}" ` +
+      `target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>`;
+    const msgHtml = renderMessageHTML(body, r.et || '', /\bbits\b/.test(cls), ch, shiny, fossa, md).html;
+    return `<div role="article" class="row arch${notice ? ' notice' : ''}${cls ? ' ' + cls : ''}" data-ts="${r.ts}" ` +
+      `data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''} data-mid="${escapeHTML(r.mid)}"` +
+      `${r.b ? ` data-badges="${escapeHTML(r.b)}"` : ''} title="from the local archive">` +
+      `${rq}<span class="time">${fmtRowTime(new Date(r.ts))}</span>${chTag}` +
+      `${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}` +
+      `${badges}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}${who}${notice || action ? ' ' : '<span class="colon">: </span>'}` +
+      `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${msgHtml}</span>${drainCards().join('')}` +
+      `<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
+  }
+  // ts-sorted records splice into #log's row order - each lands stale
+  // beside the archive block, or live beside live rows so a mid-log
+  // restore still flips with the pages
+  function archInsert(recs) {
+    const fresh = recs.filter((r) => !r.mid || !rowById.has(r.mid));
+    if (!fresh.length) return [];
+    const tpl = document.createElement('template');
+    tpl.innerHTML = fresh.map(archRowHTML).join('');
+    const rows = [...tpl.content.children];
+    const kids = [...logEl.children].filter((r) => r.classList.contains('row'));
+    let i = 0;
+    const out = [];
+    for (let j = 0; j < rows.length; j++) {
+      const row = rows[j], ts = +row.dataset.ts;
+      while (i < kids.length && +kids[i].dataset.ts <= ts) i++;
+      const ref = kids[i] || null;
+      row.classList.toggle('stale', !ref || ref.classList.contains('stale'));
+      logEl.insertBefore(row, ref);
+      const p = row.previousElementSibling;
+      row.classList.toggle('z', !p || !p.classList.contains('z'));
+      if (row.dataset.mid) {
+        seenIds.add(row.dataset.mid);
+        rowById.set(row.dataset.mid, row);
+        rowBody.set(row.dataset.mid, archBody(fresh[j]).slice(0, 500));
+        if (rowBody.size > MAX_MESSAGES + 1000) rowBody.delete(rowBody.keys().next().value);
+      }
+      out.push(row);
+    }
+    dedupeLinks(out);
+    if (hlUsers.size) for (const r of out) hlRow(r);
+    if (ucardLogin) for (const r of out) ucardMark(r);
+    for (const r of out) {
+      if (nickCol) nickFit(r);
+      rqIndent(r);
+      fillRq(r);
+      applyHideRow(r);
+      // rows landing while find is open join the marks like live rows do
+      if (!findEl.hidden && findToks.length) {
+        const hit = findMatch(r, findToks);
+        r.classList.toggle('hit', hit);
+        if (findOnlyOn && !hit) r.classList.add('fhide');
+        if (hit) { findHits.push(r); findCnt.textContent = `${findIdx + 1}/${findHits.length}`; }
+      }
+    }
+    histDirty = true;
+    trimScrollback();
+    return out;
+  }
+  // records older than `ts`, newest-first, up to n - rows already in the
+  // dom are skipped over, not counted
+  function archOlder(ts, n, cb) {
+    const recs = [];
+    try {
+      archDb.transaction('msgs').objectStore('msgs').index('ts')
+        .openCursor(IDBKeyRange.upperBound(ts, true), 'prev').onsuccess = (e) => {
+          const cur = e.target.result;
+          if (!cur || recs.length >= n) return cb(recs);
+          const r = cur.value;
+          if (!r.mid || !rowById.has(r.mid)) recs.push(r);
+          cur.continue();
+        };
+    } catch { cb(recs); }
+  }
+  // a hit's window: records on each side of its timestamp, both walks
+  // merged oldest-first for a single insert pass
+  function archAround(ts, cb) {
+    const before = [], after = [];
+    let done = 0;
+    const fin = () => {
+      if (++done !== 2) return;
+      archInsert(before.reverse().concat(after));
+      cb();
+    };
+    try {
+      archDb.transaction('msgs').objectStore('msgs').index('ts')
+        .openCursor(IDBKeyRange.upperBound(ts), 'prev').onsuccess = (e) => {
+          const cur = e.target.result;
+          if (!cur || before.length >= ARCH_CTX) return fin();
+          before.push(cur.value);
+          cur.continue();
+        };
+    } catch { fin(); }
+    try {
+      archDb.transaction('msgs').objectStore('msgs').index('ts')
+        .openCursor(IDBKeyRange.lowerBound(ts, true), 'next').onsuccess = (e) => {
+          const cur = e.target.result;
+          if (!cur || after.length >= ARCH_CTX) return fin();
+          after.push(cur.value);
+          cur.continue();
+        };
+    } catch { fin(); }
+  }
+  // the chip only earns its spot when the store holds rows older than the
+  // log's edge - the count label tells how deep the well goes
+  function archTopCheck() {
+    if (!archDb) { archTop.hidden = true; return; }
+    try {
+      const req = archDb.transaction('msgs').objectStore('msgs').index('ts')
+        .count(IDBKeyRange.upperBound(archEdge(), true));
+      req.onsuccess = () => {
+        const n = req.result;
+        archTop.hidden = !n;
+        if (n) {
+          archTop.textContent = `load earlier chat - ${n.toLocaleString()} in archive`;
+          archTop.title = `${n.toLocaleString()} archived messages older than the log - click to load ${Math.min(n, ARCH_PAGE)}`;
+        }
+      };
+      req.onerror = () => { archTop.hidden = true; };
+    } catch { archTop.hidden = true; }
+  }
+  const archLoad = () => {
+    if (archBusy) return;
+    archBusy = true;
+    archTop.textContent = 'loading earlier chat…';
+    archOlder(archEdge(), ARCH_PAGE, (recs) => {
+      archBusy = false;
+      archInsert(recs.reverse());
+      if (!recs.length) archTop.textContent = 'no earlier rows archived';
+      archTopCheck();
+    });
+  };
+  archTop.addEventListener('click', archLoad);
+  archTop.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); archLoad(); }
+  });
   document.getElementById('findArch').addEventListener('click', () => {
     const toks = findTokens();
     findRes.hidden = false;
@@ -8627,22 +8881,26 @@
     archSearch(toks, (hits) => {
       if (!hits.length) { findRes.textContent = 'no archived matches'; return; }
       findRes.innerHTML = hits.map((r) =>
-        `<div class="fr" data-mid="${escapeHTML(r.mid)}" data-ts="${r.ts}"><b>${escapeHTML(r.name || r.login || '?')}</b>: ${escapeHTML((r.text || '').slice(0, 160))}</div>`).join('');
+        `<div class="fr" data-mid="${escapeHTML(r.mid)}" data-ts="${r.ts}"><b>${escapeHTML(r.name || r.login || '?')}</b>: ${escapeHTML((r.msg || r.text || '').slice(0, 160))}</div>`).join('');
       findClear();
     });
   });
-  // an archived hit whose row still renders jumps to it; gone rows just
-  // flash nothing - the list already shows what was said
+  // an archived hit whose row still renders jumps to it; gone rows
+  // hydrate a window around the hit first, then take the same jump
   findRes.addEventListener('click', (e) => {
     const fr = e.target.closest('.fr[data-mid]');
     if (!fr) return;
-    const r = document.querySelector(`.row[data-mid="${CSS.escape(fr.dataset.mid)}"]`);
-    if (r) {
+    const sel = `.row[data-mid="${CSS.escape(fr.dataset.mid)}"]`;
+    const jump = () => {
+      const r = document.querySelector(sel);
+      if (!r) return;
       r.scrollIntoView({ block: 'center' });
       r.classList.remove('jump');
       void r.offsetWidth;
       r.classList.add('jump');
-    }
+    };
+    if (document.querySelector(sel)) return jump();
+    archAround(+fr.dataset.ts, jump);
   });
 
   // ---- user inspector: a nick click pins a card with what the page
@@ -10862,7 +11120,7 @@
     const c = cols();
     if (revFlow) return [...c].reverse().flatMap((col) => [...col.children]);
     const i = c.indexOf(activeEl);
-    return [...logEl.querySelectorAll(':scope > .stale'),
+    return [...logEl.querySelectorAll(':scope > .stale:not(.archload)'),
       ...[...c.slice(i + 1), ...c.slice(0, i + 1)].flatMap(liveRows)];
   }
   // Folds every column back into #log in flow order, the archive rejoined
@@ -10882,7 +11140,7 @@
       for (const r of [...col.children]) if (!r.classList.contains('ghostpage') && (revFlow || col !== logEl || !r.classList.contains('stale'))) frag.appendChild(r);
       logEl.appendChild(frag);
     }
-    for (const r of logEl.querySelectorAll(':scope > .stale')) { r.classList.remove('stale'); r.style.opacity = ''; }
+    for (const r of logEl.querySelectorAll(':scope > .stale:not(.archload)')) { r.classList.remove('stale'); r.style.opacity = ''; }
     activeEl = logEl;
     redupeIfLinkview(); // merged rows can claim first-posts again
   }
@@ -11004,7 +11262,7 @@
     // archive's newest rows back live and keep cutting until every
     // column holds a page or history runs out
     while (pages.length < cs.length) {
-      const arch = [...logEl.querySelectorAll(':scope > .stale')];
+      const arch = [...logEl.querySelectorAll(':scope > .stale:not(.archload)')];
       if (!arch.length) break;
       const take = arch.slice(-(Math.ceil(room / 20) + 4));
       for (const r of take) r.classList.remove('stale');
@@ -11182,7 +11440,7 @@
       for (let j = lv.length - 1; j >= 0; j--)
         if (!rowCollapsed(lv[j])) { bottom = lv[j].getBoundingClientRect().bottom; break; }
       if (bottom >= fold - 1) break;
-      const arch = logEl.querySelectorAll(':scope > .stale');
+      const arch = logEl.querySelectorAll(':scope > .stale:not(.archload)');
       if (!arch.length) break;
       for (const r of [...arch].slice(-(Math.ceil(room / 20) + 4))) r.classList.remove('stale');
     }
@@ -13872,7 +14130,7 @@
             // records carry their emote names in .em - older records only
             // have text, where rendered emotes never appear, so those
             // scan for emoji and unrendered codes instead
-            for (const tok of r.em || (r.text || '').split(/\s+/)) {
+            for (const tok of r.em || (r.msg || r.text || '').split(/\s+/)) {
               // the archived text is the whole row - the chatter's own
               // nick can coincide with an emote code, so skip name tokens
               if (!r.em && (tok === r.name || tok === r.login)) continue;

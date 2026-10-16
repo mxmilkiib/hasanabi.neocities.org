@@ -341,7 +341,10 @@ no dependencies beyond CDN-hosted fonts.
     The help panel offers bounded retention (30 days, trimming when
     origin usage passes about 50 MB) or unlimited retention without
     app-imposed age or size limits. Browser storage quotas still apply.
-    Matches still on screen can be opened directly.
+    Matches still on screen can be opened directly; trimmed ones are
+    rehydrated into the log along with their surrounding context. The
+    same store backs the "load earlier chat" seam at the top of the log,
+    which pages older history in 500-row batches.
 - **People**
   - In help, add usernames to the hide list. Choose whether their
     messages disappear, become a count line, or remain visible but
