@@ -10554,6 +10554,13 @@
         const el = new Image();
         el.alt = '';
         el.src = s.im.src;
+        // the row's own swap: an unknown static twitch emote 404s
+        // /animated/ - the seg may have sampled the url before the
+        // row's onerror rewrote it, so retry the same fallback
+        el.onerror = () => {
+          el.onerror = null;
+          el.src = el.src.replace(/(\/emoticons\/v2\/[^/]+\/)animated\//, '$1default/');
+        };
         danOl.append(el);
         s.el = el;
       }
