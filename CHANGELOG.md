@@ -19,6 +19,9 @@ not versions - the page ships continuously to Neocities.
 - the dsa banner link, the corner rose and the active tab title gain
   a softer upward shadow to match their bottom edges
 - the spacer row under the dsa banner loses its residual line height
+- the corner rose becomes the official dsa mark's own rose - the
+  emoji glyph swapped for the logo's vector, cropped off the clasped
+  hands by the viewBox and set in dsa red
 - the caucus description, the chapters' region and the midterms loc
   tag lift a step off the dim grey to one shared brighter shade
 - every federal candidate across the midterms tables gains an `fec`
