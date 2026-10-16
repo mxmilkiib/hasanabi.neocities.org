@@ -44,6 +44,9 @@ not versions - the page ships continuously to Neocities.
 - resizing the help popup no longer scrolls its contents at the same
   time - edge drags veto the touch pan, and presses that land on a
   scrollbar lane belong to the scrollbar again
+- the emote picker gains an ≡ button beside the pin that stows the
+  whole tabs/options row for a bare search + grid view; the state
+  persists and rides share-links as eprow
 - the popup's resize affordance is honest now - the grabbing hand
   shows only where a press will actually resize, so the scrollbar
   stops impersonating an edge grip; grips and the ring share the

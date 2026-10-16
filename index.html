@@ -2459,6 +2459,7 @@
   /* the source tabs sit left, the option buttons right; a thin popup
      wraps .eopts onto its own line, still hugging the right edge */
   #emotePick .etabsrow { flex: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  #emotePick.norow .etabsrow { display: none; }
   #emotePick .eopts { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; justify-content: flex-end; }
   /* wider seams split the chips into zoom / names / sort / filter / hold */
   #emotePick .eopts :is(#emoteNames, #emoteSortAz, #emoteStill, #emoteHold) { margin-left: 8px; }
@@ -2955,7 +2956,7 @@
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes, stats and help" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><div id="colSplitR" hidden title="drag to resize the centred page"></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><div id="chatWrap"><div id="chatHl" aria-hidden="true"></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" placeholder="chat" aria-label="message" rows="1"></textarea></div><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
-  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteTips" type="button" title="hover tooltip - pops the big emote card over a cell">tip</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="age rows cycle - use sort only">▤</button><button class="hdr-btn esort" id="emoteAgeSq" type="button" title="age squares cycle - use sort only">□</button><button class="hdr-btn esort on" id="emoteMove" type="button" title="re-sort motion cycle">↔</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
+  <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emoteRowTgl" type="button" title="show/hide the tabs and options row" aria-pressed="false">≡</button><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteTips" type="button" title="hover tooltip - pops the big emote card over a cell">tip</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="age rows cycle - use sort only">▤</button><button class="hdr-btn esort" id="emoteAgeSq" type="button" title="age squares cycle - use sort only">□</button><button class="hdr-btn esort on" id="emoteMove" type="button" title="re-sort motion cycle">↔</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
 <script>
 // global safety net: an uncaught error or rejected promise raises a small
@@ -9559,7 +9560,7 @@
       video: !vidBox.hidden,
       kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
-      epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0,
+      epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0, eprow: epickRowOff ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
       epgeo: JSON.parse(localStorage.getItem(EPICK_SIZE_KEY) || 'null'),
       hpw: helpWIdx, hpwpx: HELP_WIDTHS[helpWIdx], hfspx: hdrFs < 0 ? -1 : HDR_SIZES[hdrFs],
@@ -9600,6 +9601,7 @@
       if ((v = g(EPICK_MIX_KEY)) !== null) o.epmix = v === '1' ? 1 : 0;
       if ((v = g(EPICK_HOLD_KEY)) !== null) o.ephold = v === '0' || v === '1' || v === '2' ? +v : 2;
       if ((v = g(EPICK_TIPS_KEY)) !== null) o.eptips = v === '1' ? 1 : 0;
+      if ((v = g(EPICK_ROW_KEY)) !== null) o.eprow = v === '1' ? 1 : 0;
       if ((v = g(EPICK_TABS_KEY)) !== null) o.eptabs = JSON.parse(v);
       if ((v = g(EPICK_ANIM_KEY)) !== null) o.epanim = JSON.parse(v);
       if ((v = g(EPICK_FZ_KEY)) !== null) o.epfz = Math.min(2, Math.max(0, +v || 0));
@@ -9759,6 +9761,7 @@
     if (o.epmix !== undefined) { setMix(!!o.epmix); epDirty = true; }
     if (o.ephold !== undefined) setHold(o.ephold);
     if (o.eptips !== undefined) setTips(!!o.eptips);
+    if (o.eprow !== undefined) setOptsRow(!!o.eprow);
     if (o.epmove !== undefined) setMove(o.epmove);
     if (Array.isArray(o.eptabs)) { setTabs(o.eptabs); epDirty = true; }
     if (Array.isArray(o.epanim)) { setAnimFilter(o.epanim); epDirty = true; }
@@ -11248,6 +11251,7 @@
     if (!epickMerge) q.set('epmix', '0');
     if (epickHold !== 2) q.set('ephold', EPHOLD_URL[epickHold]);
     if (epickTips) q.set('eptips', '1');
+    if (epickRowOff) q.set('eprow', '1');
     if (epickOn.size) q.set('eptabs', [...epickOn].join(','));
     if (epickAnimOn.size) q.set('epanim', [...epickAnimOn].join(','));
     if (epFz) q.set('epfz', EP_FZ_NAMES[epFz]);
@@ -15119,6 +15123,21 @@
       if (!emotePick.hidden) heldOr();
     }, Math.max(1600, nextAgeDelta + 80)) : 0;
   }
+  // ≡ stows the tabs/options strip, leaving a bare search + grid
+  // picker; lit means the row is down, and the state persists like
+  // the pin's
+  const EPICK_ROW_KEY = 'hasan-epickrow';
+  const rowTglBtn = document.getElementById('emoteRowTgl');
+  let epickRowOff = false;
+  const setOptsRow = (off) => {
+    epickRowOff = !!off;
+    emotePick.classList.toggle('norow', epickRowOff);
+    rowTglBtn.setAttribute('aria-pressed', String(epickRowOff));
+    setOn(rowTglBtn, epickRowOff);
+    try { localStorage.setItem(EPICK_ROW_KEY, epickRowOff ? '1' : '0'); } catch {}
+  };
+  setOptsRow(localStorage.getItem(EPICK_ROW_KEY) === '1');
+  rowTglBtn.addEventListener('click', () => { setOptsRow(!epickRowOff); saveOpts(); emoteQ.focus(); });
   // a pinned picker floats free of the chat bar and ignores its closes;
   // the pin state persists, so a pinned picker reopens on the next load
   const emotePin = document.getElementById('emotePin');
@@ -16059,7 +16078,7 @@
     if (q.has('rbp')) { const v = q.get('rbp'); const i = RBW_PALS.findIndex((p) => p.n === v); setRbwPal(i >= 0 ? i : +v); }
     // emote-picker options: ?epnames=side|only&epzoom=small|quarter|third|half|tweet|big&epsort=az|use|seen&
     // epage=inline|eras|ends|centre&epsq=off|sparse|whole|all&epmix=1&ephold=off|hold|plus&epmove=slide..queue&
-    // eptips=1&eptabs=7tv,bttv&epanim=anim,still&epfz=off|popup|all&epgeo=WxH[,L,T]&epopen=0|1 - ints still parse
+    // eptips=1&eprow=1&eptabs=7tv,bttv&epanim=anim,still&epfz=off|popup|all&epgeo=WxH[,L,T]&epopen=0|1 - ints still parse
     let epUrlDirty = false;
     if (q.has('epnames')) { const v = q.get('epnames'); const i = ['side', 'only'].indexOf(v); setNames(i >= 0 ? i + 1 : +v || (flag('epnames') ? 1 : 0)); epUrlDirty = true; }
     if (q.has('epzoom')) { setZoom(EPZ_INV[q.get('epzoom')] || q.get('epzoom')); epUrlDirty = true; }
@@ -16068,6 +16087,7 @@
     if (q.has('epsq')) { const v = q.get('epsq'); const i = EPSQ_URL.indexOf(v); setSq(i >= 0 ? i : v === '' ? 3 : +v); epUrlDirty = true; }
     if (q.has('epmix')) { setMix(flag('epmix')); epUrlDirty = true; }
     if (q.has('eptips')) setTips(flag('eptips'));
+    if (q.has('eprow')) setOptsRow(flag('eprow'));
     if (q.has('ephold')) { const v = q.get('ephold'); const i = EPHOLD_URL.indexOf(v); setHold(i >= 0 ? i : v === '' ? 1 : +v); }
     if (q.has('epmove')) { const v = q.get('epmove'); const i = MOVE_URL.indexOf(v); setMove(i >= 0 ? i : +v); }
     if (q.has('eptabs')) { setTabs(q.get('eptabs').split(',')); epUrlDirty = true; }
