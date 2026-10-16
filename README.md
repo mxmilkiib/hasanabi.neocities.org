@@ -263,9 +263,11 @@ no dependencies beyond CDN-hosted fonts.
       two-thirds of the screen, centred between two mirrored edge grips.
     - `1col vid/chat` stacks the video in its framed floating style
       over the single chat column.
-    - `1col video` keeps the framed video alone, centred in the row.
+    - `1col video` keeps the framed video alone, centred in the row;
+      its own edges, the seam and the side gutters all drag its width.
     - `1col video/help` centres a rail holding the video over the
-      docked help popup - the same mirrored edge grips resize it.
+      docked help popup - the same mirrored edge grips resize it, and
+      the video's own edge drags the rail like them.
     - `2col chat` passes older messages to a second chat column.
     - `2col chat help` docks the help popup in the rail beside one
       chat column - no video over it; `▶` floats it like `2col chat emotes`.

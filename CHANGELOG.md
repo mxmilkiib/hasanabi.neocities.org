@@ -111,6 +111,13 @@ not versions - the page ships continuously to Neocities.
   `1col video/help` (level 18) fills the centred solo rail with the
   video over the docked help popup, like 1col help with the stream
   on top
+- the docked video's own border resizes in the video-stack and solo
+  rail layouts - thin strips straddle each frame edge since pointer
+  hits inside the frame belong to the iframe; side edges pull the
+  width straight, top and bottom translate through the aspect ratio
+  (1cv shares the side edges; the top edge stays off where the frame
+  sits at the row's top, and the rail video drops it to stay clear
+  of the header)
 - dsa electeds refresh: the four nyc council socialists, diana
   moreno (mamdani's assembly seat), soren stevenson + aurin
   chowdhury (minneapolis), nithya raman (la) and janeese lewis
