@@ -3902,6 +3902,9 @@
   // mid → extra tag fields the archive record keeps for re-rendering -
   // outlives the queue loop, which is where the flat record is built
   const archMeta = new Map();
+  // the archive's handle, opened far below - declared early since
+  // trimScrollback and /clear read it on their own schedules
+  let archDb = null;
   // every msg id already handled, so replayed backfill lines can't duplicate
   // rows - bounded, since the backfill window is small anyway
   const seenIds = new Set();
@@ -8536,7 +8539,7 @@
   const ARCH_MAX_AGE = 30 * 864e5, ARCH_CAP = 50e6, ARCH_BUF_MAX = 5000;
   const ARCH_OPT_KEY = 'hasan-archive-unlimited';
   const archiveStatusEl = document.getElementById('archiveStatus');
-  let archDb = null, archBuf = [], archAvailable = !!window.indexedDB, archFailures = 0;
+  let archBuf = [], archAvailable = !!window.indexedDB, archFailures = 0;
   let archiveUnlimited = false;
   try { archiveUnlimited = localStorage.getItem(ARCH_OPT_KEY) === '1'; } catch {}
   function setArchiveUnlimited(on, persist = true) {
@@ -8834,7 +8837,7 @@
   // a hit's window: records on each side of its timestamp, both walks
   // merged oldest-first for a single insert pass. The window stays under
   // the scrollback cap so the hit keeps its neighbours on both sides
-  function archAround(ts, cb) {
+  function archAround(ts, cb = () => {}) {
     const ctx = Math.min(ARCH_CTX, MAX_MESSAGES >> 1);
     const before = [], after = [];
     let done = 0;
@@ -11203,7 +11206,7 @@
   // column, so it reads last column first
   function chronoRows() {
     const c = cols();
-    if (revFlow) return [...c].reverse().flatMap((col) => [...col.children]);
+    if (revFlow) return [...c].reverse().flatMap((col) => [...col.children].filter((r) => !r.classList.contains('archload')));
     const i = c.indexOf(activeEl);
     return [...logEl.querySelectorAll(':scope > .stale:not(.archload)'),
       ...[...c.slice(i + 1), ...c.slice(0, i + 1)].flatMap(liveRows)];
@@ -11222,7 +11225,7 @@
       // its archive already sits ahead of every live page and stays put
       if (k === 0 && col === logEl) continue;
       const frag = document.createDocumentFragment();
-      for (const r of [...col.children]) if (!r.classList.contains('ghostpage') && (revFlow || col !== logEl || !r.classList.contains('stale'))) frag.appendChild(r);
+      for (const r of [...col.children]) if (!r.classList.contains('ghostpage') && !r.classList.contains('archload') && (revFlow || col !== logEl || !r.classList.contains('stale'))) frag.appendChild(r);
       logEl.appendChild(frag);
     }
     for (const r of logEl.querySelectorAll(':scope > .stale:not(.archload)')) { r.classList.remove('stale'); r.style.opacity = ''; }
