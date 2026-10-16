@@ -1581,8 +1581,11 @@
   .row.jump, #htabAuth .linkcols > i.jump { animation: jumpflash 1.4s ease-out; }
   @keyframes jumpflash { from { background: rgba(232, 163, 61, .35); } }
   /* the control cluster centres in its own flex line too, including
-     wrapped narrow and enlarged-header states */
-  .hdr-side { display: flex; align-items: center; align-content: center; gap: 6px; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; row-gap: 3px; min-width: 0; }
+     wrapped narrow and enlarged-header states; flex:none drops it to a
+     second header line as a unit (where .hdrwrap centres it) instead of
+     squeezing buttons off one at a time, and max-width lets its own
+     wrap take over at the very narrowest widths */
+  .hdr-side { display: flex; align-items: center; align-content: center; gap: 6px; flex: none; flex-wrap: wrap; justify-content: center; row-gap: 3px; min-width: 0; max-width: 100%; }
   .hdr-btn {
     background: none;
     border: 1px solid var(--line);
@@ -1609,9 +1612,11 @@
   #colourBtn.tall { font-size: .88em; }
   /* sparkSize() pins the box to the device grid (see its comment); the rate
      span takes over as the header's flexible space absorber so the icon
-     strip still hugs the right edge */
-  #spark { height: 26px; margin: 1px 0 0; flex: 1 1 0; min-width: 40px; vertical-align: middle; }
-  #rate { flex: 1; min-width: 0; white-space: nowrap; }
+     strip still hugs the right edge. Under pressure the graph yields its
+     whole share before the strip drops to a second line, and the rate
+     label clips rather than painting over the buttons */
+  #spark { height: 26px; margin: 1px 0 0; flex: 1 1 0; min-width: 0; vertical-align: middle; }
+  #rate { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   .hdr-btn.on.tmp { border-style: dotted; } /* on by another control's doing, not one's own */
