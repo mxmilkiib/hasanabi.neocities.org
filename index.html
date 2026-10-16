@@ -451,10 +451,11 @@
   /* the minimal view reads '2h 35m ● 25.1k': the name hides and flex
      order reseats the dot between uptime and viewers - order-0 items
      (the missed chips) trail after the count as usual */
-  .channel.minstat #channelName { display: none; }
-  .channel.minstat #streamInfo { order: -3; }
-  .channel.minstat #dot { order: -2; }
-  .channel.minstat #streamTail { order: -1; }
+  /* the dot leads the numbers in every cut rung - 'short' steps the
+     channel name ahead of it, minimal and the lone dot hide it */
+  .channel.minstat #channelName, .channel.dotstat #channelName { display: none; }
+  .channel.shortstat #channelName { order: -1; }
+  .channel.shortstat #channelName::before { content: '@'; }
   #streamTail:empty { display: none; }
   /* the chatters tally sits inside .channel so it shares .stream-info's
      baseline; the same .93em lands on the same effective size there */
@@ -1659,7 +1660,7 @@
      strip still hugs the right edge. Under pressure the graph yields its
      whole share before the strip drops to a second line, and the rate
      label clips rather than painting over the buttons */
-  #spark { height: 26px; margin: 1px 0 0; flex: 1 1 0; min-width: 0; vertical-align: middle; cursor: pointer; }
+  #spark { height: 26px; margin: 1px 0 0; flex: 1 1 0; min-width: 0; vertical-align: middle; }
   #rate { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
@@ -2824,10 +2825,10 @@
     <div><b>&amp;c</b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>stream status</b><span>the dot mirrors the stream status:</span><span class="dot connecting"></span><span>accent-pulsing while checking,</span><span class="dot connected"></span><span>green while live,</span><span class="dot reconnecting"></span><span>red-pulsing if the chat socket drops under a live stream,</span><span class="dot idle"></span><span>steady accent while the stream is off but chat is connected,</span><span class="dot offline"></span><span>grey while it is down;</span><span style="grid-column:2">page favicon (tab icon) repaints in the dot's own colour; hover for uptime, viewers and chat state; scroll trims the text beside it between full, stats, compact and minimal</span></div>
-    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded; click slims it to a fixed strip so the buttons can keep one row on a narrow screen</div>
+    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
-    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the follow-req tail, then minus the chatter tally, a compact cut, uptime and a compact viewer count flanking the dot ('2h 35m ● 25.1k'), or an empty space; scrolling there cycles the same stops<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the follow-req tail, then minus the chatter tally, a compact cut, the channel handle with the dot and uptime ('@HasanAbi ● 3h 27m'), uptime and a compact viewer count behind the dot ('● 2h 35m 25.1k'), an empty space, or just the status dot; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; a lit border and ✓ mark an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -5303,13 +5304,6 @@
   const glorpHist = [];
   const glorpHistPer = {};
   let sparkCols = null; // theme colours, resolved once instead of per draw
-  // a click on the canvas pins it to a slim fixed width - flex
-  // line-breaking reads each item's pinned base size, so a fat graph
-  // pushes the icon strip onto a second header line on narrow screens
-  // even though the strip could have shrunk it. persists across loads
-  const SPARK_SLIM = 120;
-  let sparkSlim = false;
-  try { sparkSlim = localStorage.getItem('hasan-sparkslim') === '1'; } catch {}
 
   function sparkSize() {
     DPR = window.devicePixelRatio || 1;
@@ -5320,10 +5314,7 @@
     sparkEl.style.flex = '';
     sparkEl.style.width = '';
     rateEl.style.flex = '0 0 auto'; // starve the slack absorber so the ideal reads the full free space
-    // the slim cap doesn't apply in reduced mode - that mode's whole
-    // point is a full-width graph with the buttons hidden
-    const ideal = Math.min(sparkEl.clientWidth,
-      sparkSlim && !document.body.classList.contains('hdrgraph') ? SPARK_SLIM : Infinity);
+    const ideal = sparkEl.clientWidth;
     rateEl.style.flex = '';
     const n = Math.max(240, Math.min(1800, Math.round(ideal / 3 / 30) * 30));
     sparkWin = n;
@@ -5336,7 +5327,7 @@
     const hCss = (sparkEl.height / DPR) + 'px';
     if (sparkEl.style.height !== hCss) sparkEl.style.height = hCss;
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    sparkEl.title = sparkLegend = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page\ngreen bands mark a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage\nclick toggles a slim width`;
+    sparkEl.title = sparkLegend = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page\ngreen bands mark a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage`;
     sparkEl.setAttribute('aria-label', sparkEl.title);
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (rateTimes.length > n) rateTimes.splice(0, rateTimes.length - n);
@@ -5718,11 +5709,6 @@
     sparkEl.title = sparkLegend;
     drawSpark(); // drop straight back to the live tail, don't wait a tick
   });
-  sparkEl.addEventListener('click', () => {
-    sparkSlim = !sparkSlim;
-    try { localStorage.setItem('hasan-sparkslim', sparkSlim ? '1' : '0'); } catch {}
-    sparkSize(); // repin now - the width change can raise the wrapped strip
-  });
   setInterval(() => {
     const now = Date.now();
     // a delayed tick fills each missed second from rendered-row counts;
@@ -5875,13 +5861,14 @@
   // run's END for an offline channel (matches the VOD end to seconds)
   let lastVod = null;
   let lbEnd = null;
-  // status info verbosity: 0 full, 1 compact, 2 minimal; wheel on the
+  // status info verbosity: 0 full through 7 dot-only; wheel on the
   // dot or info text cycles it, the ? popup's status-length row sets it
   let statusView = 0;
-  const SVIEW_NAMES = ['full', 'compact', 'minimal', 'stats', 'blank', 'notally'];
+  const SVIEW_NAMES = ['full', 'compact', 'minimal', 'stats', 'blank', 'notally', 'short', 'dot'];
   // wheel order seats stats beside full - it is full minus the
-  // chat-mode tail; array order keeps saved numeric ids stable
-  const SVIEW_CYCLE = [0, 3, 5, 1, 2, 4];
+  // chat-mode tail; 'short' is third-from-small before minimal and the
+  // lone dot; array order keeps saved numeric ids stable
+  const SVIEW_CYCLE = [0, 3, 5, 1, 6, 2, 4, 7];
   function setStatusView(i) {
     statusView = Math.max(0, Math.min(SVIEW_NAMES.length - 1, i | 0));
     markHelp('helpSview', statusView);
@@ -6121,10 +6108,12 @@
     modesEl.hidden = true;
     // the chatter tally holds through the first cut, then goes at notally
     chattersEl.hidden = !(statusView === 0 || statusView === 3) || !chatterSeen.size;
-    // the minimal live format reseats the dot between uptime and
-    // viewers; every other state or view leaves the name-led order
-    chanEl.classList.remove('minstat');
+    // the dot heads the numbers in every cut rung - 'short' steps the
+    // channel name ahead of it, minimal and the lone dot hide the name
+    chanEl.classList.remove('minstat', 'shortstat', 'dotstat');
     tailEl.textContent = '';
+    if (statusView === 6) chanEl.classList.add('shortstat');
+    else if (statusView === 7) chanEl.classList.add('dotstat');
     if (!stream) {
       if (streamDead) {
         // Relay never reported stream status (stale cache or blocked API):
@@ -6132,7 +6121,7 @@
         setDot(chatState);
         dotEl.title = `stream status unavailable · ${chatTxt}`;
         dotEl.setAttribute('aria-label', dotEl.title);
-        infoEl.innerHTML = statusView === 4 || chatState === 'connected' ? '' : `<b>${chatTxt}</b>`;
+        infoEl.innerHTML = statusView === 4 || statusView === 7 || chatState === 'connected' ? '' : `<b>${chatTxt}</b>`;
         document.title = CHAN_TITLE;
       } else {
         setDot('connecting');
@@ -6175,7 +6164,7 @@
       }
       dotEl.title = `${CHANNEL} is offline${ranTxt.replace(/<[^>]+>/g, '')} · ${chatTxt}`;
       dotEl.setAttribute('aria-label', dotEl.title);
-      infoEl.innerHTML = statusView === 4 ? '' : '<b>offline</b>' +
+      infoEl.innerHTML = statusView === 4 || statusView === 7 ? '' : '<b>offline</b>' +
         (statusView === 0 || statusView === 3 || statusView === 5 ? ranTxt + (chatState === 'connected' ? '' : ` · ${chatTxt}`)
          : statusView === 1 && ago ? ` · ended <b>${ago}</b>`
          : statusView === 1 && startTs ? ` · live <b>${fmtTime(startTs)}${dayTag(startTs)}</b>` : '');
@@ -6192,12 +6181,13 @@
     setDot(chatState === 'connected' ? 'connected' : chatState || 'reconnecting');
     const vK = stream.viewers != null ? fmtK(stream.viewers) : '';
     if (statusView === 2 && up && vK) {
-      // '2h 35m ● 25.1k' - the dot sits central between the numbers and
-      // still carries the live colour, tooltip and pulse
+      // '● 2h 35m 25.1k' - the dot leads, the name hides, the numbers
+      // follow in DOM order
       chanEl.classList.add('minstat');
       infoEl.innerHTML = `<b>${up}</b>`;
       tailEl.innerHTML = `<b>${vK}</b>`;
-    } else infoEl.innerHTML = statusView === 4 ? ''
+    } else infoEl.innerHTML = statusView === 4 || statusView === 7 ? ''
+      : statusView === 6 ? (up ? `<b>${up}</b>` : '<b>live</b>')
       : statusView === 2 ? '<b>live</b>'
       : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')
