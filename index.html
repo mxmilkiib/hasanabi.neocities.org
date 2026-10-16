@@ -10596,9 +10596,11 @@
           x += danCtx.measureText(s).width;
           continue;
         }
-        const im = s.im, el = s.el;
-        if (im.complete && im.naturalWidth) {
-          const eh = danEmoteSize(b.mag), ew = Math.round(eh * im.naturalWidth / im.naturalHeight);
+        const el = s.el;
+        // the shown element gates itself - the pool img only estimates
+        // lane width, so an el still fetching keeps its code text
+        if (el.complete && el.naturalWidth) {
+          const eh = danEmoteSize(b.mag), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
           el.hidden = false;
           el.style.width = ew + 'px';
           el.style.height = eh + 'px';
