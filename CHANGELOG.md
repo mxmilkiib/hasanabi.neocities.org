@@ -13,6 +13,11 @@ not versions - the page ships continuously to Neocities.
   strip drops to its own header line as a unit, centred. the centring
   now nudges by translate rather than a negative margin, which shrank
   the strip's outer size and bounced it between header lines
+- clicking the rate graph pins it to a slim 120px - flex line-breaking
+  reads the pinned base width, so a wide graph was holding the icon
+  strip down on a second row on narrow screens; reduced (graph) mode
+  ignores the cap since a full-width trace is its whole point. the
+  toggle persists across reloads
 
 ### Resources
 - the ⸻ section dividers go gold - the same #e8b73e as the ? button,

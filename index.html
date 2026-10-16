@@ -1626,7 +1626,7 @@
      strip still hugs the right edge. Under pressure the graph yields its
      whole share before the strip drops to a second line, and the rate
      label clips rather than painting over the buttons */
-  #spark { height: 26px; margin: 1px 0 0; flex: 1 1 0; min-width: 0; vertical-align: middle; }
+  #spark { height: 26px; margin: 1px 0 0; flex: 1 1 0; min-width: 0; vertical-align: middle; cursor: pointer; }
   #rate { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hdr-btn:hover { color: var(--text); }
   .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
@@ -2791,7 +2791,7 @@
     <div><b>&amp;c</b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>stream status</b><span>the dot mirrors the stream status:</span><span class="dot connecting"></span><span>accent-pulsing while checking,</span><span class="dot connected"></span><span>green while live,</span><span class="dot reconnecting"></span><span>red-pulsing if the chat socket drops under a live stream,</span><span class="dot idle"></span><span>steady accent while the stream is off but chat is connected,</span><span class="dot offline"></span><span>grey while it is down;</span><span style="grid-column:2">page favicon (tab icon) repaints in the dot's own colour; hover for uptime, viewers and chat state; scroll trims the text beside it between full, stats, compact and minimal</span></div>
-    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
+    <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded; click slims it to a fixed strip so the buttons can keep one row on a narrow screen</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
     <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the follow-req tail, then minus the chatter tally, a compact cut, the bare word, or an empty space; scrolling there cycles the same stops<sup>†</sup></span></div>
@@ -5268,6 +5268,13 @@
   const glorpHist = [];
   const glorpHistPer = {};
   let sparkCols = null; // theme colours, resolved once instead of per draw
+  // a click on the canvas pins it to a slim fixed width - flex
+  // line-breaking reads each item's pinned base size, so a fat graph
+  // pushes the icon strip onto a second header line on narrow screens
+  // even though the strip could have shrunk it. persists across loads
+  const SPARK_SLIM = 120;
+  let sparkSlim = false;
+  try { sparkSlim = localStorage.getItem('hasan-sparkslim') === '1'; } catch {}
 
   function sparkSize() {
     DPR = window.devicePixelRatio || 1;
@@ -5278,7 +5285,10 @@
     sparkEl.style.flex = '';
     sparkEl.style.width = '';
     rateEl.style.flex = '0 0 auto'; // starve the slack absorber so the ideal reads the full free space
-    const ideal = sparkEl.clientWidth;
+    // the slim cap doesn't apply in reduced mode - that mode's whole
+    // point is a full-width graph with the buttons hidden
+    const ideal = Math.min(sparkEl.clientWidth,
+      sparkSlim && !document.body.classList.contains('hdrgraph') ? SPARK_SLIM : Infinity);
     rateEl.style.flex = '';
     const n = Math.max(240, Math.min(1800, Math.round(ideal / 3 / 30) * 30));
     sparkWin = n;
@@ -5291,7 +5301,7 @@
     const hCss = (sparkEl.height / DPR) + 'px';
     if (sparkEl.style.height !== hCss) sparkEl.style.height = hCss;
     sparkCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    sparkEl.title = sparkLegend = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page\ngreen bands mark a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage`;
+    sparkEl.title = sparkLegend = `msgs/sec over the last ${n >= 60 ? n / 60 + ' min' : n + 's'}\nred bands mark socket loss\nviolet bands mark a closed or discarded page\ngreen bands mark a gap whose lines were recovered\ngrey bands mark a silent stretch with no recorded outage\nclick toggles a slim width`;
     sparkEl.setAttribute('aria-label', sparkEl.title);
     if (rateSamples.length > n) rateSamples.splice(0, rateSamples.length - n);
     if (rateTimes.length > n) rateTimes.splice(0, rateTimes.length - n);
@@ -5672,6 +5682,11 @@
     sparkCursor = -1;
     sparkEl.title = sparkLegend;
     drawSpark(); // drop straight back to the live tail, don't wait a tick
+  });
+  sparkEl.addEventListener('click', () => {
+    sparkSlim = !sparkSlim;
+    try { localStorage.setItem('hasan-sparkslim', sparkSlim ? '1' : '0'); } catch {}
+    sparkSize(); // repin now - the width change can raise the wrapped strip
   });
   setInterval(() => {
     const now = Date.now();
