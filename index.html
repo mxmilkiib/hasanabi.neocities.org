@@ -1872,15 +1872,15 @@
     color: var(--text-dim); font-size: 9px; line-height: 1; padding: 1px;
     display: grid; place-items: center; opacity: 0;
     transition: opacity .15s; touch-action: none; }
-  #helpPanel .hp-size.br { right: 0; bottom: 0; cursor: move; place-items: end end; }
-  #helpPanel .hp-size.bl { left: 0; bottom: 0; cursor: move; place-items: end start; }
-  #helpPanel .hp-size.tr { right: 0; top: 0; cursor: move; place-items: start end; }
-  #helpPanel .hp-size.tl { left: 0; top: 0; cursor: move; place-items: start start; }
-  #helpPanel .hp-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: move; place-items: center start; }
-  #helpPanel .hp-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: move; place-items: center end; }
-  #helpPanel .hp-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: move; place-items: end center; }
+  #helpPanel .hp-size.br { right: 0; bottom: 0; cursor: grab; place-items: end end; }
+  #helpPanel .hp-size.bl { left: 0; bottom: 0; cursor: grab; place-items: end start; }
+  #helpPanel .hp-size.tr { right: 0; top: 0; cursor: grab; place-items: start end; }
+  #helpPanel .hp-size.tl { left: 0; top: 0; cursor: grab; place-items: start start; }
+  #helpPanel .hp-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center start; }
+  #helpPanel .hp-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center end; }
+  #helpPanel .hp-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: grab; place-items: end center; }
   #helpPanel:hover .hp-size, #helpPanel.dragging .hp-size { opacity: 1; }
-  #helpPanel.dragging .hp-size { cursor: move; }
+  #helpPanel.dragging .hp-size { cursor: grabbing; }
   #helpPanel b { color: var(--accent); font-weight: 600; }
   /* grid items ignore vertical-align - a key dot centres on its
      description row instead of riding the cell's top edge */
@@ -16344,22 +16344,29 @@
   const EDGE_PX = 8;
   const readHsize = () => { try { return JSON.parse(localStorage.getItem(HSIZE_KEY)) || {}; } catch { return {}; } };
   const writeHsize = (s) => { try { localStorage.setItem(HSIZE_KEY, JSON.stringify(s)); } catch {} };
-  const HS_CURS = { l: 'ew-resize', r: 'ew-resize', t: 'ns-resize', b: 'ns-resize',
-    tl: 'nwse-resize', br: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize' };
   const edgeAt = (e) => {
     const r = helpPanel.getBoundingClientRect();
     const l = e.clientX - r.left < EDGE_PX, rr = r.right - e.clientX < EDGE_PX;
     const t = e.clientY - r.top < EDGE_PX, b = r.bottom - e.clientY < EDGE_PX;
     return (t ? 't' : '') + (b ? 'b' : '') + (l ? 'l' : '') + (rr ? 'r' : '');
   };
+  // a point over the scroller's own bar can't resize - the bar swallows
+  // the press before it reaches the ring, so neither cursor nor the
+  // lit edge should advertise a resize there
+  const onScBar = (e, edge) => {
+    const sc = helpPanel.querySelector('.hp-scroll'), sr = sc.getBoundingClientRect();
+    return (edge.includes('r') && e.clientX >= sr.left + sc.clientWidth && e.clientY >= sr.top && e.clientY <= sr.bottom)
+      || (edge.includes('b') && e.clientY >= sr.top + sc.clientHeight && e.clientX >= sr.left && e.clientX <= sr.right);
+  };
   helpPanel.addEventListener('pointermove', (e) => {
     if (e.buttons || helpPanel.parentNode === railEl) return; // a drag keeps its lit edge
     const edge = e.target.closest('.hp-handle, .hp-size') ? '' : edgeAt(e);
-    helpPanel.style.cursor = HS_CURS[edge] || '';
-    helpPanel.classList.toggle('edge-l', edge.includes('l'));
-    helpPanel.classList.toggle('edge-r', edge.includes('r'));
-    helpPanel.classList.toggle('edge-t', edge.includes('t'));
-    helpPanel.classList.toggle('edge-b', edge.includes('b'));
+    const lit = edge && !onScBar(e, edge) ? edge : '';
+    helpPanel.style.cursor = lit ? 'grab' : '';
+    helpPanel.classList.toggle('edge-l', lit.includes('l'));
+    helpPanel.classList.toggle('edge-r', lit.includes('r'));
+    helpPanel.classList.toggle('edge-t', lit.includes('t'));
+    helpPanel.classList.toggle('edge-b', lit.includes('b'));
   });
   helpPanel.addEventListener('pointerleave', (e) => { if (!e.buttons) helpPanel.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b'); });
   // w/h and position live in the same key; a width that lands on a
@@ -16398,7 +16405,7 @@
     const noPan = (ev) => ev.preventDefault();
     helpPanel.addEventListener('touchmove', noPan, { passive: false });
     const r = helpPanel.getBoundingClientRect();
-    helpPanel.style.cursor = HS_CURS[edge];
+    helpPanel.style.cursor = 'grabbing';
     const htop = headerEl.getBoundingClientRect().bottom + 4;
     // re-anchor to left/top so the dragged edges stay put under the
     // pointer regardless of how the panel was previously positioned
@@ -16473,14 +16480,7 @@
   helpPanel.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || helpPanel.hidden || helpPanel.parentNode === railEl) return;
     const edge = edgeAt(e);
-    if (!edge) return;
-    // a press on a scroll lane is the scrollbar's own - resizing
-    // there would drag the panel and the content at the same time
-    if (edge.includes('r') || edge.includes('b')) {
-      const sc = helpPanel.querySelector('.hp-scroll'), sr = sc.getBoundingClientRect();
-      if (edge.includes('r') && e.clientX >= sr.left + sc.clientWidth && e.clientY >= sr.top && e.clientY <= sr.bottom) return;
-      if (edge.includes('b') && e.clientY >= sr.top + sc.clientHeight && e.clientX >= sr.left && e.clientX <= sr.right) return;
-    }
+    if (!edge || onScBar(e, edge)) return;
     hpEdgeDrag(edge, e);
   });
 

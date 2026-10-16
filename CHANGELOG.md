@@ -41,6 +41,10 @@ not versions - the page ships continuously to Neocities.
 - resizing the help popup no longer scrolls its contents at the same
   time - edge drags veto the touch pan, and presses that land on a
   scrollbar lane belong to the scrollbar again
+- the popup's resize affordance is honest now - the grabbing hand
+  shows only where a press will actually resize, so the scrollbar
+  stops impersonating an edge grip; grips and the ring share the
+  handle's grab/grabbing idiom
 - the spacer row under the dsa banner loses its residual line height
 - the corner rose becomes the official dsa mark's own rose - the
   emoji glyph swapped for the logo's vector, cropped off the clasped
