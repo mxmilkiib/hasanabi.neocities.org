@@ -136,8 +136,10 @@ not versions - the page ships continuously to Neocities.
   stretching it narrows the help back while the pair's total holds
 - `1col danmaku` (level 19, `?split=1cdan`) joins the 1col group -
   the centred frame alone with the bullet overlay switched on at
-  select; the toggle still wins if turned off, and a saved 1col
-  danmaku re-arms bullets on restore even over a saved `dan:0`
+  select. danmaku now belongs to that layout alone: every other
+  level disarms it on entry, a saved `dan` state no longer re-arms
+  it elsewhere, and only an explicit `?dan=` or the toggle itself
+  can run it under another layout
 - 1col video's bare floor drags in the pulled direction - the first
   decisive move locks the axis and growth follows motion away from
   the frame's centre (outward grows, inward shrinks), so a bg grab
