@@ -2067,6 +2067,10 @@
   #helpPanel .rcstw, #helpPanel .linkcols.stbl .rcstw { color: #ee7fae; }
   #helpPanel .rcloc, #helpPanel .linkcols.stbl .rcloc { color: #4ec2a8; }
   #helpPanel .rcmsr, #helpPanel .linkcols.stbl .rcmsr { color: #e0855a; }
+  /* dsa tab group heads tint by race type; the untinted rest take a
+     muted sage off the dim face */
+  #helpPanel #htabDsa .linkcols.stbl > b:not([class]) {
+    color: color-mix(in oklch, var(--text-dim) 60%, var(--good) 40%); }
   /* a won row dots the left edge of its name cell in outcome green */
   #helpPanel .linkcols.stbl > i.won .cn::before {
     content: '●'; color: var(--good); font-size: .62em; margin-right: .35em; }
