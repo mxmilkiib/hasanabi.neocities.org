@@ -942,8 +942,9 @@
   /* mIRC-style read marker between last-seen and unseen rows */
   .redbar { border-top: 1.5px solid #e04040; margin: 2px 0; }
   /* the archive's load-earlier seam pinned to the top of #log */
-  .archload { text-align: center; color: var(--text-dim); padding: 3px 0; cursor: pointer; user-select: none; }
-  .archload:hover { color: var(--text); }
+  .archload, .row.archgap { text-align: center; color: var(--text-dim); cursor: pointer; user-select: none; }
+  .archload { padding: 3px 0; }
+  .archload:hover, .row.archgap:hover { color: var(--text); }
   main.notime .time { display: none; }
   main.nosec .sec { display: none; }
   .role { margin-right: 4px; color: var(--text-dim); }
@@ -2694,7 +2695,7 @@
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
-    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top - scrolling to it pages more in on its own - or by clicking a find hit, a reply chip, or a ?mid= link; restored rows carry the dimmed stale look and count toward the scrollback cap. The paged column layouts hide stale rows, so restoring folds back to one scrolling column. <span id="archiveStatus" role="status"></span></span></div>
+    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top - scrolling to it pages more in on its own, and ⇧click loads eight pages at once - or by clicking a find hit, a reply chip, or a ?mid= link; restored rows carry the dimmed stale look and count toward the scrollback cap. Where a restore leaves a stored stretch unrendered, a "skipped" marker counts it and fills on click. The paged column layouts hide stale rows, so restoring folds back to one scrolling column. <span id="archiveStatus" role="status"></span></span></div>
     <div><b>–</b> header size: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span> - middle-clicking the ? opens the about page, middle-clicking its ✕ recentres a moved panel<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -8639,6 +8640,10 @@
       retry(err);
     }
   }
+  // one store can hold rows from rooms this view didn't join (multi
+  // sessions share the first channel's db) - hydrate and search only the
+  // channels actually in view
+  const inChans = (r) => CHANNELS.includes((r.ch || CHANNEL).toLowerCase());
   // the same tokens the find-bar parses, run against stored rows - a
   // cursor walks newest-first and stops once 300 hits are collected
   function archSearch(toks, cb) {
@@ -8650,7 +8655,7 @@
         const cur = e.target.result;
         if (!cur || hits.length >= 300) return cb(hits);
         const r = cur.value;
-        const ok = toks.every(([k, v]) => {
+        const ok = inChans(r) && toks.every(([k, v]) => {
           if (k === 'user') return (r.login + '|' + r.name).toLowerCase().includes(v);
           if (k === 'kind') return v === 'notice' ? r.kind === 'notice' : r.kind === 'msg' || r.kind === v;
           return (r.msg || r.text || '').toLowerCase().includes(v);
@@ -8829,7 +8834,7 @@
           const cur = e.target.result;
           if (!cur || recs.length >= n) return cb(recs);
           const r = cur.value;
-          if (!r.mid || !rowById.has(r.mid)) recs.push(r);
+          if (inChans(r) && (!r.mid || !rowById.has(r.mid))) recs.push(r);
           cur.continue();
         };
     } catch { cb(recs); }
@@ -8843,15 +8848,16 @@
     let done = 0;
     const fin = () => {
       if (++done !== 2) return;
-      archInsert(before.reverse().concat(after));
+      const out = archInsert(before.reverse().concat(after));
       cb();
+      if (out.length) archGapSides(out[0], out[out.length - 1]);
     };
     try {
       archDb.transaction('msgs').objectStore('msgs').index('ts')
         .openCursor(IDBKeyRange.upperBound(ts), 'prev').onsuccess = (e) => {
           const cur = e.target.result;
           if (!cur || before.length >= ctx) return fin();
-          before.push(cur.value);
+          if (inChans(cur.value)) before.push(cur.value);
           cur.continue();
         };
     } catch { fin(); }
@@ -8860,7 +8866,7 @@
         .openCursor(IDBKeyRange.lowerBound(ts, true), 'next').onsuccess = (e) => {
           const cur = e.target.result;
           if (!cur || after.length >= ctx) return fin();
-          after.push(cur.value);
+          if (inChans(cur.value)) after.push(cur.value);
           cur.continue();
         };
     } catch { fin(); }
@@ -8874,16 +8880,100 @@
   };
   // look a mid up in the store and restore its window - the path for
   // permalinks and reply chips, which know the id but not the timestamp
-  function archSeekMid(mid, cb) {
-    if (!archDb || !mid) return;
+  function archSeekMid(mid, cb, miss) {
+    if (!archDb || !mid) return miss && miss();
     try {
       archDb.transaction('msgs').objectStore('msgs').get(mid).onsuccess = (e) => {
         const r = e.target.result;
-        if (!r) return;
+        if (!r) return miss && miss();
         archReveal();
         archAround(r.ts, cb);
       };
-    } catch {}
+    } catch { miss && miss(); }
+  }
+  // a window-load strands the stored stretches between its edges and the
+  // rendered neighbours - gap markers count them and fill on click. The
+  // key cursor keeps counting cheap: primaryKey is the mid, so rendered
+  // rows drop out via rowById without deserialising records
+  const archGapTxt = (n) => `· ${n.toLocaleString()} archived messages skipped - click to load ·`;
+  function archGapCount(lo, hi, cb) {
+    if (!archDb) return cb(0);
+    let n = 0;
+    try {
+      archDb.transaction('msgs').objectStore('msgs').index('ts')
+        .openKeyCursor(IDBKeyRange.bound(lo, hi, true, true), 'next').onsuccess = (e) => {
+          const cur = e.target.result;
+          if (!cur || n >= 99999) return cb(n);
+          if (!rowById.has(cur.primaryKey)) n++;
+          cur.continue();
+        };
+    } catch { cb(n); }
+  }
+  function archGapRecount(g) {
+    if (!g.isConnected) return;
+    const lo = +g.dataset.lo, hi = +g.dataset.hi;
+    archGapCount(lo, hi, (n) => {
+      if (!n) { g.remove(); return; }
+      g.textContent = archGapTxt(n);
+    });
+  }
+  function archGapFill(g, big) {
+    if (!archDb) return;
+    const lo = +g.dataset.lo, hi = +g.dataset.hi;
+    g.textContent = '· loading skipped chat… ·';
+    const recs = [];
+    try {
+      archDb.transaction('msgs').objectStore('msgs').index('ts')
+        .openCursor(IDBKeyRange.bound(lo, hi, true, true), 'next').onsuccess = (e) => {
+          const cur = e.target.result;
+          if (!cur || recs.length >= Math.min(big ? ARCH_PAGE << 3 : ARCH_PAGE, MAX_MESSAGES)) {
+            // the marker's own ts is the gap's far edge, so fills land
+            // ahead of it and it drifts with what remains
+            archInsert(recs);
+            archGapRecount(g);
+            return;
+          }
+          if (inChans(cur.value) && !rowById.has(cur.primaryKey)) recs.push(cur.value);
+          cur.continue();
+        };
+    } catch { archGapRecount(g); }
+  }
+  // a marker is a .row so ordering math and trims treat it as one; its ts
+  // sits at the gap's far edge, so fills land ahead of it and it drifts
+  // down with what remains
+  function archGapMark(lo, hi, ref, txt) {
+    archGapCount(lo, hi, (n) => {
+      if (!n || (ref && !ref.isConnected)) return;
+      const g = document.createElement('div');
+      g.className = 'row archgap stale';
+      g.dataset.ts = String(hi); g.dataset.lo = lo; g.dataset.hi = String(hi);
+      g.setAttribute('role', 'button');
+      g.tabIndex = 0;
+      g.textContent = txt ? txt(n) : archGapTxt(n);
+      g.title = 'archived rows sit past this point - click to load them';
+      g.addEventListener('click', (e) => archGapFill(g, e.shiftKey));
+      g.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); archGapFill(g); }
+      });
+      if (ref) logEl.insertBefore(g, ref); else logEl.appendChild(g);
+      const p = g.previousElementSibling;
+      g.classList.toggle('z', !p || !p.classList.contains('z'));
+    });
+  }
+  // called after a window-load: each side of the block may leave a stored
+  // stretch unrendered. A real row neighbour bounds a two-sided gap; none
+  // past the block means records newer than everything render an open end
+  function archGapSides(first, last) {
+    const prev = first.previousElementSibling, next = last.nextElementSibling;
+    if (prev && prev.classList.contains('archgap')) archGapRecount(prev);
+    else if (prev && prev.classList.contains('row'))
+      archGapMark(+prev.dataset.ts, +first.dataset.ts, first);
+    if (next && next.classList.contains('archgap')) archGapRecount(next);
+    else if (next && next.classList.contains('row'))
+      archGapMark(+last.dataset.ts, +next.dataset.ts, next);
+    else if (!next && last.isConnected)
+      archGapMark(+last.dataset.ts, Infinity, null,
+        (n) => `· ${n.toLocaleString()} newer archived messages - click to load ·`);
   }
   // the chip only earns its spot when the store holds rows older than the
   // log's edge - the count label tells how deep the well goes. Trims and
@@ -8905,17 +8995,17 @@
         if (n) {
           const page = Math.min(n, ARCH_PAGE, MAX_MESSAGES);
           archTop.textContent = `load earlier chat - ${n.toLocaleString()} in archive`;
-          archTop.title = `${n.toLocaleString()} archived messages older than the log - click or scroll up to load ${page}`;
+          archTop.title = `${n.toLocaleString()} archived messages older than the log - click or scroll up to load ${page} - ⇧click loads ${Math.min(ARCH_PAGE << 3, MAX_MESSAGES).toLocaleString()}`;
         }
       };
       req.onerror = () => { archTop.hidden = true; };
     } catch { archTop.hidden = true; }
   }
-  const archLoad = () => {
+  const archLoad = (e) => {
     if (archBusy) return;
     archBusy = true;
     archTop.textContent = 'loading earlier chat…';
-    archOlder(archEdge(), Math.min(ARCH_PAGE, MAX_MESSAGES), (recs) => {
+    archOlder(archEdge(), Math.min(e && e.shiftKey ? ARCH_PAGE << 3 : ARCH_PAGE, MAX_MESSAGES), (recs) => {
       archBusy = false;
       archInsert(recs.reverse());
       if (!recs.length) archTop.textContent = 'no earlier rows archived';
@@ -8937,7 +9027,7 @@
   }, { root: logEl, rootMargin: '240px' }).observe(archTop);
   archTop.addEventListener('click', archLoad);
   archTop.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); archLoad(); }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); archLoad(e); }
   });
   document.getElementById('findArch').addEventListener('click', () => {
     const toks = findTokens();
@@ -15760,8 +15850,13 @@
         }
         if (tries > 0) {
           // the dom polls run out first - one archive lookup, and a found
-          // record buys a few more ticks for its window to land
-          if (!--tries && !arched) { arched = true; archSeekMid(mid, () => { tries = 4; }); }
+          // record buys a few more ticks for its window to land. A miss
+          // says so instead of dying silently
+          if (!--tries && !arched) {
+            arched = true;
+            archSeekMid(mid, () => { tries = 4; }, () => queueMessage({ tags: {}, login: null, kind: 'NOTICE',
+              message: 'permalink target not found - outside scrollback and absent from the local archive' }, false));
+          }
         } else clearInterval(seek);
       }, 250);
     }

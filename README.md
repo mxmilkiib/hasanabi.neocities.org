@@ -345,10 +345,12 @@ no dependencies beyond CDN-hosted fonts.
     rehydrated into the log along with their surrounding context. The
     same store backs the "load earlier chat" seam at the top of the log:
     click it or just scroll into it, and batches of older history page
-    in while it stays in view. `?mid=` permalinks and reply-chip jumps
-    also restore their target from the archive when it has left the
-    rendered scrollback - folded column layouts return to one scrolling
-    column for the jump, since paged layouts hide the restored rows.
+    in while it stays in view (shift-click loads eight pages at once).
+    `?mid=` permalinks and reply-chip jumps also restore their target
+    from the archive when it has left the rendered scrollback - folded
+    column layouts return to one scrolling column for the jump, since
+    paged layouts hide the restored rows. Where a restore skips a
+    stretch, a "skipped" marker counts the gap and fills it on click.
 - **People**
   - In help, add usernames to the hide list. Choose whether their
     messages disappear, become a count line, or remain visible but
