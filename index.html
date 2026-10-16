@@ -10331,7 +10331,7 @@
   const danCv = document.getElementById('danmaku');
   const danCtx = danCv.getContext('2d');
   let danmakuOn = false;      // config toggle, default off
-  const danBullets = [];      // live { txt, col, x, w, v, y, lane }
+  const danBullets = [];      // live { segs, col, x, w, v, y, lane }
   const danQueue = [];        // pushed rows waiting for a free lane
   const DAN_CAP = 42, DAN_QCAP = 60, DAN_DUR = 5200;
   let danLanes = 0, danFontPx = 16, danNextLane = 0;
@@ -10355,22 +10355,67 @@
   // a hidden->shown box refits here and danKick resumes any bullets
   // that were mid-flight when the video folded away
   new ResizeObserver(() => { danFit(); danKick(); }).observe(vidBox);
-  // the feed rebuilds plain text with emote imgs reading as their codes,
-  // so an emote-only post doesn't fly as a blank bullet
+  // emote images fly as themselves - each bullet is a segment list of
+  // text runs and shared Image elements. one that hasn't finished
+  // loading (or never will) draws as its code until it resolves
+  const danImgs = new Map();
+  const danImg = (src) => {
+    let im = danImgs.get(src);
+    if (!im) {
+      if (danImgs.size > 800) danImgs.delete(danImgs.keys().next().value);
+      im = new Image();
+      im.src = src;
+      danImgs.set(src, im);
+    }
+    return im;
+  };
+  const danEmoteH = () => Math.round(danFontPx * 1.4);
+  const danEmoteGap = () => Math.ceil(danFontPx * 0.3);
   function danmakuPush(row) {
     if (!danmakuOn || vidBox.hidden) return;
     const m = row.querySelector('.msg');
     if (!m) return;
-    const walk = (el) => { let s = '';
-      for (const n of el.childNodes)
-        s += n.nodeType === 3 ? n.textContent : n.tagName === 'IMG' ? (n.alt || '') + ' ' : walk(n);
-      return s; };
-    let txt = walk(m).replace(/\s+/g, ' ').trim();
-    if (!txt) return;
-    if (txt.length > 160) txt = txt.slice(0, 159) + '…';
+    // walk the rendered row into segments: text nodes stay text, emote
+    // imgs become image refs, other imgs (link icons, chat images)
+    // still contribute their alt text like they did as flat text
+    const segs = [];
+    const walk = (el) => {
+      for (const n of el.childNodes) {
+        if (n.nodeType === 3) segs.push(n.textContent);
+        else if (n.tagName === 'IMG') segs.push(n.classList.contains('emote')
+          ? { im: danImg(n.currentSrc || n.src), alt: n.alt || 'emote' } : (n.alt || '') + ' ');
+        else walk(n);
+      }
+    };
+    walk(m);
+    // glue adjacent text back into runs, collapsing whitespace
+    const flat = [];
+    for (const s of segs) {
+      if (typeof s !== 'string') { flat.push(s); continue; }
+      const t = s.replace(/\s+/g, ' ');
+      if (flat.length && typeof flat[flat.length - 1] === 'string') flat[flat.length - 1] += t;
+      else flat.push(t);
+    }
+    if (typeof flat[0] === 'string') flat[0] = flat[0].replace(/^ +/, '');
+    if (flat.length && typeof flat[flat.length - 1] === 'string')
+      flat[flat.length - 1] = flat[flat.length - 1].replace(/ +$/, '');
+    // an emote counts as two chars toward the length cap
+    const out = [];
+    let len = 0;
+    for (const s of flat) {
+      const w = typeof s === 'string' ? s.length : 2;
+      if (len + w > 160) {
+        const t = typeof s === 'string' ? s.slice(0, 160 - len).replace(/ +$/, '') : '';
+        out.push((t || '') + '…');
+        break;
+      }
+      out.push(s);
+      len += w;
+    }
+    if (!out.length || out.every((s) => typeof s === 'string' && !s.trim())) return;
     const lg = row.dataset.u;
     const rec = lg && seenNicks.get(lg);
-    danQueue.push({ txt, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x') });
+    danQueue.push({ segs: out, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x') });
     if (danQueue.length > DAN_QCAP) danQueue.splice(0, danQueue.length - DAN_QCAP);
     danKick();
   }
@@ -10380,7 +10425,11 @@
     while (danBullets.length < DAN_CAP && danQueue.length) {
       const q = danQueue[0];
       danCtx.font = `600 ${danFontPx}px ${danFontFam()}`;
-      const w = Math.ceil(danCtx.measureText(q.txt).width) + 6;
+      const w = Math.ceil(q.segs.reduce((a, s) => a + (typeof s === 'string'
+        ? danCtx.measureText(s).width
+        : s.im.complete && s.im.naturalWidth
+          ? danEmoteH() * s.im.naturalWidth / s.im.naturalHeight + danEmoteGap()
+          : danCtx.measureText(s.alt).width + danEmoteGap()), 6));
       const v = (W + w) / (DAN_DUR * (0.85 + Math.random() * 0.3));
       let lane = -1;
       for (let k = 0; k < danLanes; k++) {
@@ -10396,7 +10445,7 @@
       if (lane < 0) return; // every lane backed up - wait for next frame
       danQueue.shift();
       danNextLane = (lane + 1) % danLanes;
-      danBullets.push({ txt: q.txt, col: q.col, x: W, w, v, lane,
+      danBullets.push({ segs: q.segs, col: q.col, x: W, w, v, lane,
         y: lane * danFontPx * 1.5 + danFontPx });
     }
   }
@@ -10414,9 +10463,35 @@
       const b = danBullets[i];
       b.x -= b.v * dt;
       if (b.x + b.w < 0) { danBullets.splice(i, 1); continue; }
-      danCtx.strokeText(b.txt, b.x, b.y);
-      danCtx.fillStyle = b.col;
-      danCtx.fillText(b.txt, b.x, b.y);
+      // each segment keeps the bullet's nick colour for text; an emote
+      // draws its image, or its code as text while the load is pending
+      let x = b.x;
+      for (const s of b.segs) {
+        if (typeof s === 'string') {
+          if (s.trim()) {
+            danCtx.strokeText(s, x, b.y);
+            danCtx.fillStyle = b.col;
+            danCtx.fillText(s, x, b.y);
+          }
+          x += danCtx.measureText(s).width;
+          continue;
+        }
+        const im = s.im;
+        if (im.complete && im.naturalWidth) {
+          const eh = danEmoteH(), ew = Math.round(eh * im.naturalWidth / im.naturalHeight);
+          danCtx.drawImage(im, x, Math.round(b.y - eh / 2), ew, eh);
+          x += ew;
+        } else {
+          danCtx.strokeText(s.alt, x, b.y);
+          danCtx.fillStyle = b.col;
+          danCtx.fillText(s.alt, x, b.y);
+          x += danCtx.measureText(s.alt).width;
+        }
+        x += danEmoteGap();
+      }
+      // images resolving mid-flight change the true width - the lane
+      // math reads it fresh each frame rather than the spawn estimate
+      b.w = Math.ceil(x - b.x);
     }
     // spin only while something's flying or waiting - an idle video
     // costs nothing

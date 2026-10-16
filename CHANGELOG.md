@@ -135,6 +135,12 @@ not versions - the page ships continuously to Neocities.
 - danmaku bullets wear the live chat font - the family was cached at
   refit, so a mid-session font swap left the stream in the old face;
   the bullet text cap rises 60 → 160 chars
+- danmaku draws emotes as images inline in the bullet instead of
+  flying their codes as text - the row walks into text/emote
+  segments, each emote sharing a cached Image at ~1.4x the bullet
+  font height; one still loading (or dead) falls back to its code
+  until it resolves, and the lane math re-measures the true width
+  each frame as images land
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
