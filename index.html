@@ -2835,7 +2835,7 @@
     <div class="thm"><b id="helpVariantIcon">▢</b><span>variant: <span id="helpVariantList"></span> - a finish layered over any colour: phosphor tints text and accents toward the hue, grain adds texture, contrast widens the bg/text gap</span></div>
     <div class="thm"><b id="helpShadeIcon">◑</b><span>shade: <span id="helpShadeList"></span> - darkness stop for the palette; right-click resets to <a href="#" role="button" class="helpShade" data-idx="auto">system</a><sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>font</b> <span><span id="helpFontFamList"></span><sup>†</sup></span></div>
+    <div><b>font</b> <span><span id="helpFontFamList"></span> - middle-click the header button or its menu for the hidden random face, a different one per message<sup>†</sup></span></div>
     <div><b>Aa</b><span>font size: <span id="helpFontList"></span><sup>†</sup></span><b>↕</b><span>line height: <span id="helpLhList"></span><sup>†</sup></span><b>B</b><span>font weight: <span id="helpWgList"></span> - lighter faces have fewer weights to pick from<sup>†</sup></span><b>⇄</b><span>letter spacing: <span id="helpLsList"></span> - em steps, so they scale with the font size; right-click resets to 0<sup>†</sup></span></div>
     <div><b>T</b> <span>text shadow: <span id="helpShadowList"></span> under chat text<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -5148,6 +5148,8 @@
     // append lands after it in the right spot either way
     activeEl.append(tpl.content);
     dedupeLinks(newRows);
+    // random face mode stamps each live row its own --chat-ff override
+    if (fontRand) for (const r of newRows) r.style.setProperty('--chat-ff', randStack());
     if (hlUsers.size) for (const r of newRows) hlRow(r);
     if (ucardLogin) for (const r of newRows) ucardMark(r);
     // bullets fly only rows that rendered live - backlog restores,
@@ -5158,7 +5160,10 @@
       danmakuPush(r);
     }
     if (whisHtml) {
-      whisLog.insertAdjacentHTML('beforeend', whisHtml);
+      const wt = document.createElement('template');
+      wt.innerHTML = whisHtml;
+      if (fontRand) for (const r of wt.content.querySelectorAll('.row')) r.style.setProperty('--chat-ff', randStack());
+      whisLog.append(wt.content);
       // the pane is a rolling dm history - bound it like the log but far
       // tighter; whispers don't survive a reload
       while (whisLog.children.length > 200) whisLog.firstElementChild.remove();
@@ -8347,23 +8352,44 @@
   fontMenu.innerHTML = [...fontSel.options].map((o, i) =>
     `<button type="button" role="option" data-i="${i}" style="font-family:${FONT_STACKS[o.value].replace(/"/g, "'")}">${escapeHTML(o.text)}</button>`).join('');
 
+  // a middle click on the pick or its open menu lands on the hidden
+  // 'random' - each message row then draws its own face off the stack
+  // list; any ordinary pick - menu, wheel, ?font= - steps back off it
+  let fontRand = false;
+  const randStack = () => {
+    const ks = Object.keys(FONT_STACKS);
+    return FONT_STACKS[ks[(Math.random() * ks.length) | 0]];
+  };
+  const clrRowFonts = () => {
+    for (const r of document.querySelectorAll('.row')) r.style.removeProperty('--chat-ff');
+  };
   function applyFont() {
+    if (fontRand) { fontRand = false; clrRowFonts(); }
     const cur = FONT_STACKS[fontSel.value] || FONT_STACKS.mono,
           lbl = fontSel.options[fontSel.selectedIndex].text;
     document.documentElement.style.setProperty('--chat-ff', cur);
     fontPick.style.fontFamily = cur;
     fontPick.textContent = lbl;
-    fontPick.title = `Font: ${lbl} - click for menu · scroll cycles`;
+    fontPick.title = `Font: ${lbl} - click for menu · scroll cycles · middle-click randomises`;
     markHelp('helpFontFam', fontSel.selectedIndex);
     subWProbe();
     repin();
+  }
+  function setFontRand() {
+    fontRand = true;
+    for (const r of document.querySelectorAll('.row')) r.style.setProperty('--chat-ff', randStack());
+    fontPick.style.fontFamily = randStack();
+    fontPick.textContent = 'Random';
+    fontPick.title = 'Font: random - each message draws its own face · click for menu';
+    markHelp('helpFontFam', -1);
+    markFontMenu();
   }
 
   const markFontMenu = () => {
     const i = fontSel.selectedIndex;
     fontMenu.querySelectorAll('button').forEach((b, j) => {
-      b.classList.toggle('on', j === i);
-      b.setAttribute('aria-selected', String(j === i));
+      b.classList.toggle('on', !fontRand && j === i);
+      b.setAttribute('aria-selected', String(!fontRand && j === i));
     });
   };
   const setFontMenu = (open) => {
@@ -8383,6 +8409,15 @@
     fontSel.selectedIndex = +b.dataset.i;
     applyFont(); saveOpts(); setFontMenu(false); fontPick.focus();
   });
+  for (const el of [fontPick, fontMenu]) {
+    // a middle click lands on 'random' - pointerdown pre-empts the
+    // autoscroll that middle-press would otherwise arm
+    el.addEventListener('pointerdown', (e) => { if (e.button === 1) e.preventDefault(); });
+    el.addEventListener('auxclick', (e) => {
+      if (e.button !== 1) return;
+      setFontRand(); saveOpts(); setFontMenu(false);
+    });
+  }
   document.addEventListener('pointerdown', (e) => {
     if (!fontMenu.hidden && !fontMenu.contains(e.target) && e.target !== fontPick) setFontMenu(false);
     if (!splitMenu.hidden && !splitMenu.contains(e.target) && e.target !== splitBtn) setSplitMenu(false);
@@ -8777,6 +8812,7 @@
       `<div role="article" class="row whisper out"><span class="time">${fmtRowTime(new Date())}</span>` +
       `<a class="name" style="color:${color}" data-u="${escapeHTML((auth && auth.login) || '')}">${escapeHTML(wname)}</a>` +
       `<span class="warr">→ ${escapeHTML(name)}:</span> <span class="msg">${rendered.html}</span></div>`);
+    if (fontRand) whisLog.lastElementChild.style.setProperty('--chat-ff', randStack());
     while (whisLog.children.length > 200) whisLog.firstElementChild.remove();
     whisLog.scrollTop = whisLog.scrollHeight;
   }
@@ -9787,7 +9823,7 @@
   // theme slot stashes
   function curOpts() {
     return {
-      font: fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : undefined, lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], colour: colourMode, variant: variantMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
+      font: fontRand ? 'rand' : fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : undefined, lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], colour: colourMode, variant: variantMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -9909,7 +9945,8 @@
       const i = v !== undefined ? list.indexOf(v) : Number.isInteger(o[k]) ? o[k] : -1;
       if (i >= 0 && i < list.length) ctl.set(i);
     });
-    if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
+    if (o.font === 'rand') setFontRand();
+    else if (o.font && FONT_STACKS[o.font]) { fontSel.value = o.font; applyFont(); }
     if (o.lines != null) { const v = o.lines === true ? 3 : +o.lines; if (Number.isFinite(v)) setLines(v); }
     // a saved bundle always carries both booleans, so an explicit false
     // restores the full header; presets leave the keys out and don't touch it
@@ -10056,7 +10093,7 @@
   // the stream embed is deliberately outside presets - one toggles it by hand
   function presetCmp() {
     return {
-      colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : Math.round(chatFontPx()),
+      colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontRand ? 'rand' : fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : Math.round(chatFontPx()),
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
@@ -10434,7 +10471,9 @@
     if (!out.length || out.every((s) => typeof s === 'string' && !s.trim())) return;
     const lg = row.dataset.u;
     const rec = lg && seenNicks.get(lg);
-    danQueue.push({ segs: out, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x') });
+    // a random-face pick stays with the bullet for its whole flight
+    danQueue.push({ segs: out, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x'),
+      fam: fontRand ? randStack() : '' });
     if (danQueue.length > DAN_QCAP) danQueue.splice(0, danQueue.length - DAN_QCAP);
     danKick();
   }
@@ -10443,7 +10482,7 @@
   function danSpawn(W, s) {
     while (danBullets.length < DAN_CAP && danQueue.length) {
       const q = danQueue[0];
-      danCtx.font = `${s.w} ${danFontPx}px ${s.fam}`;
+      danCtx.font = `${s.w} ${danFontPx}px ${q.fam || s.fam}`;
       danCtx.letterSpacing = s.ls;
       const w = Math.ceil(q.segs.reduce((a, s) => a + (typeof s === 'string'
         ? danCtx.measureText(s).width
@@ -10465,7 +10504,7 @@
       if (lane < 0) return; // every lane backed up - wait for next frame
       danQueue.shift();
       danNextLane = (lane + 1) % danLanes;
-      danBullets.push({ segs: q.segs, col: q.col, x: W, w, v, lane,
+      danBullets.push({ segs: q.segs, col: q.col, fam: q.fam, x: W, w, v, lane,
         y: lane * danPitch + danFontPx });
     }
   }
@@ -10488,6 +10527,7 @@
       if (b.x + b.w < 0) { danBullets.splice(i, 1); continue; }
       // each segment keeps the bullet's nick colour for text; an emote
       // draws its image, or its code as text while the load is pending
+      if (b.fam) danCtx.font = `${s.w} ${danFontPx}px ${b.fam}`;
       let x = b.x;
       for (const s of b.segs) {
         if (typeof s === 'string') {
@@ -11707,7 +11747,8 @@
     if (colourMode !== 'gray') q.set('colour', colourMode);
     if (variantMode !== 'standard') q.set('variant', variantMode);
     if (shadeIdx !== DEF.shade) q.set('shade', shadeIdx == null ? 'auto' : SHADE_NAMES[shadeIdx]);
-    if (fontSel.value !== 'roobert') q.set('font', fontSel.value);
+    if (fontRand) q.set('font', 'rand');
+    else if (fontSel.value !== 'roobert') q.set('font', fontSel.value);
     // a pick on the floor rung still travels - 16px picked isn't 16px
     // floored for a recipient whose root size isn't 16
     if (fontCtl.get() !== DEF.size || fontPicked()) q.set('size', FONT_SIZES[fontCtl.get()]);
@@ -11868,7 +11909,7 @@
     if (!b) return `theme slot ${i + 1}: empty - click to store the current options`;
     const pxv = b.px ?? FONT_SIZES[b.size];
     const px = pxv ? ` ${pxv}px` : '';
-    const ft = b.font && FONT_STACKS[b.font] ? ` ${b.font}` : '';
+    const ft = b.font && (b.font === 'rand' || FONT_STACKS[b.font]) ? ` ${b.font}` : '';
     const cv = b.colour || b.theme || 'gray';
     const vn = b.variant && b.variant !== 'standard' ? `+${b.variant}` : '';
     return `theme slot ${i + 1}: ${cv}${vn}·${b.shade == null ? 'auto' : b.shade}${px}${ft} - click to recall, shift/right-click to overwrite`;
@@ -16543,7 +16584,11 @@
       if (v === 'auto' || i >= 0) { shadeIdx = v === 'auto' ? null : i; applyShade(); }
       else if (v !== '' && Number.isFinite(+v)) { shadeIdx = Math.max(0, Math.min(SHADE_NAMES.length - 1, +v)); applyShade(); }
     }
-    if (q.has('font') && FONT_STACKS[q.get('font')]) { fontSel.value = q.get('font'); applyFont(); }
+    if (q.has('font')) {
+      const f = q.get('font');
+      if (f === 'rand') setFontRand();
+      else if (FONT_STACKS[f]) { fontSel.value = f; applyFont(); }
+    }
     if (q.has('size')) { const i = FONT_SIZES.indexOf(+q.get('size')); if (i >= 0) fontCtl.set(i); }
     if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
     if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }

@@ -474,7 +474,7 @@ editing a URL.
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
 | `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |
-| `font` | a font key | chat font family |
+| `font` | a font key / `rand` | chat font family - `rand` draws each message in a random face (middle-click the font button or its menu) |
 | `size` | `7`–`32` | chat font px |
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |

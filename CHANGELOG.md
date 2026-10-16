@@ -18,6 +18,11 @@ not versions - the page ships continuously to Neocities.
   'dot' leaves just the status light. the dot leads the numbers in
   every cut view now ('● 2h 35m 25.1k') rather than sitting between
   them; a missing half of minimal still falls back to bare 'live'
+- middle-click the font pick (or its open menu) for the hidden
+  'random' face - each message row and danmaku bullet then draws its
+  own stack off the font list, until any ordinary pick - menu, wheel
+  or ?font= - steps back off it. saved, copied and restored as
+  `font=rand` like a regular face
 
 ### Resources
 - the ⸻ section dividers go gold - the same #e8b73e as the ? button,
