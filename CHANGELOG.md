@@ -10,7 +10,9 @@ not versions - the page ships continuously to Neocities.
   blank stop clears it with the rest of the status text
 - a long stream status no longer squeezes the control strip's buttons
   off one at a time - the rate graph can now shrink to nothing, and the
-  strip drops to its own header line as a unit, centred
+  strip drops to its own header line as a unit, centred. the centring
+  now nudges by translate rather than a negative margin, which shrank
+  the strip's outer size and bounced it between header lines
 
 ### Resources
 - subsection titles across the help pages take a muted sage - group

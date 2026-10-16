@@ -322,11 +322,12 @@
   body.hdrgraph .hdr-side .hdr-btn#vidBtn { display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); right: 80px; }
   /* when the header wraps, centre the icon strip on its own line -
      a hairline's separation from the row above, and let it reach
-     under the pinned corner pair: the reserve only matters on the
-     line they pin, so on theirs the strip runs to the left pad's
-     mirror inset */
+     toward the pinned corner pair: the reserve only matters on the
+     line they pin. A translate, not a margin - shrinking the strip's
+     outer size flips it back onto the first line, which unsets
+     .hdrwrap, which drops it again: a wrap-state oscillation */
   header.hdrwrap { row-gap: 1px; }
-  header.hdrwrap .hdr-side { margin-inline: auto; margin-right: calc(var(--hdrpad, 18px) - var(--hdrres, 84px)); }
+  header.hdrwrap .hdr-side { margin-inline: auto; transform: translateX(calc((var(--hdrres, 84px) - var(--hdrpad, 18px)) / 2)); }
   /* pull-to-refresh: a downward drag on the (unscrollable) header
      grows this strip - PWA standalone has no browser gesture, since
      the page never scrolls */
