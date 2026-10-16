@@ -80,6 +80,11 @@ not versions - the page ships continuously to Neocities.
 - the midterms block gains a "get involved" row - the nec hub,
   national phonebank rsvp, the endorsed slate, socialist cash
   donations and the chapter finder
+- the dsa page splits in two - the midterms header, general ballot,
+  primary results and aligned slate move to a new '26 vote' tab
+  beside 'dsa' (?htab=vote works); the rows stay .vote-marked in the
+  dsa markup and lift onto the page at init so the election data
+  remains one editable block
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps
