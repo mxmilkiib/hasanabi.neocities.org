@@ -55,6 +55,12 @@ not versions - the page ships continuously to Neocities.
   booker, nixon, merkley), 27 house and 7 statewide rows on nov 3,
   plus a fell-short group (saikat, kat abu, nida allam, aftyn behn);
   a new `org` keyed column names the backer
+- a `dem caucuses` section sits under dsa caucuses - the
+  congressional groups (progressive + action fund, black, hispanic +
+  bold pac, asian pacific, equality, women's) and issue caucuses
+  (medicare for all, freethought, era, gun violence, blue collar,
+  future forum) with official house.gov homes where they exist; a
+  note row names the deliberately-absent centrist caucuses
 - dsa resources picks up my.dsa (member portal), the merch store,
   the npec political-education hub, and the member-gated metro dc
   and denver wikis; dsa chapters becomes a sortable table - one row
