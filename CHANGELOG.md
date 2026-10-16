@@ -185,8 +185,10 @@ not versions - the page ships continuously to Neocities.
   every emote in the message - half fly normal, others on 1.5x, 2x
   or 2.6x rungs, capped at two lane pitches. bullets always draw the
   animated file now: a detached Image can sit on a still frame, so
-  each shared copy parks in an invisible rendered holder that keeps
-  it rolling, and under the emote freeze the row's still url maps
+  each shared copy parks in a holder that stays painted (a
+  transparent corner pixel - a hidden img's animation clock pauses,
+  so visibility:hidden kept every bullet on frame one), and under
+  the emote freeze the row's still url maps
   back to the animated one (7tv's _static, twitch's /static/, the
   weserv first-frame proxy) - genuinely static twitch emotes keep
   theirs since /animated/ 404s them

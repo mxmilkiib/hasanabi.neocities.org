@@ -10436,7 +10436,9 @@
       }
       if (!danCache) {
         danCache = document.createElement('div');
-        danCache.style.cssText = 'position:fixed;left:-99px;top:0;width:1px;height:1px;overflow:hidden;visibility:hidden';
+        // a hidden or offscreen img's animation clock pauses - the holder
+        // stays painted in a transparent corner pixel so frames advance
+        danCache.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
         danCache.setAttribute('aria-hidden', 'true');
         document.body.append(danCache);
       }
