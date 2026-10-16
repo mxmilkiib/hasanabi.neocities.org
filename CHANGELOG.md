@@ -23,10 +23,10 @@ not versions - the page ships continuously to Neocities.
   own stack off the font list, until any ordinary pick - menu, wheel
   or ?font= - steps back off it. saved, copied and restored as
   `font=rand` like a regular face
-- the font-size ladder fills in every integer - the wheel steps
-  21→24→28→32 become 21-32, so 22, 23, 25-27 and 29-31 are rungs
-  now; saved `size` values travel as px so picks hold, only the
-  legacy numeric index remaps
+- the font-size ladder fills in every integer 7-48 - the wheel steps
+  21→24→28→32 become single rungs and the top extends past 32 to 48;
+  saved `size` values travel as px so picks hold, only the legacy
+  numeric index remaps
 
 ### Resources
 - the ⸻ section dividers go gold - the same #e8b73e as the ? button,
