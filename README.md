@@ -266,7 +266,8 @@ no dependencies beyond CDN-hosted fonts.
     - `1col danmaku` is `1col video` with the bullet overlay armed -
       the centred frame alone, chat comments flying across it. It is
       the only layout carrying bullets: switching away turns them off
-      and picking it turns them back on.
+      and picking it turns them back on. Its default frame size is
+      the largest the space fits, rather than the shared 720px stop.
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
