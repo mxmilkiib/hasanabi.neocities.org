@@ -70,6 +70,11 @@ not versions - the page ships continuously to Neocities.
   fetched and rendered over the help view instead of jumping to
   github, with « back exits pinned at both ends; the link keeps its
   href so a modified click still opens the file itself
+- the readme rides the same view - the footer's README.md link reads
+  the deployed file in-panel, and the markdown subset grew indented
+  bullets, tables, images and <autolinks> to cover it; a bare repo
+  link like LICENSE can't be deployed (free accounts reject
+  extensionless files), so it points at github
 - the midterms tables mark their key races - a gold ★ on the name
   for the marquee generals and nec-endorsed runs (mai vang,
   gonzales-torres, jewett, levy, mcadams, raman, parrish-wright,

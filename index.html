@@ -1918,8 +1918,9 @@
   #helpPanel .htabs::before { content: ''; position: absolute; bottom: 100%;
     left: 0; right: 0; height: 16px; pointer-events: none;
     background: linear-gradient(color-mix(in srgb, var(--panel) 30%, transparent), color-mix(in srgb, var(--panel) 85%, transparent) 40%, var(--panel)); }
-  /* the changelog view covers the whole panel - tabs, grips and all -
-     until a « back restores help; its bars pin the exits at both ends */
+  /* the in-panel doc view covers the whole panel - tabs, grips and
+     all - until a « back restores help; its bars pin the exits at
+     both ends */
   #helpClog { position: absolute; inset: 0; z-index: 4; display: flex;
     flex-direction: column; background: var(--panel); border-radius: 6px; }
   #helpClog[hidden] { display: none; }
@@ -1931,6 +1932,11 @@
   #helpClog .clh2 { display: block; margin: 1.1em 0 1px; color: var(--accent); }
   #helpClog .clh3 { display: block; margin: .9em 0 0; color: var(--text-dim); }
   #helpClog .clul { margin: 3px 0; padding-left: 1.2em; }
+  #helpClog .clul .clul { margin: 1px 0; }
+  #helpClog .climg { display: block; max-width: 100%; margin: 6px 0; border-radius: 6px; }
+  #helpClog table { border-collapse: collapse; margin: .45em 0; font-size: .92em; }
+  #helpClog th, #helpClog td { border: 1px solid var(--line); padding: 1px 8px; text-align: left; vertical-align: top; }
+  #helpClog th { color: var(--accent); }
   #helpClog p { margin: .45em 0; }
   #helpClog code { color: var(--accent); font-size: .92em; }
   /* tab names read orange - the same amber the footer links wear */
@@ -2863,7 +2869,7 @@
     <div class="sep">⸻</div>
     <div><b>alt twitch chat</b><span class="linkcols wider"><i><b>web</b> <a class="at" href="https://www.giambaj.it/twitch/jchat/" target="_blank" rel="noopener">jchat</a> (obs overlay source) · <a class="at" href="https://nightdev.com/kapchat/" target="_blank" rel="noopener">kapchat</a> (nightdev overlay) · <a class="at" href="https://raftchat.com/" target="_blank" rel="noopener">raftchat</a> (multi-chat grid) · <a class="at" href="https://multitwitch.tv/" target="_blank" rel="noopener">multitwitch</a> (streams+chat grid) · <a class="at" href="https://www.twitch.tv/popout/hasanabi/chat" target="_blank" rel="noopener">twitch popout</a> (official, bare) · this very page</i><i><b>desktop</b> <a class="at" href="https://chatterino.com/" target="_blank" rel="noopener">chatterino</a> (the standard · <a class="at" href="https://github.com/SevenTV/chatterino7" target="_blank" rel="noopener">7tv fork</a>) · <a class="at" href="https://chatty.github.io/" target="_blank" rel="noopener">chatty</a> (java)</i><i><b>mobile</b> <a class="at" href="https://chatsen.app/" target="_blank" rel="noopener">chatsen</a> (ios+android) · <a class="at" href="https://www.frostyapp.io/" target="_blank" rel="noopener">frosty</a> (ios+android) · <a class="at" href="https://github.com/flex3r/DankChat" target="_blank" rel="noopener">dankchat</a> (android · <a class="at" href="https://f-droid.org/packages/com.flxrs.dankchat/" target="_blank" rel="noopener">f-droid</a>) · <a class="at" href="https://github.com/crackededed/Xtra" target="_blank" rel="noopener">xtra</a> (android, full client)</i><i><b>terminal</b> <a class="at" href="https://github.com/Xithrius/twitch-tui" target="_blank" rel="noopener">twitch-tui</a> (rust tui) · irc.chat.twitch.tv (twitch's own irc - weechat/irssi plug straight in)</i><i><b>tv</b> <a class="at" href="https://github.com/fgl27/smarttv-twitch" target="_blank" rel="noopener">smarttv client</a> (tizen + android tv) · <a class="at" href="https://github.com/S0und/S0undTV" target="_blank" rel="noopener">s0undtv</a> (android tv)</i></span></div>
     <div class="sep">&nbsp;</div>
-    <div class="wide" style="margin-top: 8px"><span><a class="at" href="/about/" target="_blank" rel="noopener" style="color:#e8a33d">about</a> · source: <a class="at" style="color:#e8a33d" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" style="font-weight: var(--chat-w, 400)" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/README.md" target="_blank" rel="noopener">README.md</a> · <a class="at" style="font-weight: var(--chat-w, 400)" href="CHANGELOG.md" id="clogLink" title="read the changelog in this panel" target="_blank" rel="noopener">CHANGELOG.md</a> · <a class="at" style="font-weight: var(--chat-w, 400)" href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank" rel="noopener">AGPL-3.0-or-later</a> (<a class="at" style="font-weight: var(--chat-w, 400)" href="https://www.gnu.org/licenses/why-affero-gpl.html" target="_blank" rel="noopener">why?</a>))<span class="ghbtn"><a class="ghb" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener" title="star the repo on github"><svg viewBox="12 12 40 40" aria-hidden="true"><path fill="currentColor" d="M32 13.4c-10.5 0-19 8.5-19 19 0 8.4 5.5 15.5 13 18 1 .2 1.3-.4 1.3-.9v-3.2c-5.3 1.1-6.4-2.6-6.4-2.6-.9-2.1-2.1-2.7-2.1-2.7-1.7-1.2.1-1.1.1-1.1 1.9.1 2.9 2 2.9 2 1.7 2.9 4.5 2.1 5.5 1.6.2-1.2.7-2.1 1.2-2.6-4.2-.5-8.7-2.1-8.7-9.4 0-2.1.7-3.7 2-5.1-.2-.5-.8-2.4.2-5 0 0 1.6-.5 5.2 2 1.5-.4 3.1-.7 4.8-.7 1.6 0 3.3.2 4.7.7 3.6-2.4 5.2-2 5.2-2 1 2.6.4 4.6.2 5 1.2 1.3 2 3 2 5.1 0 7.3-4.5 8.9-8.7 9.4.7.6 1.3 1.7 1.3 3.5v5.2c0 .5.4 1.1 1.3.9 7.5-2.6 13-9.7 13-18.1 0-10.5-8.5-19-19-19z"/></svg>Star</a><a class="ghc" href="https://github.com/mxmilkiib/hasanabi.neocities.org/stargazers" target="_blank" rel="noopener" title="stargazers"><span id="repoStars"></span></a></span><br><span id="repoStats"></span></span></div>
+    <div class="wide" style="margin-top: 8px"><span><a class="at" href="/about/" target="_blank" rel="noopener" style="color:#e8a33d">about</a> · source: <a class="at" style="color:#e8a33d" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener">github repo</a> (<a class="at" style="font-weight: var(--chat-w, 400)" href="README.md" id="rmLink" title="read the readme in this panel" target="_blank" rel="noopener">README.md</a> · <a class="at" style="font-weight: var(--chat-w, 400)" href="CHANGELOG.md" id="clogLink" title="read the changelog in this panel" target="_blank" rel="noopener">CHANGELOG.md</a> · <a class="at" style="font-weight: var(--chat-w, 400)" href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank" rel="noopener">AGPL-3.0-or-later</a> (<a class="at" style="font-weight: var(--chat-w, 400)" href="https://www.gnu.org/licenses/why-affero-gpl.html" target="_blank" rel="noopener">why?</a>))<span class="ghbtn"><a class="ghb" href="https://github.com/mxmilkiib/hasanabi.neocities.org" target="_blank" rel="noopener" title="star the repo on github"><svg viewBox="12 12 40 40" aria-hidden="true"><path fill="currentColor" d="M32 13.4c-10.5 0-19 8.5-19 19 0 8.4 5.5 15.5 13 18 1 .2 1.3-.4 1.3-.9v-3.2c-5.3 1.1-6.4-2.6-6.4-2.6-.9-2.1-2.1-2.7-2.1-2.7-1.7-1.2.1-1.1.1-1.1 1.9.1 2.9 2 2.9 2 1.7 2.9 4.5 2.1 5.5 1.6.2-1.2.7-2.1 1.2-2.6-4.2-.5-8.7-2.1-8.7-9.4 0-2.1.7-3.7 2-5.1-.2-.5-.8-2.4.2-5 0 0 1.6-.5 5.2 2 1.5-.4 3.1-.7 4.8-.7 1.6 0 3.3.2 4.7.7 3.6-2.4 5.2-2 5.2-2 1 2.6.4 4.6.2 5 1.2 1.3 2 3 2 5.1 0 7.3-4.5 8.9-8.7 9.4.7.6 1.3 1.7 1.3 3.5v5.2c0 .5.4 1.1 1.3.9 7.5-2.6 13-9.7 13-18.1 0-10.5-8.5-19-19-19z"/></svg>Star</a><a class="ghc" href="https://github.com/mxmilkiib/hasanabi.neocities.org/stargazers" target="_blank" rel="noopener" title="stargazers"><span id="repoStars"></span></a></span><br><span id="repoStats"></span></span></div>
     </div>
     <div class="htabpage" role="tabpanel" id="htabStats" hidden>
     <div id="statsBody"></div>
@@ -2982,7 +2988,7 @@
     <div><b>free culture</b><span class="linkcols"><i><a class="at" href="https://www.gnu.org/philosophy/philosophy.html" target="_blank" rel="noopener" data-b="1953" data-g="https://www.gnu.org/philosophy/free-sw.html">richard stallman</a> (free software · b.53)<span class="ag"> (free as in freedom)</span></i><i><a class="at" href="https://wiki.c2.com/?WikiWikiWeb" target="_blank" rel="noopener" data-b="1949" data-w="https://wiki.c2.com/?WikiWikiWeb" data-g="https://c2.com/xp/DoTheSimplestThingThatCouldPossiblyWork.html">ward cunningham</a> (the first wiki · b.49)<span class="ag"> (the simplest thing that could work)</span></i><i><a class="at" href="http://www.catb.org/~esr/writings/cathedral-bazaar/" target="_blank" rel="noopener" data-b="1957" data-w="http://www.catb.org/~esr/writings/cathedral-bazaar/" data-g="http://www.catb.org/~esr/writings/cathedral-bazaar/">eric s. raymond</a> (the cathedral and the bazaar · b.57)<span class="ag"> (all bugs are shallow)</span></i><i><a class="at" href="https://lessig.org/product/free-culture/" target="_blank" rel="noopener" data-b="1961" data-w="https://free-culture.cc/freeculture.pdf" data-g="https://codev2.cc/">lawrence lessig</a> (free culture, creative commons)<span class="ag"> (code is law)</span></i><i><a class="at" href="https://pluralistic.net/" target="_blank" rel="noopener" data-b="1971" data-w="https://pluralistic.net/2023/01/21/potemkin-ai/" data-g="https://www.promarket.org/2022/04/15/seize-the-means-of-computation/">cory doctorow</a> (enshittification · b.71)<span class="ag"> (seize the means of computation)</span></i></span></div>
     </div>
     </div>
-    </div><div id="helpClog" role="document" aria-label="changelog" hidden><div class="clogbar"><a href="#" role="button" class="at clogback">« back to help</a></div><div class="clogbody"></div><div class="clogbar"><a href="#" role="button" class="at clogback">« back to help</a></div></div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
+    </div><div id="helpClog" role="document" aria-label="document" hidden><div class="clogbar"><a href="#" role="button" class="at clogback">« back to help</a></div><div class="clogbody"></div><div class="clogbar"><a href="#" role="button" class="at clogback">« back to help</a></div></div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>first-time tips: click/scroll header buttons to change some option settings -- page audio autoplay permission allows unmuted stream on open/reload -- click to dismiss</div>
@@ -6494,58 +6500,102 @@
     try { localStorage.setItem('hasan-htab', id); } catch {}
     updateUrlPrev();
   }
-  // the footer's CHANGELOG.md link fetches the deployed file and
-  // renders it over the whole panel - « back (top and bottom) restores
-  // help without losing the open tab or its scroll. the markdown subset
-  // is just what the file uses: #/##/### heads, - bullets (wrapped
-  // lines fold in), `code`, **bold** and [text](url) links
-  const clogLink = document.getElementById('clogLink');
+  // the footer's CHANGELOG.md and README.md links fetch the deployed
+  // file and render it over the whole panel - « back (top and bottom)
+  // restores help without losing the open tab or its scroll. the
+  // markdown subset is just what the files use: #..#### heads, -
+  // bullets (nesting by indent, wrapped lines fold in), | tables,
+  // 4-space code lines, `code`, **bold**, ![img](src), [text](url)
+  // and <autolink>s
   const helpClog = document.getElementById('helpClog');
   const clogBody = helpClog.querySelector('.clogbody');
   const clogEsc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const clogA = (t, u) => {
+    while (u.endsWith(')') && u.split(')').length > u.split('(').length) u = u.slice(0, -1);
+    // a bare repo path with no extension can't be deployed (free
+    // accounts reject it) - read it from github instead
+    if (!/^[./#]|^\w+:/.test(u) && !/\.[a-z0-9]+$/i.test(u)) u = `https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/${u}`;
+    return `<a class="at" href="${u}" target="_blank" rel="noopener">${t}</a>`;
+  };
   const clogInline = (s) => clogEsc(s)
-    .replace(/\[([^\]]+)\]\((\S+)\)/g, '<a class="at" href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/!\[([^\]]*)\]\((\S+)\)/g, '<img class="climg" src="$2" alt="$1">')
+    .replace(/\[([^\]]+)\]\((\S+)\)/g, (m, t, u) => clogA(t, u))
+    .replace(/&lt;(https?:\/\/[^\s&]+)&gt;/g, (m, u) => clogA(u, u))
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
   const clogMd = (src) => {
-    const out = [];
-    let list = null, para = null;
+    const out = [], lines = src.split('\n');
+    const indents = [];           // open <ul> levels, by indent width
+    let cur = null, para = null;  // open <li> text / open paragraph
+    const flushLi = () => { if (cur !== null) out.push(`<li>${cur}`), cur = null; };
     const flush = () => {
-      if (list) out.push(`<ul class="clul"><li>${list.join('</li><li>')}</li></ul>`), list = null;
+      flushLi();
+      while (indents.length) out.push('</ul>'), indents.pop();
       if (para) out.push(`<p>${para.join(' ')}</p>`), para = null;
     };
-    for (const raw of src.split('\n')) {
-      const t = raw.trim();
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i], t = raw.trim();
       if (!t) { flush(); continue; }
       const h = t.match(/^(#{1,4})\s/);
       if (h) { flush(); out.push(`<b class="clh${h[1].length}">${clogInline(t.slice(h[1].length + 1))}</b>`); continue; }
-      if (t.startsWith('- ')) { if (para) flush(); (list ??= []).push(clogInline(t.slice(2))); continue; }
-      if (list && /^\s/.test(raw)) { list[list.length - 1] += ' ' + clogInline(t); continue; }
-      if (list) flush();
+      if (t.startsWith('|')) {
+        flush();
+        const rows = [];
+        while (i < lines.length && lines[i].trim().startsWith('|')) rows.push(lines[i++].trim());
+        i--;
+        const cells = (r) => r.replace(/^\||\|$/g, '').split('|').map((c) => clogInline(c.trim()));
+        const body = rows.slice(1).filter((r) => !/^[\s:|-]+$/.test(r));
+        out.push(`<table><tr><th>${cells(rows[0]).join('</th><th>')}</th></tr>${body.map((r) => `<tr><td>${cells(r).join('</td><td>')}</td></tr>`).join('')}</table>`);
+        continue;
+      }
+      const li = raw.match(/^(\s*)- /);
+      if (li) {
+        flushLi();
+        if (para) out.push(`<p>${para.join(' ')}</p>`), para = null;
+        const ind = li[1].length;
+        while (indents.length && indents[indents.length - 1] > ind) out.push('</ul>'), indents.pop();
+        if (!indents.length || indents[indents.length - 1] < ind) out.push('<ul class="clul">'), indents.push(ind);
+        cur = clogInline(t.slice(2));
+        continue;
+      }
+      if (cur !== null && /^\s/.test(raw)) { cur += ' ' + clogInline(t); continue; }
+      if (cur === null && /^ {4}/.test(raw)) { flush(); out.push(`<p><code>${clogEsc(t)}</code></p>`); continue; }
+      flushLi();
+      while (indents.length) out.push('</ul>'), indents.pop();
       (para ??= []).push(clogInline(t));
     }
     flush();
     return out.join('');
   };
-  let clogHtml = '';
-  const openClog = async () => {
+  const clogHtml = {};
+  let clogOpen = '';
+  const openClog = async (a) => {
+    const url = a.getAttribute('href');
+    const label = url.replace(/\.md$/i, '').toLowerCase();
+    clogOpen = url;
     helpClog.hidden = false;
-    if (clogHtml) return;
-    clogBody.textContent = 'loading…';
-    try {
-      const r = await fetch('CHANGELOG.md');
-      if (!r.ok) throw new Error(r.status);
-      clogHtml = clogMd(await r.text());
-    } catch {
-      clogHtml = '<p>the changelog failed to load - read it on <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/CHANGELOG.md" target="_blank" rel="noopener">github</a></p>';
+    helpClog.setAttribute('aria-label', label);
+    clogBody.scrollTop = 0;
+    if (!(url in clogHtml)) {
+      clogBody.textContent = 'loading…';
+      try {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(r.status);
+        clogHtml[url] = clogMd(await r.text());
+      } catch {
+        clogHtml[url] = `<p>the ${label} failed to load - read it on <a class="at" href="https://github.com/mxmilkiib/hasanabi.neocities.org/blob/main/${url}" target="_blank" rel="noopener">github</a></p>`;
+      }
     }
-    clogBody.innerHTML = clogHtml;
+    if (url === clogOpen) clogBody.innerHTML = clogHtml[url];
   };
-  clogLink.addEventListener('click', (e) => {
-    if (e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
-    e.preventDefault();
-    openClog();
-  });
+  for (const id of ['clogLink', 'rmLink']) {
+    const a = document.getElementById(id);
+    a.addEventListener('click', (e) => {
+      if (e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      openClog(a);
+    });
+  }
   helpClog.querySelectorAll('.clogback').forEach((b) => b.addEventListener('click', (e) => {
     e.preventDefault();
     helpClog.hidden = true;
