@@ -100,7 +100,7 @@ not versions - the page ships continuously to Neocities.
   national phonebank rsvp, the endorsed slate, socialist cash
   donations and the chapter finder
 - the dsa page splits in two - the midterms header, general ballot,
-  primary results and aligned slate move to a new '26 vote' tab
+  primary results and aligned slate move to a new 'vote26' tab
   beside 'dsa' (?htab=vote works); the rows stay .vote-marked in the
   dsa markup and lift onto the page at init so the election data
   remains one editable block
