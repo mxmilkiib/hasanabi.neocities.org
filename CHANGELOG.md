@@ -70,6 +70,16 @@ not versions - the page ships continuously to Neocities.
   fetched and rendered over the help view instead of jumping to
   github, with « back exits pinned at both ends; the link keeps its
   href so a modified click still opens the file itself
+- the midterms tables mark their key races - a gold ★ on the name
+  for the marquee generals and nec-endorsed runs (mai vang,
+  gonzales-torres, jewett, levy, mcadams, raman, parrish-wright,
+  bell, parr, el-sayed, nixon, booker, haaland, crowley, and the
+  big primary winners). campaign `site` links go in for the key
+  generals, mai vang also gets a mobilize `vol` link, and the
+  colour key row spells the star out
+- the midterms block gains a "get involved" row - the nec hub,
+  national phonebank rsvp, the endorsed slate, socialist cash
+  donations and the chapter finder
 
 ## 2026-10-15
 
