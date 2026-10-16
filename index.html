@@ -7541,7 +7541,7 @@
     // past the Band's 1/-1 span
     cells[0].style.gridColumn = 1; cells[1].style.gridColumn = 2;
     if (slot) { cells[0].style.borderLeft = '1px solid var(--line)'; cells[0].style.paddingLeft = '.9em'; }
-    for (const el of cells) { el.style.gridRow = stblRow; el._strow = stblRow; el._slot = slot; }
+    for (const el of cells) { el.style.gridRow = stblRow; el._strow = stblRow; el._slot = slot; el._pin = i.dataset.pin != null; }
     allCells.push(...cells);
     rowSvcs.set(stblRow, rowSvc);
     if (stblZeb & 1) {
@@ -7623,6 +7623,10 @@
       if (!colKeys.has(k)) colKeys.set(k, 3 + preKeys.length + finCols.length + nextEx++);
       el.style.gridColumn = colKeys.get(k);
     } else el.style.gridColumn = 3 + preKeys.length + finCols.length + nextEx++;
+    // a pinned row's tail cell spans to the grid's end - in a split
+    // table a lone utility cell would inflate only the first copy's
+    // last track otherwise
+    if (splitN && el._pin) el.style.gridColumn += ' / -1';
   }
   // nextEx counts the distinct trailing seats - keyed cells share one.
   // copyT is one copy's track count - a split table repeats the whole
