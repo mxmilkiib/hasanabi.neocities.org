@@ -5,6 +5,10 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-16
 
+### Header
+- the ~chatters/h tally registers in the status-length cycle - the
+  blank stop clears it with the rest of the status text
+
 ### Resources
 - subsection titles across the help pages take a muted sage - group
   heads, column heads and the flowing lists' <i><b> titles; the

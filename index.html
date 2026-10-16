@@ -2734,7 +2734,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
-    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times, the same minus the chat-modes tail, a compact cut, the bare word, or an empty space; scrolling there cycles the same stops<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times, the same minus the chat-modes tail, a compact cut, the bare word, or an empty space - chatter tally included; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; a lit border and ✓ mark an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -5639,7 +5639,7 @@
       for (const [who, t] of chatterSeen) if (t < chatCut) chatterSeen.delete(who);
     }
     const nc = chatterSeen.size;
-    chattersEl.hidden = !nc;
+    chattersEl.hidden = !nc || statusView === 4;
     chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> <span title="unique chatters in the last hour">chatters/h</span>` : '';
     // an echo still unmatched a minute on isn't awaiting anything - drop
     // its pending marker so a stored copy can't re-register on reload and
@@ -5958,6 +5958,8 @@
     // the full status line already carries the mode phrases; the chips span
     // only earns its place in the shorter views, stats included
     modesEl.hidden = statusView === 0 || statusView === 4 || !modesOn;
+    // the chatters tally registers in the same run - blank clears it too
+    chattersEl.hidden = statusView === 4 || !chatterSeen.size;
     if (!stream) {
       if (streamDead) {
         // Relay never reported stream status (stale cache or blocked API):
