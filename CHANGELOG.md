@@ -3,6 +3,15 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions - the page ships continuously to Neocities.
 
+## 2026-10-16
+
+### Resources
+- every federal candidate across the midterms tables gains an `fec`
+  link to their fec.gov candidate page - congressional primaries,
+  the nov 3 general ballot and the aligned slate; the dsa electeds
+  federal row gets one too. state-leg, municipal and ballot-measure
+  rows file with the state, not the fec, so they carry none
+
 ## 2026-10-15
 
 ### Resources
