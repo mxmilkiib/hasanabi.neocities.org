@@ -15,6 +15,8 @@ not versions - the page ships continuously to Neocities.
   the strip's outer size and bounced it between header lines
 
 ### Resources
+- "operation hasan bad" joins the intro video links; "the news man"
+  loses its gloss
 - subsection titles across the help pages take a muted sage - group
   heads, column heads and the flowing lists' <i><b> titles; the
   race-tinted midterms heads keep their type colours
