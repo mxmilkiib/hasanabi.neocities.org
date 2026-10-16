@@ -1028,7 +1028,7 @@
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i, #titleTxt.fin { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i, #titleTxt.fin, #helpPanel::before { animation: none; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
@@ -1784,6 +1784,21 @@
     container-type: inline-size;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .35), var(--egx, inset 0 0 0 transparent), var(--egy, inset 0 0 0 transparent);
   }
+  /* a soft gleam orbits the card's edge - a conic band masked down to
+     the border ring so only the frame catches it */
+  @property --helpgleam { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  #helpPanel::before {
+    content: ''; position: absolute; inset: -1px; border-radius: 7px;
+    padding: 1px; pointer-events: none;
+    background: conic-gradient(from var(--helpgleam), transparent 0 84%,
+      color-mix(in srgb, var(--text) 40%, transparent) 91%, transparent 98%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+    animation: help-gleam 7s linear infinite;
+  }
+  @keyframes help-gleam { to { --helpgleam: 1turn; } }
   /* resize-edge marks: the invisible edge zones toggle .edge-* classes
      from their hover code, the grip divs drive it straight from :hover;
      --egx carries the left/right inset, --egy top/bottom, so a corner
