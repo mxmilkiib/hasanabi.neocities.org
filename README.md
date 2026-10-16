@@ -268,8 +268,9 @@ no dependencies beyond CDN-hosted fonts.
       frame wider in the dragged direction - outward grows, inward
       shrinks.
     - `1col video/help` centres a rail holding the video over the
-      docked help popup - the same mirrored edge grips resize it, and
-      the video's own edge drags the rail like them.
+      docked help popup - the frame keeps its own width inside the
+      page, and dragging its edges trades width with the help below
+      while the page's edge grips size the pair.
     - `1col danmaku` is `1col video` with the bullet overlay armed -
       the centred frame alone, chat comments flying across it.
     - `2col chat` passes older messages to a second chat column.
