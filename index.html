@@ -448,6 +448,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* the minimal view reads '2h 35m ● 25.1k': the name hides and flex
+     order reseats the dot between uptime and viewers - order-0 items
+     (the missed chips) trail after the count as usual */
+  .channel.minstat #channelName { display: none; }
+  .channel.minstat #streamInfo { order: -3; }
+  .channel.minstat #dot { order: -2; }
+  .channel.minstat #streamTail { order: -1; }
+  #streamTail:empty { display: none; }
   /* the chatters tally sits inside .channel so it shares .stream-info's
      baseline; the same .93em lands on the same effective size there */
   .channel .rate { font-size: .93em; font-weight: 400; white-space: nowrap; }
@@ -2761,7 +2769,7 @@
 </head>
 <body>
   <header>
-    <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
+    <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="stream-info" id="streamTail"></span><span class="chat-modes" id="chatModes"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span></div>
     <canvas id="spark" role="img" title="msgs/sec over the last 4 minutes - ticks every 10s" aria-label="msgs/sec over the last 4 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="colourBtn" title="Colour">◐</button><button class="hdr-btn" id="variantBtn" title="Variant">▢</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="helvetica">Helvetica</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.32)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.3)">⇄</span></button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.3)">▦</span></button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll"><span style="display:inline-block;transform:scale(1.3)">≡</span></button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-2px) scale(1.72)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back"><span style="display:inline-block;transform:translateX(-1px)">Ⓢ</span></button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="wrapBtn" title="Page wrap - click toggles"><span style="display:inline-block;transform:scale(1.2)">⇓</span></button><button class="hdr-btn" id="splitBtn" title="Layout - click for menu · scroll cycles · ⇧click back" aria-haspopup="listbox" aria-expanded="false"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
@@ -2794,7 +2802,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded; click slims it to a fixed strip so the buttons can keep one row on a narrow screen</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
-    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the follow-req tail, then minus the chatter tally, a compact cut, the bare word, or an empty space; scrolling there cycles the same stops<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the follow-req tail, then minus the chatter tally, a compact cut, uptime and a compact viewer count flanking the dot ('2h 35m ● 25.1k'), or an empty space; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; a lit border and ✓ mark an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -3115,6 +3123,8 @@
   const rateEl = document.getElementById('rate');
   const chattersEl = document.getElementById('chatters');
   const infoEl = document.getElementById('streamInfo');
+  const tailEl = document.getElementById('streamTail');
+  const chanEl = dotEl.parentElement; // .channel
   const sideEl = document.getElementById('side');
   const side2El = document.getElementById('side2');
   const railEl = document.getElementById('rail');
@@ -5879,6 +5889,9 @@
     return h ? `${h}h ${mins % 60}m` : `${mins}m`;
   }
 
+  // compact viewer counts for the minimal status: 25.1k, 800
+  const fmtK = (n) => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
+
   function fmtSecsLong(secs) {
     const parts = [];
     for (const [n, u] of [[86400, 'day'], [3600, 'hour'], [60, 'minute'], [1, 'second']]) {
@@ -6083,6 +6096,10 @@
     modesEl.hidden = true;
     // the chatter tally holds through the first cut, then goes at notally
     chattersEl.hidden = !(statusView === 0 || statusView === 3) || !chatterSeen.size;
+    // the minimal live format reseats the dot between uptime and
+    // viewers; every other state or view leaves the name-led order
+    chanEl.classList.remove('minstat');
+    tailEl.textContent = '';
     if (!stream) {
       if (streamDead) {
         // Relay never reported stream status (stale cache or blocked API):
@@ -6148,7 +6165,14 @@
     // a dropped socket under a live stream still shows on the dot (and so
     // the favicon) - green stays honest only while chat is up too
     setDot(chatState === 'connected' ? 'connected' : chatState || 'reconnecting');
-    infoEl.innerHTML = statusView === 4 ? ''
+    const vK = stream.viewers != null ? fmtK(stream.viewers) : '';
+    if (statusView === 2 && up && vK) {
+      // '2h 35m ● 25.1k' - the dot sits central between the numbers and
+      // still carries the live colour, tooltip and pulse
+      chanEl.classList.add('minstat');
+      infoEl.innerHTML = `<b>${up}</b>`;
+      tailEl.innerHTML = `<b>${vK}</b>`;
+    } else infoEl.innerHTML = statusView === 4 ? ''
       : statusView === 2 ? '<b>live</b>'
       : statusView === 1 ? `<b>live</b>${up ? ` · up <b>${up}</b>` : ''}` +
         (stream.viewers != null ? ` · <b>${stream.viewers.toLocaleString()}</b> watching` : '')

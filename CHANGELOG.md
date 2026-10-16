@@ -18,6 +18,11 @@ not versions - the page ships continuously to Neocities.
   strip down on a second row on narrow screens; reduced (graph) mode
   ignores the cap since a full-width trace is its whole point. the
   toggle persists across reloads
+- the minimal status stop reads '2h 35m ● 25.1k' - uptime and a
+  compact viewer count flanking the status dot, which flex order
+  reseats between the numbers while the channel name hides; it keeps
+  its live colour, tooltip and pulse, and a missing half falls back
+  to the bare 'live'
 
 ### Resources
 - the ⸻ section dividers go gold - the same #e8b73e as the ? button,
