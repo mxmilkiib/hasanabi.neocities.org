@@ -44,6 +44,10 @@ not versions - the page ships continuously to Neocities.
 - resizing the help popup no longer scrolls its contents at the same
   time - edge drags veto the touch pan, and presses that land on a
   scrollbar lane belong to the scrollbar again
+- the layout and font menus move out of the control strip - a
+  transformed ancestor becomes the containing block for fixed
+  children, so the wrap-centring translate on a narrow header was
+  dragging the menus' coordinates into strip space
 - the emote picker gains an ≡ button beside the pin that stows the
   whole tabs/options row for a bare search + grid view; the state
   persists and rides share-links as eprow
