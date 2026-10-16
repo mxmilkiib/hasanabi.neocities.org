@@ -118,6 +118,11 @@ not versions - the page ships continuously to Neocities.
   (1cv shares the side edges; the top edge stays off where the frame
   sits at the row's top, and the rail video drops it to stay clear
   of the header)
+- 1col video's bare floor drags in the pulled direction - the first
+  decisive move locks the axis and growth follows motion away from
+  the frame's centre (outward grows, inward shrinks), so a bg grab
+  no longer feels backwards. any floor point starts it, not just the
+  side gutters; the floor cursor reads 'grab' for the free-axis drag
 - dsa electeds refresh: the four nyc council socialists, diana
   moreno (mamdani's assembly seat), soren stevenson + aurin
   chowdhury (minneapolis), nithya raman (la) and janeese lewis

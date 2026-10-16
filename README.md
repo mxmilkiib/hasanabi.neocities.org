@@ -264,7 +264,9 @@ no dependencies beyond CDN-hosted fonts.
     - `1col vid/chat` stacks the video in its framed floating style
       over the single chat column.
     - `1col video` keeps the framed video alone, centred in the row;
-      its own edges, the seam and the side gutters all drag its width.
+      its own edges drag their side, and any bare-floor grab pulls the
+      frame wider in the dragged direction - outward grows, inward
+      shrinks.
     - `1col video/help` centres a rail holding the video over the
       docked help popup - the same mirrored edge grips resize it, and
       the video's own edge drags the rail like them.
