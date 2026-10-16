@@ -105,11 +105,12 @@ not versions - the page ships continuously to Neocities.
   dsa markup and lift onto the page at init so the election data
   remains one editable block
 - the [?] popup's font-size option splits into absolute/relative
-  modes picked after the label - relative shows 'chat −12' leading a
-  ladder of c −10, c −8, c −7 and c −6 down to c −1 beside 'chat',
-  the first entry spelling 'chat' out and the rest shortening to 'c';
-  absolute shows the px stops, gaining 17 and 19 (the header size's
-  ladder shares them); ?hpfs=chat-1..chat-12 work too
+  modes picked after the label - relative shows 'chat −16' leading a
+  ladder of c −14, c −12, c −10, c −8, c −7 and c −6 down to c −1
+  beside 'chat', the first entry spelling 'chat' out and the rest
+  shortening to 'c'; absolute shows the px stops, gaining 17 and 19
+  (the header size's ladder shares them); ?hpfs=chat-1..chat-16
+  work too
 - the emote picker no longer opens by default or re-opens on layout
   switches - its saved open/closed state governs on every layout, so
   a closed picker stays closed docked or floating and an open one

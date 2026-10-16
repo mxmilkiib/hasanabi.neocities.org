@@ -8264,7 +8264,7 @@
     de.setProperty('--peek-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 2)] : Math.max(7, fs - 2)) + 'px');
     // --help-fontN answers chat N ladder steps down, clamped to the
     // bottom rung once the chat font runs out of rungs below it
-    for (let n = 1; n <= 12; n++)
+    for (let n = 1; n <= 16; n++)
       de.setProperty('--help-font' + (n === 1 ? '' : n),
         (pi >= 0 ? FONT_SIZES[Math.max(0, pi - n)] : Math.max(7, fs - n)) + 'px');
     // tracking travels as an em step so it scales with the font, but the
@@ -10074,7 +10074,7 @@
     }
     if (Number.isInteger(o.hpfs)) {
       helpFs = o.hpfs < 0 ? o.hpfs : HDR_SIZES.indexOf(o.hpfs);
-      if (helpFs < -13) helpFs = -1; // a deeper negative or a px indexOf miss falls back to follow
+      if (helpFs < -17) helpFs = -1; // a deeper negative or a px indexOf miss falls back to follow
       applyHelpFs();
     }
     if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
@@ -11739,7 +11739,7 @@
   // with N>=4, and -4 is no step (chat itself) - else a px pick from
   // the same stops the header size uses. HELP_FS_REL lists the
   // internals in chip order
-  const HELP_FS_REL = [-13, -11, -9, -8, -7, -6, -5, -3, -2, -1, -4];
+  const HELP_FS_REL = [-17, -15, -13, -11, -9, -8, -7, -6, -5, -3, -2, -1, -4];
   let helpFs = -1;
   function applyHelpFs() {
     if (helpFs === -4) helpPanel.style.fontSize = 'var(--chat-font)';
@@ -16768,8 +16768,8 @@
       // 'chat' names the chat font itself, 'chat-N' the N-below steps;
       // negatives index them too, a positive value is the px size itself
       if (v === 'chat') { helpFs = -4; applyHelpFs(); }
-      else if (/^chat-(?:[1-9]|1[0-2])$/.test(v)) { const n = +v.slice(5); helpFs = n <= 3 ? -n : -n - 1; applyHelpFs(); }
-      else { const n = +v, i = n < 0 ? Math.max(Math.round(n), -13) : HDR_SIZES.indexOf(n); if (n < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
+      else if (/^chat-(?:[1-9]|1[0-6])$/.test(v)) { const n = +v.slice(5); helpFs = n <= 3 ? -n : -n - 1; applyHelpFs(); }
+      else { const n = +v, i = n < 0 ? Math.max(Math.round(n), -17) : HDR_SIZES.indexOf(n); if (n < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
     if (q.has('hpos') && q.get('hpos') !== '') { const v = q.get('hpos'); let i = HPOS_URL.indexOf(v); if (i < 0) i = +v; if (Number.isInteger(i) && i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
@@ -16832,7 +16832,7 @@
     helpStick: ['off', 'on'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
     helpFsMode: ['absolute', 'relative'],
-    helpFs: ['chat −12', 'c −10', 'c −8', 'c −7', 'c −6', 'c −5', 'c −4', 'c −3', 'c −2', 'c −1', 'chat'].concat(HDR_SIZES),
+    helpFs: ['chat −16', 'c −14', 'c −12', 'c −10', 'c −8', 'c −7', 'c −6', 'c −5', 'c −4', 'c −3', 'c −2', 'c −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'quicker'],
     helpHide: HIDE_MODES,
