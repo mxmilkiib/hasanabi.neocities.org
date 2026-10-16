@@ -1028,7 +1028,7 @@
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i, #titleTxt.fin, #helpPanel::before { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i, #titleTxt.fin, #helpPanel::before, #titleBar { animation: none; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
@@ -1689,6 +1689,18 @@
   #titleBar .hbar-txt { padding: 0 30px; }
   /* the stream title reads in the palette accent - gold on the default theme */
   #titleTxt { color: var(--accent); }
+  /* moonlit-lake drift behind the stream title: two translucent violet
+     sheen bands slide at different rates (the mismatched tile sizes make
+     their interference wander like ripple light) - each layer translates
+     by exactly its own tile width so the loop never seams */
+  #titleBar {
+    background-image:
+      linear-gradient(115deg, transparent 0 32%, rgba(167, 139, 250, .12) 44%, rgba(216, 180, 254, .22) 50%, rgba(167, 139, 250, .12) 56%, transparent 68% 100%),
+      linear-gradient(115deg, transparent 0 40%, rgba(124, 92, 191, .14) 50%, rgba(124, 92, 191, .14) 60%, transparent 72% 100%);
+    background-size: 300% 100%, 260% 100%;
+    animation: lake-drift 14s linear infinite;
+  }
+  @keyframes lake-drift { to { background-position: -300% 0, -260% 0; } }
   /* a small square dismiss - not the full-height slab the shared
      .hbar .hdr-btn rule makes it, so clear air sits below it */
   #titleX { width: 20px; height: 20px; }
