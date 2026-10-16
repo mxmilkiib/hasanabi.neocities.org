@@ -17,6 +17,10 @@ not versions - the page ships continuously to Neocities.
 ### Resources
 - "operation hasan bad" joins the intro video links; "the news man"
   loses its gloss
+- channels/streams entries with a real wikipedia article gain a `*`
+  link - 25 names across news, podcasts and essays verified against
+  the api; names whose articles are absent or land on the wrong
+  subject (the serfs' film, boy boy's dab page) get none
 - subsection titles across the help pages take a muted sage - group
   heads, column heads and the flowing lists' <i><b> titles; the
   race-tinted midterms heads keep their type colours
