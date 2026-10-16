@@ -10224,9 +10224,11 @@
       danCv.width = nw; danCv.height = nh;
     }
     danCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    danFontPx = Math.max(12, Math.min(24, Math.round(h * 0.055)));
+    danFontPx = Math.max(11, Math.min(20, Math.round(h * 0.032)));
     danLanes = Math.max(1, Math.min(10, Math.floor(h / (danFontPx * 1.5))));
     danFf = getComputedStyle(logEl).fontFamily;
+    // a resize re-lanes in-flight bullets so they keep their own row
+    for (const b of danBullets) b.y = b.lane * danFontPx * 1.5 + danFontPx;
   }
   // a hidden->shown box refits here and danKick resumes any bullets
   // that were mid-flight when the video folded away
@@ -10277,7 +10279,7 @@
     }
   }
   function danDraw(now) {
-    const dt = Math.min(80, now - danLast) / 1000; danLast = now;
+    const dt = Math.min(80, now - danLast); danLast = now;
     const W = danCv.width / DPR, H = danCv.height / DPR;
     danSpawn(W);
     danCtx.clearRect(0, 0, W, H);

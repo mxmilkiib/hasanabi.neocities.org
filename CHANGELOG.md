@@ -97,7 +97,11 @@ not versions - the page ships continuously to Neocities.
   bullets right-to-left across stacked lanes, niconico-style - fixed
   crossing time so longer messages fly faster, nick-coloured with a
   dark outline, lane-collision-checked, capped under load; toggles
-  from the help row or ?dan=1
+  from the help row or ?dan=1. the bullets' px/ms velocity was being
+  charged against a seconds delta - a thousand-fold crawl that pinned
+  them at the right edge; dt now stays in ms, the font scales down
+  (~3.2% of box height, cap 20px), and a resize re-lanes in-flight
+  bullets so rows don't stack
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
