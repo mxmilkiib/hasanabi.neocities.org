@@ -264,7 +264,7 @@
     /* a bare gap: shorthand would also widen the row gap; keep them apart */
     column-gap: 12px;
     row-gap: 4px;
-    padding: 0 var(--hdrpad, 18px);
+    padding: 1px var(--hdrpad, 18px);
     /* ? and – live at the absolute top-right corner whatever the wrap
        state; padding-right keeps flowing content clear of them - the
        two vars let a wrapped .hdr-side reclaim the space below them */
@@ -311,9 +311,9 @@
   /* hdr-side no longer grows - the spark takes all the free space itself */
   body.hdrgraph .hdr-side { flex: none; min-width: 0; }
   body.hdrgraph #spark { flex: 1; max-width: none; }
-  /* the bar grows to 30px so the pinned 26px corner buttons keep their
-     full-mode size instead of shrinking or overlapping the bottom edge */
-  body.hdrgraph header { min-height: 26px; }
+  /* the bar grows to fit the pinned 26px corner buttons plus the 1px
+     headroom both sides, instead of shrinking or clipping their edges */
+  body.hdrgraph header { min-height: 28px; }
   /* the pinned ▶ sits at right:80 - outside the 84px reserve, so reserve more */
   body.hdrgraph header { --hdrres: 118px; }
   /* the stream play button stays reachable too, pinned left of the -;
@@ -378,7 +378,7 @@
   }
   /* hovering the strip doubles the – and pads it out - the whole strip
      clicks to restore, so the swell is just the affordance for it */
-  body.hdrmin header:hover { height: 26px; } /* button height - matches the standard header's height */
+  body.hdrmin header:hover { height: 28px; } /* button height + 1px both sides - matches the standard header's height */
   body.hdrmin header:hover #hdrMin {
     font-size: 36px;
     height: 16px;
@@ -2715,21 +2715,21 @@
   @media (max-width: 720px), (pointer: coarse) and (max-width: 1080px) {
     /* tapping rows shouldn't arm the browser's double-tap zoom */
     body { touch-action: manipulation; }
-    header { padding: 0 8px; --hdrpad: 8px; --hdrres: 92px; padding-right: var(--hdrres); column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
+    header { padding: 1px 8px; --hdrpad: 8px; --hdrres: 92px; padding-right: var(--hdrres); column-gap: 8px; font-size: var(--hdr-fs, var(--chat-font, 15px)); }
     #helpBtn { right: 6px; }
     #hdrMin { right: 48px; }
     /* labels keep their 2px lead-in beside the wider touch buttons */
     .hdr-lbl.c-help { right: 46px; }
     .hdr-lbl.c-hdr { right: 120px; }
-    /* 32px touch targets overhang the 28px first line by 2px each way */
-    #helpBtn, #hdrMin { top: -2px; }
-    body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { top: 0; }
+    /* the 1px headroom keeps the 32px pinned pair inside the bar - the
+       old -2px overhang poked them above the header's top edge */
+    body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { top: 1px; }
     body.hdrmin #hdrMin { right: 48px; }
     .hdr-side { gap: 4px; }
     .hdr-btn { height: 32px; }
     button.hdr-btn { width: 38px; }
     #spark { max-width: 70px; }
-    body.hdrgraph header { --hdrres: 130px; min-height: 32px; } /* fits the 32px buttons */
+    body.hdrgraph header { --hdrres: 130px; min-height: 34px; } /* fits the 32px buttons + 1px both sides */
     #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; max-height: 70dvh; }
     /* the channels/streams service grid can run wider than a phone
        panel - let it slide sideways instead of clipping */

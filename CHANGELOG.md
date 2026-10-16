@@ -83,6 +83,10 @@ not versions - the page ships continuously to Neocities.
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps
+- the header's buttons get a 1px pad above and below on every stop -
+  on touch sizes the pinned pair used to sit at top:-2 and overhang
+  the bar's top edge; the graph and hover-expand min-heights grow
+  with the new headroom
 
 ## 2026-10-15
 
