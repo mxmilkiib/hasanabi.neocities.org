@@ -257,7 +257,7 @@ no dependencies beyond CDN-hosted fonts.
     month count, the label shows a dim dash. Bots do not get that
     placeholder.
 - **Chat columns**
-  - The layout menu has eighteen layouts, listed in menu order:
+  - The layout menu has nineteen layouts, listed in menu order:
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
@@ -270,6 +270,8 @@ no dependencies beyond CDN-hosted fonts.
     - `1col video/help` centres a rail holding the video over the
       docked help popup - the same mirrored edge grips resize it, and
       the video's own edge drags the rail like them.
+    - `1col danmaku` is `1col video` with the bullet overlay armed -
+      the centred frame alone, chat comments flying across it.
     - `2col chat` passes older messages to a second chat column.
     - `2col chat help` docks the help popup in the rail beside one
       chat column - no video over it; `▶` floats it like `2col chat emotes`.

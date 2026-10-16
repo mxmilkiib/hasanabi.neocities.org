@@ -118,6 +118,10 @@ not versions - the page ships continuously to Neocities.
   (1cv shares the side edges; the top edge stays off where the frame
   sits at the row's top, and the rail video drops it to stay clear
   of the header)
+- `1col danmaku` (level 19, `?split=1cdan`) joins the 1col group -
+  the centred frame alone with the bullet overlay switched on at
+  select; the toggle still wins if turned off, and a saved 1col
+  danmaku re-arms bullets on restore even over a saved `dan:0`
 - 1col video's bare floor drags in the pulled direction - the first
   decisive move locks the axis and growth follows motion away from
   the frame's centre (outward grows, inward shrinks), so a bg grab
