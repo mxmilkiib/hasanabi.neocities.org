@@ -112,6 +112,11 @@ not versions - the page ships continuously to Neocities.
   first (the mode chips that made 'stats' look identical to 'full'
   are retired from the line), the chatter tally survives one more
   stop at the new 'notally' view, then compact, minimal, blank
+- the floating popups raise as a group - a press on the video, help
+  or emote panel lifts it above the other two, most-recently-pressed
+  on top, rather than the video sitting pinned above the panels; a
+  rail- or grid-docked pane keeps its seat. the help panel's
+  open-forward and the picker's button-open ride the same ordering
 - the header's buttons get a 1px pad above and below on every stop -
   on touch sizes the pinned pair used to sit at top:-2 and overhang
   the bar's top edge; the graph and hover-expand min-heights grow

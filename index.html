@@ -468,7 +468,7 @@
     box-sizing: content-box;
     width: min(460px, 92vw);
     aspect-ratio: 16/9;
-    z-index: 14; /* above the panels even when raise-on-press tops them at 13, under hover cards */
+    z-index: 14; /* default top of the floating popups - a press on one of them can take the group's 16, under hover cards */
     border: 1px solid var(--popline);
     background: #000;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .45), var(--egx, inset 0 0 0 transparent), var(--egy, inset 0 0 0 transparent);
@@ -3179,6 +3179,19 @@
   // emotePick lives here, not with its wiring: paintEpickSync runs during
   // history restore, well before the picker block would declare it
   const emotePick = document.getElementById('emotePick');
+  // raise-on-press across the floating popups: a press lifts its panel to
+  // the group top, the untouched floats keeping their relative order
+  // beneath it. only 'fixed' floats take part - a rail- or grid-docked
+  // pane has no stacking seat to claim
+  const popFloats = [emotePick, helpPanel, vidBox];
+  function popRaise(el) {
+    if (getComputedStyle(el).position !== 'fixed') return;
+    const rest = popFloats.filter((p) => p !== el && getComputedStyle(p).position === 'fixed')
+      .sort((a, b) => (+getComputedStyle(a).zIndex || 0) - (+getComputedStyle(b).zIndex || 0));
+    rest.forEach((p, i) => { p.style.zIndex = 14 + i; });
+    el.style.zIndex = 16;
+  }
+  for (const p of popFloats) p.addEventListener('pointerdown', () => popRaise(p));
   let loadPhase = 0;
   // status text crossfades rather than swapping mid-read
   function loadSay(txt) {
@@ -11203,10 +11216,7 @@
     const showPanel = helpMode === 1;
     if (showPanel) helpForced = false;
     // a fresh open comes forward like a press does
-    if (helpPanel.hidden && (showPanel || helpForced)) {
-      helpPanel.style.zIndex = 13;
-      emotePick.style.zIndex = '';
-    }
+    if (helpPanel.hidden && (showPanel || helpForced)) popRaise(helpPanel);
     // docked into the rail the panel is the level's own furniture -
     // esc, the X, an 'off' pick or a preset can zero the mode, but the
     // rail seat stays filled: a docked panel can't hide
@@ -15457,6 +15467,7 @@
   emojiBtn.addEventListener('click', () => {
     if (!emotePick.hidden) { closePicker(); return; }
     emotePick.hidden = false;
+    popRaise(emotePick);
     syncRailSplit();
     try { localStorage.setItem(EPICK_OPEN_KEY, '1'); } catch {}
     // a spot parked while the chat bar was hidden can sit under it now
@@ -16665,13 +16676,6 @@
     if (helpPanel.style.left) { s.x = Math.round(rr.left); s.y = Math.round(rr.top); }
     writeHsize(s);
   };
-  // raise-on-press between the two floating panels: whichever takes a
-  // press pops above the other, and a press on the other wins it back
-  for (const [top, low] of [[emotePick, helpPanel], [helpPanel, emotePick]])
-    top.addEventListener('pointerdown', () => {
-      top.style.zIndex = 13;
-      low.style.zIndex = '';
-    });
   // the drag itself, callable from the inside zone or the outside ring
   const hpEdgeDrag = (edge, e) => {
     e.preventDefault();
