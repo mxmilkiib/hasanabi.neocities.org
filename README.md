@@ -636,7 +636,7 @@ Relay → parent:
 
 Where this sits relative to the usual suspects:
 
-| | this page | Twitch site | Twitch embed | [Chatterino](https://chatterino.com/) | [Chatty](https://chatty.github.io/) | [jChat](https://www.giambaj.it/twitch/jchat/) | [DankChat](https://github.com/flex3r/DankChat) | [Chatsen](https://github.com/chatsen/chatsen) |
+| | chat thing | Twitch site | Twitch embed | [Chatterino](https://chatterino.com/) | [Chatty](https://chatty.github.io/) | [jChat](https://www.giambaj.it/twitch/jchat/) | [DankChat](https://github.com/flex3r/DankChat) | [Chatsen](https://github.com/chatsen/chatsen) |
 |---|---|---|---|---|---|---|---|---|
 | form factor | one web page | web chat panel | iframe/popout | desktop app | desktop app (Java) | web overlay | Android app | iOS/Android app |
 | install / build | none, static file | none | none | app install | JRE | none | Play / F-Droid | app stores |

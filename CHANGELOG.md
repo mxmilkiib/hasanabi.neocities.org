@@ -193,6 +193,10 @@ not versions - the page ships continuously to Neocities.
   the bar's top edge; the graph and hover-expand min-heights grow
   with the new headroom
 
+### About page
+- the comparison table's own column reads 'chat thing' instead of
+  'this page'; the readme's copy of the table follows
+
 ## 2026-10-15
 
 ### Resources
