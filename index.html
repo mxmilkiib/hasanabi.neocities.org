@@ -2051,6 +2051,13 @@
   #helpPanel .linkcols.stbl .cl.ls { color: var(--danger); }
   #helpPanel .linkcols.stbl .cl.av { color: var(--accent); }
   #helpPanel .linkcols.stbl .cl[data-col="state"] { color: #e8a33d; font-weight: bold; }
+  /* the keyed metadata cells - the caucus Description, the chapter
+     Region (its Descriptor Cell, keyed only by the table's data-head)
+     and the midterms Loc tag - share one brighter Grey a step off
+     the dim face */
+  #helpPanel .linkcols.stbl .cl:is([data-col="loc"], [data-col="info"]),
+  #helpPanel .linkcols.stbl[data-head="chapter,region"] .cc {
+    color: color-mix(in oklch, var(--text-dim), var(--text) 65%); }
   /* midterms race cells + group heads tint by race type; the key row
      in '2026 midterms' spells the palette out */
   #helpPanel .rcfed, #helpPanel .linkcols.stbl .rcfed { color: #7ba4f4; }

@@ -6,6 +6,8 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-16
 
 ### Resources
+- the caucus description, the chapters' region and the midterms loc
+  tag lift a step off the dim grey to one shared brighter shade
 - every federal candidate across the midterms tables gains an `fec`
   link to their fec.gov candidate page - congressional primaries,
   the nov 3 general ballot and the aligned slate; the dsa electeds
