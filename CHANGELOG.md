@@ -137,15 +137,16 @@ not versions - the page ships continuously to Neocities.
   dark outline, lane-collision-checked, capped under load; toggles
   from the help row or ?dan=1. the bullets' px/ms velocity was being
   charged against a seconds delta - a thousand-fold crawl that pinned
-  them at the right edge; dt now stays in ms, the font scales down
-  (~3.2% of box height, cap 20px), and a resize re-lanes in-flight
-  bullets so rows don't stack
-- danmaku bullets wear the live chat font - the family was cached at
-  refit, so a mid-session font swap left the stream in the old face;
-  the bullet text cap rises 60 → 160 chars. and the family is read
-  off :root's --chat-ff itself - #log never carries the font (it only
-  lives on .row), so its computed family was the page's UI sans all
-  along
+  them at the right edge; dt now stays in ms, and a resize re-lanes
+  in-flight bullets so rows don't stack
+- danmaku bullets wear the live chat font spec - the family was
+  cached at refit, so a mid-session font swap left the stream in the
+  old face, and #log never carries the font (it only lives on .row)
+  so its computed family was the page's UI sans all along; now the
+  family, size, weight, letter-spacing and line-height all read off
+  :root's --chat-* vars each paint - bullet size is the chat size
+  capped so lanes still fit, and lane pitch follows the chat lh.
+  the bullet text cap rises 60 → 160 chars
 - danmaku draws emotes as images inline in the bullet instead of
   flying their codes as text - the row walks into text/emote
   segments, each emote sharing a cached Image at ~1.4x the bullet
