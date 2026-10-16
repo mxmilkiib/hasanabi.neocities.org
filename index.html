@@ -5208,6 +5208,9 @@
   // the draw and the hover readout both read it so the trace and the
   // index it names stay still until mouseleave drops it
   let sparkHold = null;
+  // the window slot under the pointer while hovering - drawSpark paints a
+  // vertical cursor there so the tooltip's second is visible on the trace
+  let sparkCursor = -1;
   const rateSamplesPer = {}; // ch -> same 5s-window series, for scoped bursts
   const glorpTimestamps = []; // glorp/F arrivals, trimmed to a 1s window
   const glorpSamples = [];
@@ -5438,6 +5441,20 @@
     sparkCtx.lineWidth = gDev / DPR;
     for (let i = 0; i < n; i++)
       if (Number.isFinite(rs[i]) && (gs[i] || 0) > 2) gSeg(i);
+    // the hover cursor marks the window slot the tooltip is quoting -
+    // text colour at a soft alpha so it reads over bands and trace alike
+    if (sparkCursor >= 0) {
+      const cDev = devPx(1);
+      const cx = snapDev(sparkCursor * step, cDev);
+      sparkCtx.strokeStyle = sparkCols.text;
+      sparkCtx.globalAlpha = .8;
+      sparkCtx.lineWidth = cDev / DPR;
+      sparkCtx.beginPath();
+      sparkCtx.moveTo(cx, 0);
+      sparkCtx.lineTo(cx, SPARK_H);
+      sparkCtx.stroke();
+      sparkCtx.globalAlpha = 1;
+    }
   }
 
   // persisted so a reload keeps the recent rate history; the gap while the
@@ -5598,17 +5615,24 @@
     const n = rs.length;
     if (!n) return;
     const step = (sparkEl.width / DPR) / (sparkWin - 1);
-    const i = Math.round(e.offsetX / step) - (sparkWin - n);
-    if (i < 0) { sparkEl.title = sparkLegend + '\nno data yet'; return; }
+    const p = Math.round(e.offsetX / step);
+    const i = p - (sparkWin - n);
+    if (i < 0) {
+      sparkCursor = -1; drawSpark();
+      sparkEl.title = sparkLegend + '\nno data yet'; return;
+    }
+    sparkCursor = Math.min(p, sparkWin - 1);
     const v = rs[Math.min(i, n - 1)], t = rt[Math.min(i, n - 1)];
     const g = gs[Math.min(i, n - 1)] || 0;
     sparkEl.title = sparkLegend + '\n' +
       (Number.isFinite(v) ? `${v.toFixed(1)} msgs/s` : (rw[i] || 'no data')) +
       (g ? ` · ${g} glorp${g === 1 ? '' : 's'}` : '') +
       (t ? ` · ${fmtRowTime(new Date(t)).replace(/<[^>]+>/g, '')}` : '');
+    drawSpark(); // follow the cursor now, not on the next per-second tick
   });
   sparkEl.addEventListener('mouseleave', () => {
     sparkHold = null;
+    sparkCursor = -1;
     sparkEl.title = sparkLegend;
     drawSpark(); // drop straight back to the live tail, don't wait a tick
   });

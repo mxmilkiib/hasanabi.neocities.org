@@ -83,6 +83,8 @@ not versions - the page ships continuously to Neocities.
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps
+- hovering the rate graph paints a vertical cursor at the second the
+  tooltip is quoting - text colour at soft alpha, snapped to the grid
 - the archload seam shrinks to footnote size in the paged column
   layouts - it isn't a chat row there, just the door to history
 - the status-length ladder sheds parts in order: follow-req goes
