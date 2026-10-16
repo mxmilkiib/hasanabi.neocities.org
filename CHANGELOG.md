@@ -66,6 +66,10 @@ not versions - the page ships continuously to Neocities.
   the nov 3 general ballot and the aligned slate; the dsa electeds
   federal row gets one too. state-leg, municipal and ballot-measure
   rows file with the state, not the fec, so they carry none
+- the footer's changelog link reads the deployed file in-panel now -
+  fetched and rendered over the help view instead of jumping to
+  github, with « back exits pinned at both ends; the link keeps its
+  href so a modified click still opens the file itself
 
 ## 2026-10-15
 
