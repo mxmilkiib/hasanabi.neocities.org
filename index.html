@@ -16392,6 +16392,11 @@
   const hpEdgeDrag = (edge, e) => {
     e.preventDefault();
     try { helpPanel.setPointerCapture(e.pointerId); } catch {}
+    // the press can land on the scroller itself - keeping the gesture
+    // from also panning the content takes a non-passive veto, since a
+    // pointerdown's preventDefault doesn't revoke a scroll's licence
+    const noPan = (ev) => ev.preventDefault();
+    helpPanel.addEventListener('touchmove', noPan, { passive: false });
     const r = helpPanel.getBoundingClientRect();
     helpPanel.style.cursor = HS_CURS[edge];
     const htop = headerEl.getBoundingClientRect().bottom + 4;
@@ -16449,6 +16454,7 @@
       helpPanel.removeEventListener('pointermove', move);
       helpPanel.removeEventListener('pointerup', drop);
       helpPanel.removeEventListener('pointercancel', drop);
+      helpPanel.removeEventListener('touchmove', noPan);
       helpPanel.style.cursor = '';
       helpPanel.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b');
       // sticky kept a docked panel on its spot - hand it back to the
@@ -16468,6 +16474,13 @@
     if (e.button !== 0 || helpPanel.hidden || helpPanel.parentNode === railEl) return;
     const edge = edgeAt(e);
     if (!edge) return;
+    // a press on a scroll lane is the scrollbar's own - resizing
+    // there would drag the panel and the content at the same time
+    if (edge.includes('r') || edge.includes('b')) {
+      const sc = helpPanel.querySelector('.hp-scroll'), sr = sc.getBoundingClientRect();
+      if (edge.includes('r') && e.clientX >= sr.left + sc.clientWidth && e.clientY >= sr.top && e.clientY <= sr.bottom) return;
+      if (edge.includes('b') && e.clientY >= sr.top + sc.clientHeight && e.clientX >= sr.left && e.clientX <= sr.right) return;
+    }
     hpEdgeDrag(edge, e);
   });
 

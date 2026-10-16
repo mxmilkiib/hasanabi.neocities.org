@@ -38,6 +38,9 @@ not versions - the page ships continuously to Neocities.
   bands run at a third of their old strength on a slower 26s pass
 - the sub-months gradient tops out sooner - five years now reads as
   the full red instead of seven
+- resizing the help popup no longer scrolls its contents at the same
+  time - edge drags veto the touch pan, and presses that land on a
+  scrollbar lane belong to the scrollbar again
 - the spacer row under the dsa banner loses its residual line height
 - the corner rose becomes the official dsa mark's own rose - the
   emoji glyph swapped for the logo's vector, cropped off the clasped
