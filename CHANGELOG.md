@@ -136,6 +136,9 @@ not versions - the page ships continuously to Neocities.
   the frame's centre (outward grows, inward shrinks), so a bg grab
   no longer feels backwards. any floor point starts it, not just the
   side gutters; the floor cursor reads 'grab' for the free-axis drag
+- every video resize surface now shows the grabbing hand - the docked
+  frame's edge strips, the free-axis floor and the floating grips all
+  read grab at rest and grabbing mid-drag, dropping the axis arrows
 - dsa electeds refresh: the four nyc council socialists, diana
   moreno (mamdani's assembly seat), soren stevenson + aurin
   chowdhury (minneapolis), nithya raman (la) and janeese lewis

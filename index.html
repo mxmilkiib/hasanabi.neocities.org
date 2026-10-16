@@ -520,15 +520,15 @@
     transition: opacity .15s;
     touch-action: none;
   }
-  #vid .vid-size.br { right: 0; bottom: 0; cursor: move; }
-  #vid .vid-size.bl { left: 0; bottom: 0; cursor: move; }
-  #vid .vid-size.tr { right: 0; top: 0; cursor: move; }
-  #vid .vid-size.tl { left: 0; top: 0; cursor: move; }
-  #vid .vid-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: move; }
-  #vid .vid-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: move; }
-  #vid .vid-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: move; }
+  #vid .vid-size.br { right: 0; bottom: 0; cursor: grab; }
+  #vid .vid-size.bl { left: 0; bottom: 0; cursor: grab; }
+  #vid .vid-size.tr { right: 0; top: 0; cursor: grab; }
+  #vid .vid-size.tl { left: 0; top: 0; cursor: grab; }
+  #vid .vid-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: grab; }
+  #vid .vid-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: grab; }
+  #vid .vid-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: grab; }
   #vid:hover .vid-size, #vid.dragging .vid-size { opacity: 1; }
-  #vid.dragging .vid-size { cursor: move; }
+  #vid.dragging .vid-size { cursor: grabbing; }
   #tt {
     position: fixed;
     z-index: 50;
@@ -838,12 +838,14 @@
      inside the frame belong to the iframe and never reach this document.
      the top edge stays out: it would poke under the header */
   #vid .vid-edge { position: absolute; z-index: 4; touch-action: none; display: none; }
-  #vid .vid-edge.t, #vid .vid-edge.b { left: 0; right: 0; height: 12px; cursor: ns-resize; }
+  #vid .vid-edge.t, #vid .vid-edge.b { left: 0; right: 0; height: 12px; }
   #vid .vid-edge.t { top: -8px; }
   #vid .vid-edge.b { bottom: -8px; }
-  #vid .vid-edge.l, #vid .vid-edge.r { top: 0; bottom: 0; width: 12px; cursor: ew-resize; }
+  #vid .vid-edge.l, #vid .vid-edge.r { top: 0; bottom: 0; width: 12px; }
   #vid .vid-edge.l { left: -8px; }
   #vid .vid-edge.r { right: -8px; }
+  #vid .vid-edge { cursor: grab; }
+  #vid .vid-edge:active { cursor: grabbing; }
   main.vstack.vidonly > #vid .vid-edge, #rail.solo > #vid .vid-edge { display: block; }
   main.vstack:not(.vidonly) > #vid .vid-edge.l,
   main.vstack:not(.vidonly) > #vid .vid-edge.r { display: block; }
@@ -856,10 +858,11 @@
   main.vstack > #vidSplit:active { cursor: grabbing; }
   main.vstack > #vidSplit:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
   main.vstack:has(> #vidSplit:hover) > #vid { --egy: inset 0 -10px 8px -6px var(--egc); }
-  /* bare gutters either side of the centred video start the same vertical drag */
-  main.vstack.vgut { cursor: ns-resize; }
-  /* 1col video's floor drags in the pulled direction - no fixed axis hint */
-  main.vstack.vidonly.vgut { cursor: grab; }
+  /* bare gutters either side of the centred video start a size drag */
+  main.vstack.vgut { cursor: grab; }
+  main.vstack.vgut:active { cursor: grabbing; }
+  /* the frame strips hand the cursor a fist too - every video resize
+     surface reads grab/grabbing rather than axis arrows */
   /* a hidden video leaves its cell empty - collapse the row so the
      chat takes the whole column */
   main.vstack:has(> #vid[hidden]) { grid-template-rows: 0 0 minmax(0, 1fr); }
