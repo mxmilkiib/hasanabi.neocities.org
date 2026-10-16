@@ -25,7 +25,8 @@ not versions - the page ships continuously to Neocities.
   subject (the serfs' film, boy boy's dab page) get none
 - channels/streams entries with a wikitubia page gain a `ƒ` link -
   24 names verified against the youtube.fandom api, gluing beside
-  the wikipedia `*` where both exist
+  the wikipedia `*` where both exist; the mark wears the palette's
+  danger red
 - subsection titles across the help pages take a muted sage - group
   heads, column heads and the flowing lists' <i><b> titles; the
   race-tinted midterms heads keep their type colours
