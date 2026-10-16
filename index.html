@@ -2037,9 +2037,11 @@
   #helpPanel #htabDsa .dsamain { font-size: 1.3em; color: #ec1f27;
     text-shadow: 0 1px 1px rgba(0, 0, 0, .75), 0 0 10px rgba(236, 31, 39, .45); }
   #helpPanel #htabDsa .dsamain:hover { color: #ff5257; }
-  /* the rose rides the tab's top-right corner */
+  /* the rose rides the tab's top-right corner, inset to mirror the
+     heading's left offset - the rows' 9em label column plus its 13px
+     gap, expressed in the logo's own 2.4em font */
   #helpPanel #htabDsa { position: relative; }
-  #helpPanel .dsalogo { position: absolute; top: 8px; right: 10px;
+  #helpPanel .dsalogo { position: absolute; top: 8px; right: calc(3.75em + 13px);
     font-size: 2.4em; line-height: 1; text-decoration: none;
     text-shadow: 0 1px 2px rgba(0, 0, 0, .7), 0 0 12px rgba(236, 31, 39, .4); }
   #helpPanel .linkcols > i.note { margin-top: 1em; }
