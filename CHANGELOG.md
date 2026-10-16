@@ -49,6 +49,12 @@ not versions - the page ships continuously to Neocities.
   note text no longer leaves single-line cells hugging the top; the
   zebra band stretches explicitly so the centre alignment doesn't
   collapse it
+- an `aligned slate` table joins the results pair - non-dsa but
+  politically aligned races sourced from the justice democrats and
+  working families party slates: 6 senate (el-sayed, platner,
+  booker, nixon, merkley), 27 house and 7 statewide rows on nov 3,
+  plus a fell-short group (saikat, kat abu, nida allam, aftyn behn);
+  a new `org` keyed column names the backer
 - dsa resources picks up my.dsa (member portal), the merch store,
   the npec political-education hub, and the member-gated metro dc
   and denver wikis; dsa chapters becomes a sortable table - one row
