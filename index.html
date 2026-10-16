@@ -2291,6 +2291,8 @@
   #helpPanel a.helpColour.on, #helpPanel a.helpVariant.on, #helpPanel a.helpFont.on, #helpPanel a.helpLh.on, #helpPanel a.helpLs.on, #helpPanel a.helpLines.on, #helpPanel a.helpOpt.on { color: var(--text); cursor: default; }
   /* 'follow chat' names the resolved size while it leads the hdr row */
   #helpPanel.hfs-follow a.helpHfs[data-idx="0"]::after { content: " (" var(--chat-font, 15px) ")"; }
+  /* the [?] size row's mode pick gates which chip set shows */
+  #helpPanel.fs-rel a.helpFs.fsabs, #helpPanel:not(.fs-rel) a.helpFs.fsrel { display: none; }
   /* zebra chips wear a gray wash - a little inset keeps the shade readable */
   #helpPanel a.helpZebra { padding: 0 3px; border-radius: 3px; }
   /* the font row's chips render one face each - a larger size keeps the
@@ -2810,7 +2812,7 @@
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move · double-click to maximise"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabDsa" data-htab="htabDsa">dsa</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabVote" data-htab="htabVote">26 vote</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">help/⚙&#xFE0E;</a><button class="hdr-btn" id="helpX" type="button" title="close the help panel · middle-click recentres it"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
-    <div class="wide one" style="max-width: 1360px; margin-inline: auto"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><br><span>[?] font size: <span id="helpFsList"></span><sup>†</sup></span><br><span>[?] position: <span id="helpPosList"></span><sup>†</sup></span><br><span>[?] sticky position: <span id="helpStickList"></span> - a resize keeps the popup's position spot pinned<sup>†</sup></span></div>
+    <div class="wide one" style="max-width: 1360px; margin-inline: auto"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><br><span>[?] font size: <span id="helpFsModeList"></span>: <span id="helpFsList"></span><sup>†</sup></span><br><span>[?] position: <span id="helpPosList"></span><sup>†</sup></span><br><span>[?] sticky position: <span id="helpStickList"></span> - a resize keeps the popup's position spot pinned<sup>†</sup></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
@@ -6499,6 +6501,7 @@
     else if (a.classList.contains('helpPos')) { helpPos = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; applyHelpPos(); const s = readHsize(); delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a position pick undoes a drag
     else if (a.classList.contains('helpStick')) { helpStick = +a.dataset.idx === 1; markHelp('helpStick', helpStick ? 1 : 0); saveOpts(); }
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
+    else if (a.classList.contains('helpFsMode')) applyFsMode(+a.dataset.idx === 1);
     else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i < HELP_FS_REL.length ? HELP_FS_REL[i] : i - HELP_FS_REL.length; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
@@ -11745,9 +11748,16 @@
     markHelpFs();
     saveOpts();
   }
+  // the mode pick is a view only - it gates which chip set shows while
+  // the value keeps its own kind; a value pick snaps the view to match
+  function applyFsMode(rel) {
+    helpPanel.classList.toggle('fs-rel', rel);
+    markHelp('helpFsMode', rel ? 1 : 0);
+  }
   // a chat-relative pick resolves to a px stop too - light that up as well
   // so the row shows what 'chat −N' currently means
   function markHelpFs() {
+    applyFsMode(helpFs < 0);
     markHelp('helpFs', helpFs < 0 ? HELP_FS_REL.indexOf(helpFs) : helpFs + HELP_FS_REL.length);
     if (helpFs >= 0) return;
     const i = HDR_SIZES.indexOf(Math.round(parseFloat(getComputedStyle(helpPanel).fontSize)));
@@ -16821,6 +16831,7 @@
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
+    helpFsMode: ['absolute', 'relative'],
     helpFs: ['chat −12', 'c −10', 'c −8', 'c −7', 'c −6', 'c −5', 'c −4', 'c −3', 'c −2', 'c −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'quicker'],
@@ -16833,7 +16844,7 @@
   };
   for (const [cls, names] of Object.entries(HELP_LISTS))
     document.getElementById(cls + 'List').innerHTML = names.map((n, i) =>
-      `<a href="#" role="button" class="helpOpt ${cls}" data-idx="${i}"><span class="chipName">${n}</span></a>`)
+      `<a href="#" role="button" class="helpOpt ${cls}${cls === 'helpFs' ? (i < HELP_FS_REL.length ? ' fsrel' : ' fsabs') : ''}" data-idx="${i}"><span class="chipName">${n}</span></a>`)
       // bare numbers space-join like the chat size row; wordy options keep ' / '
       .join(cls === 'helpHfs' || cls === 'helpFs' ? ' ' : ' / ');
   // each split chip seats beside its own description bullet, marked
