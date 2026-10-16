@@ -10168,7 +10168,7 @@
     e.preventDefault();
     try { vidBox.setPointerCapture(e.pointerId); } catch {}
     vidBox.classList.add('dragging');
-    vidBox.style.cursor = HS_CURS[edge];
+    vidBox.style.cursor = 'grabbing';
     const r = vidBox.getBoundingClientRect();
     const leftEdge = edge.includes('l'), rightEdge = edge.includes('r');
     const topEdge = edge.includes('t'), botEdge = edge.includes('b');
@@ -16667,7 +16667,7 @@
       for (const el of ringPops) el.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b');
       return;
     }
-    document.body.style.cursor = HS_CURS[hit[1]];
+    document.body.style.cursor = 'grab';
     const [el, edge] = hit;
     el.classList.toggle('edge-l', edge.includes('l'));
     el.classList.toggle('edge-r', edge.includes('r'));
