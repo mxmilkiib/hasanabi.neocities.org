@@ -6,8 +6,8 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-16
 
 ### Resources
-- the dsa tab's subsection titles - dsa links, overview, why dsa?,
-  chapter wikis and the table group heads - take a muted sage; the
+- subsection titles across the help pages take a muted sage - group
+  heads, column heads and the flowing lists' <i><b> titles; the
   race-tinted midterms heads keep their type colours
 - the dsa banner link, the corner rose and the active tab title gain
   a softer upward shadow to match their bottom edges

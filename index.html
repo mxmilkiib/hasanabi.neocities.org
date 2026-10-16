@@ -2067,13 +2067,15 @@
   #helpPanel .rcstw, #helpPanel .linkcols.stbl .rcstw { color: #ee7fae; }
   #helpPanel .rcloc, #helpPanel .linkcols.stbl .rcloc { color: #4ec2a8; }
   #helpPanel .rcmsr, #helpPanel .linkcols.stbl .rcmsr { color: #e0855a; }
-  /* dsa tab group heads - hoisted stbl labels and the flowing lists'
-     own <i><b> titles - take a muted sage; lightness tracks the shade
-     stop like the dim face does, the hue is fixed green - mixing out
-     of text-dim would drag the palette's own hue through it. the
-     midterms' classed race-tint heads and note rows keep theirs */
-  #helpPanel #htabDsa .linkcols.stbl > b:not([class]),
-  #helpPanel #htabDsa .linkcols > i:not(.note) > b {
+  /* group heads across the help pages - hoisted stbl labels, stbl
+     column heads, and the flowing lists' own <i><b> titles - take a
+     muted sage; lightness tracks the shade stop like the dim face
+     does, the hue is fixed green - mixing out of text-dim would drag
+     the palette's own hue through it. the midterms' classed
+     race-tint heads and note rows keep theirs */
+  #helpPanel .linkcols.stbl > b:not([class]),
+  #helpPanel .linkcols.stbl .chd,
+  #helpPanel .linkcols > i:not(.note) > b {
     color: oklch(calc(var(--sh-bg) + (var(--sh-tx) - var(--sh-bg)) * .78) .045 152); }
   /* a won row dots the left edge of its name cell in outcome green */
   #helpPanel .linkcols.stbl > i.won .cn::before {
