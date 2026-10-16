@@ -10062,19 +10062,19 @@
     // a stale px (no longer offered) still lets the bare index through
     const hw = Number.isInteger(o.hpwpx) && HELP_WIDTHS.includes(o.hpwpx) ? HELP_WIDTHS.indexOf(o.hpwpx) : o.hpw;
     if (Number.isInteger(hw) && hw >= 0 && hw < HELP_WIDTHS.length) { helpWIdx = hw; applyHelpW(); }
-    // hfspx is the px value; a saved 'hfs' is an index into the old 8-entry
-    // list, which maps +4 (7-10 were prepended)
+    // hfspx is the px value; a saved 'hfs' indexed the old 8-entry px list
+    // [11-16,18,20] - map by value so stops inserted since can't shift it
     if (Number.isInteger(o.hfspx)) {
       const i = HDR_SIZES.indexOf(o.hfspx);
       hdrFs = i >= 0 ? i : -1;
       applyHdrFs();
     } else if (Number.isInteger(o.hfs) && o.hfs >= -1 && o.hfs < 8) {
-      hdrFs = o.hfs < 0 ? -1 : o.hfs + 4;
+      hdrFs = o.hfs < 0 ? -1 : HDR_SIZES.indexOf([11, 12, 13, 14, 15, 16, 18, 20][o.hfs]);
       applyHdrFs();
     }
     if (Number.isInteger(o.hpfs)) {
       helpFs = o.hpfs < 0 ? o.hpfs : HDR_SIZES.indexOf(o.hpfs);
-      if (helpFs < -13) helpFs = -1; // a px no longer offered falls back to follow
+      if (helpFs < -13) helpFs = -1; // a deeper negative or a px indexOf miss falls back to follow
       applyHelpFs();
     }
     if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
