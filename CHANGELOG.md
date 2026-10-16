@@ -183,12 +183,12 @@ not versions - the page ships continuously to Neocities.
   until it resolves, and the lane math re-measures the true width
   each frame as images land. a per-bullet magnifier lottery rides
   every emote in the message - half fly normal, others on 1.5x, 2x
-  or 2.6x rungs, capped at two lane pitches. bullets always draw the
-  animated file now: a detached Image can sit on a still frame, so
-  each shared copy parks in a holder that stays painted (a
-  transparent corner pixel - a hidden img's animation clock pauses,
-  so visibility:hidden kept every bullet on frame one), and under
-  the emote freeze the row's still url maps
+  or 2.6x rungs, capped at two lane pitches. bullets draw the
+  animated file - but canvas drawImage is spec-pinned to an animated
+  image's first frame in every engine now, so each flying emote is a
+  real img in an overlay layer over the bullet canvas, transform-
+  moved each frame; the shared Image only measures ahead of its
+  twin's load, and under the emote freeze the row's still url maps
   back to the animated one (7tv's _static, twitch's /static/, the
   weserv first-frame proxy) - genuinely static twitch emotes keep
   theirs since /animated/ 404s them

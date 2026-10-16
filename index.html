@@ -583,6 +583,12 @@
      and resize chrome (handle z2, grips z3) */
   #vid #danmaku { position: absolute; inset: 0; width: 100%; height: 100%;
     z-index: 1; pointer-events: none; }
+  /* emote imgs ride an overlay twin of the bullet canvas - drawImage is
+     spec-pinned to an animated image's first frame, so a flying emote
+     can only animate as a real element */
+  #vid #danOl { position: absolute; inset: 0; z-index: 1;
+    pointer-events: none; overflow: hidden; }
+  #vid #danOl img { position: absolute; left: 0; top: 0; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
@@ -3028,7 +3034,7 @@
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>first-time tips: click/scroll header buttons to change some option settings -- page audio autoplay permission allows unmuted stream on open/reload -- click to dismiss</div>
-  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><canvas id="danmaku" hidden></canvas><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div><div class="vid-edge t"></div><div class="vid-edge b"></div><div class="vid-edge l"></div><div class="vid-edge r"></div></div>
+  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><canvas id="danmaku" hidden></canvas><div id="danOl" hidden></div><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div><div class="vid-edge t"></div><div class="vid-edge b"></div><div class="vid-edge l"></div><div class="vid-edge r"></div></div>
   <div id="vidSplit" aria-hidden="true" hidden title="drag to resize the video and chat"></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice · date:YYYY-MM-DD" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback - a date jumps to it" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
@@ -10372,6 +10378,7 @@
   //      authentic east-net pacing - with a little per-bullet jitter ----
   const danCv = document.getElementById('danmaku');
   const danCtx = danCv.getContext('2d');
+  const danOl = document.getElementById('danOl');
   let danmakuOn = false;      // config toggle, default off
   const danBullets = [];      // live { segs, col, x, w, v, y, lane }
   const danQueue = [];        // pushed rows waiting for a free lane
@@ -10420,31 +10427,17 @@
   new ResizeObserver(() => { danFit(); danKick(); }).observe(vidBox);
   // emote images fly as themselves - each bullet is a segment list of
   // text runs and shared Image elements. one that hasn't finished
-  // loading (or never will) draws as its code until it resolves. a
-  // detached Image can sit on a still frame (and the row's own img can
-  // trim away mid-flight), so every copy parks inside a
-  // rendered-but-invisible holder that keeps its animation rolling
+  // loading (or never will) draws as its code until it resolves. the
+  // pool img only ever measures - the visible copy is a per-segment
+  // overlay element, which the row's own img can trim away mid-flight
+  // without stalling it
   const danImgs = new Map();
-  let danCache = null;
   const danImg = (src) => {
     let im = danImgs.get(src);
     if (!im) {
-      if (danImgs.size > 800) {
-        const k = danImgs.keys().next().value;
-        danImgs.get(k).remove();
-        danImgs.delete(k);
-      }
-      if (!danCache) {
-        danCache = document.createElement('div');
-        // a hidden or offscreen img's animation clock pauses - the holder
-        // stays painted in a transparent corner pixel so frames advance
-        danCache.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
-        danCache.setAttribute('aria-hidden', 'true');
-        document.body.append(danCache);
-      }
+      if (danImgs.size > 800) danImgs.delete(danImgs.keys().next().value);
       im = new Image();
       im.src = src;
-      danCache.append(im);
       danImgs.set(src, im);
     }
     return im;
@@ -10555,6 +10548,15 @@
       if (lane < 0) return; // every lane backed up - wait for next frame
       danQueue.shift();
       danNextLane = (lane + 1) % danLanes;
+      // each emote seg gets a live overlay twin - the pool img only
+      // ever measures
+      for (const s of q.segs) if (typeof s !== 'string') {
+        const el = new Image();
+        el.alt = '';
+        el.src = s.im.src;
+        danOl.append(el);
+        s.el = el;
+      }
       danBullets.push({ segs: q.segs, col: q.col, fam: q.fam, mag: q.mag, x: W, w, v, lane,
         y: lane * danPitch + danFontPx });
     }
@@ -10575,7 +10577,11 @@
     for (let i = danBullets.length - 1; i >= 0; i--) {
       const b = danBullets[i];
       b.x -= b.v * dt;
-      if (b.x + b.w < 0) { danBullets.splice(i, 1); continue; }
+      if (b.x + b.w < 0) {
+        for (const s of b.segs) if (s.el) s.el.remove();
+        danBullets.splice(i, 1);
+        continue;
+      }
       // each segment keeps the bullet's nick colour for text; an emote
       // draws its image, or its code as text while the load is pending
       if (b.fam) danCtx.font = `${s.w} ${danFontPx}px ${b.fam}`;
@@ -10590,12 +10596,16 @@
           x += danCtx.measureText(s).width;
           continue;
         }
-        const im = s.im;
+        const im = s.im, el = s.el;
         if (im.complete && im.naturalWidth) {
           const eh = danEmoteSize(b.mag), ew = Math.round(eh * im.naturalWidth / im.naturalHeight);
-          danCtx.drawImage(im, x, Math.round(b.y - eh / 2), ew, eh);
+          el.hidden = false;
+          el.style.width = ew + 'px';
+          el.style.height = eh + 'px';
+          el.style.transform = `translate(${Math.round(x)}px, ${Math.round(b.y - eh / 2)}px)`;
           x += ew;
         } else {
+          el.hidden = true;
           danCtx.strokeText(s.alt, x, b.y);
           danCtx.fillStyle = b.col;
           danCtx.fillText(s.alt, x, b.y);
@@ -10622,10 +10632,11 @@
   function setDanmaku(on) {
     danmakuOn = on;
     markHelp('helpDan', on ? 1 : 0);
-    danCv.hidden = !on;
+    danCv.hidden = danOl.hidden = !on;
     if (on) { danFit(); danKick(); }
     else {
       danQueue.length = danBullets.length = 0;
+      danOl.replaceChildren();
       danCtx.clearRect(0, 0, danCv.width, danCv.height);
     }
   }
