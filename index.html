@@ -10278,7 +10278,10 @@
   const danQueue = [];        // pushed rows waiting for a free lane
   const DAN_CAP = 42, DAN_QCAP = 60, DAN_DUR = 5200;
   let danLanes = 0, danFontPx = 16, danNextLane = 0;
-  let danRaf = 0, danLast = 0, danFf = 'sans-serif';
+  let danRaf = 0, danLast = 0;
+  // bullets wear the live chat font - read fresh at paint time so a
+  // font swap takes effect on the very next frame, not the next refit
+  const danFontFam = () => getComputedStyle(logEl).fontFamily;
   function danFit() {
     const w = vidBox.clientWidth, h = vidBox.clientHeight;
     if (!w || !h) return;
@@ -10289,7 +10292,6 @@
     danCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
     danFontPx = Math.max(11, Math.min(20, Math.round(h * 0.032)));
     danLanes = Math.max(1, Math.min(10, Math.floor(h / (danFontPx * 1.5))));
-    danFf = getComputedStyle(logEl).fontFamily;
     // a resize re-lanes in-flight bullets so they keep their own row
     for (const b of danBullets) b.y = b.lane * danFontPx * 1.5 + danFontPx;
   }
@@ -10308,7 +10310,7 @@
       return s; };
     let txt = walk(m).replace(/\s+/g, ' ').trim();
     if (!txt) return;
-    if (txt.length > 60) txt = txt.slice(0, 59) + '…';
+    if (txt.length > 160) txt = txt.slice(0, 159) + '…';
     const lg = row.dataset.u;
     const rec = lg && seenNicks.get(lg);
     danQueue.push({ txt, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x') });
@@ -10320,7 +10322,7 @@
   function danSpawn(W) {
     while (danBullets.length < DAN_CAP && danQueue.length) {
       const q = danQueue[0];
-      danCtx.font = `600 ${danFontPx}px ${danFf}`;
+      danCtx.font = `600 ${danFontPx}px ${danFontFam()}`;
       const w = Math.ceil(danCtx.measureText(q.txt).width) + 6;
       const v = (W + w) / (DAN_DUR * (0.85 + Math.random() * 0.3));
       let lane = -1;
@@ -10346,7 +10348,7 @@
     const W = danCv.width / DPR, H = danCv.height / DPR;
     danSpawn(W);
     danCtx.clearRect(0, 0, W, H);
-    danCtx.font = `600 ${danFontPx}px ${danFf}`;
+    danCtx.font = `600 ${danFontPx}px ${danFontFam()}`;
     danCtx.textBaseline = 'middle';
     danCtx.lineJoin = 'round';
     danCtx.strokeStyle = 'rgba(0,0,0,.8)';

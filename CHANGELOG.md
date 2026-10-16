@@ -107,6 +107,9 @@ not versions - the page ships continuously to Neocities.
   them at the right edge; dt now stays in ms, the font scales down
   (~3.2% of box height, cap 20px), and a resize re-lanes in-flight
   bullets so rows don't stack
+- danmaku bullets wear the live chat font - the family was cached at
+  refit, so a mid-session font swap left the stream in the old face;
+  the bullet text cap rises 60 → 160 chars
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
