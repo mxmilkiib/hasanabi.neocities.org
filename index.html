@@ -6499,7 +6499,7 @@
     else if (a.classList.contains('helpPos')) { helpPos = +a.dataset.idx; helpPanel.style.left = ''; helpPanel.style.right = ''; applyHelpPos(); const s = readHsize(); delete s.x; delete s.y; writeHsize(s); saveOpts(); } // a position pick undoes a drag
     else if (a.classList.contains('helpStick')) { helpStick = +a.dataset.idx === 1; markHelp('helpStick', helpStick ? 1 : 0); saveOpts(); }
     else if (a.classList.contains('helpHfs')) { hdrFs = +a.dataset.idx - 1; applyHdrFs(); }
-    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i <= 2 ? i - 7 : i <= 5 ? i - 6 : i === 6 ? -4 : i - 7; applyHelpFs(); }
+    else if (a.classList.contains('helpFs')) { const i = +a.dataset.idx; helpFs = i < HELP_FS_REL.length ? HELP_FS_REL[i] : i - HELP_FS_REL.length; applyHelpFs(); }
     else if (a.classList.contains('helpSelf')) { setSelfHl(+a.dataset.idx === 1); saveOpts(); }
         else if (a.classList.contains('helpAnim')) { setNickAnim(ANIM_LVLS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpRbwS')) { setRbwScope(+a.dataset.idx); saveOpts(); }
@@ -8259,12 +8259,11 @@
     // and a following help panel one to three steps below
     const pi = FONT_SIZES.indexOf(fs);
     de.setProperty('--peek-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 2)] : Math.max(7, fs - 2)) + 'px');
-    de.setProperty('--help-font', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 1)] : Math.max(7, fs - 1)) + 'px');
-    de.setProperty('--help-font2', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 2)] : Math.max(7, fs - 2)) + 'px');
-    de.setProperty('--help-font3', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 3)] : Math.max(7, fs - 3)) + 'px');
-    de.setProperty('--help-font4', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 4)] : Math.max(7, fs - 4)) + 'px');
-    de.setProperty('--help-font5', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 5)] : Math.max(7, fs - 5)) + 'px');
-    de.setProperty('--help-font6', (pi >= 0 ? FONT_SIZES[Math.max(0, pi - 6)] : Math.max(7, fs - 6)) + 'px');
+    // --help-fontN answers chat N ladder steps down, clamped to the
+    // bottom rung once the chat font runs out of rungs below it
+    for (let n = 1; n <= 12; n++)
+      de.setProperty('--help-font' + (n === 1 ? '' : n),
+        (pi >= 0 ? FONT_SIZES[Math.max(0, pi - n)] : Math.max(7, fs - n)) + 'px');
     // tracking travels as an em step so it scales with the font, but the
     // property is inherited through body which doesn't use --chat-font -
     // resolve to px here so the same proportion reaches every element
@@ -10072,7 +10071,7 @@
     }
     if (Number.isInteger(o.hpfs)) {
       helpFs = o.hpfs < 0 ? o.hpfs : HDR_SIZES.indexOf(o.hpfs);
-      if (helpFs < -7) helpFs = -1; // a px no longer offered falls back to follow
+      if (helpFs < -13) helpFs = -1; // a px no longer offered falls back to follow
       applyHelpFs();
     }
     if (Number.isInteger(o.hpos) && o.hpos >= 0 && o.hpos < 9) { helpPos = o.hpos; applyHelpPos(); }
@@ -11664,7 +11663,7 @@
   // left/right insets regardless of the inline max-width ----
   const HELP_WIDTHS = [480, 560, 640, 720, 840, 960, 1100, 1280, 1440, 1600, 1760, 1920];
   const HELP_MIN_W = 280;
-  const HDR_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20];
+  const HDR_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
   let hdrFs = DEF.hfs; // -1 = follow the chat font
   function applyHdrFs() {
     const s = document.documentElement.style;
@@ -11733,9 +11732,11 @@
   // a dragged width isn't one of the stops - note it in brackets
   const markHelpW = (w) => { helpWCur.textContent = w ? ` (${w}px)` : ''; };
   // popup font size: negatives follow the chat font down the ladder -
-  // -1/-2/-3 map to --help-font/2/3, -5/-6/-7 to --help-font4/5/6, and
-  // -4 is no step (chat itself) - else a px pick from the same stops
-  // the header size uses
+  // -1/-2/-3 map to --help-font/2/3, -(N+1) to --help-fontN for chat-N
+  // with N>=4, and -4 is no step (chat itself) - else a px pick from
+  // the same stops the header size uses. HELP_FS_REL lists the
+  // internals in chip order
+  const HELP_FS_REL = [-13, -11, -9, -8, -7, -6, -5, -3, -2, -1, -4];
   let helpFs = -1;
   function applyHelpFs() {
     if (helpFs === -4) helpPanel.style.fontSize = 'var(--chat-font)';
@@ -11747,10 +11748,10 @@
   // a chat-relative pick resolves to a px stop too - light that up as well
   // so the row shows what 'chat −N' currently means
   function markHelpFs() {
-    markHelp('helpFs', helpFs === -4 ? 6 : helpFs <= -5 ? helpFs + 7 : helpFs < 0 ? helpFs + 6 : helpFs + 7);
+    markHelp('helpFs', helpFs < 0 ? HELP_FS_REL.indexOf(helpFs) : helpFs + HELP_FS_REL.length);
     if (helpFs >= 0) return;
     const i = HDR_SIZES.indexOf(Math.round(parseFloat(getComputedStyle(helpPanel).fontSize)));
-    const eq = i >= 0 && helpPanel.querySelector(`a.helpFs[data-idx="${i + 7}"]`);
+    const eq = i >= 0 && helpPanel.querySelector(`a.helpFs[data-idx="${i + HELP_FS_REL.length}"]`);
     if (eq) setOn(eq, true);
   }
   // header height changes with width when the controls wrap - re-anchor
@@ -16757,8 +16758,8 @@
       // 'chat' names the chat font itself, 'chat-N' the N-below steps;
       // negatives index them too, a positive value is the px size itself
       if (v === 'chat') { helpFs = -4; applyHelpFs(); }
-      else if (/^chat-[1-6]$/.test(v)) { const n = +v.slice(5); helpFs = n <= 3 ? -n : -n - 1; applyHelpFs(); }
-      else { const n = +v, i = n < 0 ? Math.max(Math.round(n), -7) : HDR_SIZES.indexOf(n); if (n < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
+      else if (/^chat-(?:[1-9]|1[0-2])$/.test(v)) { const n = +v.slice(5); helpFs = n <= 3 ? -n : -n - 1; applyHelpFs(); }
+      else { const n = +v, i = n < 0 ? Math.max(Math.round(n), -13) : HDR_SIZES.indexOf(n); if (n < 0 || i >= 0) { helpFs = i; applyHelpFs(); } }
     }
     if (q.has('hfs')) { const v = q.get('hfs'); const i = v === 'auto' ? -1 : HDR_SIZES.indexOf(+v); if (i !== -1 || v === 'auto') { hdrFs = i; applyHdrFs(); } }
     if (q.has('hpos') && q.get('hpos') !== '') { const v = q.get('hpos'); let i = HPOS_URL.indexOf(v); if (i < 0) i = +v; if (Number.isInteger(i) && i >= 0 && i < 9) { helpPos = i; applyHelpPos(); } }
@@ -16820,7 +16821,7 @@
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
     helpHfs: ['follow chat'].concat(HDR_SIZES),
-    helpFs: ['chat −6', 'c −5', 'c −4', 'c −3', 'c −2', 'c −1', 'chat'].concat(HDR_SIZES),
+    helpFs: ['chat −12', 'c −10', 'c −8', 'c −7', 'c −6', 'c −5', 'c −4', 'c −3', 'c −2', 'c −1', 'chat'].concat(HDR_SIZES),
     helpSelf: ['off', 'on'],
     helpAnim: ['off', 'super slow', 'slow', 'quicker'],
     helpHide: HIDE_MODES,

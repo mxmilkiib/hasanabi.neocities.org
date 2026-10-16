@@ -484,7 +484,7 @@ editing a URL.
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
 | `lw` | `300`–`700` | boldness of links in the help popup |
 | `hfs` | px / `auto` | header font size (unset follows chat) |
-| `hpfs` | `chat` / `chat-1`…`chat-6` / px | help popup font size (chat-N follows the chat font that many ladder steps down) |
+| `hpfs` | `chat` / `chat-1`…`chat-12` / px | help popup font size (chat-N follows the chat font that many ladder steps down) |
 | `hpw` | `480`–`1920` | help popup width |
 | `hstick` | flag | sticky position - a floating help popup resizes about its own spot (centred keeps the centre, a corner dock the corner, a dragged panel its centre) |
 | `pause` | flag | hold the scroll while hovering a row |

@@ -104,9 +104,11 @@ not versions - the page ships continuously to Neocities.
   beside 'dsa' (?htab=vote works); the rows stay .vote-marked in the
   dsa markup and lift onto the page at init so the election data
   remains one editable block
-- the [?] popup's font-size option reaches three rungs lower - 'chat
-  −6' down to 'c −1' beside 'chat', the first entry spelling 'chat'
-  out and the rest shortening to 'c'; ?hpfs=chat-4..chat-6 work too
+- the [?] popup's font-size option reaches deeper - 'chat −12' leads
+  a relative ladder of c −10, c −8, c −7 and c −6 down to c −1
+  beside 'chat', the first entry spelling 'chat' out and the rest
+  shortening to 'c'; ?hpfs=chat-1..chat-12 work too, and the px
+  stops gain 17 and 19 (the header size's ladder shares them)
 - the emote picker no longer opens by default or re-opens on layout
   switches - its saved open/closed state governs on every layout, so
   a closed picker stays closed docked or floating and an open one
