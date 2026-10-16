@@ -15,6 +15,8 @@ not versions - the page ships continuously to Neocities.
   the strip's outer size and bounced it between header lines
 
 ### Resources
+- the ⸻ section dividers go gold - the same #e8b73e as the ? button,
+  no longer tracking the theme accent
 - "operation hasan bad" joins the intro video links; "the news man"
   loses its gloss
 - channels/streams entries with a real wikipedia article gain a `*`
