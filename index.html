@@ -674,6 +674,9 @@
      before loading */
   main.split:not(.rev) .col > .stale:not(.archload), main.wrap:not(.rev) .col > .stale:not(.archload) { display: none; }
   main.split:not(.rev) .col, main.wrap:not(.rev) .col { scrollbar-width: none; }
+  /* a column's archload seam shrinks to the footnote size - in a paged
+     flow it isn't a real row, just the door out to history */
+  main.split .archload, main.wrap .archload { font-size: .85em; }
   /* a retired page's clones linger over their column, swept as the live
      page writes over them - the real rows archive on the same flip */
   .ghostpage { position: absolute; inset: 0; box-sizing: border-box; padding: inherit;

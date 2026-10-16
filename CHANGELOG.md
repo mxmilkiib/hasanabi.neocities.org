@@ -83,6 +83,8 @@ not versions - the page ships continuously to Neocities.
 - the layout menu reorders chat-emotes under chat-help in each
   column family - the wheel follows the same order, and levels keep
   their stable ids so no saved setting or ?split= url remaps
+- the archload seam shrinks to footnote size in the paged column
+  layouts - it isn't a chat row there, just the door to history
 - the status-length ladder sheds parts in order: follow-req goes
   first (the mode chips that made 'stats' look identical to 'full'
   are retired from the line), the chatter tally survives one more
