@@ -258,15 +258,15 @@ no dependencies beyond CDN-hosted fonts.
     placeholder.
 - **Chat columns**
   - The layout menu has nineteen layouts, listed in menu order:
+    - `1col video` keeps the framed video alone, centred in the row;
+      its own edges drag their side, and any bare-floor grab pulls the
+      frame wider in the dragged direction - outward grows, inward
+      shrinks.
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
     - `1col vid/chat` stacks the video in its framed floating style
       over the single chat column.
-    - `1col video` keeps the framed video alone, centred in the row;
-      its own edges drag their side, and any bare-floor grab pulls the
-      frame wider in the dragged direction - outward grows, inward
-      shrinks.
     - `1col video/help` centres a rail holding the video over the
       docked help popup - the frame keeps its own width inside the
       page, and dragging its edges trades width with the help below

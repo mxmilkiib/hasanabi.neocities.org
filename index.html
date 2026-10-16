@@ -12756,7 +12756,7 @@
   // a rearrangement never remaps a stored level - chat-emotes sits right
   // under chat-help in each column family, and the 1col variants follow
   // 1col help
-  const SPLIT_ORDER = [0, 1, 14, 16, 17, 18, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
+  const SPLIT_ORDER = [16, 0, 1, 14, 17, 18, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
   // the level families - menu order scatters the semantic ranges
   const LVL_NORAIL = new Set([1, 3, 9, 15, 17, 19]); // bare chat columns - 15/17/19 dock the video above them instead
   const LVL_VIDSTACK = new Set([15, 17, 19]);      // the framed stack - 17/19 hide the column leaving the video solo
