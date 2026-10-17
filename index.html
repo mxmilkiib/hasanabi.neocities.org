@@ -10827,9 +10827,9 @@
   // frame. 'bg' hazes a fat under-stroke silhouette into the bake,
   // hugging the glyphs rather than boxing them in a capsule slab
   const danBake = (txt, w, px, fam, spec, col) => {
-    const padX = Math.ceil(px * (danBg ? 1 : .4));
-    const padT = Math.ceil(px * (danBg ? .9 : .45));
-    const padB = Math.ceil(px * (danBg ? 1.05 : .55));
+    const padX = Math.ceil(px * (danBg ? .7 : .4));
+    const padT = Math.ceil(px * (danBg ? .6 : .45));
+    const padB = Math.ceil(px * (danBg ? .7 : .55));
     const cw = Math.ceil((w + padX * 2) * danDpr), ch = Math.ceil((padT + padB) * danDpr);
     const cv = document.createElement('canvas');
     cv.width = cw; cv.height = ch;
