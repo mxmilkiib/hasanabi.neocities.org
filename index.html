@@ -3144,9 +3144,15 @@
     const qs = String(oauthQuery);
     history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
   }
+  // every option key the url reads - keep the set in sync. a leading
+  // ?token that looks like a channel name and isn't one of these reads
+  // as the channel: ?cinemarxism is shorthand for ?channel=cinemarxism
+  const URL_PARAMS = new Set('anim bartop bauto bw clean cmodes color colour dan danb danc dand danf dann dano danp dans danv dfs eonly epage epanim epfz epgeo ephold epmix epmove epnames epopen eprow epsort epsq eptabs eptips epzoom font gifsafe help hfs hpfs hpos hpw hstick htab hw hwm kw lbls lh lines lkico ls lw min mnl nbots ncol notify overlay pause peek ping pn rbp rbw rbws reset rev scrollback self shade shadow size split stitle style sub subg sview theme times upd valt variant video wght wrap yt zebra'.split(' '));
+  const bareSeg = location.search.slice(1).split('&')[0];
+  const bareCh = /^[a-z0-9_]{1,25}(?:,[a-z0-9_]{1,25})*$/i.test(bareSeg) && !URL_PARAMS.has(bareSeg.toLowerCase()) ? bareSeg : '';
   // ?channel=a,b,c watches several chats in one merged log; the first is
   // focused (title, stream status, video, chat target, storage keys)
-  const CHANNELS = (new URLSearchParams(location.search).get('channel') ||
+  const CHANNELS = (new URLSearchParams(location.search).get('channel') || bareCh ||
     (oauthReturn && oauthReturn.channels) || '')
     .toLowerCase().split(',')
     .map((c) => c.replace(/[^a-z0-9_]/g, '').slice(0, 25))
@@ -10540,7 +10546,7 @@
   const chanAskIn = document.getElementById('chanAskIn');
   setTimeout(() => {
     if (location.hostname !== 'twtch.neocities.org' ||
-        new URLSearchParams(location.search).get('channel') ||
+        new URLSearchParams(location.search).get('channel') || bareCh ||
         (oauthReturn && oauthReturn.channels) || vidBox.hidden) return;
     chanAsk.hidden = false;
     chanAskIn.focus();

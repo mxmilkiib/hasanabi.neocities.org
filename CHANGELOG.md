@@ -95,6 +95,10 @@ not versions - the page ships continuously to Neocities.
   as ?channel=; ✕ drops it to watch the default channel instead. the
   overlay waits for boot to settle so a video-off pick stays
   unpestered, and an oauth return carrying channels skips it
+- a leading ?token shorthand picks the channel: ?cinemarxism reads as
+  ?channel=cinemarxism (comma lists work), while every option key the
+  url already reads stays an option - the denylist keeps ?min, ?dan
+  and friends from being eaten as channel names
 
 ## 2026-10-16
 
