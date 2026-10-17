@@ -10957,13 +10957,13 @@
     return danH - (L - danTopN + 1) * danPitch;
   };
   // 'adaptive' size slides the ladder as the feed heats: near-full
-  // bullets at rest, shrinking toward small ones past ~14 msg/s, and
+  // bullets at rest, shrinking toward small ones past ~10 msg/s, and
   // deeper pressure keeps sliding toward tiny - showing everything
   // small beats shedding the queue. the even rungs keep re-metering to
   // steps, not a per-frame shimmer
   const danAdaptPx = () => {
-    const t = Math.max(0, Math.min(1, (danRateAvg - 2) / 12));
-    const d = Math.max(0, Math.min(1, (danRateAvg - 14) / 12));
+    const t = Math.max(0, Math.min(1, (danRateAvg - 1) / 9));
+    const d = Math.max(0, Math.min(1, (danRateAvg - 10) / 10));
     return Math.round((34 - t * 20 - d * 8) / 2) * 2;
   };
   function danMeter(s, H) {
@@ -11448,7 +11448,7 @@
     if (!danSpecC || now - danSpecT > 500) { danSpecC = danSpec(); danSpecT = now; }
     const s = danSpecC, spec = s;
     const danR = rateSamples[rateSamples.length - 1];
-    danRateAvg += ((Number.isFinite(danR) ? danR : 0) - danRateAvg) * Math.min(1, dt / 800);
+    danRateAvg += ((Number.isFinite(danR) ? danR : 0) - danRateAvg) * Math.min(1, dt / 500);
     danMeter(s, H);
     danSpawn(W, s);
     danCtx.clearRect(0, 0, W, H);
