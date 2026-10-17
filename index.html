@@ -11337,22 +11337,32 @@
         danCtx.globalAlpha = a;
       }
       // 'bg' is the text's own cast shade rather than a capsule slab -
-      // the glyphs hug it and the dpr-scaled blur hazes the edge, with
-      // a slight drop so it reads as shadow not glow
+      // a fat blurred under-stroke silhouettes each run so it hugs the
+      // glyphs, the dpr-scaled blur hazes the edge, and a slight drop
+      // keeps it reading as shade rather than glow
       if (danBg) {
-        danCtx.shadowColor = `rgba(0,0,0,${a * DAN_BGS[danBg]})`;
-        danCtx.shadowBlur = b.px * .55 * danDpr;
-        danCtx.shadowOffsetY = b.px * .12 * danDpr;
+        danCtx.shadowColor = `rgba(0,0,0,${DAN_BGS[danBg]})`;
+        danCtx.shadowBlur = b.px * .5 * danDpr;
+        danCtx.shadowOffsetY = b.px * .1 * danDpr;
       }
       // each segment keeps the bullet's nick colour for text; an emote
       // draws its image, or its code as text while the load is pending
       const fam = b.fam || spec.fam;
       danFont(`${s.w} ${b.px}px ${fam}`);
       danCtx.lineWidth = Math.max(2, b.px * 0.18);
+      const shade = (t, x) => {
+        if (!danBg || !t.trim()) return;
+        danCtx.lineWidth = Math.max(3, b.px * .6);
+        danCtx.strokeStyle = `rgba(0,0,0,${DAN_BGS[danBg]})`;
+        danCtx.strokeText(t, x, b.y);
+        danCtx.lineWidth = Math.max(2, b.px * .18);
+        danCtx.strokeStyle = 'rgba(0,0,0,.8)';
+      };
       let x = b.x;
       for (const s of b.segs) {
         if (s.t != null) {
           if (s.t.trim()) {
+            shade(s.t, x);
             danCtx.strokeText(s.t, x, b.y);
             danCtx.fillStyle = b.col;
             danCtx.fillText(s.t, x, b.y);
@@ -11372,6 +11382,7 @@
           const t = String(s.sub).padStart(2, '0'), spx = Math.round(b.px * 0.72);
           danFont(`${spec.w} ${spx}px ${fam}`);
           if (s.spx !== spx) { s.spx = spx; s.sw = danCtx.measureText(t).width; }
+          shade(t, x);
           danCtx.strokeText(t, x, b.y);
           danCtx.fillStyle = subGrad
             ? `color-mix(in oklch longer hue, #4fbecd, #f43f5e ${Math.min(100, Math.round(s.sub / 60 * 100))}%)`
@@ -11408,6 +11419,7 @@
           if (!el.hidden) el.hidden = true;
           if (s.bd) x += danBadgeH(b.px); // a pending badge still holds its square
           else {
+            shade(s.alt, x);
             danCtx.strokeText(s.alt, x, b.y);
             danCtx.fillStyle = b.col;
             danCtx.fillText(s.alt, x, b.y);
