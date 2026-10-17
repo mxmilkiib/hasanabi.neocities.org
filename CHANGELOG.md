@@ -33,6 +33,8 @@ not versions - the page ships continuously to Neocities.
   slate unless 'stand-in' is flipped on (now written as ?valt=1)
 - blank spacer rows now flank the vote26 'nov 3 general ballot' table
   to set it off from midterms and primary results
+- 'aligned slate' sits above 'primary results' in the vote26 tab - the
+  general-election tables now run together
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own
