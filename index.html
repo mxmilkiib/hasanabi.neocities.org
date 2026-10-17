@@ -10393,7 +10393,11 @@
         vidPlayer = emb.getPlayer();
         document.querySelectorAll('#vid .viddead').forEach((n) => n.remove());
         if (saved.v != null) vidPlayer.setVolume(saved.v);
-        vidPlayer.setMuted(!wantSound);
+        // no programmatic unmute here: on a muted-built (mobile) player
+        // it's a non-gesture call the browser vetoes and it can stop
+        // the muted autoplay outright - the build's own muted state
+        // stands and one's unmute tap inside the embed, a real
+        // gesture, is what restores the sound
         if (!wantPlay) vidPlayer.pause();
         vidState();
         // 'armed' means unmuted playback was actually observed - nothing
@@ -10421,13 +10425,17 @@
         // control-only proxy without addEventListener
         // PLAYING is ground truth that beats decapi's lag in both
         // directions - a rolling embed tears the stand-in back down
-        emb.addEventListener(Twitch.Player.PLAYING, () => { vidUserPause = false; seenPlay = true; vidState(); vidAlt(false); });
+        emb.addEventListener(Twitch.Player.PLAYING, () => { vidUserPause = false; seenPlay = true; lastPlayAt = Date.now(); vidState(); vidAlt(false); });
         // only a pause one can actually make counts as the pick - the
         // stand-in's own pause, the hidden box's, and a stall's are
         // housekeeping, and any would gate the revive kicks out of
         // their own mess. a pick is provisional though: the stamp is
         // kept so a following ENDED can take it back
         let vidPauseAt = 0;
+        // a pause hot on the heels of PLAYING isn't a pick even with
+        // the iframe focused - taps leave it focused while the stall
+        // fires, so it falls through to the kicks like any hiccup
+        let lastPlayAt = 0;
         // a real pause keeps its buffer; a stall that read as a pick
         // starves instead. two starving reads hand the pick back once
         // per build - if paused players ever do report empty buffers,
@@ -10435,7 +10443,7 @@
         let vidStarved = 0, starveRevoked = false;
         emb.addEventListener(Twitch.Player.PAUSE, () => {
           const dead = vidPlayer.isEnded && vidPlayer.isEnded();
-          if (!vidAltOn && !vidBox.hidden && embedFocused() && !dead) { vidUserPause = true; vidPauseAt = Date.now(); }
+          if (!vidAltOn && !vidBox.hidden && embedFocused() && !dead && Date.now() - lastPlayAt > 1500) { vidUserPause = true; vidPauseAt = Date.now(); }
           vidState();
         });
         // ENDED beats decapi's lag to the punch, but only once offline
