@@ -10557,7 +10557,7 @@
   const vidAltEl = document.getElementById('vidAlt');
   let vidAltOn = false;
   let altUnmuted = false; // the current arm has had its sound restored
-  let vidAltPref = 1; // 'stand-in' help toggle - 0 keeps the offline slate
+  let vidAltPref = 0; // 'stand-in' help toggle - 1 fills a dead frame with the youtube stand-in
   function setVidAlt(i) { vidAltPref = i; markHelp('helpVAlt', i); if (!i) vidAlt(false); }
   function vidAlt(on) {
     on = !!VID_ALT_URL && vidAltPref && on && !vidBox.hidden;
@@ -12351,7 +12351,7 @@
     if (notifyOn) q.set('notify', '1');
     if (peekMode !== 2) q.set('peek', PEEK_URL[peekMode]);
     if (!ytEmbed) q.set('yt', '0');
-    if (!vidAltPref) q.set('valt', '0');
+    if (vidAltPref) q.set('valt', '1');
     if (!titleBarOn) q.set('stitle', '0');
     if (!modesOn) q.set('cmodes', '0');
     if (statusView) q.set('sview', SVIEW_NAMES[statusView]);
