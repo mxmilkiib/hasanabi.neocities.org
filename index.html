@@ -11178,19 +11178,9 @@
     if (typeof flat[0] === 'string') flat[0] = flat[0].replace(/^ +/, '');
     if (flat.length && typeof flat[flat.length - 1] === 'string')
       flat[flat.length - 1] = flat[flat.length - 1].replace(/ +$/, '');
-    // an emote counts as two chars toward the length cap
-    const out = [];
-    let len = 0;
-    for (const s of flat) {
-      const w = typeof s === 'string' ? s.length : 2;
-      if (len + w > 160) {
-        const t = typeof s === 'string' ? s.slice(0, 160 - len).replace(/ +$/, '') : '';
-        out.push((t || '') + '…');
-        break;
-      }
-      out.push(s);
-      len += w;
-    }
+    // no length cap - twitch's own 500-char bound limits it, and a
+    // long bullet just crosses faster by the width-weighted pace
+    const out = flat;
     if (!out.length || out.every((s) => typeof s === 'string' && !s.trim())) return;
     // 'nick' leads the bullet with the display name like a chat row -
     // 'badge' lands the sender's badge icons ahead of it, and 'subs'
