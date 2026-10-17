@@ -10480,7 +10480,9 @@
             // first so its housekeeping pause can't eat the play)
             if (vidEnded >= 2) vidAlt(true);
             if (vidEnded < 4) try { vidPlayer.play(); } catch {}
-            else if (vidEnded === 4) reviveVid();
+            // revive nulled vidPlayer and this poll - leave before the
+            // persist block below dereferences it
+            else if (vidEnded === 4) { reviveVid(); return; }
             vidEnded++;
           } else vidEnded = 0;
           // the stand-in's pause is housekeeping, not user intent - an

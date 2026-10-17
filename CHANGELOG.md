@@ -38,6 +38,9 @@ not versions - the page ships continuously to Neocities.
   to set it off from midterms and primary results
 - 'aligned slate' sits above 'primary results' in the vote26 tab - the
   general-election tables now run together
+- a player revive inside the poll tick no longer crashes the tick -
+  the callback kept running after the rebuild nulled vidPlayer and
+  dereferenced it in the persist block
 - danmaku's draw loop sheds its per-frame costs, mostly for phones:
   the computed-style read is cached half a second, text-run and chip
   widths cache on their segments instead of re-measuring every frame,
