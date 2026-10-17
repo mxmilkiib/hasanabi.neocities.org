@@ -70,6 +70,13 @@ not versions - the page ships continuously to Neocities.
   real title survives the word inside it
 - salmon gains its own glyph (❥) - it was the one palette left on
   the ◐ fallback
+- a relay that reported then fell silent kept its last verdict on the
+  dot forever - a crashed iframe or unreachable host left 'live' lit
+  for days. past ~3 missed polls every channel now drops to unknown
+  and the dot reads 'unavailable' like one that never checked in; the
+  first report back clears it. waking a slept tab also probes the
+  join set directly so the verdict isn't stale-flagged while the
+  relay's next scheduled poll catches up
 
 ## 2026-10-16
 

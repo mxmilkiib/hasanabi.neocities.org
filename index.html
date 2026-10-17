@@ -5896,6 +5896,7 @@
   let stream = null;       // { live, startedAt, viewers, title }
   let streamHeard = false; // a stream report arrived at least once
   let streamDead = false;  // no report within the watchdog window
+  let lastStreamAt = 0;    // when the last stream report landed
   // most recent stream run { started, ended|null }, persisted across reloads
   const LASTRUN_KEY = 'hasan-last-run' + CHAN_SFX;
   let lastRun = null;
@@ -5977,6 +5978,7 @@
   const offDue = {};      // ch -> first suspect offline read under 'live'
   function onStream(d) {
     streamHeard = true;
+    lastStreamAt = Date.now();
     const sch = (d.channel || CHANNEL).toLowerCase();
     const uptime = typeof d.uptime === 'string' ? d.uptime : '';
     let st;
@@ -6003,6 +6005,9 @@
         title: apiErr(d.title) ? '' : d.title || '',
       };
     }
+    // a parseable verdict means the relay is reporting - lift the dead
+    // flag a watchdog or staleness pass may have set
+    streamDead = false;
     // a provably rolling embed vetoes an offline report outright - it
     // can't be playing a stream that isn't there
     if (!st.live && sch === CHANNEL && vidPlayer && !vidPlayer.isPaused() &&
@@ -13528,6 +13533,23 @@
     if (!streamHeard) { streamDead = true; updateHeader(); }
   }, 10000);
 
+  // A relay that reported then fell silent (iframe crashed, host
+  // unreachable) would otherwise leave its last verdict on the dot
+  // forever - past ~3 missed polls drop every channel to unknown and
+  // read 'unavailable' like one that never checked in
+  setInterval(() => {
+    if (!streamHeard || streamDead || Date.now() - lastStreamAt < 200e3) return;
+    const chans = Object.keys(streamStates);
+    for (const sch of chans) delete streamStates[sch];
+    for (const sch in offDue) delete offDue[sch];
+    stream = null;
+    streamDead = true;
+    updateHeader();
+    for (const sch of chans) paintChTags(sch);
+    paintProbe();
+    if (livePing.textContent === 'pinging…') livePing.textContent = 'live?';
+  }, 30000);
+
   // A page can still miss live lines while suspended, so on wake it asks the
   // relay for the backlog (recent-messages.robotty.de); rendered ids are skipped.
   // loud narrates the sweep on the strip - the routine post-join passes stay
@@ -13559,9 +13581,16 @@
     // a brief tab-away can't miss enough to narrate - the sweep still
     // runs, just without the banner a real suspension earns
     backfill(Date.now() - hiddenAt > 15000);
+    // the relay's next scheduled poll can be a minute out after a long
+    // sleep - probe the join set directly so the stream verdict isn't
+    // sitting stale or flagged dead while it catches up
+    if (relayFrame.contentWindow && Date.now() - lastStreamAt > 60e3)
+      relayFrame.contentWindow.postMessage({ type: 'streamprobe', channels: CHANNELS }, RELAY_ORIGIN);
     hiddenAt = 0;
   });
-  window.addEventListener('pageshow', () => backfill());
+  window.addEventListener('pageshow', () => { backfill();
+    if (relayFrame.contentWindow && Date.now() - lastStreamAt > 60e3)
+      relayFrame.contentWindow.postMessage({ type: 'streamprobe', channels: CHANNELS }, RELAY_ORIGIN); });
 
   // ---- read marker: a red line between the last-seen row and whatever
   // arrived while the page was inactive. Each blur/hide arms a fresh
