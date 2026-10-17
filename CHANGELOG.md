@@ -15,7 +15,10 @@ not versions - the page ships continuously to Neocities.
   the iframe after one unmute click, so a stall later still read as
   a pick. the pick is now provisional - an ENDED landing within 3s
   of the PAUSE (the stall's signature, pausing and ending in one
-  breath) revokes it and lets the kicks run
+  breath) revokes it and lets the kicks run, and a pick that keeps
+  reporting an empty buffer under a live verdict starves out too:
+  a real pause holds buffered video, only a stall starves. that
+  revoke fires once per build so a misread costs one resume at most
 - the kick gate now covers a live stream sitting merely paused (not
   ended), so a mid-playback stall gets nudged and rebuilt instead of
   sitting silent - but only once playback was actually seen, so a

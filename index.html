@@ -10405,6 +10405,11 @@
         // their own mess. a pick is provisional though: the stamp is
         // kept so a following ENDED can take it back
         let vidPauseAt = 0;
+        // a real pause keeps its buffer; a stall that read as a pick
+        // starves instead. two starving reads hand the pick back once
+        // per build - if paused players ever do report empty buffers,
+        // a deliberate stop pays at most one spurious resume
+        let vidStarved = 0, starveRevoked = false;
         emb.addEventListener(Twitch.Player.PAUSE, () => {
           const dead = vidPlayer.isEnded && vidPlayer.isEnded();
           if (!vidAltOn && !vidBox.hidden && embedFocused() && !dead) { vidUserPause = true; vidPauseAt = Date.now(); }
@@ -10429,6 +10434,15 @@
           vidState();
           const ended = vidPlayer.isEnded && vidPlayer.isEnded();
           const paused = vidPlayer.isPaused() && !ended;
+          const stats = vidPlayer.getPlaybackStats && vidPlayer.getPlaybackStats();
+          // a pick that sits starving under a live verdict was the
+          // stall wearing the pick's focus - hand it back and the
+          // kicks take it from there
+          if (vidUserPause && !starveRevoked && stream && stream.live && (paused || ended)) {
+            if (stats && stats.bufferSize != null && stats.bufferSize < 0.5) {
+              if (++vidStarved >= 2) { starveRevoked = true; vidUserPause = false; }
+            } else vidStarved = 0;
+          } else vidStarved = 0;
           // a rolling embed always beats an armed stand-in - the
           // ENDED/decapi paths can disagree, playback can't
           if (vidAltOn && !vidPlayer.isPaused() && !ended) vidAlt(false);
@@ -10464,7 +10478,7 @@
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}
           // depending on embed version
-          const vr = vidPlayer.getPlaybackStats && vidPlayer.getPlaybackStats().videoResolution;
+          const vr = stats && stats.videoResolution;
           const vw = typeof vr === 'string' ? +vr.split('x')[0] : vr && vr.width;
           const vh = typeof vr === 'string' ? +vr.split('x')[1] : vr && vr.height;
           if (vw > 0 && vh > 0 && Math.abs(vw / vh - vidRatio) > .001) {
