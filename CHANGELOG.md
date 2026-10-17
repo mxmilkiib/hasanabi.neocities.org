@@ -48,12 +48,18 @@ not versions - the page ships continuously to Neocities.
   a mid-frame hiccup logs to console and the loop keeps flying instead
   of leaving a stale id that danKick waits on forever
 - danmaku 'from' gains an 'adaptive' rung: lanes split top and bottom
-  like 'both', and once the smoothed message rate runs hot extra lanes
-  open centred in the mid-frame gap, closing again as the flood passes
+  like 'both', and once the smoothed message rate runs hot or the
+  bullet queue backs up extra lanes open centred in the mid-frame gap,
+  closing again as the pressure passes
 - the danmaku queue bounds at 48 - a flood too fast for the lanes now
   sheds its stalest bullets onto the 'N dropped' corner tally instead
   of building a backlog that flies minutes late; the tally counts for
   the first time (it never had a feed)
+- 'auto' speed becomes a pace floor instead of a rate ramp: a lane
+  drains a bullet per ~w px of travel, so auto holds the slowest
+  velocity whose throughput covers the feed - a quiet chat crawls and
+  a flood hurries only as much as the lanes need (mean bullet width is
+  EMA'd at spawn; the pace still eases through its own EMA)
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own

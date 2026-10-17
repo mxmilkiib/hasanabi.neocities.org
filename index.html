@@ -2893,7 +2893,7 @@
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour and the live chat font (size, weight, spacing and lane pitch follow the chat font settings); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet, save a burst - a flush keeps only its newest 15 so a reload-into-fast-chat can't wall the frame; arming borrows the font picker into random and off hands the old face back; needs the video on, live messages only<sup>†</sup></span></div>
-    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against; 'adaptive' splits like 'both' and opens centred mid-frame lanes once the message rate runs hot<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' tracks the live message rate so a quiet chat keeps bullets on screen<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
+    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against; 'adaptive' splits like 'both' and opens centred mid-frame lanes once the message rate runs hot<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' holds the slowest pace that still drains the feed - a quiet chat crawls, a flood only hurries as much as the lanes need<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
@@ -10714,13 +10714,16 @@
   };
   const DAN_FS = [0, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 52]; // 0 follows the chat font
   const DAN_HOLD = 3400, DAN_FADE = 400;   // a pinned bullet's park and its in/out fade
-  // 'auto' pace rides the live message rate - speed tracks it linearly
-  // past ~3 msg/s, so a quiet chat keeps its bullets on screen and a
-  // flood hurries them through; the EMA smooths the per-second steps
-  let danAuto = 1;
+  // 'auto' pace rides the live message rate's floor: a bullet holds its
+  // lane until its tail enters the frame (~w+8 px), so a lane drains
+  // v/(w+8) bullets and the slowest viable velocity is rate*(w)/(lanes)
+  // - eased through an EMA and headroomed so bursts don't instantly jam
+  let danAuto = 1, danWAvg = 240;
   function danAutoMul(dt) {
     const r = rateSamples[rateSamples.length - 1];
-    const t = Number.isFinite(r) ? Math.max(0.3, Math.min(3, r / 3)) : 1;
+    const rr = Number.isFinite(r) ? r : 0;
+    const v0 = (danCv.width / DPR + danWAvg) / DAN_DUR;
+    const t = Math.max(0.35, Math.min(4, rr / 1000 / Math.max(1, danLanes) * (danWAvg + 8) / Math.max(1e-6, v0) * 1.15));
     return danAuto += (t - danAuto) * Math.min(1, dt / 600);
   }
   // the adaptive dir's own rate read - a slow EMA of the last sample so
@@ -10774,9 +10777,11 @@
     // 'adaptive' halve it per edge
     const per = Math.max(1, Math.floor(H * DAN_COVERS[danCover] / (danDir >= 2 ? 200 : 100) / pitch));
     const edge = danDir >= 2 ? Math.min(10, per * 2) : Math.max(1, Math.min(10, per));
-    // 'adaptive' opens lanes across the middle once chat runs hot -
-    // the hysteresis keeps a borderline rate from flapping the band
-    if (danDir === 3) danMid = danRateAvg > 6 || (danMid && danRateAvg > 3.5);
+    // 'adaptive' opens lanes across the middle once chat runs hot or
+    // the queue backs up - a high rate and a backlog both mean the
+    // edges can't drain, and hysteresis keeps the band from flapping
+    if (danDir === 3) danMid = danRateAvg > 6 || danQueue.length > 24
+      || (danMid && (danRateAvg > 3.5 || danQueue.length > 8));
     const mid = danDir === 3 && danMid ? Math.min(8, Math.max(0, Math.floor((H - edge * pitch) / pitch))) : 0;
     const lanes = edge + mid;
     if (px === danFontPx && pitch === danPitch && lanes === danLanes && H === danH && danDir === danDirWas && edge === danEdgeN) return;
@@ -10966,6 +10971,7 @@
       if (lane < 0) continue; // this row waits - try the next queued one
       danQueue.splice(qi--, 1);
       danNextLane = (lane + 1) % danLanes;
+      danWAvg += (w - danWAvg) * 0.1; // the paced floor reads mean width
       // each emote seg gets a live overlay twin - the pool img only
       // ever measures; the sub-count prefix draws on canvas as text
       for (const s of q.segs) if (typeof s !== 'string' && s.sub == null) {
