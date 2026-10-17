@@ -97,6 +97,10 @@ not versions - the page ships continuously to Neocities.
   unpestered, and an oauth return carrying channels skips it
 - ?s= is shorthand for ?channel=: ?s=cinemarxism focuses her stream,
   comma lists merge logs the same way the long key does
+- twtch's og card image gets its own render in deploy.sh - og-src.svg
+  swaps the brand and domain text, rsvg-convert rasterizes it, so a
+  pasted twtch link unfurls 'Twtch Chat Thing' with its own url
+  instead of hasanabi's card
 
 ## 2026-10-16
 
