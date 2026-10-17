@@ -210,7 +210,7 @@ not versions - the page ships continuously to Neocities.
   and drains late rather than shedding bullets; the frame's
   top-right drop tally stays wired in case a rate limit ever wants
   it, and it resets whenever danmaku disarms
-- the ? popup's font default is now 20px absolute rather than
+- the ? popup's font default is now 16px absolute rather than
   follow-chat - the chat-relative stops stay one mode pick away,
   and a relative pick now travels as chat-N in copied urls
 - the danmaku font borrow no longer persists itself - saveOpts
@@ -219,10 +219,11 @@ not versions - the page ships continuously to Neocities.
   underlying font too. and the arm always records the borrow now,
   so even a saved 'rand' bundle reverts to the named font (theme
   default on a fresh entry) when the layout disarms
-- danmaku speed gains an 'auto' rung - the crossing pace tracks
-  the live message rate (clamped 0.3-3x), so quiet chat keeps its
-  bullets lingering on screen and a flood hurries them through;
-  a short EMA smooths the per-second sample steps
+- danmaku speed gains an 'auto' rung - and it's the default - the
+  crossing pace tracks the live message rate (clamped 0.3-3x), so
+  quiet chat keeps its bullets lingering on screen and a flood
+  hurries them through; a short EMA smooths the per-second sample
+  steps
 - copied urls stop leaking implied state on the danmaku layout:
   the borrowed random font stays home (it re-derives on load),
   video=on and dan=1 drop out since 1cdan implies both - dan=0 or
