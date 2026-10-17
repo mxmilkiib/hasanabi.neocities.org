@@ -11238,10 +11238,15 @@
         const calm = !(danRateAvg > 6 || danQueue.length > 24);
         // the meter can re-run mid-hold - the adaptive slide, a resize -
         // leaving parked pins on stale rows, so occupancy reads rect
-        // overlap rather than row equality: sharing over half a pitch
-        // is a stack to dodge, less is a staggered neighbour
-        const pinClash = (b, y, sd) => b.ps === sd
-          && Math.min(b.ry + b.pitch, y + danPitch) - Math.max(b.ry, y) > Math.min(b.pitch, danPitch) / 2;
+        // overlap rather than row equality: any shared height counts on
+        // the same side, and opposite sides still clash when both pills
+        // are wide enough to meet
+        const pinClash = (b, y, sd) => {
+          if (Math.min(b.ry + b.pitch, y + danPitch) - Math.max(b.ry, y) <= 0) return false;
+          if (b.ps === sd) return true;
+          const px = danPinX(W, w, sd);
+          return b.x - 7 < px + w + 7 && px - 7 < b.x + b.w + 7;
+        };
         const freeYs = [];
         let ri = 0;
         for (const y of danPinYs) {
