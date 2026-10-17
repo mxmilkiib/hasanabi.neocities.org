@@ -2910,7 +2910,7 @@
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour (size, weight, spacing and lane pitch follow the chat font settings - the face is its own opt); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet, save a burst - a flush keeps only its newest 15 so a reload-into-fast-chat can't wall the frame; needs the video on, live messages only<sup>†</sup></span></div>
-    <div><b>danmaku opts</b><span>adapt: <span id="helpDAdpList"></span> - the layout steers itself off the feed rate: 'both' packing while calm - second+third and fifth sixths plus the bottom 4% stay clear - then mid-frame lanes open, and deeper pressure fills the frame outright, rolls scrollers over parked pins and tightens the tail gap; bullet size slides down and the pace hurries as chat heats, so size/from/speed dim while it drives<sup>†</sup></span><b></b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes; 'adaptive' slides 40px down to 14 as the feed heats<sup>†</sup></span><b></b><span>face: <span id="helpDFamList"></span> - a bullet's font: 'random' draws each off the stack list, 'chat font' follows the picked face<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' holds the slowest pace that still drains the feed - a quiet chat crawls, a flood only hurries as much as the lanes need<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>bg: <span id="helpDBgList"></span> - a shadow-hazed slab hugging the text so it pops off the video<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks left in a nick-coloured pill on any row the scroll leaves uncovered - a longer tenure parks nearer the lanes' edge until chat runs hot, and a short hold can share a lane a scroller only reaches as it fades - holds, then fades instead of crossing; the higher rungs gate subs by tenure while bits pin at any of them<sup>†</sup></span><b></b><span>pin len: <span id="helpDPinTList"></span> - a pinned sub's hold stretches with tenure: +1x per two years up to 4x, or twice that on 'x2'<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
+    <div><b>danmaku opts</b><span>adapt: <span id="helpDAdpList"></span> - the layout steers itself off the feed rate: 'both' packing while calm - second+third and fifth sixths plus the bottom 4% stay clear - then mid-frame lanes open, and deeper pressure fills the frame outright, rolls scrollers over parked pins and tightens the tail gap; bullet size slides down and the pace hurries as chat heats, so size/from/speed dim while it drives<sup>†</sup></span><b></b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes; 'adaptive' slides 40px down to 14 as the feed heats<sup>†</sup></span><b></b><span>face: <span id="helpDFamList"></span> - a bullet's font: 'random' draws each off the stack list, 'chat font' follows the picked face<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' holds the slowest pace that still drains the feed - a quiet chat crawls, a flood only hurries as much as the lanes need<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>bg: <span id="helpDBgList"></span> - a shadow-hazed slab hugging the text so it pops off the video<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks at a frame's inner edge in a nick-coloured pill on any row the scroll leaves uncovered, pins capped at half the lanes so the stream stays ahead of the parked set - a longer tenure parks nearer the lanes' edge until chat runs hot, and a short hold can share a lane a scroller only reaches as it fades - holds, then fades instead of crossing; the higher rungs gate subs by tenure while bits pin at any of them<sup>†</sup></span><b></b><span>pin len: <span id="helpDPinTList"></span> - a pinned sub's hold stretches with tenure: +1x per two years up to 4x, or twice that on 'x2'<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
@@ -10836,9 +10836,12 @@
   };
   const DAN_FS = [0, 12, 14, 16, 18, 20, 24, 28, 32, 34, 36, 38, 40, 44, 48, 52]; // 0 follows the chat font
   const DAN_HOLD = 3400, DAN_FADE = 400;   // a pinned bullet's park and its in/out fade
-  // pinned bullets park toward the left edge rather than centre-frame -
-  // the middle of the picture stays clear
-  const danPinX = (W, w) => Math.max(8, Math.min(W - w - 8, (W - w) * .2));
+  // pinned bullets park at the frame's inner edges rather than
+  // centre-frame - side 1 mirrors the left inset to the right
+  const danPinX = (W, w, side) => {
+    const x = Math.max(8, Math.min(W - w - 8, (W - w) * .2));
+    return side ? W - w - x : x;
+  };
   // 'auto' pace rides the live message rate's floor: a bullet holds its
   // lane until its tail enters the frame (~w+8 px), so a lane drains
   // v/(w+8) bullets and the slowest viable velocity is rate*(w)/(lanes)
@@ -11162,8 +11165,17 @@
             : g.im.complete && g.im.naturalWidth
               ? eh * g.im.naturalWidth / g.im.naturalHeight + danEmoteGap()
               : (g.apx = danFontPx, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap()), 6));
-      let lane = -1, pinY = -1, v = 0, hold = DAN_HOLD;
-      if (q.top) {
+      let lane = -1, pinY = -1, ps = 0, v = 0, hold = DAN_HOLD;
+      // parked pins keep to a share of the lane count - a chat full of
+      // squatting text stops reading as a stream, so an excess pin
+      // scrolls like any other bullet
+      let pinned = q.top;
+      if (pinned) {
+        let parked = 0;
+        for (const b of danBullets) if (b.t0) parked++;
+        if (parked >= Math.max(4, Math.ceil(danLanes / 2))) pinned = false;
+      }
+      if (pinned) {
         // 'pin len' tenure rungs stretch a sub's hold with its months:
         // +1x per two years capped at 4x, or twice that on 'x2', so a
         // long-timer reads but doesn't squat
@@ -11172,41 +11184,52 @@
         // will cover during the hold: pitch-rows outside the lanes
         // first - danPinYs is metered clear of adaptive's reserved
         // bands and ordered to hug the traffic's inner edges - then a
-        // lane whose traffic has passed the left-edge spot already or
-        // can't reach it before the pin fades. a longer tenure parks
-        // nearer the edge - the pick takes the spot at the months' rank
-        // on the same ~6y scale the hold stretches by; once chat runs
-        // hot the pick falls back to the first spot that fits
+        // lane whose traffic has passed the spot already or can't reach
+        // it before the pin fades. each free row offers both inner
+        // edges, alternating which side leads so pins line the frame's
+        // edges rather than stacking the left quarter. a longer tenure
+        // parks nearer the edge - the pick takes the spot at the
+        // months' rank on the same ~6y scale the hold stretches by;
+        // once chat runs hot the pick falls back to the first that fits
         const t = Math.min(1, q.mo / 72);
         const calm = !(danRateAvg > 6 || danQueue.length > 24);
         const freeYs = [];
-        for (const y of danPinYs)
-          if (!danBullets.some((b) => b.t0 && b.ry === y)) freeYs.push(y);
-        if (freeYs.length)
-          pinY = calm ? freeYs[Math.round((1 - t) * (freeYs.length - 1))] : freeYs[0];
+        let ri = 0;
+        for (const y of danPinYs) {
+          const first = ri++ & 1;
+          for (const sd of [first, 1 - first])
+            if (!danBullets.some((b) => b.t0 && b.ry === y && b.ps === sd)) freeYs.push([y, sd]);
+        }
+        if (freeYs.length) {
+          const pick = calm ? freeYs[Math.round((1 - t) * (freeYs.length - 1))] : freeYs[0];
+          pinY = pick[0]; ps = pick[1];
+        }
         if (pinY < 0) {
-          const px = danPinX(W, w), pace = danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAuto;
+          const pace = danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAuto;
           // a short hold can share a lane whose next scroller only
           // rolls over the spot as the pin fades; long holds keep the
           // whole window clear
           const clearFor = hold > DAN_HOLD * 1.5 ? hold : hold - DAN_FADE;
           const ok = [];
-          for (let L = 0; L < danLanes - (danDeep ? 0 : danSpillN); L++) {
-            let fit = true;
-            for (const b of danBullets) {
-              if (b.lane !== L) continue;
-              if (b.t0 || b.x + b.w > px && (b.x - px - w) / (b.v * pace) < clearFor) { fit = false; break; }
+          for (let L = 0; L < danLanes - (danDeep ? 0 : danSpillN); L++)
+            for (const sd of [0, 1]) {
+              const px = danPinX(W, w, sd);
+              let fit = true;
+              for (const b of danBullets) {
+                if (b.lane !== L) continue;
+                if (b.t0 ? b.ps === sd : b.x + b.w > px && (b.x - px - w) / (b.v * pace) < clearFor) { fit = false; break; }
+              }
+              if (fit) ok.push([L, sd]);
             }
-            if (fit) ok.push(L);
-          }
           if (ok.length) {
             // nearer the inner edge first - the lane closest to free
             // rows ranks before one buried in the band's middle; under
             // deep pressure scrollers roll over pins anyway, so spill
             // lanes park a pin as well as the reserved ones
             const laneGap = (L) => Math.min(Infinity, ...danPinYs.map((y) => Math.abs(danLaneY(L) - y)));
-            ok.sort((a, b) => laneGap(a) - laneGap(b) || danLaneY(a) - danLaneY(b));
-            lane = calm ? ok[Math.round((1 - t) * (ok.length - 1))] : ok[0];
+            ok.sort((a, b) => laneGap(a[0]) - laneGap(b[0]) || danLaneY(a[0]) - danLaneY(b[0]) || a[1] - b[1]);
+            const pick = calm ? ok[Math.round((1 - t) * (ok.length - 1))] : ok[0];
+            lane = pick[0]; ps = pick[1];
           }
         }
       } else {
@@ -11247,9 +11270,9 @@
         s.el = el;
       }
       danBullets.push({ segs: q.segs, col: q.col, fam: q.fam, mag: q.mag,
-        x: q.top ? danPinX(W, w) : W, w, v, lane,
-        y: (q.top && pinY >= 0 ? pinY : danLaneY(lane)) + danFontPx,
-        ...(q.top && { t0: performance.now(), ry: pinY >= 0 ? pinY : danLaneY(lane), hold }) });
+        x: pinned ? danPinX(W, w, ps) : W, w, v, lane,
+        y: (pinned && pinY >= 0 ? pinY : danLaneY(lane)) + danFontPx,
+        ...(pinned && { t0: performance.now(), ry: pinY >= 0 ? pinY : danLaneY(lane), ps, hold }) });
     }
   }
   function danDraw(now) {
@@ -11287,13 +11310,13 @@
         danBullets.splice(i, 1);
         continue;
       }
-      // a pinned bullet parks toward the left edge under a
+      // a pinned bullet parks at its claimed inner edge under a
       // nick-coloured pill and breathes in and out over its hold
       let a = 1;
       if (b.t0) {
         const age = now - b.t0;
         a = Math.max(0, Math.min(1, age / DAN_FADE, (b.hold - age) / DAN_FADE));
-        b.x = danPinX(W, b.w);
+        b.x = danPinX(W, b.w, b.ps);
       }
       // 'bg' hugs the text in a dim slab whose edge hazes out like a
       // shadow - the blur is in backing-store px so it scales with the
