@@ -9159,8 +9159,10 @@
   function setArchiveUnlimited(on, persist = true) {
     archiveUnlimited = on;
     markHelp('helpArchive', on ? 1 : 0);
-    if (persist) try { localStorage.setItem(ARCH_OPT_KEY, on ? '1' : '0'); }
-    catch { archiveStatusEl.textContent = 'archive preference could not be saved'; }
+    // trySet sheds refillable caches for room before giving up, so a
+    // full quota only fails the write once there's nothing left to shed
+    if (persist && !trySet(ARCH_OPT_KEY, on ? '1' : '0'))
+      archiveStatusEl.textContent = 'archive preference could not be saved';
   }
   if (archAvailable) {
     try {
