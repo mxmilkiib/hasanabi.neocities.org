@@ -10611,8 +10611,8 @@
       danQueue.splice(qi--, 1);
       danNextLane = (lane + 1) % danLanes;
       // each emote seg gets a live overlay twin - the pool img only
-      // ever measures
-      for (const s of q.segs) if (typeof s !== 'string') {
+      // ever measures; the sub-count prefix draws on canvas as text
+      for (const s of q.segs) if (typeof s !== 'string' && s.sub == null) {
         const el = new Image();
         el.alt = '';
         el.src = s.im.src;
