@@ -511,7 +511,7 @@ editing a URL.
 | `dans` | flag / `0` | subscriber bullets lead with the month count in the chip's gradient; on by default, `0` disables |
 | `danp` | `0`–`2` | pinned bullets: off / own, @you pings and keyword hits hold top-centre / +subs and bits |
 | `danf` | `0`–`3` | danmaku filters: none / bots / !commands / both |
-| `dfs` | px | danmaku bullet size (default `36`) - `12`/`14`/`16`/`18`/`20`/`24`/`28`/`32`/`36`/`40`/`44`/`48`/`52`; `0` follows the chat font |
+| `dfs` | px | danmaku bullet size (default `40`) - `12`/`14`/`16`/`18`/`20`/`24`/`28`/`32`/`36`/`40`/`44`/`48`/`52`; `0` follows the chat font |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `subg` | flag / `0` | subscription labels sweep teal → violet → red as the month count rises (up to 84 months); on by default, `0` disables |
 | `ncol` | flag / `left` / `right` | nick alignment - every chatter's name lands on one edge (the widest leading prefix in view sets the stop); `left` aligns the names' starts, `right` the ends so message text columns up after them |

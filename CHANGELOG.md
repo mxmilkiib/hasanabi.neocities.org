@@ -213,7 +213,7 @@ not versions - the page ships continuously to Neocities.
 - the ? popup's font default is now 20px absolute rather than
   follow-chat - the chat-relative stops stay one mode pick away,
   and a relative pick now travels as chat-N in copied urls
-- danmaku opts gains a size row - 36px is the default stop, 'chat'
+- danmaku opts gains a size row - 40px is the default stop, 'chat'
   keeps bullets tracking the chat font and a px stop (12-52) locks
   them; bigger text means fewer lanes since the pitch scales with
   it. saved as dfs, travelling as the px value in copied urls -

@@ -10414,7 +10414,7 @@
   const DAN_COVERS = [.25, .5, .75, 1], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1];
   const DAN_FS = [0, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 52]; // 0 follows the chat font
   const DAN_HOLD = 3400, DAN_FADE = 400;   // a pinned bullet's park and its in/out fade
-  let danCover = 3, danSpeed = 2, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(36);
+  let danCover = 3, danSpeed = 2, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(40);
   let danFontAuto = false; // set when arming borrowed the font picker into random
   // bullets the queue trimmed under load - the corner tally shows it
   const danDropEl = document.getElementById('danDrop');
@@ -12010,7 +12010,7 @@
     if (!danSubs) q.set('dans', '0');
     if (danPin) q.set('danp', String(danPin));
     if (danHide) q.set('danf', String(danHide));
-    if (danFs !== DAN_FS.indexOf(36)) q.set('dfs', String(DAN_FS[danFs]));
+    if (danFs !== DAN_FS.indexOf(40)) q.set('dfs', String(DAN_FS[danFs]));
     if (nickAnim !== 2) q.set('anim', ANIM_URL[nickAnim]);
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', RBW_URL[rbwStyle]);
     if (rbwPal !== 0) q.set('rbp', RBW_PALS[rbwPal].n);
