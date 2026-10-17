@@ -98,6 +98,9 @@ not versions - the page ships continuously to Neocities.
 - ?s= and ?c= are shorthand for ?channel=: ?s=cinemarxism or
   ?c=cinemarxism focuses her stream, comma lists merge logs the same
   way the long key does; the twtch picker submits ?c=
+- reset options keeps the channel on any alias now - arriving via
+  ?s=/ ?c= used to lose it on the reload and land on the default
+  channel
 - twtch's og card image renders from its own generic source in
   deploy.sh - og-src-twtch.svg drops the avatar and the hasan
   references, so a pasted twtch link unfurls 'Twtch Chat Thing' with

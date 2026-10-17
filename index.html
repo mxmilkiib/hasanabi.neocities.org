@@ -10542,9 +10542,7 @@
   const chanAskIn = document.getElementById('chanAskIn');
   setTimeout(() => {
     if (location.hostname !== 'twtch.neocities.org' ||
-        new URLSearchParams(location.search).get('channel') ||
-        new URLSearchParams(location.search).get('s') ||
-        new URLSearchParams(location.search).get('c') ||
+        chanQs.get('channel') || chanQs.get('s') || chanQs.get('c') ||
         (oauthReturn && oauthReturn.channels) || vidBox.hidden) return;
     chanAsk.hidden = false;
     chanAskIn.focus();
@@ -12448,8 +12446,9 @@
     } catch {}
     // reload on a params-free url: settings params (?theme, ?colour, ?split…)
     // would otherwise reapply over the wiped defaults. channel stays - it
-    // names the chat being watched, not an option
-    const ch = new URLSearchParams(location.search).get('channel');
+    // names the chat being watched, not an option, and any alias names it
+    const ch = chanQs.get('channel') || chanQs.get('s') || chanQs.get('c') ||
+      (oauthReturn && oauthReturn.channels) || '';
     location.href = location.pathname + (ch ? '?channel=' + encodeURIComponent(ch) : '');
   }
   document.getElementById('resetOpts').addEventListener('click', resetOpts);
