@@ -90,6 +90,11 @@ not versions - the page ships continuously to Neocities.
   og urls) into its sibling dir before pushing, so scrapers and
   no-JS views see the right name - the repo stays the hasanabi
   canonical and ./deploy.sh is the deploy entry point
+- a bare twtch load front-doors with a channel ask riding centred over
+  the video - type a twitch name (a comma list works too) and it loads
+  as ?channel=; ✕ drops it to watch the default channel instead. the
+  overlay waits for boot to settle so a video-off pick stays
+  unpestered, and an oauth return carrying channels skips it
 
 ## 2026-10-16
 

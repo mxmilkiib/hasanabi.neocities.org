@@ -600,6 +600,20 @@
   /* display:block above outranks the UA's [hidden] rule - an 'about:blank'
      vidAlt would still paint its #000 background over the whole frame */
   #vid iframe[hidden] { display: none; }
+  /* the channel ask rides centred over the video on a bare twtch load -
+     a dim veil keeps it readable over whatever plays behind it */
+  #vid #chanAsk { position: absolute; inset: 0; z-index: 4;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; background: rgba(0, 0, 0, .55); color: var(--text);
+    font-size: var(--chat-font, 15px); text-align: center; }
+  #vid #chanAsk[hidden] { display: none; }
+  #vid #chanAsk input { font: inherit; color: inherit; background: var(--panel);
+    border: 1px solid var(--popline); border-radius: 4px; padding: 4px 8px;
+    width: 11em; text-align: center; }
+  #vid #chanAsk button { font: inherit; color: var(--accent); background: var(--panel);
+    border: 1px solid var(--popline); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
+  #vid #chanAsk #chanAskX { position: absolute; top: 4px; right: 8px;
+    color: var(--text-dim); text-decoration: none; font-size: .9em; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
     position: absolute;
@@ -3051,7 +3065,7 @@
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden><b>first time tips --</b> click/scroll header buttons to change some option settings -- page audio autoplay permission allows unmuted stream on open/reload -- <b>click to dismiss</b></div>
-  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><iframe id="vidAlt" title="offline stand-in video" hidden allow="autoplay; fullscreen" allowfullscreen></iframe><canvas id="danmaku" hidden></canvas><div id="danOl" hidden></div><span id="danDrop" hidden title="danmaku bullets the lane queue had to drop under load"></span><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div><div class="vid-edge t"></div><div class="vid-edge b"></div><div class="vid-edge l"></div><div class="vid-edge r"></div></div>
+  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><iframe id="vidAlt" title="offline stand-in video" hidden allow="autoplay; fullscreen" allowfullscreen></iframe><form id="chanAsk" hidden><label for="chanAskIn">watch which twitch channel?</label><div><input id="chanAskIn" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="username"><button type="submit">go</button></div><a id="chanAskX" href="#" title="just watch the default channel">✕</a></form><canvas id="danmaku" hidden></canvas><div id="danOl" hidden></div><span id="danDrop" hidden title="danmaku bullets the lane queue had to drop under load"></span><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div><div class="vid-edge t"></div><div class="vid-edge b"></div><div class="vid-edge l"></div><div class="vid-edge r"></div></div>
   <div id="vidSplit" aria-hidden="true" hidden title="drag to resize the video and chat"></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice · date:YYYY-MM-DD" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback - a date jumps to it" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
@@ -10519,6 +10533,30 @@
   };
   addEventListener('pointerdown', vidAltKick);
   addEventListener('keydown', vidAltKick);
+  // a bare twtch load (no ?channel=) front-doors with a channel ask
+  // riding over the video - deferred past boot so a ?video=off param or
+  // saved pref that leaves the box hidden also leaves the ask off
+  const chanAsk = document.getElementById('chanAsk');
+  const chanAskIn = document.getElementById('chanAskIn');
+  setTimeout(() => {
+    if (location.hostname !== 'twtch.neocities.org' ||
+        new URLSearchParams(location.search).get('channel') ||
+        (oauthReturn && oauthReturn.channels) || vidBox.hidden) return;
+    chanAsk.hidden = false;
+    chanAskIn.focus();
+  }, 0);
+  chanAsk.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const n = chanAskIn.value.trim().toLowerCase().replace(/[^a-z0-9_,]/g, '');
+    if (!n) { chanAskIn.focus(); return; }
+    const qs = new URLSearchParams(location.search);
+    qs.set('channel', n);
+    location.search = qs.toString();
+  });
+  document.getElementById('chanAskX').addEventListener('click', (e) => {
+    e.preventDefault();
+    chanAsk.hidden = true;
+  });
   function setVideo(on) {
     vidBox.hidden = !on;
     if (on) {
