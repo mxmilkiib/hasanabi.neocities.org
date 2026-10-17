@@ -1941,7 +1941,7 @@
      overlaid on the top edge (drag anywhere) so it costs no layout
      height, and fades in on hover or while dragging; the glyph run
      itself spans the middle two-thirds */
-  #helpPanel .hp-handle { position: absolute; top: 0; left: 0; right: 0;
+  #helpPanel .hp-handle { position: absolute; top: 0; left: 0; right: 18px;
     height: 8px; z-index: 3;
     cursor: grab; color: var(--text-dim); font-size: 8px; line-height: 8px;
     letter-spacing: 4px; overflow: hidden; white-space: nowrap;
@@ -1954,17 +1954,20 @@
   #helpPanel:hover .hp-handle, #helpPanel.dragging .hp-handle { opacity: 1; }
   #helpPanel.dragging .hp-handle { cursor: grabbing; }
   /* corner glyphs mirror the stream overlay's resize grips - they fade in
-     on hover and each drags its own corner with the far one anchored */
+     on hover and each drags its own corner with the far one anchored.
+     the right-side grips step 18px inside so they never cover the
+     vertical scrollbar (12px webkit / ~17px firefox auto): a press on
+     the bar itself must scroll, not resize */
   #helpPanel .hp-size { position: absolute; width: 22px; height: 22px; z-index: 3;
     color: var(--text-dim); font-size: 9px; line-height: 1; padding: 1px;
     display: grid; place-items: center; opacity: 0;
     transition: opacity .15s; touch-action: none; }
-  #helpPanel .hp-size.br { right: 0; bottom: 0; cursor: grab; place-items: end end; }
+  #helpPanel .hp-size.br { right: 18px; bottom: 0; cursor: grab; place-items: end end; }
   #helpPanel .hp-size.bl { left: 0; bottom: 0; cursor: grab; place-items: end start; }
-  #helpPanel .hp-size.tr { right: 0; top: 0; cursor: grab; place-items: start end; }
+  #helpPanel .hp-size.tr { right: 18px; top: 0; cursor: grab; place-items: start end; }
   #helpPanel .hp-size.tl { left: 0; top: 0; cursor: grab; place-items: start start; }
   #helpPanel .hp-size.l { left: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center start; }
-  #helpPanel .hp-size.r { right: 0; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center end; }
+  #helpPanel .hp-size.r { right: 18px; top: 50%; transform: translateY(-50%); cursor: grab; place-items: center end; }
   #helpPanel .hp-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: grab; place-items: end center; }
   #helpPanel:hover .hp-size, #helpPanel.dragging .hp-size { opacity: 1; }
   #helpPanel.dragging .hp-size { cursor: grabbing; }
