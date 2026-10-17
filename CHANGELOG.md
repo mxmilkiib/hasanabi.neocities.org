@@ -40,8 +40,12 @@ not versions - the page ships continuously to Neocities.
 - danmaku defaults to a 2/3 cover split top and bottom - 'from:
   adaptive' and 'cover: 2/3' out of the box (now the url's zero state;
   adaptive packs the edges like 'both' until chat runs hot)
-- the danmaku font default drops a rung to 36px, the url's new zero
+- the danmaku font default drops a rung to 32px, the url's new zero
   state - saved picks and ?dfs links still override
+- danmaku 'size' gains an 'adaptive' rung: bullets hold near-full size
+  while chat is quiet and slide 40px down to 14 (in even steps) as the
+  message rate climbs - a shorter pitch buys more lanes and a slower
+  needed pace; travels as ?dfs=adaptive
 - '1col danmaku/chat' is the default layout - fresh visits and unsplit
   saved state land on the 99% video stack with bullets and a chat
   strip; nightshade now pins 1cvdan, and split urls emit for anything
