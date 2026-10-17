@@ -227,6 +227,9 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the stand-in embed asks for autoplay and, where the browser vetoes
+  it, the first page click or keypress re-fires play over the youtube
+  jsapi command channel
 - a dead stream swaps the video box to a stand-in youtube embed on
   the home channel - the twitch embed stays mounted underneath so a
   live flip tears the iframe down and resumes instantly, and the

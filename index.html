@@ -10349,7 +10349,7 @@
   // embed with a set youtube video until the stream comes back - the
   // embed stays mounted underneath so the return trip is instant
   const VID_ALT_ID = CHANNEL === 'hasanabi' ? 'awQzjn72bI0' : '';
-  const VID_ALT_URL = VID_ALT_ID ? `https://www.youtube-nocookie.com/embed/${VID_ALT_ID}?autoplay=1&rel=0` : '';
+  const VID_ALT_URL = VID_ALT_ID ? `https://www.youtube-nocookie.com/embed/${VID_ALT_ID}?autoplay=1&rel=0&enablejsapi=1` : '';
   const vidAltEl = document.getElementById('vidAlt');
   let vidAltOn = false;
   function vidAlt(on) {
@@ -10362,6 +10362,12 @@
     // while live again still resumes the embed
     if (on) try { if (vidPlayer && !vidPlayer.isPaused()) { vidPausedByHide = true; vidPlayer.pause(); } } catch {}
   }
+  // a browser that vetoes sound-autoplay leaves the embed cued - the
+  // first page gesture re-fires play over the jsapi command channel,
+  // a no-op if it's already rolling
+  const vidAltKick = () => { if (vidAltOn) try { vidAltEl.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch {} };
+  addEventListener('pointerdown', vidAltKick);
+  addEventListener('keydown', vidAltKick);
   function setVideo(on) {
     vidBox.hidden = !on;
     if (on) {
