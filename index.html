@@ -10758,9 +10758,9 @@
   // canvas font assignment re-parses the whole string - only set it
   // when the face actually changed
   const danFont = (f) => { if (f !== danFontWas) { danCtx.font = f; danFontWas = f; } };
-  // option indices into the stop lists - the defaults restore the plain
-  // look: full frame, standard pace, opaque, nothing pinned or hidden
-  const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1], DAN_BGS = [0, .15, .3, .45, .6, .75, .9];
+  // option indices into the stop lists - the defaults: full frame,
+  // standard pace, opaque, a half-dim slab, nothing pinned or hidden
+  const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1], DAN_BGS = [0, .2, .35, .5, .65, .8, .95];
   // danc saves/travels as the percent itself so the list can regrow -
   // a sub-25 value is the old quarter ladder's index, still resolving
   const DAN_COVERS_OLD = [25, 50, 75, 100];
@@ -10794,7 +10794,7 @@
   // the adaptive dir's own rate read - a slow EMA of the last sample so
   // the mid-band opens on a sustained flood, not one hot second
   let danRateAvg = 0, danMid = false;
-  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danPinT = 1, danHide = 0, danFs = DAN_FS.indexOf(32), danNick = 1, danBadge = 1, danFam = 0, danBg = 0;
+  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danPinT = 1, danHide = 0, danFs = DAN_FS.indexOf(32), danNick = 1, danBadge = 1, danFam = 0, danBg = 3;
   let danDir = 3; // 0 packs lanes from the top, 1 from the bottom, 2 splits between both, 3 both + mid under load
 
   // bullets the queue trimmed under load - the corner tally shows it
@@ -12597,7 +12597,7 @@
     if (!danSubs) q.set('dans', '0');
     if (!danNick) q.set('dann', '0');
     if (!danBadge) q.set('danb', '0');
-    if (danBg) q.set('danbg', String(danBg));
+    if (danBg !== 3) q.set('danbg', String(danBg));
     if (danPin) q.set('danp', String(danPin));
     if (!danPinT) q.set('danpt', '0');
     if (danHide) q.set('danf', String(danHide));
@@ -17627,7 +17627,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both', 'adaptive'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '15%', '30%', '45%', '60%', '75%', '90%'], helpDPin: ['off', 'self+pings', '+subs'], helpDPinT: ['flat', 'tenure'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both', 'adaptive'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '20%', '35%', '50%', '65%', '80%', '95%'], helpDPin: ['off', 'self+pings', '+subs'], helpDPinT: ['flat', 'tenure'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
