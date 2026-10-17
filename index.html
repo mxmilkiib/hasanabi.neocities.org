@@ -2870,7 +2870,7 @@
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour and the live chat font (size, weight, spacing and lane pitch follow the chat font settings); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet; arming borrows the font picker into random and off hands the old face back; needs the video on, live messages only<sup>†</sup></span></div>
-    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only the top slice of the frame<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' tracks the live message rate so a quiet chat keeps bullets on screen<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
+    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only the top slice of the frame<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' tracks the live message rate so a quiet chat keeps bullets on screen<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's badges and name, row-style<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
@@ -10586,6 +10586,10 @@
   };
   const danEmoteH = () => Math.round(danFontPx * 1.4);
   const danEmoteGap = () => Math.ceil(danFontPx * 0.3);
+  // badges sit near cap height like they do over a row's name, packed
+  // tighter than emotes and exempt from the magnifier's rungs
+  const danBadgeH = () => Math.round(danFontPx * 1.1);
+  const danBadgeGap = () => Math.ceil(danFontPx * 0.14);
   // the magnifier: a per-bullet lottery rides its emotes for the whole
   // flight - half fly normal, the rest draw on a bigger rung
   const DAN_MAGS = [1, 1, 1, 1, 1.5, 1.5, 2, 2.6];
@@ -10640,9 +10644,12 @@
       len += w;
     }
     if (!out.length || out.every((s) => typeof s === 'string' && !s.trim())) return;
-    // 'nick' leads the bullet with the display name like a chat row;
-    // 'subs' then lands the month count ahead of even that
-    if (danNick) out.unshift(((row.querySelector('.name') || {}).textContent || lg || 'anon') + ': ');
+    // 'nick' leads the bullet row-style: the badge icons first, then
+    // the display name; 'subs' lands the month count ahead of even those
+    if (danNick) {
+      out.unshift(...[...row.querySelectorAll('img.badge')].map((n) => ({ im: danImg(n.currentSrc || n.src), alt: '', bd: 1 })),
+        ((row.querySelector('.name') || {}).textContent || lg || 'anon') + ': ');
+    }
     // 'subs' leads a subscriber's bullet with the small month count,
     // drawn in the row chip's teal->red gradient
     if (danSubs) {
@@ -10678,9 +10685,13 @@
         ? danCtx.measureText(s).width
         : s.sub != null
           ? danCtx.measureText(String(s.sub).padStart(2, '0')).width * 0.72 + danEmoteGap()
-          : s.im.complete && s.im.naturalWidth
-            ? eh * s.im.naturalWidth / s.im.naturalHeight + danEmoteGap()
-            : danCtx.measureText(s.alt).width + danEmoteGap()), 6));
+          : s.bd
+            ? (s.im.complete && s.im.naturalWidth
+                ? danBadgeH() * s.im.naturalWidth / s.im.naturalHeight
+                : danBadgeH()) + danBadgeGap()
+            : s.im.complete && s.im.naturalWidth
+              ? eh * s.im.naturalWidth / s.im.naturalHeight + danEmoteGap()
+              : danCtx.measureText(s.alt).width + danEmoteGap()), 6));
       let lane = -1, v = 0;
       if (q.top) {
         // a pinned bullet parks, so it claims a wholly idle lane top
@@ -10792,7 +10803,7 @@
         // the shown element gates itself - the pool img only estimates
         // lane width, so an el still fetching keeps its code text
         if (el.complete && el.naturalWidth) {
-          const eh = danEmoteSize(b.mag), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
+          const eh = s.bd ? danBadgeH() : danEmoteSize(b.mag), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
           el.hidden = false;
           el.style.width = ew + 'px';
           el.style.height = eh + 'px';
@@ -10801,12 +10812,15 @@
           x += ew;
         } else {
           el.hidden = true;
-          danCtx.strokeText(s.alt, x, b.y);
-          danCtx.fillStyle = b.col;
-          danCtx.fillText(s.alt, x, b.y);
-          x += danCtx.measureText(s.alt).width;
+          if (s.bd) x += danBadgeH(); // a pending badge still holds its square
+          else {
+            danCtx.strokeText(s.alt, x, b.y);
+            danCtx.fillStyle = b.col;
+            danCtx.fillText(s.alt, x, b.y);
+            x += danCtx.measureText(s.alt).width;
+          }
         }
-        x += danEmoteGap();
+        x += s.bd ? danBadgeGap() : danEmoteGap();
       }
       // images resolving mid-flight change the true width - the lane
       // math reads it fresh each frame rather than the spawn estimate
