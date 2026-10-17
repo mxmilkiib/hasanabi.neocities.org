@@ -14,7 +14,9 @@ not versions - the page ships continuously to Neocities.
   with it on, every settings change rewrites the bar to the canonical
   settings url via history.replaceState - no reload, no history spam.
   rides in the url itself as ?lurl=1, so a copied link hands the mode
-  on; switching off writes once more so the stale param can't re-arm
+  on; switching off writes once more so the stale param can't re-arm.
+  the setter reads a boolean - the chip's idx===1 and the url flag both
+  hand bools, so an int check never saw a 1
 
 ### Resources
 - stall pauses no longer masquerade as user picks: the PAUSE event

@@ -12270,13 +12270,14 @@
     updateUrlPrev();
   }
   // live url: the address bar itself mirrors the settings url, rewritten
-  // in place on every saveOpts through updateUrlPrev
+  // in place on every saveOpts through updateUrlPrev. takes a bool -
+  // both callers (the chip and the url flag) hand one over
   const LURL_KEY = 'hasan-lurl';
   let liveUrl = false;
   try { liveUrl = localStorage.getItem(LURL_KEY) === '1'; } catch {}
-  function setLiveUrl(i) {
+  function setLiveUrl(on) {
     const was = liveUrl;
-    liveUrl = i === 1;
+    liveUrl = !!on;
     try { localStorage.setItem(LURL_KEY, liveUrl ? '1' : '0'); } catch {}
     markHelp('helpLurl', liveUrl ? 1 : 0);
     // switching off gets one last rewrite so the bar sheds the ?lurl
