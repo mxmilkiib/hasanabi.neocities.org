@@ -38,6 +38,12 @@ not versions - the page ships continuously to Neocities.
   to set it off from midterms and primary results
 - 'aligned slate' sits above 'primary results' in the vote26 tab - the
   general-election tables now run together
+- the left tab's parties section now lists by country instead of
+  continent - 'central america & caribbean', 'south america', the four
+  european regions, 'asia', 'africa' and 'oceania' break out into one
+  row per country (21 in all), each a headed list like the existing
+  usa/canada rows rather than a sentence of parties with trailing
+  country notes
 - arming danmaku no longer scrambles the chat font - bullets draw a
   random face each on their own, and the picked font stays put
 - danmaku defaults to a 2/3 cover split top and bottom - 'from:
