@@ -227,6 +227,7 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the nick option defaults on, travelling as dann=0 when switched off
 - the black video is fixed: '#vid iframe { display: block }' outranked
   the browser's [hidden] rule, so the stand-in's iframe painted its
   black background over the embed even while 'hidden' - disabling it,
