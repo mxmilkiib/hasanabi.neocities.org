@@ -10446,25 +10446,38 @@
   // embed with a set youtube video until the stream comes back - the
   // embed stays mounted underneath so the return trip is instant
   const VID_ALT_ID = CHANNEL === 'hasanabi' ? 'awQzjn72bI0' : '';
-  const VID_ALT_URL = VID_ALT_ID ? `https://www.youtube-nocookie.com/embed/${VID_ALT_ID}?autoplay=1&rel=0&enablejsapi=1` : '';
+  // muted is the only autoplay a browser guarantees - the first page
+  // gesture lifts it back over the jsapi channel (see vidAltKick)
+  const VID_ALT_URL = VID_ALT_ID ? `https://www.youtube-nocookie.com/embed/${VID_ALT_ID}?autoplay=1&mute=1&rel=0&enablejsapi=1` : '';
   const vidAltEl = document.getElementById('vidAlt');
   let vidAltOn = false;
+  let altUnmuted = false; // the current arm has had its sound restored
   let vidAltPref = 1; // 'stand-in' help toggle - 0 keeps the offline slate
   function setVidAlt(i) { vidAltPref = i; markHelp('helpVAlt', i); if (!i) vidAlt(false); }
   function vidAlt(on) {
     on = !!VID_ALT_URL && vidAltPref && on && !vidBox.hidden;
     if (on === vidAltOn) return;
     vidAltOn = on;
+    if (on) altUnmuted = false; // a fresh arm loads muted again
     vidAltEl.hidden = !on;
     vidAltEl.src = on ? VID_ALT_URL : 'about:blank'; // blanking silences it
     // pausing for the stand-in borrows the hide flag so a hide->show
     // while live again still resumes the embed
     if (on) try { if (vidPlayer && !vidPlayer.isPaused()) { vidPausedByHide = true; vidPlayer.pause(); } } catch {}
   }
-  // a browser that vetoes sound-autoplay leaves the embed cued - the
-  // first page gesture re-fires play over the jsapi command channel,
-  // a no-op if it's already rolling
-  const vidAltKick = () => { if (vidAltOn) try { vidAltEl.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch {} };
+  // the stand-in loads muted so autoplay can't be vetoed - the first
+  // page gesture re-fires play (a no-op if it's already rolling) and
+  // lifts the mute once; a deliberate in-player mute then sticks
+  const vidAltKick = () => {
+    if (!vidAltOn) return;
+    try {
+      vidAltEl.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      if (!altUnmuted) {
+        altUnmuted = true;
+        vidAltEl.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      }
+    } catch {}
+  };
   addEventListener('pointerdown', vidAltKick);
   addEventListener('keydown', vidAltKick);
   function setVideo(on) {

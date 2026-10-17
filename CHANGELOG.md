@@ -44,6 +44,10 @@ not versions - the page ships continuously to Neocities.
   stand-in's own, the hidden box's) also stopped counting as the
   stopped pick that gated the kicks out - a faked end could freeze
   the slate in place over a stream that never stopped
+- the offline stand-in now autostarts everywhere: muted is the only
+  autoplay a browser guarantees, so it loads muted and the first
+  page gesture lifts the sound - a deliberate in-player mute after
+  that still sticks
 
 ## 2026-10-16
 
