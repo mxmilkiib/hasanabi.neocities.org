@@ -11,7 +11,11 @@ not versions - the page ships continuously to Neocities.
   the revive kicks out for good while the stream ran on elsewhere. a
   pause only counts when the embed iframe itself holds focus - its
   pause paths are all click-driven, a stall's pause arrives with the
-  focus elsewhere
+  focus elsewhere. focus alone wasn't enough though: it lingers on
+  the iframe after one unmute click, so a stall later still read as
+  a pick. the pick is now provisional - an ENDED landing within 3s
+  of the PAUSE (the stall's signature, pausing and ending in one
+  breath) revokes it and lets the kicks run
 - the kick gate now covers a live stream sitting merely paused (not
   ended), so a mid-playback stall gets nudged and rebuilt instead of
   sitting silent - but only once playback was actually seen, so a

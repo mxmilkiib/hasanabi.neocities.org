@@ -10402,13 +10402,22 @@
         // only a pause one can actually make counts as the pick - the
         // stand-in's own pause, the hidden box's, and a stall's are
         // housekeeping, and any would gate the revive kicks out of
-        // their own mess
-        emb.addEventListener(Twitch.Player.PAUSE, () => { if (!vidAltOn && !vidBox.hidden && embedFocused()) vidUserPause = true; vidState(); });
+        // their own mess. a pick is provisional though: the stamp is
+        // kept so a following ENDED can take it back
+        let vidPauseAt = 0;
+        emb.addEventListener(Twitch.Player.PAUSE, () => {
+          const dead = vidPlayer.isEnded && vidPlayer.isEnded();
+          if (!vidAltOn && !vidBox.hidden && embedFocused() && !dead) { vidUserPause = true; vidPauseAt = Date.now(); }
+          vidState();
+        });
         // ENDED beats decapi's lag to the punch, but only once offline
         // is confirmed - while the stream still reports live the kicks
         // get a few beats to disprove it, since a dropped connection
-        // can fake an end the stand-in would then freeze in place
+        // can fake an end the stand-in would then freeze in place. a
+        // stall pauses and ends in the same breath, so an ENDED this
+        // hot on a PAUSE means the pick was the hiccup - hand it back
         emb.addEventListener(Twitch.Player.ENDED, () => {
+          if (Date.now() - vidPauseAt < 3000) vidUserPause = false;
           vidState();
           const rolling = vidPlayer && !vidPlayer.isPaused() && !(vidPlayer.isEnded && vidPlayer.isEnded());
           if (!rolling && !(stream && stream.live)) vidAlt(true);
