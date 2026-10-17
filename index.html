@@ -11276,11 +11276,15 @@
       }
       if (pinned) {
         // a pin longer than the frame can't park whole - shrink the
-        // face until the pill fits inside the 8px rails
+        // face until the pill fits inside the 8px rails; one that
+        // still can't flies full-size like any other bullet
         for (let n = 0; w > W - 16 && bpx > 7 && n < 4; n++) {
           bpx = Math.max(7, Math.floor(bpx * (W - 16) / w));
           w = measure(bpx);
         }
+        if (w > W - 16) { pinned = false; bpx = danFontPx; w = measure(bpx); }
+      }
+      if (pinned) {
         // 'pin len' tenure rungs stretch a sub's hold with its months:
         // +1x per two years capped at 4x, or twice that on 'x2', so a
         // long-timer reads but doesn't squat
