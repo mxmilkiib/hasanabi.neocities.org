@@ -12336,9 +12336,9 @@
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
-    // 1cdan arms bullets itself - only a state deviating from the
-    // layout's own arm travels
-    if (danmakuOn !== (splitLevel === 19)) q.set('dan', danmakuOn ? '1' : '0');
+    // the danmaku layouts arm bullets themselves - only a state
+    // deviating from the layout's own arm travels
+    if (danmakuOn !== LVL_DAN.has(splitLevel)) q.set('dan', danmakuOn ? '1' : '0');
     if (danCover !== DAN_COVERS.length - 1) q.set('danc', String(DAN_COVERS[danCover]));
     if (danDir) q.set('dand', String(danDir));
     if (danSpeed !== DAN_SPEEDS.length) q.set('danv', String(danSpeed));
@@ -13337,39 +13337,40 @@
   // video at 5/6/8/11/13/16/18 (2/4/7/10/14 float it instead, 12 leaves
   // it to the rail video setting) and the emote picker under every rail
   // that doesn't hold help - and above help on 16
-  const SPLIT_NAMES = ['1col chat', '1col help', '2col chat', '2col chat help', '2col chat vid/help', '2col chat vid/emotes', '2col chat emotes', '2x2', '3col chat', '3col chat help', '3col chat vid/help', '3col chat vid/emotes/stats', '3col chat vid/emotes', '3col chat emotes', '1col vid/chat', '3col chat vid/emotes/help', '1col video', '1col video/help', '1col danmaku'];
+  const SPLIT_NAMES = ['1col chat', '1col help', '2col chat', '2col chat help', '2col chat vid/help', '2col chat vid/emotes', '2col chat emotes', '2x2', '3col chat', '3col chat help', '3col chat vid/help', '3col chat vid/emotes/stats', '3col chat vid/emotes', '3col chat emotes', '1col vid/chat', '3col chat vid/emotes/help', '1col video', '1col video/help', '1col danmaku', '1col danmaku/chat'];
   // compact url aliases: col + v(id) e(motes) s(tats) h(elp) d(anmaku) - 2x2 is its own shape
-  const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce', '1cv', '3cveh', '1cvid', '1cvh', '1cdan'];
-  const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻', '▶▮', '▮▮▯?', '▶', '▶?', '▶»'];
+  const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce', '1cv', '3cveh', '1cvid', '1cvh', '1cdan', '1cvdan'];
+  const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻', '▶▮', '▮▮▯?', '▶', '▶?', '▶»', '▶»▮'];
   const splitGlyph = (l) => SPLIT_GLYPHS[l - 1];
   // menu + wheel order rides this over stable declaration-order ids, so
   // a rearrangement never remaps a stored level - chat-emotes sits right
   // under chat-help in each column family, and the 1col variants follow
   // 1col help
-  const SPLIT_ORDER = [16, 18, 0, 1, 14, 17, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
+  const SPLIT_ORDER = [16, 18, 19, 0, 1, 14, 17, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
   // the level families - menu order scatters the semantic ranges
-  const LVL_NORAIL = new Set([1, 3, 9, 15, 17, 19]); // bare chat columns - 15/17/19 dock the video above them instead
-  const LVL_VIDSTACK = new Set([15, 17, 19]);      // the framed stack - 17/19 hide the column leaving the video solo
+  const LVL_NORAIL = new Set([1, 3, 9, 15, 17, 19, 20]); // bare chat columns - 15/17/19/20 dock the video above them instead
+  const LVL_VIDSTACK = new Set([15, 17, 19, 20]);  // the framed stack - 17/19 hide the column leaving the video solo
   const LVL_VIDONLY = new Set([17, 19]);           // the centred frame alone - 19 arms the danmaku canvas on top
+  const LVL_DAN = new Set([19, 20]);               // the danmaku layouts arm bullets themselves - 20 keeps the chat column
   const LVL_SOLO = new Set([2, 18]);               // no chat: the centred rail fills the row - help, or video over help
   const LVL_HELPRAIL = new Set([2, 4, 5, 10, 11, 16, 18]); // help docked in the rail
   const LVL_HELPEMOTES = new Set([16]);            // help shares this rail with the picker
   const LVL_STATSRAIL = new Set([8, 12]);          // the stats pane in the rail
   const LVL_VIDRAIL = new Set([5, 6, 8, 11, 13, 16, 18]);  // video docked for the level - atop the rail, or over 8's chat
   const LVL_VIDFLOAT = new Set([2, 4, 7, 10, 14]); // rail on, the video floats
-  const LVL_PORTRAIT = new Set([1, 3, 15]);        // levels portrait can keep
+  const LVL_PORTRAIT = new Set([1, 3, 15, 20]);    // levels portrait can keep
   // level ids used to run in declaration order; a stored int from then
   // remaps to the menu-order id of the same layout
   const LVL_LEGACY = [0, 1, 3, 9, 12, 13, 14, 6, 8, 7, 11, 5, 4, 10, 2];
   function setSplit(level) {
-    if (window.innerWidth <= window.innerHeight) level = level === 1 || level === 15 ? level : 3;
+    if (window.innerWidth <= window.innerHeight) level = level === 1 || level === 15 || level === 20 ? level : 3;
     level = Math.max(1, Math.min(SPLIT_NAMES.length, level));
     const prevSplit = splitLevel;
     splitLevel = level;
-    // 1col danmaku is the centred frame with bullets armed - danmaku
-    // belongs to this layout alone, so every other level disarms it;
-    // the toggle stays free to flip it within whichever level is up
-    setDanmaku(level === 19);
+    // the 1col danmaku layouts arm bullets themselves - danmaku
+    // belongs to them alone, so every other level disarms it; the
+    // toggle stays free to flip it within whichever level is up
+    setDanmaku(LVL_DAN.has(level));
     markHelp('helpSplit', level - 1);
     setOn(splitBtn, level > 1);
     splitBtn.textContent = splitGlyph(level);
@@ -13383,7 +13384,7 @@
     // rail: 3↔10-14 and 1↔4-8 alike. the rail modes share one visible
     // rail, so level changes must still re-dock; only a true no-op
     // exits early
-    const want = level === 2 || level >= 17 ? 0 : level === 9 ? 3 : level === 3 || (level >= 10 && level <= 14) || level === 16 ? 2 : 1;
+    const want = level === 2 || (level >= 17 && level !== 20) ? 0 : level === 9 ? 3 : level === 3 || (level >= 10 && level <= 14) || level === 16 ? 2 : 1;
     const noRail = LVL_NORAIL.has(level);
     if (want === cur) {
       if (railEl.hidden === noRail && prevSplit === level) return;

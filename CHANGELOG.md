@@ -39,6 +39,11 @@ not versions - the page ships continuously to Neocities.
   (or slow/emote/subs/r9k) could re-arm and stick until the next real
   mode change. backlog ones now only seed a channel the socket
   hasn't stamped yet
+- a '1col danmaku/chat' layout (?split=1cvdan) stacks the video over
+  the chat column with bullets armed - the 1cv frame plus the danmaku
+  canvas. it joins the layout cycle after 1cdan, keeps the portrait
+  set, and arming moved to a LVL_DAN set so both danmaku levels
+  share the arm/disarm bookkeeping
 - danmaku cover gains ⅓, ⅖ and ⅔ rungs and a 'from' edge pick -
   lanes can pack up from the bottom, or 'both' splits the cover
   between the edges so two-fifths packs a fifth of lanes top and
