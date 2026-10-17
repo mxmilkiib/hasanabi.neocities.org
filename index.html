@@ -10722,8 +10722,8 @@
     const t = Number.isFinite(r) ? Math.max(0.3, Math.min(3, r / 3)) : 1;
     return danAuto += (t - danAuto) * Math.min(1, dt / 600);
   }
-  let danCover = DAN_COVERS.length - 1, danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(40), danNick = 1, danBadge = 1;
-  let danDir = 0; // 0 packs lanes from the top, 1 from the bottom, 2 splits the cover between both
+  let danCover = DAN_COVERS.indexOf(33), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(40), danNick = 1, danBadge = 1;
+  let danDir = 2; // 0 packs lanes from the top, 1 from the bottom, 2 splits the cover between both
 
   // bullets the queue trimmed under load - the corner tally shows it
   const danDropEl = document.getElementById('danDrop');
@@ -12354,8 +12354,8 @@
     // the danmaku layouts arm bullets themselves - only a state
     // deviating from the layout's own arm travels
     if (danmakuOn !== LVL_DAN.has(splitLevel)) q.set('dan', danmakuOn ? '1' : '0');
-    if (danCover !== DAN_COVERS.length - 1) q.set('danc', String(DAN_COVERS[danCover]));
-    if (danDir) q.set('dand', String(danDir));
+    if (danCover !== DAN_COVERS.indexOf(33)) q.set('danc', String(DAN_COVERS[danCover]));
+    if (danDir !== 2) q.set('dand', String(danDir));
     if (danSpeed !== DAN_SPEEDS.length) q.set('danv', String(danSpeed));
     if (danAlpha !== 3) q.set('dano', String(danAlpha));
     if (!danSubs) q.set('dans', '0');
