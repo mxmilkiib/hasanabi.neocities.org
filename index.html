@@ -2897,7 +2897,7 @@
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour (size, weight, spacing and lane pitch follow the chat font settings - the face is its own opt); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet, save a burst - a flush keeps only its newest 15 so a reload-into-fast-chat can't wall the frame; needs the video on, live messages only<sup>†</sup></span></div>
-    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes; 'adaptive' slides 40px down to 14 as the feed heats<sup>†</sup></span><b></b><span>face: <span id="helpDFamList"></span> - a bullet's font: 'random' draws each off the stack list, 'chat font' follows the picked face<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against; 'adaptive' splits like 'both', keeps the second+third and fifth sixths and the bottom 4% clear while room lasts, opens mid-frame lanes under load and lets 'auto' run faster so nothing drops<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' holds the slowest pace that still drains the feed - a quiet chat crawls, a flood only hurries as much as the lanes need<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>bg: <span id="helpDBgList"></span> - a shadow-hazed slab hugging the text so it pops off the video<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks left in a nick-coloured pill on any row the scroll leaves uncovered - a longer tenure parks higher until chat runs hot - holds, then fades instead of crossing<sup>†</sup></span><b></b><span>pin len: <span id="helpDPinTList"></span> - a pinned sub's hold stretches with tenure: +1x per two years, up to 4x<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
+    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes; 'adaptive' slides 40px down to 14 as the feed heats<sup>†</sup></span><b></b><span>face: <span id="helpDFamList"></span> - a bullet's font: 'random' draws each off the stack list, 'chat font' follows the picked face<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against; 'adaptive' splits like 'both', keeps the second+third and fifth sixths and the bottom 4% clear while room lasts, opens mid-frame lanes under load and lets 'auto' run faster so nothing drops<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' holds the slowest pace that still drains the feed - a quiet chat crawls, a flood only hurries as much as the lanes need<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>bg: <span id="helpDBgList"></span> - a shadow-hazed slab hugging the text so it pops off the video<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks left in a nick-coloured pill on any row the scroll leaves uncovered - a longer tenure parks higher until chat runs hot - holds, then fades instead of crossing; the higher rungs gate subs by tenure while bits pin at any of them<sup>†</sup></span><b></b><span>pin len: <span id="helpDPinTList"></span> - a pinned sub's hold stretches with tenure: +1x per two years up to 4x, or twice that on 'x2'<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
@@ -10181,8 +10181,8 @@
     if (Number.isInteger(o.danb)) setDanBadge(o.danb ? 1 : 0);
     if (Number.isInteger(o.danbg) && o.danbg >= 0 && o.danbg < DAN_BGS.length) setDanBg(o.danbg);
     if (Number.isInteger(o.danfm) && o.danfm >= 0 && o.danfm < 3) setDanFam(o.danfm);
-    if (Number.isInteger(o.danp) && o.danp >= 0 && o.danp <= 2) setDanPin(o.danp);
-    if (Number.isInteger(o.danpt) && o.danpt >= 0 && o.danpt <= 1) setDanPinT(o.danpt);
+    if (Number.isInteger(o.danp) && o.danp >= 0 && o.danp < DAN_PIN_MO.length + 2) setDanPin(o.danp);
+    if (Number.isInteger(o.danpt) && o.danpt >= 0 && o.danpt < DAN_PINT_SCALE.length) setDanPinT(o.danpt);
     if (Number.isInteger(o.danf) && o.danf >= 0 && o.danf <= 3) setDanFlt(o.danf);
     if (Number.isInteger(o.dfs) && o.dfs >= 0 && o.dfs <= DAN_FS.length) setDanFs(o.dfs);
     if (Number.isFinite(+o.anim)) setNickAnim(+o.anim);
@@ -10763,6 +10763,9 @@
   // option indices into the stop lists - the defaults: full frame,
   // standard pace, opaque, a half-dim slab, nothing pinned or hidden
   const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1], DAN_BGS = [0, .2, .35, .5, .65, .8, .95];
+  // 'pin' rungs past +subs gate subs by months; 'pin len' rungs are the
+  // tenure stretch - +1x hold per N months, capped
+  const DAN_PIN_MO = [0, 12, 36, 72], DAN_PINT_SCALE = [0, 24, 12], DAN_PINT_CAP = [1, 4, 6];
   // danc saves/travels as the percent itself so the list can regrow -
   // a sub-25 value is the old quarter ladder's index, still resolving
   const DAN_COVERS_OLD = [25, 50, 75, 100];
@@ -11032,12 +11035,16 @@
     const rec = lg && seenNicks.get(lg);
     // pin modes park matching bullets at the left edge for a beat:
     // own lines and keyword hits (the @you ping rides 'kw') at level
-    // one, subs and bits join at two. 'mention' is @hasanabi, not a
-    // ping to you
+    // one, and from two subs and bits join - the higher rungs gate subs
+    // by tenure while bits keep pinning at any of them. 'mention' is
+    // @hasanabi, not a ping to you
     let top = false;
     if (danPin) {
       top = row.classList.contains('self') || row.classList.contains('kw');
-      if (!top && danPin > 1) top = /\b(?:subscriber|bits)\//.test(row.dataset.badges || '');
+      if (!top && danPin > 1) {
+        const bg = row.dataset.badges || '';
+        top = /\bbits\//.test(bg) || (/\bsubscriber\//.test(bg) && subMo >= DAN_PIN_MO[danPin - 2]);
+      }
     }
     // a bullet's face comes off the 'face' opt - system sans by
     // default, the per-message mix on 'random', and 'chat' leaves fam
@@ -11078,10 +11085,10 @@
               : (g.apx = danFontPx, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap()), 6));
       let lane = -1, pinY = -1, v = 0, hold = DAN_HOLD;
       if (q.top) {
-        // 'pin len: tenure' stretches a sub's hold with its months:
-        // +1x per two years, capped at 4x so a long-timer reads but
-        // doesn't squat
-        if (danPinT && q.mo) hold = Math.min(DAN_HOLD * 4, DAN_HOLD * (1 + q.mo / 24));
+        // 'pin len' tenure rungs stretch a sub's hold with its months:
+        // +1x per two years capped at 4x, or twice that on 'x2', so a
+        // long-timer reads but doesn't squat
+        if (danPinT && q.mo) hold = Math.min(DAN_HOLD * DAN_PINT_CAP[danPinT], DAN_HOLD * (1 + q.mo / DAN_PINT_SCALE[danPinT]));
         // a pinned bullet parks, so it claims space no scrolling text
         // will cover during the hold: pitch-rows outside the lanes
         // first - danPinYs is metered clear of adaptive's reserved
@@ -17513,8 +17520,8 @@
     if (q.has('danb')) setDanBadge(flag('danb') ? 1 : 0);
     if (q.has('danbg')) setDanBg(Math.min(DAN_BGS.length - 1, Math.max(0, +q.get('danbg')) || 0));
     if (q.has('danfm')) setDanFam(Math.min(2, Math.max(0, +q.get('danfm')) || 0));
-    if (q.has('danp')) setDanPin(Math.min(2, Math.max(0, +q.get('danp')) || 0));
-    if (q.has('danpt')) setDanPinT(Math.min(1, Math.max(0, +q.get('danpt')) || 0));
+    if (q.has('danp')) setDanPin(Math.min(DAN_PIN_MO.length + 1, Math.max(0, +q.get('danp')) || 0));
+    if (q.has('danpt')) setDanPinT(Math.min(DAN_PINT_SCALE.length - 1, Math.max(0, +q.get('danpt')) || 0));
     if (q.has('danf')) setDanFlt(Math.min(3, Math.max(0, +q.get('danf')) || 0));
     if (q.has('dfs')) setDanFs(q.get('dfs') === 'adaptive' ? DAN_FS.length : Math.max(0, DAN_FS.indexOf(+q.get('dfs'))));
     if (q.has('anim')) {
@@ -17633,7 +17640,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both', 'adaptive'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '20%', '35%', '50%', '65%', '80%', '95%'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs'], helpDPinT: ['flat', 'tenure'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both', 'adaptive'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '20%', '35%', '50%', '65%', '80%', '95%'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs', '+subs 1y', '+subs 3y', '+subs 6y'], helpDPinT: ['flat', 'tenure', 'tenure x2'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
