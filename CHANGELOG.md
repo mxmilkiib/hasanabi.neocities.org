@@ -37,8 +37,9 @@ not versions - the page ships continuously to Neocities.
   general-election tables now run together
 - arming danmaku no longer scrambles the chat font - bullets draw a
   random face each on their own, and the picked font stays put
-- danmaku defaults to a 2/3 cover split top and bottom - 'from: both'
-  and 'cover: 2/3' out of the box (now the url's zero state)
+- danmaku defaults to a 2/3 cover split top and bottom - 'from:
+  adaptive' and 'cover: 2/3' out of the box (now the url's zero state;
+  adaptive packs the edges like 'both' until chat runs hot)
 - the danmaku font default drops a rung to 36px, the url's new zero
   state - saved picks and ?dfs links still override
 - '1col danmaku/chat' is the default layout - fresh visits and unsplit

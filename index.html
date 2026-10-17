@@ -10733,7 +10733,7 @@
   // the mid-band opens on a sustained flood, not one hot second
   let danRateAvg = 0, danMid = false;
   let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(36), danNick = 1, danBadge = 1;
-  let danDir = 2; // 0 packs lanes from the top, 1 from the bottom, 2 splits the cover between both
+  let danDir = 3; // 0 packs lanes from the top, 1 from the bottom, 2 splits between both, 3 both + mid under load
 
   // bullets the queue trimmed under load - the corner tally shows it
   const danDropEl = document.getElementById('danDrop');
@@ -12393,7 +12393,7 @@
     // deviating from the layout's own arm travels
     if (danmakuOn !== LVL_DAN.has(splitLevel)) q.set('dan', danmakuOn ? '1' : '0');
     if (danCover !== DAN_COVERS.indexOf(67)) q.set('danc', String(DAN_COVERS[danCover]));
-    if (danDir !== 2) q.set('dand', danDir === 3 ? 'adaptive' : String(danDir));
+    if (danDir !== 3) q.set('dand', String(danDir));
     if (danSpeed !== DAN_SPEEDS.length) q.set('danv', String(danSpeed));
     if (danAlpha !== 3) q.set('dano', String(danAlpha));
     if (!danSubs) q.set('dans', '0');
