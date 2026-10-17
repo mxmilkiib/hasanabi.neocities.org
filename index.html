@@ -11041,12 +11041,12 @@
       return g;
     };
     danPinYs.sort((a, b) => edgeGap(a) - edgeGap(b) || a - b);
-    // under 'adaptive' the top band's inner edge leads - its free
-    // first-sixth rows order deepest-first so a pin parks nearest the
-    // centre gap, then the bottom block's own inner edge rows follow
+    // under 'adaptive' the top band's underside leads - its free
+    // first-sixth rows order shallowest-first so a pin parks directly
+    // under the lanes, then the bottom block's rows follow down from
+    // the 5/6 seam
     if (danDir === 3) danPinYs.sort((a, b) =>
-      Number(b + pitch <= H / 6) - Number(a + pitch <= H / 6) ||
-      (a + pitch <= H / 6 ? b - a : a - b));
+      Number(b + pitch <= H / 6) - Number(a + pitch <= H / 6) || a - b);
   }
   function danFit() {
     const w = vidBox.clientWidth, h = vidBox.clientHeight;
