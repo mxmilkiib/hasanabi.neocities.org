@@ -22,6 +22,9 @@ sed -i "/<head>/,/<\/head>/ {
   s|\(description\" content=\"\)[^\"]*|\1$DESC|
 }" "$OUT/index.html"
 
+# the twtch note row in the help panel shows only on the mirror
+sed -i 's|id="twtchNote" hidden|id="twtchNote"|' "$OUT/index.html"
+
 sed -i "s/\"name\": \"HasanAbi Chat Thing\"/\"name\": \"Twtch Chat Thing\"/
         s/\"short_name\": \"Hasan Chat\"/\"short_name\": \"Twtch Chat\"/
         s/\"description\": \"[^\"]*\"/\"description\": \"$DESC\"/" "$OUT/manifest.json"
