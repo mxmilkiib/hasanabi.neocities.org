@@ -10584,7 +10584,7 @@
       const w = Math.ceil(q.segs.reduce((a, s) => a + (typeof s === 'string'
         ? danCtx.measureText(s).width
         : s.sub != null
-          ? danCtx.measureText(String(s.sub)).width * 0.72 + danEmoteGap()
+          ? danCtx.measureText(String(s.sub).padStart(2, '0')).width * 0.72 + danEmoteGap()
           : s.im.complete && s.im.naturalWidth
             ? eh * s.im.naturalWidth / s.im.naturalHeight + danEmoteGap()
             : danCtx.measureText(s.alt).width + danEmoteGap()), 6));
@@ -10683,7 +10683,7 @@
         if (s.sub != null) {
           // a subscriber's month count leads the bullet at chip size in
           // the row chip's teal->red gradient
-          const t = String(s.sub), spx = Math.round(danFontPx * 0.72);
+          const t = String(s.sub).padStart(2, '0'), spx = Math.round(danFontPx * 0.72);
           danCtx.font = `${spec.w} ${spx}px ${b.fam || spec.fam}`;
           const tw = danCtx.measureText(t).width;
           danCtx.strokeText(t, x, b.y);
