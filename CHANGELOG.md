@@ -59,11 +59,12 @@ not versions - the page ships continuously to Neocities.
   bullet queue backs up extra lanes open centred in the mid-frame gap,
   closing again as the pressure passes; adaptive also lifts the 'auto'
   pace ceiling to 8x and doubles its queue buffer so a flood raises the
-  pace instead of shedding bullets. adaptive also keeps the second
-  fifth (20-40% of frame height, the facecam band) clear while room
-  lasts: the top band packs only through the first fifth and sheds the
-  rest to the bottom band, load lanes centre in the gap below the zone,
-  and the zone itself fills only under deeper pressure still
+  pace instead of shedding bullets. adaptive also keeps the second and
+  fourth fifths (20-40% and 60-80%, the facecam and gameplay bands)
+  clear while room lasts: edge lanes pack through the first and last
+  fifths only, the third fifth takes the overflow plus load lanes
+  centred, and the reserved fifths fill last under deeper pressure -
+  the mid block growing outward into them
 - the danmaku queue bounds at 48 - a flood too fast for the lanes now
   sheds its stalest bullets onto the 'N dropped' corner tally instead
   of building a backlog that flies minutes late; the tally counts for
