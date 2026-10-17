@@ -10820,6 +10820,39 @@
   // canvas font assignment re-parses the whole string - only set it
   // when the face actually changed
   const danFont = (f) => { if (f !== danFontWas) { danCtx.font = f; danFontWas = f; } };
+  // a text run bakes to a bitmap at spawn - the draw loop blits it with
+  // one drawImage instead of paying stroke+fill+shadowed shade per
+  // frame. 'bg' hazes a fat under-stroke silhouette into the bake,
+  // hugging the glyphs rather than boxing them in a capsule slab
+  const danBake = (txt, w, px, fam, spec, col) => {
+    const padX = Math.ceil(px * (danBg ? .9 : .4));
+    const padT = Math.ceil(px * (danBg ? .8 : .45));
+    const padB = Math.ceil(px * (danBg ? 1 : .55));
+    const cw = Math.ceil((w + padX * 2) * danDpr), ch = Math.ceil((padT + padB) * danDpr);
+    const cv = document.createElement('canvas');
+    cv.width = cw; cv.height = ch;
+    const g = cv.getContext('2d');
+    g.setTransform(danDpr, 0, 0, danDpr, 0, 0);
+    g.font = `${spec.w} ${px}px ${fam}`;
+    g.letterSpacing = spec.ls;
+    g.textBaseline = 'middle';
+    g.lineJoin = 'round';
+    if (danBg) {
+      g.shadowColor = `rgba(0,0,0,${DAN_BGS[danBg]})`;
+      g.shadowBlur = px * .5 * danDpr;
+      g.shadowOffsetY = px * .1 * danDpr;
+      g.lineWidth = Math.max(3, px * .6);
+      g.strokeStyle = `rgba(0,0,0,${DAN_BGS[danBg]})`;
+      g.strokeText(txt, padX, padT);
+      g.shadowBlur = 0; g.shadowOffsetY = 0;
+    }
+    g.lineWidth = Math.max(2, px * .18);
+    g.strokeStyle = 'rgba(0,0,0,.8)';
+    g.strokeText(txt, padX, padT);
+    g.fillStyle = col;
+    g.fillText(txt, padX, padT);
+    return { cv, bx: padX, by: padT, bw: cw / danDpr, bh: ch / danDpr };
+  };
   // option indices into the stop lists - the defaults: full frame,
   // standard pace, opaque, a 45% slab, nothing pinned or hidden
   const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1], DAN_BGS = [0, .15, .3, .45, .6, .75, .9];
@@ -11336,43 +11369,37 @@
         danCtx.fill();
         danCtx.globalAlpha = a;
       }
-      // 'bg' is the text's own cast shade rather than a capsule slab -
-      // a fat blurred under-stroke silhouettes each run so it hugs the
-      // glyphs, the dpr-scaled blur hazes the edge, and a slight drop
-      // keeps it reading as shade rather than glow
-      if (danBg) {
-        danCtx.shadowColor = `rgba(0,0,0,${DAN_BGS[danBg]})`;
-        danCtx.shadowBlur = b.px * .5 * danDpr;
-        danCtx.shadowOffsetY = b.px * .1 * danDpr;
-      }
       // each segment keeps the bullet's nick colour for text; an emote
       // draws its image, or its code as text while the load is pending
       const fam = b.fam || spec.fam;
       danFont(`${s.w} ${b.px}px ${fam}`);
       danCtx.lineWidth = Math.max(2, b.px * 0.18);
+      // the live-draw path only survives for the sub chip - everything
+      // else comes off a spawn-baked bitmap
       const shade = (t, x) => {
         if (!danBg || !t.trim()) return;
         danCtx.lineWidth = Math.max(3, b.px * .6);
         danCtx.strokeStyle = `rgba(0,0,0,${DAN_BGS[danBg]})`;
+        danCtx.shadowColor = danCtx.strokeStyle;
+        danCtx.shadowBlur = b.px * .5 * danDpr;
+        danCtx.shadowOffsetY = b.px * .1 * danDpr;
         danCtx.strokeText(t, x, b.y);
+        danCtx.shadowBlur = 0; danCtx.shadowOffsetY = 0;
         danCtx.lineWidth = Math.max(2, b.px * .18);
         danCtx.strokeStyle = 'rgba(0,0,0,.8)';
       };
       let x = b.x;
       for (const s of b.segs) {
         if (s.t != null) {
-          if (s.t.trim()) {
-            shade(s.t, x);
-            danCtx.strokeText(s.t, x, b.y);
-            danCtx.fillStyle = b.col;
-            danCtx.fillText(s.t, x, b.y);
-          }
-          // the run's width caches on the segment keyed by size+face -
-          // measureText is the draw loop's real cost on a phone
-          if (s.px !== b.px || s.f !== fam) {
-            s.px = b.px; s.f = fam;
+          // the run's width and bitmap cache on the segment keyed by
+          // size+face+dpr+shade - re-rastering only pays when one moves
+          if (s.px !== b.px || s.f !== fam || s.rd !== danDpr || s.bg !== danBg) {
+            s.px = b.px; s.f = fam; s.rd = danDpr; s.bg = danBg;
             s.w = danCtx.measureText(s.t).width;
+            const bk = danBake(s.t, s.w, b.px, fam, spec, b.col);
+            s.bmp = bk.cv; s.bx = bk.bx; s.by = bk.by; s.bw = bk.bw; s.bh = bk.bh;
           }
+          if (s.t.trim() && s.bmp) danCtx.drawImage(s.bmp, Math.round(x - s.bx), Math.round(b.y - s.by), s.bw, s.bh);
           x += s.w;
           continue;
         }
@@ -11419,14 +11446,13 @@
           if (!el.hidden) el.hidden = true;
           if (s.bd) x += danBadgeH(b.px); // a pending badge still holds its square
           else {
-            shade(s.alt, x);
-            danCtx.strokeText(s.alt, x, b.y);
-            danCtx.fillStyle = b.col;
-            danCtx.fillText(s.alt, x, b.y);
-            if (s.apx !== b.px || s.af !== fam) {
-              s.apx = b.px; s.af = fam;
+            if (s.apx !== b.px || s.af !== fam || s.rd !== danDpr || s.bg !== danBg) {
+              s.apx = b.px; s.af = fam; s.rd = danDpr; s.bg = danBg;
               s.aw = danCtx.measureText(s.alt).width;
+              const bk = danBake(s.alt, s.aw, b.px, fam, spec, b.col);
+              s.bmp = bk.cv; s.bx = bk.bx; s.by = bk.by; s.bw = bk.bw; s.bh = bk.bh;
             }
+            danCtx.drawImage(s.bmp, Math.round(x - s.bx), Math.round(b.y - s.by), s.bw, s.bh);
             x += s.aw;
           }
         }
