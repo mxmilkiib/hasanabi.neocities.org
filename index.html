@@ -1326,6 +1326,9 @@
   .row.hit { --rowbar: linear-gradient(var(--accent) 0 0); margin-left: -8px; padding-left: 8px;
     --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 9%, transparent) 0 0); }
   .row.fhide { display: none; }
+  /* a self-send restored at the tail hides till the backlog lands - it
+     would read as the newest line while real scrollback still streams in */
+  .row.echold { display: none; }
   /* whispers live in their own pane - the row keeps chat styling but
      wears the violet tint so the stream can't be mistaken for it */
   #whis {
@@ -4166,6 +4169,11 @@
   // so it drops the 'recovered' tooltip rather than claim lost history
   const echoKeys = new Set();
   const noteEchoKey = (k) => { echoKeys.add(k); if (echoKeys.size > 300) echoKeys.delete(echoKeys.keys().next().value); };
+  let echoHoldOn = false; // trailing restore-echoes hide till the backlog lands
+  function revealEchoHold() {
+    echoHoldOn = false;
+    for (const el of document.querySelectorAll('.echold')) el.classList.remove('echold');
+  }
   // mIRC-style read marker: armed when the page loses focus, drawn as a
   // red line before the first row that lands while it's away, and moved
   // (the old line removed) each time the page goes inactive again
@@ -5322,6 +5330,9 @@
     if (unfocused) updateMissedBadge();
     if (isSplit()) { flipCols(); if (!revFlow) sweepGhosts(activeEl); }
     else if (wrapFlow && !revFlow) wrapPage();
+    // a landed batch means the backlog (or live flow) is in - held
+    // restore-echoes aren't the tail anymore
+    if (echoHoldOn) revealEchoHold();
     trimScrollback();
     // evicted rows leave their ids behind - drop only the disconnected
     if (rowById.size > MAX_MESSAGES + 1000)
@@ -13737,8 +13748,9 @@
       paintEpickSync();
       logEl.insertAdjacentHTML('beforeend', rows.join(''));
       // the one-shot sync wash is a render-time marker only - stripped
-      // here so restored scrollback doesn't strobe on every load
-      for (const el of logEl.querySelectorAll('.repflash')) el.classList.remove('repflash');
+      // here so restored scrollback doesn't strobe on every load. an
+      // echold saved mid-window likewise belongs to the boot that set it
+      for (const el of logEl.querySelectorAll('.repflash, .echold')) el.classList.remove('repflash', 'echold');
       // saved rows carry the wash they had - re-sync it to the current set
       hlApply();
       // notices saved before mid-dedup have no id and were duplicated by
@@ -13778,6 +13790,15 @@
         (echoRows.get(k) || echoRows.set(k, []).get(k)).push(el);
         noteEchoKey(k);
       }
+      // a tail echo sits reading as the newest line until the backlog
+      // lands - hold a restored .local run at the edge out of view till
+      // the first batch reveals it (or the timeout, if none ever comes).
+      // the row still re-registered above, so its real copy adopts it
+      for (let el = logEl.lastElementChild; el && el.classList.contains('local'); el = el.previousElementSibling) {
+        el.classList.add('echold');
+        echoHoldOn = true;
+      }
+      if (echoHoldOn) setTimeout(() => { revealEchoHold(); if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); }, 12e3);
       // tweet placeholders and pre-avatar cards in saved rows never
       // resolved: re-ask the relay (the asks queue until the socket
       // joins). Legacy cards carry no data-twid - the status link in
