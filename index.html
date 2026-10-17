@@ -2101,7 +2101,7 @@
   #livePing { color: var(--accent); font-weight: 400; font-size: .85em; }
   #htabRes a.at.livon::before { content: '●'; color: #43b581;
     font-size: .7em; margin-right: 2px; }
-  #htabRes a.at.livoff { opacity: .5; }
+  #htabRes a.at.livoff { opacity: .45; color: var(--text-dim); }
   /* channels/streams renders as a table: name+switch controls, then
      the kind, then the community links; the legend row spans all three */
   #helpPanel .linkcols.stbl { display: grid; column-gap: .9em; align-items: center; line-height: 1.7; }
@@ -6057,6 +6057,9 @@
       if (!st) { done = false; continue; }
       a.classList.toggle('livon', !!st.live);
       a.classList.toggle('livoff', !st.live);
+      // the * switch star sits beside the name - dim it with its channel
+      a.closest('i')?.querySelectorAll(`a.chsw[href="?channel=${m[1].toLowerCase()}"]`)
+        .forEach((s) => s.classList.toggle('livoff', !st.live));
       a.title = st.live
         ? `live${st.startedAt ? ` · up ${fmtDur(Math.round((Date.now() - st.startedAt) / 60000))}` : ''}${st.viewers != null ? ` · ${st.viewers.toLocaleString()} viewers` : ''}${st.title ? ` - ${st.title}` : ''}`
         : 'offline';

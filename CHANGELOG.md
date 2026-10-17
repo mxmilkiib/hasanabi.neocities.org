@@ -227,6 +227,9 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the live? probe's offline marking actually greys now - half
+  opacity alone was barely readable, so livoff pairs it with the
+  dim text colour and the channel's * switch star dims too
 - copied urls stop leaking implied state on the danmaku layout:
   the borrowed random font stays home (it re-derives on load),
   video=on and dan=1 drop out since 1cdan implies both - dan=0 or
