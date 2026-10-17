@@ -10732,7 +10732,7 @@
   // the adaptive dir's own rate read - a slow EMA of the last sample so
   // the mid-band opens on a sustained flood, not one hot second
   let danRateAvg = 0, danMid = false;
-  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(40), danNick = 1, danBadge = 1;
+  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(36), danNick = 1, danBadge = 1;
   let danDir = 2; // 0 packs lanes from the top, 1 from the bottom, 2 splits the cover between both
 
   // bullets the queue trimmed under load - the corner tally shows it
@@ -12401,7 +12401,7 @@
     if (!danBadge) q.set('danb', '0');
     if (danPin) q.set('danp', String(danPin));
     if (danHide) q.set('danf', String(danHide));
-    if (danFs !== DAN_FS.indexOf(40)) q.set('dfs', String(DAN_FS[danFs]));
+    if (danFs !== DAN_FS.indexOf(36)) q.set('dfs', String(DAN_FS[danFs]));
     if (nickAnim !== 2) q.set('anim', ANIM_URL[nickAnim]);
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', RBW_URL[rbwStyle]);
     if (rbwPal !== 0) q.set('rbp', RBW_PALS[rbwPal].n);

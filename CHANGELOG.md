@@ -39,6 +39,8 @@ not versions - the page ships continuously to Neocities.
   random face each on their own, and the picked font stays put
 - danmaku defaults to a 2/3 cover split top and bottom - 'from: both'
   and 'cover: 2/3' out of the box (now the url's zero state)
+- the danmaku font default drops a rung to 36px, the url's new zero
+  state - saved picks and ?dfs links still override
 - '1col danmaku/chat' is the default layout - fresh visits and unsplit
   saved state land on the 99% video stack with bullets and a chat
   strip; nightshade now pins 1cvdan, and split urls emit for anything
