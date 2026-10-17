@@ -227,6 +227,7 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the syncing strip pulses its whole bar at .8s to draw the eye
 - bullets can lead with the sender's badge icons at cap height ahead of
   the name, exempt from the magnifier - a 'badges' danmaku option, on by
   default and travelling as danb=0 when switched off
