@@ -10707,6 +10707,18 @@
   let danLaneYs = [];        // adaptive's per-lane band tops, fill order
   let danH = 0, danDirWas = 0, danTopN = 0, danEdgeN = 0; // frame height, pack edge + band splits the lanes were metered under
   let danRaf = 0, danLast = 0;
+  // a phone's 2-3x backing store quadruples every fill and stroke for
+  // no visible gain on outlined text - coarse pointers settle the
+  // canvas at 1.5x and paint at ~30fps
+  const DAN_DPR_CAP = matchMedia('(pointer: coarse)').matches ? 1.5 : 99;
+  let danDpr = 1, danPainted = 0, danMeterKey = '', danFontWas = '';
+  // the face spec reads computed style - TTL-cached so the draw loop
+  // pays it twice a second, not every frame; a font pick lands inside
+  // the half second
+  let danSpecC = null, danSpecT = 0;
+  // canvas font assignment re-parses the whole string - only set it
+  // when the face actually changed
+  const danFont = (f) => { if (f !== danFontWas) { danCtx.font = f; danFontWas = f; } };
   // option indices into the stop lists - the defaults restore the plain
   // look: full frame, standard pace, opaque, nothing pinned or hidden
   const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1];
@@ -10730,7 +10742,7 @@
   function danAutoMul(dt) {
     const r = rateSamples[rateSamples.length - 1];
     const rr = Number.isFinite(r) ? r : 0;
-    const v0 = (danCv.width / DPR + danWAvg) / DAN_DUR;
+    const v0 = (danCv.width / danDpr + danWAvg) / DAN_DUR;
     // adaptive gets double headroom - its mid lanes and a faster ceiling
     // keep pace covering the feed so the queue never has to shed
     const t = Math.max(0.35, Math.min(danDir === 3 ? 8 : 4,
@@ -10800,7 +10812,7 @@
     // drain, and hysteresis keeps the band from flapping
     if (danDir === 3) danMid = danRateAvg > 6 || danQueue.length > 24
       || (danMid && (danRateAvg > 3.5 || danQueue.length > 8));
-    let lanes = edge, nTop = edge / 2;
+    let lanes = edge, nTop = edge / 2, nBot = 0, gapN = 0, spillN = 0, cap = 0, stripCap = 0;
     if (danDir === 3) {
       // adaptive keeps the second and fourth fifths (20-40%, 60-80% -
       // the facecam and gameplay bands) plus the bottom 4% (the player
@@ -10809,14 +10821,22 @@
       // the caps shed plus the load lanes centred, and the bottom
       // strip then the reserved fifths fill last under deeper
       // pressure - the milder violation first
-      const cap = Math.max(0, Math.floor(H * 0.2 / pitch));
+      cap = Math.max(0, Math.floor(H * 0.2 / pitch));
       const botCap = Math.max(0, Math.floor(H * 0.16 / pitch));
       nTop = Math.min(edge / 2, cap);
-      const nBot = Math.min(edge - nTop, botCap);
-      const gapN = Math.min(cap, edge - nTop - nBot + (danMid ? cap : 0));
+      nBot = Math.min(edge - nTop, botCap);
+      gapN = Math.min(cap, edge - nTop - nBot + (danMid ? cap : 0));
       const deep = danMid && (danRateAvg > 10 || danQueue.length > DAN_QUEUE_CAP);
-      const stripCap = Math.max(0, Math.floor(H * 0.04 / pitch));
-      const spillN = deep ? stripCap + 2 * cap : 0;
+      stripCap = Math.max(0, Math.floor(H * 0.04 / pitch));
+      spillN = deep ? stripCap + 2 * cap : 0;
+      lanes = nTop + nBot + gapN + spillN;
+    }
+    // the lane table only moves when an input does - keying on them
+    // skips rebuilding adaptive's position list every frame
+    const key = [px, pitch, lanes, nTop, nBot, gapN, spillN, H, danDir, edge].join('|');
+    if (key === danMeterKey) return;
+    danMeterKey = key;
+    if (danDir === 3) {
       danLaneYs = [];
       for (let i = 0; i < nTop; i++) danLaneYs.push(i * pitch);
       for (let i = 0; i < nBot; i++) danLaneYs.push(H * 0.96 - (i + 1) * pitch);
@@ -10826,9 +10846,7 @@
       for (; k < spillN && k < stripCap; k++) danLaneYs.push(H - (k + 1) * pitch);
       for (; k < spillN && k < stripCap + cap; k++) danLaneYs.push(H * 0.4 - (k - stripCap + 1) * pitch);
       for (; k < spillN; k++) danLaneYs.push(H * 0.6 + (k - stripCap - cap) * pitch);
-      lanes = danLaneYs.length;
     }
-    if (px === danFontPx && pitch === danPitch && lanes === danLanes && H === danH && danDir === danDirWas && edge === danEdgeN) return;
     danFontPx = px; danPitch = pitch; danLanes = lanes; danH = H; danDirWas = danDir; danEdgeN = edge;
     danTopN = danDir >= 2 ? nTop : 0;
     for (const b of danBullets) b.y = danLaneY(b.lane) + px;
@@ -10836,12 +10854,15 @@
   function danFit() {
     const w = vidBox.clientWidth, h = vidBox.clientHeight;
     if (!w || !h) return;
-    const nw = Math.round(w * DPR), nh = Math.round(h * DPR);
+    danDpr = Math.min(DPR, DAN_DPR_CAP);
+    const nw = Math.round(w * danDpr), nh = Math.round(h * danDpr);
     if (danCv.width !== nw || danCv.height !== nh) {
       danCv.width = nw; danCv.height = nh;
+      danFontWas = ''; // a resized canvas drops its context state
     }
-    danCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    danMeter(danSpec(), h);
+    danCtx.setTransform(danDpr, 0, 0, danDpr, 0, 0);
+    danMeter(danSpecC = danSpec(), h);
+    danSpecT = performance.now();
   }
   // a hidden->shown box refits here and danKick resumes any bullets
   // that were mid-flight when the video folded away
@@ -10964,7 +10985,9 @@
     // every bullet draws its own face off the stack list and a magnifier
     // rung - both stay with it for the whole flight; chat rows keep
     // the picked font, the mix is danmaku's own
-    danQueue.push({ segs: out, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x'),
+    // text runs ride as {t} objects so a drawn width can cache on the
+    // segment - a primitive string can't carry one
+    danQueue.push({ segs: out.map((s) => typeof s === 'string' ? { t: s } : s), col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x'),
       fam: randStack(), mag: danMag(), top });
     // a sustained flood can't drain at lane pace - shed the stalest
     // bullet over keeping a backlog that flies minutes late, and count
@@ -10980,20 +11003,21 @@
   function danSpawn(W, s) {
     for (let qi = 0; danBullets.length < DAN_CAP && qi < danQueue.length; qi++) {
       const q = danQueue[qi];
-      danCtx.font = `${s.w} ${danFontPx}px ${q.fam || s.fam}`;
+      const fam0 = q.fam || s.fam;
+      danFont(`${s.w} ${danFontPx}px ${fam0}`);
       danCtx.letterSpacing = s.ls;
       const eh = danEmoteSize(q.mag);
-      const w = Math.ceil(q.segs.reduce((a, s) => a + (typeof s === 'string'
-        ? danCtx.measureText(s).width
-        : s.sub != null
-          ? danCtx.measureText(String(s.sub).padStart(2, '0')).width * 0.72 + danEmoteGap()
-          : s.bd
-            ? (s.im.complete && s.im.naturalWidth
-                ? danBadgeH() * s.im.naturalWidth / s.im.naturalHeight
+      const w = Math.ceil(q.segs.reduce((a, g) => a + (g.t != null
+        ? (g.px = danFontPx, g.f = fam0, g.w = danCtx.measureText(g.t).width, g.w)
+        : g.sub != null
+          ? danCtx.measureText(String(g.sub).padStart(2, '0')).width * 0.72 + danEmoteGap()
+          : g.bd
+            ? (g.im.complete && g.im.naturalWidth
+                ? danBadgeH() * g.im.naturalWidth / g.im.naturalHeight
                 : danBadgeH()) + danBadgeGap()
-            : s.im.complete && s.im.naturalWidth
-              ? eh * s.im.naturalWidth / s.im.naturalHeight + danEmoteGap()
-              : danCtx.measureText(s.alt).width + danEmoteGap()), 6));
+            : g.im.complete && g.im.naturalWidth
+              ? eh * g.im.naturalWidth / g.im.naturalHeight + danEmoteGap()
+              : (g.apx = danFontPx, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap()), 6));
       let lane = -1, v = 0;
       if (q.top) {
         // a pinned bullet parks, so it claims a wholly idle lane top
@@ -11019,7 +11043,7 @@
       danWAvg += (w - danWAvg) * 0.1; // the paced floor reads mean width
       // each emote seg gets a live overlay twin - the pool img only
       // ever measures; the sub-count prefix draws on canvas as text
-      for (const s of q.segs) if (typeof s !== 'string' && s.sub == null) {
+      for (const s of q.segs) if (s.t == null && s.sub == null) {
         const el = new Image();
         el.alt = '';
         el.src = s.im.src;
@@ -11043,23 +11067,31 @@
     // must not leave a stale id that danKick then waits on forever
     danRaf = 0;
     try {
+    // coarse pointers paint at ~30fps - half the canvas and dom work
+    // for bullets that read the same
+    if (DAN_DPR_CAP < 99 && now - danPainted < 31) return;
+    danPainted = now;
     const dt = Math.min(80, now - danLast); danLast = now;
-    const W = danCv.width / DPR, H = danCv.height / DPR;
-    const s = danSpec(), spec = s;
+    const W = danCv.width / danDpr, H = danCv.height / danDpr;
+    if (!danSpecC || now - danSpecT > 500) { danSpecC = danSpec(); danSpecT = now; }
+    const s = danSpecC, spec = s;
     const danR = rateSamples[rateSamples.length - 1];
     danRateAvg += ((Number.isFinite(danR) ? danR : 0) - danRateAvg) * Math.min(1, dt / 800);
     danMeter(s, H);
     danSpawn(W, s);
     danCtx.clearRect(0, 0, W, H);
-    danCtx.font = `${s.w} ${danFontPx}px ${s.fam}`;
+    danFont(`${s.w} ${danFontPx}px ${s.fam}`);
     danCtx.letterSpacing = s.ls;
     danCtx.textBaseline = 'middle';
     danCtx.lineJoin = 'round';
     danCtx.strokeStyle = 'rgba(0,0,0,.8)';
     danCtx.lineWidth = Math.max(2, danFontPx * 0.18);
+    // one pace for the whole frame - a per-bullet call stepped the
+    // auto EMA once per bullet per frame, hurrying as chat filled
+    const pace = danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAutoMul(dt);
     for (let i = danBullets.length - 1; i >= 0; i--) {
       const b = danBullets[i];
-      b.x -= b.v * dt * (danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAutoMul(dt));
+      b.x -= b.v * dt * pace;
       if (b.t0 ? now - b.t0 > DAN_HOLD : b.x + b.w < 0) {
         for (const s of b.segs) if (s.el) s.el.remove();
         danBullets.splice(i, 1);
@@ -11081,31 +11113,38 @@
       }
       // each segment keeps the bullet's nick colour for text; an emote
       // draws its image, or its code as text while the load is pending
-      if (b.fam) danCtx.font = `${s.w} ${danFontPx}px ${b.fam}`;
+      const fam = b.fam || spec.fam;
+      danFont(`${s.w} ${danFontPx}px ${fam}`);
       let x = b.x;
       for (const s of b.segs) {
-        if (typeof s === 'string') {
-          if (s.trim()) {
-            danCtx.strokeText(s, x, b.y);
+        if (s.t != null) {
+          if (s.t.trim()) {
+            danCtx.strokeText(s.t, x, b.y);
             danCtx.fillStyle = b.col;
-            danCtx.fillText(s, x, b.y);
+            danCtx.fillText(s.t, x, b.y);
           }
-          x += danCtx.measureText(s).width;
+          // the run's width caches on the segment keyed by size+face -
+          // measureText is the draw loop's real cost on a phone
+          if (s.px !== danFontPx || s.f !== fam) {
+            s.px = danFontPx; s.f = fam;
+            s.w = danCtx.measureText(s.t).width;
+          }
+          x += s.w;
           continue;
         }
         if (s.sub != null) {
           // a subscriber's month count leads the bullet at chip size in
           // the row chip's teal->red gradient
           const t = String(s.sub).padStart(2, '0'), spx = Math.round(danFontPx * 0.72);
-          danCtx.font = `${spec.w} ${spx}px ${b.fam || spec.fam}`;
-          const tw = danCtx.measureText(t).width;
+          danFont(`${spec.w} ${spx}px ${fam}`);
+          if (s.spx !== spx) { s.spx = spx; s.sw = danCtx.measureText(t).width; }
           danCtx.strokeText(t, x, b.y);
           danCtx.fillStyle = subGrad
             ? `color-mix(in oklch longer hue, #4fbecd, #f43f5e ${Math.min(100, Math.round(s.sub / 60 * 100))}%)`
             : '#4fbecd';
           danCtx.fillText(t, x, b.y);
-          danCtx.font = `${spec.w} ${danFontPx}px ${b.fam || spec.fam}`;
-          x += tw + danEmoteGap();
+          danFont(`${spec.w} ${danFontPx}px ${fam}`);
+          x += s.sw + danEmoteGap();
           continue;
         }
         const el = s.el;
@@ -11113,20 +11152,32 @@
         // lane width, so an el still fetching keeps its code text
         if (el.complete && el.naturalWidth) {
           const eh = s.bd ? danBadgeH() : danEmoteSize(b.mag), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
-          el.hidden = false;
-          el.style.width = ew + 'px';
-          el.style.height = eh + 'px';
-          el.style.transform = `translate(${Math.round(x)}px, ${Math.round(b.y - eh / 2)}px)`;
-          if (b.t0) el.style.opacity = a;
+          // dom writes are the phone's other cost - only touch style
+          // when a value actually moved
+          if (el.hidden) el.hidden = false;
+          if (el._ew !== ew || el._eh !== eh) {
+            el._ew = ew; el._eh = eh;
+            el.style.width = ew + 'px'; el.style.height = eh + 'px';
+          }
+          const tx = Math.round(x), ty = Math.round(b.y - eh / 2);
+          if (el._tx !== tx || el._ty !== ty) {
+            el._tx = tx; el._ty = ty;
+            el.style.transform = `translate(${tx}px, ${ty}px)`;
+          }
+          if (b.t0 && el._op !== a) { el._op = a; el.style.opacity = a; }
           x += ew;
         } else {
-          el.hidden = true;
+          if (!el.hidden) el.hidden = true;
           if (s.bd) x += danBadgeH(); // a pending badge still holds its square
           else {
             danCtx.strokeText(s.alt, x, b.y);
             danCtx.fillStyle = b.col;
             danCtx.fillText(s.alt, x, b.y);
-            x += danCtx.measureText(s.alt).width;
+            if (s.apx !== danFontPx || s.af !== fam) {
+              s.apx = danFontPx; s.af = fam;
+              s.aw = danCtx.measureText(s.alt).width;
+            }
+            x += s.aw;
           }
         }
         x += s.bd ? danBadgeGap() : danEmoteGap();

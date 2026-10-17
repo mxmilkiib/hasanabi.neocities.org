@@ -38,6 +38,14 @@ not versions - the page ships continuously to Neocities.
   to set it off from midterms and primary results
 - 'aligned slate' sits above 'primary results' in the vote26 tab - the
   general-election tables now run together
+- danmaku's draw loop sheds its per-frame costs, mostly for phones:
+  the computed-style read is cached half a second, text-run and chip
+  widths cache on their segments instead of re-measuring every frame,
+  overlay emote imgs only touch the dom when a value moved, and
+  adaptive's lane table rebuilds on input change rather than every
+  frame. coarse pointers cap the canvas at 1.5x dpr and paint ~30fps,
+  and 'auto' pace now computes once per frame - a per-bullet call had
+  been stepping its ema once per bullet
 - the left tab's parties section now lists by country instead of
   continent - 'central america & caribbean', 'south america', the four
   european regions, 'asia', 'africa' and 'oceania' break out into one
