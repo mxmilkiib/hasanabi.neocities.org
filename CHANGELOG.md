@@ -205,6 +205,9 @@ not versions - the page ships continuously to Neocities.
   pinned bullet claims a wholly idle lane top-down and waits rather
   than blocking - the spawn loop now walks the queue until
   something flies instead of stopping at a stuck head
+- the danmaku frame's top-right corner quietly tallies bullets the
+  lane queue had to shed under load - 'N dropped', only ever shown
+  nonzero, and it resets whenever danmaku disarms
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
