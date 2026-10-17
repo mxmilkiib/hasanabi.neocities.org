@@ -11234,21 +11234,25 @@
     for (let qi = 0; danBullets.length < capN && qi < danQueue.length; qi++) {
       const q = danQueue[qi];
       const fam0 = q.fam || s.fam;
-      const bpx = danFontPx, bpitch = danPitch;
-      danFont(`${s.w} ${bpx}px ${fam0}`);
+      let bpx = danFontPx;
+      const bpitch = danPitch;
       danCtx.letterSpacing = s.ls;
-      const eh = danEmoteSize(q.mag, bpx, bpitch);
-      const w = Math.ceil(q.segs.reduce((a, g) => a + (g.t != null
-        ? (g.px = bpx, g.f = fam0, g.w = danCtx.measureText(g.t).width, g.w)
-        : g.sub != null
-          ? danCtx.measureText(String(g.sub).padStart(2, '0')).width * 0.72 + danEmoteGap(bpx)
-          : g.bd
-            ? (g.im.complete && g.im.naturalWidth
-                ? danBadgeH(bpx) * g.im.naturalWidth / g.im.naturalHeight
-                : danBadgeH(bpx)) + danBadgeGap(bpx)
-            : g.im.complete && g.im.naturalWidth
-              ? eh * g.im.naturalWidth / g.im.naturalHeight + danEmoteGap(bpx)
-              : (g.apx = bpx, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap(bpx)), 6));
+      const measure = (px) => {
+        danFont(`${s.w} ${px}px ${fam0}`);
+        const eh = danEmoteSize(q.mag, px, bpitch);
+        return Math.ceil(q.segs.reduce((a, g) => a + (g.t != null
+          ? (g.px = px, g.f = fam0, g.w = danCtx.measureText(g.t).width, g.w)
+          : g.sub != null
+            ? danCtx.measureText(String(g.sub).padStart(2, '0')).width * 0.72 + danEmoteGap(px)
+            : g.bd
+              ? (g.im.complete && g.im.naturalWidth
+                  ? danBadgeH(px) * g.im.naturalWidth / g.im.naturalHeight
+                  : danBadgeH(px)) + danBadgeGap(px)
+              : g.im.complete && g.im.naturalWidth
+                ? eh * g.im.naturalWidth / g.im.naturalHeight + danEmoteGap(px)
+                : (g.apx = px, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap(px)), 6));
+      };
+      let w = measure(bpx);
       let lane = -1, pinY = -1, ps = 0, v = 0, hold = DAN_HOLD, bx = -1, nextPos = -1;
       // parked pins keep to a share of the lane count - a chat full of
       // squatting text stops reading as a stream, so an excess pin
@@ -11260,6 +11264,12 @@
         if (parked >= Math.max(4, Math.ceil(danLanes / 2))) pinned = false;
       }
       if (pinned) {
+        // a pin longer than the frame can't park whole - shrink the
+        // face until the pill fits inside the 8px rails
+        for (let n = 0; w > W - 16 && bpx > 9 && n < 2; n++) {
+          bpx = Math.max(9, Math.floor(bpx * (W - 16) / w));
+          w = measure(bpx);
+        }
         // 'pin len' tenure rungs stretch a sub's hold with its months:
         // +1x per two years capped at 4x, or twice that on 'x2', so a
         // long-timer reads but doesn't squat
@@ -11405,7 +11415,7 @@
       }
       danBullets.push({ segs: q.segs, col: q.col, fam: q.fam, mag: q.mag,
         x: pinned ? bx : W, w, v, lane, px: bpx, pitch: bpitch,
-        y: (pinned && pinY >= 0 ? pinY : danLaneY(lane)) + bpx,
+        y: (pinned && pinY >= 0 ? pinY : danLaneY(lane)) + (pinned ? Math.max(bpx, bpitch / 2) : bpx),
         ...(pinned && { t0: performance.now(), ry: pinY >= 0 ? pinY : danLaneY(lane), ps, hold, bx }) });
     }
   }
@@ -11524,7 +11534,7 @@
             el._ew = ew; el._eh = eh;
             el.style.width = ew + 'px'; el.style.height = eh + 'px';
           }
-          const tx = Math.round(x), ty = Math.round(b.y - b.px + (b.pitch - eh) / 2);
+          const tx = Math.round(x), ty = Math.round(b.y - eh / 2);
           if (el._tx !== tx || el._ty !== ty) {
             el._tx = tx; el._ty = ty;
             el.style.transform = `translate(${tx}px, ${ty}px)`;
