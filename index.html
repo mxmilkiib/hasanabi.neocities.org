@@ -11207,7 +11207,7 @@
             : g.im.complete && g.im.naturalWidth
               ? eh * g.im.naturalWidth / g.im.naturalHeight + danEmoteGap(bpx)
               : (g.apx = bpx, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap(bpx)), 6));
-      let lane = -1, pinY = -1, ps = 0, v = 0, hold = DAN_HOLD;
+      let lane = -1, pinY = -1, ps = 0, v = 0, hold = DAN_HOLD, bx = -1;
       // parked pins keep to a share of the lane count - a chat full of
       // squatting text stops reading as a stream, so an excess pin
       // scrolls like any other bullet
@@ -11227,9 +11227,10 @@
         // first - danPinYs is metered clear of adaptive's reserved
         // bands and ordered to hug the traffic's inner edges - then a
         // lane whose traffic has passed the spot already or can't reach
-        // it before the pin fades. each free row offers both inner
-        // edges, alternating which side leads so pins line the frame's
-        // edges rather than stacking the left quarter. a longer tenure
+        // it before the pin fades. each row offers both inner edges,
+        // alternating which side leads, and once an edge berth is
+        // parked the side's tip moves inward - pins pack into rows of
+        // pills rather than scattering one per row. a longer tenure
         // parks nearer the top edge - the pick takes the spot at the
         // months' rank on the same ~6y scale the hold stretches by;
         // once chat runs hot the pick falls back to the first that fits
@@ -11237,30 +11238,41 @@
         const calm = !(danRateAvg > 6 || danQueue.length > 24);
         // the meter can re-run mid-hold - the adaptive slide, a resize -
         // leaving parked pins on stale rows, so occupancy reads rect
-        // overlap rather than row equality: any shared height counts on
-        // the same side, and opposite sides still clash when both pills
-        // are wide enough to meet
-        const pinClash = (b, y, sd) => {
-          if (Math.min(b.ry + b.pitch, y + danPitch) - Math.max(b.ry, y) <= 0) return false;
-          if (b.ps === sd) return true;
-          const px = danPinX(W, w, sd);
-          return b.x - 7 < px + w + 7 && px - 7 < b.x + b.w + 7;
+        // overlap rather than row equality: the candidate's pill rect
+        // must not touch a parked one's, whatever the side
+        const pinClash = (b, y, px) =>
+          Math.min(b.ry + b.pitch, y + danPitch) - Math.max(b.ry, y) > 0
+          && b.x - 7 < px + w + 7 && px - 7 < b.x + b.w + 7;
+        // a side's next berth on a row sits just past its parked pills;
+        // 'hot' marks a row already holding pins so it fills first
+        const tip = (y, sd) => {
+          let px = danPinX(W, w, sd), hot = false;
+          for (const b of danBullets) {
+            if (!b.t0 || Math.min(b.ry + b.pitch, y + danPitch) <= Math.max(b.ry, y)) continue;
+            hot = true;
+            if (b.ps === sd) px = sd ? Math.min(px, b.x - w - 20) : Math.max(px, b.x + b.w + 20);
+          }
+          return [px, hot];
         };
         const freeYs = [];
-        let ri = 0, topEnd = 0;
+        let ri = 0;
         for (const y of danPinYs) {
           const first = ri++ & 1;
-          for (const sd of [first, 1 - first])
-            if (!danBullets.some((b) => b.t0 && pinClash(b, y, sd))) freeYs.push([y, sd]);
-          if (danDir === 3 && y + danPitch <= danH / 6) topEnd = freeYs.length;
+          for (const sd of [first, 1 - first]) {
+            const [px, hot] = tip(y, sd);
+            if (!danBullets.some((b) => b.t0 && pinClash(b, y, px)))
+              freeYs.push([y, sd, px, hot, danDir === 3 && y + danPitch > danH / 6 ? 1 : 0]);
+          }
         }
         if (freeYs.length) {
-          // the tenure rank spreads only across the top band's inner
-          // edge while it has room - letting it run the whole list
-          // lands every low-month pin at the bottom edge instead
-          const span = (topEnd || freeYs.length) - 1;
+          // rows already holding pins fill in before a fresh row opens;
+          // the tenure rank spreads across the top band's rows only -
+          // letting it run the whole list lands low-month pins at the
+          // bottom edge instead
+          freeYs.sort((a, b) => a[4] - b[4] || Number(b[3]) - Number(a[3]));
+          const span = Math.max(0, freeYs.reduce((n, c) => n + (c[4] ? 0 : 1), 0) - 1);
           const pick = calm ? freeYs[Math.round((1 - t) * span)] : freeYs[0];
-          pinY = pick[0]; ps = pick[1];
+          pinY = pick[0]; ps = pick[1]; bx = pick[2];
         }
         if (pinY < 0) {
           const pace = danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAuto;
@@ -11271,15 +11283,15 @@
           const ok = [];
           for (let L = 0; L < danLanes - (danDeep ? 0 : danSpillN); L++)
             for (const sd of [0, 1]) {
-              const px = danPinX(W, w, sd);
               const ly = danLaneY(L);
+              const [px, hot] = tip(ly, sd);
               let fit = true;
               for (const b of danBullets) {
-                if (b.t0) { if (pinClash(b, ly, sd)) { fit = false; break; } continue; }
+                if (b.t0) { if (pinClash(b, ly, px)) { fit = false; break; } continue; }
                 if (b.lane !== L) continue;
                 if (b.x + b.w > px && (b.x - px - w) / (b.v * pace) < clearFor) { fit = false; break; }
               }
-              if (fit) ok.push([L, sd]);
+              if (fit) ok.push([L, sd, px, hot]);
             }
           if (ok.length) {
             // nearer the inner edge first - the lane closest to free
@@ -11293,7 +11305,7 @@
             const topOk = ok.filter(([L]) => L < danTopN);
             const src = topOk.length ? topOk : ok;
             const pick = calm ? src[Math.round((1 - t) * (src.length - 1))] : src[0];
-            lane = pick[0]; ps = pick[1];
+            lane = pick[0]; ps = pick[1]; bx = pick[2];
           }
         }
       } else {
@@ -11334,9 +11346,9 @@
         s.el = el;
       }
       danBullets.push({ segs: q.segs, col: q.col, fam: q.fam, mag: q.mag,
-        x: pinned ? danPinX(W, w, ps) : W, w, v, lane, px: bpx, pitch: bpitch,
+        x: pinned ? bx : W, w, v, lane, px: bpx, pitch: bpitch,
         y: (pinned && pinY >= 0 ? pinY : danLaneY(lane)) + bpx,
-        ...(pinned && { t0: performance.now(), ry: pinY >= 0 ? pinY : danLaneY(lane), ps, hold }) });
+        ...(pinned && { t0: performance.now(), ry: pinY >= 0 ? pinY : danLaneY(lane), ps, hold, bx }) });
     }
   }
   function danDraw(now) {
@@ -11378,7 +11390,7 @@
       if (b.t0) {
         const age = now - b.t0;
         a = Math.max(0, Math.min(1, age / DAN_FADE, (b.hold - age) / DAN_FADE));
-        b.x = danPinX(W, b.w, b.ps);
+        b.x = Math.max(8, Math.min(W - b.w - 8, b.bx));
       }
       if (b.t0) {
         danCtx.globalAlpha = a * 0.18;
