@@ -77,6 +77,10 @@ not versions - the page ships continuously to Neocities.
   first report back clears it. waking a slept tab also probes the
   join set directly so the verdict isn't stale-flagged while the
   relay's next scheduled poll catches up
+- each host now picks its own twitch app for connect - the client id
+  maps by hostname, so twtch signs in through its own registered app
+  instead of borrowing hasanabi's (whose redirect list only ever
+  covered its own domain)
 
 ## 2026-10-16
 

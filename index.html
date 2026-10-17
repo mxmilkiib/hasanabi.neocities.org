@@ -3177,9 +3177,14 @@
   const RELAY_ORIGIN = 'https://mxmilkiib.github.io';
   const RELAY_URL = RELAY_ORIGIN + '/twitch-chat-relay/';
 
-  // Registered app on dev.twitch.tv/console with this page as the OAuth
-  // redirect URI; chat scopes let the relay send PRIVMSG as the user.
-  const TW_CLIENT_ID = 'm4wvvhwqxorz6fwdm504rh7ntq7q3r';
+  // Registered apps on dev.twitch.tv/console, one per host, each with
+  // its own page URL as the OAuth redirect URI; chat scopes let the
+  // relay send PRIVMSG as the user.
+  const TW_CLIENT_IDS = {
+    'hasanabi.neocities.org': 'm4wvvhwqxorz6fwdm504rh7ntq7q3r',
+    'twtch.neocities.org': 'yqvw32rombih78i6zi2jtp9q6d30z7',
+  };
+  const TW_CLIENT_ID = TW_CLIENT_IDS[location.hostname] || TW_CLIENT_IDS['hasanabi.neocities.org'];
 
   const logEl = document.getElementById('log');
   const dotEl = document.getElementById('dot');
