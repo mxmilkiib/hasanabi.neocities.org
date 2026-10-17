@@ -17,6 +17,8 @@ not versions - the page ships continuously to Neocities.
   on; switching off writes once more so the stale param can't re-arm.
   the setter reads a boolean - the chip's idx===1 and the url flag both
   hand bools, so an int check never saw a 1
+- '2col chat' and '3col chat' rename to '2col chat | chat' and
+  '3col chat | chat | chat' - the column contents named inline
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own
