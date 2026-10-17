@@ -23,6 +23,8 @@ not versions - the page ships continuously to Neocities.
   theme accent, and the flanking circles' ring march runs ~6x quicker
 - '1col danmaku/chat' moves in the layout picker to sit just below
   '1col vid/chat' with the other stacked-video variants
+- '1col danmaku/chat' defaults its video to 98% of the largest frame
+  the space fits - a slim chat strip under a near-max screen
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own

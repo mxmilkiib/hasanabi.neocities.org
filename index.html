@@ -10345,8 +10345,10 @@
     Math.min(mainEl.clientWidth, (mainEl.clientHeight - (LVL_VIDONLY.has(splitLevel) || LVL_SOLO.has(splitLevel) ? 0 : VID_CHAT_MIN) - 14) * vidRatio));
   const paintVidStackW = () => mainEl.style.setProperty('--vidw',
     // the centred-frame-alone layouts default to the largest frame the
-    // space fits; an explicit drag or saved pick still wins
-    Math.min(vidStackW || (LVL_VIDONLY.has(splitLevel) ? vidStackMax() : VID_STACK_W), vidStackMax()) + 'px');
+    // space fits; danmaku/chat defaults to 98% of it leaving a slim
+    // chat strip; an explicit drag or saved pick still wins
+    Math.min(vidStackW || (LVL_VIDONLY.has(splitLevel) ? vidStackMax()
+      : splitLevel === 20 ? vidStackMax() * .98 : VID_STACK_W), vidStackMax()) + 'px');
   const setVidStackW = (w) => {
     vidStackW = Number.isFinite(w) && w > 0 ? Math.max(VID_STACK_MIN, Math.round(w)) : 0;
     paintVidStackW();
