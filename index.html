@@ -10381,8 +10381,9 @@
         let armed = false;
         // a live stream paused past its buffer reports 'ended' like a
         // dead one - the pause event marks the pick so a slate grown
-        // out of it never earns the revive kicks
-        let vidUserPause = false;
+        // out of it never earns the revive kicks. a saved-quiet boot
+        // seeds the pick since its pause() fires unfocused
+        let vidUserPause = !wantPlay;
         // once playback has been observed this build a later pause can
         // only come from a stall or a pick - a vetoed/saved-quiet
         // autoplay never earns the resume kicks
@@ -10455,7 +10456,7 @@
           // shaken forever, and a plain pause only earns them once
           // playback was seen - a vetoed or saved-quiet autoplay
           // shouldn't be fought
-          if (stream && stream.live && !vidUserPause && (ended || vidAltOn || (paused && wantPlay && seenPlay))) {
+          if (stream && stream.live && !vidUserPause && (ended || vidAltOn || (paused && seenPlay))) {
             // still down after a couple of nudges - real enough to
             // stand in for while the kicks run their course (arming
             // first so its housekeeping pause can't eat the play)

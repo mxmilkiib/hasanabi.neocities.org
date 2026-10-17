@@ -18,7 +18,10 @@ not versions - the page ships continuously to Neocities.
   breath) revokes it and lets the kicks run, and a pick that keeps
   reporting an empty buffer under a live verdict starves out too:
   a real pause holds buffered video, only a stall starves. that
-  revoke fires once per build so a misread costs one resume at most
+  revoke fires once per build so a misread costs one resume at most.
+  and a saved-quiet boot now seeds the pick from birth - the boot's
+  own pause() fires unfocused, so without the seed the stream would
+  resume itself the moment the buffer drifted to 'ended'
 - the kick gate now covers a live stream sitting merely paused (not
   ended), so a mid-playback stall gets nudged and rebuilt instead of
   sitting silent - but only once playback was actually seen, so a
