@@ -10383,15 +10383,27 @@
         // dead one - the pause event marks the pick so a slate grown
         // out of it never earns the revive kicks
         let vidUserPause = false;
+        // once playback has been observed this build a later pause can
+        // only come from a stall or a pick - a vetoed/saved-quiet
+        // autoplay never earns the resume kicks
+        let seenPlay = false;
+        // a pause inside the embed is always click-driven, and its
+        // clicks leave the iframe focused - a stall's pause fires with
+        // the focus elsewhere, so focus sorts picks from hiccups
+        const embedFocused = () => {
+          const ae = document.activeElement;
+          return !!ae && ae.tagName === 'IFRAME' && vidBox.contains(ae);
+        };
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
         // PLAYING is ground truth that beats decapi's lag in both
         // directions - a rolling embed tears the stand-in back down
-        emb.addEventListener(Twitch.Player.PLAYING, () => { vidUserPause = false; vidState(); vidAlt(false); });
+        emb.addEventListener(Twitch.Player.PLAYING, () => { vidUserPause = false; seenPlay = true; vidState(); vidAlt(false); });
         // only a pause one can actually make counts as the pick - the
-        // stand-in's own pause and the hidden box's are housekeeping,
-        // and either would gate the revive kicks out of their own mess
-        emb.addEventListener(Twitch.Player.PAUSE, () => { if (!vidAltOn && !vidBox.hidden) vidUserPause = true; vidState(); });
+        // stand-in's own pause, the hidden box's, and a stall's are
+        // housekeeping, and any would gate the revive kicks out of
+        // their own mess
+        emb.addEventListener(Twitch.Player.PAUSE, () => { if (!vidAltOn && !vidBox.hidden && embedFocused()) vidUserPause = true; vidState(); });
         // ENDED beats decapi's lag to the punch, but only once offline
         // is confirmed - while the stream still reports live the kicks
         // get a few beats to disprove it, since a dropped connection
@@ -10407,16 +10419,20 @@
           if (vidBox.hidden || document.hidden || !vidPlayer) return;
           vidState();
           const ended = vidPlayer.isEnded && vidPlayer.isEnded();
+          const paused = vidPlayer.isPaused() && !ended;
           // a rolling embed always beats an armed stand-in - the
           // ENDED/decapi paths can disagree, playback can't
           if (vidAltOn && !vidPlayer.isPaused() && !ended) vidAlt(false);
-          // a dead slate under a stream decapi still calls live - with
-          // no pause pick behind it - is the embed's own hiccup, not an
-          // end: nudge it rolling, then rebuild when the slate won't let
-          // go. an armed stand-in counts too - its housekeeping pause
-          // isn't a pick. the tally caps the kicks so a genuinely-over
-          // stream (live on decapi lag alone) isn't shaken forever
-          if (stream && stream.live && !vidUserPause && (ended || vidAltOn)) {
+          // a dead slate or a stalled pause under a stream decapi still
+          // calls live - with no pick behind it - is the embed's own
+          // hiccup, not an end: nudge it rolling, then rebuild when the
+          // slate won't let go. an armed stand-in counts too - its
+          // housekeeping pause isn't a pick. the tally caps the kicks so
+          // a genuinely-over stream (live on decapi lag alone) isn't
+          // shaken forever, and a plain pause only earns them once
+          // playback was seen - a vetoed or saved-quiet autoplay
+          // shouldn't be fought
+          if (stream && stream.live && !vidUserPause && (ended || vidAltOn || (paused && wantPlay && seenPlay))) {
             // still down after a couple of nudges - real enough to
             // stand in for while the kicks run their course (arming
             // first so its housekeeping pause can't eat the play)
@@ -10428,11 +10444,13 @@
           // the stand-in's pause is housekeeping, not user intent - an
           // alt-played session must not persist 'paused' over the pick
           if (vidAltOn) return;
-          // an ended slate reads paused without anyone pausing it -
-          // storing it as p replays the stream's end as the user's pick
-          const paused = vidPlayer.isPaused() && !ended, muted = vidPlayer.getMuted();
+          // an ended slate or a stall reads paused without anyone
+          // pausing it - p falls only on a pick-tagged pause, or keeps
+          // a pause the saved state already carries
+          const muted = vidPlayer.getMuted();
+          const pickPause = paused && (vidUserPause || !wantPlay);
           if (!armed && !paused && !muted) armed = true;
-          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed || !wantSound ? muted : false, p: armed || !wantPlay ? !paused : true, w: 5 });
+          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed || !wantSound ? muted : false, p: armed || !wantPlay ? !pickPause : true, w: 5 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}

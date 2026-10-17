@@ -6,6 +6,20 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-17
 
 ### Resources
+- stall pauses no longer masquerade as user picks: the PAUSE event
+  fires on a connection hiccup too, and tagging that as a pick gated
+  the revive kicks out for good while the stream ran on elsewhere. a
+  pause only counts when the embed iframe itself holds focus - its
+  pause paths are all click-driven, a stall's pause arrives with the
+  focus elsewhere
+- the kick gate now covers a live stream sitting merely paused (not
+  ended), so a mid-playback stall gets nudged and rebuilt instead of
+  sitting silent - but only once playback was actually seen, so a
+  vetoed or saved-quiet autoplay still isn't fought
+- persisted playback state stops falling to a stall's 'paused': p
+  only flips on a pick-tagged pause or keeps an already-saved one, so
+  a hiccup can no longer replay itself as a saved pause on every
+  later load
 - the mode line stops taking ROOMSTATEs out of the backlog - a
   replayed state predates the live socket's, so a lifted follow-req
   (or slow/emote/subs/r9k) could re-arm and stick until the next real
