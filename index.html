@@ -321,14 +321,16 @@
      the .hdr-side .hdr-btn chain matches the hide rule's specificity so
      this later rule wins */
   body.hdrgraph .hdr-side .hdr-btn#vidBtn { display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); right: 80px; }
-  /* when the header wraps, centre the icon strip on its own line -
-     a hairline's separation from the row above, and let it reach
-     toward the pinned corner pair: the reserve only matters on the
-     line they pin. A translate, not a margin - shrinking the strip's
-     outer size flips it back onto the first line, which unsets
-     .hdrwrap, which drops it again: a wrap-state oscillation */
-  header.hdrwrap { row-gap: 1px; }
-  header.hdrwrap .hdr-side { margin-inline: auto; transform: translateX(calc((var(--hdrres, 84px) - var(--hdrpad, 18px)) / 2)); }
+  /* when the header wraps, centre the icon strip on its own line and
+     let it reach into the corner reserve - the pinned pair only lives
+     on the first line, so the width below them is dead space. the
+     reclaim comes from a wider box, not tighter margins: shrinking the
+     strip's outer size could flip it back onto the first line, which
+     unsets .hdrwrap and drops it again - a wrap-state oscillation */
+  header.hdrwrap { row-gap: 3px; }
+  /* the inner gaps tighten too - a wrapped strip packs its rows closer
+     rather than spilling a lone button to a third line */
+  header.hdrwrap .hdr-side { margin-inline: auto; width: calc(100% + var(--hdrres, 84px) - var(--hdrpad, 18px)); max-width: none; column-gap: 4px; row-gap: 4px; }
   /* pull-to-refresh: a downward drag on the (unscrollable) header
      grows this strip - PWA standalone has no browser gesture, since
      the page never scrolls */
