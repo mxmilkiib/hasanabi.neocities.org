@@ -6,6 +6,10 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-17
 
 ### Options
+- the chat font floor moves to 1.25rem - 20px at the stock 16px root,
+  still scaled by a bumped browser default; DEF.size re-seats on the
+  20px rung so the floor still earns no ?size param, and an explicit
+  rung pick keeps stamping its own px for recipients
 - new 'address bar tracks it live' option beside the copy button:
   with it on, every settings change rewrites the bar to the canonical
   settings url via history.replaceState - no reload, no history spam.
