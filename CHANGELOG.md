@@ -31,6 +31,8 @@ not versions - the page ships continuously to Neocities.
   lapses instead of the whole input locking
 - the offline youtube stand-in defaults off - a dead stream keeps its
   slate unless 'stand-in' is flipped on (now written as ?valt=1)
+- blank spacer rows now flank the vote26 'nov 3 general ballot' table
+  to set it off from midterms and primary results
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own
