@@ -11155,14 +11155,17 @@
     if ((danHide & 1 && /^(?:fossabot|blammobot)$/.test(lg || ''))
       || (danHide & 2 && /^\s*!/.test(m.textContent))) return;
     // walk the rendered row into segments: text nodes stay text, emote
-    // imgs become image refs, other imgs (link icons, chat images)
-    // still contribute their alt text like they did as flat text
+    // and embedded gif/image imgs become image refs, other imgs (link
+    // icons) still contribute their alt text like they did as flat text
     const segs = [];
     const walk = (el) => {
       for (const n of el.childNodes) {
         if (n.nodeType === 3) segs.push(n.textContent);
         else if (n.tagName === 'IMG') segs.push(n.classList.contains('emote')
-          ? { im: danEmoteImg(n), alt: n.alt || 'emote' } : (n.alt || '') + ' ');
+          ? { im: danEmoteImg(n), alt: n.alt || 'emote' }
+          : n.matches('.gifimg, .chat-img')
+            ? { im: danImg(unfreezeUrl(n.currentSrc || n.src)), alt: n.alt || 'image' }
+            : (n.alt || '') + ' ');
         else walk(n);
       }
     };
