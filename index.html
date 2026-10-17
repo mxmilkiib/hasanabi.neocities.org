@@ -434,6 +434,8 @@
     cursor: pointer;
     white-space: nowrap;
   }
+  /* all mentions visited - the kept list dims until it's cleared */
+  #missed.seen { opacity: .55; }
   /* unread whispers badge violet like the row tint they open into */
   #whisChip { color: var(--vip); border-color: var(--vip); }
   @keyframes missflash {
@@ -2872,7 +2874,7 @@
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
     <div id="twtchNote" style="display:none; text-align:center"><span>hi! this is the generic address twitch version of <a class="at" href="https://hasanabi.neocities.org/" target="_blank" rel="noopener">hasanabi.neocities.org</a> -mxmilkiib</span><div class="sep">&nbsp;</div></div>
-    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle points">violet tint</b><span>channel-point highlights</span><b class="rowstyle glorp">red rows</b><span><img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> <a>glorp / F</a></span><b class="rowstyle selfchip">accent rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to jump to each, ⇧click clears</span></div>
+    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle points">violet tint</b><span>channel-point highlights</span><b class="rowstyle glorp">red rows</b><span><img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> <a>glorp / F</a></span><b class="rowstyle selfchip">accent rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to walk through them (they keep, cycling back round), ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message - past the rendered edge it restores the parent (and its neighbours) from the archive</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row, restoring it from the archive first when it has left the log</div>
@@ -5339,7 +5341,7 @@
         if (echoRows.size > 50) echoRows.delete(echoRows.keys().next().value);
       }
     }
-    if (missed.length > 50) missed.splice(0, missed.length - 50);
+    if (missed.length > 50) { const n = missed.length - 50; missed.splice(0, n); missedIx = Math.max(0, missedIx - n); }
     if (unfocused) updateMissedBadge();
     if (isSplit()) { flipCols(); if (!revFlow) sweepGhosts(activeEl); }
     else if (wrapFlow && !revFlow) wrapPage();
@@ -8906,13 +8908,19 @@
     } catch {}
   }
   const missed = [];
+  // the queue keeps its mentions after a visit - missedIx walks them
+  // oldest-first and wraps, so a jumped-to line stays get-back-to-able
+  // until the ⇧click clear; the badge dims once all are seen
+  let missedIx = 0;
   const missedEl = document.getElementById('missed');
   function updateMissedBadge() {
+    const left = missed.length - missedIx;
     missedEl.hidden = !missed.length;
-    missedEl.textContent = `@${missed.length}`;
-    missedEl.title = missed.length
-      ? `${missed.length} mention${missed.length === 1 ? '' : 's'} while away - click to jump to each · ⇧click clears`
-      : '';
+    missedEl.classList.toggle('seen', !left);
+    missedEl.textContent = `@${left || missed.length}`;
+    missedEl.title = left
+      ? `${left} mention${left === 1 ? '' : 's'} while away - click to jump to each · ⇧click clears`
+      : `${missed.length} mention${missed.length === 1 ? '' : 's'} kept - click to walk back through · ⇧click clears`;
   }
   // the chip is a span - role+tabindex make it reachable; a synthesized
   // click carries shift so ⇧enter clears like ⇧click
@@ -8922,15 +8930,17 @@
     missedEl.dispatchEvent(new MouseEvent('click', { shiftKey: e.shiftKey }));
   });
   missedEl.addEventListener('click', (e) => {
-    if (e.shiftKey) { missed.length = 0; updateMissedBadge(); return; }
-    while (missed.length) {
-      const r = missed.shift(); // rows can be evicted - skip the gone ones
-      if (!r.isConnected) continue;
+    if (e.shiftKey) { missed.length = 0; missedIx = 0; updateMissedBadge(); return; }
+    // rows can be evicted - drop the gone ones before walking
+    for (let i = missed.length - 1; i >= 0; i--) if (!missed[i].isConnected) missed.splice(i, 1);
+    missedIx = missedIx % Math.max(1, missed.length);
+    const r = missed[missedIx];
+    if (r) {
+      missedIx++;
       r.scrollIntoView({ block: 'center' });
       r.classList.remove('flash');
       void r.offsetWidth; // restart the animation on repeat visits
       r.classList.add('flash');
-      break;
     }
     updateMissedBadge();
   });
