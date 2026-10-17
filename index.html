@@ -137,9 +137,9 @@
     --sh-bg: .95; --sh-tx: .16;
     --accent: #a8750e; --good: #1f9d55; --danger: #c94a4a; --vip: #c2255c; --wiki: #3368b0;
     /* the unset font floor rides the browser's root size - a rem value
-       honours a bumped user default where a bare px would not (1.25 =
-       20px at the stock 16px root) */
-    --chat-font: 1.25rem;
+       honours a bumped user default where a bare px would not (1.1875 =
+       19px at the stock 16px root) */
+    --chat-font: 1.1875rem;
     /* --bg-lift lets a colour nudge its paper a touch off the shade stop -
        salmon needs .97 for the ft pink but the axis only stops at .95/.99 */
     --bg: oklch(clamp(0, calc(var(--sh-bg) + var(--bg-lift, 0)), 1) var(--pc) var(--ph));
@@ -6501,7 +6501,7 @@
   const SHADE_ORDER = [0, 1, 2, 3, 4, 5, 6, 11, 7, 10, 8, 9];
   // default option indices - the controls, the copy-url diffing and the
   // 'old-default' preset all read from here
-  const DEF = { shade: 7, size: 13, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4, hpos: 4 };
+  const DEF = { shade: 7, size: 12, lh: 7, weight: 1, hpw: 7, hfs: 7, ls: 4, lines: 4, hpos: 4 };
   let shadeIdx = DEF.shade;
   function applyShade() {
     if (shadeIdx == null) document.documentElement.removeAttribute('data-shade');
