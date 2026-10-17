@@ -578,7 +578,8 @@
   #epop .epbig { display: block; margin: 0 auto 5px; max-width: 112px; max-height: 112px; }
   #epop .epemo { font-size: 64px; line-height: 1.1; margin: 0; max-width: none; max-height: none; }
   #epop .epsrc { color: var(--text-dim); font-size: .78em; margin-top: 1px; white-space: pre-line; }
-  #vid #vidFrame { position: absolute; inset: 0; }
+  #vid #vidFrame, #vid #vidAlt { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  #vid #vidAlt { background: #000; }
   /* danmaku bullets paint above the video surface but under the drag
      and resize chrome (handle z2, grips z3) */
   #vid #danmaku { position: absolute; inset: 0; width: 100%; height: 100%;
@@ -3041,7 +3042,7 @@
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
   <div id="hint" hidden>first-time tips: click/scroll header buttons to change some option settings -- page audio autoplay permission allows unmuted stream on open/reload -- click to dismiss</div>
-  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><canvas id="danmaku" hidden></canvas><div id="danOl" hidden></div><span id="danDrop" hidden title="danmaku bullets the lane queue had to drop under load"></span><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div><div class="vid-edge t"></div><div class="vid-edge b"></div><div class="vid-edge l"></div><div class="vid-edge r"></div></div>
+  <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><iframe id="vidAlt" title="offline stand-in video" hidden allow="autoplay; fullscreen" allowfullscreen></iframe><canvas id="danmaku" hidden></canvas><div id="danOl" hidden></div><span id="danDrop" hidden title="danmaku bullets the lane queue had to drop under load"></span><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div><div class="vid-edge t"></div><div class="vid-edge b"></div><div class="vid-edge l"></div><div class="vid-edge r"></div></div>
   <div id="vidSplit" aria-hidden="true" hidden title="drag to resize the video and chat"></div>
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice · date:YYYY-MM-DD" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback - a date jumps to it" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
@@ -5992,7 +5993,9 @@
         saveLastRun();
       }
       stream = { live: false };
+      vidAlt(true);
     } else {
+      vidAlt(false);
       stream = st;
       // a real offline->live flip revives a dismissed title strip
       if (prevSt && !prevSt.live) titleDismissed = '';
@@ -10290,12 +10293,17 @@
         // control-only proxy without addEventListener
         emb.addEventListener(Twitch.Player.PLAYING, vidState);
         emb.addEventListener(Twitch.Player.PAUSE, vidState);
-        emb.addEventListener(Twitch.Player.ENDED, vidState);
+        // ENDED beats decapi's lag to the punch - the stand-in swaps
+        // in on the spot rather than waiting a poll cycle
+        emb.addEventListener(Twitch.Player.ENDED, () => { vidState(); vidAlt(true); });
         let last = '';
         clearInterval(vidPoll);
         vidPoll = setInterval(() => {          // poll + persist; the API emits no volume event
           if (vidBox.hidden || document.hidden || !vidPlayer) return;
           vidState();
+          // the stand-in's pause is housekeeping, not user intent - an
+          // alt-played session must not persist 'paused' over the pick
+          if (vidAltOn) return;
           const paused = vidPlayer.isPaused(), muted = vidPlayer.getMuted();
           if (!armed && !paused && !muted) armed = true;
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed ? muted : false, p: armed || !wantPlay ? !paused : true, w: 3 });
@@ -10337,11 +10345,31 @@
   let vidPausedByHide = false;
   let vidRetry = 0;
   let vidPoll = 0;
+  // the offline stand-in: on the home channel a dead stream covers the
+  // embed with a set youtube video until the stream comes back - the
+  // embed stays mounted underneath so the return trip is instant
+  const VID_ALT_ID = CHANNEL === 'hasanabi' ? 'awQzjn72bI0' : '';
+  const VID_ALT_URL = VID_ALT_ID ? `https://www.youtube-nocookie.com/embed/${VID_ALT_ID}?autoplay=1&rel=0` : '';
+  const vidAltEl = document.getElementById('vidAlt');
+  let vidAltOn = false;
+  function vidAlt(on) {
+    on = !!VID_ALT_URL && on && !vidBox.hidden;
+    if (on === vidAltOn) return;
+    vidAltOn = on;
+    vidAltEl.hidden = !on;
+    vidAltEl.src = on ? VID_ALT_URL : 'about:blank'; // blanking silences it
+    // pausing for the stand-in borrows the hide flag so a hide->show
+    // while live again still resumes the embed
+    if (on) try { if (vidPlayer && !vidPlayer.isPaused()) { vidPausedByHide = true; vidPlayer.pause(); } } catch {}
+  }
   function setVideo(on) {
     vidBox.hidden = !on;
     if (on) {
       loadPlayer();
-      if (vidPausedByHide) { vidPausedByHide = false; try { vidPlayer && vidPlayer.play(); } catch {} }
+      // an offline reshow goes to the stand-in instead of resuming
+      // the embed's dead slate
+      if (stream && !stream.live) vidAlt(true);
+      else if (vidPausedByHide) { vidPausedByHide = false; try { vidPlayer && vidPlayer.play(); } catch {} }
     } else if (vidPlayer && !vidPlayer.isPaused()) {
       vidPausedByHide = true;
       try { vidPlayer.pause(); } catch {}
@@ -10351,6 +10379,8 @@
     vidBtn.title = `Stream video: ${on ? 'on' : 'off'}${railEl.hidden ? '' : ` · rail: ${vidRail}`} - click/scroll${railEl.hidden ? '' : ' cycles dock · float · off'}\nuse the pause button in the video to stop the stream`;
     markHelp('helpVideo', on ? 1 : 0);
     syncVidSplit();
+    // a closed box frees the stand-in's audio and decoder
+    if (!on) vidAlt(false);
     if (!on) vidState();
   }
   // rail mode gives the video a third placement axis: docked in the

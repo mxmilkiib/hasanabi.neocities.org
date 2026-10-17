@@ -227,6 +227,11 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- a dead stream swaps the video box to a stand-in youtube embed on
+  the home channel - the twitch embed stays mounted underneath so a
+  live flip tears the iframe down and resumes instantly, and the
+  swap triggers on the embed's own ENDED event rather than waiting
+  out decapi's lag. hiding the video frees the stand-in too
 - the live? probe's offline marking actually greys now - half
   opacity alone was barely readable, so livoff pairs it with the
   dim text colour and the channel's * switch star dims too
