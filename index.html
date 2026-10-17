@@ -10763,7 +10763,8 @@
       // bullets look better mixed - arming borrows the picker into
       // random; off hands back whatever fontSel still names. a font
       // the user picked while armed (fontRand off) is left alone
-      if (!fontRand) { danFontAuto = true; setFontRand(); }
+      danFontAuto = true;
+      if (!fontRand) setFontRand();
       danFit(); danKick();
     }
     else {
