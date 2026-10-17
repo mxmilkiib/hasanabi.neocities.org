@@ -10957,13 +10957,13 @@
     return danH - (L - danTopN + 1) * danPitch;
   };
   // 'adaptive' size slides the ladder as the feed heats: near-full
-  // bullets at rest, shrinking toward small ones past ~10 msg/s, and
+  // bullets at rest, shrinking toward small ones past ~8 msg/s, and
   // deeper pressure keeps sliding toward tiny - showing everything
   // small beats shedding the queue. the even rungs keep re-metering to
   // steps, not a per-frame shimmer
   const danAdaptPx = () => {
-    const t = Math.max(0, Math.min(1, (danRateAvg - 1) / 9));
-    const d = Math.max(0, Math.min(1, (danRateAvg - 10) / 10));
+    const t = Math.max(0, Math.min(1, danRateAvg / 8));
+    const d = Math.max(0, Math.min(1, (danRateAvg - 8) / 8));
     return Math.round((34 - t * 20 - d * 8) / 2) * 2;
   };
   function danMeter(s, H) {
