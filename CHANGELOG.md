@@ -81,6 +81,10 @@ not versions - the page ships continuously to Neocities.
   maps by hostname, so twtch signs in through its own registered app
   instead of borrowing hasanabi's (whose redirect list only ever
   covered its own domain)
+- the brand follows the host - twtch.neocities.org badges itself
+  'Twtch Chat Thing' in the tab title and header where hasanabi's
+  mirror keeps its own name. self-link handling treats the two
+  domains as one site either way round
 
 ## 2026-10-16
 

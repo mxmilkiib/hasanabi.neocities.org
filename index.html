@@ -3156,7 +3156,10 @@
       if (it) it.classList.add('chon');
     }
   });
-  const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? 'HasanAbi' : CHANNEL;
+  // the brand badge is host-named - each mirror front-pages itself
+  const SITE_NAMES = { 'hasanabi.neocities.org': 'HasanAbi', 'twtch.neocities.org': 'Twtch' };
+  const SITE_NAME = SITE_NAMES[location.hostname] || SITE_NAMES['hasanabi.neocities.org'];
+  const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? SITE_NAME : CHANNEL;
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
   const SCROLLBACK_SIZES = [250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
@@ -3954,7 +3957,7 @@
           // this site's own domain gets the fossabot shimmer; so does any
           // url in a line the bots post - their !link commands output
           // urls. icerr.com runs the rainbow sweep outright
-          const home = /^(?:https?:\/\/)?(?:www\.)?hasanabi\.neocities\.org(?:[?/#]|$)/i.test(url);
+          const home = /^(?:https?:\/\/)?(?:www\.)?(?:hasanabi|twtch)\.neocities\.org(?:[?/#]|$)/i.test(url);
           const icer = /^(?:https?:\/\/)?(?:www\.)?icerr\.com(?:[/?#]|$)/i.test(url);
           let ico = '';
           if (lkIco) ico = lkIcoImg(u.replace(/&amp;/g, '&'));
@@ -17823,7 +17826,7 @@
     let u;
     try { u = new URL(a.href); } catch { return false; }
     const h = u.hostname.replace(/^www\./, '');
-    if (h === 'hasanabi.neocities.org' || h === location.hostname) return false;
+    if (h === 'hasanabi.neocities.org' || h === 'twtch.neocities.org' || h === location.hostname) return false;
     // statuses inside the log already carry the inline tweet card; links
     // elsewhere (stats, help panel) get the hover card instead
     if (twStatusOf(u) && a.closest('#log')) return false;
