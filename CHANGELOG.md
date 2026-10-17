@@ -227,6 +227,9 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the stand-in can't bury a live stream anymore - a rolling embed
+  vetoes the swap (stale decapi reads or a spurious ENDED), and the
+  embed's own PLAYING event tears an armed stand-in back down
 - the stand-in embed asks for autoplay and, where the browser vetoes
   it, the first page click or keypress re-fires play over the youtube
   jsapi command channel

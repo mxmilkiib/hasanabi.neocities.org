@@ -5993,7 +5993,10 @@
         saveLastRun();
       }
       stream = { live: false };
-      vidAlt(true);
+      // a rolling embed contradicts an offline report outright -
+      // decapi's stale read must not park the stand-in over a stream
+      // that's provably still going
+      if (!(vidPlayer && !vidPlayer.isPaused() && !(vidPlayer.isEnded && vidPlayer.isEnded()))) vidAlt(true);
     } else {
       vidAlt(false);
       stream = st;
@@ -10291,11 +10294,18 @@
         let armed = !wantSound;
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
-        emb.addEventListener(Twitch.Player.PLAYING, vidState);
+        // PLAYING is ground truth that beats decapi's lag in both
+        // directions - a rolling embed tears the stand-in back down
+        emb.addEventListener(Twitch.Player.PLAYING, () => { vidState(); vidAlt(false); });
         emb.addEventListener(Twitch.Player.PAUSE, vidState);
         // ENDED beats decapi's lag to the punch - the stand-in swaps
-        // in on the spot rather than waiting a poll cycle
-        emb.addEventListener(Twitch.Player.ENDED, () => { vidState(); vidAlt(true); });
+        // in on the spot rather than waiting a poll cycle. a spurious
+        // ENDED while the embed's still rolling must not arm it
+        emb.addEventListener(Twitch.Player.ENDED, () => {
+          vidState();
+          const rolling = vidPlayer && !vidPlayer.isPaused() && !(vidPlayer.isEnded && vidPlayer.isEnded());
+          if (!rolling) vidAlt(true);
+        });
         let last = '';
         clearInterval(vidPoll);
         vidPoll = setInterval(() => {          // poll + persist; the API emits no volume event
