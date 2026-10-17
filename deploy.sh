@@ -22,8 +22,12 @@ sed -i "/<head>/,/<\/head>/ {
   s|\(description\" content=\"\)[^\"]*|\1$DESC|
 }" "$OUT/index.html"
 
-# the twtch note row in the help panel shows only on the mirror
-sed -i 's|id="twtchNote" hidden|id="twtchNote"|' "$OUT/index.html"
+# the twtch note row in the help panel shows only on the mirror - the
+# help rows are display:grid, which outranks the hidden attribute, so
+# the switch is an inline display none->block. a missing marker means
+# the source row drifted - fail loudly like the og card does
+sed -i 's|id="twtchNote" style="display:none|id="twtchNote" style="display:block|' "$OUT/index.html"
+grep -q 'id="twtchNote" style="display:block' "$OUT/index.html" || { echo "deploy: twtchNote marker drifted" >&2; exit 1; }
 
 sed -i "s/\"name\": \"HasanAbi Chat Thing\"/\"name\": \"Twtch Chat Thing\"/
         s/\"short_name\": \"Hasan Chat\"/\"short_name\": \"Twtch Chat\"/

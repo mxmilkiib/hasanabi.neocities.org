@@ -31,8 +31,9 @@ not versions - the page ships continuously to Neocities.
   a hiccup can no longer replay itself as a saved pause on every
   later load
 - a centred 'generic twitch version of hasanabi.neocities.org' note
-  sits atop the help panel's legend on twtch - hidden in the source,
-  deploy.sh unhides it on the mirror render
+  sits atop the help panel's legend on twtch - deploy.sh flips its
+  inline display none->block on the mirror render (the help rows are
+  display:grid, which would override a plain hidden attribute)
 - the mode line stops taking ROOMSTATEs out of the backlog - a
   replayed state predates the live socket's, so a lifted follow-req
   (or slow/emote/subs/r9k) could re-arm and stick until the next real
