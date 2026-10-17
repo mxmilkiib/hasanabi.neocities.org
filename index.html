@@ -3118,6 +3118,18 @@
     if (!oauthReturn || !oauthReturn.state || oauthFrag.get('state') !== oauthReturn.state) oauthReturn = null;
     history.replaceState(null, '', location.pathname + location.search);
   }
+  // a refused redirect (uri off the app's list, denied consent) comes
+  // back as ?error= in the query, not the fragment - stash the text for
+  // a notice at boot and clean it out of the address bar
+  let oauthErr = '';
+  const oauthQuery = new URLSearchParams(location.search);
+  if (oauthQuery.has('error')) {
+    oauthErr = oauthQuery.get('error_description') || oauthQuery.get('error') || '';
+    for (const k of ['error', 'error_description', 'state']) oauthQuery.delete(k);
+    try { sessionStorage.removeItem('hasan-oauth-state'); } catch {}
+    const qs = String(oauthQuery);
+    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+  }
   // ?channel=a,b,c watches several chats in one merged log; the first is
   // focused (title, stream status, video, chat target, storage keys)
   const CHANNELS = (new URLSearchParams(location.search).get('channel') ||
@@ -13572,6 +13584,10 @@
     if (CHANNEL !== DEFAULT_CHANNEL || MULTI) back.set('channel', CHANNELS.join(','));
     history.replaceState(null, '', location.pathname + (back.size ? '?' + back : ''));
   }
+  // a refused oauth ride-back narrates itself as a notice row rather
+  // than sitting unexplained in the address bar
+  if (oauthErr) queueMessage({ tags: {}, login: null, kind: 'NOTICE',
+    message: `twitch refused the login redirect (${oauthErr}) - this domain may be missing from the app's registered oauth redirect uris` }, false);
 
   // timeout lock: the input is disabled with a countdown until it lapses.
   // Keyed per channel - a timeout in one room leaves the others open.

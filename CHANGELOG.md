@@ -51,6 +51,10 @@ not versions - the page ships continuously to Neocities.
 - a danmaku flush now caps at its newest 15 bullets - a reload into
   a fast chat landed the whole accumulated burst as a wall the lanes
   couldn't hold; the newest still fly, the rest stay chat rows
+- a refused twitch redirect (uri off the app's list, denied consent)
+  lands back as ?error= in the query, not the fragment the handler
+  reads - it now narrates itself as a notice row and cleans the
+  address bar instead of sitting there unexplained
 
 ## 2026-10-16
 
