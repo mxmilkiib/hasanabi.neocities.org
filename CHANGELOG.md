@@ -33,6 +33,17 @@ not versions - the page ships continuously to Neocities.
   either axis - and a muted read only counts as a veto when sound
   was asked for: an embed loaded muted is already the intent, so a
   chosen mute persists without waiting for the arm
+- a single blinking 'offline' can't end a live verdict anymore -
+  decapi's upstream can hiccup 'not streaming' mid-broadcast, so a
+  live channel now falls only to a second consecutive read, stamped
+  back to the first suspect. a provably rolling embed vetoes the
+  report outright - it can't be playing a stream that isn't there
+- a spurious ENDED while the stream still reports live no longer
+  slams the stand-in over it - the revive kicks get a couple of
+  beats to disprove the end first. housekeeping pauses (the
+  stand-in's own, the hidden box's) also stopped counting as the
+  stopped pick that gated the kicks out - a faked end could freeze
+  the slate in place over a stream that never stopped
 
 ## 2026-10-16
 
