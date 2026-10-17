@@ -10451,6 +10451,11 @@
           if (!rolling && !(stream && stream.live)) vidAlt(true);
         });
         let last = '';
+        // mute flips only surface in the poll - the api emits no
+        // volume event - and unmutedAt stamps the latest one. seed
+        // from the boot state so an unmute before the first tick
+        // still reads as a flip
+        let lastMuted = mutedStart, unmutedAt = 0;
         clearInterval(vidPoll);
         vidPoll = setInterval(() => {          // poll + persist; the API emits no volume event
           if (vidBox.hidden || document.hidden || !vidPlayer) return;
@@ -10458,6 +10463,15 @@
           const ended = vidPlayer.isEnded && vidPlayer.isEnded();
           const paused = vidPlayer.isPaused() && !ended;
           const stats = vidPlayer.getPlaybackStats && vidPlayer.getPlaybackStats();
+          const muted = vidPlayer.getMuted();
+          // the embed's unmute button can drop playback with the pause
+          // still wearing the tap's focus - while the unmute is fresh a
+          // hot pick is the player's policy hiccup, not intent, so hand
+          // it back and the kicks below nudge it rolling; the starve
+          // check re-arms per unmute so each stutter earns a resume
+          if (lastMuted === true && !muted) { unmutedAt = Date.now(); starveRevoked = false; vidStarved = 0; }
+          lastMuted = muted;
+          if (vidUserPause && Date.now() - vidPauseAt < 4500 && Date.now() - unmutedAt < 8000) vidUserPause = false;
           // a pick that sits starving under a live verdict was the
           // stall wearing the pick's focus - hand it back and the
           // kicks take it from there
@@ -10495,7 +10509,6 @@
           // an ended slate or a stall reads paused without anyone
           // pausing it - p falls only on a pick-tagged pause, or keeps
           // a pause the saved state already carries
-          const muted = vidPlayer.getMuted();
           const pickPause = paused && (vidUserPause || !wantPlay);
           if (!armed && !paused && !muted) armed = true;
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed || !wantSound ? muted : false, p: armed || !wantPlay ? !pickPause : true, w: 5 });
