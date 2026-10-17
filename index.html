@@ -641,7 +641,7 @@
     inset: 0;
     padding: 1px;
     border-radius: inherit;
-    background: repeating-conic-gradient(from var(--jdash), var(--accent) 0 10deg, transparent 10deg 20deg);
+    background: repeating-conic-gradient(from var(--jdash), #e8b73e 0 10deg, transparent 10deg 20deg);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -684,8 +684,8 @@
      stroke - overflow lets the full dash paint, at a bolder weight so it
      reads like the pill's conic ring beside it */
   .jdown.jdc .jdash { overflow: visible; }
-  .jdown.jdc .jdash rect { fill: none; stroke: var(--accent); stroke-width: 1.5px;
-    stroke-dasharray: 4.5 3; animation: jdc-march 3s linear infinite; }
+  .jdown.jdc .jdash rect { fill: none; stroke: #e8b73e; stroke-width: 1.5px;
+    stroke-dasharray: 4.5 3; animation: jdc-march .5s linear infinite; }
   @keyframes jdc-march { to { stroke-dashoffset: 7.5px; } }
   @media (prefers-reduced-motion: reduce) { .jdown.jdc .jdash rect { animation: none; } }
   /* rev flow: the column axis flips so newest rows land at the top. The
