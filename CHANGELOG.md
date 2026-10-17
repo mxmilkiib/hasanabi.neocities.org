@@ -31,6 +31,9 @@ not versions - the page ships continuously to Neocities.
   lapses instead of the whole input locking
 - the offline youtube stand-in defaults off - a dead stream keeps its
   slate unless 'stand-in' is flipped on (now written as ?valt=1)
+- the first-time tips bar balances its wrapped lines now - text-wrap:
+  balance, so a narrow window splits it evenly rather than stranding a
+  word on the last line
 - blank spacer rows now flank the vote26 'nov 3 general ballot' table
   to set it off from midterms and primary results
 - 'aligned slate' sits above 'primary results' in the vote26 tab - the
