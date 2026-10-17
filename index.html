@@ -10761,8 +10761,8 @@
   // when the face actually changed
   const danFont = (f) => { if (f !== danFontWas) { danCtx.font = f; danFontWas = f; } };
   // option indices into the stop lists - the defaults: full frame,
-  // standard pace, opaque, a half-dim slab, nothing pinned or hidden
-  const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1], DAN_BGS = [0, .2, .35, .5, .65, .8, .95];
+  // standard pace, opaque, a 45% slab, nothing pinned or hidden
+  const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1], DAN_BGS = [0, .15, .3, .45, .6, .75, .9];
   // 'pin' rungs past +subs gate subs by months; 'pin len' rungs are the
   // tenure stretch - +1x hold per N months, capped
   const DAN_PIN_MO = [0, 12, 36, 72], DAN_PINT_SCALE = [0, 24, 12], DAN_PINT_CAP = [1, 4, 6];
@@ -17640,7 +17640,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both', 'adaptive'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '20%', '35%', '50%', '65%', '80%', '95%'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs', '+subs 1y', '+subs 3y', '+subs 6y'], helpDPinT: ['flat', 'tenure', 'tenure x2'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both', 'adaptive'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '15%', '30%', '45%', '60%', '75%', '90%'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs', '+subs 1y', '+subs 3y', '+subs 6y'], helpDPinT: ['flat', 'tenure', 'tenure x2'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
