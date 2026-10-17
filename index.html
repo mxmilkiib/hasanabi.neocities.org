@@ -10859,7 +10859,7 @@
   };
   // option indices into the stop lists - the defaults: full frame,
   // standard pace, opaque, a 45% slab, nothing pinned or hidden
-  const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1], DAN_BGS = [0, .15, .3, .45, .6, .75, .9];
+  const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.1, .2, .3, .4, .5, .6, .7, .8, .9, 1], DAN_BGS = [0, .15, .3, .45, .6, .75, .9];
   // 'pin' rungs past +subs gate subs by months; 'pin len' rungs are the
   // tenure stretch - +1x hold per N months, capped
   const DAN_PIN_MO = [0, 12, 36, 72], DAN_PINT_SCALE = [0, 24, 12], DAN_PINT_CAP = [1, 4, 6];
@@ -10899,7 +10899,7 @@
   // the adaptive dir's own rate read - a slow EMA of the last sample so
   // the mid-band opens on a sustained flood, not one hot second
   let danRateAvg = 0, danMid = false, danDeep = false;
-  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danPinT = 1, danHide = 0, danFs = DAN_FS.indexOf(32), danNick = 1, danBadge = 1, danFam = 0, danBg = 3;
+  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 9, danSubs = 1, danPin = 0, danPinT = 1, danHide = 0, danFs = DAN_FS.indexOf(32), danNick = 1, danBadge = 1, danFam = 0, danBg = 3;
   // 'adapt' steers the layout itself: effective dir 3 (both + the
   // mid/deep opens) with bullet size and pace sliding off the same
   // rate read - danDirPick keeps the 'from' pick for when it's off
@@ -11230,7 +11230,7 @@
         // it before the pin fades. each free row offers both inner
         // edges, alternating which side leads so pins line the frame's
         // edges rather than stacking the left quarter. a longer tenure
-        // parks nearer the edge - the pick takes the spot at the
+        // parks nearer the top edge - the pick takes the spot at the
         // months' rank on the same ~6y scale the hold stretches by;
         // once chat runs hot the pick falls back to the first that fits
         const t = Math.min(1, q.mo / 72);
@@ -11247,14 +11247,19 @@
           return b.x - 7 < px + w + 7 && px - 7 < b.x + b.w + 7;
         };
         const freeYs = [];
-        let ri = 0;
+        let ri = 0, topEnd = 0;
         for (const y of danPinYs) {
           const first = ri++ & 1;
           for (const sd of [first, 1 - first])
             if (!danBullets.some((b) => b.t0 && pinClash(b, y, sd))) freeYs.push([y, sd]);
+          if (danDir === 3 && y + danPitch <= danH / 6) topEnd = freeYs.length;
         }
         if (freeYs.length) {
-          const pick = calm ? freeYs[Math.round((1 - t) * (freeYs.length - 1))] : freeYs[0];
+          // the tenure rank spreads only across the top band's inner
+          // edge while it has room - letting it run the whole list
+          // lands every low-month pin at the bottom edge instead
+          const span = (topEnd || freeYs.length) - 1;
+          const pick = calm ? freeYs[Math.round((1 - t) * span)] : freeYs[0];
           pinY = pick[0]; ps = pick[1];
         }
         if (pinY < 0) {
@@ -11283,7 +11288,11 @@
             // lanes park a pin as well as the reserved ones
             const laneGap = (L) => Math.min(Infinity, ...danPinYs.map((y) => Math.abs(danLaneY(L) - y)));
             ok.sort((a, b) => laneGap(a[0]) - laneGap(b[0]) || danLaneY(a[0]) - danLaneY(b[0]) || a[1] - b[1]);
-            const pick = calm ? ok[Math.round((1 - t) * (ok.length - 1))] : ok[0];
+            // keep the pick to the top band's lanes while it has room -
+            // same top-weighting the free rows get
+            const topOk = ok.filter(([L]) => L < danTopN);
+            const src = topOk.length ? topOk : ok;
+            const pick = calm ? src[Math.round((1 - t) * (src.length - 1))] : src[0];
             lane = pick[0]; ps = pick[1];
           }
         }
@@ -12798,7 +12807,7 @@
     if (danDirPick !== 2) q.set('dand', String(danDirPick));
     if (!danAdapt) q.set('adapt', '0');
     if (danSpeed !== DAN_SPEEDS.length) q.set('danv', String(danSpeed));
-    if (danAlpha !== 3) q.set('dano', String(danAlpha));
+    if (danAlpha !== 9) q.set('dano', String(danAlpha));
     if (!danSubs) q.set('dans', '0');
     if (!danNick) q.set('dann', '0');
     if (!danBadge) q.set('danb', '0');
@@ -17836,7 +17845,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both'], helpDAdp: ['off', 'on'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '15%', '30%', '45%', '60%', '75%', '90%'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs', '+subs 1y', '+subs 3y', '+subs 6y'], helpDPinT: ['flat', 'tenure', 'tenure x2'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both'], helpDAdp: ['off', 'on'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '15%', '30%', '45%', '60%', '75%', '90%'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs', '+subs 1y', '+subs 3y', '+subs 6y'], helpDPinT: ['flat', 'tenure', 'tenure x2'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
