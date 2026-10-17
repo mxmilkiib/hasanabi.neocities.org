@@ -10752,7 +10752,7 @@
     // an off-ladder percent lands on its nearest rung
     return i >= 0 ? i : DAN_COVERS.reduce((b, c, j) => Math.abs(c - v) < Math.abs(DAN_COVERS[b] - v) ? j : b, 0);
   };
-  const DAN_FS = [0, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 52]; // 0 follows the chat font
+  const DAN_FS = [0, 12, 14, 16, 18, 20, 24, 28, 32, 34, 36, 38, 40, 44, 48, 52]; // 0 follows the chat font
   const DAN_HOLD = 3400, DAN_FADE = 400;   // a pinned bullet's park and its in/out fade
   // pinned bullets park toward the left edge rather than centre-frame -
   // the middle of the picture stays clear
