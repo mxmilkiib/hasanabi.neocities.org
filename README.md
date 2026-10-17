@@ -268,8 +268,9 @@ no dependencies beyond CDN-hosted fonts.
       the centred frame alone, chat comments flying across it. It is
       the only layout carrying bullets: switching away turns them off
       and picking it turns them back on. Its help row also carries
-      the bullet options - lane coverage, crossing speed, layer
-      opacity, pinned highlights and bot/command filters.
+      the bullet options - text size, lane coverage, crossing
+      speed, layer opacity, pinned highlights and bot/command
+      filters.
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
@@ -510,6 +511,7 @@ editing a URL.
 | `dans` | flag | subscriber bullets lead with the month count in the chip's gradient |
 | `danp` | `0`–`2` | pinned bullets: off / own, @you pings and keyword hits hold top-centre / +subs and bits |
 | `danf` | `0`–`3` | danmaku filters: none / bots / !commands / both |
+| `dfs` | px | danmaku bullet size - `12`/`14`/`16`/`18`/`20`/`24`/`28`/`32`; unset follows the chat font |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `subg` | flag / `0` | subscription labels sweep teal → violet → red as the month count rises (up to 84 months); on by default, `0` disables |
 | `ncol` | flag / `left` / `right` | nick alignment - every chatter's name lands on one edge (the widest leading prefix in view sets the stop); `left` aligns the names' starts, `right` the ends so message text columns up after them |

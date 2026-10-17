@@ -213,6 +213,10 @@ not versions - the page ships continuously to Neocities.
 - the ? popup's font default is now 20px absolute rather than
   follow-chat - the chat-relative stops stay one mode pick away,
   and a relative pick now travels as chat-N in copied urls
+- danmaku opts gains a size row - 'chat' keeps bullets tracking
+  the chat font while a px stop (12-32) locks them; bigger text
+  means fewer lanes since the pitch scales with it. saved as dfs,
+  travelling as the px value in copied urls
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
