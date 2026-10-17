@@ -85,6 +85,11 @@ not versions - the page ships continuously to Neocities.
   'Twtch Chat Thing' in the tab title and header where hasanabi's
   mirror keeps its own name. self-link handling treats the two
   domains as one site either way round
+- the raw markup now brands per host too: deploy.sh renders the twtch
+  copy (title, og/twitter metas, manifest name, its own domain in the
+  og urls) into its sibling dir before pushing, so scrapers and
+  no-JS views see the right name - the repo stays the hasanabi
+  canonical and ./deploy.sh is the deploy entry point
 
 ## 2026-10-16
 
