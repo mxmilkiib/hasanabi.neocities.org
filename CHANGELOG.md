@@ -192,6 +192,17 @@ not versions - the page ships continuously to Neocities.
   back to the animated one (7tv's _static, twitch's /static/, the
   weserv first-frame proxy) - genuinely static twitch emotes keep
   theirs since /animated/ 404s them
+- danmaku gains an options row in the help popup: cover ¼/½/¾/full
+  clips the lane count to the frame's top slice, speed ½x-2x
+  multiplies every bullet's crossing pace, alpha 25-100% dims the
+  whole layer, pin parks a matching bullet top-centre in a
+  nick-coloured pill for a few seconds - own lines, mentions and
+  keyword hits at 'self+pings', subs and bits joining at '+subs' -
+  and hide drops bots and/or !command lines from the stream; saved
+  as danc/danv/dano/danp/danf and round-tripped in copied urls. a
+  pinned bullet claims a wholly idle lane top-down and waits rather
+  than blocking - the spawn loop now walks the queue until
+  something flies instead of stopping at a stuck head
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the

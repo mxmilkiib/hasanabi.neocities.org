@@ -267,7 +267,9 @@ no dependencies beyond CDN-hosted fonts.
     - `1col danmaku` is `1col video` with the bullet overlay armed -
       the centred frame alone, chat comments flying across it. It is
       the only layout carrying bullets: switching away turns them off
-      and picking it turns them back on.
+      and picking it turns them back on. Its help row also carries
+      the bullet options - lane coverage, crossing speed, layer
+      opacity, pinned highlights and bot/command filters.
     - `1col chat` keeps one full-width chat column.
     - `1col help` drops even that - the docked help popup starts at
       two-thirds of the screen, centred between two mirrored edge grips.
@@ -501,6 +503,12 @@ editing a URL.
 | `times` | `nosec`/`24h` / `24hsec` / `12h` / `12hsec` / `0` | timestamp mode |
 | `shadow` | `0`–`2` | text shadow level |
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
+| `dan` | flag | danmaku bullets over the video |
+| `danc` | `0`–`3` | danmaku cover: top ¼ / ½ / ¾ / full frame |
+| `danv` | `0`–`4` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x |
+| `dano` | `0`–`3` | danmaku layer opacity: 25 / 50 / 75 / 100% |
+| `danp` | `0`–`2` | pinned bullets: off / own, mentions and keywords hold top-centre / +subs and bits |
+| `danf` | `0`–`3` | danmaku filters: none / bots / !commands / both |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `subg` | flag / `0` | subscription labels sweep teal → violet → red as the month count rises (up to 84 months); on by default, `0` disables |
 | `ncol` | flag / `left` / `right` | nick alignment - every chatter's name lands on one edge (the widest leading prefix in view sets the stop); `left` aligns the names' starts, `right` the ends so message text columns up after them |
