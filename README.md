@@ -509,6 +509,7 @@ editing a URL.
 | `danv` | `0`–`5` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x / `auto` (default - pace tracks the live message rate) |
 | `dano` | `0`–`3` | danmaku layer opacity: 25 / 50 / 75 / 100% |
 | `dans` | flag / `0` | subscriber bullets lead with the month count in the chip's gradient; on by default, `0` disables |
+| `dann` | flag | bullets lead with the sender's display name, row-style (`name: text`) |
 | `danp` | `0`–`2` | pinned bullets: off / own, @you pings and keyword hits hold top-centre / +subs and bits |
 | `danf` | `0`–`3` | danmaku filters: none / bots / !commands / both |
 | `dfs` | px | danmaku bullet size (default `40`) - `12`/`14`/`16`/`18`/`20`/`24`/`28`/`32`/`36`/`40`/`44`/`48`/`52`; `0` follows the chat font |

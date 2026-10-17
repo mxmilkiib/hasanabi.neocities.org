@@ -224,6 +224,9 @@ not versions - the page ships continuously to Neocities.
   quiet chat keeps its bullets lingering on screen and a flood
   hurries them through; a short EMA smooths the per-second sample
   steps
+- danmaku opts gains a 'nick' toggle - bullets lead with the
+  sender's display name row-style ('name: text'), after the sub
+  month count when both prefixes are on
 - copied urls stop leaking implied state on the danmaku layout:
   the borrowed random font stays home (it re-derives on load),
   video=on and dan=1 drop out since 1cdan implies both - dan=0 or
