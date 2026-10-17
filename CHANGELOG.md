@@ -227,6 +227,9 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the saved volume record bumps to w:4 and stops trusting a w:3
+  'paused' - a stand-in session could leak one, and a false p is
+  self-perpetuating: load paused, save paused, black box forever
 - a video box whose twitch embed never reports in now says so instead
   of sitting black - 'the twitch embed never loaded' names tracking
   protection as the usual suspect
