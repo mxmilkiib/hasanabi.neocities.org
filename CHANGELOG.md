@@ -39,6 +39,10 @@ not versions - the page ships continuously to Neocities.
   random face each on their own, and the picked font stays put
 - danmaku defaults to a 1/3 cover split top and bottom - 'from: both'
   and 'cover: 1/3' out of the box (now the url's zero state)
+- '1col danmaku/chat' is the default layout - fresh visits and unsplit
+  saved state land on the 98% video stack with bullets and a chat
+  strip; nightshade now pins 1cvdan, and split urls emit for anything
+  else
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own
