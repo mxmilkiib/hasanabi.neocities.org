@@ -6,6 +6,11 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-17
 
 ### Resources
+- danmaku cover gains ⅓ and ⅔ rungs and a 'from' edge pick - lanes
+  can now pack up from the bottom instead of the top. danc saves and
+  travels as the percent itself (danc=50) so the list can regrow
+  without remapping; legacy 0-3 indices still resolve, and the edge
+  rides as dand=1
 - the slate revive respects a stopped pick: a live stream paused past
   its buffer reports 'ended' like a dead one, so the kicks now need a
   slate no PAUSE event produced - pausing no longer gets the video

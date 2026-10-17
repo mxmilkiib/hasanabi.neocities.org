@@ -506,7 +506,8 @@ editing a URL.
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
 | `valt` | flag / `0` | offline stand-in: a youtube video fills the frame while the stream is down (home channel); on by default, `0` keeps the offline slate |
 | `dan` | flag | danmaku bullets over the video |
-| `danc` | `0`–`3` | danmaku cover: top ¼ / ½ / ¾ / full frame |
+| `danc` | `25`/`33`/`50`/`67`/`75`/`100` | danmaku cover: lane fill as % of frame height (legacy `0`–`3` indices still resolve to ¼ / ½ / ¾ / full) |
+| `dand` | flag / `0` | danmaku lanes pack from the bottom edge instead of the top |
 | `danv` | `0`–`5` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x / `auto` (default - pace tracks the live message rate) |
 | `dano` | `0`–`3` | danmaku layer opacity: 25 / 50 / 75 / 100% |
 | `dans` | flag / `0` | subscriber bullets lead with the month count in the chip's gradient; on by default, `0` disables |
