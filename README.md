@@ -504,6 +504,7 @@ editing a URL.
 | `times` | `nosec`/`24h` / `24hsec` / `12h` / `12hsec` / `0` | timestamp mode |
 | `shadow` | `0`–`2` | text shadow level |
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
+| `valt` | flag / `0` | offline stand-in: a youtube video fills the frame while the stream is down (home channel); on by default, `0` keeps the offline slate |
 | `dan` | flag | danmaku bullets over the video |
 | `danc` | `0`–`3` | danmaku cover: top ¼ / ½ / ¾ / full frame |
 | `danv` | `0`–`5` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x / `auto` (default - pace tracks the live message rate) |

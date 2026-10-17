@@ -227,6 +227,10 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the stand-in gets an off switch ('stand-in' next to the video
+  option, ?valt=0 or saved off) - and a 2s watchdog now disarms it
+  whenever the embed underneath is provably still rolling, closing
+  the cases where it blacked out a live stream
 - the stand-in can't bury a live stream anymore - a rolling embed
   vetoes the swap (stale decapi reads or a spurious ENDED), and the
   embed's own PLAYING event tears an armed stand-in back down

@@ -2861,7 +2861,7 @@
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li><li><span class="splitSeat" data-split="16"></span> the framed stream alone, centred - its edges drag their side, and any bare-floor grab pulls it wider in the dragged direction</li><li><span class="splitSeat" data-split="18"></span> the centred frame alone with danmaku bullets armed over it - the only layout that carries them, so picking another switches them back off; it defaults to the largest frame the space fits, and the same edge and floor drags resize it</li><li><span class="splitSeat" data-split="17"></span> the stream over the docked help popup, centred like 1col help - the video keeps its own width inside the page, and dragging its edges trades width with the help below - the page's side grips size the pair</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
-    <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
+    <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour and the live chat font (size, weight, spacing and lane pitch follow the chat font settings); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet; arming borrows the font picker into random and off hands the old face back; needs the video on, live messages only<sup>†</sup></span></div>
     <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only the top slice of the frame<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' tracks the live message rate so a quiet chat keeps bullets on screen<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
@@ -6518,6 +6518,7 @@
     else if (a.classList.contains('helpEonly')) { emoteMode = +a.dataset.idx; applyEmoteMode(); saveOpts(); }
     else if (a.classList.contains('helpSplit')) { setSplit(+a.dataset.idx + 1); saveOpts(); }
     else if (a.classList.contains('helpVideo')) { const v = +a.dataset.idx === 1; railEl.hidden ? setVideo(v) : setRailVid(v ? 'dock' : 'off'); saveOpts(); }
+    else if (a.classList.contains('helpVAlt')) { setVidAlt(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpFontFam')) { fontSel.selectedIndex = +a.dataset.idx; applyFont(); saveOpts(); }
     else if (a.classList.contains('helpPreset')) {
       // presets pin a header mode too - keep the panel open past its
@@ -9874,7 +9875,7 @@
       shadow: shadLevel,
       eonly: emoteMode,
       help: helpMode,
-      video: !vidBox.hidden,
+      video: !vidBox.hidden, valt: vidAltPref,
       kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0, danc: danCover, danv: danSpeed, dano: danAlpha, dans: danSubs, dann: danNick, danp: danPin, danf: danHide, dfs: danFs,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0, eprow: epickRowOff ? 1 : 0,
@@ -10057,6 +10058,7 @@
     if (o.gifsafe !== undefined) setGifSafe(!!o.gifsafe);
     if (Number.isInteger(o.peek) && o.peek >= 0 && o.peek < PEEK_MODES.length) setPeek(o.peek);
     if (o.yt !== undefined) setYtEmb(!!o.yt);
+    if (Number.isInteger(o.valt)) setVidAlt(o.valt ? 1 : 0);
     if (o.stitle !== undefined) setTitleBar(!!o.stitle);
     if (o.cmodes !== undefined) setModesOn(!!o.cmodes);
     if (o.sview !== undefined) setStatusView(+o.sview);
@@ -10310,6 +10312,9 @@
         vidPoll = setInterval(() => {          // poll + persist; the API emits no volume event
           if (vidBox.hidden || document.hidden || !vidPlayer) return;
           vidState();
+          // a rolling embed always beats an armed stand-in - the
+          // ENDED/decapi paths can disagree, playback can't
+          if (vidAltOn && !vidPlayer.isPaused() && !(vidPlayer.isEnded && vidPlayer.isEnded())) vidAlt(false);
           // the stand-in's pause is housekeeping, not user intent - an
           // alt-played session must not persist 'paused' over the pick
           if (vidAltOn) return;
@@ -10361,8 +10366,10 @@
   const VID_ALT_URL = VID_ALT_ID ? `https://www.youtube-nocookie.com/embed/${VID_ALT_ID}?autoplay=1&rel=0&enablejsapi=1` : '';
   const vidAltEl = document.getElementById('vidAlt');
   let vidAltOn = false;
+  let vidAltPref = 1; // 'stand-in' help toggle - 0 keeps the offline slate
+  function setVidAlt(i) { vidAltPref = i; markHelp('helpVAlt', i); if (!i) vidAlt(false); }
   function vidAlt(on) {
-    on = !!VID_ALT_URL && on && !vidBox.hidden;
+    on = !!VID_ALT_URL && vidAltPref && on && !vidBox.hidden;
     if (on === vidAltOn) return;
     vidAltOn = on;
     vidAltEl.hidden = !on;
@@ -12062,6 +12069,7 @@
     if (notifyOn) q.set('notify', '1');
     if (peekMode !== 2) q.set('peek', PEEK_URL[peekMode]);
     if (!ytEmbed) q.set('yt', '0');
+    if (!vidAltPref) q.set('valt', '0');
     if (!titleBarOn) q.set('stitle', '0');
     if (!modesOn) q.set('cmodes', '0');
     if (statusView) q.set('sview', SVIEW_NAMES[statusView]);
@@ -16906,6 +16914,7 @@
       else setRailVid({ float: 'float', dock: 'dock', on: 'dock' }[v] || (v !== 'off' && flag('video') ? 'dock' : 'off'));
     }
     if (q.has('kw')) { kwInput.value = q.get('kw'); setKeywords(kwInput.value); }
+    if (q.has('valt')) setVidAlt(flag('valt') ? 1 : 0);
     if (q.has('bw')) { bwInput.value = q.get('bw'); setBlocked(bwInput.value); }
     if (q.has('hw')) { hwInput.value = q.get('hw'); setHideList(hwInput.value); }
     if (q.has('hwm')) { const i = HIDE_MODES.indexOf(q.get('hwm')); if (i >= 0) setHideMode(i); }
@@ -17055,7 +17064,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: DAN_FS.map((n) => n || 'chat'), helpDCov: ['¼', '½', '¾', 'full'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: DAN_FS.map((n) => n || 'chat'), helpDCov: ['¼', '½', '¾', 'full'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
@@ -17214,7 +17223,7 @@
   markHelp('helpNickcol', nickCol);
   markHelp('helpEonly', emoteMode);
   markHelp('helpSplit', splitLevel - 1);
-  markHelp('helpVideo', vidBox.hidden ? 0 : 1);
+  markHelp('helpVideo', vidBox.hidden ? 0 : 1); markHelp('helpVAlt', vidAltPref);
   markHelp('helpLinks', document.body.classList.contains('linkview') ? 1 : 0);
   markHelp('helpBots', hideBots ? 1 : 0);
   markHelp('helpAuto', barAuto);
