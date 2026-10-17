@@ -227,6 +227,9 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- a video box whose twitch embed never reports in now says so instead
+  of sitting black - 'the twitch embed never loaded' names tracking
+  protection as the usual suspect
 - the stand-in gets an off switch ('stand-in' next to the video
   option, ?valt=0 or saved off) - and a 2s watchdog now disarms it
   whenever the embed underneath is provably still rolling, closing
