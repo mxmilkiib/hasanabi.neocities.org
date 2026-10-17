@@ -64,6 +64,10 @@ not versions - the page ships continuously to Neocities.
   the api was already in window.Twitch, so the duplicates just piled
   up in head and re-parsed every time. it boots off the loaded api
   now and only fetches the script on the first run
+- the title error-guard blanked any title mentioning 'error', 'try
+  again', 'not found', etc - decapi's failure sentences all run under
+  40 chars, so the match now needs that length cap too, and a long
+  real title survives the word inside it
 
 ## 2026-10-16
 

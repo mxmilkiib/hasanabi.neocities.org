@@ -5932,9 +5932,11 @@
     return found ? total : null;
   }
 
-  // decapi answers upstream failures with an error sentence instead of
-  // a status - matched here so one never reads as stream data
-  const apiErr = (s) => /error|too many|try again|unavailable|bad gateway|timed out|not found/i.test(String(s || ''));
+  // decapi answers upstream failures with a short error sentence instead
+  // of a status - every one is under 40 chars, so gating on length keeps
+  // a long title that merely mentions an error word from being blanked
+  const apiErr = (s) => { const t = String(s || '').trim();
+    return t.length < 40 && /error|too many|try again|unavailable|bad gateway|timed out|not found|does not exist/i.test(t); };
 
   function fmtTime(ts) {
     return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
