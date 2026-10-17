@@ -2893,7 +2893,7 @@
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour and the live chat font (size, weight, spacing and lane pitch follow the chat font settings); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet, save a burst - a flush keeps only its newest 15 so a reload-into-fast-chat can't wall the frame; arming borrows the font picker into random and off hands the old face back; needs the video on, live messages only<sup>†</sup></span></div>
-    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' tracks the live message rate so a quiet chat keeps bullets on screen<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
+    <div><b>danmaku opts</b><span>size: <span id="helpDFsList"></span> - bullet text follows the chat font or locks to a px stop - bigger sizes mean fewer lanes<sup>†</sup></span><b></b><span>cover: <span id="helpDCovList"></span> - lanes fill only a slice of the frame<sup>†</sup></span><b></b><span>from: <span id="helpDDirList"></span> - the edge that slice packs against; 'adaptive' splits like 'both' and opens centred mid-frame lanes once the message rate runs hot<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies; 'auto' tracks the live message rate so a quiet chat keeps bullets on screen<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>nick: <span id="helpDNickList"></span> - bullets lead with the sender's name, row-style<sup>†</sup></span><b></b><span>badges: <span id="helpDBadgeList"></span> - the sender's badge icons lead the name, drawn at cap height<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
@@ -10689,15 +10689,15 @@
   let danmakuOn = false;      // config toggle, default off
   const danBullets = [];      // live { segs, col, x, w, v, y, lane, t0? }
   const danQueue = [];        // pushed rows waiting for a free lane -
-                              // uncapped: under load the backlog just
-                              // drains late, no bullet is ever shed
-  const DAN_CAP = 42, DAN_DUR = 5200;
+                              // bounded: past the cap the stalest shed
+                              // onto the drop tally, fresher chat flies
+  const DAN_CAP = 42, DAN_DUR = 5200, DAN_QUEUE_CAP = 48;
   // a single flush pushes at most this many bullets - a reload joins a
   // live chat mid-flow, and the whole burst at once is a wall, not a
   // stream; the newest of the batch keep flying, the rest stay rows
   const DAN_FLUSH_MAX = 15;
   let danLanes = 0, danFontPx = 16, danPitch = 24, danNextLane = 0;
-  let danH = 0, danDirWas = 0, danTopN = 0; // frame height, pack edge + top-band split the lanes were metered under
+  let danH = 0, danDirWas = 0, danTopN = 0, danEdgeN = 0; // frame height, pack edge + band splits the lanes were metered under
   let danRaf = 0, danLast = 0;
   // option indices into the stop lists - the defaults restore the plain
   // look: full frame, standard pace, opaque, nothing pinned or hidden
@@ -10723,6 +10723,9 @@
     const t = Number.isFinite(r) ? Math.max(0.3, Math.min(3, r / 3)) : 1;
     return danAuto += (t - danAuto) * Math.min(1, dt / 600);
   }
+  // the adaptive dir's own rate read - a slow EMA of the last sample so
+  // the mid-band opens on a sustained flood, not one hot second
+  let danRateAvg = 0, danMid = false;
   let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(40), danNick = 1, danBadge = 1;
   let danDir = 2; // 0 packs lanes from the top, 1 from the bottom, 2 splits the cover between both
 
@@ -10756,19 +10759,29 @@
   // lane L's band-top - lane 0 hugs the packed edge either way. 'both'
   // splits the lane count in half: the first band packs down from the
   // top, the rest pack up from the bottom, the middle stays clear
-  const danLaneY = (L) => danDir === 2
-    ? (L < danTopN ? L * danPitch : danH - (L - danTopN + 1) * danPitch)
-    : danDir ? danH - (L + 1) * danPitch : L * danPitch;
+  const danLaneY = (L) => {
+    if (danDir < 2) return danDir ? danH - (L + 1) * danPitch : L * danPitch;
+    if (L < danTopN) return L * danPitch;
+    if (L < danEdgeN) return danH - (L - danTopN + 1) * danPitch;
+    // adaptive's extra lanes centre in the gap the edge bands leave -
+    // symmetric edges put the gap's centre on the frame's own
+    return (danH - (danLanes - danEdgeN) * danPitch) / 2 + (L - danEdgeN) * danPitch;
+  };
   function danMeter(s, H) {
     const px = Math.max(9, Math.min(DAN_FS[danFs] || s.px, H * 0.2));
     const pitch = px * Math.max(1.25, Math.min(2, s.lh));
-    // the cover is the frame fraction lanes may occupy - 'both' halves
-    // it per edge, so two-fifths packs a fifth of lanes at each edge
-    const per = Math.max(1, Math.floor(H * DAN_COVERS[danCover] / (danDir === 2 ? 200 : 100) / pitch));
-    const lanes = danDir === 2 ? Math.min(10, per * 2) : Math.max(1, Math.min(10, per));
-    if (px === danFontPx && pitch === danPitch && lanes === danLanes && H === danH && danDir === danDirWas) return;
-    danFontPx = px; danPitch = pitch; danLanes = lanes; danH = H; danDirWas = danDir;
-    danTopN = danDir === 2 ? lanes / 2 : 0;
+    // the cover is the frame fraction lanes may occupy - 'both' and
+    // 'adaptive' halve it per edge
+    const per = Math.max(1, Math.floor(H * DAN_COVERS[danCover] / (danDir >= 2 ? 200 : 100) / pitch));
+    const edge = danDir >= 2 ? Math.min(10, per * 2) : Math.max(1, Math.min(10, per));
+    // 'adaptive' opens lanes across the middle once chat runs hot -
+    // the hysteresis keeps a borderline rate from flapping the band
+    if (danDir === 3) danMid = danRateAvg > 6 || (danMid && danRateAvg > 3.5);
+    const mid = danDir === 3 && danMid ? Math.min(8, Math.max(0, Math.floor((H - edge * pitch) / pitch))) : 0;
+    const lanes = edge + mid;
+    if (px === danFontPx && pitch === danPitch && lanes === danLanes && H === danH && danDir === danDirWas && edge === danEdgeN) return;
+    danFontPx = px; danPitch = pitch; danLanes = lanes; danH = H; danDirWas = danDir; danEdgeN = edge;
+    danTopN = danDir >= 2 ? edge / 2 : 0;
     for (const b of danBullets) b.y = danLaneY(b.lane) + px;
   }
   function danFit() {
@@ -10904,6 +10917,10 @@
     // the picked font, the mix is danmaku's own
     danQueue.push({ segs: out, col: (rec && rec.c) || colorForName((rec && rec.n) || lg || 'x'),
       fam: randStack(), mag: danMag(), top });
+    // a sustained flood can't drain at lane pace - shed the stalest
+    // bullet over keeping a backlog that flies minutes late, and count
+    // it on the corner tally
+    if (danQueue.length > DAN_QUEUE_CAP) { danQueue.shift(); danDropped++; paintDanDrop(); }
     danKick();
   }
   // a lane is free once its last bullet's tail is inside the frame and
@@ -10978,6 +10995,8 @@
     const dt = Math.min(80, now - danLast); danLast = now;
     const W = danCv.width / DPR, H = danCv.height / DPR;
     const s = danSpec(), spec = s;
+    const danR = rateSamples[rateSamples.length - 1];
+    danRateAvg += ((Number.isFinite(danR) ? danR : 0) - danRateAvg) * Math.min(1, dt / 800);
     danMeter(s, H);
     danSpawn(W, s);
     danCtx.clearRect(0, 0, W, H);
@@ -11084,7 +11103,7 @@
   }
   const paintDanAlpha = () => { danCv.style.opacity = danOl.style.opacity = DAN_ALPHAS[danAlpha]; };
   function setDanCover(i) { danCover = i; markHelp('helpDCov', i); danFit(); }
-  function setDanDir(i) { danDir = Math.min(2, Math.max(0, i)); markHelp('helpDDir', danDir); danFit(); }
+  function setDanDir(i) { danDir = Math.min(3, Math.max(0, i)); markHelp('helpDDir', danDir); danFit(); }
   function setDanFs(i) { danFs = i; markHelp('helpDFs', i); danFit(); }
   function setDanV(i) { danSpeed = i; markHelp('helpDV', i); }
   function setDanAlp(i) { danAlpha = i; markHelp('helpDAlp', i); paintDanAlpha(); }
@@ -12364,7 +12383,7 @@
     // deviating from the layout's own arm travels
     if (danmakuOn !== LVL_DAN.has(splitLevel)) q.set('dan', danmakuOn ? '1' : '0');
     if (danCover !== DAN_COVERS.indexOf(67)) q.set('danc', String(DAN_COVERS[danCover]));
-    if (danDir !== 2) q.set('dand', String(danDir));
+    if (danDir !== 2) q.set('dand', danDir === 3 ? 'adaptive' : String(danDir));
     if (danSpeed !== DAN_SPEEDS.length) q.set('danv', String(danSpeed));
     if (danAlpha !== 3) q.set('dano', String(danAlpha));
     if (!danSubs) q.set('dans', '0');
@@ -17261,7 +17280,7 @@
       else if (FONT_STACKS[f]) { fontSel.value = f; applyFont(); }
     }
     if (q.has('danc')) { const i = danCovIx(+q.get('danc')); if (i >= 0) setDanCover(i); }
-    if (q.has('dand')) { const v = q.get('dand'); setDanDir(v === 'both' || +v === 2 ? 2 : flag('dand') ? 1 : 0); }
+    if (q.has('dand')) { const v = q.get('dand'); setDanDir(v === 'adaptive' || +v === 3 ? 3 : v === 'both' || +v === 2 ? 2 : flag('dand') ? 1 : 0); }
     if (q.has('danv')) setDanV(Math.min(DAN_SPEEDS.length, Math.max(0, +q.get('danv')) || 0));
     if (q.has('dano')) setDanAlp(Math.min(DAN_ALPHAS.length - 1, Math.max(0, +q.get('dano')) || 0));
     if (q.has('dans')) setDanSub(flag('dans') ? 1 : 0);
@@ -17386,7 +17405,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: DAN_FS.map((n) => n || 'chat'), helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: DAN_FS.map((n) => n || 'chat'), helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both', 'adaptive'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
