@@ -38,6 +38,10 @@ not versions - the page ships continuously to Neocities.
   to set it off from midterms and primary results
 - 'aligned slate' sits above 'primary results' in the vote26 tab - the
   general-election tables now run together
+- pinned danmaku bullets park toward the left edge rather than
+  centre-frame, and a new 'pin len' rung ('tenure') stretches a pinned
+  sub's hold with its months - +1x per two years, capped at 4x -
+  travelling as ?danpt=1
 - a player revive inside the poll tick no longer crashes the tick -
   the callback kept running after the rebuild nulled vidPlayer and
   dereferenced it in the persist block
