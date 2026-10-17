@@ -10808,6 +10808,9 @@
                               // bounded: past the cap the stalest shed
                               // onto the drop tally, fresher chat flies
   const DAN_CAP = 42, DAN_DUR = 5200, DAN_QUEUE_CAP = 48;
+  // a bullet's shortest crossing - the pace can hurry the stream under
+  // load, but nothing flies faster than a readable floor
+  const DAN_MIN_DUR = 2600;
   // a single flush pushes at most this many bullets - a reload joins a
   // live chat mid-flow, and the whole burst at once is a wall, not a
   // stream; the newest of the batch keep flying, the rest stay rows
@@ -11479,7 +11482,7 @@
     const pace = !danAdapt && danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAutoMul(dt);
     for (let i = danBullets.length - 1; i >= 0; i--) {
       const b = danBullets[i];
-      b.x -= b.v * dt * pace;
+      b.x -= Math.min(b.v * pace, (W + b.w) / DAN_MIN_DUR) * dt;
       if (b.t0 ? now - b.t0 > b.hold : b.x + b.w < 0) {
         for (const s of b.segs) if (s.el) s.el.remove();
         danBullets.splice(i, 1);
