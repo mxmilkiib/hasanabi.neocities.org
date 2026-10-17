@@ -5227,7 +5227,7 @@
     if (danmakuOn) {
       const fly = [...newRows].filter((r) => !r.classList.contains('replay') && !r.classList.contains('blk')
         && !(hideBots && (r.dataset.u === 'fossabot' || r.dataset.u === 'blammobot')));
-      for (const r of fly.slice(-DAN_FLUSH_MAX)) danmakuPush(r);
+      for (const r of fly.slice(-DAN_FLUSH_MAX)) try { danmakuPush(r); } catch (e) { console.error('danmaku push', e); }
     }
     if (whisHtml) {
       const wt = document.createElement('template');
@@ -10971,6 +10971,10 @@
     }
   }
   function danDraw(now) {
+    // released up front and rescheduled in finally - a throw mid-frame
+    // must not leave a stale id that danKick then waits on forever
+    danRaf = 0;
+    try {
     const dt = Math.min(80, now - danLast); danLast = now;
     const W = danCv.width / DPR, H = danCv.height / DPR;
     const s = danSpec(), spec = s;
@@ -11064,8 +11068,12 @@
     }
     // spin only while something's flying or waiting - an idle video
     // costs nothing
-    danRaf = (danmakuOn && !vidBox.hidden && (danBullets.length || danQueue.length))
-      ? requestAnimationFrame(danDraw) : 0;
+    } catch (e) {
+      console.error('danmaku frame', e);
+    } finally {
+      danRaf = (danmakuOn && !vidBox.hidden && (danBullets.length || danQueue.length))
+        ? requestAnimationFrame(danDraw) : 0;
+    }
   }
   function danKick() {
     if (danRaf || !danmakuOn || vidBox.hidden) return;

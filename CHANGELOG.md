@@ -43,6 +43,10 @@ not versions - the page ships continuously to Neocities.
   saved state land on the 98% video stack with bullets and a chat
   strip; nightshade now pins 1cvdan, and split urls emit for anything
   else
+- a thrown danmaku frame can't wedge the stream any more - the raf id
+  is released up front and reschedules in finally, so one bad bullet or
+  a mid-frame hiccup logs to console and the loop keeps flying instead
+  of leaving a stale id that danKick waits on forever
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own
