@@ -61,10 +61,11 @@ not versions - the page ships continuously to Neocities.
   pace ceiling to 8x and doubles its queue buffer so a flood raises the
   pace instead of shedding bullets. adaptive also keeps the second and
   fourth fifths (20-40% and 60-80%, the facecam and gameplay bands)
-  clear while room lasts: edge lanes pack through the first and last
-  fifths only, the third fifth takes the overflow plus load lanes
-  centred, and the reserved fifths fill last under deeper pressure -
-  the mid block growing outward into them
+  clear while room lasts, plus the bottom 4% (the player chrome
+  strip): edge lanes pack through the first fifth and down to 96%,
+  the third fifth takes the overflow plus load lanes centred, and the
+  bottom strip then the reserved fifths fill last under deeper
+  pressure - the milder violation first
 - the danmaku queue bounds at 48 - a flood too fast for the lanes now
   sheds its stalest bullets onto the 'N dropped' corner tally instead
   of building a backlog that flies minutes late; the tally counts for
