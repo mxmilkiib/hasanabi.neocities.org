@@ -10966,7 +10966,6 @@
     }
     danFontPx = px; danPitch = pitch; danLanes = lanes; danH = H; danDirWas = danDir; danEdgeN = edge;
     danTopN = danDir >= 2 ? nTop : 0; danSpillN = spillN;
-    for (const b of danBullets) if (b.lane >= 0) b.y = danLaneY(b.lane) + px;
     // pin rows: pitch-steps outside the lanes where a parked bullet can
     // hold - 'adaptive' also keeps its reserved sixths and the chrome
     // strip clear of pins, whatever the pressure does to the lanes.
@@ -11043,19 +11042,21 @@
     const twStill = /\/emoticons\/v2\/[^/]+\/static\//.test(u);
     return danImg(twStill && !twAnim(n.alt) ? u : unfreezeUrl(u));
   };
-  const danEmoteH = () => Math.round(danFontPx * 1.4);
-  const danEmoteGap = () => Math.ceil(danFontPx * 0.3);
+  // each metric reads the bullet's own spawn-time px/pitch - the
+  // adaptive slide resizes the next bullets, not the ones mid-flight
+  const danEmoteH = (px) => Math.round(px * 1.4);
+  const danEmoteGap = (px) => Math.ceil(px * 0.3);
   // badges sit near cap height like they do over a row's name, packed
   // tighter than emotes and exempt from the magnifier's rungs
-  const danBadgeH = () => Math.round(danFontPx * 1.1);
-  const danBadgeGap = () => Math.ceil(danFontPx * 0.14);
+  const danBadgeH = (px) => Math.round(px * 1.1);
+  const danBadgeGap = (px) => Math.ceil(px * 0.14);
   // the magnifier: a per-bullet lottery rides its emotes for the whole
   // flight - half fly normal, the rest draw on a bigger rung
   const DAN_MAGS = [1, 1, 1, 1, 1.5, 1.5, 2, 2.6];
   const danMag = () => DAN_MAGS[(Math.random() * DAN_MAGS.length) | 0];
   // a big roll may bleed into neighbouring lanes but never past two
   // pitches, so the magnifier can't cover the stack
-  const danEmoteSize = (m) => Math.min(danEmoteH() * m, Math.round(danPitch * 2));
+  const danEmoteSize = (m, px, pitch) => Math.min(danEmoteH(px) * m, Math.round(pitch * 2));
   function danmakuPush(row) {
     if (!danmakuOn || vidBox.hidden) return;
     const m = row.querySelector('.msg');
@@ -11151,20 +11152,21 @@
     for (let qi = 0; danBullets.length < DAN_CAP && qi < danQueue.length; qi++) {
       const q = danQueue[qi];
       const fam0 = q.fam || s.fam;
-      danFont(`${s.w} ${danFontPx}px ${fam0}`);
+      const bpx = danFontPx, bpitch = danPitch;
+      danFont(`${s.w} ${bpx}px ${fam0}`);
       danCtx.letterSpacing = s.ls;
-      const eh = danEmoteSize(q.mag);
+      const eh = danEmoteSize(q.mag, bpx, bpitch);
       const w = Math.ceil(q.segs.reduce((a, g) => a + (g.t != null
-        ? (g.px = danFontPx, g.f = fam0, g.w = danCtx.measureText(g.t).width, g.w)
+        ? (g.px = bpx, g.f = fam0, g.w = danCtx.measureText(g.t).width, g.w)
         : g.sub != null
-          ? danCtx.measureText(String(g.sub).padStart(2, '0')).width * 0.72 + danEmoteGap()
+          ? danCtx.measureText(String(g.sub).padStart(2, '0')).width * 0.72 + danEmoteGap(bpx)
           : g.bd
             ? (g.im.complete && g.im.naturalWidth
-                ? danBadgeH() * g.im.naturalWidth / g.im.naturalHeight
-                : danBadgeH()) + danBadgeGap()
+                ? danBadgeH(bpx) * g.im.naturalWidth / g.im.naturalHeight
+                : danBadgeH(bpx)) + danBadgeGap(bpx)
             : g.im.complete && g.im.naturalWidth
-              ? eh * g.im.naturalWidth / g.im.naturalHeight + danEmoteGap()
-              : (g.apx = danFontPx, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap()), 6));
+              ? eh * g.im.naturalWidth / g.im.naturalHeight + danEmoteGap(bpx)
+              : (g.apx = bpx, g.af = fam0, g.aw = danCtx.measureText(g.alt).width, g.aw) + danEmoteGap(bpx)), 6));
       let lane = -1, pinY = -1, ps = 0, v = 0, hold = DAN_HOLD;
       // parked pins keep to a share of the lane count - a chat full of
       // squatting text stops reading as a stream, so an excess pin
@@ -11270,8 +11272,8 @@
         s.el = el;
       }
       danBullets.push({ segs: q.segs, col: q.col, fam: q.fam, mag: q.mag,
-        x: pinned ? danPinX(W, w, ps) : W, w, v, lane,
-        y: (pinned && pinY >= 0 ? pinY : danLaneY(lane)) + danFontPx,
+        x: pinned ? danPinX(W, w, ps) : W, w, v, lane, px: bpx, pitch: bpitch,
+        y: (pinned && pinY >= 0 ? pinY : danLaneY(lane)) + bpx,
         ...(pinned && { t0: performance.now(), ry: pinY >= 0 ? pinY : danLaneY(lane), ps, hold }) });
     }
   }
@@ -11293,12 +11295,10 @@
     danMeter(s, H);
     danSpawn(W, s);
     danCtx.clearRect(0, 0, W, H);
-    danFont(`${s.w} ${danFontPx}px ${s.fam}`);
     danCtx.letterSpacing = s.ls;
     danCtx.textBaseline = 'middle';
     danCtx.lineJoin = 'round';
     danCtx.strokeStyle = 'rgba(0,0,0,.8)';
-    danCtx.lineWidth = Math.max(2, danFontPx * 0.18);
     // one pace for the whole frame - a per-bullet call stepped the
     // auto EMA once per bullet per frame, hurrying as chat filled
     const pace = !danAdapt && danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAutoMul(dt);
@@ -11322,11 +11322,11 @@
       // shadow - the blur is in backing-store px so it scales with the
       // canvas dpr. a parked pin's nick pill still tints over it
       if (danBg) {
-        const bh = Math.ceil(danFontPx * 1.25);
+        const bh = Math.ceil(b.px * 1.25);
         danCtx.globalAlpha = a * DAN_BGS[danBg];
         danCtx.fillStyle = '#000';
         danCtx.shadowColor = '#000';
-        danCtx.shadowBlur = danFontPx * .5 * danDpr;
+        danCtx.shadowBlur = b.px * .5 * danDpr;
         danCtx.beginPath();
         danCtx.roundRect(b.x - 4, b.y - bh / 2, b.w + 8, bh, bh / 2);
         danCtx.fill();
@@ -11337,14 +11337,15 @@
         danCtx.globalAlpha = a * 0.18;
         danCtx.fillStyle = b.col;
         danCtx.beginPath();
-        danCtx.roundRect(b.x - 7, b.ry, b.w + 14, danPitch, danPitch / 2);
+        danCtx.roundRect(b.x - 7, b.ry, b.w + 14, b.pitch, b.pitch / 2);
         danCtx.fill();
         danCtx.globalAlpha = a;
       }
       // each segment keeps the bullet's nick colour for text; an emote
       // draws its image, or its code as text while the load is pending
       const fam = b.fam || spec.fam;
-      danFont(`${s.w} ${danFontPx}px ${fam}`);
+      danFont(`${s.w} ${b.px}px ${fam}`);
+      danCtx.lineWidth = Math.max(2, b.px * 0.18);
       let x = b.x;
       for (const s of b.segs) {
         if (s.t != null) {
@@ -11355,8 +11356,8 @@
           }
           // the run's width caches on the segment keyed by size+face -
           // measureText is the draw loop's real cost on a phone
-          if (s.px !== danFontPx || s.f !== fam) {
-            s.px = danFontPx; s.f = fam;
+          if (s.px !== b.px || s.f !== fam) {
+            s.px = b.px; s.f = fam;
             s.w = danCtx.measureText(s.t).width;
           }
           x += s.w;
@@ -11365,7 +11366,7 @@
         if (s.sub != null) {
           // a subscriber's month count leads the bullet at chip size in
           // the row chip's teal->red gradient
-          const t = String(s.sub).padStart(2, '0'), spx = Math.round(danFontPx * 0.72);
+          const t = String(s.sub).padStart(2, '0'), spx = Math.round(b.px * 0.72);
           danFont(`${spec.w} ${spx}px ${fam}`);
           if (s.spx !== spx) { s.spx = spx; s.sw = danCtx.measureText(t).width; }
           danCtx.strokeText(t, x, b.y);
@@ -11373,15 +11374,15 @@
             ? `color-mix(in oklch longer hue, #4fbecd, #f43f5e ${Math.min(100, Math.round(s.sub / 60 * 100))}%)`
             : '#4fbecd';
           danCtx.fillText(t, x, b.y);
-          danFont(`${spec.w} ${danFontPx}px ${fam}`);
-          x += s.sw + danEmoteGap();
+          danFont(`${spec.w} ${b.px}px ${fam}`);
+          x += s.sw + danEmoteGap(b.px);
           continue;
         }
         const el = s.el;
         // the shown element gates itself - the pool img only estimates
         // lane width, so an el still fetching keeps its code text
         if (el.complete && el.naturalWidth) {
-          const eh = s.bd ? danBadgeH() : danEmoteSize(b.mag), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
+          const eh = s.bd ? danBadgeH(b.px) : danEmoteSize(b.mag, b.px, b.pitch), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
           // dom writes are the phone's other cost - only touch style
           // when a value actually moved
           if (el.hidden) el.hidden = false;
@@ -11398,19 +11399,19 @@
           x += ew;
         } else {
           if (!el.hidden) el.hidden = true;
-          if (s.bd) x += danBadgeH(); // a pending badge still holds its square
+          if (s.bd) x += danBadgeH(b.px); // a pending badge still holds its square
           else {
             danCtx.strokeText(s.alt, x, b.y);
             danCtx.fillStyle = b.col;
             danCtx.fillText(s.alt, x, b.y);
-            if (s.apx !== danFontPx || s.af !== fam) {
-              s.apx = danFontPx; s.af = fam;
+            if (s.apx !== b.px || s.af !== fam) {
+              s.apx = b.px; s.af = fam;
               s.aw = danCtx.measureText(s.alt).width;
             }
             x += s.aw;
           }
         }
-        x += s.bd ? danBadgeGap() : danEmoteGap();
+        x += s.bd ? danBadgeGap(b.px) : danEmoteGap(b.px);
       }
       // images resolving mid-flight change the true width - the lane
       // math reads it fresh each frame rather than the spawn estimate
