@@ -10840,13 +10840,13 @@
     g.textBaseline = 'middle';
     g.lineJoin = 'round';
     if (danBg) {
-      const sa = Math.min(1, DAN_BGS[danBg] * 1.4);
+      const sa = Math.min(1, DAN_BGS[danBg] * 1.6);
       g.shadowColor = `rgba(0,0,0,${sa})`;
-      g.shadowBlur = px * .45 * danDpr;
-      g.shadowOffsetY = px * .08 * danDpr;
+      g.shadowBlur = px * .3 * danDpr;
+      g.shadowOffsetY = px * .06 * danDpr;
       // two silhouette passes stack the alpha so the shade stays
       // readable where the video runs bright
-      g.lineWidth = Math.max(3, px * .55);
+      g.lineWidth = Math.max(3, px * .65);
       g.strokeStyle = `rgba(0,0,0,${sa})`;
       g.strokeText(txt, padX, padT);
       g.strokeText(txt, padX, padT);
@@ -11429,12 +11429,12 @@
       // else comes off a spawn-baked bitmap
       const shade = (t, x) => {
         if (!danBg || !t.trim()) return;
-        const sa = Math.min(1, DAN_BGS[danBg] * 1.4);
-        danCtx.lineWidth = Math.max(3, b.px * .55);
+        const sa = Math.min(1, DAN_BGS[danBg] * 1.6);
+        danCtx.lineWidth = Math.max(3, b.px * .65);
         danCtx.strokeStyle = `rgba(0,0,0,${sa})`;
         danCtx.shadowColor = danCtx.strokeStyle;
-        danCtx.shadowBlur = b.px * .45 * danDpr;
-        danCtx.shadowOffsetY = b.px * .08 * danDpr;
+        danCtx.shadowBlur = b.px * .3 * danDpr;
+        danCtx.shadowOffsetY = b.px * .06 * danDpr;
         danCtx.strokeText(t, x, b.y);
         danCtx.strokeText(t, x, b.y);
         danCtx.shadowBlur = 0; danCtx.shadowOffsetY = 0;
@@ -11493,7 +11493,7 @@
           if (b.t0 && el._op !== a) { el._op = a; el.style.opacity = a; }
           // dom emotes can't take the canvas shadow - a matching
           // drop-shadow keeps the same shade under the images
-          const dsh = danBg ? `drop-shadow(0 ${Math.round(b.px * .08)}px ${Math.round(b.px * .38)}px rgba(0,0,0,${Math.min(1, DAN_BGS[danBg] * 1.4)}))` : '';
+          const dsh = danBg ? `drop-shadow(0 ${Math.round(b.px * .06)}px ${Math.round(b.px * .28)}px rgba(0,0,0,${Math.min(1, DAN_BGS[danBg] * 1.6)}))` : '';
           if (el._dsh !== dsh) { el._dsh = dsh; el.style.filter = dsh; }
           x += ew;
         } else {
