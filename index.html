@@ -3144,11 +3144,11 @@
     const qs = String(oauthQuery);
     history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
   }
-  // ?channel=a,b,c (or the shorthand ?s=a,b,c) watches several chats in
+  // ?channel=a,b,c (or the ?s=/ ?c= shorthands) watches several chats in
   // one merged log; the first is focused (title, stream status, video,
   // chat target, storage keys)
   const chanQs = new URLSearchParams(location.search);
-  const CHANNELS = (chanQs.get('channel') || chanQs.get('s') ||
+  const CHANNELS = (chanQs.get('channel') || chanQs.get('s') || chanQs.get('c') ||
     (oauthReturn && oauthReturn.channels) || '')
     .toLowerCase().split(',')
     .map((c) => c.replace(/[^a-z0-9_]/g, '').slice(0, 25))
@@ -10544,6 +10544,7 @@
     if (location.hostname !== 'twtch.neocities.org' ||
         new URLSearchParams(location.search).get('channel') ||
         new URLSearchParams(location.search).get('s') ||
+        new URLSearchParams(location.search).get('c') ||
         (oauthReturn && oauthReturn.channels) || vidBox.hidden) return;
     chanAsk.hidden = false;
     chanAskIn.focus();
@@ -10553,7 +10554,7 @@
     const n = chanAskIn.value.trim().toLowerCase().replace(/[^a-z0-9_,]/g, '');
     if (!n) { chanAskIn.focus(); return; }
     const qs = new URLSearchParams(location.search);
-    qs.set('channel', n);
+    qs.set('c', n);
     location.search = qs.toString();
   });
   document.getElementById('chanAskX').addEventListener('click', (e) => {

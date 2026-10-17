@@ -95,8 +95,9 @@ not versions - the page ships continuously to Neocities.
   as ?channel=; ✕ drops it to watch the default channel instead. the
   overlay waits for boot to settle so a video-off pick stays
   unpestered, and an oauth return carrying channels skips it
-- ?s= is shorthand for ?channel=: ?s=cinemarxism focuses her stream,
-  comma lists merge logs the same way the long key does
+- ?s= and ?c= are shorthand for ?channel=: ?s=cinemarxism or
+  ?c=cinemarxism focuses her stream, comma lists merge logs the same
+  way the long key does; the twtch picker submits ?c=
 - twtch's og card image renders from its own generic source in
   deploy.sh - og-src-twtch.svg drops the avatar and the hasan
   references, so a pasted twtch link unfurls 'Twtch Chat Thing' with
