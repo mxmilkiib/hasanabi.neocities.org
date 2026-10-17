@@ -23,7 +23,7 @@ not versions - the page ships continuously to Neocities.
   theme accent, and the flanking circles' ring march runs ~6x quicker
 - '1col danmaku/chat' moves in the layout picker to sit just below
   '1col vid/chat' with the other stacked-video variants
-- '1col danmaku/chat' defaults its video to 98% of the largest frame
+- '1col danmaku/chat' defaults its video to 99% of the largest frame
   the space fits - a slim chat strip under a near-max screen
 - the twtch help note now reads 'generic address twitch version'
 - a timed-out chat box stays typeable - the draft ghosts in dim italics
@@ -40,7 +40,7 @@ not versions - the page ships continuously to Neocities.
 - danmaku defaults to a 2/3 cover split top and bottom - 'from: both'
   and 'cover: 2/3' out of the box (now the url's zero state)
 - '1col danmaku/chat' is the default layout - fresh visits and unsplit
-  saved state land on the 98% video stack with bullets and a chat
+  saved state land on the 99% video stack with bullets and a chat
   strip; nightshade now pins 1cvdan, and split urls emit for anything
   else
 - a thrown danmaku frame can't wedge the stream any more - the raf id
