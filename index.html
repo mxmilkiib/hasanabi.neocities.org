@@ -10929,7 +10929,7 @@
   // the adaptive dir's own rate read - a slow EMA of the last sample so
   // the mid-band opens on a sustained flood, not one hot second
   let danRateAvg = 0, danMid = false, danDeep = false, danHigh = false;
-  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 9, danSubs = 1, danPin = 3, danPinT = 1, danHide = 0, danFs = DAN_FS.indexOf(32), danNick = 1, danBadge = 1, danFam = 0, danBg = 4, danLine = 4, danTime = 0, danSubLane = 1;
+  let danCover = DAN_COVERS.indexOf(67), danSpeed = DAN_SPEEDS.length, danAlpha = 9, danSubs = 1, danPin = 3, danPinT = 1, danHide = 0, danFs = DAN_FS.indexOf(32), danNick = 1, danBadge = 1, danFam = 0, danBg = 3, danLine = 2, danTime = 0, danSubLane = 1;
   // 'adapt' steers the layout itself: effective dir 3 (both + the
   // mid/deep opens) with bullet size and pace sliding off the same
   // rate read - danDirPick keeps the 'from' pick for when it's off
@@ -12944,8 +12944,8 @@
     if (!danNick) q.set('dann', '0');
     if (danTime) q.set('dant', '1');
     if (!danBadge) q.set('danb', '0');
-    if (danBg !== 4) q.set('danbg', String(danBg));
-    if (danLine !== 4) q.set('danl', String(danLine));
+    if (danBg !== 3) q.set('danbg', String(danBg));
+    if (danLine !== 2) q.set('danl', String(danLine));
     if (danFam) q.set('danfm', String(danFam));
     if (danPin !== 3) q.set('danp', String(danPin));
     if (!danPinT) q.set('danpt', '0');
