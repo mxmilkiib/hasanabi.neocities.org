@@ -6,6 +6,11 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-17
 
 ### Resources
+- the mode line stops taking ROOMSTATEs out of the backlog - a
+  replayed state predates the live socket's, so a lifted follow-req
+  (or slow/emote/subs/r9k) could re-arm and stick until the next real
+  mode change. backlog ones now only seed a channel the socket
+  hasn't stamped yet
 - danmaku cover gains ⅓ and ⅔ rungs and a 'from' edge pick - lanes
   can now pack up from the bottom instead of the top. danc saves and
   travels as the percent itself (danc=50) so the list can regrow

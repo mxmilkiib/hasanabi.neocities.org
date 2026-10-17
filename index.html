@@ -6256,6 +6256,9 @@
   const modesEl = document.getElementById('chatModes');
   let chatModesTxt = ''; // compact mode list folded into the live status line
   let modesOn = true;    // config toggle, default on
+  // channels whose ROOMSTATE the live socket has stamped - a backlog
+  // replay predates it and could only write a lifted mode back in
+  const roomLive = new Set();
   function setModesOn(on) { modesOn = on; markHelp('helpModes', on ? 1 : 0); updateHeader(); }
   function onRoomState(tags, ch) {
     const chips = [];
@@ -6288,7 +6291,12 @@
     if (/ (PRIVMSG|USERNOTICE|ROOMSTATE|NOTICE|CLEARCHAT|CLEARMSG|USERSTATE|GLOBALUSERSTATE|WHISPER)(?: |$)/.test(line)) {
       const parsed = parseTwitchMessage(line);
       if (!parsed) return;
-      if (parsed.kind === 'ROOMSTATE') { onRoomState(parsed.tags, (parsed.channel || '').replace(/^#/, '').toLowerCase() || CHANNEL); return; }
+      if (parsed.kind === 'ROOMSTATE') {
+        const sch = (parsed.channel || '').replace(/^#/, '').toLowerCase() || CHANNEL;
+        if (!replay || !roomLive.has(sch)) onRoomState(parsed.tags, sch);
+        if (!replay) roomLive.add(sch);
+        return;
+      }
       // own badges/colour/display-name for the local echo of sent messages -
       // USERSTATE lands per channel; GLOBALUSERSTATE seeds all joined ones
       if (parsed.kind === 'USERSTATE' || parsed.kind === 'GLOBALUSERSTATE') {
