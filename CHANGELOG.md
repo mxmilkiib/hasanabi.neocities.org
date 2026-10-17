@@ -48,6 +48,9 @@ not versions - the page ships continuously to Neocities.
   autoplay a browser guarantees, so it loads muted and the first
   page gesture lifts the sound - a deliberate in-player mute after
   that still sticks
+- a danmaku flush now caps at its newest 15 bullets - a reload into
+  a fast chat landed the whole accumulated burst as a wall the lanes
+  couldn't hold; the newest still fly, the rest stay chat rows
 
 ## 2026-10-16
 
