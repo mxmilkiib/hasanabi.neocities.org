@@ -60,6 +60,10 @@ not versions - the page ships continuously to Neocities.
   Notification fallback behind it was unreachable. it now asks
   getRegistration, which answers null and falls through to the plain
   notification instead of hanging
+- a player revive re-added the embed/v1.js script tag each rebuild -
+  the api was already in window.Twitch, so the duplicates just piled
+  up in head and re-parsed every time. it boots off the loaded api
+  now and only fetches the script on the first run
 
 ## 2026-10-16
 

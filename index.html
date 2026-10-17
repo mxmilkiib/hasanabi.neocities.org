@@ -10329,9 +10329,9 @@
     // self-perpetuating - it pauses the embed, which rewrites it
     const wantSound = saved.m !== true || !(saved.w >= 3);
     const wantPlay = saved.p !== false || saved.w !== 5;
-    const s = document.createElement('script');
-    s.src = 'https://embed.twitch.tv/embed/v1.js';
-    s.onload = () => {
+    // a revive already holds the api - re-adding the tag would stack a
+    // duplicate in head and re-parse the whole script every rebuild
+    const boot = () => {
       const emb = new Twitch.Embed('vidFrame', {
         channel: CHANNEL, width: '100%', height: '100%', layout: 'video',
         parent: [location.hostname], muted: !wantSound, autoplay: wantPlay
@@ -10421,7 +10421,13 @@
         }, 2000);
       });
     };
-    document.head.appendChild(s);
+    if (window.Twitch) boot();
+    else {
+      const s = document.createElement('script');
+      s.src = 'https://embed.twitch.tv/embed/v1.js';
+      s.onload = boot;
+      document.head.appendChild(s);
+    }
     // if the embed never reports VIDEO_READY the box would sit black
     // with no clue why - say what happened instead
     setTimeout(() => {
