@@ -83,6 +83,11 @@ not versions - the page ships continuously to Neocities.
   block-on-twtch flip and needs no deploy transform of its own
 
 ### Resources
+- the embed now boots muted on mobile clients - unmuted autoplay is
+  vetoed there whatever the ua says ('desktop site' swaps the ua, not
+  the policy), so a dead slate was all a phone ever got. the muted
+  build is allowed everywhere and the saved/loud unmute still runs
+  after VIDEO_READY - unmuting a rolling video is not autoplay-gated
 - stall pauses no longer masquerade as user picks: the PAUSE event
   fires on a connection hiccup too, and tagging that as a pick gated
   the revive kicks out for good while the stream ran on elsewhere. a

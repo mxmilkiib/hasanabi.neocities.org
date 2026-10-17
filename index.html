@@ -10372,12 +10372,18 @@
     // self-perpetuating - it pauses the embed, which rewrites it
     const wantSound = saved.m !== true || !(saved.w >= 3);
     const wantPlay = saved.p !== false || saved.w !== 5;
+    // mobile browsers veto unmuted autoplay and the 'desktop site'
+    // toggle only swaps the ua, not the policy - build muted there and
+    // unmute after VIDEO_READY, since unmuting a rolling video is not
+    // autoplay-gated. a coarse pointer survives the ua swap too
+    const mutedStart = !wantSound || (navigator.userAgentData && navigator.userAgentData.mobile)
+      || matchMedia('(pointer: coarse)').matches || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
     // a revive already holds the api - re-adding the tag would stack a
     // duplicate in head and re-parse the whole script every rebuild
     const boot = () => {
       const emb = new Twitch.Embed('vidFrame', {
         channel: CHANNEL, width: '100%', height: '100%', layout: 'video',
-        parent: [location.hostname], muted: !wantSound, autoplay: wantPlay
+        parent: [location.hostname], muted: mutedStart, autoplay: wantPlay
       });
       emb.addEventListener(Twitch.Embed.VIDEO_READY, () => {
         vidPlayer = emb.getPlayer();
