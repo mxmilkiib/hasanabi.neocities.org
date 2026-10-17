@@ -8660,7 +8660,11 @@
   function notifyShow(head, body, tag) {
     if (!notifyOn || !document.hidden || !window.Notification || Notification.permission !== 'granted') return;
     const opts = { body: body || '', icon: 'icon-192.png', tag };
-    if (navigator.serviceWorker) navigator.serviceWorker.ready.then((r) => r.showNotification(head, opts)).catch(() => { try { new Notification(head, opts); } catch {} });
+    // 'ready' pends forever when the host's csp keeps sw.js from ever
+    // registering - getRegistration answers null and falls back instead
+    if (navigator.serviceWorker) navigator.serviceWorker.getRegistration().then((r) =>
+      (r && r.active ? r.showNotification(head, opts) : Promise.reject()))
+      .catch(() => { try { new Notification(head, opts); } catch {} });
     else try { new Notification(head, opts); } catch {}
   }
   const notifyLive = (ch, title) => notifyShow(`${ch} is live`, title, 'live-' + ch);

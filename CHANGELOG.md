@@ -55,6 +55,11 @@ not versions - the page ships continuously to Neocities.
   lands back as ?error= in the query, not the fragment the handler
   reads - it now narrates itself as a notice row and cleans the
   address bar instead of sitting there unexplained
+- notifications fell silent on hosts whose csp blocks sw.js - the
+  sw.ready promise never resolves without a registration, so the
+  Notification fallback behind it was unreachable. it now asks
+  getRegistration, which answers null and falls through to the plain
+  notification instead of hanging
 
 ## 2026-10-16
 
