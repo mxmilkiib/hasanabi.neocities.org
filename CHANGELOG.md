@@ -210,6 +210,9 @@ not versions - the page ships continuously to Neocities.
   and drains late rather than shedding bullets; the frame's
   top-right drop tally stays wired in case a rate limit ever wants
   it, and it resets whenever danmaku disarms
+- the ? popup's font default is now 20px absolute rather than
+  follow-chat - the chat-relative stops stay one mode pick away,
+  and a relative pick now travels as chat-N in copied urls
 - the stats trio claws back width in the popup: burst rows drop their
   bullet prefix and the bursts-to-glorps gutter tightens to 12px
 - hovering the rate graph paints a vertical cursor at the second the
