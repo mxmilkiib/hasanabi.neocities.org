@@ -50,7 +50,9 @@ not versions - the page ships continuously to Neocities.
 - danmaku 'from' gains an 'adaptive' rung: lanes split top and bottom
   like 'both', and once the smoothed message rate runs hot or the
   bullet queue backs up extra lanes open centred in the mid-frame gap,
-  closing again as the pressure passes
+  closing again as the pressure passes; adaptive also lifts the 'auto'
+  pace ceiling to 8x and doubles its queue buffer so a flood raises the
+  pace instead of shedding bullets
 - the danmaku queue bounds at 48 - a flood too fast for the lanes now
   sheds its stalest bullets onto the 'N dropped' corner tally instead
   of building a backlog that flies minutes late; the tally counts for
