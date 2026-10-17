@@ -8496,7 +8496,7 @@
     document.documentElement.style.removeProperty('--chat-font');
     const fi = FONT_SIZES.indexOf(Math.round(chatFontPx()));
     fontCtl.seat(fi >= 0 ? fi : DEF.size);
-    fontBtn.title = 'Font size: floor - click/scroll · ⇧click back · right-click resets';
+    fontBtn.title = `Font size: ${Math.round(chatFontPx())}px (default) - click/scroll · ⇧click back · right-click resets`;
     markHelp('helpFont', -1);
     syncLh();
     repin();
@@ -8518,6 +8518,9 @@
   // or url param, all through set()/apply()) earns the stamp - the list
   // still marks the live size so the default rung shows as selected
   markHelp('helpFont', FONT_SIZES.indexOf(Math.round(chatFontPx())));
+  // an unpicked font's tooltip names the floor it's riding - a saved
+  // pick's apply() overwrites it with the stamped size
+  fontBtn.title = `Font size: ${Math.round(chatFontPx())}px (default) - click/scroll · ⇧click back · right-click resets`;
   lhCtl.set(lhCtl.get());
   weightCtl.set(weightCtl.get());
   lsCtl.set(lsCtl.get());
