@@ -35,6 +35,8 @@ not versions - the page ships continuously to Neocities.
   to set it off from midterms and primary results
 - 'aligned slate' sits above 'primary results' in the vote26 tab - the
   general-election tables now run together
+- arming danmaku no longer scrambles the chat font - bullets draw a
+  random face each on their own, and the picked font stays put
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own
