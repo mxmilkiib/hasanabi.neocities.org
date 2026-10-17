@@ -6027,11 +6027,7 @@
           if (!stream || !stream.live || vidBox.hidden) return;
           if (vidPlayer && !vidPlayer.isPaused() &&
               !(vidPlayer.isEnded && vidPlayer.isEnded())) return;
-          clearInterval(vidPoll); // the rebuilt embed starts its own poll
-          vidPlayer = null;
-          loadPlayer.done = false;
-          document.getElementById('vidFrame').innerHTML = '';
-          loadPlayer();
+          reviveVid();
         }, 12000);
       }
       if (stream.startedAt && (!lastRun || lastRun.ended || lastRun.started !== stream.startedAt)) {
@@ -10329,15 +10325,25 @@
         vidPoll = setInterval(() => {          // poll + persist; the API emits no volume event
           if (vidBox.hidden || document.hidden || !vidPlayer) return;
           vidState();
+          const ended = vidPlayer.isEnded && vidPlayer.isEnded();
           // a rolling embed always beats an armed stand-in - the
           // ENDED/decapi paths can disagree, playback can't
-          if (vidAltOn && !vidPlayer.isPaused() && !(vidPlayer.isEnded && vidPlayer.isEnded())) vidAlt(false);
+          if (vidAltOn && !vidPlayer.isPaused() && !ended) vidAlt(false);
+          // an ended slate under a stream decapi still calls live is
+          // the embed's own hiccup, not an end: nudge it rolling, then
+          // rebuild when the slate won't let go. the tally caps the
+          // kicks so a genuinely-over stream (live on decapi lag alone)
+          // isn't shaken forever
+          if (ended && stream && stream.live) {
+            if (vidEnded < 4) try { vidPlayer.play(); } catch {}
+            else if (vidEnded === 4) reviveVid();
+            vidEnded++;
+          } else vidEnded = 0;
           // the stand-in's pause is housekeeping, not user intent - an
           // alt-played session must not persist 'paused' over the pick
           if (vidAltOn) return;
           // an ended slate reads paused without anyone pausing it -
           // storing it as p replays the stream's end as the user's pick
-          const ended = vidPlayer.isEnded && vidPlayer.isEnded();
           const paused = vidPlayer.isPaused() && !ended, muted = vidPlayer.getMuted();
           if (!armed && !paused && !muted) armed = true;
           const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed || !wantSound ? muted : false, p: armed || !wantPlay ? !paused : true, w: 5 });
@@ -10388,6 +10394,16 @@
   let vidPausedByHide = false;
   let vidRetry = 0;
   let vidPoll = 0;
+  let vidEnded = 0; // consecutive poll reads of an ended slate under 'live'
+  // a slate that shrugs off play() is stale outright - clear the embed
+  // and let a fresh loadPlayer() take the frame
+  function reviveVid() {
+    clearInterval(vidPoll); // the rebuilt embed starts its own poll
+    vidPlayer = null;
+    loadPlayer.done = false;
+    document.getElementById('vidFrame').innerHTML = '';
+    loadPlayer();
+  }
   // the offline stand-in: on the home channel a dead stream covers the
   // embed with a set youtube video until the stream comes back - the
   // embed stays mounted underneath so the return trip is instant

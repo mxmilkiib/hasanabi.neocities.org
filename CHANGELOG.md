@@ -6,6 +6,10 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-17
 
 ### Resources
+- an ended slate under a stream decapi still calls live now heals
+  itself - the poll nudges play for a few ticks, then rebuilds the
+  embed outright when the slate won't let go. the flip-time rebuild
+  and this share one revive helper
 - the volume record stops persisting an ended slate's 'paused' - it
   was never a pick, and a false p pauses the embed on every later
   load until one manual play rewrites it. the record bumps to w:5
