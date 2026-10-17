@@ -21,6 +21,8 @@ not versions - the page ships continuously to Neocities.
   '3col chat | chat | chat' - the column contents named inline
 - the jump-down buttons' marching-dash rings are gold now instead of the
   theme accent, and the flanking circles' ring march runs ~6x quicker
+- '1col danmaku/chat' moves in the layout picker to sit just below
+  '1col vid/chat' with the other stacked-video variants
 - the twtch generic-version note gains a spacer row below it - a nested
   blank sep inside the note div, so it rides the same hidden-in-source /
   block-on-twtch flip and needs no deploy transform of its own
