@@ -198,7 +198,8 @@ not versions - the page ships continuously to Neocities.
   whole layer, subs leads a subscriber's bullet with the small
   month count in the chip's teal→red gradient, pin parks a matching
   bullet top-centre in a nick-coloured pill for a few seconds - own
-  lines, mentions and keyword hits at 'self+pings', subs and bits
+  lines, @you pings and keyword hits at 'self+pings' (the row's
+  'mention' class is @hasanabi, not a ping), subs and bits
   joining at '+subs' - and hide drops bots and/or !command lines
   from the stream; saved
   as danc/danv/dano/dans/danp/danf and round-tripped in copied urls. a

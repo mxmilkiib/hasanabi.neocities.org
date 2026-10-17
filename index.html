@@ -10557,11 +10557,12 @@
       if (mo) out.unshift({ sub: +mo });
     }
     const rec = lg && seenNicks.get(lg);
-    // pin modes hold matching bullets top-centre for a beat: own lines,
-    // mentions and keyword hits at level one, subs and bits join at two
+    // pin modes hold matching bullets top-centre for a beat: own lines
+    // and keyword hits (the @you ping rides 'kw') at level one, subs
+    // and bits join at two. 'mention' is @hasanabi, not a ping to you
     let top = false;
     if (danPin) {
-      top = row.classList.contains('self') || row.classList.contains('mention') || row.classList.contains('kw');
+      top = row.classList.contains('self') || row.classList.contains('kw');
       if (!top && danPin > 1) top = /\b(?:subscriber|bits)\//.test(row.dataset.badges || '');
     }
     // a random-face pick and a magnifier rung stay with the bullet for
