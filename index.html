@@ -11111,9 +11111,9 @@
   // flight - half fly normal, the rest draw on a bigger rung
   const DAN_MAGS = [1, 1, 1, 1, 1.5, 1.5, 2, 2.6];
   const danMag = () => DAN_MAGS[(Math.random() * DAN_MAGS.length) | 0];
-  // a big roll may bleed into neighbouring lanes but never past two
-  // pitches, so the magnifier can't cover the stack
-  const danEmoteSize = (m, px, pitch) => Math.min(danEmoteH(px) * m, Math.round(pitch * 2));
+  // a big roll fills its own row at most - the magnifier never lets
+  // an emote bleed into the neighbouring lanes
+  const danEmoteSize = (m, px, pitch) => Math.min(danEmoteH(px) * m, Math.round(pitch));
   function danmakuPush(row) {
     if (!danmakuOn || vidBox.hidden) return;
     const m = row.querySelector('.msg');
@@ -11308,7 +11308,8 @@
               let fit = true;
               for (const b of danBullets) {
                 if (b.t0) { if (pinClash(b, ly, px)) { fit = false; break; } continue; }
-                if (b.lane !== L) continue;
+                const rt = b.y - b.px;
+                if (Math.min(rt + b.pitch, ly + danPitch) <= Math.max(rt, ly)) continue;
                 if (b.x + b.w > px && (b.x - px - w) / (b.v * pace) < clearFor) { fit = false; break; }
               }
               if (fit) ok.push([L, sd, px, hot]);
@@ -11335,13 +11336,18 @@
         const pace = danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAuto;
         for (let k = 0; k < danLanes; k++) {
           const L = (danNextLane + k) % danLanes;
+          const ly = danLaneY(L);
           let ok = true;
-          // a parked pin holds its lane only until it stops mattering -
+          // a parked pin holds its row only until it stops mattering -
           // a pin due to fade lets the bullet in, since the scroller
           // reaches the berth after the pill is gone - and a bullet
-          // keeps an 8px entry gap behind its predecessor
+          // keeps an 8px entry gap behind its predecessor. the row test
+          // reads drawn space, not the lane index - adaptive re-meters
+          // the rows while in-flight bullets keep their launch rows, so
+          // an old bullet can sit on what is now a different lane's row
           for (const b of danBullets) {
-            if (b.lane !== L) continue;
+            const rt = b.t0 ? b.ry : b.y - b.px;
+            if (Math.min(rt + b.pitch, ly + danPitch) <= Math.max(rt, ly)) continue;
             if (b.t0) {
               if (b.t0 + b.hold - DAN_FADE - performance.now() > (W - (b.x + b.w + 7)) / (v * pace)) { ok = false; break; }
               continue;
@@ -11493,7 +11499,7 @@
             el._ew = ew; el._eh = eh;
             el.style.width = ew + 'px'; el.style.height = eh + 'px';
           }
-          const tx = Math.round(x), ty = Math.round(b.y - eh / 2);
+          const tx = Math.round(x), ty = Math.round(b.y - b.px + (b.pitch - eh) / 2);
           if (el._tx !== tx || el._ty !== ty) {
             el._tx = tx; el._ty = ty;
             el.style.transform = `translate(${tx}px, ${ty}px)`;
