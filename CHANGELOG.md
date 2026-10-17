@@ -68,6 +68,8 @@ not versions - the page ships continuously to Neocities.
   again', 'not found', etc - decapi's failure sentences all run under
   40 chars, so the match now needs that length cap too, and a long
   real title survives the word inside it
+- salmon gains its own glyph (❥) - it was the one palette left on
+  the ◐ fallback
 
 ## 2026-10-16
 
