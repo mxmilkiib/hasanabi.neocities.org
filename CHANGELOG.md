@@ -214,7 +214,7 @@ not versions - the page ships continuously to Neocities.
   follow-chat - the chat-relative stops stay one mode pick away,
   and a relative pick now travels as chat-N in copied urls
 - danmaku opts gains a size row - 'chat' keeps bullets tracking
-  the chat font while a px stop (12-32) locks them; bigger text
+  the chat font while a px stop (12-52) locks them; bigger text
   means fewer lanes since the pitch scales with it. saved as dfs,
   travelling as the px value in copied urls
 - the stats trio claws back width in the popup: burst rows drop their
