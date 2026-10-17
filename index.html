@@ -11261,7 +11261,9 @@
           Math.min(b.ry + b.pitch, y + danPitch) - Math.max(b.ry, y) > 0
           && b.x - 7 < px + w + 7 && px - 7 < b.x + b.w + 7;
         // a side's next berth on a row sits just past its parked pills;
-        // 'hot' marks a row already holding pins so it fills first
+        // 'hot' marks a row already holding pins so it fills first.
+        // the berth stays inside the frame - an off-edge claim would
+        // clamp back onto the edge pill's space and stack on it
         const tip = (y, sd) => {
           let px = danPinX(W, w, sd), hot = false;
           for (const b of danBullets) {
@@ -11269,6 +11271,7 @@
             hot = true;
             if (b.ps === sd) px = sd ? Math.min(px, b.x - w - 20) : Math.max(px, b.x + b.w + 20);
           }
+          px = sd ? Math.max(8, px) : Math.min(px, W - w - 8);
           return [px, hot];
         };
         const freeYs = [];
