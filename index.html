@@ -2425,6 +2425,9 @@
   #chatLen.over { color: var(--danger); opacity: 1; }
   #chatInput.longmsg { border-color: var(--accent); }
   #chatInput.overcap { border-color: var(--danger); }
+  /* a timed-out draft stays editable but ghosts - it can't go anywhere
+     until the countdown lapses */
+  #chatInput.to { color: var(--text-dim); font-style: italic; }
   #chatbar input::placeholder, #chatbar textarea::placeholder { color: var(--text-dim); }
   /* the hint reads as a prompt, not typed text, and steps aside on focus */
   #chatInput::placeholder { font-style: italic; }
@@ -13754,7 +13757,8 @@
   if (oauthErr) queueMessage({ tags: {}, login: null, kind: 'NOTICE',
     message: `twitch refused the login redirect (${oauthErr}) - this domain may be missing from the app's registered oauth redirect uris` }, false);
 
-  // timeout lock: the input is disabled with a countdown until it lapses.
+  // timeout lock: drafts stay typeable but ghosted and unsendable, a
+  // countdown placeholder until it lapses.
   // Keyed per channel - a timeout in one room leaves the others open.
   // The map persists - a reload forgets the lock but not twitch's ban,
   // so still-running expiries come back to keep the input shut
@@ -14051,12 +14055,12 @@
       delete toUntils[tch];
       saveTos();
       if (!Object.keys(toUntils).length) { clearInterval(toTimer); toTimer = 0; }
-      chatInput.disabled = false;
+      chatInput.classList.remove('to');
       updateSendUI();
       return;
     }
     const h = (left / 3600) | 0, m = ((left % 3600) / 60) | 0, s = left % 60;
-    chatInput.disabled = true;
+    chatInput.classList.add('to');
     chatInput.placeholder = `timed out${MULTI ? ` in #${tch}` : ''} - ${h ? h + 'h ' : ''}${h || m ? m + 'm ' : ''}${s}s left`;
   }
   function setTimedOut(until, ch) {
@@ -14093,6 +14097,9 @@
         : 'Log in with Twitch to send messages';
     chatbarEl.hidden = !on && !(pending && !chatbarEl.hidden);
     chatInput.disabled = pending;
+    // a target hop to an unbanned room clears the ghost before
+    // paintTimeout re-adds it for a still-running one
+    chatInput.classList.remove('to');
     chatInput.placeholder = on
       ? `chat as @${auth.login}${MULTI ? ` → #${sendTarget()}` : ''}`
       : pending ? 'finishing twitch login…' : 'log in to chat';
