@@ -213,6 +213,10 @@ not versions - the page ships continuously to Neocities.
 - the ? popup's font default is now 20px absolute rather than
   follow-chat - the chat-relative stops stay one mode pick away,
   and a relative pick now travels as chat-N in copied urls
+- danmaku speed gains an 'auto' rung - the crossing pace tracks
+  the live message rate (clamped 0.3-3x), so quiet chat keeps its
+  bullets lingering on screen and a flood hurries them through;
+  a short EMA smooths the per-second sample steps
 - copied urls stop leaking implied state on the danmaku layout:
   the borrowed random font stays home (it re-derives on load),
   video=on and dan=1 drop out since 1cdan implies both - dan=0 or

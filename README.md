@@ -506,7 +506,7 @@ editing a URL.
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
 | `dan` | flag | danmaku bullets over the video |
 | `danc` | `0`–`3` | danmaku cover: top ¼ / ½ / ¾ / full frame |
-| `danv` | `0`–`4` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x |
+| `danv` | `0`–`5` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x / `auto` (pace tracks the live message rate) |
 | `dano` | `0`–`3` | danmaku layer opacity: 25 / 50 / 75 / 100% |
 | `dans` | flag / `0` | subscriber bullets lead with the month count in the chip's gradient; on by default, `0` disables |
 | `danp` | `0`–`2` | pinned bullets: off / own, @you pings and keyword hits hold top-centre / +subs and bits |
