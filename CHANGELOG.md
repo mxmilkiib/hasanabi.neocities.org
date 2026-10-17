@@ -6,6 +6,10 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-17
 
 ### Resources
+- the slate revive respects a stopped pick: a live stream paused past
+  its buffer reports 'ended' like a dead one, so the kicks now need a
+  slate no PAUSE event produced - pausing no longer gets the video
+  torn down and restarted under you
 - an ended slate under a stream decapi still calls live now heals
   itself - the poll nudges play for a few ticks, then rebuilds the
   embed outright when the slate won't let go. the flip-time rebuild

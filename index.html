@@ -10306,12 +10306,16 @@
         // read is only a veto when one asked for sound; an embed loaded
         // muted is already the intent, so its m can persist unarmed
         let armed = false;
+        // a live stream paused past its buffer reports 'ended' like a
+        // dead one - the pause event marks the pick so a slate grown
+        // out of it never earns the revive kicks
+        let vidUserPause = false;
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
         // PLAYING is ground truth that beats decapi's lag in both
         // directions - a rolling embed tears the stand-in back down
-        emb.addEventListener(Twitch.Player.PLAYING, () => { vidState(); vidAlt(false); });
-        emb.addEventListener(Twitch.Player.PAUSE, vidState);
+        emb.addEventListener(Twitch.Player.PLAYING, () => { vidUserPause = false; vidState(); vidAlt(false); });
+        emb.addEventListener(Twitch.Player.PAUSE, () => { vidUserPause = true; vidState(); });
         // ENDED beats decapi's lag to the punch - the stand-in swaps
         // in on the spot rather than waiting a poll cycle. a spurious
         // ENDED while the embed's still rolling must not arm it
@@ -10329,12 +10333,12 @@
           // a rolling embed always beats an armed stand-in - the
           // ENDED/decapi paths can disagree, playback can't
           if (vidAltOn && !vidPlayer.isPaused() && !ended) vidAlt(false);
-          // an ended slate under a stream decapi still calls live is
-          // the embed's own hiccup, not an end: nudge it rolling, then
-          // rebuild when the slate won't let go. the tally caps the
-          // kicks so a genuinely-over stream (live on decapi lag alone)
-          // isn't shaken forever
-          if (ended && stream && stream.live) {
+          // an ended slate under a stream decapi still calls live -
+          // with no pause behind it - is the embed's own hiccup, not
+          // an end: nudge it rolling, then rebuild when the slate
+          // won't let go. the tally caps the kicks so a genuinely-over
+          // stream (live on decapi lag alone) isn't shaken forever
+          if (ended && stream && stream.live && !vidUserPause) {
             if (vidEnded < 4) try { vidPlayer.play(); } catch {}
             else if (vidEnded === 4) reviveVid();
             vidEnded++;
@@ -10399,6 +10403,7 @@
   // and let a fresh loadPlayer() take the frame
   function reviveVid() {
     clearInterval(vidPoll); // the rebuilt embed starts its own poll
+    vidEnded = 0;
     vidPlayer = null;
     loadPlayer.done = false;
     document.getElementById('vidFrame').innerHTML = '';
