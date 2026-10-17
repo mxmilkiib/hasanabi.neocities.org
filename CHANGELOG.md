@@ -5,6 +5,13 @@ not versions - the page ships continuously to Neocities.
 
 ## 2026-10-17
 
+### Options
+- new 'address bar tracks it live' option beside the copy button:
+  with it on, every settings change rewrites the bar to the canonical
+  settings url via history.replaceState - no reload, no history spam.
+  rides in the url itself as ?lurl=1, so a copied link hands the mode
+  on; switching off writes once more so the stale param can't re-arm
+
 ### Resources
 - stall pauses no longer masquerade as user picks: the PAUSE event
   fires on a connection hiccup too, and tagging that as a pick gated
