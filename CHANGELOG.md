@@ -227,6 +227,11 @@ not versions - the page ships continuously to Neocities.
 - danmaku opts gains a 'nick' toggle - bullets lead with the
   sender's display name row-style ('name: text'), after the sub
   month count when both prefixes are on
+- the black video is fixed: '#vid iframe { display: block }' outranked
+  the browser's [hidden] rule, so the stand-in's iframe painted its
+  black background over the embed even while 'hidden' - disabling it,
+  blanking its src, never mattered. '#vid iframe[hidden]' now hides
+  for real and the stand-in is back on, properly covered
 - the saved volume record bumps to w:4 and stops trusting a w:3
   'paused' - a stand-in session could leak one, and a false p is
   self-perpetuating: load paused, save paused, black box forever

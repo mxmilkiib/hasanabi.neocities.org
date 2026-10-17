@@ -597,6 +597,9 @@
   #vid #danDrop { position: absolute; top: 3px; right: 6px; z-index: 2;
     font: 10px ui-monospace, monospace; color: var(--text); opacity: .55; }
   #vid iframe { width: 100%; height: 100%; border: 0; display: block; }
+  /* display:block above outranks the UA's [hidden] rule - an 'about:blank'
+     vidAlt would still paint its #000 background over the whole frame */
+  #vid iframe[hidden] { display: none; }
   @property --jdash { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
   .jdown {
     position: absolute;
@@ -10385,18 +10388,14 @@
   let vidAltPref = 1; // 'stand-in' help toggle - 0 keeps the offline slate
   function setVidAlt(i) { vidAltPref = i; markHelp('helpVAlt', i); if (!i) vidAlt(false); }
   function vidAlt(on) {
-    // stand-in disabled while the blank-video report runs - callers
-    // no-op; vidAltOn stays false, so the kick listeners, the poll
-    // watchdog, and the persist guard all stay inert
-    return;
-    // on = !!VID_ALT_URL && vidAltPref && on && !vidBox.hidden;
-    // if (on === vidAltOn) return;
-    // vidAltOn = on;
-    // vidAltEl.hidden = !on;
-    // vidAltEl.src = on ? VID_ALT_URL : 'about:blank'; // blanking silences it
-    // // pausing for the stand-in borrows the hide flag so a hide->show
-    // // while live again still resumes the embed
-    // if (on) try { if (vidPlayer && !vidPlayer.isPaused()) { vidPausedByHide = true; vidPlayer.pause(); } } catch {}
+    on = !!VID_ALT_URL && vidAltPref && on && !vidBox.hidden;
+    if (on === vidAltOn) return;
+    vidAltOn = on;
+    vidAltEl.hidden = !on;
+    vidAltEl.src = on ? VID_ALT_URL : 'about:blank'; // blanking silences it
+    // pausing for the stand-in borrows the hide flag so a hide->show
+    // while live again still resumes the embed
+    if (on) try { if (vidPlayer && !vidPlayer.isPaused()) { vidPausedByHide = true; vidPlayer.pause(); } } catch {}
   }
   // a browser that vetoes sound-autoplay leaves the embed cued - the
   // first page gesture re-fires play over the jsapi command channel,
