@@ -11330,15 +11330,21 @@
         }
       } else {
         v = (W + w) / (DAN_DUR * (0.85 + Math.random() * 0.3));
+        const pace = danSpeed < DAN_SPEEDS.length ? DAN_SPEEDS[danSpeed] : danAuto;
         for (let k = 0; k < danLanes; k++) {
           const L = (danNextLane + k) % danLanes;
           let ok = true;
-          // a parked pin always holds its lane and a bullet keeps an
-          // 8px entry gap behind its predecessor - pressure opens
-          // reserved rows instead of overlapping the stream
+          // a parked pin holds its lane only until it stops mattering -
+          // a pin due to fade lets the bullet in, since the scroller
+          // reaches the berth after the pill is gone - and a bullet
+          // keeps an 8px entry gap behind its predecessor
           for (const b of danBullets) {
             if (b.lane !== L) continue;
-            if (b.t0 || b.x + b.w > W - 8) { ok = false; break; }
+            if (b.t0) {
+              if (b.t0 + b.hold - DAN_FADE - performance.now() > (W - (b.x + b.w + 7)) / (v * pace)) { ok = false; break; }
+              continue;
+            }
+            if (b.x + b.w > W - 8) { ok = false; break; }
             if (v > b.v && (W - b.x - b.w) / (v - b.v) < (b.x + b.w) / b.v) { ok = false; break; }
           }
           if (ok) { lane = L; break; }
