@@ -3,6 +3,15 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions - the page ships continuously to Neocities.
 
+## 2026-10-17
+
+### Resources
+- the volume record's 'armed' now means unmuted play was actually
+  seen, so a browser's autoplay veto can't pose as a user pick on
+  either axis - and a muted read only counts as a veto when sound
+  was asked for: an embed loaded muted is already the intent, so a
+  chosen mute persists without waiting for the arm
+
 ## 2026-10-16
 
 ### Header

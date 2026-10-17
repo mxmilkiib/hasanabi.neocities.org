@@ -10305,10 +10305,11 @@
         vidPlayer.setMuted(!wantSound);
         if (!wantPlay) vidPlayer.pause();
         vidState();
-        // until the player has been seen playing unmuted, a muted read is
-        // the browser's veto rather than the user's choice, so the record
-        // keeps the saved intent instead of storing the veto
-        let armed = !wantSound;
+        // 'armed' means unmuted playback was actually observed - nothing
+        // before that can tell a user mute from a browser veto. a muted
+        // read is only a veto when one asked for sound; an embed loaded
+        // muted is already the intent, so its m can persist unarmed
+        let armed = false;
         // player events are forwarded on the embed - getPlayer() is a
         // control-only proxy without addEventListener
         // PLAYING is ground truth that beats decapi's lag in both
@@ -10336,7 +10337,7 @@
           if (vidAltOn) return;
           const paused = vidPlayer.isPaused(), muted = vidPlayer.getMuted();
           if (!armed && !paused && !muted) armed = true;
-          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed ? muted : false, p: armed || !wantPlay ? !paused : true, w: 4 });
+          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed || !wantSound ? muted : false, p: armed || !wantPlay ? !paused : true, w: 4 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}
