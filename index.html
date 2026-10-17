@@ -11239,7 +11239,7 @@
       danCtx.letterSpacing = s.ls;
       const measure = (px) => {
         danFont(`${s.w} ${px}px ${fam0}`);
-        const eh = danEmoteSize(q.mag, px, bpitch);
+        const eh = danEmoteSize(q.mag, px, Math.min(bpitch, px * 2));
         return Math.ceil(q.segs.reduce((a, g) => a + (g.t != null
           ? (g.px = px, g.f = fam0, g.w = danCtx.measureText(g.t).width, g.w)
           : g.sub != null
@@ -11266,8 +11266,8 @@
       if (pinned) {
         // a pin longer than the frame can't park whole - shrink the
         // face until the pill fits inside the 8px rails
-        for (let n = 0; w > W - 16 && bpx > 9 && n < 2; n++) {
-          bpx = Math.max(9, Math.floor(bpx * (W - 16) / w));
+        for (let n = 0; w > W - 16 && bpx > 7 && n < 4; n++) {
+          bpx = Math.max(7, Math.floor(bpx * (W - 16) / w));
           w = measure(bpx);
         }
         // 'pin len' tenure rungs stretch a sub's hold with its months:
@@ -11526,7 +11526,7 @@
         // the shown element gates itself - the pool img only estimates
         // lane width, so an el still fetching keeps its code text
         if (el.complete && el.naturalWidth) {
-          const eh = s.bd ? danBadgeH(b.px) : danEmoteSize(b.mag, b.px, b.pitch), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
+          const eh = s.bd ? danBadgeH(b.px) : danEmoteSize(b.mag, b.px, Math.min(b.pitch, b.px * 2)), ew = Math.round(eh * el.naturalWidth / el.naturalHeight);
           // dom writes are the phone's other cost - only touch style
           // when a value actually moved
           if (el.hidden) el.hidden = false;
