@@ -6,6 +6,10 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-17
 
 ### Resources
+- the volume record stops persisting an ended slate's 'paused' - it
+  was never a pick, and a false p pauses the embed on every later
+  load until one manual play rewrites it. the record bumps to w:5
+  so the leaks w:4 could hold stop being trusted
 - the volume record's 'armed' now means unmuted play was actually
   seen, so a browser's autoplay veto can't pose as a user pick on
   either axis - and a muted read only counts as a veto when sound

@@ -10286,11 +10286,11 @@
     const saved = (() => { try { return JSON.parse(localStorage.getItem(VOL_KEY)) || {}; } catch { return {}; } })();
     // only a w-stamped record is trusted as deliberate - anything older
     // may be the forced muted/paused state a blocked autoplay left
-    // behind. p asks for w:4 specifically: a w:3 record could carry a
-    // 'paused' that a stand-in session leaked, and a false p is
+    // behind. p asks for w:5 specifically: a w:4 record could carry a
+    // 'paused' that an ended slate leaked, and a false p is
     // self-perpetuating - it pauses the embed, which rewrites it
-    const wantSound = saved.m !== true || (saved.w !== 3 && saved.w !== 4);
-    const wantPlay = saved.p !== false || saved.w !== 4;
+    const wantSound = saved.m !== true || !(saved.w >= 3);
+    const wantPlay = saved.p !== false || saved.w !== 5;
     const s = document.createElement('script');
     s.src = 'https://embed.twitch.tv/embed/v1.js';
     s.onload = () => {
@@ -10335,9 +10335,12 @@
           // the stand-in's pause is housekeeping, not user intent - an
           // alt-played session must not persist 'paused' over the pick
           if (vidAltOn) return;
-          const paused = vidPlayer.isPaused(), muted = vidPlayer.getMuted();
+          // an ended slate reads paused without anyone pausing it -
+          // storing it as p replays the stream's end as the user's pick
+          const ended = vidPlayer.isEnded && vidPlayer.isEnded();
+          const paused = vidPlayer.isPaused() && !ended, muted = vidPlayer.getMuted();
           if (!armed && !paused && !muted) armed = true;
-          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed || !wantSound ? muted : false, p: armed || !wantPlay ? !paused : true, w: 4 });
+          const j = JSON.stringify({ v: Math.round(vidPlayer.getVolume() * 100) / 100, m: armed || !wantSound ? muted : false, p: armed || !wantPlay ? !paused : true, w: 5 });
           if (j !== last) { last = j; try { localStorage.setItem(VOL_KEY, j); } catch {} }
           // match the box to the actual stream resolution so the embed
           // letterboxes nothing - videoResolution is "WxH" or {width,height}
