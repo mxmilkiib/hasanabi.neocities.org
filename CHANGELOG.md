@@ -213,6 +213,11 @@ not versions - the page ships continuously to Neocities.
 - the ? popup's font default is now 20px absolute rather than
   follow-chat - the chat-relative stops stay one mode pick away,
   and a relative pick now travels as chat-N in copied urls
+- copied urls stop leaking implied state on the danmaku layout:
+  the borrowed random font stays home (it re-derives on load),
+  video=on and dan=1 drop out since 1cdan implies both - dan=0 or
+  video=off still travel when the state deviates. a url font pick
+  now applies past the arm so it beats the borrow
 - danmaku opts gains a size row - 40px is the default stop, 'chat'
   keeps bullets tracking the chat font and a px stop (12-52) locks
   them; bigger text means fewer lanes since the pitch scales with

@@ -11946,8 +11946,10 @@
     if (colourMode !== 'gray') q.set('colour', colourMode);
     if (variantMode !== 'standard') q.set('variant', variantMode);
     if (shadeIdx !== DEF.shade) q.set('shade', shadeIdx == null ? 'auto' : SHADE_NAMES[shadeIdx]);
-    if (fontRand) q.set('font', 'rand');
-    else if (fontSel.value !== 'roobert') q.set('font', fontSel.value);
+    // a borrowed random is the danmaku layout's own doing and re-derives
+    // on load - only a deliberate rand pick travels
+    if (fontRand && !danFontAuto) q.set('font', 'rand');
+    else if (!fontRand && fontSel.value !== 'roobert') q.set('font', fontSel.value);
     // a pick on the floor rung still travels - 16px picked isn't 16px
     // floored for a recipient whose root size isn't 16
     if (fontCtl.get() !== DEF.size || fontPicked()) q.set('size', FONT_SIZES[fontCtl.get()]);
@@ -11979,9 +11981,9 @@
     if (splitLevel > 1) q.set('split', SPLIT_URL[splitLevel - 1]);
     // in rail mode the video state is vidRail (dock is the baseline);
     // outside it video=1 only when the box is shown. layouts that pin
-    // the video own its placement - vidRail is stale there, so the url
-    // only needs the param when the pinned video is actually hidden
-    if (LVL_VIDRAIL.has(splitLevel) || LVL_VIDFLOAT.has(splitLevel)) { if (vidBox.hidden !== (splitLevel === 14)) q.set('video', vidBox.hidden ? 'off' : 'on'); }
+    // the video own its placement - the stack levels force it on - so
+    // the url only needs the param when the video deviates from that
+    if (LVL_VIDRAIL.has(splitLevel) || LVL_VIDFLOAT.has(splitLevel) || LVL_VIDSTACK.has(splitLevel)) { if (vidBox.hidden !== (splitLevel === 14)) q.set('video', vidBox.hidden ? 'off' : 'on'); }
     else if (railEl.hidden) { if (!vidBox.hidden) q.set('video', 'on'); }
     else if (vidRail !== 'dock') q.set('video', vidRail);
     if (kwInput.value.trim()) q.set('kw', kwInput.value.trim());
@@ -12003,7 +12005,9 @@
     if (!lkIco) q.set('lkico', '0');
     if (!pronounsOn) q.set('pn', '0');
     if (hideBots) q.set('nbots', '1');
-    if (danmakuOn) q.set('dan', '1');
+    // 1cdan arms bullets itself - only a state deviating from the
+    // layout's own arm travels
+    if (danmakuOn !== (splitLevel === 19)) q.set('dan', danmakuOn ? '1' : '0');
     if (danCover !== 3) q.set('danc', String(danCover));
     if (danSpeed !== 2) q.set('danv', String(danSpeed));
     if (danAlpha !== 3) q.set('dano', String(danAlpha));
@@ -16784,11 +16788,6 @@
       if (v === 'auto' || i >= 0) { shadeIdx = v === 'auto' ? null : i; applyShade(); }
       else if (v !== '' && Number.isFinite(+v)) { shadeIdx = Math.max(0, Math.min(SHADE_NAMES.length - 1, +v)); applyShade(); }
     }
-    if (q.has('font')) {
-      const f = q.get('font');
-      if (f === 'rand') setFontRand();
-      else if (FONT_STACKS[f]) { fontSel.value = f; applyFont(); }
-    }
     if (q.has('size')) { const i = FONT_SIZES.indexOf(+q.get('size')); if (i >= 0) fontCtl.set(i); }
     if (q.has('lh')) { const i = LINE_HEIGHTS.indexOf(+q.get('lh')); if (i >= 0) lhCtl.set(i); }
     if (q.has('wght')) { const i = WEIGHTS.indexOf(+q.get('wght')); if (i >= 0) weightCtl.set(i); }
@@ -16859,6 +16858,14 @@
     if (q.has('pn')) setPronouns(flag('pn'));
     if (q.has('nbots')) setBotsHide(flag('nbots'));
     if (q.has('dan')) setDanmaku(flag('dan'));
+    // a url font pick applies past the danmaku arm so it beats the
+    // borrow, and it isn't what disarm should hand back
+    if (q.has('font')) {
+      danFontAuto = false;
+      const f = q.get('font');
+      if (f === 'rand') setFontRand();
+      else if (FONT_STACKS[f]) { fontSel.value = f; applyFont(); }
+    }
     if (q.has('danc')) setDanCover(Math.min(DAN_COVERS.length - 1, Math.max(0, +q.get('danc')) || 0));
     if (q.has('danv')) setDanV(Math.min(DAN_SPEEDS.length - 1, Math.max(0, +q.get('danv')) || 0));
     if (q.has('dano')) setDanAlp(Math.min(DAN_ALPHAS.length - 1, Math.max(0, +q.get('dano')) || 0));
