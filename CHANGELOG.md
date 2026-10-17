@@ -101,11 +101,13 @@ not versions - the page ships continuously to Neocities.
 - reset options keeps the channel on any alias now - arriving via
   ?s=/ ?c= used to lose it on the reload and land on the default
   channel
-- twtch's og card image renders from its own generic source in
-  deploy.sh - og-src-twtch.svg drops the avatar and the hasan
-  references, so a pasted twtch link unfurls 'Twtch Chat Thing' with
-  plain client copy and its own url. the meta descriptions and
-  manifest text genericize the same way
+- twtch's og card image is generated from og-src.svg at deploy time
+  rather than kept as a second source - deploy.sh drops the avatar
+  and hasan text, swaps brand and domain, and content-caches the
+  render so rsvg-convert only re-runs when the card changes. a guard
+  fails the deploy if the source drifts past the transforms and a
+  'hasan' slips through. the meta descriptions and manifest text
+  genericize the same way
 
 ## 2026-10-16
 
