@@ -10149,7 +10149,7 @@
     // bullet state can't re-arm on a level that doesn't carry it. the
     // bullet opts do restore - they apply whenever the layout arms it
     if (Number.isInteger(o.danc) && danCovIx(o.danc) >= 0) setDanCover(danCovIx(o.danc));
-    if (Number.isInteger(o.dand)) setDanDir(o.dand ? 1 : 0);
+    if (Number.isInteger(o.dand)) setDanDir(o.dand);
     if (Number.isInteger(o.danv) && o.danv >= 0 && o.danv <= DAN_SPEEDS.length) setDanV(o.danv);
     if (Number.isInteger(o.dano) && o.dano >= 0 && o.dano < DAN_ALPHAS.length) setDanAlp(o.dano);
     if (Number.isInteger(o.dans)) setDanSub(o.dans ? 1 : 0);
@@ -10686,11 +10686,11 @@
   // stream; the newest of the batch keep flying, the rest stay rows
   const DAN_FLUSH_MAX = 15;
   let danLanes = 0, danFontPx = 16, danPitch = 24, danNextLane = 0;
-  let danH = 0, danDirWas = 0; // frame height + pack edge the lanes were metered under
+  let danH = 0, danDirWas = 0, danTopN = 0; // frame height, pack edge + top-band split the lanes were metered under
   let danRaf = 0, danLast = 0;
   // option indices into the stop lists - the defaults restore the plain
   // look: full frame, standard pace, opaque, nothing pinned or hidden
-  const DAN_COVERS = [25, 33, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1];
+  const DAN_COVERS = [25, 33, 40, 50, 67, 75, 100], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1];
   // danc saves/travels as the percent itself so the list can regrow -
   // a sub-25 value is the old quarter ladder's index, still resolving
   const DAN_COVERS_OLD = [25, 50, 75, 100];
@@ -10713,7 +10713,7 @@
     return danAuto += (t - danAuto) * Math.min(1, dt / 600);
   }
   let danCover = DAN_COVERS.length - 1, danSpeed = DAN_SPEEDS.length, danAlpha = 3, danSubs = 1, danPin = 0, danHide = 0, danFs = DAN_FS.indexOf(40), danNick = 1, danBadge = 1;
-  let danDir = 0; // 0 packs lanes from the top, 1 from the bottom
+  let danDir = 0; // 0 packs lanes from the top, 1 from the bottom, 2 splits the cover between both
   let danFontAuto = false; // set when arming borrowed the font picker into random
   // bullets the queue trimmed under load - the corner tally shows it
   const danDropEl = document.getElementById('danDrop');
@@ -10742,14 +10742,22 @@
   // the line-height floored so a tight lh can't collide lanes and capped
   // so a loose one can't starve them. a mid-flight size or lh change
   // re-lanes the bullets already flying
-  // lane L's band-top - lane 0 hugs the packed edge either way
-  const danLaneY = (L) => danDir ? danH - (L + 1) * danPitch : L * danPitch;
+  // lane L's band-top - lane 0 hugs the packed edge either way. 'both'
+  // splits the lane count in half: the first band packs down from the
+  // top, the rest pack up from the bottom, the middle stays clear
+  const danLaneY = (L) => danDir === 2
+    ? (L < danTopN ? L * danPitch : danH - (L - danTopN + 1) * danPitch)
+    : danDir ? danH - (L + 1) * danPitch : L * danPitch;
   function danMeter(s, H) {
     const px = Math.max(9, Math.min(DAN_FS[danFs] || s.px, H * 0.2));
     const pitch = px * Math.max(1.25, Math.min(2, s.lh));
-    const lanes = Math.max(1, Math.min(10, Math.floor(H * DAN_COVERS[danCover] / 100 / pitch)));
+    // the cover is the frame fraction lanes may occupy - 'both' halves
+    // it per edge, so two-fifths packs a fifth of lanes at each edge
+    const per = Math.max(1, Math.floor(H * DAN_COVERS[danCover] / (danDir === 2 ? 200 : 100) / pitch));
+    const lanes = danDir === 2 ? Math.min(10, per * 2) : Math.max(1, Math.min(10, per));
     if (px === danFontPx && pitch === danPitch && lanes === danLanes && H === danH && danDir === danDirWas) return;
     danFontPx = px; danPitch = pitch; danLanes = lanes; danH = H; danDirWas = danDir;
+    danTopN = danDir === 2 ? lanes / 2 : 0;
     for (const b of danBullets) b.y = danLaneY(b.lane) + px;
   }
   function danFit() {
@@ -11056,7 +11064,7 @@
   }
   const paintDanAlpha = () => { danCv.style.opacity = danOl.style.opacity = DAN_ALPHAS[danAlpha]; };
   function setDanCover(i) { danCover = i; markHelp('helpDCov', i); danFit(); }
-  function setDanDir(i) { danDir = i; markHelp('helpDDir', i); danFit(); }
+  function setDanDir(i) { danDir = Math.min(2, Math.max(0, i)); markHelp('helpDDir', danDir); danFit(); }
   function setDanFs(i) { danFs = i; markHelp('helpDFs', i); danFit(); }
   function setDanV(i) { danSpeed = i; markHelp('helpDV', i); }
   function setDanAlp(i) { danAlpha = i; markHelp('helpDAlp', i); paintDanAlpha(); }
@@ -12331,7 +12339,7 @@
     // layout's own arm travels
     if (danmakuOn !== (splitLevel === 19)) q.set('dan', danmakuOn ? '1' : '0');
     if (danCover !== DAN_COVERS.length - 1) q.set('danc', String(DAN_COVERS[danCover]));
-    if (danDir) q.set('dand', '1');
+    if (danDir) q.set('dand', String(danDir));
     if (danSpeed !== DAN_SPEEDS.length) q.set('danv', String(danSpeed));
     if (danAlpha !== 3) q.set('dano', String(danAlpha));
     if (!danSubs) q.set('dans', '0');
@@ -17222,7 +17230,7 @@
       else if (FONT_STACKS[f]) { fontSel.value = f; applyFont(); }
     }
     if (q.has('danc')) { const i = danCovIx(+q.get('danc')); if (i >= 0) setDanCover(i); }
-    if (q.has('dand')) setDanDir(flag('dand') ? 1 : 0);
+    if (q.has('dand')) { const v = q.get('dand'); setDanDir(v === 'both' || +v === 2 ? 2 : flag('dand') ? 1 : 0); }
     if (q.has('danv')) setDanV(Math.min(DAN_SPEEDS.length, Math.max(0, +q.get('danv')) || 0));
     if (q.has('dano')) setDanAlp(Math.min(DAN_ALPHAS.length - 1, Math.max(0, +q.get('dano')) || 0));
     if (q.has('dans')) setDanSub(flag('dans') ? 1 : 0);
@@ -17347,7 +17355,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: DAN_FS.map((n) => n || 'chat'), helpDCov: ['¼', '⅓', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: DAN_FS.map((n) => n || 'chat'), helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDNick: ['off', 'on'], helpDBadge: ['off', 'on'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],

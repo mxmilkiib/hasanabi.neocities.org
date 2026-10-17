@@ -35,11 +35,13 @@ not versions - the page ships continuously to Neocities.
   (or slow/emote/subs/r9k) could re-arm and stick until the next real
   mode change. backlog ones now only seed a channel the socket
   hasn't stamped yet
-- danmaku cover gains ⅓ and ⅔ rungs and a 'from' edge pick - lanes
-  can now pack up from the bottom instead of the top. danc saves and
-  travels as the percent itself (danc=50) so the list can regrow
-  without remapping; legacy 0-3 indices still resolve, and the edge
-  rides as dand=1
+- danmaku cover gains ⅓, ⅖ and ⅔ rungs and a 'from' edge pick -
+  lanes can pack up from the bottom, or 'both' splits the cover
+  between the edges so two-fifths packs a fifth of lanes top and
+  bottom each with the middle clear. danc saves and travels as the
+  percent itself (danc=50) so the list can regrow without remapping;
+  legacy 0-3 indices still resolve, and the edge rides as
+  dand=1 or dand=2/both
 - the slate revive respects a stopped pick: a live stream paused past
   its buffer reports 'ended' like a dead one, so the kicks now need a
   slate no PAUSE event produced - pausing no longer gets the video
