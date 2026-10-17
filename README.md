@@ -507,6 +507,7 @@ editing a URL.
 | `danc` | `0`–`3` | danmaku cover: top ¼ / ½ / ¾ / full frame |
 | `danv` | `0`–`4` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x |
 | `dano` | `0`–`3` | danmaku layer opacity: 25 / 50 / 75 / 100% |
+| `dans` | flag | subscriber bullets lead with the month count in the chip's gradient |
 | `danp` | `0`–`2` | pinned bullets: off / own, mentions and keywords hold top-centre / +subs and bits |
 | `danf` | `0`–`3` | danmaku filters: none / bots / !commands / both |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |

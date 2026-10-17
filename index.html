@@ -2858,9 +2858,9 @@
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
     <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li><li><span class="splitSeat" data-split="16"></span> the framed stream alone, centred - its edges drag their side, and any bare-floor grab pulls it wider in the dragged direction</li><li><span class="splitSeat" data-split="18"></span> the centred frame alone with danmaku bullets armed over it - the only layout that carries them, so picking another switches them back off; it defaults to the largest frame the space fits, and the same edge and floor drags resize it</li><li><span class="splitSeat" data-split="17"></span> the stream over the docked help popup, centred like 1col help - the video keeps its own width inside the page, and dragging its edges trades width with the help below - the page's side grips size the pair</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span></div>
-    <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour and the live chat font (size, weight, spacing and lane pitch follow the chat font settings); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; needs the video on, live messages only<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
-    <div><b>danmaku opts</b><span>cover: <span id="helpDCovList"></span> - lanes fill only the top slice of the frame<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
+    <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour and the live chat font (size, weight, spacing and lane pitch follow the chat font settings); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; needs the video on, live messages only<sup>†</sup></span></div>
+    <div><b>danmaku opts</b><span>cover: <span id="helpDCovList"></span> - lanes fill only the top slice of the frame<sup>†</sup></span><b></b><span>speed: <span id="helpDVList"></span> - every bullet's crossing pace multiplies<sup>†</sup></span><b></b><span>alpha: <span id="helpDAlpList"></span> - the whole layer's opacity<sup>†</sup></span><b></b><span>subs: <span id="helpDSubList"></span> - a subscriber's bullet leads with the month count in the chip's teal→red gradient<sup>†</sup></span><b></b><span>pin: <span id="helpDPinList"></span> - a matching bullet parks top-centre in a nick-coloured pill, holds, then fades instead of crossing<sup>†</sup></span><b></b><span>hide: <span id="helpDFltList"></span> - bots or !command lines never fly, chat rows unaffected<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
@@ -6477,6 +6477,7 @@
     else if (a.classList.contains('helpDCov')) { setDanCover(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpDV')) { setDanV(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpDAlp')) { setDanAlp(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpDSub')) { setDanSub(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpDPin')) { setDanPin(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpDFlt')) { setDanFlt(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpModes')) { setModesOn(+a.dataset.idx === 1); saveOpts(); }
@@ -9860,7 +9861,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0, danc: danCover, danv: danSpeed, dano: danAlpha, danp: danPin, danf: danHide,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0, danc: danCover, danv: danSpeed, dano: danAlpha, dans: danSubs, danp: danPin, danf: danHide,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0, eprow: epickRowOff ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
@@ -10055,6 +10056,7 @@
     if (Number.isInteger(o.danc) && o.danc >= 0 && o.danc < DAN_COVERS.length) setDanCover(o.danc);
     if (Number.isInteger(o.danv) && o.danv >= 0 && o.danv < DAN_SPEEDS.length) setDanV(o.danv);
     if (Number.isInteger(o.dano) && o.dano >= 0 && o.dano < DAN_ALPHAS.length) setDanAlp(o.dano);
+    if (Number.isInteger(o.dans)) setDanSub(o.dans ? 1 : 0);
     if (Number.isInteger(o.danp) && o.danp >= 0 && o.danp <= 2) setDanPin(o.danp);
     if (Number.isInteger(o.danf) && o.danf >= 0 && o.danf <= 3) setDanFlt(o.danf);
     if (Number.isFinite(+o.anim)) setNickAnim(+o.anim);
@@ -10403,7 +10405,7 @@
   // look: full frame, standard pace, opaque, nothing pinned or hidden
   const DAN_COVERS = [.25, .5, .75, 1], DAN_SPEEDS = [.5, .75, 1, 1.5, 2], DAN_ALPHAS = [.25, .5, .75, 1];
   const DAN_HOLD = 3400, DAN_FADE = 400;   // a pinned bullet's park and its in/out fade
-  let danCover = 3, danSpeed = 2, danAlpha = 3, danPin = 0, danHide = 0;
+  let danCover = 3, danSpeed = 2, danAlpha = 3, danSubs = 0, danPin = 0, danHide = 0;
   const DAN_FF = 'ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace';
   // bullets wear the live chat face: --chat-ff, --chat-w, --chat-ls and
   // --chat-lh on :root are what .row consumes (on #log itself the family
@@ -10535,6 +10537,12 @@
       len += w;
     }
     if (!out.length || out.every((s) => typeof s === 'string' && !s.trim())) return;
+    // 'subs' leads a subscriber's bullet with the small month count,
+    // drawn in the row chip's teal->red gradient
+    if (danSubs) {
+      const mo = row.querySelector('.role.sub')?.dataset.mo;
+      if (mo) out.unshift({ sub: +mo });
+    }
     const rec = lg && seenNicks.get(lg);
     // pin modes hold matching bullets top-centre for a beat: own lines,
     // mentions and keyword hits at level one, subs and bits join at two
@@ -10562,9 +10570,11 @@
       const eh = danEmoteSize(q.mag);
       const w = Math.ceil(q.segs.reduce((a, s) => a + (typeof s === 'string'
         ? danCtx.measureText(s).width
-        : s.im.complete && s.im.naturalWidth
-          ? eh * s.im.naturalWidth / s.im.naturalHeight + danEmoteGap()
-          : danCtx.measureText(s.alt).width + danEmoteGap()), 6));
+        : s.sub != null
+          ? danCtx.measureText(String(s.sub)).width * 0.72 + danEmoteGap()
+          : s.im.complete && s.im.naturalWidth
+            ? eh * s.im.naturalWidth / s.im.naturalHeight + danEmoteGap()
+            : danCtx.measureText(s.alt).width + danEmoteGap()), 6));
       let lane = -1, v = 0;
       if (q.top) {
         // a pinned bullet parks, so it claims a wholly idle lane top
@@ -10611,7 +10621,7 @@
   function danDraw(now) {
     const dt = Math.min(80, now - danLast); danLast = now;
     const W = danCv.width / DPR, H = danCv.height / DPR;
-    const s = danSpec();
+    const s = danSpec(), spec = s;
     danMeter(s, H);
     danSpawn(W, s);
     danCtx.clearRect(0, 0, W, H);
@@ -10657,6 +10667,21 @@
           x += danCtx.measureText(s).width;
           continue;
         }
+        if (s.sub != null) {
+          // a subscriber's month count leads the bullet at chip size in
+          // the row chip's teal->red gradient
+          const t = String(s.sub), spx = Math.round(danFontPx * 0.72);
+          danCtx.font = `${spec.w} ${spx}px ${b.fam || spec.fam}`;
+          const tw = danCtx.measureText(t).width;
+          danCtx.strokeText(t, x, b.y);
+          danCtx.fillStyle = subGrad
+            ? `color-mix(in oklch longer hue, #4fbecd, #f43f5e ${Math.min(100, Math.round(s.sub / 60 * 100))}%)`
+            : '#4fbecd';
+          danCtx.fillText(t, x, b.y);
+          danCtx.font = `${spec.w} ${danFontPx}px ${b.fam || spec.fam}`;
+          x += tw + danEmoteGap();
+          continue;
+        }
         const el = s.el;
         // the shown element gates itself - the pool img only estimates
         // lane width, so an el still fetching keeps its code text
@@ -10698,6 +10723,7 @@
   function setDanCover(i) { danCover = i; markHelp('helpDCov', i); danFit(); }
   function setDanV(i) { danSpeed = i; markHelp('helpDV', i); }
   function setDanAlp(i) { danAlpha = i; markHelp('helpDAlp', i); paintDanAlpha(); }
+  function setDanSub(i) { danSubs = i; markHelp('helpDSub', i); }
   function setDanPin(i) { danPin = i; markHelp('helpDPin', i); }
   function setDanFlt(i) { danHide = i; markHelp('helpDFlt', i); }
   function setDanmaku(on) {
@@ -11952,6 +11978,7 @@
     if (danCover !== 3) q.set('danc', String(danCover));
     if (danSpeed !== 2) q.set('danv', String(danSpeed));
     if (danAlpha !== 3) q.set('dano', String(danAlpha));
+    if (danSubs) q.set('dans', '1');
     if (danPin) q.set('danp', String(danPin));
     if (danHide) q.set('danf', String(danHide));
     if (nickAnim !== 2) q.set('anim', ANIM_URL[nickAnim]);
@@ -16805,6 +16832,7 @@
     if (q.has('danc')) setDanCover(Math.min(DAN_COVERS.length - 1, Math.max(0, +q.get('danc')) || 0));
     if (q.has('danv')) setDanV(Math.min(DAN_SPEEDS.length - 1, Math.max(0, +q.get('danv')) || 0));
     if (q.has('dano')) setDanAlp(Math.min(DAN_ALPHAS.length - 1, Math.max(0, +q.get('dano')) || 0));
+    if (q.has('dans')) setDanSub(flag('dans') ? 1 : 0);
     if (q.has('danp')) setDanPin(Math.min(2, Math.max(0, +q.get('danp')) || 0));
     if (q.has('danf')) setDanFlt(Math.min(3, Math.max(0, +q.get('danf')) || 0));
     if (q.has('anim')) {
@@ -16923,7 +16951,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpDan: ['off', 'on'], helpDCov: ['¼', '½', '¾', 'full'], helpDV: ['½x', '¾x', '1x', '1½x', '2x'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpDan: ['off', 'on'], helpDCov: ['¼', '½', '¾', 'full'], helpDV: ['½x', '¾x', '1x', '1½x', '2x'], helpDAlp: ['25%', '50%', '75%', '100%'], helpDSub: ['off', 'on'], helpDPin: ['off', 'self+pings', '+subs'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
@@ -17006,7 +17034,7 @@
   markHelp('helpTitle', titleBarOn ? 1 : 0);
   markHelp('helpDan', danmakuOn ? 1 : 0);
   markHelp('helpDCov', danCover); markHelp('helpDV', danSpeed); markHelp('helpDAlp', danAlpha);
-  markHelp('helpDPin', danPin); markHelp('helpDFlt', danHide);
+  markHelp('helpDSub', danSubs); markHelp('helpDPin', danPin); markHelp('helpDFlt', danHide);
   markHelp('helpModes', modesOn ? 1 : 0);
   markHelp('helpSview', statusView);
   markHelp('helpUpd', UPD_STOPS.indexOf(updMin));
