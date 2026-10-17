@@ -5958,6 +5958,7 @@
   const streamStates = {};
   const peakViewers = {}; // ch -> highest reported viewer count this session
   const peakViewersAt = {}; // ch -> when that high-water mark was set
+  const offDue = {};      // ch -> first suspect offline read under 'live'
   function onStream(d) {
     streamHeard = true;
     const sch = (d.channel || CHANNEL).toLowerCase();
@@ -5986,6 +5987,19 @@
         title: apiErr(d.title) ? '' : d.title || '',
       };
     }
+    // a provably rolling embed vetoes an offline report outright - it
+    // can't be playing a stream that isn't there
+    if (!st.live && sch === CHANNEL && vidPlayer && !vidPlayer.isPaused() &&
+        !(vidPlayer.isEnded && vidPlayer.isEnded())) return;
+    // one blinking 'offline' isn't an end either - decapi's upstream can
+    // hiccup 'not streaming' mid-broadcast, so a live verdict falls only
+    // to a second consecutive read, stamped back to the first suspect
+    if (!st.live && streamStates[sch] && streamStates[sch].live && !offDue[sch]) {
+      offDue[sch] = Date.now();
+      return;
+    }
+    const offAt = offDue[sch] || 0;
+    offDue[sch] = 0;
     const prevSt = streamStates[sch];
     streamStates[sch] = st;
     if (st.live && st.viewers != null && st.viewers > (peakViewers[sch] || 0)) {
@@ -5998,14 +6012,14 @@
     if (sch !== CHANNEL) return;
     if (!st.live) {
       if (stream && stream.live) {
-        lastRun = { started: stream.startedAt || (lastRun && lastRun.started) || null, ended: Date.now() };
+        // a confirmed blip ends back at its first suspect read, not now
+        lastRun = { started: stream.startedAt || (lastRun && lastRun.started) || null, ended: offAt || Date.now() };
         saveLastRun();
       }
       stream = { live: false };
-      // a rolling embed contradicts an offline report outright -
-      // decapi's stale read must not park the stand-in over a stream
-      // that's provably still going
-      if (!(vidPlayer && !vidPlayer.isPaused() && !(vidPlayer.isEnded && vidPlayer.isEnded()))) vidAlt(true);
+      // a rolling embed vetoes the report above, so reaching here means
+      // the slate is genuinely down - the stand-in parks over it
+      vidAlt(true);
     } else {
       vidAlt(false);
       stream = st;
