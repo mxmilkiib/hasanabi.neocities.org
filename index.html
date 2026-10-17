@@ -11197,12 +11197,18 @@
         // once chat runs hot the pick falls back to the first that fits
         const t = Math.min(1, q.mo / 72);
         const calm = !(danRateAvg > 6 || danQueue.length > 24);
+        // the meter can re-run mid-hold - the adaptive slide, a resize -
+        // leaving parked pins on stale rows, so occupancy reads rect
+        // overlap rather than row equality: sharing over half a pitch
+        // is a stack to dodge, less is a staggered neighbour
+        const pinClash = (b, y, sd) => b.ps === sd
+          && Math.min(b.ry + b.pitch, y + danPitch) - Math.max(b.ry, y) > Math.min(b.pitch, danPitch) / 2;
         const freeYs = [];
         let ri = 0;
         for (const y of danPinYs) {
           const first = ri++ & 1;
           for (const sd of [first, 1 - first])
-            if (!danBullets.some((b) => b.t0 && b.ry === y && b.ps === sd)) freeYs.push([y, sd]);
+            if (!danBullets.some((b) => b.t0 && pinClash(b, y, sd))) freeYs.push([y, sd]);
         }
         if (freeYs.length) {
           const pick = calm ? freeYs[Math.round((1 - t) * (freeYs.length - 1))] : freeYs[0];
@@ -11218,10 +11224,12 @@
           for (let L = 0; L < danLanes - (danDeep ? 0 : danSpillN); L++)
             for (const sd of [0, 1]) {
               const px = danPinX(W, w, sd);
+              const ly = danLaneY(L);
               let fit = true;
               for (const b of danBullets) {
+                if (b.t0) { if (pinClash(b, ly, sd)) { fit = false; break; } continue; }
                 if (b.lane !== L) continue;
-                if (b.t0 ? b.ps === sd : b.x + b.w > px && (b.x - px - w) / (b.v * pace) < clearFor) { fit = false; break; }
+                if (b.x + b.w > px && (b.x - px - w) / (b.v * pace) < clearFor) { fit = false; break; }
               }
               if (fit) ok.push([L, sd]);
             }
