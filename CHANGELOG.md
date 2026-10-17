@@ -213,6 +213,11 @@ not versions - the page ships continuously to Neocities.
 - the ? popup's font default is now 20px absolute rather than
   follow-chat - the chat-relative stops stay one mode pick away,
   and a relative pick now travels as chat-N in copied urls
+- the danmaku font borrow no longer persists itself - saveOpts
+  stores the font under the borrow, so a reload restores the real
+  pick and disarming lands back on it (theme default on a fresh
+  entry) instead of sticking on random; preset matching reads the
+  underlying font too
 - danmaku speed gains an 'auto' rung - the crossing pace tracks
   the live message rate (clamped 0.3-3x), so quiet chat keeps its
   bullets lingering on screen and a flood hurries them through;

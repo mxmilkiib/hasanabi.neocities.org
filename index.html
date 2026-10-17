@@ -9848,7 +9848,7 @@
   // theme slot stashes
   function curOpts() {
     return {
-      font: fontRand ? 'rand' : fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : undefined, lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], colour: colourMode, variant: variantMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
+      font: fontRand && !danFontAuto ? 'rand' : fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : undefined, lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], colour: colourMode, variant: variantMode, shade: shadeIdx, shadeName: shadeIdx == null ? 'system' : SHADE_NAMES[shadeIdx],
       lines: lineLevel,
       hdrmin: document.body.classList.contains('hdrmin'),
       hdrgraph: document.body.classList.contains('hdrgraph'),
@@ -10126,7 +10126,7 @@
   // the stream embed is deliberately outside presets - one toggles it by hand
   function presetCmp() {
     return {
-      colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontRand ? 'rand' : fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : Math.round(chatFontPx()),
+      colour: colourMode, variant: variantMode, shade: shadeIdx, font: fontRand && !danFontAuto ? 'rand' : fontSel.value, px: fontPicked() ? FONT_SIZES[fontCtl.get()] : Math.round(chatFontPx()),
       lhv: LINE_HEIGHTS[lhCtl.get()], wv: WEIGHTS[weightCtl.get()], lsv: LS_STEPS[lsCtl.get()], lwv: WEIGHTS[linkW], lines: lineLevel,
       zebra: zebraLevel > 0, times: timeIdx, shadow: shadLevel,
       subMode, eonly: emoteMode,
