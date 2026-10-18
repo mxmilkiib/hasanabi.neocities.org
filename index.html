@@ -5434,6 +5434,11 @@
     // pin would keep it there - clear the flag so the measure is honest;
     // put it back only if the strip still can't fit with the spark at 0
     hdrBarEl.classList.remove('hdrwrap');
+    // a balanced cap narrows the strip enough to seat on the first line -
+    // the fit check must read it uncapped or the cap becomes a wrap-state
+    // oscillator: cap seats it, clear drops it, cap re-seats it
+    hdrSideEl.style.maxWidth = '';
+    sideBalW = 0;
     const ideal = sparkEl.clientWidth;
     if (hdrSideEl.offsetTop > 10) hdrBarEl.classList.add('hdrwrap');
     rateEl.style.flex = '';
@@ -5509,6 +5514,8 @@
     // drop the class, read the honest position, restore it only if the
     // strip still needs a second line
     hdrBarEl.classList.remove('hdrwrap');
+    hdrSideEl.style.maxWidth = ''; // same rule - the cap can fake a fit
+    sideBalW = 0;
     if (hdrSideEl.offsetTop > 10) hdrBarEl.classList.add('hdrwrap');
     balanceHdrSide();
   }).observe(hdrBarEl);
