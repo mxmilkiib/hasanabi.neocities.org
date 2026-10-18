@@ -5471,8 +5471,36 @@
     sparkPending = true;
     requestAnimationFrame(() => { sparkPending = false; sparkSize(); });
   };
+  // a wrapped strip still packs its buttons greedily - full rows plus a
+  // stub tail. count the natural rows, then cap the strip at the widest
+  // run of ceil(n/rows) buttons so the tail spreads evenly over every
+  // line; the cap lifts while measuring so the row count stays honest
+  let sideBalW = 0;
+  function balanceHdrSide() {
+    if (!hdrBarEl.classList.contains('hdrwrap')) {
+      if (sideBalW) { sideBalW = 0; hdrSideEl.style.maxWidth = ''; }
+      return;
+    }
+    hdrSideEl.style.maxWidth = '';
+    const kids = [...hdrSideEl.children].filter((el) => el.offsetParent);
+    const rows = new Set(kids.map((el) => el.offsetTop)).size;
+    const per = Math.ceil(kids.length / rows);
+    let px = 0;
+    if (per < kids.length) {
+      const gap = parseFloat(getComputedStyle(hdrSideEl).columnGap) || 0;
+      let runW = 0;
+      for (let i = 0; i + per <= kids.length; i++) {
+        let run = 0;
+        for (let j = i; j < i + per; j++) run += kids[j].offsetWidth;
+        if (run > runW) runW = run;
+      }
+      px = Math.ceil(runW + (per - 1) * gap) + 1;
+    }
+    sideBalW = px;
+    hdrSideEl.style.maxWidth = px ? px + 'px' : '';
+  }
   new ResizeObserver(queueSparkSize).observe(sparkEl);
-  new ResizeObserver(queueSparkSize).observe(hdrSideEl);
+  new ResizeObserver(() => { queueSparkSize(); balanceHdrSide(); }).observe(hdrSideEl);
   new ResizeObserver(queueSparkSize).observe(headerEl.querySelector('.channel'));
   new ResizeObserver(() => {
     queueSparkSize();
@@ -5482,6 +5510,7 @@
     // strip still needs a second line
     hdrBarEl.classList.remove('hdrwrap');
     if (hdrSideEl.offsetTop > 10) hdrBarEl.classList.add('hdrwrap');
+    balanceHdrSide();
   }).observe(hdrBarEl);
   // late webfont swaps shift every width the flex maths used
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => sparkSize());
