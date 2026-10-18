@@ -5428,7 +5428,13 @@
     sparkEl.style.flex = '';
     sparkEl.style.width = '';
     rateEl.style.flex = '0 0 auto'; // starve the slack absorber so the ideal reads the full free space
+    // a wrapped strip holds a forced full-width line of its own, so the
+    // ideal would be priced without its seat on the first line and the
+    // pin would keep it there - clear the flag so the measure is honest;
+    // put it back only if the strip still can't fit with the spark at 0
+    hdrBarEl.classList.remove('hdrwrap');
     const ideal = sparkEl.clientWidth;
+    if (hdrSideEl.offsetTop > 10) hdrBarEl.classList.add('hdrwrap');
     rateEl.style.flex = '';
     const n = Math.max(240, Math.min(1800, Math.round(ideal / 3 / 30) * 30));
     sparkWin = n;
