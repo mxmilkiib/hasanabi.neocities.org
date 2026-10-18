@@ -5469,7 +5469,12 @@
   new ResizeObserver(queueSparkSize).observe(headerEl.querySelector('.channel'));
   new ResizeObserver(() => {
     queueSparkSize();
-    hdrBarEl.classList.toggle('hdrwrap', hdrSideEl.offsetTop > 10);
+    // .hdrwrap forces the strip a full-width line of its own, so its
+    // offsetTop can't say whether it would fit back on the first line -
+    // drop the class, read the honest position, restore it only if the
+    // strip still needs a second line
+    hdrBarEl.classList.remove('hdrwrap');
+    if (hdrSideEl.offsetTop > 10) hdrBarEl.classList.add('hdrwrap');
   }).observe(hdrBarEl);
   // late webfont swaps shift every width the flex maths used
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => sparkSize());
