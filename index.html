@@ -456,6 +456,7 @@
   /* the dot leads the numbers in every cut rung - 'short' steps the
      channel name ahead of it, minimal and the lone dot hide it */
   .channel.minstat #channelName, .channel.dotstat #channelName { display: none; }
+  .channel.shortstat #dot { order: -2; }
   .channel.shortstat #channelName { order: -1; }
   .channel.shortstat #channelName::before { content: '@'; }
   #streamTail:empty { display: none; }
@@ -6258,8 +6259,9 @@
     modesEl.hidden = true;
     // the chatter tally holds through the first cut, then goes at notally
     chattersEl.hidden = !(statusView === 0 || statusView === 3) || !chatterSeen.size;
-    // the dot heads the numbers in every cut rung - 'short' steps the
-    // channel name ahead of it, minimal and the lone dot hide the name
+    // the dot holds the left end in every cut rung - 'short' steps the
+    // channel name in ahead of the numbers, minimal and the lone dot
+    // hide the name
     chanEl.classList.remove('minstat', 'shortstat', 'dotstat');
     tailEl.textContent = '';
     if (statusView === 6) chanEl.classList.add('shortstat');
