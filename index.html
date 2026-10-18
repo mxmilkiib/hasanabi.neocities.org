@@ -2840,6 +2840,10 @@
     body.hdrgraph #helpBtn, body.hdrgraph #hdrMin { top: 1px; }
     body.hdrmin #hdrMin { right: 48px; }
     .hdr-side { gap: 4px; }
+    /* the 32px pinned pair ends at 33px but the first line stays ~27px
+       tall - the wrapped strip's row would start under their overhang,
+       so widen the wrap gap until it starts clear */
+    header.hdrwrap { row-gap: 8px; }
     .hdr-btn { height: 32px; }
     button.hdr-btn { width: 38px; }
     #spark { max-width: 70px; }
