@@ -1155,7 +1155,7 @@
     --rowtint: linear-gradient(rgba(128, 128, 128, var(--zeba, .07)) 0 0);
   }
   body.selfhl main.zebra .row.z.self {
-    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) calc(var(--zeba, .07) * 260%), transparent) 0 0); }
+    --rowtint: linear-gradient(color-mix(in srgb, #2dc8b4 calc(var(--zeba, .07) * 260%), transparent) 0 0); }
   main.shadowed .row { text-shadow: var(--row-sh); }
   .row.glorp {
     --rowtint: linear-gradient(rgba(232, 93, 93, .13) 0 0);
@@ -1495,7 +1495,7 @@
   #tour .trow.vio { background: rgba(155, 93, 232, .12); }
   #tour .trow.red { background: rgba(232, 93, 93, .13); box-shadow: inset .4em 0 0 var(--danger); }
   #tour .trow.blu { background: rgba(102, 142, 232, .15); }
-  #tour .trow.me  { background: color-mix(in srgb, var(--accent) 13%, transparent); box-shadow: inset .4em 0 0 var(--accent); }
+  #tour .trow.me  { background: rgba(45, 200, 180, .13); box-shadow: inset .4em 0 0 #2dc8b4; }
   #tour .trow.gap { background: color-mix(in srgb, var(--danger) 8%, transparent); }
   #tour .trow .tchip { width: 1.1em; height: 1.1em; border: 1px solid var(--line);
     border-radius: .25em; flex: none; display: flex; align-items: center;
@@ -1679,12 +1679,12 @@
      viewport, so a thin desktop column folds the same way */
   @container (max-width: 560px) { #statsBody .st-trio { grid-template-columns: 1fr 1fr; } }
   body.selfhl .row.self {
-    --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 0 0);
-    --rowbar: linear-gradient(var(--accent) 0 0);
+    --rowtint: linear-gradient(rgba(45, 200, 180, .18) 0 0);
+    --rowbar: linear-gradient(#2dc8b4 0 0);
     margin-left: -8px;
     padding-left: 8px;
   }
-  /* own nick pops at the mention weight - the row already accents, the
+  /* own nick pops at the mention weight - the row already teals, the
      heavier name is what catches the eye scanning a fast column */
   body.selfhl .row.self a.name { font-weight: max(700, calc(var(--chat-w, 400) + 200)); }
   /* a fixed +200 step over the chat weight keeps mentions visibly heavier
@@ -2095,7 +2095,7 @@
   #helpPanel b.glorp { background-color: rgba(232, 93, 93, .13); box-shadow: inset 4px 0 0 var(--danger); }
   #helpPanel b.mention { background-color: rgba(232, 163, 61, .13); box-shadow: inset 4px 0 0 var(--accent); }
   #helpPanel b.points { background-color: rgba(155, 93, 232, .12); }
-  #helpPanel b.selfchip { background-color: color-mix(in srgb, var(--accent) 13%, transparent); box-shadow: inset 4px 0 0 var(--accent); }
+  #helpPanel b.selfchip { background-color: rgba(45, 200, 180, .13); box-shadow: inset 4px 0 0 #2dc8b4; }
   #helpPanel b.kw { background-color: color-mix(in srgb, var(--good) 13%, transparent); box-shadow: inset 4px 0 0 var(--good); }
   #helpPanel b.mod { background-color: rgba(102, 142, 232, .15); box-shadow: inset 4px 0 0 rgba(102, 142, 232, .85); }
   #helpPanel b.gap { background-color: color-mix(in srgb, var(--danger) 8%, transparent); box-shadow: inset 4px 0 0 color-mix(in srgb, var(--danger) 55%, transparent); }
@@ -2997,7 +2997,7 @@
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
     <div id="twtchNote" style="display:none; text-align:center"><span>hi! this is the generic address twitch version of <a class="at" href="https://hasanabi.neocities.org/" target="_blank" rel="noopener">hasanabi.neocities.org</a> -mxmilkiib</span><div class="sep">&nbsp;</div></div>
-    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle points">violet tint</b><span>channel-point highlights</span><b class="rowstyle glorp">red rows</b><span><img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> <a>glorp / F</a></span><b class="rowstyle selfchip">accent rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to walk through them (they keep, cycling back round), ⇧click clears</span></div>
+    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle points">violet tint</b><span>channel-point highlights</span><b class="rowstyle glorp">red rows</b><span><img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> <a>glorp / F</a></span><b class="rowstyle selfchip">teal rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to walk through them (they keep, cycling back round), ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message - past the rendered edge it restores the parent (and its neighbours) from the archive</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row, restoring it from the archive first when it has left the log</div>
@@ -3255,7 +3255,7 @@
                 <span class="trow"><i class="tchip">↩</i><i class="nk" style="background:#66d9e8"></i><i class="tseg" style="width:40%"></i></span>
                 <span class="trow gap"><i class="tseg" style="width:26%;opacity:.5"></i></span>
               </div>
-              <figcaption>top to bottom: <b style="color:#e8a33d">amber</b> mention · <b style="color:#9b5de8">violet</b> channel points · <b style="color:#e85d5d">red</b> glorp · <b style="color:var(--accent)">accent</b> own message · <b style="color:#668ee8">blue</b> mod action · ↩ reply chip · a gap row for dropped or silent stretches</figcaption>
+              <figcaption>top to bottom: <b style="color:#e8a33d">amber</b> mention · <b style="color:#9b5de8">violet</b> channel points · <b style="color:#e85d5d">red</b> glorp · <b style="color:#2dc8b4">teal</b> own message · <b style="color:#668ee8">blue</b> mod action · ↩ reply chip · a gap row for dropped or silent stretches</figcaption>
             </figure>
             <figure class="tshot">
               <div class="thdr" style="flex-wrap:wrap;row-gap:.4em"><i class="tdot"></i><i class="tseg acc" style="width:4.5em"></i><i class="tseg" style="width:5em;opacity:.55"></i><span class="tspark"><i style="height:.5em"></i><i style="height:.9em"></i><i style="height:.7em"></i><i style="height:1.1em"></i><i class="red" style="height:.9em"></i><i style="height:.6em"></i><i style="height:1em"></i></span><span class="tsp" style="min-width:1em"></span><i class="tbt on">?</i><i class="tbt">–</i><i class="tbt">◆</i><i class="tbt">◐</i><i class="tbt">▢</i><i class="tbt">◑</i><i class="tbt">Aa</i><i class="tbt">Aa</i><i class="tbt">B</i><i class="tbt">↕</i><i class="tbt">⇄</i><i class="tbt">T</i><i class="tbt">▦</i><i class="tbt">≡</i><i class="tbt">◷</i><i class="tbt">Ⓢ</i><i class="tbt">☺</i><i class="tbt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></i><i class="tbt">⇓</i><i class="tbt">▮▮</i><i class="tbt">▶</i><i class="tbt"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></i><i class="tbt">⌕</i></div>
@@ -12820,7 +12820,7 @@
   timeBtn.addEventListener('wheel', (e) => { e.preventDefault(); stepTime(e.deltaY > 0 ? 1 : -1); }, { passive: false });
   setTimes(2);
 
-  // ---- accent edge on one's own messages (needs the twitch login) ----
+  // ---- teal edge on one's own messages (needs the twitch login) ----
   let selfHl = false;
   function setSelfHl(on) {
     selfHl = on;
