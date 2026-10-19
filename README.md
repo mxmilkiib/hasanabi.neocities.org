@@ -535,10 +535,11 @@ editing a URL.
 |---|---|---|
 | `split` | `1`–`20` or a short name | layout - each seat's alias sits beside its name under Chat columns above; the numeric ids run `1c` `1ch` `2c` `2ch` `2cvh` `2cve` `2ce` `2x2` `3c` `3ch` `3cvh` `3cves` `3cve` `3ce` `1cv` `3cveh` `1cvid` `1cvh` `1cdan` `1cvdan` in that order |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
+| `reset` | flag | wipe all saved options and reload param-free - the reset button via url |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
-| `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |
+| `shade` | `0`–`11`, a shade name, `auto` | shade axis - `white`…`twilight` name the stops; `auto` follows the system |
 | `font` | a font key / `rand` | chat font family - `rand` draws each message in a random face (middle-click the font button or its menu) |
-| `size` | `7`–`32` | chat font px |
+| `size` | `7`–`48` | chat font px |
 | `lh` | a line-height key | row line height |
 | `wght` | `300`–`700` | font weight |
 | `ls` | `-0.08`–`0.12` em | letter spacing (tracking) |
@@ -547,8 +548,9 @@ editing a URL.
 | `hpfs` | `chat` / `chat-1`…`chat-20` / px | help popup font size (default `16`) - the row's absolute/relative pick swaps px stops for chat-relative rungs (chat-N follows the chat font that many ladder steps down) |
 | `hpw` | `480`–`1920` | help popup width |
 | `hstick` | flag | sticky position - a floating help popup resizes about its own spot (centred keeps the centre, a corner dock the corner, a dragged panel its centre) |
+| `hpos` | `0`–`8` or `tl`/`tc`/`tr`/`ml`/`mc`/`mr`/`bl`/`bc`/`br` | floating help popup anchor - edge, corner or centre |
 | `pause` | flag | hold the scroll while hovering a row |
-| `scrollback` | `250`…`100000` | row cap |
+| `scrollback` | `250`/`500`/`1000`/`2000`/`5000`/`10000`/`25000`/`50000`/`100000` | row cap (other values don't take) |
 | `rev` | flag | reverse flow - new messages cascade down from the top |
 | `wrap` | flag | page wrap - a full page retires to a faded layer the new one writes down over, like the multi-column layouts |
 | `bartop` | flag | dock the chat input under the header instead of at the bottom |
@@ -556,21 +558,21 @@ editing a URL.
 | `mnl` | `0`–`3` | msg new line: off / body on its own line / plus a blank line below / blank line above, body inline |
 | `channel` | a twitch login | point the whole page at another channel |
 | `zebra` | `0`–`4` / flag | zebra stripe contrast (0=off, 1=faint, 2=mild, 3=strong, 4=heavy; a bare flag = mild) |
-| `lines` | `0`–`3` | row separator shades |
+| `lines` | `0`–`4` or `faint`/`medium`/`solid`/`faint-dots` | row separator shades (0=off; a bare flag = faint dots) |
 | `times` | `nosec`/`24h` / `24hsec` / `12h` / `12hsec` / `0` | timestamp mode |
-| `shadow` | `0`–`2` | text shadow level |
+| `shadow` | `0`–`5` or `off`/`subtle`/`medium`/`strong`/`black`/`pitch` | text shadow level |
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
 | `valt` | flag / `0` | offline stand-in: a youtube video fills the frame while the stream is down (home channel); on by default, `0` keeps the offline slate |
 | `dan` | flag | danmaku bullets over the video |
 | `adapt` | flag / `0` | adaptive danmaku - the feed rate steers band growth, packing, bullet size and pace; on by default, `0` holds the manual picks |
-| `dfs` | px / `adaptive` | bullet size (default `32`): `0` follows the chat font, stops `12`/`14`/`16`/`18`/`20`/`24`/`28`/`30`/`32`/`34`/`36`/`38`/`40`/`44`/`48`/`52`; `adaptive` slides 34→20px (~14 under deep pressure) with the feed |
-| `danfm` | `0`–`2` | bullet face: system sans / random off the font stack / chat font |
+| `dfs` | px / `adaptive` / `chat` | bullet size (default `32`): `0`/`chat` follows the chat font, stops `12`/`14`/`16`/`18`/`20`/`24`/`28`/`30`/`32`/`34`/`36`/`38`/`40`/`44`/`48`/`52`; `adaptive` slides 34→20px (~14 under deep pressure) with the feed |
+| `danfm` | `0`–`2` or `sans`/`rand`/`chat` | bullet face: system sans / random off the font stack / chat font |
 | `danc` | `25`/`33`/`40`/`50`/`67`/`75`/`100` | danmaku cover: lane fill as % of frame height (legacy `0`–`3` indices still resolve to ¼ / ½ / ¾ / full) |
-| `dand` | `0`–`2` / `adaptive` | the edge the lane slice packs against: top / bottom / both (default `both`; `adaptive` or `3` here also switches `adapt` on) |
-| `danv` | `0`–`5` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x / `auto` (default - pace tracks the live message rate) |
+| `dand` | `0`–`2` / `top`/`bottom`/`both` / `adaptive` | the edge the lane slice packs against (default `both`; `adaptive` or `3` here also switches `adapt` on) |
+| `danv` | `0`–`5` or `auto` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x / `auto` (default - pace tracks the live message rate) |
 | `dano` | `0`–`9` | danmaku layer opacity: 10%–100% in 10% steps |
 | `dans` | flag / `0` | subscriber bullets lead with the month count in the chip's gradient; on by default, `0` disables |
-| `dansl` | `0`–`2` | sub lane: off / inner / outer - seat bullets by sub tenure (default `inner`) |
+| `dansl` | `0`–`2` or `off`/`inner`/`outer` | sub lane - seat bullets by sub tenure (default `inner`) |
 | `dant` | flag | bullets lead with the row's timestamp, ahead of the badges and nick; off by default |
 | `dann` | flag / `0` | bullets lead with the sender's display name, row-style (`name: text`); on by default, `0` disables |
 | `danb` | flag / `0` | the sender's badge icons lead the bullet's name at cap height; on by default, `0` disables |
@@ -599,19 +601,21 @@ editing a URL.
 | `pn` | `0` | pronoun lookups on profile cards off |
 | `cmodes` | `0` | active chat-mode display off (chips and status-line mode text) |
 | `sview` | `0`–`7` | stream-status text length by name: full / stats (full minus the chat-modes tail) / notally / compact / short (`@HasanAbi ● 3h 27m`) / minimal (`● 2h 35m 25.1k`) / blank (empty status space) / dot (just the status light) - or numeric ids `sview=0`–`7` |
+| `stitle` | `0` | stream title strip off (the channel's set title under the header) |
 | `upd` | `5`,`15`,`30`,`60`,`180`,`360`,`1440`,`0` | update-check poll minutes, default `60` (`0` = never; also the bar's update-check chips) |
-| `anim` | `0`–`3` | nick shimmer: off / super slow / slow / on |
+| `anim` | `0`–`3` or `off`/`quick`/`slow`/`vslow` | nick shimmer: 0=off, 1=quicker, 2=slow (default), 3=super slow |
 | `rbw` | `0`–`3` | rainbow motion: sweep / wave / hue cycle / random |
 | `rbp` | `0`–`4` | rainbow palette: classic / vivid / candy / ocean / sunset |
 | `rbws` | `0`–`3` | rainbow scope: all marks / @hasanabi only / all but @hasanabi / off |
 | `epnames` | `0`–`2` | picker emote names: off / below the art / beside it |
-| `epzoom` | `sm`/`q`/`th`/`hf`/`tw`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x) |
-| `epsort` | `az`/`useseen` | picker sort (default usage; `useseen` = usage order, hiding never-used emotes) |
+| `epzoom` | `small`/`quarter`/`third`/`half`/`tweet`/`big` | picker cell size (½x / ¾x / 1⅓x / 1½x / 1⅔x / 2x; the `sm`/`q`/`th`/`hf`/`tw`/`big` short keys still resolve) |
+| `epsort` | `az`/`use`/`seen` | picker sort: alphabetical / usage (default) / usage hiding never-used emotes (`useseen` still resolves) |
 | `epage` | `0`–`3` | how time-ago squares divide or centre the rows |
 | `epsq` | `0`–`3` | how many time-ago squares appear: none / few / minutes and hours / all (default) |
 | `epmix` | `1` | picker merged provider grid |
 | `ephold` | `0`–`2` | stop the picker from moving emotes under the pointer; 2 also pauses animation |
 | `eptips` | `1` | picker hover tip card on (off by default) |
+| `eprow` | `1` | picker options row off |
 | `epmove` | `0`–`6` | how emotes move when the picker changes their order |
 | `eptabs` | comma list | picker sources: `7tv,bttv,ffz,twitch,emoji` |
 | `epanim` | `anim`,`still` | picker animation filter (which kinds show) |
@@ -619,9 +623,11 @@ editing a URL.
 | `epgeo` | `WxH[,L,T]` | picker box size (and float position, pinned) |
 | `epopen` | flag | picker open state - the popup opens or stays closed |
 | `overlay` | flag | [OBS](https://obsproject.com/) browser-source mode: transparent page, live rows only |
+| `lurl` | flag | live url - the address bar mirrors the settings url as options change |
 | `mid` | a message id | scroll to and flash that row on load (set by timestamp clicks) |
 | `hw` | comma list | hide these logins' rows |
 | `hwm` | `vanish`/`stub`/`ghost` | remove hidden users' messages, replace them with a count or leave them crossed out |
+| `nbots` | flag | hide known bot rows (fossabot, blammobot) |
 
 `theme=name` selects a preset that combines colours, fonts and other
 display choices. The presets are:
