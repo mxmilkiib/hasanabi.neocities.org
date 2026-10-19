@@ -751,10 +751,9 @@
   .ghostpage { position: absolute; inset: 0; box-sizing: border-box; padding: inherit;
     overflow: hidden; z-index: 5; }
   #side, #side2 { border-left: 1px solid var(--line); }
-  /* the loop pane: a conveyor of row clones held on the live edge by
-     script-pinned scrollTop - rows clipping off the top wrap back in at
-     the tail, so the ring of lines keeps cycling with no scrollbar to
-     grab (hidden overflow still scrolls programmatically) */
+  /* the loop pane: a non-scrolling seat for clones of the live lines,
+     paged by the same wrap system - full pages ghost out under the new
+     one, so overflow stays clipped rather than scrollable */
   #loop { overflow: hidden; border-left: 1px solid var(--line); }
   /* the rail: a side column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
@@ -3103,7 +3102,7 @@
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li><li><span class="splitSeat" data-split="16"></span> the framed stream alone, centred - its edges drag their side, and any bare-floor grab pulls it wider in the dragged direction</li><li><span class="splitSeat" data-split="18"></span> the centred frame alone with danmaku bullets armed over it - the only layout that carries them, so picking another switches them back off; it defaults to the largest frame the space fits, and the same edge and floor drags resize it</li><li><span class="splitSeat" data-split="17"></span> the stream over the docked help popup, centred like 1col help - the video keeps its own width inside the page, and dragging its edges trades width with the help below - the page's side grips size the pair</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="20"></span> the same lines loop in a second pane - rows leaving the top wrap back in at the tail, a conveyor that keeps cycling and never scrolls</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li><li><span class="splitSeat" data-split="16"></span> the framed stream alone, centred - its edges drag their side, and any bare-floor grab pulls it wider in the dragged direction</li><li><span class="splitSeat" data-split="18"></span> the centred frame alone with danmaku bullets armed over it - the only layout that carries them, so picking another switches them back off; it defaults to the largest frame the space fits, and the same edge and floor drags resize it</li><li><span class="splitSeat" data-split="17"></span> the stream over the docked help popup, centred like 1col help - the video keeps its own width inside the page, and dragging its edges trades width with the help below - the page's side grips size the pair</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="20"></span> the same lines loop in a second pane - each page ghosts out under the next like the wrap toggle, cycling pages without scrolling</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour (size, weight, spacing and lane pitch follow the chat font settings - the face is its own opt); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet, save a burst - a flush keeps only its newest 15 so a reload-into-fast-chat can't wall the frame; needs the video on, live messages only<sup>†</sup></span></div>
@@ -4771,6 +4770,7 @@
       resnapQueued = false;
       // page-flip columns never scroll - a late image growing a row past
       // the fold flips the spill on, or re-deals if it was an idle page
+      if (!loopEl.hidden) { loopPage(); sweepGhosts(loopEl); }
       if (isSplit() && !revFlow) { refitPages(); return; }
       if (wrapFlow && !revFlow) { wrapPage(); sweepGhosts(logEl); return; }
       if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl);
@@ -13914,15 +13914,11 @@
     col.appendChild(ov);
   }
 
-  // the loop pane (level 21): a second seat for clones of the same live
-  // lines, running as a conveyor - scrollTop stays pinned to the tail,
-  // and once the pane overflows each arrival wraps the clipped head row
-  // back in at the tail, so the ring of lines keeps cycling with
-  // nothing to scroll. the ring is capped - past it a head sheds out
-  // of the loop as each wrap lands a new one in
-  const LOOP_MAX = 120;
-  const loopFull = () => loopEl.scrollHeight > loopEl.clientHeight + 2;
-  const loopPin = () => { loopEl.scrollTop = loopEl.scrollHeight; };
+  // the loop pane (level 21): clones of the live lines paged by the same
+  // wrap system the lone column can run - a page fills, ghosts out, and
+  // the new one writes down over the faded layer, so the pane cycles
+  // pages with nothing to scroll and keeps no scrollback: the outgoing
+  // page lives on in the ghost overlay, everything else drops
   function loopClone(r) {
     const cl = r.cloneNode(true);
     // the mid and ts come off: rowById replies and the row-count and
@@ -13934,28 +13930,60 @@
     cl.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
     return cl;
   }
-  // the wrap lands before the append so the fresh line keeps the tail;
-  // the shed removes the next-clipped head once the ring passes the
-  // cap, so a saturated loop keeps braiding old lines through the new
   function loopFeed(rows) {
-    for (const r of rows) {
-      if (loopFull()) loopEl.appendChild(loopEl.firstElementChild);
-      loopEl.appendChild(loopClone(r));
-      if (loopEl.children.length > LOOP_MAX) loopEl.firstElementChild.remove();
-    }
-    loopPin();
+    const frag = document.createDocumentFragment();
+    for (const r of rows) frag.appendChild(loopClone(r));
+    loopEl.appendChild(frag);
+    loopPage();
+    sweepGhosts(loopEl);
   }
+  // the lone column's wrapPage, minus its archive: the staying page
+  // ghosts, the fold-crossing run moves up, and a burst's unshown
+  // excess drops with the page it never displayed on
+  function loopPage() {
+    const live = liveRows(loopEl);
+    if (!live.length) return;
+    const { room, fold } = pageBox(loopEl);
+    let k = live.length;
+    for (let j = live.length - 1; j > 0; j--) {
+      if (rowCollapsed(live[j])) continue;
+      if (live[j].getBoundingClientRect().bottom <= fold + 0.5) break;
+      k = j;
+    }
+    if (k === live.length) return;
+    const staying = live.slice(0, k), moving = live.slice(k);
+    let end = null, cut = 0;
+    for (let j = moving.length - 1; j >= 0; j--) {
+      const r = moving[j];
+      if (rowCollapsed(r)) continue;
+      const rc = r.getBoundingClientRect();
+      if (end === null) { end = rc.bottom; cut = j; continue; }
+      if (end - rc.top > room) break;
+      cut = j;
+    }
+    ghostify(loopEl, staying);
+    for (const r of staying) r.remove();
+    for (let j = 0; j < cut; j++) moving[j].remove();
+  }
+  // seats the newest page of the live column as clones, cut the same
+  // way wrapDeal re-cuts its column
   function loopSeed() {
     loopEl.textContent = '';
-    loopFeed(liveRows(logEl).slice(-90));
-  }
-  // a slow ambient turn keeps the ring visibly looping through lulls
-  setInterval(() => {
-    if (splitLevel === 21 && !loopEl.hidden && !document.hidden && loopFull()) {
-      loopEl.appendChild(loopEl.firstElementChild);
-      loopPin();
+    const frag = document.createDocumentFragment();
+    for (const r of liveRows(logEl).slice(-90)) frag.appendChild(loopClone(r));
+    loopEl.appendChild(frag);
+    const { room } = pageBox(loopEl);
+    const live = liveRows(loopEl);
+    let end = null, k = 0;
+    for (let j = live.length - 1; j >= 0; j--) {
+      const r = live[j];
+      if (rowCollapsed(r)) continue;
+      const rc = r.getBoundingClientRect();
+      if (end === null) { end = rc.bottom; continue; }
+      if (end - rc.top > room) { k = j + 1; break; }
     }
-  }, 1700);
+    for (let j = 0; j < k; j++) live[j].remove();
+  }
   // Clips the overlay at the live page's bottom edge rather than dropping
   // covered clones - a removed clone reflows every one below it, which
   // reads as the old page sliding up instead of holding still under the

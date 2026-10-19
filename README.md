@@ -294,9 +294,9 @@ no dependencies beyond CDN-hosted fonts.
       - `2col chat | chat` (`2c`) passes older messages to a second
         chat column - a column fills top-to-bottom, then flips to the
         next; the rest of the family runs one.
-      - `2col chat | loop` (`2cl`) mirrors the same lines in a second
-        pane on a conveyor - rows leaving the top wrap back in at the
-        tail, and the ring keeps cycling with no scroll of its own.
+      - `2col chat | loop` (`2cl`) pages the same lines through a second
+        pane - each full page ghosts out under the next like the wrap
+        toggle, cycling pages with no scroll of its own.
       - `2col chat | emotes` (`2ce`) puts chat beside the emote picker.
         Video starts off; `▶` can float it over the chat.
       - `2col chat | help` (`2ch`) docks the help popup in the rail
