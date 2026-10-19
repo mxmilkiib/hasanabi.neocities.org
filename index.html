@@ -1533,6 +1533,25 @@
     border: 1px solid var(--line); border-radius: .3em; background: var(--bg);
     color: var(--accent); font-weight: 600; margin-right: .5em; vertical-align: -.45em; }
   #tour .tlegs svg, #tour .tbt svg { width: .9em; height: .9em; }
+  /* the layouts page's schematic grid - one thumbnail per ▮▮ menu entry:
+     chat columns grey, video accent, help green, stats pink, and
+     danmaku a dash band over the video */
+  #tour .tlays { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.6em, 1fr));
+    gap: .7em; padding: .7em .9em; }
+  #tour .tlay { display: flex; flex-direction: column; gap: .3em; min-width: 0; }
+  #tour .tlw { display: flex; gap: 2px; height: 4.4em; padding: 3px; box-sizing: border-box;
+    border: 1px solid var(--line); border-radius: .4em; background: var(--bg); }
+  #tour .tlw.col { flex-direction: column; }
+  #tour .tcol { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  #tour .tlw i { flex: 1; border-radius: 2px; background: var(--line); }
+  #tour .tlw i.v { background: color-mix(in srgb, var(--accent) 32%, transparent); }
+  #tour .tlw i.h { background: color-mix(in srgb, var(--good) 30%, transparent); }
+  #tour .tlw i.s { background: color-mix(in srgb, var(--vip) 30%, transparent); }
+  #tour .tlw i.dan { background-image: repeating-linear-gradient(-8deg,
+      rgba(255, 255, 255, .42) 0 .1em, transparent .1em .55em); }
+  #tour .tlr { width: 30%; flex: none; display: flex; flex-direction: column; gap: 2px; }
+  #tour .tlay span { font-size: 10px; color: var(--text-dim); line-height: 1.3; }
+  #tour .tlay span b { color: var(--accent); font-weight: 600; margin-right: .35em; }
   #tour .tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px;
     border-top: 1px solid var(--line); padding-top: 9px; }
   #tour .tour-tabs { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -3235,7 +3254,7 @@
     <div class="tour-card">
       <div class="tour-head"><b id="tourTitle"></b><button class="hdr-btn" id="tourX" type="button" title="close the tour (esc)"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div>
       <div class="tour-body">
-        <div class="tour-page" data-title="a chat thing how-to">
+        <div class="tour-page" data-title="a chat thing how-to:">
           <div class="tour-copy">
             <div><b>hi --</b> this page mirrors twitch chat for a channel - <b>@HasanAbi</b> by default - through a small relay; no account is needed to watch. adding <b>?channel=name</b> to the url retargets the whole page at another streamer, and comma-separated names merge several chats into one log</div>
             <div>everything lives on one screen: a header strip of controls up top, the live chat log filling the page, an optional stream player, and a <b>?</b> panel carrying the manual, session stats and links</div>
@@ -3269,10 +3288,10 @@
             </figure>
           </div>
         </div>
-        <div class="tour-page" data-title="video &amp; layout" hidden>
+        <div class="tour-page" data-title="layouts" hidden>
           <div class="tour-copy">
             <div><b>▶</b> pops the stream player - it drags by its top edge, resizes from every side and corner, and docks into a rail column if one wants it parked. the player's own pause button stops the stream</div>
-            <div><b>▮▮</b> opens the layout menu - it can split the log into up to three scrolling columns, or dock the video, emote, stats and help panes into a rail down the side; the splitters between sections drag to resize</div>
+            <div><b>▮▮</b> opens the layout menu - it can split the log into up to three scrolling columns, or dock the video, emote, stats and help panes into a rail down the side; the splitters between sections drag to resize. all twenty layouts map out below</div>
             <div>the header's <b>–</b> shrinks the strip to a sliver - hovering swells it back</div>
             <div>the <b>dot</b> narrates stream status - pulsing while checking, green while live, red on a dropped socket, grey while off - and the sparkline beside it graphs messages a second over the last four minutes, banding red, violet and grey over outages, page closures and silence</div>
           </div>
@@ -3291,6 +3310,31 @@
                 <div class="trail"><i></i><i></i><i></i></div>
               </div>
               <figcaption>video docked beside a split log and a rail of panes - every boundary drags to resize</figcaption>
+            </figure>
+            <figure class="tshot">
+              <div class="tlays">
+                <div class="tlay"><div class="tlw"><i></i></div><span><b>▮</b>1col chat</span></div>
+                <div class="tlay"><div class="tlw"><i class="h" style="flex:0 0 68%;margin:0 auto"></i></div><span><b>?</b>1col help</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i></div><span><b>▮▮</b>2col chat | chat</span></div>
+                <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="h"></i></span></div><span><b>▮?</b>2col chat | help</span></div>
+                <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="v"></i><i class="h"></i></span></div><span><b>▮▶?</b>2col chat | video/help</span></div>
+                <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="v"></i><i></i></span></div><span><b>▮▶</b>2col chat | video/emotes</span></div>
+                <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i></i></span></div><span><b>▮☻</b>2col chat | emotes</span></div>
+                <div class="tlay"><div class="tlw"><span class="tlr"><i class="s"></i><i></i></span><span class="tcol"><i class="v"></i><i></i></span></div><span><b>⊞</b>2x2</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><i></i></div><span><b>▮▮▮</b>3col chat | chat | chat</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="h"></i></span></div><span><b>▮▮?</b>3col chat | chat | help</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i class="h"></i></span></div><span><b>▮▮▶?</b>3col chat | chat | video/help</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i></i><i class="s"></i></span></div><span><b>▮▮▯</b>3col chat | chat | video/emotes/stats</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i></i></span></div><span><b>▮▮▶</b>3col chat | chat | video/emotes</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i></i></span></div><span><b>▮▮☻</b>3col chat | chat | emotes</span></div>
+                <div class="tlay"><div class="tlw col"><i class="v" style="flex:0 0 42%"></i><i></i></div><span><b>▶▮</b>1col video/chat</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i></i><i class="h"></i></span></div><span><b>▮▮▯?</b>3col chat | chat | video/emotes/help</span></div>
+                <div class="tlay"><div class="tlw"><i class="v" style="flex:0 0 78%;margin:0 auto"></i></div><span><b>▶</b>1col video</span></div>
+                <div class="tlay"><div class="tlw"><span class="tcol" style="flex:0 0 68%;margin:0 auto"><i class="v" style="flex:0 0 42%"></i><i class="h"></i></span></div><span><b>▶?</b>1col video/help</span></div>
+                <div class="tlay"><div class="tlw"><i class="v dan" style="flex:0 0 78%;margin:0 auto"></i></div><span><b>▶»</b>1col danmaku</span></div>
+                <div class="tlay"><div class="tlw col"><i class="v dan" style="flex:0 0 42%"></i><i></i></div><span><b>▶»▮</b>1col danmaku/chat</span></div>
+              </div>
+              <figcaption>every ▮▮ menu layout, in menu order - grey bars are chat columns, accent the video, green help, pink stats, dashes danmaku, and the narrow stack the rail</figcaption>
             </figure>
             <figure class="tshot">
               <div class="thdr"><i class="tdot"></i><i class="tseg acc" style="width:5em"></i><i class="tseg" style="width:8em;opacity:.55"></i><i class="tseg" style="width:4em;opacity:.35"></i><span class="tsp"></span><span class="tspark"><i style="height:.6em"></i><i style="height:1em"></i><i style="height:.8em"></i><i class="red" style="height:1.1em"></i><i class="red" style="height:.9em"></i><i style="height:.7em"></i><i style="height:1em"></i><i style="height:.5em"></i><i style="height:.9em"></i></span><i class="tseg" style="width:2.6em"></i></div>
