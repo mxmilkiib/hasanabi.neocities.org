@@ -697,6 +697,11 @@
   main.split3 .jdc[data-for="jdownSide"].r { left: 58.333%; }
   main.split3 .jdc[data-for="jdownSide2"].l { left: 75%; }
   main.split3 .jdc[data-for="jdownSide2"].r { left: 91.666%; }
+  /* the loop level seats #log in the left half - its jump control and
+     edge grips centre on that half like a 2col's first seat */
+  main.hasloop .jdown { left: 25%; }
+  main.hasloop .jdc[data-for="jdownLog"].l { left: 12.5%; }
+  main.hasloop .jdc[data-for="jdownLog"].r { left: 37.5%; }
   /* the circles wear an svg rect ring instead of the pill's masked
      conic one - the mask shaved a sliver off the right rim wherever a
      quarter/percent position landed on a fractional pixel; the march
@@ -717,7 +722,7 @@
      columns pack against the bottom edge - the exact mirror of normal */
   /* :not([hidden]) keeps the author-rule display from overriding the UA
      hidden attribute on unused split columns */
-  main.rev .col:not([hidden]) { display: flex; flex-direction: column-reverse; }
+  main.rev .col:not([hidden]):not(#loop) { display: flex; flex-direction: column-reverse; }
   main.rev .col > * { flex-shrink: 0; }
   main.rev .jdown { top: 10px; bottom: auto; }
   .col {
@@ -746,6 +751,11 @@
   .ghostpage { position: absolute; inset: 0; box-sizing: border-box; padding: inherit;
     overflow: hidden; z-index: 5; }
   #side, #side2 { border-left: 1px solid var(--line); }
+  /* the loop pane: a conveyor of row clones held on the live edge by
+     script-pinned scrollTop - rows clipping off the top wrap back in at
+     the tail, so the ring of lines keeps cycling with no scrollbar to
+     grab (hidden overflow still scrolls programmatically) */
+  #loop { overflow: hidden; border-left: 1px solid var(--line); }
   /* the rail: a side column holding the floating panels
      re-parented by dockRail - video up top (full width, aspect kept),
      the picker, stats or help sharing the rest by flex. The floating
@@ -1581,6 +1591,8 @@
   #tour .tlw i.s { background: color-mix(in srgb, var(--vip) 30%, transparent); }
   #tour .tlw i.dan { background-image: repeating-linear-gradient(-8deg,
       rgba(255, 255, 255, .42) 0 .1em, transparent .1em .55em); }
+  #tour .tlw i.lp { background-image: repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, .5) 0 .18em, transparent .18em .62em); }
   #tour .tlr { width: 30%; flex: none; display: flex; flex-direction: column; gap: 2px; }
   #tour .tlay span { font-size: 10px; color: var(--text-dim); line-height: 1.3; }
   #tour .tlay span b { color: var(--accent); font-weight: 600; margin-right: .35em; }
@@ -3091,7 +3103,7 @@
     <div><b>☺</b> <span>emote-only rows: <span id="helpEonlyList"></span> - messages of only emotes render them larger; cycles inline / pinned right like gif embeds / normal size<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align: -0.15em" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></b> <span>links view: <span id="helpLinksList"></span> - only messages carrying a url show, and only the first post of each link<sup>†</sup></span></div>
-    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li><li><span class="splitSeat" data-split="16"></span> the framed stream alone, centred - its edges drag their side, and any bare-floor grab pulls it wider in the dragged direction</li><li><span class="splitSeat" data-split="18"></span> the centred frame alone with danmaku bullets armed over it - the only layout that carries them, so picking another switches them back off; it defaults to the largest frame the space fits, and the same edge and floor drags resize it</li><li><span class="splitSeat" data-split="17"></span> the stream over the docked help popup, centred like 1col help - the video keeps its own width inside the page, and dragging its edges trades width with the help below - the page's side grips size the pair</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
+    <div><b id="helpSplitIcon">▮▮</b> <span class="linkcols ecfg"><i><b>layout</b> click for menu or scroll to change layout. column layouts offer a new reading experience; chat in one column lingers until the other column(s) is filled, then older chat is grayed out while the new chat overwrites it</i><i><b>1col</b><ul><li><span class="splitSeat" data-split="0"></span> one full-width chat column</li><li><span class="splitSeat" data-split="1"></span> the help popup starting centred at two-thirds of the screen</li><li><span class="splitSeat" data-split="14"></span> the stream docks in its frame over the chat column</li><li><span class="splitSeat" data-split="16"></span> the framed stream alone, centred - its edges drag their side, and any bare-floor grab pulls it wider in the dragged direction</li><li><span class="splitSeat" data-split="18"></span> the centred frame alone with danmaku bullets armed over it - the only layout that carries them, so picking another switches them back off; it defaults to the largest frame the space fits, and the same edge and floor drags resize it</li><li><span class="splitSeat" data-split="17"></span> the stream over the docked help popup, centred like 1col help - the video keeps its own width inside the page, and dragging its edges trades width with the help below - the page's side grips size the pair</li></ul></i><i><b>2col</b><ul><li><span class="splitSeat" data-split="2"></span> two chat columns - a column fills top-to-bottom, then flips to the next<sup>†</sup>; the rest of the family runs one</li><li><span class="splitSeat" data-split="20"></span> the same lines loop in a second pane - rows leaving the top wrap back in at the tail, a conveyor that keeps cycling and never scrolls</li><li><span class="splitSeat" data-split="6"></span> emotes alone - the video floats the same way</li><li><span class="splitSeat" data-split="3"></span> help docked beside one chat column</li><li><span class="splitSeat" data-split="5"></span> video + emotes</li><li><span class="splitSeat" data-split="4"></span> help docked under the video</li><li><span class="splitSeat" data-split="7"></span> a vertical split with emotes under the stats and the chat under the video</li></ul></i><i><b>3col</b><ul><li><span class="splitSeat" data-split="8"></span> a third chat column joins the cycle on a landscape screen</li><li><span class="splitSeat" data-split="11"></span> a rail layout - two chat columns plus a side rail holding the stream, the emote picker and the stats page; the line between its emotes and stats drags to resize them, and the rail's left edge drags the chat columns narrower or wider</li><li><span class="splitSeat" data-split="13"></span> emotes alone - the video stays off but the ▶ button floats it over the chat</li><li><span class="splitSeat" data-split="9"></span> help docked beside two chat columns</li><li><span class="splitSeat" data-split="12"></span> video + emotes in a slimmer rail on the same columns</li><li><span class="splitSeat" data-split="10"></span> help under the video on the rail</li><li><span class="splitSeat" data-split="15"></span> video over emotes over help on the rail</li></ul></i></span></div>
     <div><b>▶</b> <span>stream video popup: <span id="helpVideoList"></span> - draggable, resizable, loads only when enabled<sup>†</sup></span><b></b><span>stand-in: <span id="helpVAltList"></span> - a youtube video fills the frame while the stream is down<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div><b>danmaku</b> <span>bullet chat over video: <span id="helpDanList"></span> - incoming messages stream right-to-left across the video in stacked lanes, niconico-style - a longer message flies faster, each in its sender's nick colour (size, weight, spacing and lane pitch follow the chat font settings - the face is its own opt); some bullets' emotes fly on a magnified rung, rolled per message, and animated emotes keep rolling even under the picker's freeze; under load the queue backs up and drains late rather than dropping a bullet, save a burst - a flush keeps only its newest 15 so a reload-into-fast-chat can't wall the frame; needs the video on, live messages only<sup>†</sup></span></div>
@@ -3360,6 +3372,7 @@
                 <div class="tlay"><div class="tlw col"><i class="v dan" style="flex:0 0 42%"></i><i></i></div><span title="1col danmaku/chat"><b>▶»▮</b>1col danmaku/chat</span></div>
                 <div class="tlay"><div class="tlw"><span class="tcol" style="flex:0 0 68%;margin:0 auto"><i class="v" style="flex:0 0 42%"></i><i class="h"></i></span></div><span title="1col video/help"><b>▶?</b>1col video/help</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i></div><span title="2col chat | chat"><b>▮▮</b>2col</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i class="lp"></i></div><span title="2col chat | loop"><b>▮∞</b>2col | loop</span></div>
                 <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="h"></i></span></div><span title="2col chat | help"><b>▮?</b>2col | help</span></div>
                 <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i></i></span></div><span title="2col chat | emotes"><b>▮☻</b>2col | emotes</span></div>
                 <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="v"></i><i class="h"></i></span></div><span title="2col chat | video/help"><b>▮▶?</b>2col | video/help</span></div>
@@ -3378,7 +3391,7 @@
           </div>
           <div class="tour-copy">
             <div><b>▶</b> pops the stream player - it drags by its top edge, resizes from every side and corner, and docks into a rail column if one wants it parked. the player's own pause button stops the stream</div>
-            <div><b>▮▮</b> opens the layout menu - it can split the log into up to three scrolling columns, or dock the video, emote, stats and help panes into a rail down the side; the splitters between sections drag to resize. all twenty layouts map out below</div>
+            <div><b>▮▮</b> opens the layout menu - it can split the log into up to three scrolling columns, or dock the video, emote, stats and help panes into a rail down the side; the splitters between sections drag to resize. all twenty-one layouts map out below</div>
             <div>the two <b>▶» danmaku</b> layouts fly chat lines across the video as bullets, niconico-style - right to left in stacked lanes, each in the sender's nick colour; lane band, size, speed and more tune in the ? panel's danmaku section. only they carry the bullets, so picking another layout switches them off</div>
             <div>the header's <b>–</b> shrinks the strip to a sliver - hovering swells it back</div>
           </div>
@@ -3447,7 +3460,7 @@
     </div>
   </div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
-  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes, stats and help" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><div id="colSplitR" hidden title="drag to resize the centred page"></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
+  <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div class="col" id="loop" role="feed" aria-label="chat loop" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes, stats and help" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><div id="colSplitR" hidden title="drag to resize the centred page"></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><div id="chatWrap"><div id="chatHl" aria-hidden="true"></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" placeholder="chat" aria-label="message" rows="1"></textarea></div><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
   <div id="emotePick" role="dialog" aria-label="emote picker" hidden><div class="epick-handle" title="drag to move"></div><div class="erow"><div class="qwrap"><input id="emoteQ" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="search emotes…" aria-label="search emotes"><button id="emoteQx" type="button" title="clear the search" aria-label="clear the search">×</button></div><button class="hdr-btn esort" id="emoteRowTgl" type="button" title="show/hide the tabs and options row" aria-pressed="false">≡</button><button class="hdr-btn esort" id="emotePin" type="button" title="pin the picker open - it floats free of the chat bar and survives hiding it; esc still closes">📌&#xFE0E;</button><button class="hdr-btn" id="emoteX" type="button" title="close the picker"><span style="display:inline-block;transform:translate(0,1px)">✕</span></button></div><div class="etabsrow"><div class="etabs" id="emoteTabs"></div><button class="hdr-btn esort" id="emoteMix" type="button" title="merge all enabled sources into one grid">mix</button><div class="eopts"><button class="hdr-btn esort" id="emoteZoomSm" type="button" title="halve the cell size for a denser emote overview">½x</button><button class="hdr-btn esort" id="emoteZoomQ" type="button" title="three-quarter cell size - a middle ground between dense and normal">¾x</button><button class="hdr-btn esort" id="emoteZoomOne" type="button" title="normal cell size">1x</button><button class="hdr-btn esort" id="emoteZoomTh" type="button" title="1⅓x cell size - a third past normal">1⅓x</button><button class="hdr-btn esort" id="emoteZoomHf" type="button" title="1.5x cell size - between normal and double">1½x</button><button class="hdr-btn esort" id="emoteZoomTw" type="button" title="1⅔x cell size - two-thirds past normal">1⅔x</button><button class="hdr-btn esort" id="emoteZoom" type="button" title="double the cell size for a closer emote preview">2x</button><button class="hdr-btn" id="emoteNames" type="button" title="toggle emote names">Aa</button><button class="hdr-btn esort" id="emoteTips" type="button" title="hover tooltip - pops the big emote card over a cell">tip</button><button class="hdr-btn esort" id="emoteSortAz" type="button" title="sort emotes alphabetically">a-z</button><button class="hdr-btn esort on" id="emoteSortUse" type="button" title="sort emotes by most recent channel usage - middle-click resets the recorded order">use</button><button class="hdr-btn esort" id="emoteAgeRows" type="button" title="age rows cycle - use sort only">▤</button><button class="hdr-btn esort" id="emoteAgeSq" type="button" title="age squares cycle - use sort only">□</button><button class="hdr-btn esort on" id="emoteMove" type="button" title="re-sort motion cycle">↔</button><button class="hdr-btn esort on" id="emoteStill" type="button" title="toggle still emotes (shift-click for only still)">still</button><button class="hdr-btn esort on" id="emoteAnim" type="button" title="toggle animated emotes (shift-click for only animated)">anim</button><button class="hdr-btn esort" id="emoteAnimPause" type="button" title="pause animated emotes - swaps playing cells for stills; click again to resume">⏸&#xFE0E;</button><button class="hdr-btn esort on" id="emoteHold" type="button" title="hold the grid still while the pointer is over the picker - chat use won't reshuffle cells under the cursor">hold</button></div></div><div id="emoteRecent" hidden></div><div id="emoteGrid"></div><div class="ep-size tl" title="drag to resize">◤</div><div class="ep-size tr" title="drag to resize">◥</div><div class="ep-size bl" title="drag to resize">◣</div><div class="ep-size br" title="drag to resize">◢</div><div class="ep-size l" title="drag to resize">◀</div><div class="ep-size r" title="drag to resize">▶</div><div class="ep-size b" title="drag to resize">▼</div></div>
 
@@ -3590,6 +3603,7 @@
   const chanEl = dotEl.parentElement; // .channel
   const sideEl = document.getElementById('side');
   const side2El = document.getElementById('side2');
+  const loopEl = document.getElementById('loop');
   const railEl = document.getElementById('rail');
   const railSplitEl = document.getElementById('railSplit');
   const colSplitEl = document.getElementById('colSplit');
@@ -5326,6 +5340,7 @@
             // divs, so the non-greedy match ends at the row's own close)
             for (const c of cols())
               for (const r of c.querySelectorAll(`.row[data-ch="${ch}"]`)) r.remove();
+            loopEl.querySelectorAll(`.row[data-ch="${ch}"]`).forEach((r) => r.remove());
             for (const r of rowById) if ((r[1].dataset || {}).ch === ch) rowById.delete(r[0]);
             html = html.replace(new RegExp(`<div [^>]*data-ch="${ch}"[^>]*>[^]*?</div>`, 'g'), '');
             histDirty = true;
@@ -5333,6 +5348,7 @@
           } else {
             html = '';
             for (const c of cols()) c.textContent = '';
+            loopEl.textContent = '';
             rowById.clear();
             histDirty = true;
             // the wipe takes the load seam with it - re-seat it at the
@@ -5757,6 +5773,7 @@
     }
     if (missed.length > 50) { const n = missed.length - 50; missed.splice(0, n); missedIx = Math.max(0, missedIx - n); }
     if (unfocused) updateMissedBadge();
+    if (!loopEl.hidden) loopFeed(newRows);
     if (isSplit()) { flipCols(); if (!revFlow) sweepGhosts(activeEl); }
     else if (wrapFlow && !revFlow) wrapPage();
     // a landed batch means the backlog (or live flow) is in - held
@@ -13896,6 +13913,49 @@
     }
     col.appendChild(ov);
   }
+
+  // the loop pane (level 21): a second seat for clones of the same live
+  // lines, running as a conveyor - scrollTop stays pinned to the tail,
+  // and once the pane overflows each arrival wraps the clipped head row
+  // back in at the tail, so the ring of lines keeps cycling with
+  // nothing to scroll. the ring is capped - past it a head sheds out
+  // of the loop as each wrap lands a new one in
+  const LOOP_MAX = 120;
+  const loopFull = () => loopEl.scrollHeight > loopEl.clientHeight + 2;
+  const loopPin = () => { loopEl.scrollTop = loopEl.scrollHeight; };
+  function loopClone(r) {
+    const cl = r.cloneNode(true);
+    // the mid and ts come off: rowById replies and the row-count and
+    // emote-use sweeps all key on real rows only
+    delete cl.dataset.ts;
+    if (cl.dataset.mid) { cl.dataset.omid = cl.dataset.mid; delete cl.dataset.mid; }
+    cl.querySelectorAll('.ytcard').forEach((e) => e.remove());
+    cl.querySelectorAll('video, audio').forEach((v) => v.removeAttribute('autoplay'));
+    cl.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
+    return cl;
+  }
+  // the wrap lands before the append so the fresh line keeps the tail;
+  // the shed removes the next-clipped head once the ring passes the
+  // cap, so a saturated loop keeps braiding old lines through the new
+  function loopFeed(rows) {
+    for (const r of rows) {
+      if (loopFull()) loopEl.appendChild(loopEl.firstElementChild);
+      loopEl.appendChild(loopClone(r));
+      if (loopEl.children.length > LOOP_MAX) loopEl.firstElementChild.remove();
+    }
+    loopPin();
+  }
+  function loopSeed() {
+    loopEl.textContent = '';
+    loopFeed(liveRows(logEl).slice(-90));
+  }
+  // a slow ambient turn keeps the ring visibly looping through lulls
+  setInterval(() => {
+    if (splitLevel === 21 && !loopEl.hidden && !document.hidden && loopFull()) {
+      loopEl.appendChild(loopEl.firstElementChild);
+      loopPin();
+    }
+  }, 1700);
   // Clips the overlay at the live page's bottom edge rather than dropping
   // covered clones - a removed clone reflows every one below it, which
   // reads as the old page sliding up instead of holding still under the
@@ -14460,18 +14520,18 @@
   // video at 5/6/8/11/13/16/18 (2/4/7/10/14 float it instead, 12 leaves
   // it to the rail video setting) and the emote picker under every rail
   // that doesn't hold help - and above help on 16
-  const SPLIT_NAMES = ['1col chat', '1col help', '2col chat | chat', '2col chat | help', '2col chat | video/help', '2col chat | video/emotes', '2col chat | emotes', '2x2', '3col chat | chat | chat', '3col chat | chat | help', '3col chat | chat | video/help', '3col chat | chat | video/emotes/stats', '3col chat | chat | video/emotes', '3col chat | chat | emotes', '1col video/chat', '3col chat | chat | video/emotes/help', '1col video', '1col video/help', '1col danmaku', '1col danmaku/chat'];
+  const SPLIT_NAMES = ['1col chat', '1col help', '2col chat | chat', '2col chat | help', '2col chat | video/help', '2col chat | video/emotes', '2col chat | emotes', '2x2', '3col chat | chat | chat', '3col chat | chat | help', '3col chat | chat | video/help', '3col chat | chat | video/emotes/stats', '3col chat | chat | video/emotes', '3col chat | chat | emotes', '1col video/chat', '3col chat | chat | video/emotes/help', '1col video', '1col video/help', '1col danmaku', '1col danmaku/chat', '2col chat | loop'];
   // compact url aliases: col + v(id) e(motes) s(tats) h(elp) d(anmaku) - 2x2 is its own shape
-  const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce', '1cv', '3cveh', '1cvid', '1cvh', '1cdan', '1cvdan'];
-  const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻', '▶▮', '▮▮▯?', '▶', '▶?', '▶»', '▶»▮'];
+  const SPLIT_URL = ['1c', '1ch', '2c', '2ch', '2cvh', '2cve', '2ce', '2x2', '3c', '3ch', '3cvh', '3cves', '3cve', '3ce', '1cv', '3cveh', '1cvid', '1cvh', '1cdan', '1cvdan', '2cl'];
+  const SPLIT_GLYPHS = ['▮', '?', '▮▮', '▮?', '▮▶?', '▮▶', '▮☻', '⊞', '▮▮▮', '▮▮?', '▮▮▶?', '▮▮▯', '▮▮▶', '▮▮☻', '▶▮', '▮▮▯?', '▶', '▶?', '▶»', '▶»▮', '▮∞'];
   const splitGlyph = (l) => SPLIT_GLYPHS[l - 1];
   // menu + wheel order rides this over stable declaration-order ids, so
   // a rearrangement never remaps a stored level - chat-emotes sits right
   // under chat-help in each column family, and the 1col variants follow
   // 1col help
-  const SPLIT_ORDER = [16, 18, 0, 1, 14, 19, 17, 2, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
+  const SPLIT_ORDER = [16, 18, 0, 1, 14, 19, 17, 2, 20, 3, 6, 4, 5, 7, 8, 9, 13, 10, 11, 12, 15];
   // the level families - menu order scatters the semantic ranges
-  const LVL_NORAIL = new Set([1, 3, 9, 15, 17, 19, 20]); // bare chat columns - 15/17/19/20 dock the video above them instead
+  const LVL_NORAIL = new Set([1, 3, 9, 15, 17, 19, 20, 21]); // bare chat columns - 15/17/19/20 dock the video above them instead, 21's second pane is the self-driving loop
   const LVL_VIDSTACK = new Set([15, 17, 19, 20]);  // the framed stack - 17/19 hide the column leaving the video solo
   const LVL_VIDONLY = new Set([17, 19]);           // the centred frame alone - 19 arms the danmaku canvas on top
   const LVL_DAN = new Set([19, 20]);               // the danmaku layouts arm bullets themselves - 20 keeps the chat column
@@ -14481,12 +14541,12 @@
   const LVL_STATSRAIL = new Set([8, 12]);          // the stats pane in the rail
   const LVL_VIDRAIL = new Set([5, 6, 8, 11, 13, 16, 18]);  // video docked for the level - atop the rail, or over 8's chat
   const LVL_VIDFLOAT = new Set([2, 4, 7, 10, 14]); // rail on, the video floats
-  const LVL_PORTRAIT = new Set([1, 3, 15, 20]);    // levels portrait can keep
+  const LVL_PORTRAIT = new Set([1, 3, 15, 20, 21]); // levels portrait can keep - the loop needs no more width than its 2col sibling
   // level ids used to run in declaration order; a stored int from then
   // remaps to the menu-order id of the same layout
   const LVL_LEGACY = [0, 1, 3, 9, 12, 13, 14, 6, 8, 7, 11, 5, 4, 10, 2];
   function setSplit(level) {
-    if (window.innerWidth <= window.innerHeight) level = level === 1 || level === 15 || level === 20 ? level : 3;
+    if (window.innerWidth <= window.innerHeight) level = level === 1 || level === 15 || level === 20 || level === 21 ? level : 3;
     level = Math.max(1, Math.min(SPLIT_NAMES.length, level));
     const prevSplit = splitLevel;
     splitLevel = level;
@@ -14507,8 +14567,13 @@
     // rail: 3↔10-14 and 1↔4-8 alike. the rail modes share one visible
     // rail, so level changes must still re-dock; only a true no-op
     // exits early
-    const want = level === 2 || (level >= 17 && level !== 20) ? 0 : level === 9 ? 3 : level === 3 || (level >= 10 && level <= 14) || level === 16 ? 2 : 1;
+    const want = level === 2 || (level >= 17 && level <= 19) ? 0 : level === 9 ? 3 : level === 3 || (level >= 10 && level <= 14) || level === 16 ? 2 : 1;
     const noRail = LVL_NORAIL.has(level);
+    // the loop pane rides beside a plain 1col chat - its clones re-seed
+    // from the live tail on entry and drop out when the level leaves
+    loopEl.hidden = level !== 21;
+    mainEl.classList.toggle('hasloop', level === 21);
+    if (level === 21) requestAnimationFrame(loopSeed); else loopEl.textContent = '';
     if (want === cur) {
       if (railEl.hidden === noRail && prevSplit === level) return;
       logEl.hidden = want < 1;
@@ -15284,9 +15349,10 @@
     const inField = /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(tag);
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !inField) {
       e.preventDefault();
-      // direct rows only - ghost clones inside .ghostpage would step the
-      // selection through their overlay order, not their screen order
-      const rows = [...document.querySelectorAll('.col > .row')];
+      // direct rows only - ghost clones inside .ghostpage and the loop
+      // pane's conveyor clones would step the selection through orders
+      // that aren't the chat's
+      const rows = cols().flatMap((c) => [...c.querySelectorAll(':scope > .row')]);
       if (!rows.length) return;
       const i = rows.indexOf(selRow);
       setSel(rows[i < 0 ? rows.length - 1

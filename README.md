@@ -294,6 +294,9 @@ no dependencies beyond CDN-hosted fonts.
       - `2col chat | chat` (`2c`) passes older messages to a second
         chat column - a column fills top-to-bottom, then flips to the
         next; the rest of the family runs one.
+      - `2col chat | loop` (`2cl`) mirrors the same lines in a second
+        pane on a conveyor - rows leaving the top wrap back in at the
+        tail, and the ring keeps cycling with no scroll of its own.
       - `2col chat | emotes` (`2ce`) puts chat beside the emote picker.
         Video starts off; `▶` can float it over the chat.
       - `2col chat | help` (`2ch`) docks the help popup in the rail
@@ -533,7 +536,7 @@ editing a URL.
 
 | key | values | effect |
 |---|---|---|
-| `split` | `1`–`20` or a short name | layout - each seat's alias sits beside its name under Chat columns above; the numeric ids run `1c` `1ch` `2c` `2ch` `2cvh` `2cve` `2ce` `2x2` `3c` `3ch` `3cvh` `3cves` `3cve` `3ce` `1cv` `3cveh` `1cvid` `1cvh` `1cdan` `1cvdan` in that order |
+| `split` | `1`–`21` or a short name | layout - each seat's alias sits beside its name under Chat columns above; the numeric ids run `1c` `1ch` `2c` `2ch` `2cvh` `2cve` `2ce` `2x2` `3c` `3ch` `3cvh` `3cves` `3cve` `3ce` `1cv` `3cveh` `1cvid` `1cvh` `1cdan` `1cvdan` `2cl` in that order |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `reset` | flag | wipe all saved options and reload param-free - the reset button via url |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
