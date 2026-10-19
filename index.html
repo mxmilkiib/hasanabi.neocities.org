@@ -2357,14 +2357,14 @@
   #helpPanel .rcmsr, #helpPanel .linkcols.stbl .rcmsr { color: #e0855a; }
   /* group heads across the help pages - hoisted stbl labels, stbl
      column heads, and the flowing lists' own <i><b> titles - take a
-     grayed jade; lightness tracks the shade stop like the dim face
-     does, the hue is fixed green - mixing out of text-dim would drag
-     the palette's own hue through it. the midterms' classed
+     jade-tinged gray; lightness tracks the shade stop like the dim
+     face does, the hue is fixed green - mixing out of text-dim would
+     drag the palette's own hue through it. the midterms' classed
      race-tint heads and note rows keep theirs */
   #helpPanel .linkcols.stbl > b:not([class]),
   #helpPanel .linkcols.stbl .chd,
   #helpPanel .linkcols > i:not(.note) > b {
-    color: oklch(calc(var(--sh-bg) + (var(--sh-tx) - var(--sh-bg)) * .78) .03 168); }
+    color: oklch(calc(var(--sh-bg) + (var(--sh-tx) - var(--sh-bg)) * .78) .015 168); }
   /* a won row dots the left edge of its name cell in outcome green */
   #helpPanel .linkcols.stbl > i.won .cn::before {
     content: '●'; color: var(--good); font-size: .62em; margin-right: .35em; }
