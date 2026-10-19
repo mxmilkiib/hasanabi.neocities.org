@@ -14285,6 +14285,8 @@
   // ---- relay iframe: handles the Twitch socket and its own reconnects ----
   const relayFrame = document.createElement('iframe');
   relayFrame.style.display = 'none';
+  // sandbox stills top-nav/popups; allow-same-origin keeps its localStorage
+  relayFrame.sandbox = 'allow-scripts allow-same-origin';
   relayFrame.src = RELAY_URL;
   document.body.appendChild(relayFrame);
 
