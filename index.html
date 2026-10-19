@@ -1558,6 +1558,9 @@
   #tour .tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px;
     border-top: 1px solid var(--line); padding-top: 9px; }
   #tour .tour-tabs { display: flex; flex-wrap: wrap; gap: 5px; }
+  /* the same strip rides under the title too - the page tabs are jump
+     links, so one hand is always near them */
+  #tour .tour-tabs.tour-top { justify-content: center; margin: 8px 0 2px; }
   #tour .tour-tabs .hdr-btn { width: auto; height: 24px; padding: 0 9px; font-size: .8em;
     display: inline-flex; align-items: center; white-space: nowrap; }
   #tour .tour-tabs .hdr-btn.on { color: var(--accent); border-color: var(--accent);
@@ -3261,6 +3264,7 @@
   <div id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden>
     <div class="tour-card">
       <div class="tour-head"><b id="tourTitle"></b><button class="hdr-btn" id="tourX" type="button" title="close the tour (esc)"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div>
+      <div class="tour-tabs tour-top" id="tourTabsTop"></div>
       <div class="tour-body">
         <div class="tour-page" data-title="a chat thing how-to" data-tab="the basics">
           <div class="tour-copy">
@@ -3269,7 +3273,7 @@
             <div><b>row colours</b> narrate what a line is at a glance - the key is beside. the <b>↩ chip</b> on a reply jumps to the original message, restoring it from the archive past the rendered edge, and a row's <b>◷ timestamp</b> copies a link straight to it</div>
             <div>the <b>@N chip</b> that will appear in the header queues mentions of your name that landed while the page was unfocused - click walks through them, ⇧click clears. <b>⌕</b> finds in chat (ctrl+f or /) - text, user:login, kind:notice or a date - and the log archives in the browser, so a reload keeps the backlog</div>
             <div>the strip's <b>whole button cast</b> is listed below, in order - nearly all of them <b>click/scroll</b> to change and <b>⇧click</b> steps back; later pages go deeper on the big features</div>
-            <div><b>esc</b>, <b>✕</b> or a click on the dimmed surround bails out any time, <b>←/→</b> or the page tabs below hop between them, and the ? panel's <b>tour</b> link re-runs this later</div>
+            <div><b>esc</b>, <b>✕</b> or a click on the dimmed surround bails out any time, <b>←/→</b> or the page tabs above and below hop between them, and the ? panel's <b>tour</b> link re-runs this later</div>
           </div>
           <div class="tour-shots">
             <figure class="tshot">
@@ -3699,7 +3703,7 @@
     const tourEl = document.getElementById('tour');
     const tourTitle = document.getElementById('tourTitle');
     const tourPages = [...tourEl.querySelectorAll('.tour-page')];
-    const tourTabs = document.getElementById('tourTabs');
+    const tourTabs = tourEl.querySelectorAll('.tour-tabs');
     const tourBack = document.getElementById('tourBack');
     const tourNext = document.getElementById('tourNext');
     let tourPage = 0;
@@ -3707,7 +3711,7 @@
     function tourPaint() {
       tourPages.forEach((p, i) => { p.hidden = i !== tourPage; });
       tourTitle.textContent = tourPages[tourPage].dataset.title;
-      tourTabs.querySelectorAll('button').forEach((d, i) => d.classList.toggle('on', i === tourPage));
+      tourEl.querySelectorAll('.tour-tabs button').forEach((d) => d.classList.toggle('on', +d.dataset.page === tourPage));
       tourBack.disabled = tourPage === 0;
       tourNext.textContent = tourPage === tourPages.length - 1 ? 'done' : 'next';
     }
@@ -3721,14 +3725,19 @@
       tourEl.hidden = true;
       try { localStorage.setItem(TOUR_KEY, '1'); } catch {}
     }
-    // the page tabs build from the page titles - a click jumps straight there
+    // the page tabs build from the page titles - a click jumps straight there;
+    // the strip renders twice (under the title and above back/next), each
+    // button carrying its own page index so both stay in sync
     tourPages.forEach((p, i) => {
-      const d = document.createElement('button');
-      d.className = 'hdr-btn';
-      d.type = 'button';
-      d.textContent = p.dataset.tab || p.dataset.title;
-      d.addEventListener('click', () => { tourPage = i; tourPaint(); });
-      tourTabs.appendChild(d);
+      tourTabs.forEach((host) => {
+        const d = document.createElement('button');
+        d.className = 'hdr-btn';
+        d.type = 'button';
+        d.dataset.page = i;
+        d.textContent = p.dataset.tab || p.dataset.title;
+        d.addEventListener('click', () => { tourPage = i; tourPaint(); });
+        host.appendChild(d);
+      });
     });
     tourBack.addEventListener('click', () => { if (tourPage > 0) { tourPage--; tourPaint(); } });
     tourNext.addEventListener('click', () => {
