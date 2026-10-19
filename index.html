@@ -17927,22 +17927,22 @@
       else if (FONT_STACKS[f]) { fontSel.value = f; applyFont(); }
     }
     if (q.has('danc')) { const i = danCovIx(+q.get('danc')); if (i >= 0) setDanCover(i); }
-    if (q.has('dand')) { const v = q.get('dand'); if (v === 'adaptive' || +v === 3) setDanAdapt(1); else { setDanDir(v === 'both' || +v === 2 ? 2 : flag('dand') ? 1 : 0); setDanAdapt(0); } }
+    if (q.has('dand')) { const v = q.get('dand'); if (v === 'adaptive' || +v === 3) setDanAdapt(1); else { setDanDir({ top: 0, bottom: 1, both: 2 }[v] ?? (v !== '' && Number.isFinite(+v) ? +v : flag('dand') ? 1 : 0)); setDanAdapt(0); } }
     if (q.has('adapt')) setDanAdapt(flag('adapt') ? 1 : 0);
-    if (q.has('danv')) setDanV(Math.min(DAN_SPEEDS.length, Math.max(0, +q.get('danv')) || 0));
+    if (q.has('danv')) { const v = q.get('danv'); setDanV(v === 'auto' ? DAN_SPEEDS.length : Math.min(DAN_SPEEDS.length, Math.max(0, +v) || 0)); }
     if (q.has('dano')) setDanAlp(Math.min(DAN_ALPHAS.length - 1, Math.max(0, +q.get('dano')) || 0));
     if (q.has('dans')) setDanSub(flag('dans') ? 1 : 0);
-    if (q.has('dansl')) setDanSubLane(Math.min(2, Math.max(0, +q.get('dansl')) || 0));
+    if (q.has('dansl')) { const v = q.get('dansl'); const i = ['off', 'inner', 'outer'].indexOf(v); setDanSubLane(i >= 0 ? i : Math.min(2, Math.max(0, +v) || 0)); }
     if (q.has('dann')) setDanNick(flag('dann') ? 1 : 0);
     if (q.has('dant')) setDanTime(flag('dant') ? 1 : 0);
     if (q.has('danb')) setDanBadge(flag('danb') ? 1 : 0);
     if (q.has('danbg')) setDanBg(Math.min(DAN_BGS.length - 1, Math.max(0, +q.get('danbg')) || 0));
     if (q.has('danl')) setDanLine(Math.min(DAN_LINES.length - 1, Math.max(0, +q.get('danl')) || 0));
-    if (q.has('danfm')) setDanFam(Math.min(2, Math.max(0, +q.get('danfm')) || 0));
+    if (q.has('danfm')) { const v = q.get('danfm'); const i = ['sans', 'rand', 'chat'].indexOf(v); setDanFam(i >= 0 ? i : Math.min(2, Math.max(0, +v) || 0)); }
     if (q.has('danp')) setDanPin(Math.min(DAN_PIN_MO.length + 1, Math.max(0, +q.get('danp')) || 0));
     if (q.has('danpt')) setDanPinT(Math.min(DAN_PINT_SCALE.length - 1, Math.max(0, +q.get('danpt')) || 0));
     if (q.has('danf')) setDanFlt(Math.min(3, Math.max(0, +q.get('danf')) || 0));
-    if (q.has('dfs')) setDanFs(q.get('dfs') === 'adaptive' ? DAN_FS.length : Math.max(0, DAN_FS.indexOf(+q.get('dfs'))));
+    if (q.has('dfs')) { const v = q.get('dfs'); setDanFs(v === 'adaptive' ? DAN_FS.length : v === 'chat' ? 0 : Math.max(0, DAN_FS.indexOf(+v))); }
     if (q.has('anim')) {
       const v = q.get('anim'), i = ANIM_URL.indexOf(v);
       if (i >= 0) setNickAnim(i);
