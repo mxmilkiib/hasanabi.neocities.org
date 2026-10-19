@@ -19,6 +19,11 @@
 <meta property="og:title" content="HasanAbi Chat Thing">
 <meta property="og:description" content="A compact, customisable HasanAbi Twitch chat client - real emotes, badges, replies, stream video, themes and resources - orientated around the Hasan Piker stream, aka the Piker Broadcasting Service (PBS). An alt-UI, second-screen/accessibility tool, organising, media and other resources, &amp; more!">
 <meta property="og:url" content="https://hasanabi.neocities.org/">
+<!-- every ?channel=a,b combination is a distinct url serving this same
+     page - canonical folds them into one index entry for the bare host
+     so multichannel links don't litter search results. the deploy
+     script's head sed re-brands the domain for twtch -->
+<link rel="canonical" href="https://hasanabi.neocities.org/">
 <meta property="og:image" content="https://hasanabi.neocities.org/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
