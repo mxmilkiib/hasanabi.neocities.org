@@ -3278,7 +3278,7 @@
             <div><b>hi --</b> this page mirrors twitch chat for a channel - <b>@HasanAbi</b> by default - through a small relay; no account is needed to watch. adding <b>?channel=name</b> to the url retargets the whole page at another streamer, and comma-separated names merge several chats into one log</div>
             <div>everything lives on one screen: a header strip of controls up top, the live chat log filling the page, an optional stream player, and a <b>?</b> panel carrying the manual, session stats and links</div>
             <div><b>row colours</b> narrate what a line is at a glance - the key is beside. the <b>↩ chip</b> on a reply jumps to the original message, restoring it from the archive past the rendered edge, and a row's <b>◷ timestamp</b> copies a link straight to it</div>
-            <div>the <b>@N chip</b> that will appear in the header queues mentions of your name that landed while the page was unfocused - click walks through them, ⇧click clears. <b>⌕</b> finds in chat (ctrl+f or /) - text, user:login, kind:notice or a date - and the log archives in the browser, so a reload keeps the backlog</div>
+            <div><b>⌕</b> finds in chat (ctrl+f or /) - text, user:login, kind:notice or a date - and the log archives in the browser, so a reload keeps the backlog</div>
             <div>the strip's <b>whole button cast</b> is listed below, in order - nearly all of them <b>click/scroll</b> to change and <b>⇧click</b> steps back; later pages go deeper on the big features</div>
             <div><b>esc</b>, <b>✕</b> or a click on the dimmed surround bails out any time, <b>←/→</b> or the page tabs above and below hop between them, and the ? panel's <b>tour</b> link re-runs this later</div>
           </div>
@@ -3304,6 +3304,41 @@
               <div class="thdr"><i class="tbt">⌕</i><i class="tin">user:someone kind:notice</i><i class="tseg" style="width:2.4em"></i><i class="tbt">↑</i><i class="tbt">↓</i></div>
               <div class="thdr" style="border-bottom:none"><i class="tseg acc" style="width:1.7em"></i><i class="tseg" style="width:9em"></i><span class="tsp"></span><i class="tseg" style="width:3.4em;opacity:.5"></i></div>
               <figcaption>⌕ find bar, ctrl-f, second ctrl-f for browsers find.</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="tour-page" data-title="chatting" hidden>
+          <div class="tour-copy">
+            <div>the <b>twitch button</b> in the header logs in and opens the chat bar under the chat - type and hit enter to send, arrow-up in the box recalls sent messages, and a counter watches the length cap; ⇧click on the button logs out</div>
+            <div>typing a character anywhere jumps into the input, which grows with long drafts and keeps parked drafts across reloads - <b>@</b> narrows a list of channels and nicks, <b>:word</b> or a word then <b>tab</b> completes emote codes, and slash commands (/me, /raid…) pass through as twitch reads them</div>
+            <div><b>↑/↓</b> selects a chat row and <b>r</b> or enter replies to it - the ↩ chip on the sent line jumps back to the original. channel rules apply as normal: slow mode counts down in the input and rejections arrive as notice rows</div>
+            <div>the <b>☻ emote picker</b> searches and tabs across the twitch, 7tv, bttv and ffz sets, sorts cells by recent channel use, and can pin open to float free of the bar</div>
+            <div>the <b>@N chip</b> that will appear in the header queues mentions of your name that landed while the page was unfocused - click walks through them, ⇧click clears</div>
+            <div>the <b>✉ chip</b> is whispers - /w name text sends one, clicking a name in the whisper pane answers, and the unread count badges the chip</div>
+            <div>hovering a name previews their channel card; a plain click pins a <b>user card</b> with their channel info, pronouns, first-seen date, session count and recent lines - mods get timeout, ban and delete buttons there</div>
+          </div>
+          <div class="tour-shots">
+            <figure class="tshot">
+              <div class="trows" style="padding-top:.5em">
+                <span class="trow"><i class="nk" style="background:#f783ac"></i><i class="tseg" style="width:16%"></i><i class="tseg acc" style="width:12%"></i><i class="tseg" style="width:20%"></i></span>
+                <span class="trow"><i class="nk" style="background:#4dabf7"></i><i class="tseg" style="width:38%"></i></span>
+              </div>
+              <div class="tbar" style="margin-top:.5em"><i class="tbt">☻</i><i class="tin">glorp in the chat</i><i class="tseg" style="width:2em;opacity:.5"></i><i class="tbt">➤</i></div>
+              <figcaption>logged in, the bar under the chat takes messages - ☻ opens the emote picker</figcaption>
+            </figure>
+            <figure class="tshot">
+              <div class="tcard">
+                <div class="tc-head"><i class="tav"></i><b class="tc-name" style="color:#53b462">HasanAbi</b></div>
+                <div class="tbtns"><i>@mention</i><i>profile ↗</i><i>highlight</i><i>hide user</i></div>
+                <div class="tc-facts">2.9M followers · live</div>
+                <div class="tc-facts">he/him · seen 13:58 · 41 msgs this session</div>
+                <div class="tc-msgs">
+                  <div><i class="tc-t">13:52</i>chat. chat. listen</div>
+                  <div><i class="tc-t">13:55</i>that is actually insane</div>
+                  <div><i class="tc-t">13:58</i>ok here's the thing</div>
+                </div>
+              </div>
+              <figcaption>a pinned user card - channel facts, pronouns, first-seen and recent lines</figcaption>
             </figure>
           </div>
         </div>
@@ -3358,40 +3393,6 @@
             <figure class="tshot">
               <div class="thdr"><i class="tdot"></i><i class="tseg acc" style="width:5em"></i><i class="tseg" style="width:8em;opacity:.55"></i><i class="tseg" style="width:4em;opacity:.35"></i><span class="tsp"></span><span class="tspark"><i style="height:.6em"></i><i style="height:1em"></i><i style="height:.8em"></i><i class="red" style="height:1.1em"></i><i class="red" style="height:.9em"></i><i style="height:.7em"></i><i style="height:1em"></i><i style="height:.5em"></i><i style="height:.9em"></i></span><i class="tseg" style="width:2.6em"></i></div>
               <figcaption>the status line and the rate sparkline - red bands are outages, violet a closed page, grey silence</figcaption>
-            </figure>
-          </div>
-        </div>
-        <div class="tour-page" data-title="chatting" hidden>
-          <div class="tour-copy">
-            <div>the <b>twitch button</b> in the header logs in and opens the chat bar under the chat - type and hit enter to send, arrow-up in the box recalls sent messages, and a counter watches the length cap; ⇧click on the button logs out</div>
-            <div>typing a character anywhere jumps into the input, which grows with long drafts and keeps parked drafts across reloads - <b>@</b> narrows a list of channels and nicks, <b>:word</b> or a word then <b>tab</b> completes emote codes, and slash commands (/me, /raid…) pass through as twitch reads them</div>
-            <div><b>↑/↓</b> selects a chat row and <b>r</b> or enter replies to it - the ↩ chip on the sent line jumps back to the original. channel rules apply as normal: slow mode counts down in the input and rejections arrive as notice rows</div>
-            <div>the <b>☻ emote picker</b> searches and tabs across the twitch, 7tv, bttv and ffz sets, sorts cells by recent channel use, and can pin open to float free of the bar</div>
-            <div>the <b>✉ chip</b> is whispers - /w name text sends one, clicking a name in the whisper pane answers, and the unread count badges the chip</div>
-            <div>hovering a name previews their channel card; a plain click pins a <b>user card</b> with their channel info, pronouns, first-seen date, session count and recent lines - mods get timeout, ban and delete buttons there</div>
-          </div>
-          <div class="tour-shots">
-            <figure class="tshot">
-              <div class="trows" style="padding-top:.5em">
-                <span class="trow"><i class="nk" style="background:#f783ac"></i><i class="tseg" style="width:16%"></i><i class="tseg acc" style="width:12%"></i><i class="tseg" style="width:20%"></i></span>
-                <span class="trow"><i class="nk" style="background:#4dabf7"></i><i class="tseg" style="width:38%"></i></span>
-              </div>
-              <div class="tbar" style="margin-top:.5em"><i class="tbt">☻</i><i class="tin">glorp in the chat</i><i class="tseg" style="width:2em;opacity:.5"></i><i class="tbt">➤</i></div>
-              <figcaption>logged in, the bar under the chat takes messages - ☻ opens the emote picker</figcaption>
-            </figure>
-            <figure class="tshot">
-              <div class="tcard">
-                <div class="tc-head"><i class="tav"></i><b class="tc-name" style="color:#53b462">HasanAbi</b></div>
-                <div class="tbtns"><i>@mention</i><i>profile ↗</i><i>highlight</i><i>hide user</i></div>
-                <div class="tc-facts">2.9M followers · live</div>
-                <div class="tc-facts">he/him · seen 13:58 · 41 msgs this session</div>
-                <div class="tc-msgs">
-                  <div><i class="tc-t">13:52</i>chat. chat. listen</div>
-                  <div><i class="tc-t">13:55</i>that is actually insane</div>
-                  <div><i class="tc-t">13:58</i>ok here's the thing</div>
-                </div>
-              </div>
-              <figcaption>a pinned user card - channel facts, pronouns, first-seen and recent lines</figcaption>
             </figure>
           </div>
         </div>
