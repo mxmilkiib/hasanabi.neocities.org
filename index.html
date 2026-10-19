@@ -2155,7 +2155,9 @@
   #helpClog p { margin: .45em 0; }
   #helpClog code { color: var(--accent); font-size: .92em; }
   /* tab names read orange - the same amber the footer links wear */
-  #helpPanel .htabs a { flex: 1; text-align: center; color: #e8a33d; text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-color: color-mix(in srgb, var(--text-dim) 65%, var(--line)); border-radius: 4px; font-weight: 700; }
+  /* nowrap + clip - a squeezed tab hides its label's tail inside the
+     button rather than breaking the cog onto a second line */
+  #helpPanel .htabs a { flex: 1; text-align: center; color: #e8a33d; text-decoration: none; padding: 1px 9px; border: 1px solid var(--line); border-color: color-mix(in srgb, var(--text-dim) 65%, var(--line)); border-radius: 4px; font-weight: 700; white-space: nowrap; overflow: hidden; }
   #helpPanel .htabs a:hover { color: var(--text); background: var(--line); }
   #helpPanel .htabs a.on { color: #e8a33d; border-color: var(--accent); background: var(--line);
     text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 -1px 2px rgba(0, 0, 0, .55), 0 0 3px rgba(0, 0, 0, .6), 0 0 8px rgba(232, 163, 61, .4); }
