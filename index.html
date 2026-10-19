@@ -3703,9 +3703,10 @@
       e.preventDefault();
       tourShow();
     });
-    // first visit only - the ?overlay obs view never interrupts
+    // first visit only - ?tour forces a replay (previews/testing), and
+    // the ?overlay obs view never interrupts
     const overlayMode = chanQs.has('overlay') && chanQs.get('overlay') !== '0';
-    try { if (!localStorage.getItem(TOUR_KEY) && !overlayMode) tourShow(); } catch {}
+    try { if ((chanQs.has('tour') || !localStorage.getItem(TOUR_KEY)) && !overlayMode) tourShow(); } catch {}
   }
 
   // Colors picked for contrast against --bg, used when a chatter has no
