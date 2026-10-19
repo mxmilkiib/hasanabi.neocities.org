@@ -1055,6 +1055,16 @@
      live channel the same colour; full weight+opacity marks it instead */
   .chtag.live { opacity: 1; font-weight: 700; }
   .chtag:hover { color: var(--text); text-decoration: underline; }
+  /* merged-channel view tabs: the strip under the header pares the log
+     down to one room's rows - a pick aims sends at its room too. each tab
+     keeps its channel hue; the room's stream going live firms it up */
+  #chanTabs { gap: 4px; overflow-x: auto; }
+  #chanTabs a { flex: none; display: inline-block; padding: 0 10px; border: 1px solid var(--line);
+    border-radius: 4px; color: var(--cc, var(--text-dim)); text-decoration: none;
+    font-size: .92em; white-space: nowrap; opacity: .8; }
+  #chanTabs a.live { opacity: 1; }
+  #chanTabs a:hover { color: var(--text); }
+  #chanTabs a.on { border-color: var(--cc, var(--accent)); background: var(--line); font-weight: 700; opacity: 1; }
   .role.mod { color: var(--danger); }
   .role.vip { color: var(--vip); }
   .role.host { color: var(--accent); }
@@ -1375,7 +1385,7 @@
   body.overlay, body.overlay main { background: transparent; }
   body.overlay header, body.overlay #chatbar, body.overlay #vid,
   body.overlay #helpPanel, body.overlay #whis, body.overlay #findbar,
-  body.overlay .jdown, body.overlay #offBar, body.overlay #updateBar, body.overlay #titleBar, body.overlay #hint,
+  body.overlay .jdown, body.overlay #offBar, body.overlay #updateBar, body.overlay #titleBar, body.overlay #chanTabs, body.overlay #hint,
   body.overlay #emotePick, body.overlay #peek, body.overlay #epop,
   body.overlay #tt, body.overlay #tour { display: none !important; }
   body.overlay main { height: 100vh; }
@@ -3055,6 +3065,7 @@
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
     <div><b>title</b> <span>stream title bar: <span id="helpTitleList"></span> - a strip under the header shows the live stream's title; its ✕ dismisses it until the title changes or the stream restarts<sup>†</sup></span></div>
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
+    <div><b>room tabs</b> <span>channel view tabs: <span id="helpCTabsList"></span> - merged-channel pages carry a strip under the header; a room's tab pares the log down to that room's rows (and aims sends at it), 'merged' shows the whole feed again<sup>†</sup></span></div>
     <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the follow-req tail, then minus the chatter tally, a compact cut, the channel handle with the dot and uptime ('@HasanAbi ● 3h 27m'), uptime and a compact viewer count behind the dot ('● 2h 35m 25.1k'), an empty space, or just the status dot; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; a lit border and ✓ mark an exact match<sup>†</sup></span></div>
@@ -3266,6 +3277,7 @@
     </div><div id="helpClog" role="document" aria-label="document" hidden><div class="clogbar"><a href="#" role="button" class="at clogback">« back to help</a></div><div class="clogbody"></div><div class="clogbar"><a href="#" role="button" class="at clogback">« back to help</a></div></div><div class="hp-size tl" title="drag to resize">◤</div><div class="hp-size tr" title="drag to resize">◥</div><div class="hp-size bl" title="drag to resize">◣</div><div class="hp-size br" title="drag to resize">◢</div><div class="hp-size l" title="drag to resize">◀</div><div class="hp-size r" title="drag to resize">▶</div><div class="hp-size b" title="drag to resize">▼</div></div>
   <div id="offBar" class="hbar" role="status" hidden><span class="hbar-txt">you're offline - chat is paused and will catch up when the connection returns</span></div>
   <div id="updateBar" class="hbar" role="status" hidden><span class="hbar-txt" id="updateTxt"><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span><span>page updated. reload? -- warning: wip! - if broken wait for fix, worse case "reset all settings" -- reload message options in [?] popup</span><span id="updPoll" role="group" title="update poll frequency - mirrored by the ? popup's update notice row"><span class="upd-lbl">update check:</span><button class="hdr-btn" type="button" data-m="5">5m</button><button class="hdr-btn" type="button" data-m="15">15m</button><button class="hdr-btn" type="button" data-m="30">30m</button><button class="hdr-btn" type="button" data-m="60">1h</button><button class="hdr-btn" type="button" data-m="180">3h</button><button class="hdr-btn" type="button" data-m="360">6h</button><button class="hdr-btn" type="button" data-m="1440">24h</button><button class="hdr-btn" type="button" data-m="0">never</button></span><span class="updgap"><button class="hdr-btn updgo" type="button" title="reload for the latest version - keeps this url's settings">↻ reload</button></span></span><button class="hdr-btn" id="updateX" type="button" title="dismiss - it returns on the next update"><span style="display:inline-block;transform:translateY(1px)">✕</span></button></div>
+  <div id="chanTabs" class="hbar" role="tablist" aria-label="channel views" hidden></div>
   <div id="hint" hidden><b>first time tips --</b> click/scroll header buttons to change some option settings -- page audio autoplay permission allows unmuted stream on open/reload -- <b>click to dismiss</b></div>
   <div id="vid" role="dialog" aria-label="twitch stream player" hidden><div class="vid-handle" title="drag to move"></div><div id="vidFrame"></div><iframe id="vidAlt" title="offline stand-in video" hidden allow="autoplay; fullscreen" allowfullscreen></iframe><form id="chanAsk" hidden><label for="chanAskIn">watch which twitch channel?</label><div><input id="chanAskIn" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="username"><button type="submit">go</button></div><a id="chanAskX" href="#" title="just watch the default channel">✕</a></form><canvas id="danmaku" hidden></canvas><div id="danOl" hidden></div><span id="danDrop" hidden title="danmaku bullets the lane queue had to drop under load"></span><div class="vid-size tl" title="drag to resize">◤</div><div class="vid-size tr" title="drag to resize">◥</div><div class="vid-size bl" title="drag to resize">◣</div><div class="vid-size br" title="drag to resize">◢</div><div class="vid-size l" title="drag to resize">◀</div><div class="vid-size r" title="drag to resize">▶</div><div class="vid-size b" title="drag to resize">▼</div><div class="vid-edge t"></div><div class="vid-edge b"></div><div class="vid-edge l"></div><div class="vid-edge r"></div></div>
   <div id="vidSplit" aria-hidden="true" hidden title="drag to resize the video and chat"></div>
@@ -3306,7 +3318,7 @@
           </div>
           <div class="tour-copy">
             <div>this page mirrors twitch chat for a channel - <b>@HasanAbi</b> by default - no account is needed to watch</div>
-            <div>adding <b>?channel=name</b> (or <b>?c=name</b>) to the url retargets the whole page at another streamer, and comma-separated names merge several chats into one log</div>
+            <div>adding <b>?channel=name</b> (or <b>?c=name</b>) to the url retargets the whole page at another streamer, and comma-separated names merge several chats into one log - a tab strip under the header can then pare the log down to one room</div>
             <div>generic version available at <b>twtch.neocities.org</b></div>
             <div>everything lives on one screen: a header strip of controls up top, the live chat log filling the page, an optional stream player, and a <b>?</b> panel carrying the manual, session stats and links</div>
             <div><b>row colours</b> narrate what a line is at a glance</div>
@@ -6630,6 +6642,58 @@
         ? `#${ch} is live${st.viewers != null ? ` · ${st.viewers.toLocaleString()} viewers` : ''} - click to focus`
         : `#${ch} - click to focus`;
     }
+    paintChanTabs();
+  }
+
+  // merged-channel view tabs: an optional strip under the header - a room
+  // pick pares the log down to that room's rows (and aims sends at it),
+  // 'merged' shows the whole feed again. the filter is one injected rule
+  // so rows arriving after the pick hide the same way; untagged rows
+  // (gap marks, the unread bar) have no room and stay put either way
+  const chanTabsEl = document.getElementById('chanTabs');
+  const chanViewCss = document.head.appendChild(document.createElement('style'));
+  let chanTabsOn = true;
+  let chanView = '';
+  if (MULTI) {
+    chanTabsEl.innerHTML =
+      `<a href="#" role="tab" data-cv="" title="every joined room, merged">merged</a>` +
+      CHANNELS.map((c) =>
+        `<a href="#" role="tab" data-cv="${escapeHTML(c)}" style="--cc:${chColor(c)}" ` +
+        `title="only #${escapeHTML(c)}'s rows - sends aim there too">#${escapeHTML(c)}</a>`).join('');
+    chanTabsEl.addEventListener('click', (e) => {
+      const a = e.target.closest('a[data-cv]');
+      if (!a) return;
+      e.preventDefault();
+      setChanView(a.dataset.cv);
+    });
+  }
+  function paintChanTabs() {
+    if (!MULTI) return;
+    chanTabsEl.hidden = !chanTabsOn;
+    for (const a of chanTabsEl.querySelectorAll('a')) {
+      const on = a.dataset.cv === chanView;
+      a.classList.toggle('on', on);
+      a.setAttribute('aria-selected', String(on));
+      a.classList.toggle('live', !!(a.dataset.cv && streamStates[a.dataset.cv]?.live));
+    }
+  }
+  function setChanTabs(on) {
+    chanTabsOn = on;
+    markHelp('helpCTabs', on ? 1 : 0);
+    // hiding the strip while a room is picked would strand the filter -
+    // off lands back on the merged feed (the boot-time toggle-off finds
+    // no view picked and skips the send-ui refresh, which isn't up yet)
+    if (chanView) setChanView('');
+    paintChanTabs();
+  }
+  function setChanView(ch) {
+    chanView = ch;
+    chanViewCss.textContent = ch
+      ? `.col .row[data-ch]:not([data-ch="${ch}"]) { display: none; }`
+      : '';
+    pickChan = ch || null;
+    paintChanTabs();
+    updateSendUI();
   }
 
   // Favicon glyph recolored to match the status dot's computed color,
@@ -7062,6 +7126,7 @@
     else if (a.classList.contains('helpDPinT')) { setDanPinT(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpDFlt')) { setDanFlt(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpModes')) { setModesOn(+a.dataset.idx === 1); saveOpts(); }
+    else if (a.classList.contains('helpCTabs')) { setChanTabs(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpSview')) { setStatusView(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpUpd')) { setUpdMin(UPD_STOPS[+a.dataset.idx]); saveOpts(); }
     else if (a.classList.contains('helpEpfz')) { setEpFz(+a.dataset.idx); saveOpts(); }
@@ -10503,7 +10568,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden, valt: vidAltPref,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0, danc: DAN_COVERS[danCover], danv: danSpeed, dano: danAlpha, dans: danSubs, dansl: danSubLane, dann: danNick, dant: danTime, danb: danBadge, danbg: danBg, danl: danLine, danfm: danFam, danp: danPin, danpt: danPinT, danf: danHide, dfs: danFs, dand: danDirPick, dana: danAdapt,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, ctabs: chanTabsOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0, danc: DAN_COVERS[danCover], danv: danSpeed, dano: danAlpha, dans: danSubs, dansl: danSubLane, dann: danNick, dant: danTime, danb: danBadge, danbg: danBg, danl: danLine, danfm: danFam, danp: danPin, danpt: danPinT, danf: danHide, dfs: danFs, dand: danDirPick, dana: danAdapt,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0, eprow: epickRowOff ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
@@ -10689,6 +10754,7 @@
     if (Number.isInteger(o.valt)) setVidAlt(o.valt ? 1 : 0);
     if (o.stitle !== undefined) setTitleBar(!!o.stitle);
     if (o.cmodes !== undefined) setModesOn(!!o.cmodes);
+    if (o.ctabs !== undefined) setChanTabs(!!o.ctabs);
     if (o.sview !== undefined) setStatusView(+o.sview);
     if (o.upd !== undefined) setUpdMin(+o.upd);
     if (o.lkico !== undefined) setLkIco(!!o.lkico);
@@ -13377,6 +13443,7 @@
     if (vidAltPref) q.set('valt', '1');
     if (!titleBarOn) q.set('stitle', '0');
     if (!modesOn) q.set('cmodes', '0');
+    if (!chanTabsOn) q.set('ctabs', '0');
     if (statusView) q.set('sview', SVIEW_NAMES[statusView]);
     if (updMin !== 60) q.set('upd', UPD_NAMES[UPD_STOPS.indexOf(updMin)]);
     if (!lkIco) q.set('lkico', '0');
@@ -18292,6 +18359,7 @@
     if (q.has('yt')) setYtEmb(flag('yt'));
     if (q.has('stitle')) setTitleBar(flag('stitle'));
     if (q.has('cmodes')) setModesOn(flag('cmodes'));
+    if (q.has('ctabs')) setChanTabs(flag('ctabs'));
     if (q.has('sview')) { const v = q.get('sview'); const i = SVIEW_NAMES.indexOf(v); setStatusView(i >= 0 ? i : +v); }
     if (q.has('upd') && q.get('upd') !== '') { const v = q.get('upd'); const i = UPD_NAMES.indexOf(v); setUpdMin(i >= 0 ? UPD_STOPS[i] : +v); }
     if (q.has('lkico')) setLkIco(flag('lkico'));
@@ -18437,7 +18505,7 @@
     helpZebra: ZEBRA_SHADES.map((s) => s[0]), helpPause: ['off', 'on'], helpPing: ['off', 'on'], helpClean: ['off', 'on'], helpGif: ['off', 'on'], helpNotify: ['off', 'on'], helpScrollback: SCROLLBACK_SIZES.map((n) => n.toLocaleString('en')), helpArchive: ['bounded', 'unlimited'],
     helpFlow: ['newest at bottom', 'newest at top'], helpWrap: ['scroll', 'wrap'], helpNl: ['off', 'on', 'on + blank', 'blank above'], helpBar: ['bottom', 'top'], helpAuto: ['off', 'fade', 'slim'], helpLinks: ['off', 'on'], helpTimes: TIME_MODES, helpShadow: SHADOW_NAMES,
     helpSub: ['right edge', 'right compact', 'before the badges', 'compact', 'hidden'], helpSubg: ['off', 'on'], helpNickcol: ['off', 'left-edge', 'right-edge'], helpEonly: EMOTE_MODES,
-    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both'], helpDAdp: ['off', 'on'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'], helpDSub: ['off', 'on'], helpDSl: ['off', 'inner', 'outer'], helpDNick: ['off', 'on'], helpDTime: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '1%', '2%', '3%', '4%', '5%', '6%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%'], helpDLine: ['off', 'thin', 'light', 'norm', 'bold'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs', '+subs 1y', '+subs 3y', '+subs 6y'], helpDPinT: ['flat', 'tenure', 'tenure x2'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
+    helpVideo: ['off', 'on'], helpVAlt: ['off', 'on'], helpDan: ['off', 'on'], helpDFs: [...DAN_FS.map((n) => n || 'chat'), 'adaptive'], helpDCov: ['¼', '⅓', '⅖', '½', '⅔', '¾', 'full'], helpDDir: ['top', 'bottom', 'both'], helpDAdp: ['off', 'on'], helpDV: ['½x', '¾x', '1x', '1½x', '2x', 'auto'], helpDAlp: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'], helpDSub: ['off', 'on'], helpDSl: ['off', 'inner', 'outer'], helpDNick: ['off', 'on'], helpDTime: ['off', 'on'], helpDBadge: ['off', 'on'], helpDBg: ['off', '1%', '2%', '3%', '4%', '5%', '6%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%'], helpDLine: ['off', 'thin', 'light', 'norm', 'bold'], helpDFam: ['system sans', 'random', 'chat font'], helpDPin: ['off', 'self+pings', '+subs', '+subs 1y', '+subs 3y', '+subs 6y'], helpDPinT: ['flat', 'tenure', 'tenure x2'], helpDFlt: ['none', 'bots', 'cmds', 'both'], helpHelp: HELP_MODES, helpPeek: PEEK_MODES, helpYtem: ['off', 'on'], helpTitle: ['off', 'on'], helpModes: ['off', 'on'], helpCTabs: ['off', 'on'], helpFav: ['off', 'on'], helpPn: ['off', 'on'], helpUpd: UPD_NAMES, helpEpfz: EP_FZ_NAMES,
     helpW: HELP_WIDTHS.map((w) => w + 'px'),
     helpPos: ['top-left', 'top', 'top-right', 'left', 'middle', 'right', 'bottom-left', 'bottom', 'bottom-right'],
     helpStick: ['off', 'on'],
@@ -18524,6 +18592,7 @@
   paintDanAdp();
   markHelp('helpDSub', danSubs); markHelp('helpDSl', danSubLane); markHelp('helpDNick', danNick); markHelp('helpDTime', danTime); markHelp('helpDBadge', danBadge); markHelp('helpDBg', danBg); markHelp('helpDLine', danLine); markHelp('helpDFam', danFam); markHelp('helpDPin', danPin); markHelp('helpDPinT', danPinT); markHelp('helpDFlt', danHide);
   markHelp('helpModes', modesOn ? 1 : 0);
+  markHelp('helpCTabs', chanTabsOn ? 1 : 0);
   markHelp('helpSview', statusView);
   markHelp('helpUpd', UPD_STOPS.indexOf(updMin));
   markHelp('helpEpfz', epFz);
