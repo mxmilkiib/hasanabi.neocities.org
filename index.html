@@ -207,6 +207,17 @@
   /* twitch/chatterino: near-neutral surfaces a hair violet, brand purple
      accent, hype-train green, vip badge pink */
   :root[data-colour="violet"]   { --ph: 285; --pc: .018; --ptc: .015; --accent: #a970ff; --good: #00f593; --danger: #ff4f4d; --vip: #e005b9; --wiki: #5aa5f5; }
+  /* okabe-ito: the colourblind-safe set - good/danger split by hue AND
+     luminance (bluish green vs vermillion), an orange accent, reddish-
+     purple vip and blue wiki; near-neutral cool surfaces like ice */
+  :root[data-colour="okabe"]    { --ph: 240; --pc: .02;  --ptc: .03;  --accent: #a87100; --good: #00805e; --danger: #c14e00; --vip: #b1528b; --wiki: #0072b2; }
+  /* its accents tune for the pale stops; mid down they lift to the
+     brighter halves of the set (incl. an unset shade under dark system) */
+  :root[data-colour="okabe"]:is([data-shade="4"], [data-shade="5"], [data-shade="6"], [data-shade="7"], [data-shade="8"], [data-shade="9"], [data-shade="10"], [data-shade="11"]) {
+    --accent: #e69f00; --good: #3ecf9e; --danger: #e8724a; --vip: #da8fbf; --wiki: #56b4e9; }
+  @media (prefers-color-scheme: dark) {
+    :root[data-colour="okabe"]:not([data-shade]) {
+      --accent: #e69f00; --good: #3ecf9e; --danger: #e8724a; --vip: #da8fbf; --wiki: #56b4e9; } }
   /* variants: finishes layered over any colour. phosphor runs the old
      amber/console look generically - text and accents tint toward the
      colour's hue, designed for the darkest stops. contrast is steel's
@@ -6488,6 +6499,7 @@
     ftdark:   { colour: 'salmon', shade: 7,    font: 'georgia',    px: 16, lhv: 1.5, lines: 1, zebra: false, times: 2, shadow: 0, subMode: 3, eonly: 1, split: '3cves', help: 0, lbls: 0 },
     cosy:     { colour: 'sepia',  variant: 'grain', shade: 2, font: 'sans', px: 16, lhv: 2.2, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, split: '3c', help: 0, lbls: 0 },
     dyslexic: { colour: 'lavender',shade: 2,   font: 'dyslexic',   px: 20, lhv: 2, lines: 3, zebra: true,  times: 2,  shadow: 0, subMode: 0, eonly: 0, help: 0, lbls: 0 },
+    colourblind: { colour: 'okabe', shade: 7, font: 'atkinson', px: 16, lhv: 1.5, wv: 400, lines: 1, zebra: 2, times: 2, shadow: 0, subMode: 3, eonly: 0, help: 0, lbls: 0 },
     minimal:  { colour: 'mirc',   shade: 2,    font: 'lexend',     px: 16, lhv: 1, wv: 300, lines: 0, zebra: false, times: 0, shadow: 0, subMode: 4, eonly: 2, hdrgraph: false, hfspx: -1, help: 0, lbls: 0 },
     heather:  { colour: 'lavender',shade: 2,   font: 'sourcecodepro', px: 15, lhv: 1.5, wv: 300, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 3, eonly: 2, hpw: 7, hfspx: 18, help: 0, lbls: 0 },
     gohu:     { colour: 'lavender',shade: 6,   font: 'gohu',       px: 19, lhv: 1.5, lines: 1, zebra: true,  times: 2,  shadow: 0, subMode: 1, eonly: 0, hpw: 4, hfspx: 15, help: 0, lbls: 0 },
@@ -6505,15 +6517,15 @@
   const presetName = (n) => PRESET_ALIASES[n] || n;
   const presetByName = (n) => THEME_PRESETS[presetName(n)];
   // ordered by each colour's designed shade stop, darkest → lightest
-  const COLOURS = ['violet', 'gray', 'red', 'wine', 'green', 'ember', 'solarized', 'nord', 'lavender', 'sepia', 'salmon', 'ice', 'cream', 'mirc'];
+  const COLOURS = ['violet', 'gray', 'red', 'wine', 'green', 'ember', 'solarized', 'okabe', 'nord', 'lavender', 'sepia', 'salmon', 'ice', 'cream', 'mirc'];
   const VARIANTS = ['standard', 'phosphor', 'grain', 'contrast'];
   // each colour's designed shade: swatch previews, colour clicks and the
   // header colour cycle all land on it; a variant only changes shade
   // when it has its own stop (phosphor designs at black)
-  const COLOUR_SHADE = { violet: 8, gray: 7, red: 7, wine: 7, green: 7, ember: 7, solarized: 7, nord: 6, lavender: 2, sepia: 2, salmon: 1, ice: 2, cream: 1, mirc: 0 };
+  const COLOUR_SHADE = { violet: 8, gray: 7, red: 7, wine: 7, green: 7, ember: 7, solarized: 7, okabe: 7, nord: 6, lavender: 2, sepia: 2, salmon: 1, ice: 2, cream: 1, mirc: 0 };
   const VARIANT_SHADE = { phosphor: 9 };
   const designedShade = (c, v) => VARIANT_SHADE[v] ?? COLOUR_SHADE[c];
-  const COLOUR_ICONS = { gray: '☾', red: '♦', wine: '❋', sepia: '☼', cream: '☀', ember: '◉', green: '⬢', solarized: '◍', ice: '❅', mirc: '⊞', nord: '❄', violet: '◘', lavender: '❀', salmon: '❥' };
+  const COLOUR_ICONS = { gray: '☾', red: '♦', wine: '❋', sepia: '☼', cream: '☀', ember: '◉', green: '⬢', solarized: '◍', ice: '❅', mirc: '⊞', nord: '❄', violet: '◘', lavender: '❀', salmon: '❥', okabe: '◎' };
   const VARIANT_ICONS = { standard: '▢', phosphor: '▮', grain: '▤', contrast: '◧' };
   // old style names → [colour, variant]: saved options and ?theme=/?style=
   // urls written before the split still resolve to their designed pair

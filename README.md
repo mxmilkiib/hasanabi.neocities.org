@@ -253,7 +253,10 @@ no dependencies beyond CDN-hosted fonts.
 - **Colours and text**
   - Choose a colour palette and a separate light-to-dark shade. The
     automatic shade follows the system theme. The colour chips show
-    the shade each palette was designed with.
+    the shade each palette was designed with. The `okabe` palette
+    follows the [Okabe-Ito](https://jfly.uni-koeln.de/color/)
+    colourblind-safe set - the `colourblind` preset pairs it with the
+    Atkinson Hyperlegible font.
   - Choose a font, including fonts intended to make reading easier.
     Adjust font size, weight, line height, letter spacing and shadow.
     The help popup marks the size currently in use.
@@ -624,8 +627,8 @@ editing a URL.
 display choices. The presets are:
 
 - `old-default`, `compact`, `print`, `cosy`, `cinema`, `phosphor`,
-  `dyslexic`, `midnight`, `solar`, `minimal`, `retro`, `irc`,
-  `gohu`, `heather`, `nightshade`, `ft`, `ftdark`, `twitch`
+  `dyslexic`, `colourblind`, `midnight`, `solar`, `minimal`, `retro`,
+  `irc`, `gohu`, `heather`, `nightshade`, `ft`, `ftdark`, `twitch`
 
 The initial preset and the one used after a settings reset is
 `nightshade`. `old-default` remains available. Some old preset names
