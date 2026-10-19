@@ -1453,8 +1453,11 @@
     border: 1px solid var(--popline); border-radius: 8px;
     padding: 16px 24px; font-size: var(--chat-font, 15px); line-height: 1.55;
     box-shadow: 0 8px 28px rgba(0, 0, 0, .45); }
-  #tour .tour-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  #tour .tour-head b { color: var(--accent); font-weight: 700; font-size: 1.3em; }
+  /* the title centres on the card, so the close button absolutely
+     anchors to the right instead of sharing the flex row's space */
+  #tour .tour-head { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; }
+  #tour .tour-head b { color: var(--accent); font-weight: 700; font-size: 1.3em; text-decoration: underline; }
+  #tour .tour-head #tourX { position: absolute; right: 0; }
   #tour .tour-body { overflow-y: auto; padding: 6px 0; flex: 1; }
   #tour .tour-page[hidden] { display: none; }
   /* copy left, mini screenshots right - a poster spread per page,
