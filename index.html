@@ -1447,17 +1447,17 @@
     display: flex; align-items: center; justify-content: center; padding: 16px;
     background: color-mix(in srgb, var(--bg) 62%, transparent); }
   #tour[hidden] { display: none; }
-  #tour .tour-card { width: 520px; max-width: 100%; max-height: 86vh; max-height: 86dvh;
+  #tour .tour-card { width: 680px; max-width: 100%; max-height: 88vh; max-height: 88dvh;
     display: flex; flex-direction: column;
     background: var(--panel); color: var(--text);
     border: 1px solid var(--popline); border-radius: 8px;
-    padding: 12px 16px; font-size: var(--chat-font, 15px); line-height: 1.55;
+    padding: 14px 20px; font-size: var(--chat-font, 15px); line-height: 1.55;
     box-shadow: 0 8px 28px rgba(0, 0, 0, .45); }
   #tour .tour-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   #tour .tour-head b { color: var(--accent); font-weight: 700; }
-  #tour .tour-body { overflow-y: auto; padding: 4px 0; }
+  #tour .tour-body { overflow-y: auto; padding: 6px 0; }
   #tour .tour-page[hidden] { display: none; }
-  #tour .tour-page > div { margin: 8px 0; }
+  #tour .tour-page > div { margin: 10px 0; }
   #tour .tour-page b { color: var(--accent); font-weight: 600; }
   #tour .tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px;
     border-top: 1px solid var(--line); padding-top: 9px; }
@@ -3159,27 +3159,32 @@
       <div class="tour-head"><b id="tourTitle"></b><button class="hdr-btn" id="tourX" type="button" title="close the tour (esc)"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div>
       <div class="tour-body">
         <div class="tour-page" data-title="welcome">
-          <div><b>hi --</b> this page mirrors twitch chat for a channel - <b>@HasanAbi</b> by default - through a small relay; no account needed to watch</div>
-          <div>five short pages walk the main controls -- <b>esc</b> or <b>✕</b> bails out any time, and the <b>?</b> panel's tour link re-runs it later</div>
+          <div><b>hi --</b> this page mirrors twitch chat for a channel - <b>@HasanAbi</b> by default - through a small relay; no account is needed to watch. adding <b>?channel=name</b> to the url retargets the whole page at another streamer, and comma-separated names merge several chats into one log</div>
+          <div>everything lives on one screen: a header strip of controls up top, the live chat log filling the page, an optional stream player, and a <b>?</b> panel carrying the manual, session stats and links</div>
+          <div>five pages walk the main features -- <b>esc</b>, <b>✕</b> or a click on the dimmed surround bails out any time, <b>←/→</b> or the dots step the pages, and the ? panel's <b>tour</b> link re-runs this later</div>
         </div>
         <div class="tour-page" data-title="the log" hidden>
-          <div><b>row colours --</b> amber rows are mentions of the channel · violet is channel-point redeems · red is glorp / F · accent-tinted rows are your own messages once logged in · blue is mod actions</div>
-          <div><b>↩ chip</b> on a reply jumps to the original message -- a row's <b>◷ timestamp</b> copies a link straight to it</div>
-          <div><b>⌕</b> finds in chat (ctrl+f or /) -- the log archives in the browser, so a reload keeps the backlog</div>
+          <div><b>row colours --</b> amber rows are mentions of the channel · violet rows are channel-point redeems · red rows are glorp / F · accent-tinted rows are your own messages once logged in · blue rows are mod actions - timeouts, bans, clears - with a timed-out or banned user's rows ghosting, name and text struck through · a gap row marks a stretch where lines went missing or chat fell silent</div>
+          <div><b>↩ chip</b> on a reply jumps to the original message - past the rendered edge it restores the parent from the archive. a row's <b>◷ timestamp</b> copies a link straight to that message, and opening such a link scrolls to the row and flashes it</div>
+          <div><b>@N chip</b> counts mentions of your name that landed while the page was unfocused - click walks through them one by one (they keep, cycling back round), ⇧click clears the queue</div>
+          <div><b>⌕</b> finds in chat (ctrl+f or /) - plain text, user:login, kind:notice or a date, with an archive mode reaching past the rendered scrollback. the log itself archives in the browser, so a reload keeps the backlog</div>
         </div>
         <div class="tour-page" data-title="video &amp; layout" hidden>
-          <div><b>▶</b> pops the stream player - draggable, resizable, dockable in a rail column</div>
-          <div><b>▮▮</b> opens the layout menu - splits the log into columns or docks panes in a rail</div>
-          <div>the header's <b>–</b> shrinks the strip; the <b>dot</b> narrates stream status and the sparkline beside it graphs chat rate</div>
+          <div><b>▶</b> pops the stream player - it drags by its top edge, resizes from every side and corner, and docks into a rail column if one wants it parked. the player's own pause button stops the stream</div>
+          <div><b>▮▮</b> opens the layout menu - it can split the log into up to three scrolling columns, or dock the video, emote, stats and help panes into a rail down the side; the splitters between sections drag to resize</div>
+          <div>the header's <b>–</b> shrinks the strip to a sliver - hovering swells it back. the <b>dot</b> narrates stream status - pulsing while checking, green while live, red on a dropped socket, grey while off - and the sparkline beside it graphs messages a second over the last four minutes, banding red, violet and grey over outages, page closures and silence</div>
         </div>
         <div class="tour-page" data-title="joining in" hidden>
-          <div>the <b>glitch button</b> logs in with twitch to send messages - the bar under the log carries the <b>☻ emote picker</b>, reply context and nick completion</div>
-          <div>the <b>✉ chip</b> is whispers - /w name text sends one too; hovering a name previews their channel, a click pins their user card</div>
+          <div>the <b>glitch button</b> logs in with twitch and opens the chat bar under the log - type and hit enter to send, arrow-up in the box recalls sent messages, and a counter watches the length cap</div>
+          <div>the <b>☻ emote picker</b> searches and tabs across the twitch, 7tv, bttv and ffz sets, sorts cells by recent channel use, and can pin open to float free of the bar</div>
+          <div>the <b>✉ chip</b> is whispers - /w name text sends one, clicking a name in the whisper pane answers, and the unread count badges the chip</div>
+          <div>hovering a name previews their channel card; a plain click pins a <b>user card</b> with their channel info, pronouns, first-seen date, session count and recent lines - mods get timeout, ban and delete buttons there</div>
         </div>
         <div class="tour-page" data-title="make it yours" hidden>
-          <div><b>◆ ◐ ▢ ◑</b> theme, colour, variant, shade -- <b>Aa B ↕ ⇄</b> font, weight, line height, spacing; most header buttons <b>click/scroll</b> to change and <b>⇧click</b> steps back</div>
-          <div>options persist between visits; the page installs as a PWA for a standalone window</div>
-          <div><b>?</b> opens the full manual - stats, resources and a replay of this tour all live there</div>
+          <div><b>◆ ◐ ▢ ◑</b> are the look: theme presets bundle every display option, colour sets the hue, variant layers a finish (phosphor tint, grain, contrast), shade sets the darkness - a right-click on colour or shade resets it to follow the system</div>
+          <div><b>Aa B ↕ ⇄ T</b> set the type: a long font list including several accessibility faces, weight, line height, letter spacing, text shadow. the <b>?</b> panel adds the rest - zebra striping, row separators, timestamps, the sub badge, nick alignment, emote-only rows, a links-only view</div>
+          <div>nearly every header control works the same way: <b>click or scroll</b> cycles the stops, <b>⇧click</b> steps back, and many resets sit on a right-click. every option persists between visits in localStorage</div>
+          <div>the page installs as a <b>PWA</b> - add to home screen or install from the address bar for a standalone window - and the <b>?</b> panel stays the full manual, with the stats tab, resource links and a replay of this tour inside</div>
         </div>
       </div>
       <div class="tour-foot"><span class="tour-dots" id="tourDots"></span><span class="tour-nav"><button class="hdr-btn" id="tourBack" type="button">back</button><button class="hdr-btn" id="tourNext" type="button">next</button></span></div>
