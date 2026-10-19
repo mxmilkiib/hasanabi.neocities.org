@@ -14631,7 +14631,9 @@
   relayFrame.style.display = 'none';
   // sandbox stills top-nav/popups; allow-same-origin keeps its localStorage
   relayFrame.sandbox = 'allow-scripts allow-same-origin';
-  relayFrame.src = RELAY_URL;
+  // ?overlay (obs browser-source) tells the relay page to skip its
+  // presence pings - an automated source isn't a viewer
+  relayFrame.src = RELAY_URL + (chanQs.has('overlay') && chanQs.get('overlay') !== '0' ? '?overlay' : '');
   document.body.appendChild(relayFrame);
 
   let joined = false;
