@@ -1525,10 +1525,10 @@
   #tour .tsw i { width: 1.4em; height: 1.4em; border-radius: .35em; flex: none; }
   #tour .tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px;
     border-top: 1px solid var(--line); padding-top: 9px; }
-  #tour .tour-dots { display: flex; gap: 5px; }
-  #tour .tour-dots i { width: 7px; height: 7px; border-radius: 50%;
-    background: var(--text-dim); opacity: .4; cursor: pointer; }
-  #tour .tour-dots i.on { opacity: 1; background: var(--accent); }
+  #tour .tour-tabs { display: flex; flex-wrap: wrap; gap: 5px; }
+  #tour .tour-tabs .hdr-btn { width: auto; height: 24px; padding: 0 9px; font-size: .8em;
+    display: inline-flex; align-items: center; white-space: nowrap; }
+  #tour .tour-tabs .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
   #tour .tour-nav { display: flex; gap: 6px; }
   #tour .tour-nav .hdr-btn { width: auto; height: 28px; padding: 0 12px; font-size: .9em;
     display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
@@ -3227,7 +3227,7 @@
             <div><b>hi --</b> this page mirrors twitch chat for a channel - <b>@HasanAbi</b> by default - through a small relay; no account is needed to watch</div>
             <div>adding <b>?channel=name</b> to the url retargets the whole page at another streamer, and comma-separated names merge several chats into one log</div>
             <div>everything lives on one screen: a header strip of controls up top, the live chat log filling the page, an optional stream player, and a <b>?</b> panel carrying the manual, session stats and links</div>
-            <div>five pages walk the main features -- <b>esc</b>, <b>✕</b> or a click on the dimmed surround bails out any time, <b>←/→</b> or the dots step the pages, and the ? panel's <b>tour</b> link re-runs this later</div>
+            <div>five pages walk the main features -- <b>esc</b>, <b>✕</b> or a click on the dimmed surround bails out any time, <b>←/→</b> or the page tabs below hop between them, and the ? panel's <b>tour</b> link re-runs this later</div>
           </div>
           <div class="tour-shots">
             <figure class="tshot">
@@ -3358,7 +3358,7 @@
           </div>
         </div>
       </div>
-      <div class="tour-foot"><span class="tour-dots" id="tourDots"></span><span class="tour-nav"><button class="hdr-btn" id="tourBack" type="button">back</button><button class="hdr-btn" id="tourNext" type="button">next</button></span></div>
+      <div class="tour-foot"><span class="tour-tabs" id="tourTabs"></span><span class="tour-nav"><button class="hdr-btn" id="tourBack" type="button">back</button><button class="hdr-btn" id="tourNext" type="button">next</button></span></div>
     </div>
   </div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
@@ -3653,7 +3653,7 @@
     const tourEl = document.getElementById('tour');
     const tourTitle = document.getElementById('tourTitle');
     const tourPages = [...tourEl.querySelectorAll('.tour-page')];
-    const tourDots = document.getElementById('tourDots');
+    const tourTabs = document.getElementById('tourTabs');
     const tourBack = document.getElementById('tourBack');
     const tourNext = document.getElementById('tourNext');
     let tourPage = 0;
@@ -3661,7 +3661,7 @@
     function tourPaint() {
       tourPages.forEach((p, i) => { p.hidden = i !== tourPage; });
       tourTitle.textContent = tourPages[tourPage].dataset.title;
-      tourDots.querySelectorAll('i').forEach((d, i) => d.classList.toggle('on', i === tourPage));
+      tourTabs.querySelectorAll('button').forEach((d, i) => d.classList.toggle('on', i === tourPage));
       tourBack.disabled = tourPage === 0;
       tourNext.textContent = tourPage === tourPages.length - 1 ? 'done' : 'next';
     }
@@ -3675,11 +3675,14 @@
       tourEl.hidden = true;
       try { localStorage.setItem(TOUR_KEY, '1'); } catch {}
     }
-    // the dots build from the page count - a click jumps to that page
+    // the page tabs build from the page titles - a click jumps straight there
     tourPages.forEach((p, i) => {
-      const d = document.createElement('i');
+      const d = document.createElement('button');
+      d.className = 'hdr-btn';
+      d.type = 'button';
+      d.textContent = p.dataset.title;
       d.addEventListener('click', () => { tourPage = i; tourPaint(); });
-      tourDots.appendChild(d);
+      tourTabs.appendChild(d);
     });
     tourBack.addEventListener('click', () => { if (tourPage > 0) { tourPage--; tourPaint(); } });
     tourNext.addEventListener('click', () => {
