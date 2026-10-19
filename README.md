@@ -11,7 +11,9 @@ This alternative chat view acts as a quality-of-life and accessibility tool,
 for general or second-screen use, and a hub for links related to the stream.
 
 It runs at
-<https://hasanabi.neocities.org/> on [Neocities](https://neocities.org/). See the [about page](https://hasanabi.neocities.org/about/) for more.
+<https://hasanabi.neocities.org/> on [Neocities](https://neocities.org/),
+with a brand-swapped mirror at
+<https://twtch.neocities.org/>. See the [about page](https://hasanabi.neocities.org/about/) for more.
 
 The chat page:
 
@@ -21,12 +23,18 @@ The chat page:
 - displays Twitch emotes alongside [7TV](https://7tv.app/),
   [BetterTTV](https://betterttv.com/) and
   [FrankerFaceZ](https://www.frankerfacez.com/) emotes
+- can stream chat across the video niconico-style in the danmaku
+  layouts
 - lets one send messages and replies after an optional
   [Twitch login](https://dev.twitch.tv/docs/authentication/)
 
 The `?` popup has more than settings:
 
 - **Media:** clips, news, YouTube channels and Twitch streams.
+- **Vote26:** 2026 US midterms - races to watch, dates, voter tools
+  and the DSA slate.
+- **DSA:** chapters, caucuses, committees, campaigns and organising
+  links.
 - **Left and libre:** political organising, free software and culture.
 - **Authors:** reading lists grouped by era.
 
@@ -258,57 +266,95 @@ no dependencies beyond CDN-hosted fonts.
     month count, the label shows a dim dash. Bots do not get that
     placeholder.
 - **Chat columns**
-  - The layout menu has nineteen layouts, listed in menu order:
-    - `1col video` keeps the framed video alone, centred in the row;
-      its own edges drag their side, and any bare-floor grab pulls the
-      frame wider in the dragged direction - outward grows, inward
-      shrinks. Its default frame size is the largest the space fits,
-      rather than the shared 720px stop.
-    - `1col danmaku` is `1col video` with the bullet overlay armed -
-      the centred frame alone, chat comments flying across it. It is
-      the only layout carrying bullets: switching away turns them off
-      and picking it turns them back on. Its help row also carries
-      the bullet options - text size, lane coverage, crossing
-      speed, layer opacity, pinned highlights and bot/command
-      filters.
-    - `1col chat` keeps one full-width chat column.
-    - `1col help` drops even that - the docked help popup starts at
-      two-thirds of the screen, centred between two mirrored edge grips.
-    - `1col vid/chat` stacks the video in its framed floating style
-      over the single chat column.
-    - `1col video/help` centres a rail holding the video over the
-      docked help popup - the frame keeps its own width inside the
-      page, and dragging its edges trades width with the help below
-      while the page's edge grips size the pair.
-    - `2col chat` passes older messages to a second chat column.
-    - `2col chat help` docks the help popup in the rail beside one
-      chat column - no video over it; `▶` floats it like `2col chat emotes`.
-    - `2col chat vid/help` puts chat beside video and the help popup.
-    - `2col chat vid/emotes` keeps one chat column on the left and puts
-      video above the emote picker on the right.
-    - `2col chat emotes` puts chat beside the emote picker. Video starts
-      off; `▶` can float it over the chat.
-    - `2x2` puts the stats pane over the emote picker on the left and
-      the video over the chat on the right; hiding the video gives the
-      chat the full height.
-    - `3col chat` runs three chat columns - a landscape screen only.
-    - `3col chat help` docks the same popup rail beside two chat
-      columns.
-    - `3col chat vid/help` puts two chat columns beside video and the
-      help popup.
-    - `3col chat vid/emotes/stats` puts two chat columns beside a
-      column with video, emotes and stats.
-    - `3col chat vid/emotes` puts two chat columns beside video and
-      emotes.
-    - `3col chat emotes` puts two chat columns beside the emote picker;
-      video can float above the chat.
-    - `3col chat vid/emotes/help` puts two chat columns beside a rail
-      with video, the emote picker and the help popup.
+  - The layout menu seats the panes in three families (name followed
+    by its `split` alias), in menu order:
+    - **1col**
+      - `1col chat` (`1c`) keeps one full-width chat column.
+      - `1col help` (`1ch`) drops even that - the docked help popup
+        starts at two-thirds of the screen, centred between two
+        mirrored edge grips.
+      - `1col video/chat` (`1cv`) stacks the video in its framed
+        floating style over the single chat column.
+      - `1col video` (`1cvid`) keeps the framed video alone, centred in
+        the row; its own edges drag their side, and any bare-floor grab
+        pulls the frame wider in the dragged direction - outward grows,
+        inward shrinks. Its default frame size is the largest the space
+        fits, rather than the shared 720px stop.
+      - `1col danmaku` (`1cdan`) is `1col video` with the bullet overlay
+        armed - the centred frame alone, chat comments flying across
+        it; see **Danmaku** below for its option row.
+      - `1col video/help` (`1cvh`) centres a rail holding the video
+        over the docked help popup - the frame keeps its own width
+        inside the page, and dragging its edges trades width with the
+        help below while the page's edge grips size the pair.
+    - **2col**
+      - `2col chat | chat` (`2c`) passes older messages to a second
+        chat column - a column fills top-to-bottom, then flips to the
+        next; the rest of the family runs one.
+      - `2col chat | emotes` (`2ce`) puts chat beside the emote picker.
+        Video starts off; `▶` can float it over the chat.
+      - `2col chat | help` (`2ch`) docks the help popup in the rail
+        beside one chat column - no video over it; `▶` floats it like
+        `2col chat | emotes`.
+      - `2col chat | video/emotes` (`2cve`) keeps one chat column on
+        the left and puts video above the emote picker on the right.
+      - `2col chat | video/help` (`2cvh`) puts chat beside video and
+        the help popup.
+      - `2x2` (`2x2`) puts the stats pane over the emote picker on the
+        left and the video over the chat on the right; hiding the
+        video gives the chat the full height.
+    - **3col**
+      - `3col chat | chat | chat` (`3c`) runs three chat columns - a
+        landscape screen only.
+      - `3col chat | chat | video/emotes/stats` (`3cves`) puts two chat
+        columns beside a column with video, emotes and stats.
+      - `3col chat | chat | emotes` (`3ce`) puts two chat columns
+        beside the emote picker; video can float above the chat.
+      - `3col chat | chat | help` (`3ch`) docks the same popup rail
+        beside two chat columns.
+      - `3col chat | chat | video/emotes` (`3cve`) puts two chat
+        columns beside video and emotes.
+      - `3col chat | chat | video/help` (`3cvh`) puts two chat columns
+        beside video and the help popup.
+      - `3col chat | chat | video/emotes/help` (`3cveh`) puts two chat
+        columns beside a rail with video, the emote picker and the
+        help popup.
+    - `1col danmaku/chat` (`1cvdan`) sits off the menu - the default
+      landing layout: the framed video fills ~99% of the space with
+      bullets armed, leaving a slim chat strip alongside.
   - Drag the divider to change the side column's width. In layouts
     with both emotes and stats, drag their divider to divide the
     remaining height. Help keeps a 280px minimum, capped by the
     screen. When help is docked in the side column, its own move and
     resize controls are disabled; stats remains a tab inside it.
+- **Danmaku**
+  - The `1col danmaku` layouts arm a
+    [niconico-style](https://en.wikipedia.org/wiki/Niconico#Comments)
+    bullet layer over the video: live messages fly right-to-left in
+    stacked lanes, drawn in each sender's nick colour - a longer
+    message flies faster, image and gif embeds fly as images, and a
+    burst flushes down to its newest 15 rather than walling the
+    frame. Picking a non-danmaku layout turns the overlay back off.
+  - `adapt` (on by default) lets the feed rate steer the layout: lane
+    bands grow as chat heats, bullet size slides down and the pace
+    hurries, so `size`, `from` and `speed` dim while it drives.
+  - `cover` picks the slice of the frame the lanes fill and `from`
+    the edge they pack against; `speed` scales the crossing pace or
+    drains the queue on `auto`; `alpha` fades the whole layer. `size`
+    locks a px stop, follows the chat font, or slides with the feed on
+    `adaptive`; `face` draws each bullet in system sans, a random
+    stack face or the chat font. `bg` and `line` back and outline the
+    bullet pills.
+  - Bullets can lead with the row's timestamp (`time`), the sender's
+    badges (`badge`), display name (`nick`, row-style) and a
+    subscriber's month count in the gradient chip (`subs`); `sub lane`
+    seats longer subs nearer the band's inner edge or flips it
+    outward.
+  - `pin` parks one's own messages, @mentions, keyword hits, subs and
+    bits under the band instead of flying - the higher rungs gate subs
+    by tenure, and `pin len` stretches a pinned sub's hold with its
+    month count. `hide` keeps bots and `!` commands off the overlay
+    (chat rows are unaffected).
 - **Video and live links**
   - Drag and resize the video when it floats. It pauses when hidden.
     In the side-column layouts it can dock, float or switch off.
@@ -316,9 +362,9 @@ no dependencies beyond CDN-hosted fonts.
     Live channels gain a green dot and a tooltip with stream details;
     offline channels appear dimmer.
 - **Help popup and saved settings**
-  - The popup has tabs for help and settings, stats, media, left,
-    libre and authors. Change its width and font size or drag it to
-    another position when it is floating.
+  - The popup has tabs for help and settings, stats, media, vote26,
+    dsa, left, libre and authors. Change its width and font size or
+    drag it to another position when it is floating.
   - The page saves choices in the browser. Click or scroll over many
     controls to cycle through options; Shift+click cycles backwards.
   - The three theme slots save sets of display choices. Click an empty
@@ -332,8 +378,9 @@ no dependencies beyond CDN-hosted fonts.
     logged-in user. A separate blocked-words list hides matches.
     Mentions and reply names use the named chatter's colour.
   - While the page is out of focus, missed mentions add to a counter
-    in the header. Click it to visit them, or Shift+click to clear it.
-    An optional setting plays a quiet sound for mentions.
+    in the header. Clicks walk the queued mentions, wrapping around;
+    Shift+click clears it. An optional setting plays a quiet sound
+    for mentions.
 - **Special styles and media**
   - Glorp and F bursts, channel-point messages, some bot messages and
     game lines have their own styles. Notice labels can carry a
@@ -423,7 +470,7 @@ no dependencies beyond CDN-hosted fonts.
 
 - **Chat history**
   - Set the visible message limit between 250 and 100,000 rows;
-    5,000 is the default. Higher limits can use more browser memory.
+    10,000 is the default. Higher limits can use more browser memory.
   - The page keeps up to 1,000 of the newest rows across reloads.
     It also saves stream history, graph data, emote use, statistics and
     display choices in the browser.
@@ -454,6 +501,12 @@ no dependencies beyond CDN-hosted fonts.
 - **Links**
   - **Media** collects Hasan-related links, clips, news, YouTube
     channels, other streams and community pages.
+  - **Vote26** covers the 2026 US midterms - primary results, the
+    general ballot, races to watch, key dates, voter tools and ways to
+    get involved.
+  - **DSA** collects Democratic Socialists of America links -
+    chapters and caucuses, national committees, governance, campaigns
+    and electoral tools.
   - **Left** collects parties and organisations, unions, tenant
     groups, activism, boycotts, mutual aid, reformism, organising and
     other political resources.
@@ -464,7 +517,7 @@ no dependencies beyond CDN-hosted fonts.
     name in the left or libre tabs jumps to their entry here; links to
     organisations, tools and ideas stay in their topic tabs.
 - **Layout**
-  - These six tabs use more link columns as the popup grows wider.
+  - The link tabs use more link columns as the popup grows wider.
     Resize the popup, choose a preset width or move it when floating.
     The width choices run from 480px to 1920px.
 
@@ -477,7 +530,7 @@ editing a URL.
 
 | key | values | effect |
 |---|---|---|
-| `split` | `1`–`16` or a short name (`2ch`, `3cveh`…) | layout, in the order listed under Chat columns above |
+| `split` | `1`–`20` or a short name | layout - each seat's alias sits beside its name under Chat columns above; the numeric ids run `1c` `1ch` `2c` `2ch` `2cvh` `2cve` `2ce` `2x2` `3c` `3ch` `3cvh` `3cves` `3cve` `3ce` `1cv` `3cveh` `1cvid` `1cvh` `1cdan` `1cvdan` in that order |
 | `min` | `1` / `graph` | minimised strip, or reduced header with the rate graph across the bar |
 | `style` | a theme name | palette (a bare `style` lands on its designed shade stop) |
 | `shade` | `0`–`8`, `auto` | shade axis; `auto` follows the system |
@@ -506,23 +559,30 @@ editing a URL.
 | `video` | flag / `dock` / `float` / `off` | show, hide or place the stream video in layouts that allow it |
 | `valt` | flag / `0` | offline stand-in: a youtube video fills the frame while the stream is down (home channel); on by default, `0` keeps the offline slate |
 | `dan` | flag | danmaku bullets over the video |
-| `danc` | `25`/`33`/`50`/`67`/`75`/`100` | danmaku cover: lane fill as % of frame height (legacy `0`–`3` indices still resolve to ¼ / ½ / ¾ / full) |
-| `dand` | flag / `0` | danmaku lanes pack from the bottom edge instead of the top |
+| `adapt` | flag / `0` | adaptive danmaku - the feed rate steers band growth, packing, bullet size and pace; on by default, `0` holds the manual picks |
+| `dfs` | px / `adaptive` | bullet size (default `32`): `0` follows the chat font, stops `12`/`14`/`16`/`18`/`20`/`24`/`28`/`30`/`32`/`34`/`36`/`38`/`40`/`44`/`48`/`52`; `adaptive` slides 34→20px (~14 under deep pressure) with the feed |
+| `danfm` | `0`–`2` | bullet face: system sans / random off the font stack / chat font |
+| `danc` | `25`/`33`/`40`/`50`/`67`/`75`/`100` | danmaku cover: lane fill as % of frame height (legacy `0`–`3` indices still resolve to ¼ / ½ / ¾ / full) |
+| `dand` | `0`–`2` / `adaptive` | the edge the lane slice packs against: top / bottom / both (default `both`; `adaptive` or `3` here also switches `adapt` on) |
 | `danv` | `0`–`5` | danmaku speed: ½x / ¾x / 1x / 1½x / 2x / `auto` (default - pace tracks the live message rate) |
-| `dano` | `0`–`3` | danmaku layer opacity: 25 / 50 / 75 / 100% |
+| `dano` | `0`–`9` | danmaku layer opacity: 10%–100% in 10% steps |
 | `dans` | flag / `0` | subscriber bullets lead with the month count in the chip's gradient; on by default, `0` disables |
+| `dansl` | `0`–`2` | sub lane: off / inner / outer - seat bullets by sub tenure (default `inner`) |
+| `dant` | flag | bullets lead with the row's timestamp, ahead of the badges and nick; off by default |
 | `dann` | flag / `0` | bullets lead with the sender's display name, row-style (`name: text`); on by default, `0` disables |
 | `danb` | flag / `0` | the sender's badge icons lead the bullet's name at cap height; on by default, `0` disables |
-| `danp` | `0`–`2` | pinned bullets: off / own, @you pings and keyword hits hold top-centre / +subs and bits |
+| `danbg` | `0`–`15` | bullet backing shade: off, then 1–6% and 10–90% rungs (default `3%`) |
+| `danl` | `0`–`4` | bullet outline: off / thin / light / norm / bold (default `light`) |
+| `danp` | `0`–`5` | pinned bullets: off / own, @pings and keyword hits / +subs and bits / +subs 1y / +subs 3y / +subs 6y (default `+subs 1y`; bits pin at any sub rung) |
+| `danpt` | `0`–`2` | pinned-sub hold scaling: flat / tenure (+1x per two years up to 4x) / tenure x2 (up to 6x) |
 | `danf` | `0`–`3` | danmaku filters: none / bots / !commands / both |
-| `dfs` | px | danmaku bullet size (default `40`) - `12`/`14`/`16`/`18`/`20`/`24`/`28`/`32`/`36`/`40`/`44`/`48`/`52`; `0` follows the chat font |
 | `sub` | `right`/`num-right`/`left`/`num-left`/`hidden` | sub-chip mode |
 | `subg` | flag / `0` | subscription labels sweep teal → violet → red as the month count rises (up to 84 months); on by default, `0` disables |
 | `ncol` | flag / `left` / `right` | nick alignment - every chatter's name lands on one edge (the widest leading prefix in view sets the stop); `left` aligns the names' starts, `right` the ends so message text columns up after them |
 | `eonly` | `inline`/`right`/`off` | emote-only row mode |
 | `help` | `off`/`panel` | help popup visibility (old `labels`/`both` urls still set the labels flag) |
 | `lbls` | flag | header button labels shown beside each header control - independent of the `?` cycle |
-| `htab` | `help`/`media`/`dsa`/`vote`/`left`/`libre`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`config`, `resources`, `midterms` and `liberatory` still resolve to `help`/`media`/`vote`/`libre`) |
+| `htab` | `help`/`media`/`dsa`/`vote`/`left`/`libre`/`authors`/`stats` | selected `?` popup tab; alone it also opens the panel (`config`, `resources`, `midterms`, `praxis`, `parties` and `liberatory` still resolve to `help`/`media`/`vote`/`left`/`libre`) |
 | `kw` | comma list | keyword highlights (green edge) |
 | `bw` | comma list | block words - matching lines hidden |
 | `ping` | flag | mention ping sound |
@@ -692,7 +752,7 @@ Where this sits relative to the usual suspects:
 | stream stats line | ✅ uptime·viewers·chatters | viewers/uptime | ❌ | partial | ✅ | ❌ | partial | partial |
 | session stats tab | ✅ chatters/emotes/bursts/storage | ❌ | ❌ | ❌ | partial logs | ❌ | ❌ | ❌ |
 | pause scroll on hover | ✅ opt-in | partial | ❌ | ✅ | ✅ | ❌ | partial | ❌ |
-| resource tabs | ✅ media·left·libre·authors·dsa | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| resource tabs | ✅ media·vote26·dsa·left·libre·authors | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | stream video alongside | ✅ drag/resize overlay | ✅ | ❌ | ❌ | partial ext. | ❌ | ❌ | ❌ |
 | multi-column log | ✅ 2-3 page-flip + rail layouts | ❌ | ❌ | ✅ splits | partial | ❌ | ❌ | ❌ |
 | screen-reader landmarks | ✅ live region + feeds | partial | partial | ❌ | ❌ | ❌ | partial | partial |
@@ -716,7 +776,16 @@ an extracted copy at `page-scan.js` (gitignored, never deployed):
 
 ## Deploy
 
-    neocities-deploy deploy -s hasanabi.neocities.org
+    ./deploy.sh
+
+The script first renders the
+[twtch.neocities.org](https://twtch.neocities.org/) mirror - the same
+tree with its own brand swapped into the static head metas,
+`manifest.json` and og card - into the sibling
+`../twtch.neocities.org/` directory that site's deploy path points at,
+then runs `neocities-deploy deploy` for every configured site. A raw
+`neocities-deploy` run still works; it just pushes the last rendered
+twtch copy rather than re-rendering it.
 
 Using [neocities-deploy](https://github.com/kugland/neocities-deploy)
 ([AUR package](https://aur.archlinux.org/packages/neocities-deploy-bin)).
