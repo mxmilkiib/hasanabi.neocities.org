@@ -1540,10 +1540,11 @@
   #tour .tlegs { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.4em, 1fr));
     gap: .45em .9em; padding: .7em .9em; border-top: 1px solid var(--line);
     font-size: 12px; color: var(--text-dim); }
+  #tour .tlegs span { display: inline-flex; align-items: center; }
   #tour .tlegs b { display: inline-flex; min-width: 1.7em; height: 1.7em; padding: 0 .3em;
-    align-items: center; justify-content: center; box-sizing: border-box;
+    align-items: center; justify-content: center; box-sizing: border-box; flex: none;
     border: 1px solid var(--line); border-radius: .3em; background: var(--bg);
-    color: var(--accent); font-weight: 600; margin-right: .5em; vertical-align: -.45em; }
+    color: var(--accent); font-weight: 600; margin-right: .5em; }
   #tour .tlegs svg, #tour .tbt svg { width: .9em; height: .9em; }
   /* the layouts page's schematic grid - one thumbnail per ▮▮ menu entry:
      chat columns grey, video accent, help green, stats pink, and
