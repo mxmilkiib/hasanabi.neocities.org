@@ -1377,7 +1377,7 @@
   body.overlay #helpPanel, body.overlay #whis, body.overlay #findbar,
   body.overlay .jdown, body.overlay #offBar, body.overlay #updateBar, body.overlay #titleBar, body.overlay #hint,
   body.overlay #emotePick, body.overlay #peek, body.overlay #epop,
-  body.overlay #tt { display: none !important; }
+  body.overlay #tt, body.overlay #tour { display: none !important; }
   body.overlay main { height: 100vh; }
   /* the floating find-bar docks under the header - 'only' toggles like a
      header button, archive results list below it */
@@ -1441,6 +1441,33 @@
   #ucard .uc-mod { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
   #ucard .uc-mod button[data-armed] { color: var(--danger); border-color: var(--danger); }
   #ucardX { float: right; padding: 0 6px; margin: -2px -4px 6px 10px; }
+  /* the first-time tour: a dimming veil with a centred card of paged
+     tips - esc, the ✕, a veil click or the last page's done all close it */
+  #tour { position: fixed; inset: 0; z-index: 70;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: color-mix(in srgb, var(--bg) 62%, transparent); }
+  #tour[hidden] { display: none; }
+  #tour .tour-card { width: 520px; max-width: 100%; max-height: 86vh; max-height: 86dvh;
+    display: flex; flex-direction: column;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--popline); border-radius: 8px;
+    padding: 12px 16px; font-size: var(--chat-font, 15px); line-height: 1.55;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .45); }
+  #tour .tour-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  #tour .tour-head b { color: var(--accent); font-weight: 700; }
+  #tour .tour-body { overflow-y: auto; padding: 4px 0; }
+  #tour .tour-page[hidden] { display: none; }
+  #tour .tour-page > div { margin: 8px 0; }
+  #tour .tour-page b { color: var(--accent); font-weight: 600; }
+  #tour .tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    border-top: 1px solid var(--line); padding-top: 9px; }
+  #tour .tour-dots { display: flex; gap: 5px; }
+  #tour .tour-dots i { width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-dim); opacity: .4; cursor: pointer; }
+  #tour .tour-dots i.on { opacity: 1; background: var(--accent); }
+  #tour .tour-nav { display: flex; gap: 6px; }
+  #tour .tour-nav .hdr-btn { width: auto; height: 28px; padding: 0 12px; font-size: .9em;
+    display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
   /* the stats tab: headed sections, chatters and emotes in paired
      columns with tabular counts pinned right */
   /* display:flex - #helpPanel .htabpage > div's label grid must not
@@ -2902,6 +2929,7 @@
     <div style="margin-top: 17px"><b class="fn">†</b> click/scroll to change · ⇧click goes back</div>
     <div><b>etc</b> <span class="linkcols ecfg"><i><b>names</b> link to twitch profiles · hovering one (or an @mention in the text) previews the channel · a plain click pins a user card · ⇧/⌃/⌘-click opens the profile</i><i><b>user card</b> @mention / profile / highlight / hide buttons under the name, then the hover card's channel info (title, live state, followers, modes, description), pronouns, first-seen, session count and recent lines - mods get timeout · ban · delete there, each a click-twice confirm</i><i><b>shimmer</b> fossabot + blammobot names shimmer, as do urls they post · @ostonox mentions too · @hasanabi mentions get a rainbow sweep hashed per author · merged-view #room tags run the same sweep per channel · the ✦ row switches these styles off</i><i><b>embeds</b> urls are clickable · images and gifs embed pinned right</i></span></div>
     <div><b>&amp;c</b>options persist between visits in localStorage · the page is an installable PWA - add to home screen / install from the address bar for a standalone window<span id="pwaState"></span></div>
+    <div><b>tour</b> <a href="#" role="button" id="tourOpen">replay</a> the first-time walkthrough - the paged popup a fresh browser opens with</div>
     <div class="sep">&nbsp;</div>
     <div><b>stream status</b><span>the dot mirrors the stream status:</span><span class="dot connecting"></span><span>accent-pulsing while checking,</span><span class="dot connected"></span><span>green while live,</span><span class="dot reconnecting"></span><span>red-pulsing if the chat socket drops under a live stream,</span><span class="dot idle"></span><span>steady accent while the stream is off but chat is connected,</span><span class="dot offline"></span><span>grey while it is down;</span><span style="grid-column:2">page favicon (tab icon) repaints in the dot's own colour; hover for uptime, viewers and chat state; scroll trims the text beside it between full, stats, compact and minimal</span></div>
     <div><b>graph</b> messages per second over the last 4 minutes, left of – and filling whatever space is free; thin ticks mark 10s, thicker ones each minute; red segments mark glorp bursts; red bands mark socket loss under an open page; violet bands mark the page itself being closed or discarded (missed lines backfill on wake); a red band turns green once its missed lines backfill; grey bands mark stretches where chat went silent with no outage recorded</div>
@@ -3124,6 +3152,39 @@
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice · date:YYYY-MM-DD" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback - a date jumps to it" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
+  <!-- first-time tour: paged walkthrough over a dimming veil - opens once
+       per browser (hasan-tour), re-runs from the help panel's tour link -->
+  <div id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden>
+    <div class="tour-card">
+      <div class="tour-head"><b id="tourTitle"></b><button class="hdr-btn" id="tourX" type="button" title="close the tour (esc)"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div>
+      <div class="tour-body">
+        <div class="tour-page" data-title="welcome">
+          <div><b>hi --</b> this page mirrors twitch chat for a channel - <b>@HasanAbi</b> by default - through a small relay; no account needed to watch</div>
+          <div>five short pages walk the main controls -- <b>esc</b> or <b>✕</b> bails out any time, and the <b>?</b> panel's tour link re-runs it later</div>
+        </div>
+        <div class="tour-page" data-title="the log" hidden>
+          <div><b>row colours --</b> amber rows are mentions of the channel · violet is channel-point redeems · red is glorp / F · accent-tinted rows are your own messages once logged in · blue is mod actions</div>
+          <div><b>↩ chip</b> on a reply jumps to the original message -- a row's <b>◷ timestamp</b> copies a link straight to it</div>
+          <div><b>⌕</b> finds in chat (ctrl+f or /) -- the log archives in the browser, so a reload keeps the backlog</div>
+        </div>
+        <div class="tour-page" data-title="video &amp; layout" hidden>
+          <div><b>▶</b> pops the stream player - draggable, resizable, dockable in a rail column</div>
+          <div><b>▮▮</b> opens the layout menu - splits the log into columns or docks panes in a rail</div>
+          <div>the header's <b>–</b> shrinks the strip; the <b>dot</b> narrates stream status and the sparkline beside it graphs chat rate</div>
+        </div>
+        <div class="tour-page" data-title="joining in" hidden>
+          <div>the <b>glitch button</b> logs in with twitch to send messages - the bar under the log carries the <b>☻ emote picker</b>, reply context and nick completion</div>
+          <div>the <b>✉ chip</b> is whispers - /w name text sends one too; hovering a name previews their channel, a click pins their user card</div>
+        </div>
+        <div class="tour-page" data-title="make it yours" hidden>
+          <div><b>◆ ◐ ▢ ◑</b> theme, colour, variant, shade -- <b>Aa B ↕ ⇄</b> font, weight, line height, spacing; most header buttons <b>click/scroll</b> to change and <b>⇧click</b> steps back</div>
+          <div>options persist between visits; the page installs as a PWA for a standalone window</div>
+          <div><b>?</b> opens the full manual - stats, resources and a replay of this tour all live there</div>
+        </div>
+      </div>
+      <div class="tour-foot"><span class="tour-dots" id="tourDots"></span><span class="tour-nav"><button class="hdr-btn" id="tourBack" type="button">back</button><button class="hdr-btn" id="tourNext" type="button">next</button></span></div>
+    </div>
+  </div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
   <main><div id="loadBar" class="hbar" role="status"><div class="loadbar"><i></i></div><span id="loadTxt">loading relay…</span><div class="loadbar"><i></i></div></div><div class="col" id="log" role="feed" aria-label="chat"></div><div class="col" id="side" role="feed" aria-label="chat continued" hidden></div><div class="col" id="side2" role="feed" aria-label="chat continued" hidden></div><div id="colSplit" hidden title="drag to resize the chat columns and rail"></div><div id="rail" role="complementary" aria-label="video, emotes, stats and help" hidden><div id="railSplit" hidden title="drag to resize the emote and stats panes"></div></div><div id="colSplitR" hidden title="drag to resize the centred page"></div><button class="jdown jdc l" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown" id="jdownLog" hidden title="Scroll to live chat">↓</button><button class="jdown jdc r" data-for="jdownLog" hidden title="Scroll to live chat">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side" id="jdownSide" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown jdc l" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button><button class="jdown side2" id="jdownSide2" hidden title="Scroll to bottom">↓</button><button class="jdown jdc r" data-for="jdownSide2" hidden title="Scroll to bottom">↓<svg class="jdash" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="98" height="98" rx="49" vector-effect="non-scaling-stroke"/></svg></button></main>
   <div id="chatbar" hidden><div id="replyBar" role="status" hidden>↩ replying to <b id="replyWho"></b>: <span id="replyWhat"></span><button id="replyX" title="cancel reply (esc)" aria-label="cancel reply">×</button></div><button class="hdr-btn" id="emojiBtn" type="button" aria-label="emote picker" aria-expanded="false" aria-controls="emotePick"><span style="display:inline-block;transform:translate(0.1pt,1.7px) scale(2.3,2.2) rotate(17deg)">☻</span></button><div id="chatWrap"><div id="chatHl" aria-hidden="true"></div><textarea id="chatInput" class="hdr-btn" autocomplete="off" spellcheck="false" placeholder="chat" aria-label="message" rows="1"></textarea></div><span id="chatLen" aria-hidden="true"></span><button class="hdr-btn" id="msgSend" type="button" aria-label="send message">➤</button><span id="chatPick" hidden></span><div id="chatComp" role="listbox" aria-label="nick completions" hidden></div></div>
@@ -3406,6 +3467,70 @@
     hintEl.remove();
     try { localStorage.setItem('hasan-hint', '1'); } catch {}
   });
+
+  // ---- first-time tour ----
+  // a paged walkthrough over a dimming veil - opens once per browser
+  // (hasan-tour), re-runs from the help panel's tour link. esc, the veil,
+  // the ✕ or the last page's done all close it
+  {
+    const TOUR_KEY = 'hasan-tour';
+    const tourEl = document.getElementById('tour');
+    const tourTitle = document.getElementById('tourTitle');
+    const tourPages = [...tourEl.querySelectorAll('.tour-page')];
+    const tourDots = document.getElementById('tourDots');
+    const tourBack = document.getElementById('tourBack');
+    const tourNext = document.getElementById('tourNext');
+    let tourPage = 0;
+
+    function tourPaint() {
+      tourPages.forEach((p, i) => { p.hidden = i !== tourPage; });
+      tourTitle.textContent = tourPages[tourPage].dataset.title;
+      tourDots.querySelectorAll('i').forEach((d, i) => d.classList.toggle('on', i === tourPage));
+      tourBack.disabled = tourPage === 0;
+      tourNext.textContent = tourPage === tourPages.length - 1 ? 'done' : 'next';
+    }
+    function tourShow() {
+      tourPage = 0;
+      tourEl.hidden = false;
+      tourPaint();
+      tourNext.focus();
+    }
+    function tourHide() {
+      tourEl.hidden = true;
+      try { localStorage.setItem(TOUR_KEY, '1'); } catch {}
+    }
+    // the dots build from the page count - a click jumps to that page
+    tourPages.forEach((p, i) => {
+      const d = document.createElement('i');
+      d.addEventListener('click', () => { tourPage = i; tourPaint(); });
+      tourDots.appendChild(d);
+    });
+    tourBack.addEventListener('click', () => { if (tourPage > 0) { tourPage--; tourPaint(); } });
+    tourNext.addEventListener('click', () => {
+      if (tourPage < tourPages.length - 1) { tourPage++; tourPaint(); }
+      else tourHide();
+    });
+    document.getElementById('tourX').addEventListener('click', tourHide);
+    // a press on the veil itself (not the card) dismisses too
+    tourEl.addEventListener('pointerdown', (e) => { if (e.target === tourEl) tourHide(); });
+    // esc and the arrow keys only act while the tour is up - this handler
+    // registers ahead of the global esc peeler, so stopping it immediate
+    // keeps the picker/help panel under the veil untouched
+    document.addEventListener('keydown', (e) => {
+      if (tourEl.hidden) return;
+      if (e.key === 'Escape') { e.stopImmediatePropagation(); tourHide(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); tourNext.click(); }
+      else if (e.key === 'ArrowLeft' && tourPage > 0) { e.preventDefault(); tourBack.click(); }
+    });
+    // the help panel's replay link
+    document.getElementById('tourOpen').addEventListener('click', (e) => {
+      e.preventDefault();
+      tourShow();
+    });
+    // first visit only - the ?overlay obs view never interrupts
+    const overlayMode = chanQs.has('overlay') && chanQs.get('overlay') !== '0';
+    try { if (!localStorage.getItem(TOUR_KEY) && !overlayMode) tourShow(); } catch {}
+  }
 
   // Colors picked for contrast against --bg, used when a chatter has no
   // color set (or one too dark to read), hashed so each name is stable.
