@@ -1458,6 +1458,7 @@
   #tour .tour-head { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; }
   #tour .tour-head b { color: var(--accent); font-weight: 700; font-size: 1.3em; }
   #tour .tour-head #tourX { position: absolute; right: 0; }
+  #tour .tour-x { display: inline-flex; align-items: center; justify-content: center; }
   #tour .tour-body { overflow-y: auto; padding: 6px 0; flex: 1; }
   #tour .tour-page[hidden] { display: none; }
   /* copy left, mini screenshots right - a poster spread per page,
@@ -1566,7 +1567,8 @@
   #tour .tlay span { font-size: 10px; color: var(--text-dim); line-height: 1.3; }
   #tour .tlay span b { color: var(--accent); font-weight: 600; margin-right: .35em; }
   #tour .tour-foot { display: flex; align-items: center; justify-content: center; gap: 10px;
-    border-top: 1px solid var(--line); padding-top: 9px; }
+    border-top: 1px solid var(--line); padding-top: 9px; position: relative; }
+  #tour .tour-foot .tour-x { position: absolute; right: 0; }
   #tour .tour-tabs { display: flex; flex-wrap: wrap; gap: 5px; }
   /* the same strip rides under the title too - the page tabs are jump
      links, so one hand is always near them */
@@ -3271,7 +3273,7 @@
        per browser (hasan-tour), re-runs from the help panel's tour link -->
   <div id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden>
     <div class="tour-card">
-      <div class="tour-head"><b id="tourTitle"></b><button class="hdr-btn" id="tourX" type="button" title="close the tour (esc)"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div>
+      <div class="tour-head"><b id="tourTitle"></b><button class="hdr-btn tour-x" id="tourX" type="button" title="close the tour (esc)"><svg viewBox="0 0 24 24" width=".9em" height=".9em" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
       <div class="tour-tabs tour-top" id="tourTabsTop"></div>
       <div class="tour-body">
         <div class="tour-page" data-title="chat thing tutorial" data-tab="the basics">
@@ -3427,7 +3429,7 @@
           </div>
         </div>
       </div>
-      <div class="tour-foot"><span class="tour-tabs" id="tourTabs"></span></div>
+      <div class="tour-foot"><span class="tour-tabs" id="tourTabs"></span><button class="hdr-btn tour-x" type="button" title="close the tour (esc)"><svg viewBox="0 0 24 24" width=".9em" height=".9em" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     </div>
   </div>
   <div id="srLive" class="sr" aria-live="polite" aria-atomic="true"></div>
@@ -3754,7 +3756,7 @@
         host.appendChild(d);
       });
     });
-    document.getElementById('tourX').addEventListener('click', tourHide);
+    tourEl.querySelectorAll('.tour-x').forEach((b) => b.addEventListener('click', tourHide));
     // a press on the veil itself (not the card) dismisses too
     tourEl.addEventListener('pointerdown', (e) => { if (e.target === tourEl) tourHide(); });
     // esc and the arrow keys only act while the tour is up - this handler
