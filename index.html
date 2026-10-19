@@ -1503,7 +1503,7 @@
     border-radius: 2px; margin: 0 3px -1px 4px; }
   #statsBody .st-key .st-sw.st-dim { background: var(--text-dim, #666); opacity: .4; }
   /* inside a fixed column the ranked lists run single-file */
-  #statsBody .st-2col, #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
+  #statsBody .st-cols, #statsBody .st-bcols, #statsBody .st-ucols { column-count: 1; }
   #statsBody #stRate { display: block; width: 100%; height: 100px; }
   /* a burst row's hover bands its span over the graph - transparent to
      the pointer so the canvas' own bin readout keeps working */
@@ -1569,7 +1569,6 @@
   #statsBody .st-brow .bt { font-weight: 600; white-space: nowrap; }
   #statsBody .st-brow i { margin-left: auto; font-style: normal;
     color: var(--text-dim); font-variant-numeric: tabular-nums; padding-left: 8px; }
-  @media (max-width: 640px) { #statsBody .st-grid { grid-template-columns: 1fr; } }
   /* narrow popups (phones): the summary trio stacks two-up and glorps
      takes the full second row - the panel is the container, not the
      viewport, so a thin desktop column folds the same way */
@@ -10906,7 +10905,7 @@
   let danLaneYs = [];        // adaptive's per-lane band tops, fill order
   let danLaneOrder = [];     // spawn's berth order - outer rows first
   let danPinYs = [];        // pitch-rows outside the lanes a pinned bullet may park on
-  let danH = 0, danDirWas = 0, danTopN = 0, danEdgeN = 0, danSpillN = 0; // frame height, pack edge + band splits the lanes were metered under
+  let danH = 0, danTopN = 0, danSpillN = 0; // frame height + band splits the lanes were metered under
   let danRaf = 0, danLast = 0;
   // a phone's 2-3x backing store quadruples every fill and stroke for
   // no visible gain on outlined text - coarse pointers settle the
@@ -11133,7 +11132,7 @@
       lanes = danLaneYs.length;
       spillN = lanes - nTop - nBot - gapN - gapB;
     }
-    danFontPx = px; danPitch = pitch; danLanes = lanes; danH = H; danDirWas = danDir; danEdgeN = edge;
+    danFontPx = px; danPitch = pitch; danLanes = lanes; danH = H;
     danTopN = danDir >= 2 ? nTop + gapN : 0; danSpillN = spillN;
     // spawn order walks the bands outermost-first across the edges:
     // the row at the top edge and the one at the bottom claim the
