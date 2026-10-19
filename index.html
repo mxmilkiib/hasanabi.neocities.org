@@ -17827,8 +17827,11 @@
   });
 
   // optional installability: standalone PWA windows survive backgrounding
-  // better than a backgrounded browser tab
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  // better than a backgrounded browser tab. neocities' host csp pins
+  // worker-src to blob: so the file can never register there - skip the
+  // attempt (and its console violation) while keeping it for other hosts
+  if ('serviceWorker' in navigator && !location.hostname.endsWith('neocities.org'))
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   // reflect the actual install state in the help note
   const pwaStateEl = document.getElementById('pwaState');
   const standaloneMQ = matchMedia('(display-mode: standalone)');
