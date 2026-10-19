@@ -1528,7 +1528,10 @@
   #tour .tour-tabs { display: flex; flex-wrap: wrap; gap: 5px; }
   #tour .tour-tabs .hdr-btn { width: auto; height: 24px; padding: 0 9px; font-size: .8em;
     display: inline-flex; align-items: center; white-space: nowrap; }
-  #tour .tour-tabs .hdr-btn.on { color: var(--accent); border-color: var(--accent); }
+  #tour .tour-tabs .hdr-btn.on { color: var(--accent); border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    /* inset shadow doubles the border to a solid 2px look without reflowing */
+    box-shadow: inset 0 0 0 1px var(--accent), 0 0 7px color-mix(in srgb, var(--accent) 40%, transparent); }
   #tour .tour-nav { display: flex; gap: 6px; }
   #tour .tour-nav .hdr-btn { width: auto; height: 28px; padding: 0 12px; font-size: .9em;
     display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
@@ -3248,7 +3251,7 @@
             </figure>
           </div>
         </div>
-        <div class="tour-page" data-title="the log" hidden>
+        <div class="tour-page" data-title="chat log" hidden>
           <div class="tour-copy">
             <div><b>row colours</b> narrate what a line is at a glance - the shot beside names them all</div>
             <div><b>↩ chip</b> on a reply jumps to the original message - past the rendered edge it restores the parent from the archive. a row's <b>◷ timestamp</b> copies a link straight to that message, and opening such a link scrolls to the row and flashes it</div>
@@ -3266,7 +3269,7 @@
                 <span class="trow"><i class="tchip">↩</i><i class="nk" style="background:#66d9e8"></i><i class="tseg" style="width:40%"></i></span>
                 <span class="trow gap"><i class="tseg" style="width:26%;opacity:.5"></i></span>
               </div>
-              <figcaption>top to bottom: amber mention · violet channel points · red glorp · accent own message · blue mod action · ↩ reply chip · a gap row for dropped or silent stretches</figcaption>
+              <figcaption>top to bottom: <b style="color:#e8a33d">amber</b> mention · <b style="color:#9b5de8">violet</b> channel points · <b style="color:#e85d5d">red</b> glorp · <b style="color:var(--accent)">accent</b> own message · <b style="color:#668ee8">blue</b> mod action · ↩ reply chip · a gap row for dropped or silent stretches</figcaption>
             </figure>
             <figure class="tshot">
               <div class="thdr"><i class="tbt">⌕</i><i class="tin">user:someone kind:notice</i><i class="tseg" style="width:2.4em"></i><i class="tbt">↑</i><i class="tbt">↓</i></div>
