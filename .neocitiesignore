@@ -7,6 +7,7 @@ eslint.config.mjs
 page-scan.js
 og.png.bak
 index.html.bak_*
+README.md.bak_*
 deploy.sh
 AGENTS.md
 old
