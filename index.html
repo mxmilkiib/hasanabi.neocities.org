@@ -1456,7 +1456,7 @@
   /* the title centres on the card, so the close button absolutely
      anchors to the right instead of sharing the flex row's space */
   #tour .tour-head { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; }
-  #tour .tour-head b { color: var(--accent); font-weight: 700; font-size: 1.3em; text-decoration: underline; }
+  #tour .tour-head b { color: var(--accent); font-weight: 700; font-size: 1.3em; }
   #tour .tour-head #tourX { position: absolute; right: 0; }
   #tour .tour-body { overflow-y: auto; padding: 6px 0; flex: 1; }
   #tour .tour-page[hidden] { display: none; }
@@ -3370,26 +3370,26 @@
             </figure>
             <figure class="tshot">
               <div class="tlays">
+                <div class="tlay"><div class="tlw"><i class="v" style="flex:0 0 78%;margin:0 auto"></i></div><span title="1col video"><b>▶</b>1col video</span></div>
+                <div class="tlay"><div class="tlw"><i class="v dan" style="flex:0 0 78%;margin:0 auto"></i></div><span title="1col danmaku"><b>▶»</b>1col danmaku</span></div>
                 <div class="tlay"><div class="tlw"><i></i></div><span title="1col chat"><b>▮</b>1col</span></div>
                 <div class="tlay"><div class="tlw"><i class="h" style="flex:0 0 68%;margin:0 auto"></i></div><span title="1col help"><b>?</b>1col help</span></div>
+                <div class="tlay"><div class="tlw col"><i class="v" style="flex:0 0 42%"></i><i></i></div><span title="1col video/chat"><b>▶▮</b>1col video/chat</span></div>
+                <div class="tlay"><div class="tlw col"><i class="v dan" style="flex:0 0 42%"></i><i></i></div><span title="1col danmaku/chat"><b>▶»▮</b>1col danmaku/chat</span></div>
+                <div class="tlay"><div class="tlw"><span class="tcol" style="flex:0 0 68%;margin:0 auto"><i class="v" style="flex:0 0 42%"></i><i class="h"></i></span></div><span title="1col video/help"><b>▶?</b>1col video/help</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i></div><span title="2col chat | chat"><b>▮▮</b>2col</span></div>
                 <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="h"></i></span></div><span title="2col chat | help"><b>▮?</b>2col | help</span></div>
+                <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i></i></span></div><span title="2col chat | emotes"><b>▮☻</b>2col | emotes</span></div>
                 <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="v"></i><i class="h"></i></span></div><span title="2col chat | video/help"><b>▮▶?</b>2col | video/help</span></div>
                 <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i class="v"></i><i></i></span></div><span title="2col chat | video/emotes"><b>▮▶</b>2col | video/emotes</span></div>
-                <div class="tlay"><div class="tlw"><i></i><span class="tlr"><i></i></span></div><span title="2col chat | emotes"><b>▮☻</b>2col | emotes</span></div>
                 <div class="tlay"><div class="tlw"><span class="tlr"><i class="s"></i><i></i></span><span class="tcol"><i class="v"></i><i></i></span></div><span title="2x2"><b>⊞</b>2x2</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i><i></i></div><span title="3col chat | chat | chat"><b>▮▮▮</b>3col</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="h"></i></span></div><span title="3col chat | chat | help"><b>▮▮?</b>3col | help</span></div>
+                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i></i></span></div><span title="3col chat | chat | emotes"><b>▮▮☻</b>3col | emotes</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i class="h"></i></span></div><span title="3col chat | chat | video/help"><b>▮▮▶?</b>3col | video/help</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i></i><i class="s"></i></span></div><span title="3col chat | chat | video/emotes/stats"><b>▮▮▯</b>3col | v/e/stats</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i></i></span></div><span title="3col chat | chat | video/emotes"><b>▮▮▶</b>3col | video/emotes</span></div>
-                <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i></i></span></div><span title="3col chat | chat | emotes"><b>▮▮☻</b>3col | emotes</span></div>
-                <div class="tlay"><div class="tlw col"><i class="v" style="flex:0 0 42%"></i><i></i></div><span title="1col video/chat"><b>▶▮</b>1col video/chat</span></div>
                 <div class="tlay"><div class="tlw"><i></i><i></i><span class="tlr"><i class="v"></i><i></i><i class="h"></i></span></div><span title="3col chat | chat | video/emotes/help"><b>▮▮▯?</b>3col | v/e/help</span></div>
-                <div class="tlay"><div class="tlw"><i class="v" style="flex:0 0 78%;margin:0 auto"></i></div><span title="1col video"><b>▶</b>1col video</span></div>
-                <div class="tlay"><div class="tlw"><span class="tcol" style="flex:0 0 68%;margin:0 auto"><i class="v" style="flex:0 0 42%"></i><i class="h"></i></span></div><span title="1col video/help"><b>▶?</b>1col video/help</span></div>
-                <div class="tlay"><div class="tlw"><i class="v dan" style="flex:0 0 78%;margin:0 auto"></i></div><span title="1col danmaku"><b>▶»</b>1col danmaku</span></div>
-                <div class="tlay"><div class="tlw col"><i class="v dan" style="flex:0 0 42%"></i><i></i></div><span title="1col danmaku/chat"><b>▶»▮</b>1col danmaku/chat</span></div>
               </div>
               <figcaption>every ▮▮ menu layout, in menu order - grey bars are chat columns, accent the video, green help, pink stats, dashes danmaku, and the narrow stack the rail; names abbreviate, hover gives the menu's wording</figcaption>
             </figure>
