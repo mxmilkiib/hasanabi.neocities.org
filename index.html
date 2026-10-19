@@ -1523,7 +1523,16 @@
   #tour .tcard .tav { width: 3em; height: 3em; border-radius: .5em; flex: none;
     background: linear-gradient(135deg, var(--accent), var(--vip)); }
   #tour .tbtns { display: grid; grid-template-columns: 1fr 1fr; gap: .4em; margin: .7em 0; }
-  #tour .tbtns i { height: 1.5em; border: 1px solid var(--line); border-radius: .3em; background: var(--bg); }
+  #tour .tbtns i { height: 1.5em; border: 1px solid var(--line); border-radius: .3em; background: var(--bg);
+    font-style: normal; font-size: .78em; color: var(--text-dim);
+    display: inline-flex; align-items: center; justify-content: center; }
+  #tour .tc-name { font-weight: 700; font-size: 1.05em; }
+  #tour .tc-facts { font-size: .8em; color: var(--text-dim); line-height: 1.4; }
+  #tour .tc-msgs { margin-top: .45em; border-top: 1px solid var(--line); padding-top: .45em;
+    font-size: .8em; }
+  #tour .tc-msgs div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #tour .tc-msgs .tc-t { display: inline; font-style: normal; opacity: .65; margin-right: .6em;
+    font-variant-numeric: tabular-nums; }
   #tour .tsw { display: flex; gap: .45em; padding: .55em .8em; border-top: 1px solid var(--line); }
   #tour .tsw i { width: 1.4em; height: 1.4em; border-radius: .35em; flex: none; }
   /* the header-cast legend: every button's glyph beside its name, in a
@@ -3370,12 +3379,15 @@
             </figure>
             <figure class="tshot">
               <div class="tcard">
-                <div class="tc-head"><i class="tav"></i><i class="tseg acc" style="width:6em"></i><i class="tseg" style="width:4em;opacity:.5"></i></div>
-                <i class="tseg" style="width:86%;margin-bottom:.5em;opacity:.5"></i>
-                <i class="tseg" style="width:64%;margin-bottom:.5em;opacity:.4"></i>
-                <div class="tbtns"><i></i><i></i><i></i><i></i></div>
-                <i class="tseg" style="width:72%;opacity:.45"></i>
-                <i class="tseg" style="width:55%;margin-top:.4em;opacity:.4"></i>
+                <div class="tc-head"><i class="tav"></i><b class="tc-name" style="color:#53b462">HasanAbi</b></div>
+                <div class="tbtns"><i>@mention</i><i>profile ↗</i><i>highlight</i><i>hide user</i></div>
+                <div class="tc-facts">2.9M followers · live</div>
+                <div class="tc-facts">he/him · seen 13:58 · 41 msgs this session</div>
+                <div class="tc-msgs">
+                  <div><i class="tc-t">13:52</i>what's up chat</div>
+                  <div><i class="tc-t">13:55</i>ok let me look at this real quick</div>
+                  <div><i class="tc-t">13:58</i>hell yeah brother</div>
+                </div>
               </div>
               <figcaption>a pinned user card - channel facts, pronouns, first-seen and recent lines</figcaption>
             </figure>
