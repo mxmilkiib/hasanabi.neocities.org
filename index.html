@@ -7064,6 +7064,25 @@
     setStatusView(SVIEW_CYCLE[(i + (e.deltaY > 0 ? 1 : -1) + SVIEW_CYCLE.length) % SVIEW_CYCLE.length]);
     saveOpts();
   }, { passive: false });
+  // the rate graph cycles the same ladder - it sits beside the status
+  // block, so wheel there reads as the same gesture
+  document.getElementById('spark').addEventListener('wheel', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const i = SVIEW_CYCLE.indexOf(statusView);
+    setStatusView(SVIEW_CYCLE[(i + (e.deltaY > 0 ? 1 : -1) + SVIEW_CYCLE.length) % SVIEW_CYCLE.length]);
+    saveOpts();
+  }, { passive: false });
+  // clicking the viewer count asks the relay for a fresh poll - 20s
+  // cooldown so a click storm can't burst decapi
+  let lastManualPoll = 0;
+  const askPoll = () => {
+    if (Date.now() - lastManualPoll < 20000 || !relayFrame.contentWindow) return;
+    lastManualPoll = Date.now();
+    relayFrame.contentWindow.postMessage({ type: 'streamprobe', channels: [CHANNEL] }, RELAY_ORIGIN);
+  };
+  infoEl.addEventListener('click', askPoll);
+  tailEl.addEventListener('click', askPoll);
 
   // Chat mode chips from ROOMSTATE: slow / followers / emote / sub / r9k
   const modesEl = document.getElementById('chatModes');
@@ -7092,7 +7111,9 @@
     // the header buttons onto extra rows
     const phrases = [];
     if (slow > 0) phrases.push(`slow ${slow}s`);
-    if (foll === 0) phrases.push('follow req');
+    // followers-only=0 means 'must be followed', no minimum tenure -
+    // spell it out rather than leaving a value-less 'follow req'
+    if (foll === 0) phrases.push('follow req <b>0m</b>');
     else if (foll > 0) phrases.push(`follow req <b>${foll >= 60 ? `${Math.round(foll / 60)}h` : `${foll}m`}</b>`);
     if (tags['emote-only'] === '1') phrases.push('emote');
     if (tags['subs-only'] === '1') phrases.push('subs');
