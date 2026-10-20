@@ -37,6 +37,19 @@ not versions - the page ships continuously to Neocities.
   swaps in when it lands - failures drop the marker with a notice
 
 ### Resources
+- the media tab's creators table regroups by genre - home, commentary,
+  news & talk, podcasts, comedy, essays - with each group's
+  twitch-active rows first; majority report, foreign fridays and shaun
+  gain their wiki stars and switch controls back (a space in the name
+  run was stranding them loose in the grid), and channel-menu picks
+  label from the row's name instead of a stray 'twitch' tail link
+- zero-width emotes stack again: the overlay img wears the .zw marker
+  the estk css pins over its base - it never gained the class, so
+  overlays drew inline beside their base
+- boot sheds ~300ms of blocking script: swatch palettes paint once per
+  frame instead of once per option setter, preset matching reads
+  computed style once per pass, and the help rows' bracket wraps scan
+  each row once instead of once per bracket
 - the relay fetches the chatterino/ffz/bttv badge lists on the emote
   cycle and forwards a deduped uid map once per peer, like the emote
   payloads
