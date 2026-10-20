@@ -3861,7 +3861,8 @@
       // name cell, falling back to the login
       const nm = a.closest('i')?.querySelector('.cn a.at')?.textContent.trim();
       const lbl = nm || (/^[a-z0-9_]{3,}$/i.test(a.textContent.trim()) ? a.textContent.trim() : l);
-      rest.push(`<button type="button" role="option" data-ch="${l}">${escapeHTML(lbl)}${streamStates[l] && streamStates[l].live ? ' ●' : ''}</button>`);
+      const st = streamStates[l];
+      rest.push(`<button type="button" role="option" data-ch="${l}">${escapeHTML(lbl)}${st ? (st.live ? ' ●' : ' ◌') : ''}</button>`);
     });
     chanMenu.innerHTML =
       `<div class="chjoin"><input class="hdr-btn" id="chanJoinIn" type="text" autocomplete="off" spellcheck="false" placeholder="join channel…"><button class="hdr-btn" id="chanJoinGo" type="button">join</button>` +
@@ -3892,11 +3893,15 @@
       joinTo(inp.value.trim().replace(/[^a-zA-Z0-9_]/g, '').slice(0, 25));
     }
     // live? probes every listed channel once - the replies land in
-    // streamStates, so rebuild shortly after to paint the ● marks
-    if (e.target.id === 'chanLiveGo' && relayFrame.contentWindow) {
+    // streamStates, so rebuild shortly after to paint the ● marks.
+    // probeChans shares the set with the creators tab's ping so its
+    // links tint too; 'pinging…' always shows, relay loaded or not
+    if (e.target.id === 'chanLiveGo') {
       const chs = [...chanMenu.querySelectorAll('button[data-ch]')].map((b) => b.dataset.ch);
       e.target.textContent = 'pinging…';
-      relayFrame.contentWindow.postMessage({ type: 'streamprobe', channels: chs }, RELAY_ORIGIN);
+      probeChans = new Set(chs);
+      if (relayFrame.contentWindow)
+        relayFrame.contentWindow.postMessage({ type: 'streamprobe', channels: chs }, RELAY_ORIGIN);
       setTimeout(buildChanMenu, 2500);
       setTimeout(buildChanMenu, 8000);
     }
