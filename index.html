@@ -3197,7 +3197,7 @@
     <div><b>⏸</b> <span>scroll pause: <span id="helpPauseList"></span> - hovering a message row holds its column still; empty space doesn't count (a row's ↩ reply and mod buttons hold it regardless, so the target can't slide out from under the cursor)<sup>†</sup></span></div>
     <div><b>⏸</b> <span>emote pause: <span id="helpEpfzList"></span> - where animated emotes still: 'popup' freezes the picker's cells only, 'all' adds chat rows, the autocomplete and the stats list; the picker's ⏸ chip cycles the same stops<sup>†</sup></span></div>
     <div><b>✦</b> <span>nick shimmer: <span id="helpAnimList"></span> - shimmer/rainbow sweeps on styled nicks, mentions and notice labels; the slow options stretch the same sweep, reduced-motion switches it off too.<sup>†</sup></span></div>
-    <div><b class="rbw rbwh">@hasanabi</b> <span>rainbow: <span id="helpRbwSList"></span> - which marks run the sweep; 'hasanabi' keeps only the @mention, 'other' all but it, 'off' paints none · palette: <span id="helpRbwPalList"></span><sup>†</sup></span></div>
+    <div><b class="rbw rbwh">@hasanabi</b> <span>rainbow: <span id="helpRbwSList"></span> - which marks run the sweep; 'hasanabi' keeps only the @mention, 'other' all but it, 'off' paints none · palette: <span id="helpRbwPalList"></span> · @hasanabi's: <span id="helpRbwPalHList"></span><sup>†</sup></span></div>
     <div><b>≈</b> <span>rainbow motion: <span id="helpRbwList"></span> - the sweep's animation; 'random' deals each mark its own off its palette index · the shimmer's slow stops stretch its period<sup>†</sup></span></div>
     <div><b>◇</b> <span>3rd-party marks: bttv, ffz and chatterino badge icons trail twitch's own, and a chatter's 7tv paint recolours their nick - each looked up by twitch user-id through the relay and cached; paintless nicks keep the palette colour</span></div>
     <div><b>♪</b> <span>mention ping: <span id="helpPingList"></span> - a soft tone when a keyword or "@you" line lands while the page isn't focused<sup>†</sup></span></div>
@@ -4081,9 +4081,9 @@
     { n: 'ocean',   hb: [170, 85], s: [72, 18], l: [55, 10] },
     { n: 'sunset',  hb: [335, 70], s: [82, 15], l: [56, 10] },
   ];
-  let rbwPal = 0, rbwSeq = 0;
-  function rbwPalette(i) {
-    const p = RBW_PALS[rbwPal], bw = p.hb[1];
+  let rbwPal = 0, rbwPalH = 5, rbwSeq = 0;
+  function rbwPalette(i, pi) {
+    const p = RBW_PALS[pi == null ? rbwPal : pi], bw = p.hb[1];
     const arc = bw === 360 ? [360, 220, 160, 280][i % 4] : bw * [1, .7, .5, .85][i % 4];
     // a banded arc starts inside the band's remainder so the whole sweep
     // stays in-palette - past the end it would wrap into foreign hues
@@ -4126,7 +4126,7 @@
       let w = 0;
       for (let i = 0; i < who.length; i++) w = (w * 31 + who.toLowerCase().charCodeAt(i)) >>> 0;
       seq = who ? w : rbwSeq++;
-      e.target.style.backgroundImage = rbwPalette(seq);
+      e.target.style.backgroundImage = rbwPalette(seq, e.target.classList.contains('rbwh') ? rbwPalH : null);
       e.target.dataset.rseq = seq;
       // 'random' mode: each mention draws its motion off its palette index
       if (RBW_STYLES[rbwStyle] === 'rbw-rand') {
@@ -7559,6 +7559,7 @@
     else if (a.classList.contains('helpRbwS')) { setRbwScope(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpRbw')) { setRbwStyle(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpRbwPal')) { setRbwPal(+a.dataset.idx); saveOpts(); }
+    else if (a.classList.contains('helpRbwPalH')) { setRbwPalH(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpHide')) { setHideMode(+a.dataset.idx); saveOpts(); }
     else if (a.classList.contains('helpNoLbl')) { setLbls(+a.dataset.idx === 1); saveOpts(); }
     else if (a.classList.contains('helpCopyHelp')) setCopyHelp(+a.dataset.idx ? COPYHELP_TABS[+a.dataset.idx - 1] : '');
@@ -11120,7 +11121,7 @@
       eonly: emoteMode,
       help: helpMode,
       video: !vidBox.hidden, valt: vidAltPref,
-      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, ctabs: chanTabsOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0, danc: DAN_COVERS[danCover], danv: danSpeed, dano: danAlpha, dans: danSubs, dansl: danSubLane, dann: danNick, dant: danTime, danb: danBadge, danbg: danBg, danl: danLine, danfm: danFam, danp: danPin, danpt: danPinT, danf: danHide, dfs: danFs, dand: danDirPick, dana: danAdapt,
+      kw: kwInput.value, bw: bwInput.value, hw: hwInput.value, hwm: hideMode, self: selfHl ? 1 : 0, ping: pingOn ? 1 : 0, clean: cleanUrls ? 1 : 0, gifsafe: gifSafe ? 1 : 0, notify: notifyOn ? 1 : 0, peek: peekMode, yt: ytEmbed ? 1 : 0, lkico: lkIco ? 1 : 0, pn: pronounsOn ? 1 : 0, nbots: hideBots ? 1 : 0, anim: nickAnim, rbw: rbwStyle, rbp: rbwPal, rbph: rbwPalH, rbws: rbwScope, stitle: titleBarOn ? 1 : 0, cmodes: modesOn ? 1 : 0, ctabs: chanTabsOn ? 1 : 0, sview: statusView, upd: updMin, dan: danmakuOn ? 1 : 0, danc: DAN_COVERS[danCover], danv: danSpeed, dano: danAlpha, dans: danSubs, dansl: danSubLane, dann: danNick, dant: danTime, danb: danBadge, danbg: danBg, danl: danLine, danfm: danFam, danp: danPin, danpt: danPinT, danf: danHide, dfs: danFs, dand: danDirPick, dana: danAdapt,
       epnames: emotePick.classList.contains('namesb') ? 1 : emotePick.classList.contains('names') ? 2 : 0, epzoom: epickZoom, epsort: epickSeen ? 'useseen' : epickSort,
       epage: epickAge, epsq: epickSq, epmix: epickMerge ? 1 : 0, ephold: epickHold, epmove: epickMove, eptips: epickTips ? 1 : 0, eprow: epickRowOff ? 1 : 0,
       eptabs: [...epickOn], epanim: [...epickAnimOn], epfz: epFz,
@@ -11338,6 +11339,7 @@
     if (o.rbws !== undefined) setRbwScope(+o.rbws);
     if (o.rbw !== undefined) setRbwStyle(+o.rbw);
     if (o.rbp !== undefined) setRbwPal(+o.rbp);
+    if (o.rbph !== undefined) setRbwPalH(+o.rbph);
     // emote-picker display options ride the bundle too; one rebuild
     // covers any combination of them
     let epDirty = false;
@@ -13652,11 +13654,21 @@
     // re-stamp the arcs that already drew - only elements with a recorded
     // palette index; unstamped .rbw keeps the css strip either way
     document.querySelectorAll('.rbw[data-rseq]').forEach((el) => {
-      el.style.backgroundImage = rbwPalette(+el.dataset.rseq);
+      el.style.backgroundImage = rbwPalette(+el.dataset.rseq, el.classList.contains('rbwh') ? rbwPalH : null);
     });
     markHelp('helpRbwPal', rbwPal);
   }
   setRbwPal(1);
+  // the @mention has its own palette - .rbwh arcs re-draw off it, the
+  // shared strip and other marks keep rbwPal
+  function setRbwPalH(idx) {
+    rbwPalH = Math.max(0, Math.min(RBW_PALS.length - 1, idx | 0));
+    document.querySelectorAll('.rbw.rbwh[data-rseq]').forEach((el) => {
+      el.style.backgroundImage = rbwPalette(+el.dataset.rseq, rbwPalH);
+    });
+    markHelp('helpRbwPalH', rbwPalH);
+  }
+  setRbwPalH(5);
 
   // ---- text shadow on chat rows: graduated off/subtle/medium/strong ----
   const SHADOW_LVLS = [
@@ -14078,6 +14090,7 @@
     if (nickAnim !== 2) q.set('anim', ANIM_URL[nickAnim]);
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', RBW_URL[rbwStyle]);
     if (rbwPal !== 1) q.set('rbp', RBW_PALS[rbwPal].n);
+    if (rbwPalH !== 5) q.set('rbph', RBW_PALS[rbwPalH].n);
     if (rbwScope !== 0) q.set('rbws', RBW_SCOPES[rbwScope]);
     // emote-picker options only enter the url off their defaults - and
     // only when the copy-side toggle asks for them
@@ -19289,6 +19302,7 @@
     if (q.has('rbws')) { const v = q.get('rbws'); const i = RBW_SCOPES.indexOf(v); setRbwScope(i >= 0 ? i : +v); }
     if (q.has('rbw')) { const v = q.get('rbw'); const i = RBW_URL.indexOf(v); setRbwStyle(i >= 0 ? i : +v); }
     if (q.has('rbp')) { const v = q.get('rbp'); const i = RBW_PALS.findIndex((p) => p.n === v); setRbwPal(i >= 0 ? i : +v); }
+    if (q.has('rbph')) { const v = q.get('rbph'); const i = RBW_PALS.findIndex((p) => p.n === v); setRbwPalH(i >= 0 ? i : +v); }
     // emote-picker options: ?epnames=side|only&epzoom=small|quarter|third|half|tweet|big&epsort=az|use|seen&
     // epage=inline|eras|ends|centre&epsq=off|sparse|whole|all&epmix=1&ephold=off|hold|plus&epmove=slide..queue&
     // eptips=1&eprow=1&eptabs=7tv,bttv&epanim=anim,still&epfz=off|popup|all&epgeo=WxH[,L,T]&epopen=0|1 - ints still parse
@@ -19411,7 +19425,8 @@
     helpBots: ['off', 'on'],
     helpNoLbl: ['off', 'on'],
     helpRbw: ['sweep', 'wave', 'hue cycle', 'random'],
-    helpRbwPal: RBW_PALS.map((p) => p.n), helpRbwS: RBW_SCOPES,
+    helpRbwPal: RBW_PALS.map((p) => p.n),
+    helpRbwPalH: RBW_PALS.map((p) => p.n), helpRbwS: RBW_SCOPES,
     helpCopyHelp: ['off'].concat(COPYHELP_TABS),
     helpCopyEp: ['off', 'on'],
     helpLurl: ['off', 'on'],
