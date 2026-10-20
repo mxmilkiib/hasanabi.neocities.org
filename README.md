@@ -79,7 +79,11 @@ no dependencies beyond CDN-hosted fonts.
 
 - **Messages**
   - Each row shows a time, a linked name and any Twitch badges, such as
-    moderator, VIP, subscriber or founder. Text labels can appear
+    moderator, VIP, subscriber or founder. Third-party user badges -
+    [Chatterino](https://chatterino.com/),
+    [FrankerFaceZ](https://www.frankerfacez.com/) and
+    [BetterTTV](https://betterttv.com/) - draw beside them when the
+    chatter has one. Text labels can appear
     beside the badges for subscriptions, bits and first messages.
   - Hover over a subscription label to see its duration in years and
     months. An optional colour setting gradually changes the label
@@ -218,6 +222,10 @@ no dependencies beyond CDN-hosted fonts.
     Type `:word`, or press Tab after a word of at least three letters,
     to choose an emote. The list shows previews and narrows as one
     types; Tab, Shift+Tab, Enter and a click select an item.
+- **Paste an image**
+  - Pasting an image into the message box uploads it to
+    [catbox](https://catbox.moe/) through the relay and drops the
+    hosted link into the draft at the cursor.
 - **Channel rules**
   - The box shows a countdown when slow mode delays the next message.
     Rejected messages appear as notices.
@@ -426,10 +434,13 @@ no dependencies beyond CDN-hosted fonts.
     panel's import link reads a downloaded log dump (raw IRC lines or
     `[timestamp] #chan nick: text`) into the same store - raw lines
     keep their real ids, badges, emote positions and reply links, so
-    they re-render like live rows. Cards under hydrated links fetch
+    they re-render like live rows. The export link writes the store
+    back out in the same `[timestamp] #chan nick: text` format, so a
+    dump round-trips. Cards under hydrated links fetch
     lazily as they scroll into view rather than at restore time.
 - **People**
-  - In help, add usernames to the hide list. Choose whether their
+  - In help, add usernames to the hide list - hidden names render as
+    removable chips under the input. Choose whether their
     messages disappear, become a count line, or remain visible but
     dimmed and crossed out.
   - Click a name or @mention to open a card with the user's colour,
@@ -687,6 +698,7 @@ Parent → relay:
 | `{type: 'send', channel, text, replyTo}` | post a chat message once authenticated; `replyTo` attaches a `reply-parent-msg-id` tag |
 | `{type: 'tweet', id}` | fetch an X/Twitter preview via the [FixTweet](https://github.com/FixTweet/FxTwitter) api (fxtwitter, then vxtwitter) |
 | `{type: 'twsets', ids}` | fetch Twitch emote-set metadata via [ivr.fi](https://api.ivr.fi) |
+| `{type: 'upload', id, name, blob}` | post a pasted image to catbox; answered with `{type: 'upload', id, url}` |
 
 Relay → parent:
 
@@ -704,6 +716,9 @@ Relay → parent:
   ([StreamElements](https://streamelements.com/) chatstats) +
   animated-emote names, refetched every
   10 minutes (global sets are fetched once per cycle and merged in)
+- `{type: 'extbadges', badges}` - a user-id → badge map for the
+  third-party user badges (Chatterino, FFZ, BTTV); rows match it
+  against their `user-id` tag
 - `{type: 'nitter', host}` - a [nitter](https://github.com/zedeus/nitter)
   instance verified live through the linkpeek worker; candidates are a
   built-in list plus [status.d420.de](https://status.d420.de/) picks, and

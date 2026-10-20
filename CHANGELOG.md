@@ -3,6 +3,33 @@
 All notable changes to the HasanAbi chat client, newest first. Dates,
 not versions - the page ships continuously to Neocities.
 
+## 2026-10-20
+
+### Options
+- archive export sits beside import: the whole store walks its ts
+  index into a downloadable '<channel>-chat-<date>.log' in the same
+  '[timestamp] #chan nick: text' form import reads, so a dump
+  round-trips
+- hidden users list as chips: each login in the hide set renders a
+  removable button under the input instead of living only as commas
+  in a field
+- third-party user badges (chatterino, ffz, bttv): the relay ships a
+  uid -> badge map - the lists all key on twitch user id - rows stamp
+  their user-id tag as data-uid and draw the matched badge after the
+  twitch icons, healing rows that rendered before the map landed;
+  archive records keep the uid so restores badge too
+- image paste uploads to catbox: a pasted image leaves a marker in
+  the draft where the caret was, the blob crosses to the relay (the
+  csp blocks a direct post) and the returned files.catbox.moe url
+  swaps in when it lands - failures drop the marker with a notice
+
+### Resources
+- the relay fetches the chatterino/ffz/bttv badge lists on the emote
+  cycle and forwards a deduped uid map once per peer, like the emote
+  payloads
+- the relay multipart-posts pasted image blobs to catbox.moe - the
+  page can't post out itself under connect-src 'self'
+
 ## 2026-10-17
 
 ### Options
