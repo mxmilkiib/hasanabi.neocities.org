@@ -15122,6 +15122,50 @@
   });
   chatInput.addEventListener('input', paintChatPick);
 
+  // ---- image paste -> catbox: the CSP blocks the page's own post, so
+  // the blob crosses to the relay, which multipart-sends it upstream and
+  // returns a files.catbox.moe url. A ⌛ marker sits in the text where
+  // the caret was; the reply swaps it for the url, or drops it on a
+  // failed upload - drafts with an unsent marker just keep it ----
+  let uploadSeq = 0;
+  const uploadMark = (id) => `\u231Bupload${id}`;
+  chatInput.addEventListener('paste', (e) => {
+    const file = [...(e.clipboardData && e.clipboardData.files || [])]
+      .find((f) => f.type.startsWith('image/'));
+    if (!file) return;
+    e.preventDefault();
+    if (file.size > 25 * 1024 * 1024) {
+      queueMessage({ tags: {}, login: null, kind: 'NOTICE',
+        message: 'image too large to upload - 25MB max' }, false);
+      return;
+    }
+    if (!joined || !relayFrame.contentWindow) {
+      queueMessage({ tags: {}, login: null, kind: 'NOTICE',
+        message: 'image upload needs the chat socket' }, false);
+      return;
+    }
+    const id = ++uploadSeq;
+    const at = chatInput.selectionStart;
+    chatInput.setRangeText(uploadMark(id) + ' ', at, chatInput.selectionEnd, 'end');
+    paintChatPick();
+    relayFrame.contentWindow.postMessage({ type: 'upload', id,
+      name: file.name || `paste.${file.type.split('/')[1] || 'png'}`,
+      blob: file }, RELAY_ORIGIN);
+  });
+  function uploadDone(id, url) {
+    const mark = uploadMark(id);
+    const i = chatInput.value.indexOf(mark);
+    if (url && i >= 0) {
+      chatInput.setRangeText(url + ' ', i, i + mark.length, 'end');
+    } else {
+      if (i >= 0) chatInput.setRangeText('', i, i + mark.length + 1, 'end');
+      if (!url) queueMessage({ tags: {}, login: null, kind: 'NOTICE',
+        message: 'image upload failed - the host rejected it' }, false);
+    }
+    paintChatPick();
+    chatInput.focus();
+  }
+
   // ---- @nick completion: nicks seen scrolling by feed a strip above
   // the input; further typing narrows it, tab/⇧tab walks the pick and
   // enter/click fills the name in ----
@@ -18263,6 +18307,8 @@
           });
         }
       }
+    } else if (d.type === 'upload' && /^\d+$/.test(d.id || '')) {
+      uploadDone(+d.id, /^https:\/\/files\.catbox\.moe\/\S+$/.test(d.url || '') ? d.url : null);
     } else if (d.type === 'nitter') {
       // trailing slashes would double against the profile path's leading
       // slash, and some instances answer that with a 400
