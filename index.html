@@ -461,6 +461,8 @@
   }
   /* all mentions visited - the kept list dims until it's cleared */
   #missed.seen { opacity: .55; }
+  /* a queued hit names the logged-in user - the chip turns gold */
+  #missed.gold { color: #ffd75f; border-color: #ffd75f; }
   /* unread whispers badge violet like the row tint they open into */
   #whisChip { color: var(--vip); border-color: var(--vip); }
   @keyframes missflash {
@@ -3098,7 +3100,7 @@
 </head>
 <body>
   <header>
-    <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><span class="stream-info" id="streamInfo"></span><span class="stream-info" id="streamTail"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span><span class="chat-modes" id="chatModes"></span></div>
+    <div class="channel"><span class="dot connecting" id="dot" role="img" title="connecting…" aria-label="connecting…"></span><a id="channelName" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener" title="hasanabi on twitch"></a><a href="#" id="chanNext" class="hdr-btn" role="button" title="switch focus to the next joined channel" hidden>▸</a><span class="stream-info" id="streamInfo"></span><span class="stream-info" id="streamTail"></span><span class="missed" id="missed" role="button" tabindex="0" hidden></span><span class="missed" id="whisChip" role="button" tabindex="0" hidden></span><span class="rate" id="chatters" title="distinct chatters seen talking in the last hour - lurkers don't register" hidden></span><span class="chat-modes" id="chatModes"></span></div>
     <canvas id="spark" role="img" title="msgs/sec over the last 4 minutes - ticks every 10s" aria-label="msgs/sec over the last 4 minutes - ticks every 10s"></canvas><span class="rate" id="rate"></span>
     <button class="hdr-btn" id="helpBtn" aria-expanded="false" aria-controls="helpPanel" title="Help - click/scroll · ⇧click back">?</button><button class="hdr-btn hdr-min" id="hdrMin" title="Header size - click/scroll cycles full → reduced → minimised · ⇧click back"><span class="dash">–</span></button>
     <div class="hdr-side"><button class="hdr-btn" id="presetBtn" title="Theme preset - click/scroll · ⇧click back">◆</button><button class="hdr-btn" id="colourBtn" title="Colour">◐</button><button class="hdr-btn" id="variantBtn" title="Variant">▢</button><button class="hdr-btn" id="shadeBtn" title="Shade">◑</button><select class="hdr-btn" id="fontSel" title="Chat font - click/scroll" hidden><option value="roobert">Roobert</option><option value="sans">System Sans</option><option value="inter">Inter</option><option value="sourcesans">Source Sans 3</option><option value="sourcecodepro">Source Code Pro</option><option value="hack">Hack</option><option value="helvetica">Helvetica</option><option value="firacode">Fira Code</option><option value="plexmono">IBM Plex Mono</option><option value="mono">JetBrains Mono</option><option value="mononoki">Mononoki</option><option value="atkinson">Atkinson Hyperlegible</option><option value="atkinsonmono">Atkinson Hyperlegible Mono</option><option value="lexend">Lexend</option><option value="comicneue">Comic Neue</option><option value="shantell">Shantell Sans</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="elstob">Elstob</option><option value="dyslexic">OpenDyslexic</option><option value="dyslexicmono">OpenDyslexic Mono</option><option value="stl">Some Time Later</option><option value="vga">Px437 VGA</option><option value="cursed">Cursed</option><option value="fixedsys">Fixedsys</option><option value="vt323">VT323</option><option value="terminus">Terminus</option><option value="gohu">GohuFont</option><option value="glean">Glean</option></select><button class="hdr-btn" id="fontPick" type="button" title="Chat font - click for menu · scroll cycles" aria-haspopup="listbox" aria-expanded="false">Aa</button><button class="hdr-btn" id="fontBtn" title="Chat font size - click/scroll · ⇧click back">Aa</button><button class="hdr-btn" id="weightBtn" title="Font weight - click/scroll · ⇧click back">B</button><button class="hdr-btn" id="lhBtn" title="Line height - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.32)">↕</span></button><button class="hdr-btn" id="kernBtn" title="Letter spacing - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.3)">⇄</span></button><button class="hdr-btn" id="shadowBtn" title="Text shadow - click/scroll · ⇧click back">T</button><button class="hdr-btn" id="zebraBtn" title="Zebra-striped rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.3)">▦</span></button><button class="hdr-btn on" id="linesBtn" title="Row separator lines - click/scroll"><span style="display:inline-block;transform:scale(1.3)">≡</span></button><button class="hdr-btn on" id="timeBtn" title="Message timestamps - click/scroll"><span style="display:inline-block;transform:translate(1px,-2px) scale(1.72)">◷</span></button><button class="hdr-btn" id="subBtn" title="Sub badge display - click/scroll · ⇧click back"><span style="display:inline-block;transform:translateX(-1px)">Ⓢ</span></button><button class="hdr-btn on" id="emoteBtn" title="Emote-only rows - click/scroll · ⇧click back"><span style="display:inline-block;transform:scale(1.2)">☺</span></button><button class="hdr-btn" id="linkBtn" title="Links view - click toggles"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button class="hdr-btn" id="wrapBtn" title="Page wrap - click toggles"><span style="display:inline-block;transform:scale(1.2)">⇓</span></button><button class="hdr-btn" id="splitBtn" title="Layout - click for menu · scroll cycles · ⇧click back" aria-haspopup="listbox" aria-expanded="false"><span style="display:inline-block;transform:scale(1.1,1.3)">▮▮</span></button><button class="hdr-btn" id="vidBtn" aria-expanded="false" aria-controls="vid" title="Stream video - click/scroll&#10;use the pause button in the video to stop the stream"><span style="display:inline-block;transform:translate(1px,-1px)">▶</span></button><button class="hdr-btn" id="sendBtn" aria-expanded="false" aria-controls="chatbar" title="Log in with Twitch to send messages"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></button><button class="hdr-btn" id="findBtn" title="Find in chat - ctrl+f or /"><span style="display:inline-block;transform:scale(1.6)">⌕</span></button></div>
@@ -3118,7 +3120,7 @@
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
     <div id="twtchNote" style="display:none; text-align:center"><span>hi! this is the generic address twitch version of <a class="at" href="https://hasanabi.neocities.org/" target="_blank" rel="noopener">hasanabi.neocities.org</a> -mxmilkiib</span><div class="sep">&nbsp;</div></div>
-    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle points">violet tint</b><span>channel-point highlights</span><b class="rowstyle glorp">red rows</b><span><img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> <a>glorp / F</a></span><b class="rowstyle selfchip">teal rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - click to walk through them (they keep, cycling back round), ⇧click clears</span></div>
+    <div><b class="rowstyle mention">amber rows</b><span><a class="at" href="https://www.twitch.tv/hasanabi" target="_blank" rel="noopener"><b>@HasanAbi</b></a> mentions</span><b class="rowstyle points">violet tint</b><span>channel-point highlights</span><b class="rowstyle glorp">red rows</b><span><img class="emote" src="https://cdn.7tv.app/emote/01J94DZYDR0008SGMD5K4B9HFW/2x.webp" alt="glorp"> <a>glorp / F</a></span><b class="rowstyle selfchip">teal rows</b><span>own messages, deeper tint + heavier nick (needs twitch login) <span id="helpSelfList"></span><sup>†</sup></span><b class="rowstyle mod">blue rows</b><span>mod actions - timeouts, bans, /clear; a timed-out or banned user's rendered rows ghost with the name and message struck-through in gray</span><b class="rowstyle gap">gap rows</b><span>a stretch where lines went missing or chat fell silent; the rate graph bands the same span red or grey</span><b class="rowstyle kw">@N chip</b><span>logged in, mentions of your name highlight like keywords; keyword/name matches arriving while unfocused queue on the @N chip - gold when a queued hit names you - click to walk through them (they keep, cycling back round), ⇧click clears</span></div>
     <div><b>↩ chip</b> reply context; click to jump to the original message - past the rendered edge it restores the parent (and its neighbours) from the archive · ⇧click opens the whole reply thread in a popup</div>
     <div><b>✉ chip</b> whispers: twitch dms render in their own floating pane when the login carries whisper scopes - click a name there to answer, ⇧click opens their profile; unread count badges the chip - click opens, ⇧click clears, esc closes</div>
     <div><b>◷ click</b> a row's timestamp copies a ?mid= link - opening it scrolls to and flashes the row, restoring it from the archive first when it has left the log</div>
@@ -3810,6 +3812,20 @@
   }
   const chanLink = document.getElementById('channelName');
   chanLink.textContent = CHAN_LABEL;
+  // ▸ rotates the join set: the focused room moves to the back and the
+  // next channel takes the header. Only meaningful on merged pages -
+  // reloads with ?channel= reordered (typed casing kept via CHAN_CASE)
+  const chanNext = document.getElementById('chanNext');
+  if (MULTI) {
+    chanNext.hidden = false;
+    chanNext.addEventListener('click', (e) => {
+      e.preventDefault();
+      const u = new URL(location.href);
+      u.searchParams.set('channel', [...CHANNELS.slice(1), CHANNELS[0]]
+        .map((c) => CHAN_CASE[c] || c).join(','));
+      location.assign(u);
+    });
+  }
   chanLink.href = 'https://www.twitch.tv/' + CHANNEL;
   chanLink.title = CHANNEL + ' on twitch';
   document.title = CHAN_TITLE;
@@ -5809,7 +5825,7 @@
       // matches what strict per-line alternation would give
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
-      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${tags.bits ? ' bits' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
+      html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${kwSelf(message) ? ' kwself' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${tags.bits ? ' bits' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
               ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags['user-id'] ? ` data-uid="${tags['user-id']}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${btags.length ? ` data-badges="${escapeHTML(tags.badges)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${extBadgeImg(tags['user-id'])}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
@@ -9421,6 +9437,9 @@
   function kwMatch(txt) {
     return !!((kwRe && kwRe.test(txt)) || (selfMentionRe && selfMentionRe.test(txt)));
   }
+  // a self-username hit inside the wider kw set - the @N chip lights gold
+  // when a queued mention names the logged-in user rather than a keyword
+  const kwSelf = (txt) => !!(selfMentionRe && selfMentionRe.test(txt));
   let retagT = 0;
   function retagKw() {
     // the scan walks every chat row - debounce so keystrokes in the kw/bw
@@ -9431,6 +9450,7 @@
       const name = r.querySelector('.name');
       const txt = name ? r.textContent.replace(name.textContent, '') : r.textContent;
       r.classList.toggle('kw', kwMatch(txt));
+      r.classList.toggle('kwself', kwSelf(txt));
       r.classList.toggle('blk', bwMatch(txt));
     }), 150);
   }
@@ -9751,6 +9771,9 @@
     const left = missed.length - missedIx;
     missedEl.hidden = !missed.length;
     missedEl.classList.toggle('seen', !left);
+    // a queued hit that names the logged-in user (not just a keyword)
+    // lights the chip gold
+    missedEl.classList.toggle('gold', missed.some((r) => r.classList.contains('kwself')));
     missedEl.textContent = `@${left || missed.length}`;
     missedEl.title = left
       ? `${left} mention${left === 1 ? '' : 's'} while away - click to jump to each · ⇧click clears`
@@ -10299,7 +10322,7 @@
   // into #log's stale block in ts order - the archload chip pages back in
   // batches, a find-hit restores a window around itself. Hydrated rows
   // never re-enter the write buffer ----
-  const ARCH_CLS = new Set('mention kw blk points bits glorp htag action eonly self mod selfmod deleted local'.split(' '));
+  const ARCH_CLS = new Set('mention kw kwself blk points bits glorp htag action eonly self mod selfmod deleted local'.split(' '));
   const ARCH_PAGE = 500, ARCH_CTX = 300;
   const archTop = document.createElement('div');
   archTop.className = 'stale archload';
@@ -10335,6 +10358,7 @@
     const f = [];
     if (mentionRe(r.ch || CHANNEL).test(body)) f.push('mention');
     if (kwMatch(body)) f.push('kw');
+    if (kwSelf(body)) f.push('kwself');
     if (bwMatch(body)) f.push('blk');
     if (GLORP_RE.test(body) || F_RE.test(body.trim())) f.push('glorp');
     const ni = r.name ? (r.text || '').indexOf(r.name) : -1;
