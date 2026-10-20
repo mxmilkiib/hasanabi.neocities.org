@@ -4614,9 +4614,11 @@
         const img = `<img class="emote" src="${escapeHTML(chatStill(url, ea.has(name)))}" alt="${alt}"` +
                     ` title="${alt}${es[name] ? ' - ' + es[name] : ''}">`;
         if (zw.has(name) && lastEmote >= 0) {
+          // the overlay wears .zw so the estk css can pin it over the base
+          const ov = img.replace('class="emote"', 'class="emote zw"');
           if (out[lastEmote].endsWith('</span>'))
-            out[lastEmote] = out[lastEmote].slice(0, -7) + img + '</span>';
-          else out[lastEmote] = `<span class="estk">${out[lastEmote]}${img}</span>`;
+            out[lastEmote] = out[lastEmote].slice(0, -7) + ov + '</span>';
+          else out[lastEmote] = `<span class="estk">${out[lastEmote]}${ov}</span>`;
         } else {
           out.push(img);
           if (!zw.has(name)) lastEmote = out.length - 1;
