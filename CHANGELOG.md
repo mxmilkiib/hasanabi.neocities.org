@@ -6,6 +6,19 @@ not versions - the page ships continuously to Neocities.
 ## 2026-10-20
 
 ### Options
+- 7tv paints: a chatter's cosmetic gradient/image layers and drop
+  shadows clip into their nick - uids queue to the relay as rows
+  render, the reply heals every row that uid owns, and paintless
+  users map null so they never re-ask
+- per-row mod actions: while own userstate marks the row's channel
+  modded, the hover strip gains 10m · ban · ✕ delete left of the ↩,
+  armed by a first click like the user card's buttons
+- thread view: ⇧click a reply's quote for a popup listing the root
+  and every rendered reply descending from it, time-ordered, each
+  line a jump back into the log
+- deep backfill: the archive row's 'older' link pulls the day before
+  the store's oldest row from justlog, landing through the same
+  import parser - one day per click walks further back
 - archive export sits beside import: the whole store walks its ts
   index into a downloadable '<channel>-chat-<date>.log' in the same
   '[timestamp] #chan nick: text' form import reads, so a dump
@@ -29,6 +42,9 @@ not versions - the page ships continuously to Neocities.
   payloads
 - the relay multipart-posts pasted image blobs to catbox.moe - the
   page can't post out itself under connect-src 'self'
+- the relay resolves 7tv paints (v3 rest paint_id -> v4 gql paint) and
+  serves justlog day dumps chunked at 20k lines, both asked lazily by
+  the page
 
 ## 2026-10-17
 

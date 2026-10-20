@@ -95,7 +95,9 @@ no dependencies beyond CDN-hosted fonts.
     for people who do not have them.
 - **Replies**
   - A reply shows the original message above it. Click the quote to
-    jump to that message in the chat log.
+    jump to that message in the chat log; Shift+click opens the whole
+    thread - the root plus every rendered reply - in a popup whose
+    lines jump back into the log.
 - **Special messages**
   - Actions written with `/me`, bot commands starting with `!` and
     `#` tags appear in italics. Names, badges and times stay upright.
@@ -132,6 +134,9 @@ no dependencies beyond CDN-hosted fonts.
 - **Preview cards**
   - Hover over an emote in chat to see a larger image, its name and
     where it comes from. Emoji previews also show search terms.
+  - Chatters with a [7TV](https://7tv.app/) paint get it clipped into
+    their name - gradients, image layers and shadows resolved lazily
+    through the relay as each sender first appears.
   - The picker's preview card has a separate `tip` switch. It starts off.
 
 ### Emote picker
@@ -436,7 +441,10 @@ no dependencies beyond CDN-hosted fonts.
     keep their real ids, badges, emote positions and reply links, so
     they re-render like live rows. The export link writes the store
     back out in the same `[timestamp] #chan nick: text` format, so a
-    dump round-trips. Cards under hydrated links fetch
+    dump round-trips. And `older` deep-fills history from
+    [justlog](https://logs.ivr.fi/) one day at a time - each click
+    pulls the day before the archive's oldest row for channels the
+    service logs. Cards under hydrated links fetch
     lazily as they scroll into view rather than at restore time.
 - **People**
   - In help, add usernames to the hide list - hidden names render as
@@ -453,7 +461,9 @@ no dependencies beyond CDN-hosted fonts.
     take priority.
   - When the logged-in account has permission in the channel, the
     card also offers timeout, ban and delete actions. Those actions
-    ask for a second click before sending.
+    ask for a second click before sending. The same three ride each
+    chat row's hover strip, left of the reply button, while the
+    account can moderate the row's channel.
 - **Link previews**
   - Hover over a link, name or @mention for a card with more details.
     It can show where a shortened link leads, a video from an
@@ -719,6 +729,12 @@ Relay → parent:
 - `{type: 'extbadges', badges}` - a user-id → badge map for the
   third-party user badges (Chatterino, FFZ, BTTV); rows match it
   against their `user-id` tag
+- `{type: 'paint', map}` - a user-id → `{bg, sh, name}` map for 7TV
+  paints: the relay resolves each uid's `paint_id` (v3 rest) to layer
+  and shadow data (v4 gql) and compiles it to css. Asked with
+  `{type: 'paint', ids[]}`
+- `{type: 'logs', channel, day, lines[], done}` - a day's justlog
+  dump for `{type: 'logs', channel, day}` asks, chunked at 20k lines
 - `{type: 'nitter', host}` - a [nitter](https://github.com/zedeus/nitter)
   instance verified live through the linkpeek worker; candidates are a
   built-in list plus [status.d420.de](https://status.d420.de/) picks, and
