@@ -3058,7 +3058,7 @@
     cursor: pointer; white-space: nowrap; }
   #fontMenu button:hover, #splitMenu button:hover, #chanMenu button:hover, #fontMenu button:focus-visible, #splitMenu button:focus-visible, #chanMenu button:focus-visible { background: var(--line); }
   #fontMenu button.on, #splitMenu button.on, #chanMenu button.on { color: var(--accent); font-weight: 700; }
-  #chanMenu .chjoin { display: flex; gap: 4px; margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--line); }
+  #chanMenu .chjoin { display: flex; gap: 4px; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
   #chanMenu .chjoin input { flex: 1; min-width: 0; height: 24px; font-size: .85em; }
   #chanMenu .chjoin button { width: auto; padding: 0 8px; border: 1px solid var(--line); border-radius: 4px; }
   #chanMenu .joined { border-bottom: 1px solid var(--line); margin-bottom: 4px; padding-bottom: 4px; }
@@ -3849,9 +3849,10 @@
       const lbl = /^[a-z0-9_]{3,}$/i.test(a.textContent.trim()) ? a.textContent.trim() : l;
       rest.push(`<button type="button" role="option" data-ch="${l}">${escapeHTML(lbl)}${streamStates[l] && streamStates[l].live ? ' ●' : ''}</button>`);
     });
-    chanMenu.innerHTML = `<div class="${joined ? 'joined' : ''}">${joined}</div>${rest.join('')}` +
+    chanMenu.innerHTML =
       `<div class="chjoin"><input class="hdr-btn" id="chanJoinIn" type="text" autocomplete="off" spellcheck="false" placeholder="join channel…"><button class="hdr-btn" id="chanJoinGo" type="button">join</button>` +
-      `<button class="hdr-btn" id="chanLiveGo" type="button" title="ping every listed channel for live status">live?</button></div>`;
+      `<button class="hdr-btn" id="chanLiveGo" type="button" title="ping every listed channel for live status">live?</button></div>` +
+      `<div class="${joined ? 'joined' : ''}">${joined}</div>${rest.join('')}`;
   }
   const setChanMenu = (open) => {
     chanMenu.hidden = !open;
