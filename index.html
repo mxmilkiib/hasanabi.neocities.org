@@ -1166,7 +1166,7 @@
        unset it falls back to this hand-tuned classic strip */
     background: var(--rbwgrad, linear-gradient(90deg, #ff6868, #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868,
       #ffc45c, #e1ee72, #70dca3, #6ccbf2, #bc87ed, #ff6868));
-    background-size: 200% 100%;
+    background-size: var(--rbwsz, 200%) 100%;
     -webkit-background-clip: text;
     background-clip: text;
     animation: notice-rainbow var(--rbw-t, 6s) linear infinite;
@@ -4075,7 +4075,7 @@
   // and the hand-tuned label gradient; the rest stamp --rbwgrad too
   const RBW_PALS = [
     { n: 'classic', hb: [0, 360], s: [62, 24], l: [56, 16] },
-    { n: 'pastel',  hb: [0, 360], s: [38, 15], l: [76, 10] },
+    { n: 'pastel',  hb: [0, 360], s: [38, 15], l: [76, 10], sz: 320 },
     { n: 'vivid',   hb: [0, 360], s: [90, 10], l: [52, 8] },
     { n: 'candy',   hb: [285, 75], s: [85, 15], l: [62, 10] },
     { n: 'ocean',   hb: [170, 85], s: [72, 18], l: [55, 10] },
@@ -13646,8 +13646,9 @@
   function setRbwPal(idx) {
     rbwPal = Math.max(0, Math.min(RBW_PALS.length - 1, idx | 0));
     const de = document.documentElement.style;
-    if (rbwPal === 0) de.removeProperty('--rbwgrad');
-    else de.setProperty('--rbwgrad', rbwGrad());
+    const p = RBW_PALS[rbwPal];
+    if (rbwPal === 0) { de.removeProperty('--rbwgrad'); de.removeProperty('--rbwsz'); }
+    else { de.setProperty('--rbwgrad', rbwGrad()); de.setProperty('--rbwsz', (p.sz || 200) + '%'); }
     // re-stamp the arcs that already drew - only elements with a recorded
     // palette index; unstamped .rbw keeps the css strip either way
     document.querySelectorAll('.rbw[data-rseq]').forEach((el) => {
