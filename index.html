@@ -335,6 +335,8 @@
   /* hdrgmax: the graph-only stop - every header control hides until
      hover, so the sparkline owns the whole bar */
   body.hdrgmax .hdr-side .hdr-btn, body.hdrgmax .hdr-side select, body.hdrgmax .hdr-lbl { display: none; }
+  /* #subBtn's own display:flex (id selector) outranks the rule above */
+  body.hdrgmax .hdr-side #subBtn { display: none; }
   body.hdrgmax .hdr-side { flex: none; min-width: 0; }
   body.hdrgmax #spark { flex: 1; max-width: none; }
   body.hdrgmax header { min-height: 28px; --hdrres: 0px; }
