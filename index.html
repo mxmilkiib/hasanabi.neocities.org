@@ -3850,7 +3850,8 @@
     });
     chanMenu.innerHTML =
       `<div class="chjoin"><input class="hdr-btn" id="chanJoinIn" type="text" autocomplete="off" spellcheck="false" placeholder="join channel…"><button class="hdr-btn" id="chanJoinGo" type="button">join</button>` +
-      `<button class="hdr-btn" id="chanLiveGo" type="button" title="ping every listed channel for live status">live?</button></div>` +
+      `<button class="hdr-btn" id="chanLiveGo" type="button" title="ping every listed channel for live status">live?</button>` +
+      `<button class="hdr-btn" id="chanHelpGo" type="button" title="open the help popup on the media tab">?</button></div>` +
       `<div class="${joined ? 'joined' : ''}">${joined}</div>${rest.join('')}`;
   }
   const setChanMenu = (open) => {
@@ -3883,6 +3884,14 @@
       relayFrame.contentWindow.postMessage({ type: 'streamprobe', channels: chs }, RELAY_ORIGIN);
       setTimeout(buildChanMenu, 2500);
       setTimeout(buildChanMenu, 8000);
+    }
+    // ? opens the help popup straight onto the media tab
+    if (e.target.id === 'chanHelpGo') {
+      setChanMenu(false);
+      helpForced = false;
+      helpMode = 1;
+      applyHelp(); saveOpts();
+      switchTab('htabRes');
     }
   });
   chanMenu.addEventListener('keydown', (e) => {
