@@ -4265,6 +4265,30 @@
     return best === null ? null : set[best];
   }
 
+  // third-party user badges (chatterino/ffz/bttv) ride the row's user-id
+  // tag - the relay ships the whole uid -> {u,t,s} map since the
+  // embedder's CSP blocks the apis themselves
+  let extBadges = new Map();
+  const extBadgeImg = (uid) => {
+    const xb = uid && extBadges.get(uid);
+    return xb ? `<img class="badge xbadge" src="${escapeHTML(xb.u)}" title="${escapeHTML(xb.t)}" alt="">` : '';
+  };
+  // a row rendered before the map landed gets its badge healed in place,
+  // like rebadgeRows does for late twitch sets
+  function addXBadge(r) {
+    const xb = r.dataset.uid && extBadges.get(r.dataset.uid);
+    if (!xb || r.querySelector('img.xbadge')) return;
+    const img = document.createElement('img');
+    img.className = 'badge xbadge';
+    img.src = xb.u;
+    img.title = xb.t;
+    img.alt = '';
+    // the name anchor puts the badge right after the twitch badge icons
+    // in every sub-mode - .aux would land it post-name on the right modes
+    const anchor = r.querySelector('.name');
+    if (anchor) r.insertBefore(img, anchor);
+  }
+
   // bit cheermotes: prefix + amount -> tier, image from twitch's CDN
   const CHEER_ACTIONS = new Set(['cheer', 'kappa', 'kreygasm', 'muxify', 'swiftloss',
     'cheerwhal', 'corgo', 'scoody', 'uni', 'showlove', 'party', 'seemsgood', 'pride',
@@ -5654,8 +5678,8 @@
       if (reply) zFlip = !zFlip; // the quote line consumes a stripe first
       const zc = ((zFlip = !zFlip)) ? ' z' : '';
       html += `<div data-new role="article" class="row${zc}${mentionRe(ch).test(message) ? ' mention' : ''}${kwMatch(message) ? ' kw' : ''}${bwMatch(message) ? ' blk' : ''}${points ? ' points' : ''}${tags.bits ? ' bits' : ''}${glorp ? ' glorp' : ''}${htag ? ' htag' : ''}${action ? ' action' : ''}${eonly ? ' eonly' : ''}${auth && login === auth.login ? ' self' : ''}${local ? ' local' : ''}${live ? '' : ' replay repflash'}"${live ? '' : ' title="recovered from the recent-messages backlog"'}` +
-              ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${btags.length ? ` data-badges="${escapeHTML(tags.badges)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
-              `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
+              ` data-ts="${ts}" data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${tags['user-id'] ? ` data-uid="${tags['user-id']}"` : ''}${tags.id ? ` data-mid="${escapeHTML(tags.id)}"` : ''}${local ? ` data-ek="${encodeURIComponent(ch + '\x00' + echoKey(login, tags, rawMsg))}"` : ''}${btags.length ? ` data-badges="${escapeHTML(tags.badges)}"` : ''}${lkey ? ` data-lk="${escapeHTML(lkey)}"` : ''}>` +
+              `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${extBadgeImg(tags['user-id'])}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
               `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${msgHtml}</span>${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
@@ -5753,6 +5777,7 @@
         archBuf.push({
           mid: r.dataset.mid, ts: +r.dataset.ts || 0, ch: r.dataset.ch || '',
           login: r.dataset.u || '',
+          ...(r.dataset.uid ? { uid: r.dataset.uid } : {}),
           kind: r.classList.contains('notice') ? 'notice' : 'msg',
           name: (r.querySelector('.name') || {}).textContent || '',
           ...(archBody0 ? { msg: archBody0.slice(0, 500) } : { text: (r.textContent || '').slice(0, 500) }),
@@ -10107,11 +10132,11 @@
     }
     const action = cls.split(' ').includes('action');
     return `<div role="article" class="row arch${notice ? ' notice' : ''}${cls ? ' ' + cls : ''}" data-ts="${r.ts}" ` +
-      `data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''} data-mid="${escapeHTML(r.mid)}"` +
+      `data-ch="${escapeHTML(ch)}"${login ? ` data-u="${escapeHTML(login)}"` : ''}${r.uid ? ` data-uid="${escapeHTML(r.uid)}"` : ''} data-mid="${escapeHTML(r.mid)}"` +
       `${r.b ? ` data-badges="${escapeHTML(r.b)}"` : ''} title="from the local archive">` +
       `${rq}<span class="time">${fmtRowTime(new Date(r.ts))}</span>${chTag}` +
       `${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}` +
-      `${badges}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}${who}${notice || action ? ' ' : '<span class="colon">: </span>'}` +
+      `${badges}${extBadgeImg(r.uid)}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}${who}${notice || action ? ' ' : '<span class="colon">: </span>'}` +
       `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${rendered.html}</span>${drainCards().join('')}` +
       `<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
   }
@@ -18189,6 +18214,11 @@
       onStream(d);
     } else if (d.type === 'emotes') {
       onEmotes(d, false);
+    } else if (d.type === 'extbadges' && d.badges && typeof d.badges === 'object') {
+      // uid -> {u,t,s} - rows rendered before the map arrived heal in
+      // place; fresh rows pick it up inline at render
+      extBadges = new Map(Object.entries(d.badges));
+      for (const c of cols()) for (const r of c.querySelectorAll('.row[data-uid]')) addXBadge(r);
     } else if (d.type === 'twsets') {
       // the relay answers with the key it was asked for. A reply for a
       // superseded ask still carries valid sets - merge it rather than
