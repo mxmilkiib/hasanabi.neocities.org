@@ -12052,24 +12052,6 @@
       // draws its image, or its code as text while the load is pending
       const fam = b.fam || spec.fam;
       danFont(`${s.w} ${b.px}px ${fam}`);
-      const lw = danLine ? Math.max(1, b.px * DAN_LINES[danLine]) : 0;
-      danCtx.lineWidth = lw;
-      // the live-draw path only survives for the sub chip - everything
-      // else comes off a spawn-baked bitmap
-      const shade = (t, x) => {
-        if (!danBg || !t.trim()) return;
-        const sa = Math.min(1, DAN_BGS[danBg] * 1.6);
-        danCtx.lineWidth = Math.max(3, b.px * .35);
-        danCtx.strokeStyle = `rgba(0,0,0,${sa})`;
-        danCtx.shadowColor = danCtx.strokeStyle;
-        danCtx.shadowBlur = b.px * .1 * danDpr;
-        danCtx.shadowOffsetY = b.px * .02 * danDpr;
-        danCtx.strokeText(t, x, b.y);
-        danCtx.strokeText(t, x, b.y);
-        danCtx.shadowBlur = 0; danCtx.shadowOffsetY = 0;
-        danCtx.lineWidth = lw;
-        danCtx.strokeStyle = 'rgba(0,0,0,.8)';
-      };
       let x = b.x;
       for (const s of b.segs) {
         if (s.t != null) {
@@ -12088,17 +12070,22 @@
         }
         if (s.sub != null) {
           // a subscriber's month count leads the bullet at chip size in
-          // the row chip's teal->red gradient
+          // the row chip's teal->red gradient - it bakes like the text
+          // runs now, so no per-frame stroke+shadow path survives
           const t = String(s.sub).padStart(2, '0'), spx = Math.round(b.px * 0.72);
-          danFont(`${spec.w} ${spx}px ${fam}`);
-          if (s.spx !== spx) { s.spx = spx; s.sw = danCtx.measureText(t).width; }
-          shade(t, x);
-          if (lw) danCtx.strokeText(t, x, b.y);
-          danCtx.fillStyle = subGrad
-            ? `color-mix(in oklch longer hue, #4fbecd, #f43f5e ${Math.min(100, Math.round(s.sub / 60 * 100))}%)`
-            : '#4fbecd';
-          danCtx.fillText(t, x, b.y);
-          danFont(`${spec.w} ${b.px}px ${fam}`);
+          if (s.spx !== spx || s.f !== fam || s.rd !== danDpr || s.bg !== danBg || s.ln !== danLine || s.sg !== subGrad) {
+            s.spx = spx; s.f = fam; s.rd = danDpr; s.bg = danBg; s.ln = danLine; s.sg = subGrad;
+            danFont(`${spec.w} ${spx}px ${fam}`);
+            s.sw = danCtx.measureText(t).width;
+            const col = subGrad
+              ? `color-mix(in oklch longer hue, #4fbecd, #f43f5e ${Math.min(100, Math.round(s.sub / 60 * 100))}%)`
+              : '#4fbecd';
+            const bk = danBake(t, s.sw, spx, fam, spec, col);
+            s.bmp = bk.cv; s.bx = bk.bx; s.by = bk.by; s.bw = bk.bw; s.bh = bk.bh;
+            // back to the bullet's own size for the next run's measure
+            danFont(`${spec.w} ${b.px}px ${fam}`);
+          }
+          danCtx.drawImage(s.bmp, Math.round(x - s.bx), Math.round(b.y - s.by), s.bw, s.bh);
           x += s.sw + danEmoteGap(b.px);
           continue;
         }
