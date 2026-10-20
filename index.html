@@ -3849,9 +3849,10 @@
       const l = m[1].toLowerCase();
       if (seen.has(l)) return;
       seen.add(l);
-      // a link whose text is a social abbreviation ('tw', 'ig'…) isn't a
-      // name - fall back to the login as the label
-      const lbl = /^[a-z0-9_]{3,}$/i.test(a.textContent.trim()) ? a.textContent.trim() : l;
+      // a tail 'twitch' service link isn't a name - label from the row's
+      // name cell, falling back to the login
+      const nm = a.closest('i')?.querySelector('.cn a.at')?.textContent.trim();
+      const lbl = nm || (/^[a-z0-9_]{3,}$/i.test(a.textContent.trim()) ? a.textContent.trim() : l);
       rest.push(`<button type="button" role="option" data-ch="${l}">${escapeHTML(lbl)}${streamStates[l] && streamStates[l].live ? ' ●' : ''}</button>`);
     });
     chanMenu.innerHTML =
