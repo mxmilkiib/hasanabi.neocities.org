@@ -483,7 +483,7 @@
   .channel.minstat #channelName, .channel.dotstat #channelName { display: none; }
   .channel.shortstat #dot { order: -2; }
   .channel.shortstat #channelName { order: -1; }
-  .channel.shortstat #channelName::before { content: '@'; }
+  #channelName::before { content: '@'; }
   #streamTail:empty { display: none; }
   /* the chatters tally sits inside .channel so it shares .stream-info's
      baseline; the same .93em lands on the same effective size there */
@@ -3136,7 +3136,7 @@
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
     <div><b>room tabs</b> <span>channel view tabs: <span id="helpCTabsList"></span> - merged-channel pages carry a strip under the header; a room's tab pares the log down to that room's rows (and aims sends at it), 'merged' shows the whole feed again<sup>†</sup></span></div>
     <div><b>+ room</b> <span>join another channel: <input id="joinInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="channel login" style="width: 11em; height: 22px; font-size: .9em; text-align: left"> <a href="#" role="button" id="joinBtn" title="merge the room into the feed - reloads with ?channel= set">join</a> - merges rooms (6 max) and is remembered locally; remembered joins land as removable chips <span id="joinList" style="display: inline-flex; flex-wrap: wrap; gap: 4px"></span></span></div>
-    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the mode tail, then minus the chatter tally too, a compact cut, the handle with the dot, uptime and viewers ('@HasanAbi ● 3h 27m 25.1k'), the handle with the dot and uptime alone ('@HasanAbi ● 3h 27m'), uptime and a compact viewer count behind the dot ('● 2h 35m 25.1k'), an empty space, or just the status dot; scrolling there cycles the same stops<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the mode tail, then minus the chatter tally too, a compact cut, the handle with the dot, uptime and viewers ('@HasanAbi ● 3h 27m 25.1k'), uptime and a compact viewer count behind the dot alone ('● 2h 35m 25.1k'), an empty space, or just the status dot; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; a lit border and ✓ mark an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -3598,8 +3598,16 @@
   // one merged log; the first is focused (title, stream status, video,
   // chat target, storage keys)
   const chanQs = new URLSearchParams(location.search);
-  const CHANNELS = (chanQs.get('channel') || chanQs.get('s') || chanQs.get('c') ||
-    (oauthReturn && oauthReturn.channels) || '')
+  const chanRaw = chanQs.get('channel') || chanQs.get('s') || chanQs.get('c') ||
+    (oauthReturn && oauthReturn.channels) || '';
+  // the display case a room was typed with, keyed by lowercase login -
+  // logins stay lowercase for matching, labels show the typed casing
+  const CHAN_CASE = {};
+  for (const t of chanRaw.split(',')) {
+    const c = t.replace(/[^a-zA-Z0-9_]/g, '').slice(0, 25);
+    if (c) CHAN_CASE[c.toLowerCase()] = c;
+  }
+  const CHANNELS = chanRaw
     .toLowerCase().split(',')
     .map((c) => c.replace(/[^a-z0-9_]/g, '').slice(0, 25))
     .filter(Boolean).slice(0, 6);
@@ -3609,11 +3617,14 @@
   let joinExtras = [];
   try {
     joinExtras = (JSON.parse(localStorage.getItem(JOIN_KEY)) || [])
-      .filter((c) => /^[a-z0-9_]{1,25}$/.test(c));
+      .map((c) => String(c).replace(/[^a-zA-Z0-9_]/g, '').slice(0, 25))
+      .filter((c) => /^[a-z0-9_]{1,25}$/i.test(c));
   } catch {}
   for (const c of joinExtras) {
     if (CHANNELS.length >= 6) break;
-    if (!CHANNELS.includes(c)) CHANNELS.push(c);
+    const l = c.toLowerCase();
+    if (!CHANNELS.includes(l)) CHANNELS.push(l);
+    if (!CHAN_CASE[l]) CHAN_CASE[l] = c;
   }
   const CHANNEL = CHANNELS[0] || DEFAULT_CHANNEL;
   if (!CHANNELS.length) CHANNELS.push(DEFAULT_CHANNEL);
@@ -3637,7 +3648,7 @@
   // the brand badge is host-named - each mirror front-pages itself
   const SITE_NAMES = { 'hasanabi.neocities.org': 'HasanAbi', 'twtch.neocities.org': 'Twtch' };
   const SITE_NAME = SITE_NAMES[location.hostname] || SITE_NAMES['hasanabi.neocities.org'];
-  const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? SITE_NAME : CHANNEL;
+  const CHAN_LABEL = CHANNEL === DEFAULT_CHANNEL ? SITE_NAME : (CHAN_CASE[CHANNEL] || CHANNEL);
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
   const SCROLLBACK_SIZES = [250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
@@ -6615,7 +6626,7 @@
   // 'stats' (3) and 'notally' (5) render the same status text - the
   // ladder's two trims are the modes tail (dropped at 3) then the
   // chatter tally (dropped at 5), not duplicate stops
-  const SVIEW_CYCLE = [0, 3, 5, 1, 8, 6, 2, 4, 7];
+  const SVIEW_CYCLE = [0, 3, 5, 1, 8, 2, 4, 7];
   function setStatusView(i) {
     statusView = Math.max(0, Math.min(SVIEW_NAMES.length - 1, i | 0));
     markHelp('helpSview', statusView);
@@ -9527,9 +9538,10 @@
     location.assign(u);
   };
   function joinChannel() {
-    const c = joinInput.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 25);
-    if (!c || CHANNELS.includes(c) || CHANNELS.length >= 6) { joinInput.select(); return; }
-    if (!joinExtras.includes(c)) { joinExtras.push(c); saveJoinExtras(); }
+    const c = joinInput.value.trim().replace(/[^a-zA-Z0-9_]/g, '').slice(0, 25);
+    const l = c.toLowerCase();
+    if (!c || CHANNELS.includes(l) || CHANNELS.length >= 6) { joinInput.select(); return; }
+    if (!joinExtras.some((x) => x.toLowerCase() === l)) { joinExtras.push(c); saveJoinExtras(); }
     goChannels([...CHANNELS, c]);
   }
   function renderJoinList() {
@@ -9542,9 +9554,9 @@
       b.textContent = c + ' ✕';
       b.title = `stop joining ${c}`;
       b.addEventListener('click', () => {
-        joinExtras = joinExtras.filter((x) => x !== c);
+        joinExtras = joinExtras.filter((x) => x.toLowerCase() !== c.toLowerCase());
         saveJoinExtras();
-        goChannels(CHANNELS.filter((x) => x !== c));
+        goChannels(CHANNELS.filter((x) => x !== c.toLowerCase()));
       });
       joinList.appendChild(b);
     }
