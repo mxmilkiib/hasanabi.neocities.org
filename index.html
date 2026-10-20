@@ -19739,6 +19739,34 @@
     hdl.addEventListener('pointerup', drop);
     hdl.addEventListener('pointercancel', drop);
   });
+  // anywhere that isn't a link, a control or a grip edge moves the
+  // panel like the dotted strip does - the edge-resize listener ran
+  // first and claims lit edges through defaultPrevented
+  helpPanel.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || helpPanel.hidden || helpPanel.parentNode === railEl || e.defaultPrevented) return;
+    if (e.target.closest('a, button, input, select, textarea, summary, .hp-size, .hp-handle')) return;
+    e.preventDefault();
+    helpPanel.setPointerCapture(e.pointerId);
+    helpPanel.classList.add('dragging');
+    const r = helpPanel.getBoundingClientRect();
+    const ox = e.clientX - r.left, oy = e.clientY - r.top;
+    const move = (ev) => {
+      hpMaxRect = null; // moving by hand un-maximises
+      helpPanel.style.right = 'auto';
+      helpPanel.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
+      helpPanel.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+    };
+    const drop = () => {
+      helpPanel.classList.remove('dragging');
+      helpPanel.removeEventListener('pointermove', move);
+      helpPanel.removeEventListener('pointerup', drop);
+      helpPanel.removeEventListener('pointercancel', drop);
+      saveHsize(''); // '' skips w/h - position only
+    };
+    helpPanel.addEventListener('pointermove', move);
+    helpPanel.addEventListener('pointerup', drop);
+    helpPanel.addEventListener('pointercancel', drop);
+  });
   helpPanel.querySelectorAll('.hp-size').forEach((grip) => {
     grip.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
