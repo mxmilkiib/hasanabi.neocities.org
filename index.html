@@ -4289,6 +4289,36 @@
     if (anchor) r.insertBefore(img, anchor);
   }
 
+  // 7tv paints: uid -> {bg, sh, name}. Chatters' uids queue to the relay
+  // as rows render; the reply heals every row that uid already owns.
+  // null entries mark paintless users so they never re-ask
+  const paints = new Map();
+  const paintQueue = new Set();
+  function paintAsk(r) {
+    const uid = r.dataset.uid;
+    if (!uid || paints.has(uid) || paintQueue.has(uid)) return;
+    if (paintQueue.size > 400) return; // a fresh-chatter flood outruns the relay anyway
+    paintQueue.add(uid);
+  }
+  function paintApply(r) {
+    const p = r.dataset.uid && paints.get(r.dataset.uid);
+    const a = p && r.querySelector('.name');
+    if (!a || a.dataset.painted) return;
+    a.dataset.painted = '1';
+    a.style.color = 'transparent';
+    a.style.background = p.bg;
+    a.style.webkitBackgroundClip = 'text';
+    a.style.backgroundClip = 'text';
+    if (p.sh) a.style.filter = p.sh;
+    if (p.name) a.title = (a.title ? a.title + ' · ' : '') + p.name;
+  }
+  setInterval(() => {
+    if (!paintQueue.size || !joined || !relayFrame.contentWindow) return;
+    const ids = [...paintQueue].slice(0, 40);
+    for (const id of ids) paintQueue.delete(id);
+    relayFrame.contentWindow.postMessage({ type: 'paint', ids }, RELAY_ORIGIN);
+  }, 2500);
+
   // bit cheermotes: prefix + amount -> tier, image from twitch's CDN
   const CHEER_ACTIONS = new Set(['cheer', 'kappa', 'kreygasm', 'muxify', 'swiftloss',
     'cheerwhal', 'corgo', 'scoody', 'uni', 'showlove', 'party', 'seemsgood', 'pride',
@@ -5713,6 +5743,7 @@
     if (fontRand) for (const r of newRows) r.style.setProperty('--chat-ff', randStack());
     if (hlUsers.size) for (const r of newRows) hlRow(r);
     if (ucardLogin) for (const r of newRows) ucardMark(r);
+    for (const r of newRows) { paintAsk(r); if (paints.size) paintApply(r); }
     // bullets fly only rows that rendered live - backlog restores,
     // blocked rows and the hidden bots stay out of the stream. a batch
     // caps at its newest few either way: a reload into a fast chat
@@ -10189,6 +10220,8 @@
       rqIndent(r);
       fillRq(r);
       applyHideRow(r);
+      paintAsk(r);
+      if (paints.size) paintApply(r);
       for (const el of r.querySelectorAll('.ytprev,.igprev,.twprev'))
         if (!el.closest('.rqt')) archPeekIO.observe(el);
       // rows landing while find is open join the marks like live rows do
@@ -18263,6 +18296,17 @@
       // place; fresh rows pick it up inline at render
       extBadges = new Map(Object.entries(d.badges));
       for (const c of cols()) for (const r of c.querySelectorAll('.row[data-uid]')) addXBadge(r);
+    } else if (d.type === 'paint' && d.map && typeof d.map === 'object') {
+      // uid -> css descriptor or null (no paint) - land each and heal
+      // the uid's rendered rows; the map is bounded like rowById
+      let painted = false;
+      for (const [uid, p] of Object.entries(d.map)) {
+        if (paints.size > 2000) paints.delete(paints.keys().next().value);
+        paints.set(uid, p && p.bg ? p : null);
+        if (p && p.bg) painted = true;
+      }
+      if (painted) for (const c of cols())
+        for (const r of c.querySelectorAll('.row[data-uid]')) paintApply(r);
     } else if (d.type === 'twsets') {
       // the relay answers with the key it was asked for. A reply for a
       // superseded ask still carries valid sets - merge it rather than
