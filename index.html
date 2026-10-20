@@ -3136,7 +3136,7 @@
     <div><b>modes</b> <span>active chat modes: <span id="helpModesList"></span> - the header narrates the focused channel's live modes: slow Ns (seconds between messages) · follow req Nm/Nh (must have followed that long to chat; bare 'follow req' means following is enough) · emote · subs · r9k (unique messages)<sup>†</sup></span></div>
     <div><b>room tabs</b> <span>channel view tabs: <span id="helpCTabsList"></span> - merged-channel pages carry a strip under the header; a room's tab pares the log down to that room's rows (and aims sends at it), 'merged' shows the whole feed again<sup>†</sup></span></div>
     <div><b>+ room</b> <span>join another channel: <input id="joinInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="channel login" style="width: 11em; height: 22px; font-size: .9em; text-align: left"> <a href="#" role="button" id="joinBtn" title="merge the room into the feed - reloads with ?channel= set">join</a> - merges rooms (6 max) and is remembered locally; remembered joins land as removable chips <span id="joinList" style="display: inline-flex; flex-wrap: wrap; gap: 4px"></span></span></div>
-    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the modes tail and the chatter tally, a compact cut, the channel handle with the dot and uptime ('@HasanAbi ● 3h 27m'), uptime and a compact viewer count behind the dot ('● 2h 35m 25.1k'), an empty space, or just the status dot; scrolling there cycles the same stops<sup>†</sup></span></div>
+    <div><b>status</b> <span>status length: <span id="helpSviewList"></span> - how much the stream status line says beside the dot: the full run with times and chat modes, the same minus the mode tail, then minus the chatter tally too, a compact cut, the channel handle with the dot and uptime ('@HasanAbi ● 3h 27m'), uptime and a compact viewer count behind the dot ('● 2h 35m 25.1k'), an empty space, or just the status dot; scrolling there cycles the same stops<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
     <div class="thm"><b>◆</b><span>theme: <span id="helpPresetList"></span> - preset combos of all the display options; a lit border and ✓ mark an exact match<sup>†</sup></span></div>
     <div class="thm"><b id="helpColourIcon">◐</b><span>colour: <span id="helpColourList"></span> - chips preview and apply each colour at its designed shade (the header cycle lands the same stop); right-click resets to <a href="#" role="button" class="helpColour" data-colour="auto">system</a><sup>†</sup></span></div>
@@ -6612,9 +6612,10 @@
   // wheel order seats stats beside full - it is full minus the
   // chat-mode tail; 'short' is third-from-small before minimal and the
   // lone dot; array order keeps saved numeric ids stable
-  // 'stats' (3) renders the same status text as 'notally' (5) - the tally
-  // chip was the only difference, so the cycle keeps 5 and skips 3
-  const SVIEW_CYCLE = [0, 5, 1, 6, 2, 4, 7];
+  // 'stats' (3) and 'notally' (5) render the same status text - the
+  // ladder's two trims are the modes tail (dropped at 3) then the
+  // chatter tally (dropped at 5), not duplicate stops
+  const SVIEW_CYCLE = [0, 3, 5, 1, 6, 2, 4, 7];
   function setStatusView(i) {
     statusView = Math.max(0, Math.min(SVIEW_NAMES.length - 1, i | 0));
     markHelp('helpSview', statusView);
