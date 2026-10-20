@@ -1024,6 +1024,8 @@
     color: var(--text-dim); font-size: .95em; line-height: 1; cursor: pointer;
     opacity: 0; pointer-events: none; }
   .row:hover .rplybtn { opacity: .95; pointer-events: auto; }
+  /* hovering the ↩ tints its row - the same layer notice/points rows use */
+  .row:has(.rplybtn:hover) { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0); }
   body:not(.chaton) .rplybtn { display: none; }
   /* mod actions sit left of the ↩ in the same hover strip; same reveal
      and the same arm-then-send visual as the user card's buttons */
