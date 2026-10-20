@@ -1070,15 +1070,22 @@
   .chtag.live { opacity: 1; font-weight: 700; }
   .chtag:hover { color: var(--text); text-decoration: underline; }
   /* merged-channel view tabs: the strip under the header pares the log
-     down to one room's rows - a pick aims sends at its room too. each tab
+     down to one room's rows - a pick aims sends at its room too. the tabs
+     sit on the strip's bottom rule like folder tabs; the picked one
+     reaches a pixel past it so it opens into the feed below. each tab
      keeps its channel hue; the room's stream going live firms it up */
-  #chanTabs { gap: 4px; overflow-x: auto; }
-  #chanTabs a { flex: none; display: inline-block; padding: 0 10px; border: 1px solid var(--line);
-    border-radius: 4px; color: var(--cc, var(--text-dim)); text-decoration: none;
+  #chanTabs { gap: 2px; overflow-x: auto; padding-bottom: 0;
+    border-bottom: 1px solid var(--line); align-items: flex-end; }
+  #chanTabs a { flex: none; display: inline-block; padding: 2px 10px 1px;
+    border: 1px solid var(--line); border-bottom: none; border-radius: 5px 5px 0 0;
+    color: var(--cc, var(--text-dim)); text-decoration: none;
     font-size: .92em; white-space: nowrap; opacity: .8; }
+  /* the unseen tally inherits the tab's colour but never its bold */
+  #chanTabs a .unseen { font-weight: 400; }
   #chanTabs a.live { opacity: 1; }
   #chanTabs a:hover { color: var(--text); }
-  #chanTabs a.on { border-color: var(--cc, var(--accent)); background: var(--line); font-weight: 700; opacity: 1; }
+  #chanTabs a.on { border-color: var(--cc, var(--accent)); background: var(--bg);
+    font-weight: 700; opacity: 1; margin-bottom: -1px; padding-bottom: 2px; }
   .role.mod { color: var(--danger); }
   .role.vip { color: var(--vip); }
   .role.host { color: var(--accent); }
@@ -3610,6 +3617,11 @@
   const vidSplitEl = document.getElementById('vidSplit');
   const splitMenu = document.getElementById('splitMenu');
   let activeEl = logEl; // column currently receiving new rows
+  // rows that arrived while another room's tab filtered them out of the
+  // log - tallied per channel, printed on the tab, cleared when that
+  // room (or the merged feed) is opened
+  const chanUnseen = new Map();
+  let chanView = ''; // '' = merged feed, or the channel login being viewed
   let splitLevel = 1; // the applied layout - a level in menu order
   // the visible columns in page-flip order; a row page-flips to the column
   // after the active one, so the column after it holds the oldest rows
@@ -5699,6 +5711,9 @@
     const unfocused = document.hidden || !document.hasFocus();
     for (const r of newRows) {
       r.removeAttribute('data-new');
+      // a room tab hides the other rooms' rows - tally what it's missing
+      if (chanView && r.dataset.ch && r.dataset.ch !== chanView)
+        chanUnseen.set(r.dataset.ch, (chanUnseen.get(r.dataset.ch) || 0) + 1);
       // this batch's own rows for a struck login ghost on insertion
       if (ghosted.size && r.dataset.u && ghosted.has(r.dataset.u)) r.classList.add('deleted');
       if (nickCol) nickFit(r);
@@ -5771,6 +5786,7 @@
         if (echoRows.size > 50) echoRows.delete(echoRows.keys().next().value);
       }
     }
+    if (chanView) paintChanTabs();
     if (missed.length > 50) { const n = missed.length - 50; missed.splice(0, n); missedIx = Math.max(0, missedIx - n); }
     if (unfocused) updateMissedBadge();
     if (!loopEl.hidden) loopFeed(newRows);
@@ -6670,13 +6686,12 @@
   const chanTabsEl = document.getElementById('chanTabs');
   const chanViewCss = document.head.appendChild(document.createElement('style'));
   let chanTabsOn = true;
-  let chanView = '';
   if (MULTI) {
     chanTabsEl.innerHTML =
       `<a href="#" role="tab" data-cv="" title="every joined room, merged">merged</a>` +
       CHANNELS.map((c) =>
         `<a href="#" role="tab" data-cv="${escapeHTML(c)}" style="--cc:${chColor(c)}" ` +
-        `title="only #${escapeHTML(c)}'s rows - sends aim there too">#${escapeHTML(c)}</a>`).join('');
+        `title="only #${escapeHTML(c)}'s rows - sends aim there too">#${escapeHTML(c)}<b class="unseen"></b></a>`).join('');
     chanTabsEl.addEventListener('click', (e) => {
       const a = e.target.closest('a[data-cv]');
       if (!a) return;
@@ -6692,6 +6707,11 @@
       a.classList.toggle('on', on);
       a.setAttribute('aria-selected', String(on));
       a.classList.toggle('live', !!(a.dataset.cv && streamStates[a.dataset.cv]?.live));
+      const badge = a.querySelector('.unseen');
+      if (badge) {
+        const n = chanUnseen.get(a.dataset.cv) || 0;
+        badge.textContent = n ? ` (${n})` : '';
+      }
     }
   }
   function setChanTabs(on) {
@@ -6705,6 +6725,8 @@
   }
   function setChanView(ch) {
     chanView = ch;
+    // the room just opened counts as seen; merged reads them all as seen
+    if (ch) chanUnseen.delete(ch); else chanUnseen.clear();
     chanViewCss.textContent = ch
       ? `.col .row[data-ch]:not([data-ch="${ch}"]) { display: none; }`
       : '';
