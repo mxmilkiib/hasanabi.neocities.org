@@ -1209,7 +1209,7 @@
   .row.action .aux, .row.action .sub, .row.action .time { font-style: normal; }
   .tag { padding: 0 3px; border-radius: 3px; }
   .row.points { --rowtint: linear-gradient(rgba(155, 93, 232, .12) 0 0); }
-  main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) {
+  main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .mod, .selfmod, .gap)) {
     --rowtint: linear-gradient(rgba(128, 128, 128, var(--zeba, .07)) 0 0);
   }
   body.selfhl main.zebra .row.z.self {
@@ -1291,7 +1291,8 @@
   .row.stale, .row.arch { opacity: .7; }
   /* no separator above the first row of a column */
   .col > .row:first-child { --rowline: transparent; }
-  .row.notice.raid { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 0 0); }
+  /* no row ever carries .raid - raids render as plain notices */
+  /* .row.notice.raid { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 0 0); } */
   .row.notice.livemark { --rowtint: linear-gradient(color-mix(in srgb, var(--good) 14%, transparent) 0 0); }
   .row.notice.livemark.off { --rowtint: linear-gradient(color-mix(in srgb, var(--danger) 12%, transparent) 0 0); }
   .twcard {
@@ -1508,7 +1509,8 @@
   #thread .th-row.th-root { border-left: 3px solid var(--accent); padding-left: 6px; }
   #thread .th-t { opacity: .65; margin-right: 6px; font-variant-numeric: tabular-nums; font-size: .85em; }
   #thread .th-n { font-weight: 600; }
-  #thread .th-none { color: var(--text-dim); }
+  /* no producer for .th-none - the thread popup only builds .th-row */
+  /* #thread .th-none { color: var(--text-dim); } */
   #ucard .uc-btns .hdr-btn { height: 26px; width: auto; padding: 0 10px; font-size: .85em;
     white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
   /* .uc-hover mirrors the cursor-hover channel card: title, provider
@@ -1614,8 +1616,9 @@
   #tour .tc-msgs div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #tour .tc-msgs .tc-t { display: inline; font-style: normal; opacity: .65; margin-right: .6em;
     font-variant-numeric: tabular-nums; }
-  #tour .tsw { display: flex; gap: .45em; padding: .55em .8em; border-top: 1px solid var(--line); }
-  #tour .tsw i { width: 1.4em; height: 1.4em; border-radius: .35em; flex: none; }
+  /* no .tsw markup - the tour's swatch rows never landed */
+  /* #tour .tsw { display: flex; gap: .45em; padding: .55em .8em; border-top: 1px solid var(--line); }
+  #tour .tsw i { width: 1.4em; height: 1.4em; border-radius: .35em; flex: none; } */
   /* the header-cast legend: every button's glyph beside its name, in a
      wrappable grid under the strip's miniature */
   #tour .tlegs { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.4em, 1fr));
@@ -1875,11 +1878,11 @@
      text, and the slivers around it (the 4px padding strip above, 1px
      below) - takes the line's own parity: plain when the reply beneath
      is striped, striped when it isn't */
-  main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
+  main.zebra .row.z:not(:is(.points, .glorp, .mention, .kw, .mod, .selfmod, .gap)) .reply.rq {
     background-color: var(--bg);
     box-shadow: 0 -4px 0 var(--bg), 0 1px 0 var(--bg);
   }
-  main.zebra .row:not(.z):not(:is(.points, .glorp, .mention, .kw, .raid, .mod, .selfmod, .gap)) .reply.rq {
+  main.zebra .row:not(.z):not(:is(.points, .glorp, .mention, .kw, .mod, .selfmod, .gap)) .reply.rq {
     background-color: rgba(128, 128, 128, var(--zeba, .07));
     box-shadow: 0 -4px 0 rgba(128, 128, 128, var(--zeba, .07)), 0 1px 0 rgba(128, 128, 128, var(--zeba, .07));
   }
