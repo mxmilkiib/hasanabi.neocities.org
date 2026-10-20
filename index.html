@@ -1818,6 +1818,8 @@
   /* everyday nicks keep the accent and clickable affordance but drop the
      +200 chip weight - only the shimmered mentions stay heavy */
   .at.mnt { font-weight: var(--chat-w, 400); }
+  /* the @hasanabi mention reads lighter than a full link - 600 cap */
+  .at.rbwh { font-weight: 600; }
   .at:hover { color: var(--text); text-decoration: underline; }
   /* .at's accent colour and the help panel's <b> tint would otherwise
      outrank .rbw's transparent text and hide the clipped gradient */
