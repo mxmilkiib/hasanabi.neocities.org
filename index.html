@@ -3148,7 +3148,7 @@
     <div class="sep">⸻</div>
     <div style="margin-top: 8px"><b>to highlight</b><span>comma separated; a line containing one gets a green edge (own username, phrases…):</span><b></b><span><input id="kwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="keyword, another keyword, phrase" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left"></span></div>
     <div style="margin-top: 8px"><b>to block</b><span>comma separated; a chat line containing one is hidden:</span><b></b><span><input id="bwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="word, phrase to hide" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left"></span></div>
-    <div style="margin-top: 8px"><b>to hide (users)</b><span>comma separated logins; their messages: <span id="helpHideList"></span><sup>†</sup></span><b></b><span><input id="hwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="login, another login" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left"></span></div>
+    <div style="margin-top: 8px"><b>to hide (users)</b><span>comma separated logins; their messages: <span id="helpHideList"></span><sup>†</sup></span><b></b><span><input id="hwInput" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="login, another login" style="margin-top: 6px; width: 100%; height: 26px; font-size: .9em; text-align: left"><span id="hwList" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px"></span></span></div>
     <div><b></b><span>vanish drops the rows outright · stub folds them into a running count line · ghost strikes them dim like deleted rows</span></div>
     <div class="sep">⸻</div>
     <div class="wide" style="margin-top: 20px"><span id="copyUrlPrev" style="display: block; text-align: center; word-break: break-all; font-size: .78em; opacity: .65; user-select: all" title="the url the button below copies"></span></div>
@@ -9282,12 +9282,33 @@
       c.querySelectorAll('.row[data-u]').forEach(applyHideRow);
     }
   }
+  // the list under the input mirrors the set: one chip per login, its
+  // click drops the name - a manageable view of the same text field
+  const hwList = document.getElementById('hwList');
+  function renderHideList() {
+    hwList.innerHTML = '';
+    for (const lg of hideUsers) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'hdr-btn';
+      b.style.cssText = 'height: 22px; padding: 0 8px; font-size: .82em';
+      b.textContent = lg + ' ✕';
+      b.title = `stop hiding ${lg}`;
+      b.addEventListener('click', () => {
+        hwInput.value = [...hideUsers].filter((x) => x !== lg).join(', ');
+        setHideList(hwInput.value);
+        saveOpts();
+      });
+      hwList.appendChild(b);
+    }
+  }
   function setHideList(str) {
     hideUsers.clear();
     for (const s of str.split(',')) {
       const lg = s.trim().toLowerCase();
       if (/^[a-z0-9_]{2,25}$/.test(lg)) hideUsers.add(lg);
     }
+    renderHideList();
     retagHide();
   }
   function setHideMode(i) {
