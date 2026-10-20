@@ -5462,6 +5462,14 @@
       if (n.nodeType !== 1 || !n.matches('.rplybtn, .colon, .aux, .auxr, .sub, .twprev, .twcard, .ytprev, .ytinfo, .ytcard, .igprev, .iginfo'))
         qi.appendChild(n.cloneNode(true));
   }
+  // a merged view's rows wear their source channel as a chip - the live
+  // renderer and the archive one share this one builder
+  const chTagHtml = (ch) => MULTI
+    ? `<a class="chtag rbw${streamStates[ch] && streamStates[ch].live ? ' live' : ''}" data-ch="${escapeHTML(ch)}" ` +
+      `style="--chc:${chColor(ch)}" ` +
+      `href="?channel=${escapeHTML([ch, ...CHANNELS.filter((c) => c !== ch)].join(','))}" ` +
+      `title="from #${escapeHTML(ch)} - click to focus that channel">#${escapeHTML(ch)}</a>`
+    : '';
   function flush() {
     scheduled = false;
     hiddenFlush = 0;
@@ -5486,12 +5494,7 @@
       // dedupes or gets adopted still leaves the bar at the right seam
       if (markRed) html += '<div class="redbar" role="separator" title="new messages arrived while the page was inactive"></div>';
       const ch = (channel || '').replace(/^#/, '').toLowerCase() || CHANNEL;
-      const chTag = MULTI
-        ? `<a class="chtag rbw${streamStates[ch] && streamStates[ch].live ? ' live' : ''}" data-ch="${escapeHTML(ch)}" ` +
-          `style="--chc:${chColor(ch)}" ` +
-          `href="?channel=${escapeHTML([ch, ...CHANNELS.filter((c) => c !== ch)].join(','))}" ` +
-          `title="from #${escapeHTML(ch)} - click to focus that channel">#${escapeHTML(ch)}</a>`
-        : '';
+      const chTag = chTagHtml(ch);
       // replayed backfill lines carry ids the page has already rendered;
       // notice-type events carry no id, so key them on kind+ts+sender+body
       // system-msg in the notice key: two message-less subs in the same ms
@@ -10491,12 +10494,7 @@
     const fossa = /^(fossabot|blammobot)$/i.test(login || name);
     const shiny = fossa || /^(hasanabi|ostonox)$/i.test(login || name);
     const md = (r.b || '').includes('moderator/');
-    const chTag = MULTI
-      ? `<a class="chtag rbw${streamStates[ch] && streamStates[ch].live ? ' live' : ''}" data-ch="${escapeHTML(ch)}" ` +
-        `style="--chc:${chColor(ch)}" ` +
-        `href="?channel=${escapeHTML([ch, ...CHANNELS.filter((c) => c !== ch)].join(','))}" ` +
-        `title="from #${escapeHTML(ch)} - click to focus that channel">#${escapeHTML(ch)}</a>`
-      : '';
+    const chTag = chTagHtml(ch);
     const badges = (r.b || '').split(',').filter(Boolean).map((b) => {
       const u = badgeUrl(b, ch);
       return u ? `<img class="badge" src="${escapeHTML(u)}"` +
