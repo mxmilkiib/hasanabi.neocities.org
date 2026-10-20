@@ -1164,8 +1164,8 @@
     color: transparent;
     /* --rbwgrad swaps the band when an alt rainbow palette is picked;
        unset it falls back to this hand-tuned classic strip */
-    background: var(--rbwgrad, linear-gradient(90deg, #d98d8d, #d9b78d, #c9cc97, #9ccdb8, #97bdd9, #b3a3d4, #d98d8d,
-      #d9b78d, #c9cc97, #9ccdb8, #97bdd9, #b3a3d4, #d98d8d));
+    background: var(--rbwgrad, linear-gradient(90deg, #f0b8b8, #f2cfa8, #dee0a8, #b4e0c8, #a8cfe6, #cbb8e8, #f0b8b8,
+      #f2cfa8, #dee0a8, #b4e0c8, #a8cfe6, #cbb8e8, #f0b8b8));
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -6657,7 +6657,7 @@
     }
     const nc = chatterSeen.size;
     chattersEl.hidden = !nc || !(statusView === 0 || statusView === 3);
-    chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> <span title="unique chatters in the last hour">chatters/h</span>` : '';
+    chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b><span title="unique chatters in the last hour">chatters/h</span>` : '';
     // an echo still unmatched a minute on isn't awaiting anything - drop
     // its pending marker so a stored copy can't re-register on reload and
     // get adopted by a far-later replay. A live late copy can still adopt
