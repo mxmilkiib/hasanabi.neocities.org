@@ -1105,6 +1105,10 @@
     font-size: .92em; white-space: nowrap; opacity: .8; }
   /* the unseen tally inherits the tab's colour but never its bold */
   #chanTabs a .unseen { font-weight: 400; }
+  /* the per-tab ✕ only shows on hover so the strip stays quiet */
+  #chanTabs a .rx { font-style: normal; font-size: .85em; margin-left: 4px;
+    opacity: .4; cursor: pointer; }
+  #chanTabs a .rx:hover { opacity: 1; color: var(--danger); }
   #chanTabs a.live { opacity: 1; }
   #chanTabs a:hover { color: var(--text); }
   #chanTabs a.on { border-color: var(--cc, var(--accent)); background: var(--bg);
@@ -6939,8 +6943,21 @@
       `<a href="#" role="tab" data-cv="" title="every joined room, merged">merged</a>` +
       CHANNELS.map((c) =>
         `<a href="#" role="tab" data-cv="${escapeHTML(c)}" style="--cc:${chColor(c)}" ` +
-        `title="only #${escapeHTML(c)}'s rows - sends aim there too">#${escapeHTML(c)}<b class="unseen"></b></a>`).join('');
+        `title="only #${escapeHTML(c)}'s rows - sends aim there too">#${escapeHTML(c)}<b class="unseen"></b>` +
+        `<i class="rx" data-rx="${escapeHTML(c)}" role="button" title="leave #${escapeHTML(c)}">✕</i></a>`).join('');
     chanTabsEl.addEventListener('click', (e) => {
+      // the ✕ leaves the room outright - drops it from the remembered
+      // joins too, then reloads on the remaining set
+      const rx = e.target.closest('i.rx');
+      if (rx) {
+        e.preventDefault();
+        const ch = rx.dataset.rx;
+        joinExtras = joinExtras.filter((x) => x.toLowerCase() !== ch);
+        saveJoinExtras();
+        const rest = CHANNELS.filter((x) => x !== ch);
+        goChannels(rest.length ? rest : [DEFAULT_CHANNEL]);
+        return;
+      }
       const a = e.target.closest('a[data-cv]');
       if (!a) return;
       e.preventDefault();
