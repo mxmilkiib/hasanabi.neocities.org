@@ -3785,6 +3785,12 @@
     el.style.zIndex = 16;
   }
   for (const p of popFloats) p.addEventListener('pointerdown', () => popRaise(p));
+  // clicks landing inside the player iframe never reach the box's own
+  // pointerdown - the window blurring with the iframe focused is the tell
+  addEventListener('blur', () => {
+    const ae = document.activeElement;
+    if (ae && ae.tagName === 'IFRAME' && vidBox.contains(ae)) popRaise(vidBox);
+  });
   let loadPhase = 0;
   // status text crossfades rather than swapping mid-read
   function loadSay(txt) {
@@ -8771,6 +8777,13 @@
     const stop = document.getElementById('resChans');
     for (let n = document.getElementById('resNews'); n && n !== stop; n = n.nextElementSibling)
       n.dataset.sub = 'news';
+  }
+  // music and extra links leave creators for the bottom of the left
+  // tab's praxis sheet - untagged rows land on the first sheet, and the
+  // trailing divider rides along to split them off there
+  {
+    const libEl = document.getElementById('htabLib');
+    libEl.append(...[...document.getElementById('htabRes').children].slice(-3));
   }
   // the last-opened tab survives reloads - a ?channel hop reopens the
   // panel (persisted helpMode) and used to drop back to config/help
