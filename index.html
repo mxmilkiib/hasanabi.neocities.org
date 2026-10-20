@@ -13656,7 +13656,7 @@
     });
     markHelp('helpRbwPal', rbwPal);
   }
-  setRbwPal(0);
+  setRbwPal(1);
 
   // ---- text shadow on chat rows: graduated off/subtle/medium/strong ----
   const SHADOW_LVLS = [
@@ -14077,7 +14077,7 @@
     if (danFs !== DAN_FS.indexOf(32)) q.set('dfs', danFs === DAN_FS.length ? 'adaptive' : String(DAN_FS[danFs]));
     if (nickAnim !== 2) q.set('anim', ANIM_URL[nickAnim]);
     if (rbwStyle !== RBW_DEFAULT) q.set('rbw', RBW_URL[rbwStyle]);
-    if (rbwPal !== 0) q.set('rbp', RBW_PALS[rbwPal].n);
+    if (rbwPal !== 1) q.set('rbp', RBW_PALS[rbwPal].n);
     if (rbwScope !== 0) q.set('rbws', RBW_SCOPES[rbwScope]);
     // emote-picker options only enter the url off their defaults - and
     // only when the copy-side toggle asks for them
