@@ -1015,6 +1015,19 @@
     opacity: 0; pointer-events: none; }
   .row:hover .rplybtn { opacity: .95; pointer-events: auto; }
   body:not(.chaton) .rplybtn { display: none; }
+  /* mod actions sit left of the ↩ in the same hover strip; same reveal
+     and the same arm-then-send visual as the user card's buttons */
+  .modbtns { position: absolute; bottom: 2px; right: 24px; z-index: 1;
+    display: inline-flex; align-items: center; gap: 2px;
+    height: var(--chat-lhpx, 1.35em);
+    opacity: 0; pointer-events: none; }
+  .row:hover .modbtns { opacity: .95; pointer-events: auto; }
+  body:not(.chaton) .modbtns { display: none; }
+  .modbtns i { font-style: normal; font-size: .78em; padding: 1px 5px;
+    border: 1px solid var(--line); border-radius: 3px; background: var(--panel);
+    color: var(--text-dim); line-height: 1.1; cursor: pointer; }
+  .modbtns i:hover { color: var(--danger); }
+  .modbtns i[data-armed] { color: var(--danger); border-color: var(--danger); }
   /* pending-reply indicator across the top of the input */
   #chatbar { flex-wrap: wrap; }
   /* chat box on top: the flex order lifts it under the header; the
@@ -4319,6 +4332,22 @@
     relayFrame.contentWindow.postMessage({ type: 'paint', ids }, RELAY_ORIGIN);
   }, 2500);
 
+  // ---- per-row mod actions: hover buttons beside ↩ while own USERSTATE
+  // marks the row's channel modded; sends ride the relay like a typed
+  // command, armed by a first click like the user card's ----
+  const modBtnsHtml = (ch, login, mid) =>
+    auth && auth.login && login && login !== auth.login && selfMods[ch]
+      ? `<span class="modbtns"><i data-m="to" title="timeout 10 minutes">10m</i><i data-m="ban" title="ban">ban</i>${mid ? '<i data-m="del" title="delete this message">✕</i>' : ''}</span>`
+      : '';
+  // heals rows that rendered before the mod flag landed, or before this
+  // feature existed in a restored scrollback
+  function modBtnsHeal(r) {
+    const btn = r.querySelector(':scope > .rplybtn');
+    if (!btn || r.querySelector(':scope > .modbtns')) return;
+    const html = modBtnsHtml(r.dataset.ch || CHANNEL, r.dataset.u, r.dataset.mid);
+    if (html) btn.insertAdjacentHTML('beforebegin', html);
+  }
+
   // bit cheermotes: prefix + amount -> tier, image from twitch's CDN
   const CHEER_ACTIONS = new Set(['cheer', 'kappa', 'kreygasm', 'muxify', 'swiftloss',
     'cheerwhal', 'corgo', 'scoody', 'uni', 'showlove', 'party', 'seemsgood', 'pride',
@@ -5712,7 +5741,7 @@
               `${reply}<span class="time">${timeStr}</span>${chTag}${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}${badgeImgs}${extBadgeImg(tags['user-id'])}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}` +
               `<a class="name${shinyNick ? ' shimmer' : ''}"${shinyNick ? '' : ` style="color:${color}"`} href="https://www.twitch.tv/${profile}"` +
               ` target="_blank" rel="noopener noreferrer">${escapeHTML(name)}</a>${action ? ' ' : '<span class="colon">: </span>'}` +
-              `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${msgHtml}</span>${twTail}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
+              `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${msgHtml}</span>${twTail}${modBtnsHtml(ch, login, tags.id)}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
       if (tags.id) {
         rowBody.set(tags.id, message.slice(0, 500));
         if (rowBody.size > MAX_MESSAGES + 1000) rowBody.delete(rowBody.keys().next().value);
@@ -7010,6 +7039,15 @@
         for (const c of which) {
           selfTagsPer[c] = { ...selfTagsPer[c], ...parsed.tags };
           selfExempts[c] = /(?:^|[,\s])(?:moderator|broadcaster|vip)\//.test(parsed.tags.badges || '');
+          // stricter than the exempt set: vip can't moderate, so the
+          // row buttons only show for an actual mod/broadcaster tag
+          const wasMod = selfMods[c];
+          selfMods[c] = parsed.tags.mod === '1' ||
+            /(?:^|[,\s])(?:moderator|broadcaster)\//.test(parsed.tags.badges || '');
+          // rows rendered before the first USERSTATE lacked the buttons -
+          // heal them now that mod rights are known
+          if (!wasMod && selfMods[c])
+            for (const col of cols()) for (const r of col.querySelectorAll('.row[data-u]')) modBtnsHeal(r);
         }
         if (parsed.tags['emote-sets']) loadTwitchSets(parsed.tags['emote-sets']);
         return;
@@ -10169,7 +10207,7 @@
       `${SUB_MODES[subMode].endsWith('left') ? subHtml + modHtml : SUB_MODES[subMode] === 'hidden' ? subHtml : ''}` +
       `${badges}${extBadgeImg(r.uid)}${role ? role + ' ' : ''}${SUB_MODES[subMode].endsWith('left') ? auxHtml : ''}${action ? '* ' : ''}${who}${notice || action ? ' ' : '<span class="colon">: </span>'}` +
       `${SUB_MODES[subMode].endsWith('left') ? '' : auxHtml}<span class="msg">${rendered.html}</span>${drainCards().join('')}` +
-      `<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
+      `${modBtnsHtml(ch, login, r.mid)}<span class="rplybtn" role="button" title="reply to this message">↩</span></div>`;
   }
   // hydrated links render with their card placeholders but skip the
   // fetch - the ask fires when one scrolls into view instead. Reply-band
@@ -13860,6 +13898,28 @@
         return;
       }
     }
+    // row mod buttons: arm with one click, send on the second within 3s -
+    // the user card's confirm dance in miniature. ban never re-arms
+    const mb = e.target.closest('.modbtns i');
+    if (mb) {
+      const row = mb.closest('.row'), lg = row && row.dataset.u, ch = (row && row.dataset.ch) || CHANNEL;
+      if (!lg || !selfMods[ch] || (auth && lg === auth.login)) return;
+      if (mb.dataset.armed) {
+        const cmd = mb.dataset.m === 'to' ? `/timeout ${lg} 600`
+          : mb.dataset.m === 'ban' ? `/ban ${lg}`
+          : row.dataset.mid ? `/delete ${row.dataset.mid}` : null;
+        if (cmd && relayFrame.contentWindow)
+          relayFrame.contentWindow.postMessage({ type: 'send', channel: ch, text: cmd }, RELAY_ORIGIN);
+        mb.textContent = 'sent';
+        delete mb.dataset.armed;
+        return;
+      }
+      mb.dataset.armed = '1';
+      const label = mb.textContent;
+      mb.textContent = 'sure?';
+      setTimeout(() => { if (mb.isConnected && mb.dataset.armed) { delete mb.dataset.armed; mb.textContent = label; } }, 3000);
+      return;
+    }
     const rb = e.target.closest('.rplybtn');
     if (rb) { setReply(rb.closest('.row')); return; }
     const tv = e.target.closest('a.twvid');
@@ -15109,6 +15169,7 @@
   let slowTimer = 0;
   const roomStates = {};   // channel -> { slow, ... } from ROOMSTATE
   const selfExempts = {};  // channel -> own mod/broadcaster/vip flag
+  const selfMods = {};     // channel -> own mod/broadcaster flag (no vip)
   const selfTagsPer = {};  // channel -> own USERSTATE tags (echo dressing)
   // where a send is headed: the reply's channel, then any chip pick in
   // the input, then the focused channel
@@ -15574,7 +15635,7 @@
   function logout() {
     auth = null;
     selfMentionRe = null;
-    for (const c of CHANNELS) { delete selfTagsPer[c]; delete selfExempts[c]; }
+    for (const c of CHANNELS) { delete selfTagsPer[c]; delete selfExempts[c]; delete selfMods[c]; }
     // exemptions wait for the next login's USERSTATEs to land
     retagKw();
     try { localStorage.removeItem(AUTH_KEY); } catch {}
