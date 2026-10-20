@@ -12782,6 +12782,33 @@
     vidHandle.addEventListener('pointerup', drop);
     vidHandle.addEventListener('pointercancel', drop);
   });
+  // anywhere outside the player surface, controls and grips drags the
+  // box the same way the strip does - the iframe swallows its own
+  // presses, so the play button and twitch chrome are untouchable here
+  vidBox.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || e.defaultPrevented) return;
+    if (e.target.closest('iframe, form, a, button, input, select, textarea, .vid-size, .vid-handle, #chanAsk')) return;
+    e.preventDefault();
+    vidBox.setPointerCapture(e.pointerId);
+    vidBox.classList.add('dragging');
+    const r = vidBox.getBoundingClientRect();
+    const ox = e.clientX - r.left, oy = e.clientY - r.top;
+    const move = (ev) => {
+      vidBox.style.right = 'auto'; vidBox.style.bottom = 'auto';
+      vidBox.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
+      vidBox.style.top = Math.max(headerEl.getBoundingClientRect().bottom, Math.min(innerHeight - r.height, ev.clientY - oy)) + 'px';
+    };
+    const drop = () => {
+      vidBox.classList.remove('dragging');
+      vidBox.removeEventListener('pointermove', move);
+      vidBox.removeEventListener('pointerup', drop);
+      vidBox.removeEventListener('pointercancel', drop);
+      saveVidBox();
+    };
+    vidBox.addEventListener('pointermove', move);
+    vidBox.addEventListener('pointerup', drop);
+    vidBox.addEventListener('pointercancel', drop);
+  });
 
   // resizing: each corner grip drags the far width, the opposite corner stays
   // anchored, and aspect-ratio keeps the height at the stream's real ratio
