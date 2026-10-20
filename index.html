@@ -6693,6 +6693,12 @@
     streamHeard = true;
     lastStreamAt = Date.now();
     const sch = (d.channel || CHANNEL).toLowerCase();
+    // the broadcaster's own display-name casing rides every stream
+    // report - it outranks whatever casing the room was typed with
+    if (/^[a-zA-Z0-9_]{1,25}$/.test(d.disp || '')) {
+      CHAN_CASE[sch] = d.disp;
+      if (sch === CHANNEL) chanLink.textContent = d.disp;
+    }
     const uptime = typeof d.uptime === 'string' ? d.uptime : '';
     let st;
     // only a parseable uptime counts as live - an error page or empty
