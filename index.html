@@ -10747,7 +10747,7 @@
     // int is a level id from before ids ran in menu order
     const sl = typeof o.split === 'string' ? SPLIT_URL.indexOf(o.split) + 1 : LVL_LEGACY[o.split] || 0;
     // no saved layout lands on danmaku/chat - the default's a stream watch
-    setSplit(sl >= 1 && sl <= SPLIT_NAMES.length ? sl : 20);
+    setSplit(sl >= 1 && sl <= SPLIT_NAMES.length ? sl : 1);
     if (o.railw !== undefined) {
       railEl.classList.toggle('fixed', o.railw > 0);
       if (o.railw > 0) mainEl.style.setProperty('--railw', o.railw + 'px');
@@ -13424,7 +13424,7 @@
     if (document.body.classList.contains('hdrgraph')) q.set('min', 'graph');
     else if (document.body.classList.contains('hdrmin')) q.set('min', '');
     if (!selfHl) q.set('self', '0');
-    if (splitLevel !== 20) q.set('split', SPLIT_URL[splitLevel - 1]);
+    if (splitLevel !== 1) q.set('split', SPLIT_URL[splitLevel - 1]);
     // in rail mode the video state is vidRail (dock is the baseline);
     // outside it video=1 only when the box is shown. layouts that pin
     // the video own its placement - the stack levels force it on - so
