@@ -3117,7 +3117,7 @@
     <div class="sep">&nbsp;</div>
     <div><b><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></b> <span>Twitch login: to send messages from the input bar or the ➤ button; ⇧click logs out · channel rules (slow mode, followers-only, emote-only) apply as normal - rejections arrive as [notice] rows, and slow mode counts down in the input · slash commands go through as twitch reads them (/me, /timeout, /announce, /raid…) · typing a character jumps into the input (it grows with long drafts; ↑/↓ there walks sent lines and parked drafts, kept across reloads), ↑/↓ select a row, r or enter replies to it, esc peels a layer - pick, then popups · @ opens a list of the joined channels and recently seen nicks that narrows as more is typed - tab/⇧tab walks the pick, →/enter or a click fills it in · :word or a 3+ letter word then tab completes emote codes the same way</span></div>
     <div><b>⌕</b> find bar: ctrl+f (twice for the browser's own), / or the ⌕ button - bare words match row text, user:login the chatter, kind:notice|mod|gap|action|emote|mention|kw|deleted|sub the row type; enter/⇧enter step through matches, 'only' collapses non-matching rows, 'archive' searches the indexed local store that outlasts scrollback - a hit whose row was trimmed restores it (and its neighbours) into the log</div>
-    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top - scrolling to it pages more in on its own, and ⇧click loads eight pages at once - or by clicking a find hit, a reply chip, or a ?mid= link; restored rows carry the dimmed stale look and count toward the scrollback cap. A date (date:YYYY-MM-DD) in the find bar jumps straight to its moment. Where a restore leaves a stored stretch unrendered, a "skipped" marker counts it and fills on click. The paged column layouts hide stale rows but keep the seam - clicking it folds back to one scrolling column first. <a href="#" role="button" id="archImport" title="read a downloaded log dump into the archive - raw irc lines or [timestamp] #chan nick: text">import</a> back-fills the store from a log file.<input type="file" id="archFile" accept=".txt,.log,.irc,text/plain" hidden> <span id="archiveStatus" role="status"></span></span></div>
+    <div><b>archive</b> <span>retention: <span id="helpArchiveList"></span> - bounded trims after 30 days or when origin use passes ~50MB, on the next load; unlimited removes both app limits, but browser storage quota still applies. Rows past the scrollback edge reload into the log from the "load earlier chat" seam at its top - scrolling to it pages more in on its own, and ⇧click loads eight pages at once - or by clicking a find hit, a reply chip, or a ?mid= link; restored rows carry the dimmed stale look and count toward the scrollback cap. A date (date:YYYY-MM-DD) in the find bar jumps straight to its moment. Where a restore leaves a stored stretch unrendered, a "skipped" marker counts it and fills on click. The paged column layouts hide stale rows but keep the seam - clicking it folds back to one scrolling column first. <a href="#" role="button" id="archImport" title="read a downloaded log dump into the archive - raw irc lines or [timestamp] #chan nick: text">import</a> back-fills the store from a log file, and <a href="#" role="button" id="archExport" title="download the whole archive as a [timestamp] #chan nick: text log - the same format import reads">export</a> writes it back out.<input type="file" id="archFile" accept=".txt,.log,.irc,text/plain" hidden> <span id="archiveStatus" role="status"></span></span></div>
     <div><b>–</b> header size: full (all options) → reduced (options hidden, rate graph fills the bar, ? stays visible) → minimised strip with just –; ⇧click or scroll back retreats; click the strip to restore</div>
     <div><b>?</b> <span>help popup: <span id="helpHelpList"></span> - middle-clicking the ? opens the about page, middle-clicking its ✕ recentres a moved panel<sup>†</sup></span></div>
     <div class="sep">&nbsp;</div>
@@ -9917,6 +9917,44 @@
     const f = e.target.files[0];
     e.target.value = '';
     if (f) archImport(f);
+  });
+  // ---- archive export: the whole store walks its ts index into the
+  // '[timestamp] #chan nick: text' form import reads back, so a dump
+  // round-trips through archImport. Logins carry the name slot - display
+  // names with spaces would break the line grammar on a re-import ----
+  document.getElementById('archExport').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!archDb) { archiveStatusEl.textContent = 'archive not open'; return; }
+    archiveStatusEl.textContent = 'exporting…';
+    const parts = [];
+    let n = 0;
+    const tx = archDb.transaction('msgs', 'readonly');
+    tx.objectStore('msgs').index('ts').openCursor().onsuccess = (ev) => {
+      const cur = ev.target.result;
+      if (cur) {
+        const r = cur.value;
+        if (inChans(r)) {
+          const d = new Date(r.ts || 0);
+          const stamp = isNaN(d) ? '0000-00-00 00:00:00Z' : d.toISOString().replace('T', ' ').replace(/\.\d+Z$/, 'Z');
+          const who = (r.login || r.name || 'notice').replace(/[^A-Za-z0-9_]/g, '_').slice(0, 40) || 'notice';
+          const body = (r.msg != null ? r.msg : archBody(r)).replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ');
+          parts.push(`[${stamp}] #${r.ch || CHANNEL} ${who}: ${body}`);
+          n++;
+          if (!(n % 20000)) archiveStatusEl.textContent = `exporting ${n.toLocaleString()} rows…`;
+        }
+        cur.continue();
+      }
+    };
+    tx.oncomplete = () => {
+      if (!parts.length) { archiveStatusEl.textContent = 'nothing to export'; return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([parts.join('\n') + '\n'], { type: 'text/plain' }));
+      a.download = `${CHANNEL}-chat-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.log`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+      archiveStatusEl.textContent = `exported ${n.toLocaleString()} rows`;
+    };
+    tx.onerror = () => { archiveStatusEl.textContent = 'export failed - storage error'; };
   });
   // one store can hold rows from rooms this view didn't join (multi
   // sessions share the first channel's db) - hydrate and search only the
