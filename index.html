@@ -1476,6 +1476,23 @@
   /* a lone last button - hide user logged out, delete msg for mods -
      spans the row rather than sitting half-width off to the left */
   #ucard .uc-btns > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* the reply-thread popup: a uc-msgs-styled list that stays up until
+     dismissed, each line a jump link back into the log */
+  #thread {
+    position: fixed; z-index: 55; width: 400px; max-width: 92vw;
+    max-height: 60vh; overflow-y: auto;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--popline); border-radius: 6px;
+    padding: 10px 12px; font-size: var(--chat-font, 15px); line-height: 1.5;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+  }
+  #thread[hidden] { display: none; }
+  #thread .th-row { padding: 2px 0; overflow-wrap: anywhere; cursor: pointer; }
+  #thread .th-row:hover { background: var(--line); }
+  #thread .th-row.th-root { border-left: 3px solid var(--accent); padding-left: 6px; }
+  #thread .th-t { opacity: .65; margin-right: 6px; font-variant-numeric: tabular-nums; font-size: .85em; }
+  #thread .th-n { font-weight: 600; }
+  #thread .th-none { color: var(--text-dim); }
   #ucard .uc-btns .hdr-btn { height: 26px; width: auto; padding: 0 10px; font-size: .85em;
     white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
   /* .uc-hover mirrors the cursor-hover channel card: title, provider
@@ -3320,6 +3337,7 @@
   <div id="whis" role="dialog" aria-label="whispers" hidden><div class="whis-head"><b>whispers</b><span class="whis-hint">click a name to answer · ⇧click for the profile</span><button class="hdr-btn" id="whisX" type="button" title="close the whisper pane"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="whis-log" id="whisLog"></div></div>
   <div id="findbar" role="search" hidden><input id="findIn" class="hdr-btn" type="text" autocomplete="off" spellcheck="false" placeholder="find: text · user:login · kind:notice · date:YYYY-MM-DD" aria-label="find in chat"><button class="hdr-btn" id="findPrev" type="button" title="previous match (⇧enter)">↑</button><button class="hdr-btn" id="findNext" type="button" title="next match (enter)">↓</button><span id="findCnt"></span><button class="hdr-btn" id="findOnly" type="button" title="hide non-matching rows">only</button><button class="hdr-btn" id="findArch" type="button" title="search the local archive - indexed rows beyond scrollback - a date jumps to it" hidden>archive</button><button class="hdr-btn" id="findX" type="button" title="close find (esc)"><span style="display:inline-block;transform:translate(-1px,1px)">✕</span></button><div id="findres" hidden></div></div>
   <div id="ucard" role="dialog" aria-label="user card" hidden></div>
+  <div id="thread" role="dialog" aria-label="reply thread" hidden></div>
   <!-- first-time tour: paged walkthrough over a dimming veil - opens once
        per browser (hasan-tour), re-runs from the help panel's tour link -->
   <div id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden>
@@ -5585,7 +5603,7 @@
       if (pid) {
         const pname = tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || '';
         const pbody = unescapeTag(tags['reply-parent-msg-body'] || '');
-        reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message">` +
+        reply = `<span class="reply rq" data-pid="${escapeHTML(pid)}" title="jump to the original message - ⇧click for the thread">` +
                 `${chTag}<span class="rqt"><b style="color:${mentionCol(tags['reply-parent-user-login'] || pname)}">${escapeHTML(pname)}</b>: <i>${linkifyEsc(escapeHTML(pbody).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'))}</i><span class="rarr">↩</span></span></span>`;
       }
       const htag = /#(?:trivia|scramble|roulette|top|points)\b|!\w+/i.test(message);
@@ -10183,7 +10201,7 @@
       if (subHtml && SUB_MODES[subMode] !== 'hidden' && !SUB_MODES[subMode].endsWith('left')) aux.push(subHtml);
       auxHtml = aux.length ? `<span class="aux${SUB_MODES[subMode].endsWith('left') ? '' : ' auxr'}">${aux.join(' ')}</span>` : '';
     }
-    const rq = r.rq ? `<span class="reply rq"${r.rq[2] ? ` data-pid="${escapeHTML(r.rq[2])}"` : ''} title="jump to the original message">` +
+    const rq = r.rq ? `<span class="reply rq"${r.rq[2] ? ` data-pid="${escapeHTML(r.rq[2])}"` : ''} title="jump to the original message - ⇧click for the thread">` +
       `${chTag}<span class="rqt"><b style="color:${mentionCol(r.rq[0])}">${escapeHTML(r.rq[0])}</b>: ` +
       `<i>${linkifyEsc(escapeHTML(r.rq[1]).replace(/([^\x00-\x7F]+)/g, '<span class="up">$1</span>'))}</i><span class="rarr">↩</span></span></span>` : '';
     const ncol = monoNames ? colorForName(login || name) : (r.c || colorForName(login || name));
@@ -13995,6 +14013,7 @@
     }
     const chip = e.target.closest('.reply');
     if (!chip || e.target.closest('a')) return;
+    if (e.shiftKey) { threadShow(chip.dataset.pid, e.clientX, e.clientY); return; }
     const target = rowById.get(chip.dataset.pid);
     if (target && target.isConnected) {
       // rendered but stale-hidden under split/wrap folds to reveal it
@@ -14017,6 +14036,71 @@
       t.classList.add('jump');
     });
   });
+
+  // ---- reply threads: shift+click a quote for the whole chain - the
+  // root message plus every rendered reply descending from it, in time
+  // order. Dom-only: replies trimmed into the archive don't count ----
+  const threadEl = document.getElementById('thread');
+  function threadHide() { threadEl.hidden = true; }
+  function threadShow(pid, x, y) {
+    // parent -> children map over rendered rows: a reply's .rq carries
+    // its parent mid, so one sweep links the chain transitively
+    const kids = {};
+    for (const c of cols()) for (const r of c.querySelectorAll('.row[data-mid]')) {
+      const p = r.querySelector(':scope > .reply.rq');
+      if (p && p.dataset.pid) (kids[p.dataset.pid] = kids[p.dataset.pid] || []).push(r);
+    }
+    const want = new Set([pid]);
+    let mid = pid, guard = 0;
+    // a mid-chain quote can name a parent off the root - walk up first
+    for (let r = rowById.get(mid); r && guard++ < 50; ) {
+      const p = r.querySelector(':scope > .reply.rq');
+      if (!p || !p.dataset.pid) break;
+      mid = p.dataset.pid;
+      want.add(mid);
+      r = rowById.get(mid);
+    }
+    const seen = new Set();
+    for (let grew = true; grew && guard++ < 200; ) {
+      grew = false;
+      for (const w of want)
+        for (const r of kids[w] || [])
+          if (!seen.has(r)) { seen.add(r); want.add(r.dataset.mid); grew = true; }
+    }
+    const rows = [...seen];
+    if (rowById.get(mid)) rows.unshift(rowById.get(mid));
+    rows.sort((a, b) => (+a.dataset.ts || 0) - (+b.dataset.ts || 0));
+    if (!rows.length) { threadHide(); return; }
+    threadEl.innerHTML = `<div class="th-head"><b>thread</b> - ${rows.length} message${rows.length === 1 ? '' : 's'}</div>` +
+      rows.map((r) => {
+        const nm = (r.querySelector(':scope > .name') || {}).textContent || '';
+        const body = (r.querySelector(':scope > .msg') || r).textContent || '';
+        return `<div class="th-row${r.dataset.mid === mid ? ' th-root' : ''}" data-mid="${escapeHTML(r.dataset.mid || '')}">` +
+          `<span class="th-t">${escapeHTML(fmtRowTime(new Date(+r.dataset.ts || Date.now())))}</span>` +
+          `<span class="th-n" style="color:${escapeHTML((r.querySelector(':scope > .name') || {}).style?.color || 'inherit')}">${escapeHTML(nm)}</span>: ` +
+          `${escapeHTML(body.slice(0, 300))}</div>`;
+      }).join('');
+    threadEl.hidden = false;
+    const w = threadEl.offsetWidth, h = threadEl.offsetHeight;
+    threadEl.style.left = Math.max(4, Math.min(innerWidth - w - 4, x - 20)) + 'px';
+    threadEl.style.top = Math.max(headerEl.getBoundingClientRect().bottom + 4, Math.min(innerHeight - h - 4, y - 10)) + 'px';
+  }
+  threadEl.addEventListener('click', (e) => {
+    const line = e.target.closest('.th-row');
+    if (!line) return;
+    const t = rowById.get(line.dataset.mid);
+    threadHide();
+    if (!t || !t.isConnected) return;
+    if (!t.getClientRects().length) archReveal();
+    t.scrollIntoView({ block: 'center' });
+    t.classList.remove('jump');
+    void t.offsetWidth;
+    t.classList.add('jump');
+  });
+  document.addEventListener('mousedown', (e) => {
+    if (!threadEl.hidden && !e.target.closest('#thread')) threadHide();
+  });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') threadHide(); });
 
 
 
