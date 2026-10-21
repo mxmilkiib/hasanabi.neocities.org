@@ -1081,7 +1081,8 @@
   /* mIRC-style read marker between last-seen and unseen rows */
   .redbar { border-top: 1.5px solid #e04040; margin: 2px 0; }
   /* the archive's load-earlier seam pinned to the top of #log */
-  .archload, .row.archgap { text-align: center; color: var(--text-dim); cursor: pointer; user-select: none; }
+  .archload, .row.archgap, .row.gap { text-align: center; color: var(--text-dim); cursor: pointer; user-select: none; }
+  .row.gap:hover { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 9%, transparent) 0 0); }
   .archload { padding: 3px 0; }
   .archload:hover, .row.archgap:hover { color: var(--text); }
   main.notime .time { display: none; }
@@ -5612,9 +5613,10 @@
       if (pendingGap && !live && !pendingGap.emitted && ts > pendingGap.from && ts < pendingGap.to) {
         const pg = pendingGap;
         pg.emitted = true;
-        html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${pg.to}" data-gfrom="${pg.from}" data-gto="${pg.to}"><span class="time">${fmtRowTime(new Date(pg.to))}</span>` +
+        html += `<div role="article" class="row notice gap${((zFlip = !zFlip)) ? ' z' : ''}" data-ts="${pg.to}" data-gfrom="${pg.from}" data-gto="${pg.to}"` +
+                ` role="button" tabindex="0" title="fetch this stretch from the public log archive"><span class="time">${fmtRowTime(new Date(pg.to))}</span>` +
                 `· ${fmtDur(Math.max(1, Math.round((pg.to - pg.from) / 60000)))} gap · ${pg.why || 'lines missed - socket stayed open'} · ` +
-                `<span class="grange">${fmtRowTime(new Date(pg.from))} → ${fmtRowTime(new Date(pg.to))}</span></div>`;
+                `<span class="grange">${fmtRowTime(new Date(pg.from))} → ${fmtRowTime(new Date(pg.to))}</span> · fetch</div>`;
       }
       if (lastRowTs > bootTs && ts - lastRowTs > GAP_MS) {
         const why = gapCause(lastRowTs, ts);
@@ -10812,6 +10814,80 @@
       g.textContent = archGapTxt(n);
     });
   }
+  // a .row.gap click pulls the missing stretch off the public log mirror
+  // (logs.ivr.fi serves the whole channel day as one static file). Rows
+  // inside the window write to the archive - the gap then behaves like
+  // any other archived seam, paging them in on demand instead of
+  // flooding the DOM with hours of backlog at once
+  async function gapFetch(row) {
+    if (!archDb || row.dataset.gfill) return;
+    const from = +row.dataset.gfrom, to = +row.dataset.gto;
+    if (!from || !to) return;
+    row.dataset.gfill = '1';
+    const rng = row.querySelector('.grange');
+    if (rng) rng.textContent = 'fetching…';
+    const ch = row.dataset.ch || CHANNEL;
+    const recs = [];
+    try {
+      let t = from, days = 0;
+      while (t <= to && days++ < 31) {
+        const d = new Date(t);
+        const y = d.getUTCFullYear(), mm = String(d.getUTCMonth() + 1).padStart(2, '0'),
+              dd = String(d.getUTCDate()).padStart(2, '0');
+        const res = await fetch(`https://logs.ivr.fi/channel/${encodeURIComponent(ch)}/${y}/${mm}/${dd}?raw`);
+        if (!res.ok) throw new Error('fetch');
+        for (const line of (await res.text()).split('\n')) {
+          const r = archImportLine(line);
+          if (r && r.ts > from && r.ts < to) recs.push(r);
+        }
+        t = Date.UTC(y, d.getUTCMonth(), d.getUTCDate() + 1);
+      }
+    } catch {
+      if (rng) rng.textContent = 'fetch failed - click to retry';
+      delete row.dataset.gfill;
+      return;
+    }
+    if (!recs.length) {
+      if (rng) rng.textContent = 'nothing archived for that span';
+      delete row.dataset.gfill;
+      return;
+    }
+    try {
+      const tx = archDb.transaction('msgs', 'readwrite');
+      const st = tx.objectStore('msgs');
+      for (const r of recs) st.put(r);
+      tx.oncomplete = () => {
+        row.classList.add('archgap');
+        row.dataset.lo = from;
+        row.dataset.hi = to;
+        delete row.dataset.gfill;
+        archGapRecount(row);
+        archGapFill(row); // the first page comes in on its own
+      };
+      tx.onerror = () => {
+        if (rng) rng.textContent = 'archive write failed - click to retry';
+        delete row.dataset.gfill;
+      };
+    } catch {
+      if (rng) rng.textContent = 'archive write failed - click to retry';
+      delete row.dataset.gfill;
+    }
+  }
+  // gap clicks: a fresh gap fetches the stretch, an already-fed one is
+  // just another archived seam that pages more of it in
+  logEl.addEventListener('click', (e) => {
+    const g = e.target.closest('.row.gap');
+    if (!g || e.target.closest('a,button')) return;
+    if (g.classList.contains('archgap')) archGapFill(g, e.shiftKey);
+    else gapFetch(g);
+  });
+  logEl.addEventListener('keydown', (e) => {
+    const g = e.target.closest('.row.gap');
+    if (!g || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    if (g.classList.contains('archgap')) archGapFill(g, e.shiftKey);
+    else gapFetch(g);
+  });
   function archGapFill(g, big) {
     if (!archDb) return;
     const lo = +g.dataset.lo, hi = +g.dataset.hi;
