@@ -1252,6 +1252,11 @@
   }
   body.selfhl main.zebra .row.z.self {
     --rowtint: linear-gradient(color-mix(in srgb, #2dc8b4 calc(var(--zeba, .07) * 260%), transparent) 0 0); }
+  /* these sit past the zebra rule on purpose: the hover tint keeps a
+     .z qualifier so it outranks the stripe outright, and the hasanabi
+     wash ties the stripe so it must come later in the sheet */
+  main.zebra .row.z:has(.rplybtn:hover) { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0); }
+  main.zebra .row.z[data-u="hasanabi"] { --rowtint: linear-gradient(color-mix(in srgb, #e8a33d 13%, transparent) 0 0); }
   main.shadowed .row { text-shadow: var(--row-sh); }
   .row.glorp {
     --rowtint: linear-gradient(rgba(232, 93, 93, .13) 0 0);
