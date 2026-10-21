@@ -15950,7 +15950,7 @@
     if (m) return { start: at - m[1].length, q: m[1].toLowerCase(), mode: 'nick' };
     // ':word' completes emote codes; start covers the colon so accept
     // replaces the whole token with just the code
-    m = before.match(/(?:^|[^\w:]):([a-z0-9_]+)$/i);
+    m = before.match(/(?:^|[^\w:]):([a-z0-9_]{2,})$/i);
     if (m) return { start: at - m[1].length - 1, q: m[1].toLowerCase(), mode: 'emote' };
     if (compBare) {
       m = before.match(/(?:^|\s)([a-z0-9_]{2,})$/i);
