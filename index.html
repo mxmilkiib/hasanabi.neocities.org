@@ -5963,17 +5963,21 @@
     // a minutes-old notice from claiming the live edge
     for (const n of [...tpl.content.childNodes]) {
       if (n.nodeType === 1 && n.classList.contains('row') && n.dataset.ts) {
+        // only a row older than the tail needs order placement - the
+        // common case (in-order arrivals) takes the plain append
         const ts = +n.dataset.ts;
-        let ref = null, sawRow = false;
-        for (let r = activeEl.lastElementChild; r; r = r.previousElementSibling) {
-          if (!r.classList.contains('row')) continue;
-          sawRow = true;
-          if (+r.dataset.ts <= ts) { ref = r.nextElementSibling; break; }
-          ref = r;
-        }
-        if (sawRow && ref !== null) {
-          // a mid-log insert shifts everything below - hold the view
-          // by pushing scrollTop down the inserted row's height
+        let tail = null;
+        for (let r = activeEl.lastElementChild; r; r = r.previousElementSibling)
+          if (r.classList.contains('row')) { tail = r; break; }
+        if (tail && +tail.dataset.ts > ts) {
+          // stale replayed row - walk back to its slot, then hold the
+          // view: the mid-log insert shifts everything below it
+          let ref = tail;
+          for (let r = tail.previousElementSibling; r; r = r.previousElementSibling) {
+            if (!r.classList.contains('row')) continue;
+            if (+r.dataset.ts <= ts) break;
+            ref = r;
+          }
           const vtop = activeEl.scrollTop;
           activeEl.insertBefore(n, ref);
           if (n.offsetTop < vtop) activeEl.scrollTop = vtop + n.offsetHeight;
