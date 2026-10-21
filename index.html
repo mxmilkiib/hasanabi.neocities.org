@@ -5971,7 +5971,14 @@
           if (+r.dataset.ts <= ts) { ref = r.nextElementSibling; break; }
           ref = r;
         }
-        if (sawRow && ref !== null) { activeEl.insertBefore(n, ref); continue; }
+        if (sawRow && ref !== null) {
+          // a mid-log insert shifts everything below - hold the view
+          // by pushing scrollTop down the inserted row's height
+          const vtop = activeEl.scrollTop;
+          activeEl.insertBefore(n, ref);
+          if (n.offsetTop < vtop) activeEl.scrollTop = vtop + n.offsetHeight;
+          continue;
+        }
       }
       activeEl.append(n);
     }
