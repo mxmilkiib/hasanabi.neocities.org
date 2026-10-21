@@ -586,6 +586,8 @@
     pointer-events: none; box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
   }
   #peek[hidden] { display: none; }
+  /* tweet cards pop at twice the scale */
+  #peek.twx { transform: scale(2); transform-origin: top left; }
   /* the preview image floats right and the card text wraps its left */
   #peek > img { float: right; max-width: 40%; max-height: 12em; border-radius: 4px; margin: 0 0 .3em .6em; border: 1px solid var(--peekline, var(--popline)); box-sizing: border-box; }
   /* a card carrying a playable file takes the pointer so its controls
@@ -20101,6 +20103,7 @@
       ttl: +raw.ttl > 0 ? Math.min(+raw.ttl, 86400) : 0,
       video: /^https:\/\//.test(s('video')) ? s('video') : '',
       final: /^https?:\/\//.test(s('url')) ? s('url') : '',
+      twx: !!raw.twx,
     } : null;
     // bound the cache - a long session can hover thousands of unique urls
     peekCache.delete(url);
@@ -20141,7 +20144,7 @@
     title: c.author ? '@' + c.author : '', description: (c.text || '').slice(0, 300),
     author: c.author || '', published: c.ts ? new Date(c.ts).toISOString().slice(0, 10) : '',
     image: c.photo || c.avatar || '', video: c.video || '', picon: c.avatar || '',
-    url: 'https://x.com/i/status/' + id,
+    url: 'https://x.com/i/status/' + id, twx: 1,
   } : null;
   function peekAsk(url) {
     if (peekInflight.has(url)) return true;
@@ -20185,6 +20188,7 @@
     // poster image and makes the card interactive - pointer events stay
     // off otherwise so it never eats a click meant for a link
     peekEl.classList.toggle('pint', !!(p && p.video));
+    peekEl.classList.toggle('twx', !!(p && p.twx));
     if (p && p.video && peekMode === 2) {
       const v = document.createElement('video');
       v.className = 'pvid'; v.controls = true; v.muted = true;
