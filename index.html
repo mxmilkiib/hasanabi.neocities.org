@@ -15469,6 +15469,14 @@
         if (seenRows.has(k)) el.remove();
         else seenRows.add(k);
       }
+      // seed the hourly chatter tally off the restored rows - a reload
+      // with an hour of scrollback shouldn't rebuild the figure blind
+      {
+        const chatCut = Date.now() - 60 * 60e3;
+        for (const el of logEl.children)
+          if (el.classList.contains('row') && el.dataset.u && +el.dataset.ts >= chatCut && !STATS_EXCLUDE.has(el.dataset.u))
+            chatterSeen.set(el.dataset.u, +el.dataset.ts);
+      }
       for (const el of logEl.children)
         if (el.dataset.mid) { rowById.set(el.dataset.mid, el); seenIds.add(el.dataset.mid); }
       for (const rq of logEl.querySelectorAll('.reply.rq')) {
