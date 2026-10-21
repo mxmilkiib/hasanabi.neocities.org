@@ -5958,23 +5958,8 @@
     tpl.innerHTML = html;
     const newRows = tpl.content.querySelectorAll('.row[data-new]');
     // the archive sits above the live tail in dom order, so a plain
-    // append lands after it in the right spot either way. a replayed
-    // row carries its original ts though - slotting it in order keeps
-    // a minutes-old notice from claiming the live edge
-    for (const n of [...tpl.content.childNodes]) {
-      if (n.nodeType === 1 && n.classList.contains('row') && n.dataset.ts) {
-        const ts = +n.dataset.ts;
-        let ref = null, sawRow = false;
-        for (let r = activeEl.lastElementChild; r; r = r.previousElementSibling) {
-          if (!r.classList.contains('row')) continue;
-          sawRow = true;
-          if (+r.dataset.ts <= ts) { ref = r.nextElementSibling; break; }
-          ref = r;
-        }
-        if (sawRow && ref !== null) { activeEl.insertBefore(n, ref); continue; }
-      }
-      activeEl.append(n);
-    }
+    // append lands after it in the right spot either way
+    activeEl.append(tpl.content);
     dedupeLinks(newRows);
     // random face mode stamps each live row its own --chat-ff override
     if (fontRand) for (const r of newRows) r.style.setProperty('--chat-ff', randStack());
