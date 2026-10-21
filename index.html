@@ -1030,6 +1030,8 @@
   .row:hover .rplybtn { opacity: .95; pointer-events: auto; }
   /* hovering the ↩ tints its row - the same layer notice/points rows use */
   .row:has(.rplybtn:hover) { --rowtint: linear-gradient(color-mix(in srgb, var(--accent) 11%, transparent) 0 0); }
+  /* the broadcaster's own rows wear a gold wash */
+  .row[data-u="hasanabi"] { --rowtint: linear-gradient(color-mix(in srgb, #e8a33d 13%, transparent) 0 0); }
   body:not(.chaton) .rplybtn { display: none; }
   /* mod actions sit left of the ↩ in the same hover strip; same reveal
      and the same arm-then-send visual as the user card's buttons */
