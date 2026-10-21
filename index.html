@@ -1198,7 +1198,7 @@
   body.rbw-hue.rbw-other .rbw:not(.rbwh) { animation-name: rbw-hue; }
   /* links view: rows without a url, and repeat posts of a url, hide */
   body.linkview .row:not([data-lk]), body.linkview .row.linkdup { display: none; }
-  body.nobots .row[data-u="blammobot"], body.nobots .row[data-u="fossabot"] { display: none; }
+  body.nobots .row[data-u="blammobot"], body.nobots .row[data-u="fossabot"], body.nobots .row[data-u="whammobot"] { display: none; }
   .row.notice.selfmod {
     color: var(--danger); font-style: normal; font-weight: 600;
     --rowtint: linear-gradient(color-mix(in srgb, var(--danger) 13%, transparent) 0 0);
@@ -3215,7 +3215,7 @@
     <div><b>pn</b> <span>pronouns: <span id="helpPnList"></span> - a fact line on the twitch-profile hover card for chatters who set pronouns on alejo.io; looked up when a profile is previewed and cached for a month<sup>†</sup></span></div>
     <div><b>safe gifs</b><span>limit giphy lookups for gif posts to a PG-13 rating: <span id="helpGifList"></span><sup>†</sup></span></div>
     <div class="sep">⸻</div>
-    <div><b>bots</b><span>hide blammobot + fossabot: <span id="helpBotsList"></span> - their chat rows vanish entirely, commands and all<sup>†</sup></span></div>
+    <div><b>bots</b><span>hide blammobot + fossabot + whammobot: <span id="helpBotsList"></span> - their chat rows vanish entirely, commands and all<sup>†</sup></span></div>
     <div><b>Blammobot</b><span class="linkcols wider cmds"><i><b>games</b><nw>!roulette <i>[amount|all]</i> (gamble points on red/black)</nw> · <nw>!trivia (answer questions for points)</nw> · <nw>!scramble (unscramble the word)</nw></i><i><b>points</b><nw>!points (check balance)</nw> · <nw>!top <i>[count]</i> (leaderboard)</nw></i></span></div>
     <div><b>Fossabot</b><span class="linkcols wider cmds"><i><b>mod/utility</b>!commands · !uptime · !title · !game · !vod · !quote · !rules · !mods · !followage · !subcount · !emotes</i><i><b>links</b>!twitter · !tweet · !instagram · !tiktok · !youtube · !discord · !reddit · !merch · !socials · !pronouns · !dsa · !palestine · !time · !weather</i><i><b>toys</b>!pog · !cock · !sus · !fight · !gamba · !dance · !vanish · !fact · !dadjoke</i><i><b>offline chat only</b>!offline · !8ball · !fishh · !farmm · !lake · !offliners · !offlinercensus</i><i><b>more</b><a class="at" href="https://fossabot.com/hasanabi/commands" target="_blank" rel="noopener">full list</a> on fossabot.com</i></span></div>
     <div><b></b><span>this page colours each game's [tag] chip and bolds answers, rolls and point counts</span></div>
@@ -5727,7 +5727,7 @@
       const role = badgeImgs ? '' : roleTag(tags);
       const profile = escapeHTML(encodeURIComponent(login || name.toLowerCase()));
       const fossa = (login || name).toLowerCase() === 'fossabot';
-      const blammo = (login || name).toLowerCase() === 'blammobot';
+      const blammo = ['blammobot', 'whammobot'].includes((login || name).toLowerCase());
       const shimmer = fossa || blammo;
       // moderator lines rainbow their urls - md is the num-mode chip's
       // own shorthand for the role
@@ -5972,7 +5972,7 @@
     // would otherwise land a wall of bullets the lanes can't all hold
     if (danmakuOn) {
       const fly = [...newRows].filter((r) => !r.classList.contains('replay') && !r.classList.contains('blk')
-        && !(hideBots && (r.dataset.u === 'fossabot' || r.dataset.u === 'blammobot')));
+        && !(hideBots && (r.dataset.u === 'fossabot' || r.dataset.u === 'blammobot' || r.dataset.u === 'whammobot')));
       for (const r of fly.slice(-DAN_FLUSH_MAX)) try { danmakuPush(r); } catch (e) { console.error('danmaku push', e); }
     }
     if (whisHtml) {
@@ -7858,7 +7858,7 @@
   // counts, channel emote usage, and the rate graph's loudest samples
   // logins the top-chatters ranking ignores - channel bots whose volume
   // would otherwise crowd the list out
-  const STATS_EXCLUDE = new Set(['blammobot', 'fossabot']);
+  const STATS_EXCLUDE = new Set(['blammobot', 'fossabot', 'whammobot']);
   // badge sort order: use = most-seen in chat, name = a-z, vers = most
   // versions, kind = channel sets then everyday globals then a-z
   const BADGE_SORT_KEY = 'hasan-badgesort';
@@ -10513,7 +10513,7 @@
     const body = archBody(r);
     let cls = archCls(r, body);
     const notice = r.kind === 'notice';
-    const fossa = /^(fossabot|blammobot)$/i.test(login || name);
+    const fossa = /^(fossabot|blammobot|whammobot)$/i.test(login || name);
     const shiny = fossa || /^(hasanabi|ostonox)$/i.test(login || name);
     const md = (r.b || '').includes('moderator/');
     const chTag = chTagHtml(ch);
@@ -12256,7 +12256,7 @@
     const lg = row.dataset.u;
     // the hide filter drops bots and !command lines before they queue -
     // the chat rows themselves are untouched
-    if ((danHide & 1 && /^(?:fossabot|blammobot)$/.test(lg || ''))
+    if ((danHide & 1 && /^(?:fossabot|blammobot|whammobot)$/.test(lg || ''))
       || (danHide & 2 && /^\s*!/.test(m.textContent))) return;
     // walk the rendered row into segments: text nodes stay text, emote
     // and embedded gif/image imgs become image refs, other imgs (link
