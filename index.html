@@ -449,7 +449,7 @@
   }
   /* flex-shrink 0: the mode chips are short status info - let stream-info
      take all the truncation instead of clipping 'follow req' off its value */
-  .chat-modes { font-size: .93em; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
+  .chat-modes { font-size: .93em; font-weight: 400; color: var(--text-dim); white-space: nowrap; margin-left: 4px; flex-shrink: 0; }
   /* @N chip: mentions that arrived while the page wasn't focused
      (scoped to the header chip - .eage.missed rungs are unrelated) */
   #missed.missed, #whisChip {
@@ -6688,7 +6688,7 @@
     }
     const nc = chatterSeen.size;
     chattersEl.hidden = !nc || !(statusView === 0 || statusView === 3);
-    chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b><span title="unique chatters in the last hour">chatters/h</span>` : '';
+    chattersEl.innerHTML = nc ? `· ~<b>${nc >= 10000 ? Math.round(nc / 1000) + 'k' : nc}</b> <span title="unique chatters in the last hour">chatters/h</span>` : '';
     // an echo still unmatched a minute on isn't awaiting anything - drop
     // its pending marker so a stored copy can't re-register on reload and
     // get adopted by a far-later replay. A live late copy can still adopt
