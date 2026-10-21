@@ -5119,6 +5119,10 @@
   // the graph bands these grey, distinct from the red of a confirmed gap
   const quietGaps = [];
   let lastRowTs = 0; // wall-clock ms of the newest rendered row
+  // a silent stretch that opened before this page existed is a reload
+  // artifact, not lines the live flow missed - gap marking only counts
+  // windows that opened on this session's watch
+  const bootTs = Date.now();
   // a caused gap whose row is deferred: the backfill fetch confirms whether
   // anything actually went missing - a recovered line inside the span emits
   // the marker before it, an empty batch means the stretch was just quiet
@@ -5572,7 +5576,7 @@
                 `· ${fmtDur(Math.max(1, Math.round((pg.to - pg.from) / 60000)))} gap · ${pg.why || 'lines missed - socket stayed open'} · ` +
                 `<span class="grange">${fmtRowTime(new Date(pg.from))} → ${fmtRowTime(new Date(pg.to))}</span></div>`;
       }
-      if (lastRowTs && ts - lastRowTs > GAP_MS) {
+      if (lastRowTs > bootTs && ts - lastRowTs > GAP_MS) {
         const why = gapCause(lastRowTs, ts);
         // every long stretch defers to the backlog, cause or not: a replayed
         // line inside the span proves lines went missing and earns the
