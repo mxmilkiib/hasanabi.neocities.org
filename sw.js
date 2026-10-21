@@ -14,6 +14,10 @@ const FONTS = 'hasan-fonts-v1';
 const IMG_CAP = 600;
 const IMAGE_REFRESH_MS = 24 * 60 * 60 * 1000;
 const imageRefresh = new Map();
+// gif cdns serve content-addressed media - it can never change, so those
+// hits skip revalidation entirely; emote hosts keep the daily window for
+// seasonal swaps and the odd in-place edit
+const STATIC_IMG = /(^|\.)giphy\.com$|(^|\.)tenor\.com$/;
 const PRECACHE = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
@@ -62,6 +66,7 @@ async function cacheFirst(req, e) {
     return res;
   };
   if (hit) {
+    if (STATIC_IMG.test(new URL(req.url).host)) return hit;
     const now = Date.now();
     const recent = imageRefresh.get(req.url) || 0;
     if (now - recent < IMAGE_REFRESH_MS) return hit;
