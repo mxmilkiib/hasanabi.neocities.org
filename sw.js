@@ -2,7 +2,8 @@
 // - the page and its same-origin files go network-first, so a deploy is
 //   picked up on the next load and the cached copy only serves when offline
 // - cross-origin images (emotes, badges, gifs) paint from a capped cache
-//   and refresh in the background, so updates appear on the next load
+//   and refresh in the background daily - the urls are near-immutable,
+//   so updates are rare anyway and appear on the next load
 // - google fonts (the css2 sheet and its woff2 payloads) go cache-first in a
 //   small uncapped bucket, so offline keeps the same faces
 // - everything else (twitch embed, relay iframe, apis) passes straight through
@@ -11,7 +12,7 @@ const IMAGES = 'hasan-img-v1';
 const IMAGE_STAMPS = 'hasan-img-stamps-v1';
 const FONTS = 'hasan-fonts-v1';
 const IMG_CAP = 600;
-const IMAGE_REFRESH_MS = 15 * 60 * 1000;
+const IMAGE_REFRESH_MS = 24 * 60 * 60 * 1000;
 const imageRefresh = new Map();
 const PRECACHE = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
