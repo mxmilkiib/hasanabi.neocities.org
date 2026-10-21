@@ -15465,15 +15465,10 @@
         (echoRows.get(k) || echoRows.set(k, []).get(k)).push(el);
         noteEchoKey(k);
       }
-      // a tail echo sits reading as the newest line until the backlog
-      // lands - hold a restored .local run at the edge out of view till
-      // the first batch reveals it (or the timeout, if none ever comes).
-      // the row still re-registered above, so its real copy adopts it
-      for (let el = logEl.lastElementChild; el && el.classList.contains('local'); el = el.previousElementSibling) {
-        el.classList.add('echold');
-        echoHoldOn = true;
-      }
-      if (echoHoldOn) setTimeout(() => { revealEchoHold(); if (stickBottom && !pausedCols.has(logEl)) snapLive(logEl); }, 12e3);
+      // restored echoes stay in place - they're already chronological
+      // tail, and a hide-then-reveal cycle reads as the messages being
+      // re-sent. a real copy arriving through backfill still adopts the
+      // row via the re-registered keys above.
       // tweet placeholders and pre-avatar cards in saved rows never
       // resolved: re-ask the relay (the asks queue until the socket
       // joins). Legacy cards carry no data-twid - the status link in
