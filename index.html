@@ -10229,6 +10229,21 @@
         archPrune();
         healUseArchive();
         archFlush();
+        // seed the hourly chatter tally from the archive - deeper than
+        // the scrollback window, so the count reflects the last hour
+        // even when the saved rows don't reach it
+        try {
+          const chatCut = Date.now() - 60 * 60e3;
+          archDb.transaction('msgs').objectStore('msgs').index('ts')
+            .openCursor(IDBKeyRange.lowerBound(chatCut)).onsuccess = (ev) => {
+              const cur = ev.target.result;
+              if (!cur) return;
+              const r = cur.value;
+              if (r.kind === 'msg' && r.login && !STATS_EXCLUDE.has(r.login))
+                chatterSeen.set(r.login, r.ts);
+              cur.continue();
+            };
+        } catch {}
       };
       req.onerror = () => {
         archAvailable = false; archBuf = [];
