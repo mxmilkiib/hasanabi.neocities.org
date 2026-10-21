@@ -5958,8 +5958,32 @@
     tpl.innerHTML = html;
     const newRows = tpl.content.querySelectorAll('.row[data-new]');
     // the archive sits above the live tail in dom order, so a plain
-    // append lands after it in the right spot either way
-    activeEl.append(tpl.content);
+    // append lands after it in the right spot either way. a replayed
+    // row carries its original ts though - if it's older than the tail
+    // it walks back to its slot instead of claiming the live edge;
+    // in-order arrivals (nearly all of them) take the plain append
+    for (const n of [...tpl.content.childNodes]) {
+      if (n.nodeType === 1 && n.classList.contains('row') && n.dataset.ts) {
+        const ts = +n.dataset.ts;
+        let tail = null;
+        for (let r = activeEl.lastElementChild; r; r = r.previousElementSibling)
+          if (r.classList.contains('row')) { tail = r; break; }
+        if (tail && +tail.dataset.ts > ts) {
+          let ref = tail;
+          for (let r = tail.previousElementSibling; r; r = r.previousElementSibling) {
+            if (!r.classList.contains('row')) continue;
+            if (+r.dataset.ts <= ts) break;
+            ref = r;
+          }
+          // the mid-log insert shifts everything below - hold the view
+          const vtop = activeEl.scrollTop;
+          activeEl.insertBefore(n, ref);
+          if (n.offsetTop < vtop) activeEl.scrollTop = vtop + n.offsetHeight;
+          continue;
+        }
+      }
+      activeEl.append(n);
+    }
     dedupeLinks(newRows);
     // random face mode stamps each live row its own --chat-ff override
     if (fontRand) for (const r of newRows) r.style.setProperty('--chat-ff', randStack());
