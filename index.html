@@ -2560,6 +2560,9 @@
   /* config's top width row is a filter-style row like the authors' sort/info
      pair - give the content below it the same air */
   #helpPanel #htabCfg > div.wide + div { margin-top: 9px; }
+  #cfgFind { background: var(--bg); color: var(--text); border: 1px solid var(--line);
+    border-radius: 4px; font: inherit; padding: 0 6px; min-width: 11em; }
+  #cfgFind::placeholder { color: var(--text-dim); }
   /* the top option rows read as one group - tighter than the rule
      between a wide row and a regular one */
   #helpPanel #htabCfg > div.wide + div.wide { margin-top: 0; }
@@ -3182,7 +3185,7 @@
   <div id="helpPanel" role="dialog" aria-label="help, resources and authors" hidden><div class="hp-handle" title="drag to move · double-click to maximise"></div><div class="hp-scroll">
     <nav class="htabs" role="tablist" aria-label="help sections"><div class="htabrow"><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabRes" data-htab="htabRes">media</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabVote" data-htab="htabVote">vote26</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabDsa" data-htab="htabDsa">dsa</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLib" data-htab="htabLib">left</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabLbr" data-htab="htabLbr">libre</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabAuth" data-htab="htabAuth">authors</a><a href="#" class="htab" role="tab" aria-selected="false" aria-controls="htabStats" data-htab="htabStats">stats</a><a href="#" class="htab on" role="tab" aria-selected="true" aria-controls="htabCfg" data-htab="htabCfg">help/<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a><button class="hdr-btn" id="helpX" type="button" title="close the help panel · middle-click recentres it"><span style="display:inline-block;transform:translate(-1.5px,1px)">✕</span></button></div><div class="hsubs" id="hsubBar" role="tablist" aria-label="page sections" hidden></div></nav>
     <div class="htabpage" role="tabpanel" id="htabCfg">
-    <div class="wide one" style="max-width: 1360px; margin-inline: auto"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><br><span>[?] font size: <span id="helpFsModeList"></span>: <span id="helpFsList"></span><sup>†</sup></span><br><span>[?] position: <span id="helpPosList"></span><sup>†</sup></span><br><span>[?] sticky position: <span id="helpStickList"></span> - a resize keeps the popup's position spot pinned<sup>†</sup></span><br><span>[?] fade when unfocused: <span id="helpFadeList"></span> - the popup ghosts to 95% while the pointer or focus isn't on it<sup>†</sup></span><br><span>[?] drag anywhere: <span id="helpDragList"></span> - grab the popup on any blank spot to move it, not only the dotted strip<sup>†</sup></span></div>
+    <div class="wide one" style="max-width: 1360px; margin-inline: auto"><span>[?] popup width: <span id="helpWList"></span><span id="helpWCur"></span></span><br><span>[?] font size: <span id="helpFsModeList"></span>: <span id="helpFsList"></span><sup>†</sup></span><br><span>[?] position: <span id="helpPosList"></span><sup>†</sup></span><br><span>[?] sticky position: <span id="helpStickList"></span> - a resize keeps the popup's position spot pinned<sup>†</sup></span><br><span>[?] fade when unfocused: <span id="helpFadeList"></span> - the popup ghosts to 95% while the pointer or focus isn't on it<sup>†</sup></span><br><span>[?] drag anywhere: <span id="helpDragList"></span> - grab the popup on any blank spot to move it, not only the dotted strip<sup>†</sup></span><br><span>[?] find: <input id="cfgFind" type="search" placeholder="filter options…" aria-label="filter config options"></span></div>
     <div class="wide" style="display:none"><span>? link weight: <span id="helpLwList"></span> - each entry's own name link, in resources/authors and the stats rows<sup>†</sup></span></div>
     <div class="wide one"><span>header button labels: <span id="helpNoLblList"></span><sup>†</sup></span><span>header font size: <span id="helpHfsList"></span></span></div>
     <div class="sep">&nbsp;</div>
@@ -19818,6 +19821,32 @@
     helpPanel.classList.toggle('edge-b', lit.includes('b'));
   });
   helpPanel.addEventListener('pointerleave', (e) => { if (!e.buttons) helpPanel.classList.remove('edge-l', 'edge-r', 'edge-t', 'edge-b'); });
+  // config search: filter option rows by their own text; inside a
+  // linkcols row each <i> is an entry, so non-matching entries fold away
+  // unless the row's own head already matched
+  const cfgFind = document.getElementById('cfgFind');
+  cfgFind.addEventListener('input', () => {
+    const q = cfgFind.value.trim().toLowerCase();
+    for (const d of document.querySelectorAll('#htabCfg > div')) {
+      if (d.contains(cfgFind) || d.classList.contains('sep')) continue;
+      if (!q) {
+        d.style.display = '';
+        for (const i of d.querySelectorAll('.linkcols > i')) i.style.display = '';
+        continue;
+      }
+      const head = d.querySelector(':scope > b');
+      const headHit = head && head.textContent.toLowerCase().includes(q);
+      const plainHit = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.toLowerCase().includes(q)) ||
+        [...d.children].some((c) => c.tagName !== 'B' && !c.classList.contains('linkcols') && c.textContent.toLowerCase().includes(q));
+      let itemHit = false;
+      for (const i of d.querySelectorAll('.linkcols > i')) {
+        const hit = headHit || i.textContent.toLowerCase().includes(q);
+        i.style.display = hit ? '' : 'none';
+        itemHit = itemHit || hit;
+      }
+      d.style.display = (headHit || plainHit || itemHit) ? '' : 'none';
+    }
+  });
   // w/h and position live in the same key; a width that lands on a
   // preset re-marks the preset button instead of storing the px
   const saveHsize = (edges) => {
