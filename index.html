@@ -2259,6 +2259,8 @@
   #helpPanel .hp-size.b { bottom: 0; left: 50%; transform: translateX(-50%); cursor: grab; place-items: end center; }
   #helpPanel:hover .hp-size, #helpPanel.dragging .hp-size { opacity: 1; }
   #helpPanel.dragging .hp-size { cursor: grabbing; }
+  #helpPanel.hpnodrag .hp-handle, #helpPanel.hpnodrag .hp-size,
+  #helpPanel.hpnodrag.dragging .hp-handle, #helpPanel.hpnodrag.dragging .hp-size { cursor: default; }
   #helpPanel b { color: var(--accent); font-weight: 600; }
   /* grid items ignore vertical-align - a key dot centres on its
      description row instead of riding the cell's top edge */
@@ -14043,6 +14045,7 @@
   let helpDrag = true;
   function setHelpDrag(on) {
     helpDrag = !!on;
+    helpPanel.classList.toggle('hpnodrag', !helpDrag);
     markHelp('helpDrag', helpDrag ? 1 : 0);
   }
   function setHelpFade(on) {
