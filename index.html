@@ -9269,7 +9269,7 @@
     for (const el of stbl.querySelectorAll('[style*="grid-"]'))
       el.style.gridRow = +el.style.gridRow + 1;
     const names = stbl.dataset.head.split(',');
-    const labels = [names[0] || '', names[1] || '', ...preKeys.map((k) => k === 'subs' ? '' : k), ...finCols];
+    const labels = [names[0] || '', names[1] || '', ...preKeys.map((k) => k === 'subs' ? 'yt/tw' : k), ...finCols];
     for (let h = 0; h < (splitN || 1); h++)
       labels.forEach((t, k) => {
         const s = document.createElement('span');
