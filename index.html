@@ -19829,7 +19829,11 @@
     const q = cfgFind.value.trim().toLowerCase();
     for (const d of document.querySelectorAll('#htabCfg > div')) {
       if (d.contains(cfgFind) || d.classList.contains('sep')) continue;
+      // authored-hidden rows (twtchNote, link weight) keep their hide -
+      // only rows the filter itself hid may come back
+      if (d.style.display === 'none' && !d.dataset.cfgOff) continue;
       if (!q) {
+        delete d.dataset.cfgOff;
         d.style.display = '';
         for (const i of d.querySelectorAll('.linkcols > i')) i.style.display = '';
         continue;
@@ -19844,7 +19848,9 @@
         i.style.display = hit ? '' : 'none';
         itemHit = itemHit || hit;
       }
-      d.style.display = (headHit || plainHit || itemHit) ? '' : 'none';
+      const show = headHit || plainHit || itemHit;
+      d.style.display = show ? '' : 'none';
+      if (show) delete d.dataset.cfgOff; else d.dataset.cfgOff = '1';
     }
   });
   // w/h and position live in the same key; a width that lands on a
