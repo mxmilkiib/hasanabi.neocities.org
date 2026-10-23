@@ -6389,7 +6389,10 @@
       return;
     }
     hdrSideEl.style.maxWidth = '';
-    const kids = [...hdrSideEl.children].filter((el) => el.offsetParent);
+    // 0-width pairs (the label+hidden-select shell for #fontSel) still
+    // claim a flex line of their own - counting them would inflate the
+    // row tally and shrink the balance cap around a row that isn't there
+    const kids = [...hdrSideEl.children].filter((el) => el.offsetParent && el.offsetWidth);
     const rows = new Set(kids.map((el) => el.offsetTop)).size;
     const per = Math.ceil(kids.length / rows);
     let px = 0;
