@@ -1314,7 +1314,10 @@
   /* touch devices get the animation freeze too - a thousand shimmering
      rows repaint every frame on a phone */
   @media (pointer: coarse) {
-    #hint { animation: none !important; }
+    #hint, .hdr-btn.shiny::after, .jdown.jdc .jdash rect,
+    #emoteGrid .eage .ants rect, #helpPanel a.helpColour.on::before,
+    #helpPanel a.helpVariant.on::before, #helpPanel a.helpPreset.on::before,
+    #helpPanel a.helpShade.on::before { animation: none !important; }
     .name.shimmer, .row a.shimmer, .row .at.shimmer { animation-play-state: paused !important; animation-delay: -1.5s !important; }
     .rbw, .row.notice .notice-label,
     .msg a:is([href*="twitter.com"], [href*="x.com"], [href*="fxtwitter"], [href*="vxtwitter"], [href*="fixupx"]),
