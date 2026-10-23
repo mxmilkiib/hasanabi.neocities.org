@@ -1197,7 +1197,7 @@
     filter: var(--rbwshadow);
   }
   @keyframes notice-rainbow { to { background-position: 100% 0; } }
-  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i, #titleTxt.fin, #helpPanel::before, #titleBar { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .row.notice .notice-label, .rbw, .row.repflash, .loadbar i, #titleTxt.fin, #helpPanel::before, #titleBar { animation: none !important; } }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
   @keyframes rbw-wave { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
@@ -1239,7 +1239,7 @@
   @media (prefers-reduced-motion: reduce) {
     .msg a:is([href*="twitter.com"], [href*="x.com"], [href*="fxtwitter"], [href*="vxtwitter"], [href*="fixupx"]),
     .msg a:is([href*="youtube.com"], [href*="youtu.be"], [href*="youtube-nocookie.com"]),
-    .msg a:is([href*="twitch.tv"]) { animation: none; }
+    .msg a:is([href*="twitch.tv"]) { animation: none !important; }
   }
   body.rbw-hue.rbw-all .rbw, body.rbw-hue.rbw-has .rbwh,
   body.rbw-hue.rbw-other .rbw:not(.rbwh) { animation-name: rbw-hue; }
@@ -1293,14 +1293,22 @@
   @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
   @media (prefers-reduced-motion: reduce) { .name.shimmer, .row a.shimmer, .row .at.shimmer { animation: none; } }
   /* the nick shimmer option kills the same set the reduced-motion rules
-     do; the slow modes just stretch the sweep's period via the vars */
+     do; the slow modes just stretch the sweep's period via the vars.
+     !important: body.rbw-all's :is() branch weight outranks plain
+     .rbw selectors, so the kill has to be unbeatable to hold */
   body.noanim .name.shimmer, body.noanim .row a.shimmer, body.noanim .row .at.shimmer,
-  body.noanim .rbw, body.noanim .row.notice .notice-label { animation: none; }
+  body.noanim .rbw, body.noanim .row.notice .notice-label,
+  body.noanim .msg a:is([href*="twitter.com"], [href*="x.com"], [href*="fxtwitter"], [href*="vxtwitter"], [href*="fixupx"]),
+  body.noanim .msg a:is([href*="youtube.com"], [href*="youtu.be"], [href*="youtube-nocookie.com"]),
+  body.noanim .msg a:is([href*="twitch.tv"]) { animation: none !important; }
   /* touch devices get the animation kill too - a thousand shimmering
      rows repaint every frame on a phone */
   @media (pointer: coarse) {
-    .name.shimmer, .row a.shimmer, .row .at.shimmer,
-    .rbw, .row.notice .notice-label { animation: none; }
+    #hint, .name.shimmer, .row a.shimmer, .row .at.shimmer,
+    .rbw, .row.notice .notice-label,
+    .msg a:is([href*="twitter.com"], [href*="x.com"], [href*="fxtwitter"], [href*="vxtwitter"], [href*="fixupx"]),
+    .msg a:is([href*="youtube.com"], [href*="youtu.be"], [href*="youtube-nocookie.com"]),
+    .msg a:is([href*="twitch.tv"]) { animation: none !important; }
   }
   body.animslow { --shim-t: 6s; --rbw-t: 12s; }
   body.animsslow { --shim-t: 12s; --rbw-t: 24s; }
