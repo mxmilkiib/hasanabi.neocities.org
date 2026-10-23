@@ -4719,7 +4719,7 @@
       if (url) {
         const alt = escapeHTML(name);
         const img = `<img class="emote" src="${escapeHTML(chatStill(url, ea.has(name)))}" alt="${alt}"` +
-                    ` title="${alt}${es[name] ? ' - ' + es[name] : ''}">`;
+                    ` loading="lazy" decoding="async" title="${alt}${es[name] ? ' - ' + es[name] : ''}">`;
         if (zw.has(name) && lastEmote >= 0) {
           // the overlay wears .zw so the estk css can pin it over the base
           const ov = img.replace('class="emote"', 'class="emote zw"');
@@ -4741,7 +4741,7 @@
           const src = `https://d3aqoihi2n8ty8.cloudfront.net/actions/` +
             `${cheer[1].toLowerCase()}/${lightMode ? 'light' : 'dark'}/animated/${tier}/2.gif`;
           out.push(`<img class="emote" src="${src}" alt="${escapeHTML(tok)}"` +
-                   ` title="${escapeHTML(tok)} - cheermote">`);
+                   ` loading="lazy" decoding="async" title="${escapeHTML(tok)} - cheermote">`);
           lastEmote = out.length - 1;
           return;
         }
@@ -4908,7 +4908,7 @@
         (x.id == e.id || x.code === name) && x.assetType !== 'ANIMATED'));
       html += `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${eid}/${chatFrozen() ? 'static' : tstat ? 'default' : 'animated'}/${tone}/2.0"` +
               ` onerror="this.onerror=null;this.src='https://static-cdn.jtvnw.net/emoticons/v2/${eid}/default/${tone}/2.0'"` +
-              ` alt="${alt}" title="${alt} - Twitch">`;
+              ` loading="lazy" decoding="async" alt="${alt}" title="${alt} - Twitch">`;
       cursor = e.end + 1;
     }
     if (cursor < message.length) html += renderTextHTML(message.slice(cursor), hasBits, ch, shiny, fossa, md, defer);
@@ -5068,10 +5068,15 @@
     if (from === prev[0] && to === prev[1]) return;
     col._vr = [from, to];
     const row = (el) => el.nodeType === 1 && el.classList.contains('row');
-    for (let i = prev[0]; i < Math.min(prev[1], n); i++) if (i < from || i >= to) { if (row(kids[i])) kids[i].classList.remove('inview'); }
+    for (let i = prev[0]; i < Math.min(prev[1], n); i++) if (i < from || i >= to) {
+      if (row(kids[i])) { kids[i].classList.remove('inview'); if (typeof stillRow === 'function') stillRow(kids[i], true); }
+    }
     // the band re-tags every pass - a stale tag left by a shifted
     // removal heals on the next scroll or flush
-    for (let i = from; i < to; i++) { const k = kids[i]; if (row(k) && !k.classList.contains('inview')) k.classList.add('inview'); }
+    for (let i = from; i < to; i++) {
+      const k = kids[i];
+      if (row(k) && !k.classList.contains('inview')) { k.classList.add('inview'); if (typeof stillRow === 'function') stillRow(k, false); }
+    }
   }
   function jdownSet(btn, col, forceHidden) {
     markView(col);
@@ -17709,6 +17714,32 @@
     }
   };
   if (chatFrozen()) restillEmotes();
+  // a single row's still/restore pass, scoped to its own emotes - markView
+  // runs it as rows cross the view band so parked rows stop decoding
+  // frames nobody can see; chatFrozen's 'all' stop still owns the picture
+  const stillRow = (row, on) => {
+    if (chatFrozen()) return;
+    for (const im of row.querySelectorAll('img.emote')) {
+      const u = im.getAttribute('src') || '';
+      const tw = u.match(/(\/emoticons\/v2\/[^/]+\/)(animated|default|static)\//);
+      if (tw) {
+        const v = u.replace(`/${tw[2]}/`, `/${on ? 'static' : 'animated'}/`);
+        if (v !== u) {
+          // heading back to playing hits animated/ first, which static
+          // emotes 404 - re-arm the fallback a fresh render carries
+          im.onerror = on ? null : () => { im.onerror = null; im.src = u; };
+          im.src = v;
+        }
+        continue;
+      }
+      const ch = row.dataset.ch || CHANNEL;
+      const name = emoteNameOf(ch, im.alt);
+      const base = name && emotesOf(ch)[name];
+      if (!base) continue;
+      if (on) { const v = animUrl(u, setFor(ch).emoteAnim?.has(name)) ? freezeUrl(u) : u; if (v !== u) im.src = v; }
+      else if (u !== base) im.src = base;
+    }
+  };
   const setEpFz = (i) => {
     const pk = animFrozen(), ch = chatFrozen();
     epFz = Math.max(0, Math.min(2, +i || 0));
