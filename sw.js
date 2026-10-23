@@ -27,21 +27,24 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
       .then((ks) => Promise.all(ks.filter((k) => k !== SHELL && k !== IMAGES && k !== IMAGE_STAMPS && k !== FONTS).map((k) => caches.delete(k))))
+      // the nav request starts while the worker boots rather than after
+      .then(() => self.registration.navigationPreload && self.registration.navigationPreload.enable())
       .then(() => clients.claim()));
 });
 
+let puts = 0;
 async function trim(cache) {
   const ks = await cache.keys();
   for (const k of ks.slice(0, Math.max(0, ks.length - IMG_CAP))) await cache.delete(k);
 }
 
-async function networkFirst(req) {
+async function networkFirst(req, e) {
   const cache = await caches.open(SHELL);
   // keyed by path alone: ?channel= and cache-bust queries share one entry
   const u = new URL(req.url);
   const key = u.origin + u.pathname;
   try {
-    const res = await fetch(req);
+    const res = (await e.preloadResponse) || await fetch(req);
     if (res.ok) cache.put(key, res.clone());
     return res;
   } catch (err) {
@@ -59,9 +62,10 @@ async function cacheFirst(req, e) {
     const res = await fetch(req);
     if (res.ok || res.type === 'opaque') try {
       await cache.put(req, res.clone());
-      await trim(cache);
       await stamps.put(req, new Response(String(Date.now())));
-      await trim(stamps);
+      // full key scans on every put would contend with the emote burst -
+      // a small overshoot keeps them occasional instead
+      if (++puts % 25 === 0) { await trim(cache); await trim(stamps); }
     } catch {}
     return res;
   };
@@ -104,7 +108,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin === location.origin) return e.respondWith(networkFirst(req));
+  if (url.origin === location.origin) return e.respondWith(networkFirst(req, e));
   if (req.destination === 'image') return e.respondWith(cacheFirst(req, e));
   if (url.host === 'fonts.googleapis.com' || url.host === 'fonts.gstatic.com') e.respondWith(fontFirst(req));
 });
