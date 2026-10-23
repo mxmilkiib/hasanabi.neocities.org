@@ -19854,6 +19854,15 @@
       d.style.display = show ? '' : 'none';
       if (show) delete d.dataset.cfgOff; else d.dataset.cfgOff = '1';
     }
+    // a ⸻ separator only earns its line with content on both sides
+    for (const sep of document.querySelectorAll('#htabCfg > div.sep')) {
+      if (!q) { sep.style.display = ''; continue; }
+      let prev = sep.previousElementSibling;
+      while (prev && prev.style.display === 'none') prev = prev.previousElementSibling;
+      let next = sep.nextElementSibling;
+      while (next && next.style.display === 'none') next = next.nextElementSibling;
+      sep.style.display = prev && next ? '' : 'none';
+    }
   });
   // w/h and position live in the same key; a width that lands on a
   // preset re-marks the preset button instead of storing the px
