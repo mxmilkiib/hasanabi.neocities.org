@@ -1206,7 +1206,7 @@
     .row.repflash, .loadbar i, #titleTxt.fin, #helpPanel::before, #titleBar { animation: none !important; }
     /* none would park the sweep on its first frame - a mostly-dark left
        end; paused at a mid-sweep delay holds a colourful band still */
-    .row.notice .notice-label, .rbw { animation-play-state: paused !important; animation-delay: -3s !important; }
+    .row.notice .notice-label, .rbw { animation-play-state: paused !important; animation-delay: calc(var(--rbw-t, 6s) * -.5) !important; }
   }
   /* @hasanabi motion variants: same clipped gradient, different keyframes -
      a body class swaps animation-name and the rate var still rules */
@@ -1301,7 +1301,7 @@
     animation: shimmer var(--shim-t, 3s) linear infinite;
   }
   @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-  @media (prefers-reduced-motion: reduce) { .name.shimmer, .row a.shimmer, .row .at.shimmer { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .name.shimmer, .row a.shimmer, .row .at.shimmer { animation-play-state: paused !important; animation-delay: calc(var(--shim-t, 3s) * -.5) !important; } }
   /* the nick shimmer option kills the same set the reduced-motion rules
      do; the slow modes just stretch the sweep's period via the vars.
      !important: body.rbw-all's :is() branch weight outranks plain
@@ -9557,9 +9557,12 @@
   }
   if (htabPage) { switchTab(htabPage.id); htabTarget.scrollIntoView(); }
   // whatever is still inert lands on idle, so link tints, tables and the
-  // live? probe are live even if the panel never opens
+  // live? probe are live even if the panel never opens - one page per
+  // tick so a big build can't stall the main thread in a single burst
   const onIdle = window.requestIdleCallback ? (f) => requestIdleCallback(f) : (f) => setTimeout(f, 400);
-  onIdle(() => MAT_PAGES.forEach(matPage));
+  const matQueue = [...MAT_PAGES];
+  const matIdle = () => { if (matQueue.length) { matPage(matQueue.shift()); onIdle(matIdle); } };
+  onIdle(matIdle);
   applyColour();
   applyVariant();
 
