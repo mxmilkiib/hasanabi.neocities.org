@@ -2027,13 +2027,13 @@
      eases back to chrome over the transition on the base state */
   #copyUrl { transition: background .4s ease, color .4s ease, border-color .4s ease; }
   #copyUrl.copied { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; transition: none; }
-  #sendBtn.on { border-color: #9146ff; } /* twitch purple while logged in */
+  #sendBtn.on { color: #9146ff; } /* twitch purple on the glyph while logged in */
   #hdrMin .dash { display: inline-block; transform: translateY(-1px); } /* the en dash sits low in its glyph box */
   /* login preflight: busy pulses while id.twitch.tv is probed, err flashes
      danger if unreachable - the oauth navigation only runs once reachable,
      so a dead connection can't strand the tab on a browser timeout page */
   .hdr-btn.busy, #sendBtn.wait { animation: pulse 1.2s ease-in-out infinite; }
-  #sendBtn.wait { color: #9146ff; border-color: #9146ff; }
+  #sendBtn.wait { color: #9146ff; }
   .hdr-btn.err { color: var(--danger); border-color: var(--danger); }
   /* destructive config buttons warn in the theme's danger hue */
   #resetOpts:hover, #cacheBust:hover { color: var(--danger); }
