@@ -270,6 +270,10 @@
     letter-spacing: var(--chat-ls, normal);
     display: flex;
     flex-direction: column;
+    /* a wide child could let touch pan the page sideways into bare
+       background - clip the overhang rather than mask it */
+    overflow-x: clip;
+    overscroll-behavior-x: none;
     overflow: hidden;
   }
   header {
