@@ -9070,11 +9070,17 @@
     while (i.firstChild && i.firstChild.nodeType === 1 && i.firstChild.tagName === 'A')
       cn.appendChild(i.firstChild);
     const w = document.createTreeWalker(i, NodeFilter.SHOW_TEXT);
-    let tn;
-    while ((tn = w.nextNode())) if (tn.data.includes('·')) break;
-    if (tn) {
-      const cut = tn.data.indexOf('·');
-      cc.textContent = tn.data.slice(0, cut).replace(/^[\s(]+/, '').trim();
+    let tn, pre = '', cut = -1;
+    // the descriptor may span several text nodes (an unwrapped nested
+    // <i> leaves it standing alone before the · separator) - gather
+    // everything up to the first · rather than just its own node
+    while ((tn = w.nextNode())) {
+      const j = tn.data.indexOf('·');
+      if (j >= 0) { cut = j; pre += tn.data.slice(0, j); break; }
+      pre += tn.data;
+    }
+    if (tn && cut >= 0) {
+      cc.textContent = pre.replace(/^[\s(]+/, '').trim();
       tn.data = tn.data.slice(cut + 1).replace(/^\s+/, '');
       for (let n = tn; n; ) { const nx = n.nextSibling; tail.appendChild(n); n = nx; }
       // the first ')' in the links cell closed the descriptor paren
