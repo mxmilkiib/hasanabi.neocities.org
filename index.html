@@ -6302,7 +6302,11 @@
     hdrSideEl.style.maxWidth = '';
     sideBalW = 0;
     const ideal = sparkEl.clientWidth;
-    if (hdrSideEl.offsetTop > 10) hdrBarEl.classList.add('hdrwrap');
+    applyWrap(hdrSideEl.offsetTop > 10);
+    // restore the balance cap in the same pass - leaving it cleared
+    // resizes the strip, refires its observer, which queues another
+    // refit that clears it again: a cap on/off flip every frame
+    balanceHdrSide();
     rateEl.style.flex = '';
     const n = Math.max(240, Math.min(1800, Math.round(ideal / 3 / 30) * 30));
     sparkWin = n;
@@ -6369,8 +6373,22 @@
   new ResizeObserver(queueSparkSize).observe(sparkEl);
   new ResizeObserver(() => { queueSparkSize(); balanceHdrSide(); }).observe(hdrSideEl);
   new ResizeObserver(queueSparkSize).observe(headerEl.querySelector('.channel'));
-  new ResizeObserver(() => {
-    queueSparkSize();
+  // every wrap verdict routes through one damped gate - sparkSize's
+  // measure and the observer's check would otherwise out-vote each
+  // other. a reversed verdict inside half a second is the loop
+  // stuttering rather than the layout settling: hold the last state,
+  // then let one late check land the true answer
+  let wrapW = 0, wrapApplied = false, wrapFlipAt = 0, wrapEvalRaf = 0, wrapRetry = 0;
+  const applyWrap = (need) => {
+    if (need !== wrapApplied && performance.now() - wrapFlipAt < 500) {
+      if (!wrapRetry) wrapRetry = setTimeout(() => { wrapRetry = 0; evalHdrWrap(); queueSparkSize(); }, 520);
+      need = wrapApplied;
+    } else if (need !== wrapApplied) wrapFlipAt = performance.now();
+    wrapApplied = need;
+    hdrBarEl.classList.toggle('hdrwrap', need);
+  };
+  const evalHdrWrap = () => {
+    wrapEvalRaf = 0;
     // .hdrwrap forces the strip a full-width line of its own, so its
     // offsetTop can't say whether it would fit back on the first line -
     // drop the class, read the honest position, restore it only if the
@@ -6378,11 +6396,17 @@
     hdrBarEl.classList.remove('hdrwrap');
     hdrSideEl.style.maxWidth = ''; // same rule - the cap can fake a fit
     sideBalW = 0;
-    if (hdrSideEl.offsetTop > 10) hdrBarEl.classList.add('hdrwrap');
+    applyWrap(hdrSideEl.offsetTop > 10);
     balanceHdrSide();
+  };
+  const queueHdrWrap = () => { if (!wrapEvalRaf) wrapEvalRaf = requestAnimationFrame(evalHdrWrap); };
+  new ResizeObserver((entries) => {
+    queueSparkSize();
+    const w = entries[0].borderBoxSize[0]?.inlineSize ?? hdrBarEl.getBoundingClientRect().width;
+    if (Math.abs(w - wrapW) > .5) { wrapW = w; queueHdrWrap(); }
   }).observe(hdrBarEl);
   // late webfont swaps shift every width the flex maths used
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => sparkSize());
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { sparkSize(); queueHdrWrap(); });
 
   // the trace draws in the accent's complement so it reads as its own
   // element against the header; the canvas resolves whatever colour
