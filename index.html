@@ -1305,12 +1305,15 @@
   /* the nick shimmer option kills the same set the reduced-motion rules
      do; the slow modes just stretch the sweep's period via the vars.
      !important: body.rbw-all's :is() branch weight outranks plain
-     .rbw selectors, so the kill has to be unbeatable to hold */
-  body.noanim .name.shimmer, body.noanim .row a.shimmer, body.noanim .row .at.shimmer { animation-play-state: paused !important; animation-delay: -1.5s !important; }
+     .rbw selectors, so the kill has to be unbeatable to hold. the delay
+     halves the period so a frozen sweep rests on its light band - a
+     fixed -1.5s/-3s was tuned for the base durations and fell onto the
+     dark accent run once animslow stretched the period */
+  body.noanim .name.shimmer, body.noanim .row a.shimmer, body.noanim .row .at.shimmer { animation-play-state: paused !important; animation-delay: calc(var(--shim-t, 3s) * -.5) !important; }
   body.noanim .rbw, body.noanim .row.notice .notice-label,
   body.noanim .msg a:is([href*="twitter.com"], [href*="x.com"], [href*="fxtwitter"], [href*="vxtwitter"], [href*="fixupx"]),
   body.noanim .msg a:is([href*="youtube.com"], [href*="youtu.be"], [href*="youtube-nocookie.com"]),
-  body.noanim .msg a:is([href*="twitch.tv"]) { animation-play-state: paused !important; animation-delay: -3s !important; }
+  body.noanim .msg a:is([href*="twitch.tv"]) { animation-play-state: paused !important; animation-delay: calc(var(--rbw-t, 6s) * -.5) !important; }
   /* touch devices get the animation freeze too - a thousand shimmering
      rows repaint every frame on a phone */
   @media (pointer: coarse) {
@@ -1318,11 +1321,11 @@
     #emoteGrid .eage .ants rect, #helpPanel a.helpColour.on::before,
     #helpPanel a.helpVariant.on::before, #helpPanel a.helpPreset.on::before,
     #helpPanel a.helpShade.on::before { animation: none !important; }
-    .name.shimmer, .row a.shimmer, .row .at.shimmer { animation-play-state: paused !important; animation-delay: -1.5s !important; }
+    .name.shimmer, .row a.shimmer, .row .at.shimmer { animation-play-state: paused !important; animation-delay: calc(var(--shim-t, 3s) * -.5) !important; }
     .rbw, .row.notice .notice-label,
     .msg a:is([href*="twitter.com"], [href*="x.com"], [href*="fxtwitter"], [href*="vxtwitter"], [href*="fixupx"]),
     .msg a:is([href*="youtube.com"], [href*="youtu.be"], [href*="youtube-nocookie.com"]),
-    .msg a:is([href*="twitch.tv"]) { animation-play-state: paused !important; animation-delay: -3s !important; }
+    .msg a:is([href*="twitch.tv"]) { animation-play-state: paused !important; animation-delay: calc(var(--rbw-t, 6s) * -.5) !important; }
   }
   body.animslow { --shim-t: 6s; --rbw-t: 12s; }
   body.animsslow { --shim-t: 12s; --rbw-t: 24s; }
@@ -4597,7 +4600,9 @@
   }
   function paintApply(r) {
     const p = r.dataset.uid && paints.get(r.dataset.uid);
-    const a = p && r.querySelector('.name');
+    // site-styled names (the bots, hasan, ostonox) keep their own sweep
+    // rather than taking a uid's paint
+    const a = p && r.querySelector('.name:not(.shimmer)');
     if (!a || a.dataset.painted) return;
     a.dataset.painted = '1';
     a.style.color = 'transparent';
