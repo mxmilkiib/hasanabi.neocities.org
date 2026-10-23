@@ -1285,6 +1285,12 @@
      do; the slow modes just stretch the sweep's period via the vars */
   body.noanim .name.shimmer, body.noanim .row a.shimmer, body.noanim .row .at.shimmer,
   body.noanim .rbw, body.noanim .row.notice .notice-label { animation: none; }
+  /* touch devices get the animation kill too - a thousand shimmering
+     rows repaint every frame on a phone */
+  @media (pointer: coarse) {
+    .name.shimmer, .row a.shimmer, .row .at.shimmer,
+    .rbw, .row.notice .notice-label { animation: none; }
+  }
   body.animslow { --shim-t: 6s; --rbw-t: 12s; }
   body.animsslow { --shim-t: 12s; --rbw-t: 24s; }
   /* Negative vertical margins keep the line box at the fixed line-height
@@ -3726,7 +3732,9 @@
   const CHAN_TITLE = CHAN_LABEL + ' Chat Thing';
   const CHAN_SFX = CHANNEL === DEFAULT_CHANNEL ? '' : '-' + CHANNEL;
   const SCROLLBACK_SIZES = [250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
-  let MAX_MESSAGES = 10000;
+  // touch devices hold less rendered history - the archive seam still
+  // covers the rest, but a smaller DOM keeps scroll/layout cheap
+  let MAX_MESSAGES = matchMedia('(pointer: coarse)').matches ? 4000 : 10000;
   const BACKLOG_FLUSH = 1000;
   const HISTORY_SAVE_MAX = 5000;
   // '@channel' pings highlight per the row's own channel - cached per name
