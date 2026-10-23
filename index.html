@@ -747,6 +747,9 @@
     flex: 1;
     min-width: 0;
     overflow-y: auto;
+    /* wide rows clip rather than scroll - sideways drag would park the
+       chat offscreen in bare background */
+    overflow-x: clip;
     padding: 8px 18px 2px 6px;
     /* anchored so the ghostpage overlay can cover the column box */
     position: relative;
