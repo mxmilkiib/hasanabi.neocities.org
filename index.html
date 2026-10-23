@@ -3196,7 +3196,17 @@
     header.hdrwrap { row-gap: 8px; }
     .hdr-btn { height: 32px; }
     button.hdr-btn { width: 38px; }
-    #spark { max-width: 70px; }
+    /* mid-width touch (fold-out/tablet): the strip still lands on its
+       own line, but 38px targets would need two rows where 30px ones
+       fit - compact back down while the finger room is plentiful */
+    @media (min-width: 720px) {
+      .hdr-btn { height: 28px; }
+      button.hdr-btn { width: 30px; }
+    }
+    /* sparkSize() already pins the canvas to a measured ideal - a fixed
+       clamp only strands it beside an empty rate span. let it flex to
+       the line's free space so the wrapped header reads denser */
+    #spark { max-width: none; }
     body.hdrgraph header { --hdrres: 130px; min-height: 34px; } /* fits the 32px buttons + 1px both sides */
     #helpPanel { left: 8px; right: 8px; width: auto; max-width: none; max-height: 70vh; max-height: 70dvh; }
     /* the channels/streams service grid can run wider than a phone
