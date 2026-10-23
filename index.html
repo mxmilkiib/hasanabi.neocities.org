@@ -476,6 +476,10 @@
     100% { background-color: transparent; }
   }
   .row.flash { animation: missflash 1.4s ease-out; }
+  /* a local echo whose send the server rejected - dimmed and struck so
+     it stops reading like a delivered message */
+  .row.sendfail { opacity: .55; }
+  .row.sendfail .msg { text-decoration: line-through; }
   .stream-info {
     font-size: .93em;
     font-weight: 400;
@@ -5679,6 +5683,14 @@
         continue;
       }
       if (kind === 'NOTICE') {
+        // a send rejection means the local echo of that message lied -
+        // mark the newest pending echo in this room so it doesn't read
+        // like a real send to the reader
+        if (/^(msg_banned|msg_timed_out|msg_followersonly|msg_subsonly|msg_emoteonly|msg_slowmode|msg_duplicate|msg_ratelimit|msg_r9k_mode|msg_channel_blocked|msg_automod|msg_bad_characters|msg_rejected)/.test(tags['msg-id'] || '')) {
+          const echs = logEl.querySelectorAll(`.row.local[data-ch="${CSS.escape(ch)}"]`);
+          const last = echs[echs.length - 1];
+          if (last) last.classList.add('sendfail');
+        }
         const noticeBody = rawMsg.startsWith('[notice]') ? rawMsg.slice(8) : rawMsg;
         const lead = noticeBody.match(/^\s*/)[0];
         const timeout = noticeBody.trim().match(/^you are timed out for (\d+) more seconds\.?$/i);
