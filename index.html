@@ -1016,6 +1016,11 @@
     word-wrap: break-word;
     position: relative;
   }
+  /* markView tags the column's visible rows with .inview - parked rows
+     hold their shimmer, rainbow and service-link sweeps still instead
+     of recalcing loops nobody can see (content-visibility was the
+     neater hammer but its paint containment clipped emote overhang) */
+  .col > .row:not(.inview) :is(.rbw, .shimmer, .notice-label, .msg a) { animation-play-state: paused; }
   /* 'faint dots' swaps the seam layer for a run of 1px dots */
   main.linedots .row {
     background-image:
@@ -5035,7 +5040,36 @@
   const fmtBack = (s) => s < 60 ? s + 's' : s < 3600
     ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
     : Math.floor(s / 3600) + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  // tags the column's visible rows with .inview so parked rows' sweeps
+  // can freeze - runs inside jdownSet, which every scroll event and
+  // flush batch already calls. binary search finds the view window in
+  // the kids' offsetTops; an overscan band keeps the boundary quiet,
+  // and the stored range diffs so a steady scroll costs two probes
+  const OFFSCAN = 15;
+  function markView(col) {
+    if (!col || col.hidden || !col.children.length) return;
+    const kids = col.children, n = kids.length;
+    // rev's flipped axis reads the view off the content's far end
+    const top = (revFlow ? col.scrollHeight - col.clientHeight + col.scrollTop : col.scrollTop) - 1;
+    const bot = top + col.clientHeight + 2;
+    let lo = 0, hi = n;
+    while (lo < hi) { const m = (lo + hi) >> 1; if (kids[m].offsetTop + kids[m].offsetHeight < top) lo = m + 1; else hi = m; }
+    const from = Math.max(0, lo - OFFSCAN);
+    lo = 0; hi = n;
+    while (lo < hi) { const m = (lo + hi) >> 1; if (kids[m].offsetTop <= bot) lo = m + 1; else hi = m; }
+    const to = Math.min(n, lo + OFFSCAN);
+    const prev = col._vr || [0, -1];
+    if (from === prev[0] && to === prev[1]) return;
+    col._vr = [from, to];
+    const row = (el) => el.nodeType === 1 && el.classList.contains('row');
+    for (let i = prev[0]; i < Math.min(prev[1], n); i++) if (i < from || i >= to) { if (row(kids[i])) kids[i].classList.remove('inview'); }
+    // the band re-tags every pass - a stale tag left by a shifted
+    // removal heals on the next scroll or flush
+    for (let i = from; i < to; i++) { const k = kids[i]; if (row(k) && !k.classList.contains('inview')) k.classList.add('inview'); }
+  }
   function jdownSet(btn, col, forceHidden) {
+    markView(col);
+    if (loopEl && !loopEl.hidden && col !== loopEl) markView(loopEl);
     const at = forceHidden || liveDist(col) < 60;
     btn.hidden = at;
     // the flanking arrow circles ride the pill's visibility
