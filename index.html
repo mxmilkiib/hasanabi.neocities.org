@@ -2486,7 +2486,7 @@
      and the midterms Loc tag - share one brighter Grey a step off
      the dim face */
   #helpPanel .linkcols.stbl .cl:is([data-col="loc"], [data-col="info"]),
-  #helpPanel .linkcols.stbl .cl[data-col="subs"] { text-align: center; }
+  #helpPanel .linkcols.stbl .cl[data-col="subs"], #helpPanel .linkcols.stbl .chd[data-col="subs"] { text-align: center; }
   #helpPanel .linkcols.stbl[data-head="chapter,region"] .cc {
     color: color-mix(in oklch, var(--text-dim), var(--text) 65%); }
   /* midterms race cells + group heads tint by race type; the key row
@@ -9280,12 +9280,17 @@
     for (const el of stbl.querySelectorAll('[style*="grid-"]'))
       el.style.gridRow = +el.style.gridRow + 1;
     const names = stbl.dataset.head.split(',');
-    const labels = [names[0] || '', names[1] || '', ...preKeys.map((k) => k === 'subs' ? 'yt/tw' : k), ...finCols];
+    const labels = [names[0] || '', names[1] || '', ...preKeys.map((k) => k === 'subs' ? 'tw/yt' : k), ...finCols];
     for (let h = 0; h < (splitN || 1); h++)
       labels.forEach((t, k) => {
         const s = document.createElement('span');
         s.className = 'chd';
         s.textContent = t;
+        // key the head by its column so a head can style per column
+        // (the subs column centres its tw/yt title)
+        const ck = k < 2 ? (k === 0 ? 'channel' : 'kind')
+          : (k - 2 < preKeys.length ? preKeys[k - 2] : finCols[k - 2 - preKeys.length]);
+        if (ck) s.dataset.col = ck;
         s.style.gridRow = 1;
         s.style.gridColumn = k + 1 + h * copyT;
         stbl.append(s);
