@@ -4351,9 +4351,15 @@
       if (cmd[1] === 'USERSTATE' || cmd[1] === 'GLOBALUSERSTATE')
         return { tags, login, channel: afterCmd, message: '', kind: cmd[1] };
       // a USERNOTICE without a user message ends at the channel - no ' :'
-      // param - so subs/raids without a text would drop here entirely
-      if (cmd[1] === 'PRIVMSG') return null;
-      return { tags, login, channel: afterCmd, message: '', kind: cmd[1] };
+      // param - so subs/raids without a text would drop here entirely. a
+      // spaceless body also arrives as a bare trailing param: the
+      // recent-messages backlog serialises one-word PRIVMSGs that way, so
+      // clip it off the channel rather than dropping the line. a PRIVMSG
+      // with no body at all is the only true miss
+      const sp = afterCmd.indexOf(' ');
+      const body = sp < 0 ? '' : afterCmd.slice(sp + 1);
+      if (cmd[1] === 'PRIVMSG' && !body) return null;
+      return { tags, login, channel: sp < 0 ? afterCmd : afterCmd.slice(0, sp), message: body, kind: cmd[1] };
     }
     return { tags, login, channel: afterCmd.slice(0, msgIdx), message: afterCmd.slice(msgIdx + 2), kind: cmd[1] };
   }
