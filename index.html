@@ -4250,6 +4250,30 @@
     e.target.style.animationDelay = -(((h + seq * 53) % 160) / 40).toFixed(2) + 's';
   }, true);
 
+  // Splits a token into [url, trailing punct]: sentence punctuation and
+  // closers peel off the tail, but a ')' or ']' stays while an opener
+  // inside the url still lacks its mate - 'a_(b)' keeps its closer where
+  // '(a)' sheds the wrap. escaped peels &quot;/&#39; whole so a ';' peel
+  // never halves an entity
+  function peelUrlTail(s, escaped) {
+    let post = '';
+    while (s) {
+      if (escaped) {
+        const ent = s.match(/&(?:quot|#0?39);$/i);
+        if (ent) { post = ent[0] + post; s = s.slice(0, -ent[0].length); continue; }
+      }
+      const c = s[s.length - 1];
+      if (c === ')' || c === ']') {
+        const open = s.split(c === ')' ? '(' : '[').length - 1;
+        if (s.split(c).length - 1 <= open) break;
+      }
+      else if (!(escaped ? /[”’.,!?;:]/ : /["'”’.,!?;:]/).test(c)) break;
+      post = c + post;
+      s = s.slice(0, -1);
+    }
+    return [s, post];
+  }
+
   // linkifies url-looking tokens inside already-escaped text - system msgs,
   // notice rows, reply quotes and fossa columns skip renderTextHTML so urls
   // in them would render as raw text; honours the clean urls display option.
@@ -4268,8 +4292,7 @@
             : `<span class="at mnt" style="color:${mentionCol(at)}">@${at}</span>`}`;
         }
         // peel trailing punctuation/entities the same way the main linkifier does
-        const m = url.match(/^(.*?)((?:[)\]”’.,!?;:]|&quot;|&#0?39;)*)$/s);
-        const url2 = m[1], post = m[2];
+        const [url2, post] = peelUrlTail(url, true);
         if (!url2 || url2 === '.') return raw;
         // esc is html-escaped - &amp; would read as a param named amp;x
         const urlC = stripTrack(url2.replace(/&amp;/g, '&')), esc2 = escapeHTML(urlC);
@@ -4805,8 +4828,10 @@
       }
       else {
       // urls may be wrapped in brackets/quotes or trail sentence punctuation;
-      // peel those off so `(example.com),` still links the bare domain
-      const [, pre, url0, post] = tok.match(/^([(["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s);
+      // peel those off so `(example.com),` still links the bare domain while
+      // 'a_(b)' keeps a closer its '(' inside still pairs
+      const [, pre, mid] = tok.match(/^([(["'“‘]*)(.*)$/s);
+      const [url0, post] = peelUrlTail(mid);
       const url = stripTrack(url0);
       if (/^https?:\/\/\S+$/i.test(url) ||
           /^(?:[\w-]+\.)+(?:com|net|org|gg|tv|io|me|be|co|fm|so|live|xyz|dev|app|info|site|link|watch|wiki|art|news|media|social|chat|club|fans|lol|wtf|cool|store|blog|page|video|tube|gov|edu|ca|us|uk|de|fr|es|it|nl|se|no|fi|dk|pl|au|nz|jp|kr|br|mx|in|ru|cn|ee)(?:[?/#]\S*)?$/i.test(url)) {
@@ -5461,7 +5486,7 @@
   function linkUrlsOf(msg) {
     const ks = [];
     for (const t of msg.split(/\s+/)) {
-      const u = (t.match(/^([(["'“‘]*)(.*?)([)\]"'”’.,!?;:]*)$/s) || [])[2] || t;
+      const u = peelUrlTail(t.replace(/^[([\"'“‘]+/, ''))[0] || t;
       if (/^https?:\/\/\S+$/i.test(u) || LINK_TLD_RE.test(u)) ks.push(showUrl(u));
     }
     return ks;
